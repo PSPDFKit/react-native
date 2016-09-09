@@ -1,0 +1,53 @@
+## PSPDFKit for React Native
+
+### iOS
+
+#### Installation
+
+##### Add React Native dependency
+
+##### Add PSPDFKit.framework to your Xcode project
+
+#### Running Example Project
+
+- install npm packages: `npm install`
+- copy PSPDFKit.framework to Example/ios/PSPDFKit
+- run app with react-native-cli: `react-native run-ios`
+- or open Example.xcodeproj and run the app from Xcode
+
+##### TODO
+
+- use CocoaPods to install PSPDFKit for Example project
+
+### Notes
+
+##### Headers in library's Xcode project
+
+The main project has to be able to find React headers. In normal react-native app it's added automatically: `$(SRCROOT)/../node_modules/react-native/React`, but this is often missing when you just want to run sample project and you haven't done `npm install` in main catalog. Moreover if you do run `npm install` in main dir and then try to run Catalog, react complains about naming collisions - looks like it loads content from both `node_modules` directories.
+Few existing OSS component just add sample project `node_modules` path to Headers Search Paths to solve that. Mess.
+
+##### View Controllers in React Native
+
+https://github.com/wix/react-native-controllers - good summary of how view controllers don't really fit into react native world. Would be nice to support this in the future.
+
+##### Xcode 8
+
+Xcode 8 need version `0.33.0-rc.0`.
+
+##### Temporary PSPDFKit.framework integration
+
+Manually add framework to react project and modify Framework Search Paths.
+
+##### Building a wrapper
+
+Looks like all components start as a react app.
+
+##### Integrating with the PSPDFKit.framework
+
+I've checked some existing wrappers (Stripe, Twilio) and they all have additional manual step of adding SDK library dependency to your project. So I will start with the same approach for PSPDFKit.
+
+This [image picker wrapper](https://github.com/marcshilling/react-native-image-picker) points to [rnpm](https://github.com/rnpm/rnpm) which links the library automatically. I don't know how it would work with the external framework though.
+
+##### Updating React Native
+
+`npm install --save react-native@VERSION`
