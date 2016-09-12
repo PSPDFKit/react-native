@@ -17,6 +17,10 @@ Use `npm link` to avoid constant `npm install` when you change the library. In C
 npm link ../../
 ```
 
+Ech... `npm link` doesn't work. Here's a github with with many many comments about it: https://github.com/facebook/react-native/issues/637.
+
+Trying to setup a solution based on this: https://github.com/wix/wml.
+
 ##### Headers in library's Xcode project
 
 The main project has to be able to find React headers. In normal react-native app it's added automatically: `$(SRCROOT)/../node_modules/react-native/React`, but this is often missing when you just want to run sample project and you haven't done `npm install` in main catalog. Moreover if you do run `npm install` in main dir and then try to run Catalog, react complains about naming collisions - looks like it loads content from both `node_modules` directories.

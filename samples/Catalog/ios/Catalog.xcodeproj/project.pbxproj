@@ -686,7 +686,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.pspdfkit.react-native.catalog";
 				PRODUCT_NAME = Catalog;
 			};
 			name = Debug;
@@ -711,7 +711,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.pspdfkit.react-native.catalog";
 				PRODUCT_NAME = Catalog;
 			};
 			name = Release;
