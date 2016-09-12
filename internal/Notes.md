@@ -1,5 +1,7 @@
 ##### TODO
 
+- [x] configuration convert method
+- [ ] basic view controller configuration (?) - e.g. for navigation bar items
 - [ ] configure for testing license
 - [ ] fix copyright comments
 - [ ] add missing metadata in `package.json`
@@ -19,6 +21,10 @@ npm link ../../
 
 The main project has to be able to find React headers. In normal react-native app it's added automatically: `$(SRCROOT)/../node_modules/react-native/React`, but this is often missing when you just want to run sample project and you haven't done `npm install` in main catalog. Moreover if you do run `npm install` in main dir and then try to run Catalog, react complains about naming collisions - looks like it loads content from both `node_modules` directories.
 Few existing OSS component just add sample project `node_modules` path to Headers Search Paths to solve that. Mess.
+
+##### RCT prefix
+
+React removes `RCT` prefix in ModuleRegistry::normalizeName.
 
 ##### View Controllers in React Native
 

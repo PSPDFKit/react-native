@@ -21,7 +21,8 @@ var examples = [
   {
     name: "Debug Log",
     action: () => {
-      console.log(NativeModules)
+      console.log(PSPDFKit)
+      // console.log(NativeModules)
     }
   },
   {
