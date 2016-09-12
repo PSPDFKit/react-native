@@ -1,7 +1,12 @@
 {
   "name": "react-native-pspdfkit",
+  "description": "A React Native module for PSPDFKit library.",
   "version": "0.0.1",
   "main": "js/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/PSPDFKit/react-native.git"
+  },
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start"
   },

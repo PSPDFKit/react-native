@@ -1,9 +1,19 @@
 ##### TODO
 
+- [ ] configure for testing license
 - [ ] fix copyright comments
+- [ ] add missing metadata in `package.json`
+- [ ] publish package (?)
 - [ ] use CocoaPods to install PSPDFKit for Example project
 
 ### Notes
+
+##### Development workflow tips
+
+Use `npm link` to avoid constant `npm install` when you change the library. In Catalog app run:
+```
+npm link ../../
+```
 
 ##### Headers in library's Xcode project
 

@@ -25,7 +25,7 @@
 		657277951D83189C00A5E1A8 /* PSPDFKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6572778F1D83184800A5E1A8 /* PSPDFKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		657277961D8318A800A5E1A8 /* PSPDFKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6572778F1D83184800A5E1A8 /* PSPDFKit.framework */; };
 		657277981D831B0300A5E1A8 /* PDFs in Resources */ = {isa = PBXBuildFile; fileRef = 657277971D831B0300A5E1A8 /* PDFs */; };
-		6572784B1D86BA3F00A5E1A8 /* libRCTPSPDFKit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6572782F1D86B10500A5E1A8 /* libRCTPSPDFKit.a */; };
+		657278861D86C2A900A5E1A8 /* libRCTPSPDFKit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 657278841D86C28800A5E1A8 /* libRCTPSPDFKit.a */; };
 		832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 832341B51AAA6A8300B99B32 /* libRCTText.a */; };
 /* End PBXBuildFile section */
 
@@ -93,9 +93,9 @@
 			remoteGlobalIDString = 83CBBA2E1A601D0E00E9B192;
 			remoteInfo = React;
 		};
-		6572782E1D86B10500A5E1A8 /* PBXContainerItemProxy */ = {
+		657278831D86C28800A5E1A8 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 657277301D8314D700A5E1A8 /* RCTPSPDFKit.xcodeproj */;
+			containerPortal = 657278751D86C28800A5E1A8 /* RCTPSPDFKit.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = 657277151D8312EA00A5E1A8;
 			remoteInfo = RCTPSPDFKit;
@@ -150,9 +150,9 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Catalog/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = Catalog/main.m; sourceTree = "<group>"; };
 		146833FF1AC3E56700842450 /* React.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = React.xcodeproj; path = "../node_modules/react-native/React/React.xcodeproj"; sourceTree = "<group>"; };
-		657277301D8314D700A5E1A8 /* RCTPSPDFKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTPSPDFKit.xcodeproj; path = ../../../ios/RCTPSPDFKit.xcodeproj; sourceTree = "<group>"; };
 		6572778F1D83184800A5E1A8 /* PSPDFKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PSPDFKit.framework; path = ../../../PSPDFKit/PSPDFKit.framework; sourceTree = "<group>"; };
 		657277971D831B0300A5E1A8 /* PDFs */ = {isa = PBXFileReference; lastKnownFileType = folder; name = PDFs; path = ../../PDFs; sourceTree = "<group>"; };
+		657278751D86C28800A5E1A8 /* RCTPSPDFKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTPSPDFKit.xcodeproj; path = ../../../ios/RCTPSPDFKit.xcodeproj; sourceTree = "<group>"; };
 		78C398B01ACF4ADC00677621 /* RCTLinking.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTLinking.xcodeproj; path = "../node_modules/react-native/Libraries/LinkingIOS/RCTLinking.xcodeproj"; sourceTree = "<group>"; };
 		832341B01AAA6A8300B99B32 /* RCTText.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTText.xcodeproj; path = "../node_modules/react-native/Libraries/Text/RCTText.xcodeproj"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -170,7 +170,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6572784B1D86BA3F00A5E1A8 /* libRCTPSPDFKit.a in Frameworks */,
+				657278861D86C2A900A5E1A8 /* libRCTPSPDFKit.a in Frameworks */,
 				146834051AC3E58100842450 /* libReact.a in Frameworks */,
 				00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */,
 				00C302E71ABCBA2D00DB3ED1 /* libRCTGeolocation.a in Frameworks */,
@@ -284,12 +284,21 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		657278261D86B10500A5E1A8 /* Products */ = {
+		657278761D86C28800A5E1A8 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				6572782F1D86B10500A5E1A8 /* libRCTPSPDFKit.a */,
+				657278841D86C28800A5E1A8 /* libRCTPSPDFKit.a */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		657278851D86C29100A5E1A8 /* PSPDFKit */ = {
+			isa = PBXGroup;
+			children = (
+				657278751D86C28800A5E1A8 /* RCTPSPDFKit.xcodeproj */,
+				6572778F1D83184800A5E1A8 /* PSPDFKit.framework */,
+			);
+			name = PSPDFKit;
 			sourceTree = "<group>";
 		};
 		78C398B11ACF4ADC00677621 /* Products */ = {
@@ -303,8 +312,7 @@
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
-				6572778F1D83184800A5E1A8 /* PSPDFKit.framework */,
-				657277301D8314D700A5E1A8 /* RCTPSPDFKit.xcodeproj */,
+				657278851D86C29100A5E1A8 /* PSPDFKit */,
 				146833FF1AC3E56700842450 /* React.xcodeproj */,
 				00C302A71ABCB8CE00DB3ED1 /* RCTActionSheet.xcodeproj */,
 				00C302B51ABCB90400DB3ED1 /* RCTGeolocation.xcodeproj */,
@@ -436,8 +444,8 @@
 					ProjectRef = 00C302D31ABCB9D200DB3ED1 /* RCTNetwork.xcodeproj */;
 				},
 				{
-					ProductGroup = 657278261D86B10500A5E1A8 /* Products */;
-					ProjectRef = 657277301D8314D700A5E1A8 /* RCTPSPDFKit.xcodeproj */;
+					ProductGroup = 657278761D86C28800A5E1A8 /* Products */;
+					ProjectRef = 657278751D86C28800A5E1A8 /* RCTPSPDFKit.xcodeproj */;
 				},
 				{
 					ProductGroup = 139105B71AF99BAD00B5F7CC /* Products */;
@@ -525,11 +533,11 @@
 			remoteRef = 146834031AC3E56700842450 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		6572782F1D86B10500A5E1A8 /* libRCTPSPDFKit.a */ = {
+		657278841D86C28800A5E1A8 /* libRCTPSPDFKit.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libRCTPSPDFKit.a;
-			remoteRef = 6572782E1D86B10500A5E1A8 /* PBXContainerItemProxy */;
+			remoteRef = 657278831D86C28800A5E1A8 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		78C398B91ACF4ADC00677621 /* libRCTLinking.a */ = {
