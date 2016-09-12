@@ -19,6 +19,12 @@ var PSPDFKit = NativeModules.PSPDFKit;
 
 var examples = [
   {
+    name: "Debug Log",
+    action: () => {
+      console.log(NativeModules)
+    }
+  },
+  {
     name: "Modal Presentation",
     action: () => {
       PSPDFKit.present('PDFs/PSPDFKit 5 QuickStart Guide.pdf')

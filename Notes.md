@@ -1,23 +1,7 @@
-## PSPDFKit for React Native
-
-### iOS
-
-#### Installation
-
-##### Add React Native dependency
-
-##### Add PSPDFKit.framework to your Xcode project
-
-#### Running Example Project
-
-- install npm packages: `npm install`
-- copy PSPDFKit.framework to Example/ios/PSPDFKit
-- run app with react-native-cli: `react-native run-ios`
-- or open Example.xcodeproj and run the app from Xcode
-
 ##### TODO
 
-- use CocoaPods to install PSPDFKit for Example project
+- [ ] fix copyright comments
+- [ ] use CocoaPods to install PSPDFKit for Example project
 
 ### Notes
 

@@ -1,7 +1,7 @@
 {
   "name": "react-native-pspdfkit",
   "version": "0.0.1",
-  "main": "index.js",
+  "main": "js/index.js",
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start"
   },
