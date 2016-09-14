@@ -26,10 +26,6 @@ RCT_EXPORT_METHOD(setLicenseKey:(NSString *)licenseKey) {
   [PSPDFKit setLicenseKey:licenseKey];
 }
 
-RCT_EXPORT_METHOD(present:(PSPDFDocument *)document) {
-  [self present:document withConfiguration:nil];
-}
-
 RCT_EXPORT_METHOD(present:(PSPDFDocument *)document withConfiguration:(PSPDFConfiguration *)configuration) {
   PSPDFViewController *pdfViewController = [[PSPDFViewController alloc] initWithDocument:document configuration:configuration];
 
@@ -43,4 +39,11 @@ RCT_EXPORT_METHOD(present:(PSPDFDocument *)document withConfiguration:(PSPDFConf
   return dispatch_get_main_queue();
 }
 
+- (NSDictionary *)constantsToExport
+{
+  return @{@"versionString": [PSPDFKit versionString],
+           @"versionNumber": [PSPDFKit versionNumber],
+           @"version": @([PSPDFKit version]),
+           @"buildNumber": @([PSPDFKit buildNumber])};
+}
 @end

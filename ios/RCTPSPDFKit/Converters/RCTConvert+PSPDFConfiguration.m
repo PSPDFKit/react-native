@@ -20,7 +20,6 @@
   NSDictionary *dictionary = [self NSDictionary:json];
 
   return [PSPDFConfiguration configurationWithBuilder:^(PSPDFConfigurationBuilder * _Nonnull builder) {
-
     SET(margin, UIEdgeInsets)
     SET(padding, UIEdgeInsets)
     SET(pagePadding, CGFloat)
