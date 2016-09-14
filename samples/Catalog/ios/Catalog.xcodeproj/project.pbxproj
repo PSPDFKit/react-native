@@ -402,8 +402,9 @@
 		83CBB9F71A601CBA00E9B192 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				CLASSPREFIX = RCTPSPDF;
 				LastUpgradeCheck = 0800;
-				ORGANIZATIONNAME = Facebook;
+				ORGANIZATIONNAME = "PSPDFKit GmbH";
 				TargetAttributes = {
 					00E356ED1AD99517003FC87E = {
 						CreatedOnToolsVersion = 6.2;
