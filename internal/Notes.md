@@ -2,8 +2,8 @@
 
 - [x] configuration convert method
 - [ ] basic view controller configuration (?) - e.g. for navigation bar items
-- [ ] configure for testing license
-- [ ] fix copyright comments
+- [x] configure for testing license
+- [x] fix copyright comments
 - [ ] add missing metadata in `package.json`
 - [ ] publish package (?)
 - [ ] use CocoaPods to install PSPDFKit for Example project
@@ -36,7 +36,7 @@ https://github.com/wix/react-native-controllers - good summary of how view contr
 
 ##### Xcode 8
 
-Xcode 8 need version `0.33.0-rc.0`.
+Xcode 8 needs version `>=0.33.0`.
 
 ##### Temporary PSPDFKit.framework integration
 

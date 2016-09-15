@@ -15,9 +15,15 @@
 @implementation RCTConvert (PSPDFDocument)
 
 + (PSPDFDocument *)PSPDFDocument:(NSString *)string {
-  NSString *documentPath = [[NSBundle mainBundle] pathForResource:string ofType:nil];
+  NSURL *url;
 
-  return [PSPDFDocument documentWithURL:[NSURL fileURLWithPath:documentPath]];
+  if ([string hasPrefix:@"/"]) {
+    url = [NSURL fileURLWithPath:string];
+  } else {
+    url = [[NSBundle mainBundle] URLForResource:string withExtension:nil];
+  }
+
+  return [PSPDFDocument documentWithURL:url];
 }
 
 @end

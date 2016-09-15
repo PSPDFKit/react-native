@@ -13,6 +13,6 @@
 #import <Foundation/Foundation.h>
 #import "RCTBridgeModule.h"
 
-@interface RCTPSPDFKit : NSObject <RCTBridgeModule>
+@interface RCTPSPDFKitManager : NSObject <RCTBridgeModule>
 
 @end

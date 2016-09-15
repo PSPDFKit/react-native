@@ -23,6 +23,8 @@ import {
   processColor
 } from 'react-native';
 
+var RNFS = require('react-native-fs');
+
 var PSPDFKit = NativeModules.PSPDFKit;
 
 var examples = [
@@ -30,14 +32,27 @@ var examples = [
     name: "Open document using resource path",
     description: 'Open document from your resource bundle with relative path.',
     action: () => {
-      PSPDFKit.present('PDFs/PSPDFKit 5 QuickStart Guide.pdf')
+      PSPDFKit.present('PDFs/PSPDFKit 5 QuickStart Guide.pdf', {})
     }
   },
   {
     name: "Open document with absolute path",
     description: 'Opens document from application Documents directory by passing the absolute path.',
     action: () => {
-      PSPDFKit.present('PDFs/PSPDFKit 5 QuickStart Guide.pdf')
+      const filename = 'PSPDFKit 5 QuickStart Guide.pdf'
+      
+      const path = RNFS.DocumentDirectoryPath + '/' + filename
+      const src = RNFS.MainBundlePath + '/PDFs/' + filename 
+      
+      RNFS.exists(path).then((exists) => {
+        if (!exists) {
+          return RNFS.copyFile(src, path)
+        }
+      }).then(() => {
+        PSPDFKit.present(path, {})
+      }).catch((err) => {
+        console.log(err.message, err.code);
+      });
     }
   },
   {

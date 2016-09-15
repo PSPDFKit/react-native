@@ -10,7 +10,7 @@
 //  This notice may not be removed from this file.
 //
 
-#import "RCTPSPDFKit.h"
+#import "RCTPSPDFKitManager.h"
 
 #import "RCTLog.h"
 #import "RCTUtils.h"
@@ -18,9 +18,9 @@
 
 @import PSPDFKit;
 
-@implementation RCTPSPDFKit
+@implementation RCTPSPDFKitManager
 
-RCT_EXPORT_MODULE()
+RCT_EXPORT_MODULE(PSPDFKit)
 
 RCT_EXPORT_METHOD(setLicenseKey:(NSString *)licenseKey) {
   [PSPDFKit setLicenseKey:licenseKey];
