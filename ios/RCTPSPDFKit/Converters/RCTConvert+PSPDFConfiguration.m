@@ -23,7 +23,6 @@
     SET(margin, UIEdgeInsets)
     SET(padding, UIEdgeInsets)
     SET(pagePadding, CGFloat)
-    SET(renderingMode, PSPDFPageRenderingMode)
     SET(doubleTapAction, PSPDFTapAction)
     SET(formElementZoomEnabled, BOOL)
     SET(scrollOnTapPageEndEnabled, BOOL)
@@ -114,16 +113,6 @@ RCT_ENUM_CONVERTER(PSPDFScrollDirection,
                    (@{@"horizontal" : @(PSPDFScrollDirectionHorizontal),
                       @"vertical" : @(PSPDFScrollDirectionVertical)}),
                    PSPDFScrollDirectionHorizontal,
-                   unsignedIntegerValue)
-
-RCT_ENUM_CONVERTER(PSPDFPageRenderingMode,
-                   (@{@"thumbnailThenFullPage" : @(PSPDFPageRenderingModeThumbnailThenFullPage),
-                      @"thumbnailIfInMemoryTheFullPage" : @(PSPDFPageRenderingModeThumbnailIfInMemoryThenFullPage),
-                      @"fullPage" : @(PSPDFPageRenderingModeFullPage),
-                      @"fullPageBlocking" : @(PSPDFPageRenderingModeFullPageBlocking),
-                      @"thumbnailThenRender" : @(PSPDFPageRenderingModeThumbnailThenRender),
-                      @"render" : @(PSPDFPageRenderingModeRender)}),
-                   PSPDFPageRenderingModeThumbnailThenFullPage,
                    unsignedIntegerValue)
 
 RCT_ENUM_CONVERTER(PSPDFTapAction,
