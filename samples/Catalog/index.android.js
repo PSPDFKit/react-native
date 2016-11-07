@@ -15,45 +15,145 @@ import {
   AppRegistry,
   StyleSheet,
   Text,
-  View
+  View,
+  Image,
+  TouchableHighlight,
+  ListView,
+  NativeModules,
+  processColor
 } from 'react-native';
 
+var PSPDFKit = NativeModules.PSPDFKit;
+const LICENSE = "LICENSE_KEY_GOES_HERE";
+
+var examples = [
+  {
+    name: "Open assets document",
+    description: 'Open document from your project assets folder',
+    action: () => {
+      PSPDFKit.presentAsset('PSPDFKit 5 QuickStart Guide.pdf', LICENSE, {})
+    }
+  },
+  {
+    name: "Open local document",
+    description: 'Opens document from external storage directory.',
+    action: () => {
+      PSPDFKit.presentLocal('PSPDFKit 5 QuickStart Guide.pdf', LICENSE, {})
+    }
+  },
+  {
+    name: "Configuration Builder",
+    description: "You can configure the builder with dictionary representation of the PSPDFConfiguration object.",
+    action: () => {
+      PSPDFKit.presentLocal('PSPDFKit 5 QuickStart Guide.pdf', LICENSE, {
+        startPage : 3,
+        scrollContinuously : false,
+        showPageNumberOverlay : true,
+        grayScale : true,
+        showPageLabels : false,
+        pageScrollDirection : "vertical"
+      })
+    }
+  },
+  {
+    name: "Debug Log",
+    description: "Action used for printing stuff during development and debugging.",
+    action: () => {
+      console.log(PSPDFKit)
+      console.log(PSPDFKit.VERSION)
+      // console.log(NativeModules)
+    }
+  }
+]
+
 class Catalog extends Component {
+  // Initialize the hardcoded data
+  constructor(props) {
+    super(props);
+    const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
+    this.state = {
+      dataSource: ds.cloneWithRows(examples)
+    };
+  }
+  
   render() {
     return (
-      <View style={styles.container}>
-        <Text style={styles.welcome}>
-          Welcome to React Native!
-        </Text>
-        <Text style={styles.instructions}>
-          To get started, edit index.android.js
-        </Text>
-        <Text style={styles.instructions}>
-          Double tap R on your keyboard to reload,{'\n'}
-          Shake or press menu button for dev menu
-        </Text>
+      <View style={styles.page}>
+        <View style={styles.header}>
+          <Image source={require('./assets/logo-flat.png')} style={styles.logo} />
+          <Text style={styles.version}>{PSPDFKit.VERSION}</Text>
+        </View>
+        <ListView
+          dataSource={this.state.dataSource}
+          renderRow={this._renderRow}
+          renderSeparator={this._renderSeparator}
+          contentContainerStyle={styles.listContainer}
+          style={styles.list}
+        />
       </View>
     );
   }
+  
+  _renderSeparator(sectionId, rowId) {
+    return (
+      <View key={rowId} style={styles.separator} />
+    );
+  }
+  
+  _renderRow(example: object) {
+    return (
+      <TouchableHighlight onPress={example.action} style={styles.row} underlayColor='#209cca50'>
+        <View style={styles.rowContent}>
+          <Text style={styles.name}>{example.name}</Text>
+          <Text style={styles.description}>{example.description}</Text>
+        </View>
+      </TouchableHighlight>
+    )
+  }
 }
 
-const styles = StyleSheet.create({
-  container: {
+var styles = StyleSheet.create({
+  separator: {
+    height: 0.5,
+    backgroundColor: '#ccc',
+    marginLeft: 10
+  },
+  page: {
     flex: 1,
-    justifyContent: 'center',
+    alignItems: 'stretch',
+    backgroundColor: '#eee'
+  },
+  header: {
     alignItems: 'center',
-    backgroundColor: '#F5FCFF',
+    borderBottomWidth: 0.5,
+    borderColor: '#ccc'
   },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
+  version: {
+    color: '#666666',
+    marginTop: 10,
+    marginBottom: 20
   },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
+  logo: {
+    marginTop: 40
   },
+  listContainer: {
+    backgroundColor: 'white',
+  },
+  list: {
+  },
+  name: {
+    color: '#209cca',
+    fontWeight: '700',
+    fontSize: 14,
+    marginBottom: 4
+  },
+  description: {
+    color: "#666666",
+    fontSize: 12
+  },
+  rowContent: {
+    padding: 10
+  }
 });
 
 AppRegistry.registerComponent('Catalog', () => Catalog);
