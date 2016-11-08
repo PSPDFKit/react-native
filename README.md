@@ -161,9 +161,9 @@ Let's create a simple app that integrates `pspdfkit-*.aar` and uses the react-na
         compile project(':pspdfkit-lib')
         }
         
-11. Add `PSPDFKitPackage` to `MainApplication.java` in `YourApp/android/app/src/main/java/com/yourapp`:
+11. Add `PSPDFKitPackage` to `MainApplication.java` in `YourApp/android/app/src/main/java/com/yourapp` (note **two** places to edit):
 
-  ```java
+  ```diff
 package com.yourapp;
 
 import android.app.Application;
@@ -174,7 +174,7 @@ import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
-import com.react.pspdfkit.PSPDFKitPackage; // <--- import
++ import com.react.pspdfkit.PSPDFKitPackage;
 
 import java.util.Arrays;
 import java.util.List;
@@ -190,8 +190,8 @@ public class MainApplication extends Application implements ReactApplication {
     @Override
     protected List<ReactPackage> getPackages() {
        return Arrays.<ReactPackage>asList(
-           new MainReactPackage(), // <------- add comma
-           new PSPDFKitPackage()   // <------- add package
++          new PSPDFKitPackage(),
+               new MainReactPackage()
         );
     }
   };
