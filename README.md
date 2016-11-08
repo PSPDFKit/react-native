@@ -269,29 +269,6 @@ AppRegistry.registerComponent('YourApp', () => YourApp);
 
 Your app is now ready to launch. From `YourApp` directory run `react-native run-android`.
 
-#### Configuration
-
-To copy a pdf document to your local device storage:
-```bash         
-adb push "document.pdf" "/sdcard/document.pdf"
-```
-
-You can configure the builder with a dictionary representation of the PSPDFConfiguration object. Check `ConfigurationAdapter.java` for all the parameters available.
-
-Example:
-
-```javascript
-const CONFIGURATION = {
-          startPage : 3,
-          scrollContinuously : false,
-          showPageNumberOverlay : true,
-          grayScale : true,
-          showPageLabels : false,
-          pageScrollDirection : "vertical"
-        };
-})
-```
-
 #### Running Catalog Project
 
 1. Clone the repository. `git clone https://github.com/PSPDFKit/react-native.git`.
@@ -318,6 +295,31 @@ const CONFIGURATION = {
 3. Copy `pspdfkit-*.aar` library in `samples/Catalog/android/pspdfkit-lib`.
 4. Install npm packages: run `npm install` from `samples/Catalog` directory.
 5. Catalog app is now ready to launch. From `samples/Catalog` directory run `react-native run-android`.
+
+#### Configuration
+
+To copy a pdf document to your local device storage:
+```bash         
+adb push "document.pdf" "/sdcard/document.pdf"
+```
+
+To bundle a pdf document in the Android app, simply copy it the Android `assets` folder, for the Catalog app is `samples/PDFs`.
+
+You can configure the builder with a dictionary representation of the PSPDFConfiguration object. Check `ConfigurationAdapter.java` for all the parameters available.
+
+Example:
+
+```javascript
+const CONFIGURATION = {
+          startPage : 3,
+          scrollContinuously : false,
+          showPageNumberOverlay : true,
+          grayScale : true,
+          showPageLabels : false,
+          pageScrollDirection : "vertical"
+        };
+})
+```
 
 ## License
 
