@@ -108,7 +108,7 @@ PSPDFKit.present('document.pdf', {
 #### Requirements
 
 - Android SDK
-- PSPDFKit 6
+- PSPDFKit 7
 - react-native >= 0.34.1
 
 #### Getting Started
@@ -123,7 +123,7 @@ Let's create a simple app that integrates `pspdfkit-*.aar` and uses the react-na
    
     A complete list of the dependencies needed can be found in the [documentation](https://pspdfkit.com/guides/android/current/getting-started/integrating-pspdfkit/#toc_manual-library-file-integration) step 6, under `Manual library file integration`.
     
-    For PSPDFKit 2.6 :
+    For PSPDFKit 2.7 :
                                      
        
         dependencies {
