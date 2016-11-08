@@ -220,9 +220,9 @@ TouchableHighlight,
 View
 } from 'react-native';
 
-var PSPDFKit = NativeModules.PSPDFKit;
+ var PSPDFKit = NativeModules.PSPDFKit;
 
-const DOCUMENT = "document.pdf";
+ const DOCUMENT = "document.pdf";
 const LICENSE = "LICENSE_KEY_GOES_HERE";
 const CONFIGURATION = {
 scrollContinuously : false,
@@ -230,13 +230,13 @@ showPageNumberOverlay : true,
 pageScrollDirection : "vertical"
 };
 
-// Change 'YourApp' to your app's name.
+ // Change 'YourApp' to your app's name.
 class YourApp extends Component {
 _onPressButton() {
   PSPDFKit.presentLocal(DOCUMENT, LICENSE, CONFIGURATION);
 }
 
-render() {
+ render() {
   return (
     <View style={styles.container}>
     <Text>{PSPDFKit.VERSION}</Text>
@@ -248,7 +248,7 @@ render() {
 }
 }
 
-const styles = StyleSheet.create({
+ const styles = StyleSheet.create({
 container: {
   flex: 1,
   justifyContent: 'center',
@@ -262,9 +262,8 @@ text: {
 }
 });
 
-// Change both 'YourApp's to your app's name.
+ // Change both 'YourApp's to your app's name.
 AppRegistry.registerComponent('YourApp', () => YourApp);
-
   ```  
 
 Your app is now ready to launch. From `YourApp` directory run `react-native run-android`.
@@ -321,6 +320,30 @@ const CONFIGURATION = {
         };
 })
 ```
+
+#### API
+
+##### Constants
+
+The following constants are available on the PSPDFKit export:
+
+- `VERSION` (`String`) PSPDFKit version number.
+
+##### `presentLocal(document : string, licenseKey : string, configuration : readable map) : void`
+
+Shows the pdf `document` from the local device filesystem.
+
+`configuration` can be empty `{}`.
+
+A valid `licenseKey` must be provided. 
+
+##### `presentAssets(document : string, licenseKey : string, configuration : readable map) : void`
+
+Shows the pdf `document` from app's assets.
+
+`configuration` can be empty `{}`.
+
+A valid `licenseKey` must be provided. 
 
 ## License
 
