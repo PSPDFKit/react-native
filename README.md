@@ -278,20 +278,21 @@ Your app is now ready to launch. From `YourApp` directory run `react-native run-
 
     For PSPDFKit 2.7 :
                                      
-       
-        dependencies {
-        ...
-        //compile 'com.pspdfkit:pspdfkit:2.6.0@aar' <-- DO NOT ADD THE LIBRARY ITSELF
-        compile 'com.android.support:support-v4:23.4.+'
-        compile 'com.android.support:appcompat-v7:23.4.+'
-        compile "com.android.support:recyclerview-v7:23.4.+"
-        compile "com.android.support:cardview-v7:23.4.+"
-        compile "com.android.support:design:23.4.+"
-        compile 'io.reactivex:rxjava:1.2.0'
-        compile 'io.reactivex:rxandroid:1.2.1'
-        compile 'com.getkeepsafe.relinker:relinker:1.2.2'
-}
-
+  ```       
+dependencies {
+...
+//compile 'com.pspdfkit:pspdfkit:2.6.0@aar' <-- DO NOT ADD THE LIBRARY ITSELF
+compile 'com.android.support:support-v4:23.4.+'
+compile 'com.android.support:appcompat-v7:23.4.+'
+compile "com.android.support:recyclerview-v7:23.4.+"
+compile "com.android.support:cardview-v7:23.4.+"
+compile "com.android.support:design:23.4.+"
+compile 'io.reactivex:rxjava:1.2.0'
+compile 'io.reactivex:rxandroid:1.2.1'
+compile 'com.getkeepsafe.relinker:relinker:1.2.2'
+    }
+  ```
+  
 3. Copy `pspdfkit-*.aar` library in `samples/Catalog/android/pspdfkit-lib`.
 4. Install npm packages: run `npm install` from `samples/Catalog` directory.
 5. Catalog app is now ready to launch. From `samples/Catalog` directory run `react-native run-android`.
