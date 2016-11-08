@@ -294,11 +294,12 @@ const CONFIGURATION = {
 
 #### Running Catalog Project
 
-1. Add dependencies to `android/app/build.gradle`.
+1. Clone the repository. `git clone https://github.com/PSPDFKit/react-native.git`.
+2. Add dependencies to `android/app/build.gradle`.
 
     A complete list of the dependencies needed can be found in the [documentation](https://pspdfkit.com/guides/android/current/getting-started/integrating-pspdfkit/#toc_manual-library-file-integration) step 6, under `Manual library file integration`.
 
-    For PSPDFKit 2.6 :
+    For PSPDFKit 2.7 :
                                      
        
         dependencies {
@@ -314,9 +315,9 @@ const CONFIGURATION = {
         compile 'com.getkeepsafe.relinker:relinker:1.2.2'
 }
 
-2. Copy `pspdfkit-*.aar` library in `samples/Catalog/android/pspdfkit-lib`.
-3. Install npm packages: run `npm install` from `samples/Catalog` directory.
-4. Catalog app is now ready to launch. From `samples/Catalog` directory run `react-native run-android`.
+3. Copy `pspdfkit-*.aar` library in `samples/Catalog/android/pspdfkit-lib`.
+4. Install npm packages: run `npm install` from `samples/Catalog` directory.
+5. Catalog app is now ready to launch. From `samples/Catalog` directory run `react-native run-android`.
 
 ## License
 
