@@ -1,8 +1,45 @@
-<resources>
+<!--
+  ~ styles.xml
+  ~   PSPDFKit
+  ~
+  ~   Copyright (c) 2014-2016 PSPDFKit GmbH. All rights reserved.
+  ~
+  ~   THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
+  ~   AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
+  ~   UNAUTHORIZED REPRODUCTION OR DISTRIBUTION IS SUBJECT TO CIVIL AND CRIMINAL PENALTIES.
+  ~   This notice may not be removed from this file.
+  -->
 
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="PSPDFCatalog.Theme.Light">
-        <!-- Customize your theme here. -->
+<resources>
+    <style name="PSPDFCatalog.Theme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/pspdf_color</item>
+        <item name="colorPrimaryDark">@color/pspdf_color_dark</item>
+        <item name="colorAccent">@color/pspdf_color_dark</item>
+
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionModeOverlay">true</item>
+
+        <item name="pspdf__contextualToolbarBackground">@color/pspdf_color_dark</item>
+        <item name="pspdf__contextualToolbarSubmenuBackground">@color/pspdf_color</item>
+        <item name="pspdf__actionBarIconsStyle">@style/pspdf__ActionBarIcons</item>
+        <item name="pspdf__outlineViewStyle">@style/pspdf__OutlineView</item>
+        <item name="pspdf__inlineSearchStyle">@style/pspdf__SearchViewInline</item>
+        <item name="pspdf__modularSearchStyle">@style/pspdf__SearchViewModular</item>
+        <item name="pspdf__thumbnailBarStyle">@style/pspdf__ThumbnailBar</item>
+        <item name="pspdf__thumbnailGridStyle">@style/pspdf__ThumbnailGrid</item>
+        <item name="pspdf__documentStyle">@style/pspdf__Document</item>
+        <item name="pspdf__annotationStyle">@style/pspdf__Annotation</item>
+        <item name="pspdf__annotationSelectionStyle">@style/pspdf__AnnotationSelection</item>
+        <item name="pspdf__annotationCreationToolbarIconsStyle">@style/pspdf__AnnotationCreationToolbarIcons</item>
+        <item name="pspdf__annotationEditingToolbarIconsStyle">@style/pspdf__AnnotationEditingToolbarIcons</item>
+        <item name="pspdf__textSelectionToolbarIconsStyle">@style/pspdf__TextSelectionToolbarIcons</item>
+        <item name="pspdf__documentEditingToolbarIconsStyle">@style/pspdf__DocumentEditingToolbarIcons</item>
+        <item name="pspdf__toolbarCoordinatorLayoutStyle">@style/pspdf__ToolbarCoordinatorLayout</item>
+        <item name="pspdf__passwordViewStyle">@style/pspdf__PasswordView</item>
+        <item name="pspdf__propertyInspectorStyle">@style/pspdf__PropertyInspector</item>
     </style>
+
+    <style name="PSPDFCatalog.Theme.Light"/>
 
 </resources>
