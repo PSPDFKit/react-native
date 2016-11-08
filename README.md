@@ -212,12 +212,12 @@ with
   ```javascript
 import React, { Component } from 'react';
 import {
-  AppRegistry,
-  StyleSheet,
-  NativeModules,
-  Text,
-  TouchableHighlight,
-  View
+AppRegistry,
+StyleSheet,
+NativeModules,
+Text,
+TouchableHighlight,
+View
 } from 'react-native';
 
 var PSPDFKit = NativeModules.PSPDFKit;
@@ -225,49 +225,46 @@ var PSPDFKit = NativeModules.PSPDFKit;
 const DOCUMENT = "document.pdf";
 const LICENSE = "LICENSE_KEY_GOES_HERE";
 const CONFIGURATION = {
-  startPage : 3,
-  scrollContinuously : false,
-  showPageNumberOverlay : true,
-  grayScale : true,
-  showPageLabels : false,
-  pageScrollDirection : "vertical"
+scrollContinuously : false,
+showPageNumberOverlay : true,
+pageScrollDirection : "vertical"
 };
 
 // Change 'YourApp' to your app's name.
 class YourApp extends Component {
-  _onPressButton() {
-    PSPDFKit.presentLocal(DOCUMENT, LICENSE, CONFIGURATION);
-  }
+_onPressButton() {
+  PSPDFKit.presentLocal(DOCUMENT, LICENSE, CONFIGURATION);
+}
 
-  render() {
-    return (
-      <View style={styles.container}>
-      <Text style={styles.version}>{PSPDFKit.VERSION}</Text>
-        <TouchableHighlight onPress={this._onPressButton}>
-          <Text style={styles.text}>Tap to Open Document</Text>
-        </TouchableHighlight>
-      </View>
-    );
-  }
+render() {
+  return (
+    <View style={styles.container}>
+    <Text>{PSPDFKit.VERSION}</Text>
+      <TouchableHighlight onPress={this._onPressButton}>
+        <Text style={styles.text}>Tap to Open Document</Text>
+      </TouchableHighlight>
+    </View>
+  );
+}
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
-  },
-  text: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  }
+container: {
+  flex: 1,
+  justifyContent: 'center',
+  alignItems: 'center',
+  backgroundColor: '#F5FCFF',
+},
+text: {
+  fontSize: 20,
+  textAlign: 'center',
+  margin: 10,
+}
 });
 
 // Change both 'YourApp's to your app's name.
 AppRegistry.registerComponent('YourApp', () => YourApp);
-  
+
   ```  
 
 Your app is now ready to launch. From `YourApp` directory run `react-native run-android`.
