@@ -199,13 +199,13 @@ public class MainApplication extends Application implements ReactApplication {
 }
   ```
      
-12. Set default PSPDFKit theme. In `YourApp/android/app/src/main/res/values/style.xml` replace
+12. Set primary color. In `YourApp/android/app/src/main/res/values/style.xml` replace
   ```xml    
-<style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+<!-- Customize your theme here. -->
   ```
 with
   ```xml    
-<style name="AppTheme" parent="PSPDFCatalog.Theme.Light"> 
+<item name="colorPrimary">#3C97C9</item>
   ```     
 13. Replace the default component from `index.android.js` with a simple touch area to present the bundled PDF:
 
