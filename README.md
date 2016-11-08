@@ -295,7 +295,7 @@ const CONFIGURATION = {
 #### Running Catalog Project
 
 1. Clone the repository. `git clone https://github.com/PSPDFKit/react-native.git`.
-2. Add dependencies to `android/app/build.gradle`.
+2. Add dependencies to `android/build.gradle`.
 
     A complete list of the dependencies needed can be found in the [documentation](https://pspdfkit.com/guides/android/current/getting-started/integrating-pspdfkit/#toc_manual-library-file-integration) step 6, under `Manual library file integration`.
 
