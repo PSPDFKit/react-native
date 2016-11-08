@@ -15,21 +15,4 @@
     <color name="pspdf_color">#3C97C9</color>
     <color name="pspdf_color_dark">#306F8B</color>
 
-    <!-- Dark theme. -->
-    <color name="pspdf_dark">#1E2428</color>
-    <color name="pspdf_dark_accent">#D2ED4F</color>
-
-    <color name="pspdf_dark_status_bar">@color/pspdf_dark</color>
-    <color name="pspdf_dark_background_color">#363D42</color>
-    <color name="pspdf_dark_selection_text">#363D42</color>
-    <color name="pspdf_dark_selection_background">@color/pspdf_dark_accent</color>
-    <color name="pspdf_dark_icons_blue">#64BDDF</color>
-    <color name="pspdf_dark_page_number_blue">#64BDDF</color>
-    <color name="pspdf_dark_input_field_blue">#6CB6D0</color>
-    <color name="pspdf_search_result_text">#B0DDDD</color>
-
-    <color name="pspdf_dark_translucent">#c8000000</color>
-    <color name="pspdf_color_black_translucent">#64000000</color>
-
-    <color name="pspdf_dark_drag_target">#D32F2F</color>
 </resources>
