@@ -10,7 +10,7 @@
  *   This notice may not be removed from this file.
  */
 
-package com.react.pspdfkit;
+package com.pspdfkit.react;
 
 import com.facebook.react.ReactActivity;
 
