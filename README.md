@@ -124,69 +124,69 @@ Let's create a simple app that integrates `pspdfkit-*.aar` and uses the react-na
     A complete list of the dependencies needed can be found in the [documentation](https://pspdfkit.com/guides/android/current/getting-started/integrating-pspdfkit/#toc_manual-library-file-integration) step 6, under `Manual library file integration`.
     
     For PSPDFKit 2.7 :
-                                     
-       
-        dependencies {
-        ...
-        //compile 'com.pspdfkit:pspdfkit:2.6.0@aar' <-- DO NOT ADD THE LIBRARY ITSELF
-        compile 'com.android.support:support-v4:23.4.+'
-        compile 'com.android.support:appcompat-v7:23.4.+'
-        compile "com.android.support:recyclerview-v7:23.4.+"
-        compile "com.android.support:cardview-v7:23.4.+"
-        compile "com.android.support:design:23.4.+"
-        compile 'io.reactivex:rxjava:1.2.0'
-        compile 'io.reactivex:rxandroid:1.2.1'
-        compile 'com.getkeepsafe.relinker:relinker:1.2.2'
-        }
+
+  ```                                     
+dependencies {
+...
+//compile 'com.pspdfkit:pspdfkit:2.6.0@aar' <-- DO NOT ADD THE LIBRARY ITSELF
+compile 'com.android.support:support-v4:23.4.+'
+compile 'com.android.support:appcompat-v7:23.4.+'
+compile "com.android.support:recyclerview-v7:23.4.+"
+compile "com.android.support:cardview-v7:23.4.+"
+compile "com.android.support:design:23.4.+"
+compile 'io.reactivex:rxjava:1.2.0'
+compile 'io.reactivex:rxandroid:1.2.1'
+compile 'com.getkeepsafe.relinker:relinker:1.2.2'
+	}
+  ```
 
 6. Add the following lines to `YourApp/android/settings.gradle` file:
-        
-        include ':pspdfkit-lib'
-        include ':react-native-pspdfkit'
-        project(':react-native-pspdfkit').projectDir = new File(settingsDir, '../node_modules/react-native-pspdfkit/android')
+
+  ```   
+include ':pspdfkit-lib'
+include ':react-native-pspdfkit'
+project(':react-native-pspdfkit').projectDir = new File(settingsDir, '../node_modules/react-native-pspdfkit/android')
+  ```
         
 7. Create new `pspdfkit-lib` folder in `YourApp/android`.
 8. Create new `build.gradle` file in `YourApp/android/pspdfkit-lib` and add the following lines:
-       
-        configurations.maybeCreate("default")
-        def library =  fileTree(".").filter { it.isFile()}.filter {it.name.endsWith('.aar')}.files.name.first()
-        artifacts.add("default", file(library))
+     
+  ```  
+configurations.maybeCreate("default")
+def library =  fileTree(".").filter { it.isFile()}.filter {it.name.endsWith('.aar')}.files.name.first()
+artifacts.add("default", file(library))
+  ```
         
 9. Copy `pspdfkit-*.aar` library in `YourApp/android/pspdfkit-lib`.
 10. Add the following dependencies to `YourApp/android/app/build.gradle` file:
      
-        dependencies {
-        ...
-        compile project(':react-native-pspdfkit')
-        compile project(':pspdfkit-lib')
-        }
+  ```
+dependencies {
+...
+compile project(':react-native-pspdfkit')
+compile project(':pspdfkit-lib')
+	}
+  ```
         
 11. Add `PSPDFKitPackage` to `MainApplication.java` in `YourApp/android/app/src/main/java/com/yourapp` (note **two** places to edit):
 
   ```diff
 package com.yourapp;
-
 import android.app.Application;
 import android.util.Log;
-
 import com.facebook.react.ReactApplication;
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 + import com.react.pspdfkit.PSPDFKitPackage;
-
-import java.util.Arrays;
-import java.util.List;
-
+.....
 public class MainApplication extends Application implements ReactApplication {
-
   private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
     @Override
     protected boolean getUseDeveloperSupport() {
       return BuildConfig.DEBUG;
-    }
-    
+    }   
     @Override
     protected List<ReactPackage> getPackages() {
        return Arrays.<ReactPackage>asList(
