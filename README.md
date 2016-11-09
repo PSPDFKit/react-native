@@ -240,7 +240,7 @@ with
     render() {
       return (
         <View style={styles.container}>
-          <Text>{PSPDFKit.VERSION}</Text>
+          <Text>{PSPDFKit.versionString}</Text>
             <TouchableHighlight onPress={this._onPressButton}>
               <Text style={styles.text}>Tap to Open Document</Text>
               </TouchableHighlight>
