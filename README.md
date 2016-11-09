@@ -222,7 +222,7 @@ with
 
   var PSPDFKit = NativeModules.PSPDFKit;
 
-  const DOCUMENT = "document.pdf";
+  const DOCUMENT = "file:///sdcard/document.pdf";
   const LICENSE = "LICENSE_KEY_GOES_HERE";
   const CONFIGURATION = {
     scrollContinuously : false,
@@ -230,10 +230,11 @@ with
     pageScrollDirection : "vertical"
   };
 
+  PSPDFKit.setLicenseKey(LICENSE);
   // Change 'YourApp' to your app's name.
   class YourApp extends Component {
     _onPressButton() {
-      PSPDFKit.presentLocal(DOCUMENT, LICENSE, CONFIGURATION);
+      PSPDFKit.present(DOCUMENT, CONFIGURATION);
     }
 
     render() {
@@ -327,21 +328,20 @@ const CONFIGURATION = {
 
 The following constants are available on the PSPDFKit export:
 
-- `VERSION` (`String`) PSPDFKit version number.
+- `versionString` (`String`) PSPDFKit version number.
 
-##### `presentLocal(document : string, licenseKey : string, configuration : readable map) : void`
+##### `present(document : string, configuration : readable map) : void`
 
-Shows the pdf `document` from the local device filesystem.
+Shows the pdf `document` from the local device filesystem, or your app's assets.
 
-`configuration` can be empty `{}`.
-
-A valid `licenseKey` must be provided. 
-
-##### `presentAssets(document : string, licenseKey : string, configuration : readable map) : void`
-
-Shows the pdf `document` from app's assets.
+- `file:///sdcard/document.pdf` will open the document from local device filesystem.
+- `file:///android_asset/document.pdf` will open the document from your app's assets.
 
 `configuration` can be empty `{}`.
+
+##### `setLicenseKey(licenseKey : string) : void`
+
+Initialize PSPDFKit module with a license key.
 
 A valid `licenseKey` must be provided. 
 
