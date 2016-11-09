@@ -24,28 +24,27 @@ import {
 } from 'react-native';
 
 var PSPDFKit = NativeModules.PSPDFKit;
-const LICENSE = "LICENSE_KEY_GOES_HERE";
 
 var examples = [
   {
     name: "Open assets document",
     description: 'Open document from your project assets folder',
     action: () => {
-      PSPDFKit.presentAsset('PSPDFKit 5 QuickStart Guide.pdf', LICENSE, {})
+      PSPDFKit.present('file:///android_asset/PSPDFKit 5 QuickStart Guide.pdf', {})
     }
   },
   {
     name: "Open local document",
     description: 'Opens document from external storage directory.',
     action: () => {
-      PSPDFKit.presentLocal('PSPDFKit 5 QuickStart Guide.pdf', LICENSE, {})
+      PSPDFKit.present('file:///sdcard/PSPDFKit 5 QuickStart Guide.pdf', {})
     }
   },
   {
     name: "Configuration Builder",
     description: "You can configure the builder with dictionary representation of the PSPDFConfiguration object.",
     action: () => {
-      PSPDFKit.presentLocal('PSPDFKit 5 QuickStart Guide.pdf', LICENSE, {
+      PSPDFKit.present('file:///sdcard/PSPDFKit 5 QuickStart Guide.pdf', {
         startPage : 3,
         scrollContinuously : false,
         showPageNumberOverlay : true,
@@ -60,7 +59,7 @@ var examples = [
     description: "Action used for printing stuff during development and debugging.",
     action: () => {
       console.log(PSPDFKit)
-      console.log(PSPDFKit.VERSION)
+      console.log(PSPDFKit.versionString)
       // console.log(NativeModules)
     }
   }
@@ -81,7 +80,7 @@ class Catalog extends Component {
       <View style={styles.page}>
         <View style={styles.header}>
           <Image source={require('./assets/logo-flat.png')} style={styles.logo} />
-          <Text style={styles.version}>{PSPDFKit.VERSION}</Text>
+          <Text style={styles.version}>{PSPDFKit.versionString}</Text>
         </View>
         <ListView
           dataSource={this.state.dataSource}

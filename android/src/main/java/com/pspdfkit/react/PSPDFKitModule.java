@@ -13,7 +13,6 @@
 package com.pspdfkit.react;
 
 import android.net.Uri;
-import android.os.Environment;
 import android.support.annotation.NonNull;
 
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -23,15 +22,14 @@ import com.facebook.react.bridge.ReadableMap;
 import com.pspdfkit.PSPDFKit;
 import com.pspdfkit.ui.PSPDFActivity;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.Nullable;
-
 public class PSPDFKitModule extends ReactContextBaseJavaModule {
 
-    private static final String VERSION_KEY = "VERSION";
+    private static final String VERSION_KEY = "versionString";
+    private static final String FILE_SCHEME = "file:///";
+    private String licenseKey = "LICENSE_KEY_GOES_HERE";
 
     public PSPDFKitModule(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -43,20 +41,19 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void presentAsset(@NonNull String document, @NonNull String licenseKey, @NonNull ReadableMap configuration) {
-        if (getCurrentActivity() != null) {
-            final Uri assetDocument = Uri.parse("file:///android_asset/" + document);
-            ConfigurationAdapter configurationAdapter = new ConfigurationAdapter(getCurrentActivity(), licenseKey, configuration);
-            PSPDFActivity.showDocument(getCurrentActivity(), assetDocument, configurationAdapter.build());
-        }
-    }    
+    public void setLicenseKey(@NonNull String licenseKey) {
+        this.licenseKey = licenseKey;
+    }
 
     @ReactMethod
-    public void presentLocal(@NonNull String document, @NonNull String licenseKey, @NonNull ReadableMap configuration) {
+    public void present(@NonNull String document, @NonNull ReadableMap configuration) {
         if (getCurrentActivity() != null) {
-            final Uri localDocument = Uri.fromFile(new File(Environment.getExternalStorageDirectory(), document));
             ConfigurationAdapter configurationAdapter = new ConfigurationAdapter(getCurrentActivity(), licenseKey, configuration);
-            PSPDFActivity.showDocument(getCurrentActivity(), localDocument, configurationAdapter.build());
+            // This is an edge case where file scheme is missing.
+            if (Uri.parse(document).getScheme() == null) {
+                document = FILE_SCHEME + document;
+            }
+            PSPDFActivity.showDocument(getCurrentActivity(), Uri.parse(document), configurationAdapter.build());
         }
     }
 
