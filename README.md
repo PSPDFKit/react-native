@@ -123,20 +123,20 @@ Let's create a simple app that integrates `pspdfkit-*.aar` and uses the react-na
    
     A complete list of the dependencies needed can be found in the [documentation](https://pspdfkit.com/guides/android/current/getting-started/integrating-pspdfkit/#toc_manual-library-file-integration) step 6, under `Manual library file integration`.
     
-    For PSPDFKit 2.7 :
+For PSPDFKit 2.7 :
 
   ```                                     
 dependencies {
-...    
-//compile 'com.pspdfkit:pspdfkit:2.7.0@aar'  <-- DO NOT ADD THE LIBRARY ITSELF
-compile 'com.android.support:support-v4:23.4.+'
-compile 'com.android.support:appcompat-v7:23.4.+'
-compile "com.android.support:recyclerview-v7:23.4.+"
-compile "com.android.support:cardview-v7:23.4.+"
-compile "com.android.support:design:23.4.+"
-compile 'io.reactivex:rxjava:1.2.0'
-compile 'io.reactivex:rxandroid:1.2.1'
-compile 'com.getkeepsafe.relinker:relinker:1.2.2'
+    ...
+    //compile 'com.pspdfkit:pspdfkit:2.7.0@aar' <-- DO NOT ADD THE LIBRARY ITSELF
+    compile 'com.android.support:support-v4:25.0.+'
+    compile 'com.android.support:appcompat-v7:25.0.+'
+    compile "com.android.support:recyclerview-v7:25.0.+"
+    compile "com.android.support:cardview-v7:25.0.+"
+    compile "com.android.support:design:25.0.+"
+    compile 'io.reactivex:rxjava:1.2.2'
+    compile 'io.reactivex:rxandroid:1.2.1'
+    compile 'com.getkeepsafe.relinker:relinker:1.2.2'
 	}
   ```
 
@@ -210,60 +210,60 @@ with
 13. Replace the default component from `index.android.js` with a simple touch area to present the bundled PDF:
 
   ```javascript
-import React, { Component } from 'react';
-import {
-AppRegistry,
-StyleSheet,
-NativeModules,
-Text,
-TouchableHighlight,
-View
-} from 'react-native';
+  import React, { Component } from 'react';
+  import {
+  AppRegistry,
+  StyleSheet,
+  NativeModules,
+  Text,
+  TouchableHighlight,
+  View
+  } from 'react-native';
 
- var PSPDFKit = NativeModules.PSPDFKit;
+  var PSPDFKit = NativeModules.PSPDFKit;
 
- const DOCUMENT = "document.pdf";
-const LICENSE = "LICENSE_KEY_GOES_HERE";
-const CONFIGURATION = {
-scrollContinuously : false,
-showPageNumberOverlay : true,
-pageScrollDirection : "vertical"
-};
+  const DOCUMENT = "document.pdf";
+  const LICENSE = "LICENSE_KEY_GOES_HERE";
+  const CONFIGURATION = {
+    scrollContinuously : false,
+    showPageNumberOverlay : true,
+    pageScrollDirection : "vertical"
+  };
 
- // Change 'YourApp' to your app's name.
-class YourApp extends Component {
-_onPressButton() {
-  PSPDFKit.presentLocal(DOCUMENT, LICENSE, CONFIGURATION);
-}
+  // Change 'YourApp' to your app's name.
+  class YourApp extends Component {
+    _onPressButton() {
+      PSPDFKit.presentLocal(DOCUMENT, LICENSE, CONFIGURATION);
+    }
 
- render() {
-  return (
-    <View style={styles.container}>
-    <Text>{PSPDFKit.VERSION}</Text>
-      <TouchableHighlight onPress={this._onPressButton}>
-        <Text style={styles.text}>Tap to Open Document</Text>
-      </TouchableHighlight>
-    </View>
-  );
-}
-}
+    render() {
+      return (
+        <View style={styles.container}>
+          <Text>{PSPDFKit.VERSION}</Text>
+            <TouchableHighlight onPress={this._onPressButton}>
+              <Text style={styles.text}>Tap to Open Document</Text>
+              </TouchableHighlight>
+        </View>
+      );
+    }
+  }
 
- const styles = StyleSheet.create({
-container: {
-  flex: 1,
-  justifyContent: 'center',
-  alignItems: 'center',
-  backgroundColor: '#F5FCFF',
-},
-text: {
-  fontSize: 20,
-  textAlign: 'center',
-  margin: 10,
-}
-});
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: '#F5FCFF',
+    },
+    text: {
+      fontSize: 20,
+      textAlign: 'center',
+      margin: 10,
+    }
+  });
 
- // Change both 'YourApp's to your app's name.
-AppRegistry.registerComponent('YourApp', () => YourApp);
+  // Change both 'YourApp's to your app's name.
+  AppRegistry.registerComponent('YourApp', () => YourApp);
   ```  
 
 Your app is now ready to launch. From `YourApp` directory run `react-native run-android`.
@@ -275,21 +275,21 @@ Your app is now ready to launch. From `YourApp` directory run `react-native run-
 
     A complete list of the dependencies needed can be found in the [documentation](https://pspdfkit.com/guides/android/current/getting-started/integrating-pspdfkit/#toc_manual-library-file-integration) step 6, under `Manual library file integration`.
 
-    For PSPDFKit 2.7 :
-                                     
-  ```       
+For PSPDFKit 2.7 :
+                                         
+  ```                                     
 dependencies {
-...
-//compile 'com.pspdfkit:pspdfkit:2.7.0@aar'  <-- DO NOT ADD THE LIBRARY ITSELF
-compile 'com.android.support:support-v4:23.4.+'
-compile 'com.android.support:appcompat-v7:23.4.+'
-compile "com.android.support:recyclerview-v7:23.4.+"
-compile "com.android.support:cardview-v7:23.4.+"
-compile "com.android.support:design:23.4.+"
-compile 'io.reactivex:rxjava:1.2.0'
-compile 'io.reactivex:rxandroid:1.2.1'
-compile 'com.getkeepsafe.relinker:relinker:1.2.2'
-    }
+    ...
+    //compile 'com.pspdfkit:pspdfkit:2.7.0@aar' <-- DO NOT ADD THE LIBRARY ITSELF
+    compile 'com.android.support:support-v4:25.0.+'
+    compile 'com.android.support:appcompat-v7:25.0.+'
+    compile "com.android.support:recyclerview-v7:25.0.+"
+    compile "com.android.support:cardview-v7:25.0.+"
+    compile "com.android.support:design:25.0.+"
+    compile 'io.reactivex:rxjava:1.2.2'
+    compile 'io.reactivex:rxandroid:1.2.1'
+    compile 'com.getkeepsafe.relinker:relinker:1.2.2'
+	}
   ```
   
 3. Copy `pspdfkit-*.aar` library in `samples/Catalog/android/pspdfkit-lib`.
