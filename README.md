@@ -199,7 +199,7 @@ public class MainApplication extends Application implements ReactApplication {
 }
   ```
      
-12. Set primary color. In `YourApp/android/app/src/main/res/values/style.xml` replace
+12. Set primary color. In `YourApp/android/app/src/main/res/values/styles.xml` replace
   ```xml    
 <!-- Customize your theme here. -->
   ```
