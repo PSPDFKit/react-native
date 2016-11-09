@@ -127,8 +127,8 @@ Let's create a simple app that integrates `pspdfkit-*.aar` and uses the react-na
 
   ```                                     
 dependencies {
-...
-//compile 'com.pspdfkit:pspdfkit:2.6.0@aar' <-- DO NOT ADD THE LIBRARY ITSELF
+...    
+//compile 'com.pspdfkit:pspdfkit:2.7.0@aar'  <-- DO NOT ADD THE LIBRARY ITSELF
 compile 'com.android.support:support-v4:23.4.+'
 compile 'com.android.support:appcompat-v7:23.4.+'
 compile "com.android.support:recyclerview-v7:23.4.+"
@@ -280,7 +280,7 @@ Your app is now ready to launch. From `YourApp` directory run `react-native run-
   ```       
 dependencies {
 ...
-//compile 'com.pspdfkit:pspdfkit:2.6.0@aar' <-- DO NOT ADD THE LIBRARY ITSELF
+//compile 'com.pspdfkit:pspdfkit:2.7.0@aar'  <-- DO NOT ADD THE LIBRARY ITSELF
 compile 'com.android.support:support-v4:23.4.+'
 compile 'com.android.support:appcompat-v7:23.4.+'
 compile "com.android.support:recyclerview-v7:23.4.+"
