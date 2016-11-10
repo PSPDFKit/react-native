@@ -122,7 +122,6 @@ Let's create a simple app that integrates `pspdfkit-*.aar` and uses the react-na
 5. Add dependencies to `YourApp/node_modules/react-native-pspdfkit/android/build.gradle`.
    
     A complete list of the dependencies needed can be found in the [documentation](https://pspdfkit.com/guides/android/current/getting-started/integrating-pspdfkit/#toc_manual-library-file-integration) step 6, under `Manual library file integration`.
-    
 For PSPDFKit 2.7 :
 
   ```                                     
@@ -275,7 +274,6 @@ Your app is now ready to launch. From `YourApp` directory run `react-native run-
 2. Add dependencies to `android/build.gradle`.
 
     A complete list of the dependencies needed can be found in the [documentation](https://pspdfkit.com/guides/android/current/getting-started/integrating-pspdfkit/#toc_manual-library-file-integration) step 6, under `Manual library file integration`.
-
 For PSPDFKit 2.7 :
                                          
   ```                                     
