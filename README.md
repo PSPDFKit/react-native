@@ -108,7 +108,8 @@ PSPDFKit.present('document.pdf', {
 #### Requirements
 
 - Android SDK
-- Android Build Tools 23.0.1 and 25
+- Android Build Tools 23.0.1 (React Native)
+- Android Build Tools 25 (PSPDFKit module)
 - PSPDFKit 7
 - react-native >= 0.34.1
 
