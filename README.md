@@ -269,7 +269,7 @@ with
   ```  
 
 Your app is now ready to launch.  
-To copy a PDF document to your local device storage check [Configuration](#configuration01) section.  
+To copy a PDF document to your local device storage check [Configuration](#configuration-1) section.  
 From `YourApp` directory run `react-native run-android`.
 
 #### Running Catalog Project
