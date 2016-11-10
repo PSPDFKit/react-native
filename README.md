@@ -267,10 +267,17 @@ with
   // Change both 'YourApp's to your app's name.
   AppRegistry.registerComponent('YourApp', () => YourApp);
   ```  
+14. Before launching the app you need to copy a PDF document onto your development device or emulator.
 
-Your app is now ready to launch.  
-To copy a PDF document to your local device storage check [Configuration](#configuration-1) section.  
-From `YourApp` directory run `react-native run-android`.
+	```bash
+	adb push /path/to/your/document.pdf /sdcard/document.pdf
+	```
+
+15. Your app is now ready to launch.  From `YourApp` directory run `react-native run-android`.
+
+	```bash
+	react-native run-android
+	```
 
 #### Running Catalog Project
 
@@ -292,7 +299,7 @@ dependencies {
     compile 'io.reactivex:rxjava:1.2.2'
     compile 'io.reactivex:rxandroid:1.2.1'
     compile 'com.getkeepsafe.relinker:relinker:1.2.2'
-	}
+}
   ```
   
 3. Copy `pspdfkit-*.aar` library in `samples/Catalog/android/pspdfkit-lib`.
@@ -301,12 +308,18 @@ dependencies {
 
 #### Configuration
 
+##### Upload PDF to device 
+
 To copy a pdf document to your local device storage:
 ```bash         
 adb push "document.pdf" "/sdcard/document.pdf"
 ```
 
+##### Bundle PDF inside the APK's assets
+
 To bundle a pdf document in the Android app, simply copy it the Android `assets` folder, for the Catalog app is `samples/PDFs`.
+
+##### Viewer options
 
 You can configure the builder with a dictionary representation of the PSPDFConfiguration object. Check `ConfigurationAdapter.java` for all the parameters available.
 
