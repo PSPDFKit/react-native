@@ -108,6 +108,7 @@ PSPDFKit.present('document.pdf', {
 #### Requirements
 
 - Android SDK
+- Android Build Tools 23.0.01 and 25
 - PSPDFKit 7
 - react-native >= 0.34.1
 
@@ -206,7 +207,7 @@ with
   ```xml    
 <item name="colorPrimary">#3C97C9</item>
   ```     
-13. Replace the default component from `index.android.js` with a simple touch area to present the bundled PDF:
+13. Replace the default component from `YourApp/index.android.js` with a simple touch area to present a PDF document from the local device filesystem:
 
   ```javascript
   import React, { Component } from 'react';
