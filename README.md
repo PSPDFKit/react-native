@@ -321,20 +321,17 @@ To bundle a pdf document in the Android app, simply copy it the Android `assets`
 
 ##### Viewer options
 
-You can configure the builder with a dictionary representation of the PSPDFConfiguration object. Check `ConfigurationAdapter.java` for all the parameters available.
-
-Example:
+You can configure the builder with a dictionary representation of the PSPDFConfiguration object. Check [`ConfigurationAdapter.java`](https://github.com/PSPDFKit/react-native/blob/master/android/src/main/java/com/pspdfkit/react/ConfigurationAdapter.java) for all the parameters available.
 
 ```javascript
 const CONFIGURATION = {
-          startPage : 3,
-          scrollContinuously : false,
-          showPageNumberOverlay : true,
-          grayScale : true,
-          showPageLabels : false,
-          pageScrollDirection : "vertical"
-        };
-})
+	startPage : 3,
+	scrollContinuously : false,
+	showPageNumberOverlay : true,
+	grayScale : true,
+	showPageLabels : false,
+	pageScrollDirection : "vertical"
+};
 ```
 
 #### API
