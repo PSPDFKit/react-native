@@ -103,6 +103,248 @@ PSPDFKit.present('document.pdf', {
 - Install npm packages: `npm install` in `samples/Catalog` directory.
 - Run the app with `react-native-cli`: `react-native run-ios`
 
+### Android
+
+#### Requirements
+
+- Android SDK
+- PSPDFKit 7
+- react-native >= 0.34.1
+
+#### Getting Started
+
+Let's create a simple app that integrates `pspdfkit-*.aar` and uses the react-native-pspdfkit module.
+
+1. Make sure `react-native-cli` is installed: `npm install -g react-native-cli`
+2. Create the app with `react-native init YourApp`.
+3. Step into your newly created app folder: `cd YourApp`.
+4. Install `react-native-pspdfkit` from GitHub: `react-native install github:PSPDFKit/react-native`.
+5. Add dependencies to `YourApp/node_modules/react-native-pspdfkit/android/build.gradle`.
+   
+    A complete list of the dependencies needed can be found in the [documentation](https://pspdfkit.com/guides/android/current/getting-started/integrating-pspdfkit/#toc_manual-library-file-integration) step 6, under `Manual library file integration`.
+    
+For PSPDFKit 2.7 :
+
+  ```                                     
+dependencies {
+    ...
+    //compile 'com.pspdfkit:pspdfkit:2.7.0@aar' <-- DO NOT ADD THE LIBRARY ITSELF
+    compile 'com.android.support:support-v4:25.0.+'
+    compile 'com.android.support:appcompat-v7:25.0.+'
+    compile "com.android.support:recyclerview-v7:25.0.+"
+    compile "com.android.support:cardview-v7:25.0.+"
+    compile "com.android.support:design:25.0.+"
+    compile 'io.reactivex:rxjava:1.2.2'
+    compile 'io.reactivex:rxandroid:1.2.1'
+    compile 'com.getkeepsafe.relinker:relinker:1.2.2'
+	}
+  ```
+
+6. Add the following lines to `YourApp/android/settings.gradle` file:
+
+  ```   
+include ':pspdfkit-lib'
+include ':react-native-pspdfkit'
+project(':react-native-pspdfkit').projectDir = new File(settingsDir, '../node_modules/react-native-pspdfkit/android')
+  ```
+        
+7. Create new `pspdfkit-lib` folder in `YourApp/android`.
+8. Create new `build.gradle` file in `YourApp/android/pspdfkit-lib` and add the following lines:
+     
+  ```  
+configurations.maybeCreate("default")
+def library =  fileTree(".").filter { it.isFile()}.filter {it.name.endsWith('.aar')}.files.name.first()
+artifacts.add("default", file(library))
+  ```
+        
+9. Copy `pspdfkit-*.aar` library in `YourApp/android/pspdfkit-lib`.
+10. Add the following dependencies to `YourApp/android/app/build.gradle` file:
+     
+  ```
+dependencies {
+...
+compile project(':react-native-pspdfkit')
+compile project(':pspdfkit-lib')
+	}
+  ```
+        
+11. Add `PSPDFKitPackage` to `MainApplication.java` in `YourApp/android/app/src/main/java/com/yourapp` (note **two** places to edit):
+
+  ```diff
+package com.yourapp;
+import android.app.Application;
+import android.util.Log;
+import com.facebook.react.ReactApplication;
+import com.facebook.react.ReactInstanceManager;
+import com.facebook.react.ReactNativeHost;
+import com.facebook.react.ReactPackage;
+import com.facebook.react.shell.MainReactPackage;
++ import com.pspdfkit.react.PSPDFKitPackage;
+.....
+public class MainApplication extends Application implements ReactApplication {
+  private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
+    @Override
+    protected boolean getUseDeveloperSupport() {
+      return BuildConfig.DEBUG;
+    }   
+    @Override
+    protected List<ReactPackage> getPackages() {
+       return Arrays.<ReactPackage>asList(
++          new PSPDFKitPackage(),
+               new MainReactPackage()
+        );
+    }
+  };
+  .....
+}
+  ```
+     
+12. Set primary color. In `YourApp/android/app/src/main/res/values/styles.xml` replace
+  ```xml    
+<!-- Customize your theme here. -->
+  ```
+with
+  ```xml    
+<item name="colorPrimary">#3C97C9</item>
+  ```     
+13. Replace the default component from `index.android.js` with a simple touch area to present the bundled PDF:
+
+  ```javascript
+  import React, { Component } from 'react';
+  import {
+  AppRegistry,
+  StyleSheet,
+  NativeModules,
+  Text,
+  TouchableHighlight,
+  View
+  } from 'react-native';
+
+  var PSPDFKit = NativeModules.PSPDFKit;
+
+  const DOCUMENT = "file:///sdcard/document.pdf";
+  const LICENSE = "LICENSE_KEY_GOES_HERE";
+  const CONFIGURATION = {
+    scrollContinuously : false,
+    showPageNumberOverlay : true,
+    pageScrollDirection : "vertical"
+  };
+
+  PSPDFKit.setLicenseKey(LICENSE);
+  // Change 'YourApp' to your app's name.
+  class YourApp extends Component {
+    _onPressButton() {
+      PSPDFKit.present(DOCUMENT, CONFIGURATION);
+    }
+
+    render() {
+      return (
+        <View style={styles.container}>
+          <Text>{PSPDFKit.versionString}</Text>
+            <TouchableHighlight onPress={this._onPressButton}>
+              <Text style={styles.text}>Tap to Open Document</Text>
+              </TouchableHighlight>
+        </View>
+      );
+    }
+  }
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: '#F5FCFF',
+    },
+    text: {
+      fontSize: 20,
+      textAlign: 'center',
+      margin: 10,
+    }
+  });
+
+  // Change both 'YourApp's to your app's name.
+  AppRegistry.registerComponent('YourApp', () => YourApp);
+  ```  
+
+Your app is now ready to launch. From `YourApp` directory run `react-native run-android`.
+
+#### Running Catalog Project
+
+1. Clone the repository. `git clone https://github.com/PSPDFKit/react-native.git`.
+2. Add dependencies to `android/build.gradle`.
+
+    A complete list of the dependencies needed can be found in the [documentation](https://pspdfkit.com/guides/android/current/getting-started/integrating-pspdfkit/#toc_manual-library-file-integration) step 6, under `Manual library file integration`.
+
+For PSPDFKit 2.7 :
+                                         
+  ```                                     
+dependencies {
+    ...
+    //compile 'com.pspdfkit:pspdfkit:2.7.0@aar' <-- DO NOT ADD THE LIBRARY ITSELF
+    compile 'com.android.support:support-v4:25.0.+'
+    compile 'com.android.support:appcompat-v7:25.0.+'
+    compile "com.android.support:recyclerview-v7:25.0.+"
+    compile "com.android.support:cardview-v7:25.0.+"
+    compile "com.android.support:design:25.0.+"
+    compile 'io.reactivex:rxjava:1.2.2'
+    compile 'io.reactivex:rxandroid:1.2.1'
+    compile 'com.getkeepsafe.relinker:relinker:1.2.2'
+	}
+  ```
+  
+3. Copy `pspdfkit-*.aar` library in `samples/Catalog/android/pspdfkit-lib`.
+4. Install npm packages: run `npm install` from `samples/Catalog` directory.
+5. Catalog app is now ready to launch. From `samples/Catalog` directory run `react-native run-android`.
+
+#### Configuration
+
+To copy a pdf document to your local device storage:
+```bash         
+adb push "document.pdf" "/sdcard/document.pdf"
+```
+
+To bundle a pdf document in the Android app, simply copy it the Android `assets` folder, for the Catalog app is `samples/PDFs`.
+
+You can configure the builder with a dictionary representation of the PSPDFConfiguration object. Check `ConfigurationAdapter.java` for all the parameters available.
+
+Example:
+
+```javascript
+const CONFIGURATION = {
+          startPage : 3,
+          scrollContinuously : false,
+          showPageNumberOverlay : true,
+          grayScale : true,
+          showPageLabels : false,
+          pageScrollDirection : "vertical"
+        };
+})
+```
+
+#### API
+
+##### Constants
+
+The following constants are available on the PSPDFKit export:
+
+- `versionString` (`String`) PSPDFKit version number.
+
+##### `present(document : string, configuration : readable map) : void`
+
+Shows the pdf `document` from the local device filesystem, or your app's assets.
+
+- `file:///sdcard/document.pdf` will open the document from local device filesystem.
+- `file:///android_asset/document.pdf` will open the document from your app's assets.
+
+`configuration` can be empty `{}`.
+
+##### `setLicenseKey(licenseKey : string) : void`
+
+Initialize PSPDFKit module with a license key.
+
+A valid `licenseKey` must be provided. 
+
 ## License
 
 This project can be used for evaluation or if you have a valid PSPDFKit license.  

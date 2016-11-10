@@ -1,4 +1,4 @@
-package com.catalog;
+package com.pspdfkit.react.catalog;
 
 import com.facebook.react.ReactActivity;
 
