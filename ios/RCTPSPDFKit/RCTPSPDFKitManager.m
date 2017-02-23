@@ -12,9 +12,9 @@
 
 #import "RCTPSPDFKitManager.h"
 
-#import "RCTLog.h"
-#import "RCTUtils.h"
-#import "RCTConvert.h"
+#import <React/RCTLog.h>
+#import <React/RCTUtils.h>
+#import <React/RCTConvert.h>
 
 @import PSPDFKit;
 

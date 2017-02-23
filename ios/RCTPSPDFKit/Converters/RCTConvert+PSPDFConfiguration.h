@@ -10,7 +10,7 @@
 //  This notice may not be removed from this file.
 //
 
-#import "RCTConvert.h"
+#import <React/RCTConvert.h>
 @import PSPDFKit;
 
 @interface RCTConvert (PSPDFConfiguration)
