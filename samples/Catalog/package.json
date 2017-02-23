@@ -6,9 +6,9 @@
     "start": "node node_modules/react-native/local-cli/cli.js start"
   },
   "dependencies": {
-    "react": "15.3.1",
-    "react-native": "0.34.1",
-    "react-native-fs": "2.0.1-rc.2",
+    "react": "15.4.2",
+    "react-native": "0.41.2",
+    "react-native-fs": "github:johanneslumpe/react-native-fs#55dd2a7624f4617e04a895a9a319cb012c1002a5",
     "react-native-pspdfkit": "file:../../"
   }
 }
