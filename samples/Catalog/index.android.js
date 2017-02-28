@@ -25,6 +25,16 @@ import {
 
 var PSPDFKit = NativeModules.PSPDFKit;
 
+const DOCUMENT = 'file:///sdcard/PSPDFKit 5 QuickStart Guide.pdf';
+const CONFIGURATION = {
+  startPage : 3,
+  scrollContinuously : false,
+  showPageNumberOverlay : true,
+  grayScale : true,
+  showPageLabels : false,
+  pageScrollDirection : "vertical"
+};
+
 var examples = [
   {
     name: "Open assets document",
@@ -37,21 +47,16 @@ var examples = [
     name: "Open local document",
     description: 'Opens document from external storage directory.',
     action: () => {
-      PSPDFKit.present('file:///sdcard/PSPDFKit 5 QuickStart Guide.pdf', {})
+      // PSPDFKit.present(DOCUMENT, {})
+      requestExternalStoragePermission(function () { PSPDFKit.present(DOCUMENT, {}); });
     }
   },
   {
     name: "Configuration Builder",
     description: "You can configure the builder with dictionary representation of the PSPDFConfiguration object.",
     action: () => {
-      PSPDFKit.present('file:///sdcard/PSPDFKit 5 QuickStart Guide.pdf', {
-        startPage : 3,
-        scrollContinuously : false,
-        showPageNumberOverlay : true,
-        grayScale : true,
-        showPageLabels : false,
-        pageScrollDirection : "vertical"
-      })
+      // PSPDFKit.present(DOCUMENT, CONFIGURATION)
+      requestExternalStoragePermission(function () { PSPDFKit.present(DOCUMENT, CONFIGURATION) });
     }
   },
   {
@@ -64,6 +69,22 @@ var examples = [
     }
   }
 ]
+
+async function requestExternalStoragePermission(callback) {
+  try {
+    const granted = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
+    )
+    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+      console.log("Write external storage permission granted")
+      callback()
+    } else {
+      console.log("Write external storage permission denied")
+    }
+  } catch (err) {
+    console.warn(err)
+  }
+}
 
 class Catalog extends Component {
   // Initialize the hardcoded data
