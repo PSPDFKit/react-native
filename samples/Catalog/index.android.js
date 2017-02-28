@@ -20,7 +20,8 @@ import {
   TouchableHighlight,
   ListView,
   NativeModules,
-  processColor
+  processColor,
+  PermissionsAndroid
 } from 'react-native';
 
 var PSPDFKit = NativeModules.PSPDFKit;
