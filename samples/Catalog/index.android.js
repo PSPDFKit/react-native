@@ -47,7 +47,6 @@ var examples = [
     name: "Open local document",
     description: 'Opens document from external storage directory.',
     action: () => {
-      // PSPDFKit.present(DOCUMENT, {})
       requestExternalStoragePermission(function () { PSPDFKit.present(DOCUMENT, {}); });
     }
   },
@@ -55,7 +54,6 @@ var examples = [
     name: "Configuration Builder",
     description: "You can configure the builder with dictionary representation of the PSPDFConfiguration object.",
     action: () => {
-      // PSPDFKit.present(DOCUMENT, CONFIGURATION)
       requestExternalStoragePermission(function () { PSPDFKit.present(DOCUMENT, CONFIGURATION) });
     }
   },
