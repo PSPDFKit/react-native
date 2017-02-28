@@ -109,9 +109,9 @@ PSPDFKit.present('document.pdf', {
 
 - Android SDK
 - Android Build Tools 23.0.1 (React Native)
-- Android Build Tools 25 (PSPDFKit module)
-- PSPDFKit 2.7
-- react-native >= 0.34.1
+- Android Build Tools 25.0.2 (PSPDFKit module)
+- PSPDFKit >= 2.9.2
+- react-native >= 0.41.2
 
 #### Getting Started
 
@@ -124,18 +124,18 @@ Let's create a simple app that integrates `pspdfkit-*.aar` and uses the react-na
 5. Add dependencies to `YourApp/node_modules/react-native-pspdfkit/android/build.gradle`.
    
     A complete list of the dependencies needed can be found in the [documentation](https://pspdfkit.com/guides/android/current/getting-started/integrating-pspdfkit/#toc_manual-library-file-integration) step 6, under `Manual library file integration`.
-For PSPDFKit 2.7 :
+For PSPDFKit 2.9.2 :
 
   ```                                     
 dependencies {
     ...
-    //compile 'com.pspdfkit:pspdfkit:2.7.0@aar' <-- DO NOT ADD THE LIBRARY ITSELF
-    compile 'com.android.support:support-v4:25.0.+'
-    compile 'com.android.support:appcompat-v7:25.0.+'
-    compile "com.android.support:recyclerview-v7:25.0.+"
-    compile "com.android.support:cardview-v7:25.0.+"
-    compile "com.android.support:design:25.0.+"
-    compile 'io.reactivex:rxjava:1.2.2'
+    //compile 'com.pspdfkit:pspdfkit:2.9.2@aar' <-- DO NOT ADD THE LIBRARY ITSELF
+    compile 'com.android.support:support-v4:25.1.+'
+    compile 'com.android.support:appcompat-v7:25.1.+'
+    compile "com.android.support:recyclerview-v7:25.1.+"
+    compile "com.android.support:cardview-v7:25.1.+"
+    compile "com.android.support:design:25.1.+"
+    compile 'io.reactivex:rxjava:1.2.6'
     compile 'io.reactivex:rxandroid:1.2.1'
     compile 'com.getkeepsafe.relinker:relinker:1.2.2'
 	}
@@ -167,7 +167,31 @@ dependencies {
 compile project(':react-native-pspdfkit')
 compile project(':pspdfkit-lib')
 	}
-  ```
+  ```  
+  
+  And modify the following lines (note **three** places to edit):
+    
+    ```diff
+    ...
+    android {
+-    compileSdkVersion 23
++    compileSdkVersion 25
+-    buildToolsVersion "23.0.1"
++    buildToolsVersion "25.0.2" 
+
+    defaultConfig {
+        applicationId "com.yourapp"
+        minSdkVersion 16
+-       targetSdkVersion 22
++       targetSdkVersion 25
+        versionCode 1
+        versionName "1.0"
+        ndk {
+            abiFilters "armeabi-v7a", "x86"
+        }
+    }
+    ...
+    ```
         
 11. Add `PSPDFKitPackage` to `MainApplication.java` in `YourApp/android/app/src/main/java/com/yourapp` (note **two** places to edit):
 
@@ -211,61 +235,78 @@ with
 13. Replace the default component from `YourApp/index.android.js` with a simple touch area to present a PDF document from the local device filesystem:
 
   ```javascript
-  import React, { Component } from 'react';
-  import {
-  AppRegistry,
-  StyleSheet,
-  NativeModules,
-  Text,
-  TouchableHighlight,
-  View
-  } from 'react-native';
-
-  var PSPDFKit = NativeModules.PSPDFKit;
-
-  const DOCUMENT = "file:///sdcard/document.pdf";
-  const LICENSE = "LICENSE_KEY_GOES_HERE";
-  const CONFIGURATION = {
-    scrollContinuously : false,
-    showPageNumberOverlay : true,
-    pageScrollDirection : "vertical"
-  };
-
-  PSPDFKit.setLicenseKey(LICENSE);
-  // Change 'YourApp' to your app's name.
-  class YourApp extends Component {
-    _onPressButton() {
-      PSPDFKit.present(DOCUMENT, CONFIGURATION);
-    }
-
-    render() {
-      return (
-        <View style={styles.container}>
-          <Text>{PSPDFKit.versionString}</Text>
-            <TouchableHighlight onPress={this._onPressButton}>
-              <Text style={styles.text}>Tap to Open Document</Text>
-              </TouchableHighlight>
-        </View>
-      );
-    }
-  }
-
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: '#F5FCFF',
-    },
-    text: {
-      fontSize: 20,
-      textAlign: 'center',
-      margin: 10,
-    }
-  });
-
-  // Change both 'YourApp's to your app's name.
-  AppRegistry.registerComponent('YourApp', () => YourApp);
+	import React, { Component } from 'react';
+	import {
+	AppRegistry,
+	StyleSheet,
+	NativeModules,
+	Text,
+	TouchableHighlight,
+	View,
+	PermissionsAndroid
+	} from 'react-native';
+	
+	var PSPDFKit = NativeModules.PSPDFKit;
+	
+	const DOCUMENT = "file:///sdcard/document.pdf";
+	const LICENSE = "LICENSE_KEY_GOES_HERE";
+	const CONFIGURATION = {
+	  scrollContinuously : false,
+	  showPageNumberOverlay : true,
+	  pageScrollDirection : "vertical"
+	};
+	
+	PSPDFKit.setLicenseKey(LICENSE);
+	// Change 'YourApp' to your app's name.
+	class YourApp extends Component {
+	  _onPressButton() {
+	  requestExternalStoragePermission();
+	  }
+	
+	  render() {
+	    return (
+	      <View style={styles.container}>
+	        <Text>{PSPDFKit.versionString}</Text>
+	          <TouchableHighlight onPress={this._onPressButton}>
+	            <Text style={styles.text}>Tap to Open Document</Text>
+	            </TouchableHighlight>
+	      </View>
+	    );
+	  }
+	}
+	
+	async function requestExternalStoragePermission() {
+	  try {
+	    const granted = await PermissionsAndroid.request(
+	      PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
+	    )
+	    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+	      console.log("Write external storage permission granted")
+	      PSPDFKit.present(DOCUMENT, CONFIGURATION);
+	    } else {
+	      console.log("Write external storage permission denied")
+	    }
+	  } catch (err) {
+	    console.warn(err)
+	  }
+	}
+	
+	const styles = StyleSheet.create({
+	  container: {
+	    flex: 1,
+	    justifyContent: 'center',
+	    alignItems: 'center',
+	    backgroundColor: '#F5FCFF',
+	  },
+	  text: {
+	    fontSize: 20,
+	    textAlign: 'center',
+	    margin: 10,
+	  }
+	});
+	
+	// Change both 'YourApp's to your app's name.
+	AppRegistry.registerComponent('YourApp', () => YourApp);
   ```  
 14. Before launching the app you need to copy a PDF document onto your development device or emulator.
 
@@ -285,23 +326,23 @@ with
 2. Add dependencies to `android/build.gradle`.
 
     A complete list of the dependencies needed can be found in the [documentation](https://pspdfkit.com/guides/android/current/getting-started/integrating-pspdfkit/#toc_manual-library-file-integration) step 6, under `Manual library file integration`.
-For PSPDFKit 2.7 :
-                                         
+For PSPDFKit 2.9.2 :
+
   ```                                     
 dependencies {
     ...
-    //compile 'com.pspdfkit:pspdfkit:2.7.0@aar' <-- DO NOT ADD THE LIBRARY ITSELF
-    compile 'com.android.support:support-v4:25.0.+'
-    compile 'com.android.support:appcompat-v7:25.0.+'
-    compile "com.android.support:recyclerview-v7:25.0.+"
-    compile "com.android.support:cardview-v7:25.0.+"
-    compile "com.android.support:design:25.0.+"
-    compile 'io.reactivex:rxjava:1.2.2'
+    //compile 'com.pspdfkit:pspdfkit:2.9.2@aar' <-- DO NOT ADD THE LIBRARY ITSELF
+    compile 'com.android.support:support-v4:25.1.+'
+    compile 'com.android.support:appcompat-v7:25.1.+'
+    compile "com.android.support:recyclerview-v7:25.1.+"
+    compile "com.android.support:cardview-v7:25.1.+"
+    compile "com.android.support:design:25.1.+"
+    compile 'io.reactivex:rxjava:1.2.6'
     compile 'io.reactivex:rxandroid:1.2.1'
     compile 'com.getkeepsafe.relinker:relinker:1.2.2'
-}
+	}
   ```
-  
+
 3. Copy `pspdfkit-*.aar` library in `samples/Catalog/android/pspdfkit-lib`.
 4. Install npm packages: run `npm install` from `samples/Catalog` directory.
 5. Catalog app is now ready to launch. From `samples/Catalog` directory run `react-native run-android`.
