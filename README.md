@@ -11,7 +11,7 @@
 
 Lets create a simple app that integrates `PSPDFKit.framework` and uses the `react-native-pspdfkit` module.
 
-1. Make sure `react-native-cli` is installed: `npm install -g react-native-cli`
+1. Make sure `react-native-cli` is installed: `yarn global add react-native-cli`
 2. Create the app with `react-native init YourApp`.
 3. Step into your newly created app folder: `cd YourApp`
 4. Install `react-native-pspdfkit` from GitHub: `react-native install github:PSPDFKit/react-native`
@@ -100,7 +100,7 @@ PSPDFKit.present('document.pdf', {
 #### Running Catalog Project
 
 - Copy `PSPDFKit.framework` into the `PSPDFKit` directory.
-- Install npm packages: `npm install` in `samples/Catalog` directory.
+- Install dependencies: `yarn install` in `samples/Catalog` directory.
 - Run the app with `react-native-cli`: `react-native run-ios`
 
 ### Android
@@ -117,7 +117,7 @@ PSPDFKit.present('document.pdf', {
 
 Let's create a simple app that integrates `pspdfkit-*.aar` and uses the react-native-pspdfkit module.
 
-1. Make sure `react-native-cli` is installed: `npm install -g react-native-cli`
+1. Make sure `react-native-cli` is installed: `yarn global add react-native-cli`
 2. Create the app with `react-native init YourApp`.
 3. Step into your newly created app folder: `cd YourApp`.
 4. Install `react-native-pspdfkit` from GitHub: `react-native install github:PSPDFKit/react-native`.
@@ -344,7 +344,7 @@ dependencies {
   ```
 
 3. Copy `pspdfkit-*.aar` library in `samples/Catalog/android/pspdfkit-lib`.
-4. Install npm packages: run `npm install` from `samples/Catalog` directory.
+4. Install dependencies: run `yarn install` from `samples/Catalog` directory.
 5. Catalog app is now ready to launch. From `samples/Catalog` directory run `react-native run-android`.
 
 #### Configuration
