@@ -5,7 +5,7 @@
 #### Requirements
 - Xcode 8
 - PSPDFKit 6
-- react-native >= 0.34.1
+- react-native >= 0.41.2
 
 #### Getting Started
 
