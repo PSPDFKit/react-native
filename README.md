@@ -100,7 +100,7 @@ PSPDFKit.present('document.pdf', {
 #### Running Catalog Project
 
 - Copy `PSPDFKit.framework` into the `PSPDFKit` directory.
-- Install dependencies: `yarn install` in `samples/Catalog` directory.
+- Install dependencies: `yarn install` in `samples/Catalog` directory. (Because of a [bug](https://github.com/yarnpkg/yarn/issues/2165) you may need to clean `yarn`'s cache with `yarn cache clean` before.)
 - Run the app with `react-native-cli`: `react-native run-ios`
 
 ### Android
@@ -344,7 +344,7 @@ dependencies {
   ```
 
 3. Copy `pspdfkit-*.aar` library in `samples/Catalog/android/pspdfkit-lib`.
-4. Install dependencies: run `yarn install` from `samples/Catalog` directory.
+4. Install dependencies: run `yarn install` from `samples/Catalog` directory. (Because of a [bug](https://github.com/yarnpkg/yarn/issues/2165) you may need to clean `yarn`'s cache with `yarn cache clean` before.)
 5. Catalog app is now ready to launch. From `samples/Catalog` directory run `react-native run-android`.
 
 #### Configuration
