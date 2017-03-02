@@ -110,7 +110,7 @@ PSPDFKit.present('document.pdf', {
 - Android SDK
 - Android Build Tools 23.0.1 (React Native)
 - Android Build Tools 25.0.2 (PSPDFKit module)
-- PSPDFKit >= 2.9.2
+- PSPDFKit >= 2.9.3
 - react-native >= 0.41.2
 
 #### Getting Started
@@ -124,12 +124,12 @@ Let's create a simple app that integrates `pspdfkit-*.aar` and uses the react-na
 5. Add dependencies to `YourApp/node_modules/react-native-pspdfkit/android/build.gradle`.
    
     A complete list of the dependencies needed can be found in the [documentation](https://pspdfkit.com/guides/android/current/getting-started/integrating-pspdfkit/#toc_manual-library-file-integration) step 6, under `Manual library file integration`.
-For PSPDFKit 2.9.2 :
+For PSPDFKit 2.9.3 :
 
   ```                                     
 dependencies {
     ...
-    //compile 'com.pspdfkit:pspdfkit:2.9.2@aar' <-- DO NOT ADD THE LIBRARY ITSELF
+    //compile 'com.pspdfkit:pspdfkit:2.9.3@aar' <-- DO NOT ADD THE LIBRARY ITSELF
     compile 'com.android.support:support-v4:25.1.+'
     compile 'com.android.support:appcompat-v7:25.1.+'
     compile "com.android.support:recyclerview-v7:25.1.+"
@@ -197,19 +197,20 @@ compile project(':pspdfkit-lib')
 
   ```diff
 package com.yourapp;
+
 import android.app.Application;
-import android.util.Log;
+
 import com.facebook.react.ReactApplication;
-import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
+import com.facebook.soloader.SoLoader;
 + import com.pspdfkit.react.PSPDFKitPackage;
 .....
 public class MainApplication extends Application implements ReactApplication {
   private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
     @Override
-    protected boolean getUseDeveloperSupport() {
+    public boolean getUseDeveloperSupport() {
       return BuildConfig.DEBUG;
     }   
     @Override
@@ -326,12 +327,12 @@ with
 2. Add dependencies to `android/build.gradle`.
 
     A complete list of the dependencies needed can be found in the [documentation](https://pspdfkit.com/guides/android/current/getting-started/integrating-pspdfkit/#toc_manual-library-file-integration) step 6, under `Manual library file integration`.
-For PSPDFKit 2.9.2 :
+For PSPDFKit 2.9.3 :
 
   ```                                     
 dependencies {
     ...
-    //compile 'com.pspdfkit:pspdfkit:2.9.2@aar' <-- DO NOT ADD THE LIBRARY ITSELF
+    //compile 'com.pspdfkit:pspdfkit:2.9.3@aar' <-- DO NOT ADD THE LIBRARY ITSELF
     compile 'com.android.support:support-v4:25.1.+'
     compile 'com.android.support:appcompat-v7:25.1.+'
     compile "com.android.support:recyclerview-v7:25.1.+"
