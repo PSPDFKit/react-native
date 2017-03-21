@@ -402,6 +402,6 @@ A valid `licenseKey` must be provided.
 ## License
 
 This project can be used for evaluation or if you have a valid PSPDFKit license.  
-All items and source code Copyright © 2010-2016 PSPDFKit GmbH.
+All items and source code Copyright © 2010-2017 PSPDFKit GmbH.
 
 See LICENSE for details.
