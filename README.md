@@ -161,37 +161,37 @@ artifacts.add("default", file(library))
 9. Copy `pspdfkit-*.aar` library in `YourApp/android/pspdfkit-lib`.
 10. Add the following dependencies to `YourApp/android/app/build.gradle` file:
      
-  ```
-dependencies {
-...
-compile project(':react-native-pspdfkit')
-compile project(':pspdfkit-lib')
-	}
-  ```  
-  
-  And modify the following lines (note **three** places to edit):
+   ```
+   dependencies {
+       ...
+       compile project(':react-native-pspdfkit')
+       compile project(':pspdfkit-lib')
+   }
+   ```  
+        
+   And modify the following lines (note **three** places to edit):
     
-    ```diff
-    ...
-    android {
--    compileSdkVersion 23
-+    compileSdkVersion 25
--    buildToolsVersion "23.0.1"
-+    buildToolsVersion "25.0.2" 
+   ```diff
+   ...
+   android {
+   -   compileSdkVersion 23
+   +   compileSdkVersion 25
+   -   buildToolsVersion "23.0.1"
+   +   buildToolsVersion "25.0.2" 
 
-    defaultConfig {
-        applicationId "com.yourapp"
-        minSdkVersion 16
--       targetSdkVersion 22
-+       targetSdkVersion 25
-        versionCode 1
-        versionName "1.0"
-        ndk {
-            abiFilters "armeabi-v7a", "x86"
-        }
-    }
-    ...
-    ```
+   defaultConfig {
+       applicationId "com.yourapp"
+       minSdkVersion 16
+   -   targetSdkVersion 22
+   +   targetSdkVersion 25
+       versionCode 1
+       versionName "1.0"
+       ndk {
+           abiFilters "armeabi-v7a", "x86"
+       }
+   }
+   ...
+   ```
         
 11. Add `PSPDFKitPackage` to `MainApplication.java` in `YourApp/android/app/src/main/java/com/yourapp` (note **two** places to edit):
 
