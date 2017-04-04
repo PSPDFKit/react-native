@@ -35,6 +35,14 @@ RCT_EXPORT_METHOD(present:(PSPDFDocument *)document withConfiguration:(PSPDFConf
   [presentingViewController presentViewController:navigationController animated:YES completion:nil];
 }
 
+RCT_EXPORT_METHOD(dismiss) {
+  UIViewController *presentedViewController = RCTPresentedViewController();
+  NSAssert([presentedViewController isKindOfClass:UINavigationController.class], @"Presented view controller needs to be a UINavigationController");
+  UINavigationController *navigationController = (UINavigationController *)presentedViewController;
+  NSAssert(navigationController.viewControllers.count == 1 && [navigationController.viewControllers.firstObject isKindOfClass:PSPDFViewController.class], @"Presented view controller needs to contain a PSPDFViewController");
+  [navigationController dismissViewControllerAnimated:true completion:nil];
+}
+
 - (dispatch_queue_t)methodQueue {
   return dispatch_get_main_queue();
 }
