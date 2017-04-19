@@ -4,7 +4,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.3'
+        classpath 'com.android.tools.build:gradle:2.3.0'
     }
 }
 
@@ -26,6 +26,6 @@ android {
 }
 
 dependencies {
+    compile 'com.pspdfkit:pspdfkit:3.0.0'
     compile 'com.facebook.react:react-native:+'
-    compile project(':pspdfkit-lib')
 }
