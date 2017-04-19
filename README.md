@@ -111,64 +111,42 @@ PSPDFKit.present('document.pdf', {
 - Android SDK
 - Android Build Tools 23.0.1 (React Native)
 - Android Build Tools 25.0.2 (PSPDFKit module)
-- PSPDFKit >= 2.9.3
+- PSPDFKit >= 3.0.0
 - react-native >= 0.41.2
 
 #### Getting Started
 
-Let's create a simple app that integrates `pspdfkit-*.aar` and uses the react-native-pspdfkit module.
+Let's create a simple app that integrates PSPDFKit and uses the react-native-pspdfkit module.
 
 1. Make sure `react-native-cli` is installed: `yarn global add react-native-cli`
 2. Create the app with `react-native init YourApp`.
 3. Step into your newly created app folder: `cd YourApp`.
 4. Install `react-native-pspdfkit` from GitHub: `yarn add github:PSPDFKit/react-native`.
-5. Link module `react-native-pspdfkit`: `react-native link react-native-pspdfkit`. 
-6. Add dependencies to `YourApp/node_modules/react-native-pspdfkit/android/build.gradle`.
-   
-    A complete list of the dependencies needed can be found in the [documentation](https://pspdfkit.com/guides/android/current/getting-started/integrating-pspdfkit/#toc_manual-library-file-integration) step 6, under `Manual library file integration`.
-For PSPDFKit 2.9.3 :
+5. Link module `react-native-pspdfkit`: `react-native link react-native-pspdfkit`.
+6. Add PSPDFKit repository to `YourApp/android/build.gradle` so PSPDFKit library can be downloaded:
 
-  ```                                     
-dependencies {
-    ...
-    //compile 'com.pspdfkit:pspdfkit:2.9.3@aar' <-- DO NOT ADD THE LIBRARY ITSELF
-    compile 'com.android.support:support-v4:25.1.+'
-    compile 'com.android.support:appcompat-v7:25.1.+'
-    compile "com.android.support:recyclerview-v7:25.1.+"
-    compile "com.android.support:cardview-v7:25.1.+"
-    compile "com.android.support:design:25.1.+"
-    compile 'io.reactivex:rxjava:1.2.6'
-    compile 'io.reactivex:rxandroid:1.2.1'
-    compile 'com.getkeepsafe.relinker:relinker:1.2.2'
-	}
+  ```diff
+    allprojects {
+        repositories {
+            mavenLocal()
+            jcenter()
+  +         maven {
+  +             url 'https://customers.pspdfkit.com/maven/'
+
+  +             credentials {
+  +                 username 'pspdfkit'
+  +                 password 'YOUR_MAVEN_KEY_GOES_HERE'
+  +             }
+  +         }
+            maven {
+                // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
+                url "$rootDir/../node_modules/react-native/android"
+            }
+        }
+    }
   ```
 
-7. Add the following lines to `YourApp/android/settings.gradle` file:
-
-  ```   
-include ':pspdfkit-lib'
-  ```
-        
-8. Create new `pspdfkit-lib` folder in `YourApp/android`.
-9. Create new `build.gradle` file in `YourApp/android/pspdfkit-lib` and add the following lines:
-     
-  ```  
-configurations.maybeCreate("default")
-def library =  fileTree(".").filter { it.isFile() }.filter { it.name.endsWith('.aar') }.files.name.first()
-artifacts.add("default", file(library))
-  ```
-        
-10. Copy `pspdfkit-*.aar` library in `YourApp/android/pspdfkit-lib`.
-11. Add the following dependencies to `YourApp/android/app/build.gradle` file:
-     
-   ```
-   dependencies {
-       ...
-       compile project(':pspdfkit-lib')
-   }
-   ```  
-        
-   And modify the following lines (note **three** places to edit):
+7. PSPDFKit targets modern platforms, so you'll have to update `compileSdkVersion` and `targetSdkVersion` to at least API 25 (note **three** places to edit):
     
    ```diff
    ...
@@ -192,7 +170,7 @@ artifacts.add("default", file(library))
    ...
    ```
      
-12. Set primary color. In `YourApp/android/app/src/main/res/values/styles.xml` replace
+8. Set primary color. In `YourApp/android/app/src/main/res/values/styles.xml` replace
   ```xml    
 <!-- Customize your theme here. -->
   ```
@@ -200,7 +178,7 @@ with
   ```xml    
 <item name="colorPrimary">#3C97C9</item>
   ```     
-13. Replace the default component from `YourApp/index.android.js` with a simple touch area to present a PDF document from the local device filesystem:
+9. Replace the default component from `YourApp/index.android.js` with a simple touch area to present a PDF document from the local device filesystem:
         
    ```javascript
    import React, { Component } from 'react';
@@ -224,7 +202,6 @@ with
      pageScrollDirection : "vertical"
    };
 	
-   PSPDFKit.setLicenseKey(LICENSE);
    // Change 'YourApp' to your app's name.
    class YourApp extends Component {
      _onPressButton() {
@@ -276,13 +253,13 @@ with
    // Change both 'YourApp's to your app's name.
    AppRegistry.registerComponent('YourApp', () => YourApp);
    ```  
-14. Before launching the app you need to copy a PDF document onto your development device or emulator.
+10. Before launching the app you need to copy a PDF document onto your development device or emulator.
 
 	```bash
 	adb push /path/to/your/document.pdf /sdcard/document.pdf
 	```
 
-15. Your app is now ready to launch.  From `YourApp` directory run `react-native run-android`.
+11. Your app is now ready to launch.  From `YourApp` directory run `react-native run-android`.
 
 	```bash
 	react-native run-android
