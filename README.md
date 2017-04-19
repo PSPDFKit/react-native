@@ -170,7 +170,20 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
    ...
    ```
      
-8. Set primary color. In `YourApp/android/app/src/main/res/values/styles.xml` replace
+8. Enter your PSPDFKit license key into `YourApp/android/app/src/main/AndroidManifest.xml` file: 
+
+  ```diff
+     <application>
+        ...
+
+  +      <meta-data
+  +          android:name="pspdfkit_license_key"
+  +          android:value="YOUR_LICENSE_KEY_GOES_HERE"/>
+
+     </application> 
+  ```
+
+9. Set primary color. In `YourApp/android/app/src/main/res/values/styles.xml` replace
   ```xml    
 <!-- Customize your theme here. -->
   ```
@@ -178,7 +191,7 @@ with
   ```xml    
 <item name="colorPrimary">#3C97C9</item>
   ```     
-9. Replace the default component from `YourApp/index.android.js` with a simple touch area to present a PDF document from the local device filesystem:
+10. Replace the default component from `YourApp/index.android.js` with a simple touch area to present a PDF document from the local device filesystem:
         
    ```javascript
    import React, { Component } from 'react';
@@ -253,13 +266,13 @@ with
    // Change both 'YourApp's to your app's name.
    AppRegistry.registerComponent('YourApp', () => YourApp);
    ```  
-10. Before launching the app you need to copy a PDF document onto your development device or emulator.
+11. Before launching the app you need to copy a PDF document onto your development device or emulator.
 
 	```bash
 	adb push /path/to/your/document.pdf /sdcard/document.pdf
 	```
 
-11. Your app is now ready to launch.  From `YourApp` directory run `react-native run-android`.
+12. Your app is now ready to launch.  From `YourApp` directory run `react-native run-android`.
 
 	```bash
 	react-native run-android
