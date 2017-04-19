@@ -18,8 +18,8 @@ import android.support.annotation.NonNull;
 
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableMapKeySetIterator;
-import com.pspdfkit.configuration.activity.HUDViewMode;
-import com.pspdfkit.configuration.activity.PSPDFActivityConfiguration;
+import com.pspdfkit.configuration.activity.HudViewMode;
+import com.pspdfkit.configuration.activity.PdfActivityConfiguration;
 import com.pspdfkit.configuration.annotations.AnnotationEditingConfiguration;
 import com.pspdfkit.configuration.page.PageFitMode;
 import com.pspdfkit.configuration.page.PageScrollDirection;
@@ -32,7 +32,7 @@ public class ConfigurationAdapter {
     private static final String PAGE_SCROLL_CONTINUOUS = "scrollContinuously";
     private static final String FIT_PAGE_TO_WIDTH = "fitPageToWidth";
     private static final String IMMERSIVE_MODE = "immersiveMode";
-    private static final String SYSTEM_HUD_MODE = "hudViewMode";
+    private static final String SYSTEM_HUD_MODE = "HudViewMode";
     private static final String HUD_VIEW_MODE_AUTOMATIC = "automatic";
     private static final String HUD_VIEW_MODE_AUTOMATIC_BORDER_PAGES = "automaticBorderPages";
     private static final String HUD_VIEW_MODE_ALWAYS_VISIBLE = "alwaysVisible";
@@ -53,19 +53,19 @@ public class ConfigurationAdapter {
     private static final String SHOW_SHARE_ACTION = "showShareAction";
     private static final String SHOW_PRINT_ACTION = "showPrintAction";
 
-    private final PSPDFActivityConfiguration.Builder configuration;
+    private final PdfActivityConfiguration.Builder configuration;
     private final Activity activity;
 
 
-    public ConfigurationAdapter(@NonNull Activity activity, @NonNull String licenseKey, ReadableMap configuration) {
+    public ConfigurationAdapter(@NonNull Activity activity, ReadableMap configuration) {
 
         this.activity = activity;
         ReadableMapKeySetIterator iterator = configuration.keySetIterator();
         boolean emptyConfiguration = iterator.hasNextKey() ? false : true;
         if (emptyConfiguration) {
-            this.configuration = getDefaultConfiguration(activity, licenseKey);
+            this.configuration = getDefaultConfiguration(activity);
         } else {
-            this.configuration = new PSPDFActivityConfiguration.Builder(activity, licenseKey);
+            this.configuration = new PdfActivityConfiguration.Builder(activity);
 
             if (configuration.hasKey(PAGE_SCROLL_DIRECTION)) {
                 configurePageScrollDirection(configuration.getString(PAGE_SCROLL_DIRECTION));
@@ -157,7 +157,7 @@ public class ConfigurationAdapter {
     }
 
     private void configureInlineSearch(boolean inlineSearch) {
-        final int searchType = inlineSearch ? PSPDFActivityConfiguration.SEARCH_INLINE : PSPDFActivityConfiguration.SEARCH_MODULAR;
+        final int searchType = inlineSearch ? PdfActivityConfiguration.SEARCH_INLINE : PdfActivityConfiguration.SEARCH_MODULAR;
         configuration.setSearchType(searchType);
     }
 
@@ -166,15 +166,15 @@ public class ConfigurationAdapter {
     }
 
     private void configureSystemHudMode(String systemHudMode) {
-        HUDViewMode hudMode = HUDViewMode.HUD_VIEW_MODE_AUTOMATIC;
+        HudViewMode hudMode = HudViewMode.HUD_VIEW_MODE_AUTOMATIC;
         if (systemHudMode.equals(HUD_VIEW_MODE_AUTOMATIC)) {
-            hudMode = HUDViewMode.HUD_VIEW_MODE_AUTOMATIC;
+            hudMode = HudViewMode.HUD_VIEW_MODE_AUTOMATIC;
         } else if (systemHudMode.equals(HUD_VIEW_MODE_AUTOMATIC_BORDER_PAGES)) {
-            hudMode = HUDViewMode.HUD_VIEW_MODE_AUTOMATIC_BORDER_PAGES;
+            hudMode = HudViewMode.HUD_VIEW_MODE_AUTOMATIC_BORDER_PAGES;
         } else if (systemHudMode.equals(HUD_VIEW_MODE_ALWAYS_VISIBLE)) {
-            hudMode = HUDViewMode.HUD_VIEW_MODE_VISIBLE;
+            hudMode = HudViewMode.HUD_VIEW_MODE_VISIBLE;
         } else if (systemHudMode.equals(HUD_VIEW_MODE_ALWAYS_HIDDEN)) {
-            hudMode = HUDViewMode.HUD_VIEW_MODE_HIDDEN;
+            hudMode = HudViewMode.HUD_VIEW_MODE_HIDDEN;
         }
         configuration.setHudViewMode(hudMode);
     }
@@ -269,20 +269,20 @@ public class ConfigurationAdapter {
         configuration.textSelectionEnabled(enableTextSelection);
     }
 
-    public PSPDFActivityConfiguration build() {
+    public PdfActivityConfiguration build() {
         return configuration.build();
     }
 
-    public static PSPDFActivityConfiguration.Builder getDefaultConfiguration(Context context, String license) {
+    public static PdfActivityConfiguration.Builder getDefaultConfiguration(Context context) {
 
         final PageScrollDirection pageScrollDirection = PageScrollDirection.HORIZONTAL;
         final PageScrollMode pageScrollMode = PageScrollMode.PER_PAGE;
         final PageFitMode pageFitMode = PageFitMode.FIT_TO_WIDTH;
-        final int searchType = PSPDFActivityConfiguration.SEARCH_INLINE;
-        final HUDViewMode hudViewMode = HUDViewMode.HUD_VIEW_MODE_AUTOMATIC;
+        final int searchType = PdfActivityConfiguration.SEARCH_INLINE;
+        final HudViewMode hudViewMode = HudViewMode.HUD_VIEW_MODE_AUTOMATIC;
         int startPage = 0;
 
-        PSPDFActivityConfiguration.Builder configuration = new PSPDFActivityConfiguration.Builder(context, license)
+        PdfActivityConfiguration.Builder configuration = new PdfActivityConfiguration.Builder(context)
                 .scrollDirection(pageScrollDirection)
                 .scrollMode(pageScrollMode)
                 .fitMode(pageFitMode)
