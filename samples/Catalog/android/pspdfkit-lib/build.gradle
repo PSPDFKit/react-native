@@ -1,3 +1,0 @@
-configurations.maybeCreate("default")
-def library =  fileTree(".").filter { it.isFile()}.filter {it.name.endsWith('.aar')}.files.name.first()
-artifacts.add("default", file(library))

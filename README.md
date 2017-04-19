@@ -268,28 +268,33 @@ with
 #### Running Catalog Project
 
 1. Clone the repository. `git clone https://github.com/PSPDFKit/react-native.git`.
-2. Add dependencies to `android/build.gradle` (not `samples/Catalog/android/build.gradle`).
+2. Install dependencies: run `yarn install` from `samples/Catalog` directory. (Because of a [bug](https://github.com/yarnpkg/yarn/issues/2165) you may need to clean `yarn`'s cache with `yarn cache clean` before.)
+3. Add your customer portal password to `samples/Catalog/build.gradle`:
 
-    A complete list of the dependencies needed can be found in the [documentation](https://pspdfkit.com/guides/android/current/getting-started/integrating-pspdfkit/#toc_manual-library-file-integration) step 6, under `Manual library file integration`.
-For PSPDFKit 2.9.3 :
+  ```groovy
+        maven {
+            url 'https://customers.pspdfkit.com/maven/'
 
-  ```                                     
-dependencies {
-    ...
-    //compile 'com.pspdfkit:pspdfkit:2.9.3@aar' <-- DO NOT ADD THE LIBRARY ITSELF
-    compile 'com.android.support:support-v4:25.1.+'
-    compile 'com.android.support:appcompat-v7:25.1.+'
-    compile "com.android.support:recyclerview-v7:25.1.+"
-    compile "com.android.support:cardview-v7:25.1.+"
-    compile "com.android.support:design:25.1.+"
-    compile 'io.reactivex:rxjava:1.2.6'
-    compile 'io.reactivex:rxandroid:1.2.1'
-    compile 'com.getkeepsafe.relinker:relinker:1.2.2'
-	}
+            credentials {
+                username 'pspdfkit'
+                password 'YOUR_MAVEN_PASSWORD_GOES_HERE'
+            }
+        }
+  ```
+    
+4. Update license key in `samples/Catalog/android/app/src/main/AndroidManifest.xml`:
+
+  ```xml
+     <application>
+        ...
+
+        <meta-data
+            android:name="pspdfkit_license_key"
+            android:value="YOUR_LICENSE_KEY_GOES_HERE"/>
+
+     </application> 
   ```
 
-3. Copy `pspdfkit-*.aar` library in `samples/Catalog/android/pspdfkit-lib`.
-4. Install dependencies: run `yarn install` from `samples/Catalog` directory. (Because of a [bug](https://github.com/yarnpkg/yarn/issues/2165) you may need to clean `yarn`'s cache with `yarn cache clean` before.)
 5. Catalog app is now ready to launch. From `samples/Catalog` directory run `react-native run-android`.
 
 #### Configuration

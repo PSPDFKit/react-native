@@ -26,6 +26,10 @@
             </intent-filter>
         </activity>
         <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
+
+        <meta-data
+            android:name="pspdfkit_license_key"
+            android:value="YOUR_LICENSE_KEY_GOES_HERE"/>
     </application>
 
 </manifest>
