@@ -146,7 +146,7 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
     }
   ```
 
-7. PSPDFKit targets modern platforms, so you'll have to update `compileSdkVersion` and `targetSdkVersion` to at least API 25 (note **three** places to edit):
+7. PSPDFKit targets modern platforms, so you'll have to update `compileSdkVersion` and `targetSdkVersion` to at least API 25 and enable MultiDex. From `YourApp/android/app/build.gradle` (note **four** places to edit):
     
    ```diff
    ...
@@ -158,6 +158,7 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
 
    defaultConfig {
        applicationId "com.yourapp"
+   +   multiDexEnabled true
        minSdkVersion 16
    -   targetSdkVersion 22
    +   targetSdkVersion 25
@@ -281,7 +282,7 @@ with
 
 1. Clone the repository. `git clone https://github.com/PSPDFKit/react-native.git`.
 2. Install dependencies: run `yarn install` from `samples/Catalog` directory. (Because of a [bug](https://github.com/yarnpkg/yarn/issues/2165) you may need to clean `yarn`'s cache with `yarn cache clean` before.)
-3. Add your customer portal password to `samples/Catalog/build.gradle`:
+3. Add your customer portal password to `samples/Catalog/android/build.gradle`:
 
   ```groovy
         maven {
