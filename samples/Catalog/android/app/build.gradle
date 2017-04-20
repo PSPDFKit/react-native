@@ -88,6 +88,7 @@ android {
 
     defaultConfig {
         applicationId "com.pspdfkit.react.catalog"
+        multiDexEnabled true
         minSdkVersion 16
         targetSdkVersion 25
         versionCode 1
@@ -131,7 +132,6 @@ dependencies {
     compile 'com.facebook.react:react-native:+'
     // From node_modules
     compile project(':react-native-pspdfkit')
-    compile project(':pspdfkit-lib')
 }
 
 // Run this once to be able to run the application with BUCK
