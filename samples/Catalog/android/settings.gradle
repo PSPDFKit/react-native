@@ -1,6 +1,6 @@
 rootProject.name = 'Catalog'
 
-include ':app', ':pspdfkit-lib'
+include ':app'
 
 include ':react-native-pspdfkit'
 project(':react-native-pspdfkit').projectDir = new File(settingsDir, '../node_modules/react-native-pspdfkit/android')
