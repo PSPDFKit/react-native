@@ -123,7 +123,7 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
 3. Step into your newly created app folder: `cd YourApp`.
 4. Install `react-native-pspdfkit` from GitHub: `yarn add github:PSPDFKit/react-native`.
 5. Link module `react-native-pspdfkit`: `react-native link react-native-pspdfkit`.
-6. Add PSPDFKit repository to `YourApp/android/build.gradle` so PSPDFKit library can be downloaded:
+6. <a id="step-6"></a>Add PSPDFKit repository to `YourApp/android/build.gradle` so PSPDFKit library can be downloaded:
 
   ```diff
     allprojects {
@@ -146,7 +146,7 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
     }
   ```
 
-7. PSPDFKit targets modern platforms, so you'll have to update `compileSdkVersion` and `targetSdkVersion` to at least API 25 (note **three** places to edit):
+7. PSPDFKit targets modern platforms, so you'll have to update `compileSdkVersion` and `targetSdkVersion` to at least API 25 and enable MultiDex. In `YourApp/android/app/build.gradle` (note **four** places to edit):
     
    ```diff
    ...
@@ -158,6 +158,7 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
 
    defaultConfig {
        applicationId "com.yourapp"
+   +   multiDexEnabled true
        minSdkVersion 16
    -   targetSdkVersion 22
    +   targetSdkVersion 25
@@ -170,7 +171,7 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
    ...
    ```
      
-8. Enter your PSPDFKit license key into `YourApp/android/app/src/main/AndroidManifest.xml` file: 
+8. <a id="step-8"></a>Enter your PSPDFKit license key into `YourApp/android/app/src/main/AndroidManifest.xml` file: 
 
   ```diff
      <application>
@@ -191,7 +192,7 @@ with
   ```xml    
 <item name="colorPrimary">#3C97C9</item>
   ```     
-10. Replace the default component from `YourApp/index.android.js` with a simple touch area to present a PDF document from the local device filesystem:
+10. <a id="step-10"></a>Replace the default component from `YourApp/index.android.js` with a simple touch area to present a PDF document from the local device filesystem:
         
    ```javascript
    import React, { Component } from 'react';
@@ -281,7 +282,7 @@ with
 
 1. Clone the repository. `git clone https://github.com/PSPDFKit/react-native.git`.
 2. Install dependencies: run `yarn install` from `samples/Catalog` directory. (Because of a [bug](https://github.com/yarnpkg/yarn/issues/2165) you may need to clean `yarn`'s cache with `yarn cache clean` before.)
-3. Add your customer portal password to `samples/Catalog/build.gradle`:
+3. Add your customer portal password to `samples/Catalog/android/build.gradle`:
 
   ```groovy
         maven {
@@ -336,6 +337,43 @@ const CONFIGURATION = {
 	pageScrollDirection : "vertical"
 };
 ```
+
+#### Update
+Upgrading yarn's lock file is required in order to update react-native-pspdfkit module in a project that has been already setup following the steps in [Getting Started](#getting-started) section.  
+From root project folder (e.g.`YourApp` for upgrading example project) launch `yarn upgrade`.
+
+##### Migrate from PSPDFKit version 2.9.x to 3.0.0
+After launching `yarn upgrade`, apply [step 6](#step-6), [step 8](#step-8) and [step 10](#step-10) from [Getting Started](#getting-started) section.  
+Enable MultiDex in `YourApp/android/app/build.gradle` (note **one** place to edit):
+    
+   ```diff
+   ...
+   android {
+       compileSdkVersion 25
+       buildToolsVersion "25.0.2" 
+
+   defaultConfig {
+       applicationId "com.yourapp"
+   +   multiDexEnabled true
+       minSdkVersion 16
+       targetSdkVersion 25
+       versionCode 1
+       versionName "1.0"
+       ndk {
+           abiFilters "armeabi-v7a", "x86"
+       }
+   }
+   ...
+   ```
+ Remove `pspdfkit-lib` folder in `YourApp/android/`.  
+ In `YourApp/android/settings.gradle` remove the old reference to `pspdfkit-lib` (note **one** place to edit):
+   
+   ```diff
+    project(':react-native-pspdfkit').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-pspdfkit/android')  
+    include ':app'
+   -include ':pspdfkit-lib'
+   ```
+   
 
 #### API
 
