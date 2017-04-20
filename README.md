@@ -339,11 +339,11 @@ const CONFIGURATION = {
 ```
 
 #### Update
-Upgrading yarn's lock file is required in order to update react-native-pspdfkit module in a project that has been already setup following the steps in [Getting Started](#getting-started) section.  
+Upgrading yarn's lock file is required in order to update react-native-pspdfkit module in a project that has been already setup following the steps in [Getting Started](#getting-started-1) section.  
 From root project folder (e.g.`YourApp` for upgrading example project) launch `yarn upgrade`.
 
 ##### Migrate from PSPDFKit version 2.9.x to 3.0.0
-After launching `yarn upgrade`, apply [step 6](#step-6), [step 8](#step-8) and [step 10](#step-10) from [Getting Started](#getting-started) section.  
+After launching `yarn upgrade`, apply [step 6](#step-6), [step 8](#step-8) and [step 10](#step-10) from [Getting Started](#getting-started-1) section.  
 Enable MultiDex in `YourApp/android/app/build.gradle` (note **one** place to edit):
     
    ```diff
