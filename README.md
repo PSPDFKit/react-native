@@ -355,12 +355,6 @@ Shows the pdf `document` from the local device filesystem, or your app's assets.
 
 `configuration` can be empty `{}`.
 
-##### `setLicenseKey(licenseKey : string) : void`
-
-Initialize PSPDFKit module with a license key.
-
-A valid `licenseKey` must be provided. 
-
 ## License
 
 This project can be used for evaluation or if you have a valid PSPDFKit license.  
