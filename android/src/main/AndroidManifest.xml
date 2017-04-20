@@ -8,7 +8,7 @@
 
     <application>
     <activity
-        android:name="com.pspdfkit.ui.PSPDFActivity"
+        android:name="com.pspdfkit.ui.PdfActivity"
         android:windowSoftInputMode="adjustNothing" />
     </application>
 </manifest>

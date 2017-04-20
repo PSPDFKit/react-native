@@ -208,7 +208,6 @@ with
    var PSPDFKit = NativeModules.PSPDFKit;
 	
    const DOCUMENT = "file:///sdcard/document.pdf";
-   const LICENSE = "LICENSE_KEY_GOES_HERE";
    const CONFIGURATION = {
      scrollContinuously : false,
      showPageNumberOverlay : true,
