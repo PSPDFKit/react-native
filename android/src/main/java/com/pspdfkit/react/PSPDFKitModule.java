@@ -20,7 +20,7 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
 import com.pspdfkit.PSPDFKit;
-import com.pspdfkit.ui.PSPDFActivity;
+import com.pspdfkit.ui.PdfActivity;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,19 +41,15 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void setLicenseKey(@NonNull String licenseKey) {
-        this.licenseKey = licenseKey;
-    }
-
-    @ReactMethod
     public void present(@NonNull String document, @NonNull ReadableMap configuration) {
         if (getCurrentActivity() != null) {
-            ConfigurationAdapter configurationAdapter = new ConfigurationAdapter(getCurrentActivity(), licenseKey, configuration);
+            ConfigurationAdapter configurationAdapter = new ConfigurationAdapter(getCurrentActivity(), configuration);
             // This is an edge case where file scheme is missing.
             if (Uri.parse(document).getScheme() == null) {
                 document = FILE_SCHEME + document;
             }
-            PSPDFActivity.showDocument(getCurrentActivity(), Uri.parse(document), configurationAdapter.build());
+
+            PdfActivity.showDocument(getCurrentActivity(), Uri.parse(document), configurationAdapter.build());
         }
     }
 
