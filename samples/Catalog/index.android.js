@@ -33,7 +33,8 @@ const CONFIGURATION = {
   showPageNumberOverlay : true,
   grayScale : true,
   showPageLabels : false,
-  pageScrollDirection : "vertical"
+  pageScrollDirection : "vertical",
+  showThumbnailBar : "scrollable"
 };
 
 var examples = [

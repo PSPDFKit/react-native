@@ -20,7 +20,7 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableMapKeySetIterator;
 import com.pspdfkit.configuration.activity.HudViewMode;
 import com.pspdfkit.configuration.activity.PdfActivityConfiguration;
-import com.pspdfkit.configuration.annotations.AnnotationEditingConfiguration;
+import com.pspdfkit.configuration.activity.ThumbnailBarMode;
 import com.pspdfkit.configuration.page.PageFitMode;
 import com.pspdfkit.configuration.page.PageScrollDirection;
 import com.pspdfkit.configuration.page.PageScrollMode;
@@ -40,6 +40,9 @@ public class ConfigurationAdapter {
     private static final String SHOW_SEARCH_ACTION = "showSearchAction";
     private static final String INLINE_SEARCH = "inlineSearch";
     private static final String SHOW_THUMBNAIL_BAR = "showThumbnailBar";
+    private static final String SHOW_THUMBNAIL_BAR_DEFAULT = "default";
+    private static final String SHOW_THUMBNAIL_BAR_SCROLLABLE = "scrollable";
+    private static final String SHOW_THUMBNAIL_BAR_NONE = "none";
     private static final String SHOW_THUMBNAIL_GRID_ACTION = "showThumbnailGridAction";
     private static final String SHOW_OUTLINE_ACTION = "showOutlineAction";
     private static final String SHOW_ANNOTATION_LIST_ACTION = "showAnnotationListAction";
@@ -91,9 +94,6 @@ public class ConfigurationAdapter {
             if (configuration.hasKey(IMMERSIVE_MODE)) {
                 configureImmersiveMode(configuration.getBoolean(IMMERSIVE_MODE));
             }
-            if (configuration.hasKey(SHOW_THUMBNAIL_BAR)) {
-                configureShowThumbnailBar(configuration.getBoolean(SHOW_THUMBNAIL_BAR));
-            }
             if (configuration.hasKey(SHOW_THUMBNAIL_GRID_ACTION)) {
                 configureShowThumbnailGridAction(configuration.getBoolean(SHOW_THUMBNAIL_GRID_ACTION));
             }
@@ -126,6 +126,9 @@ public class ConfigurationAdapter {
             }
             if (configuration.hasKey(ENABLE_TEXT_SELECTION)) {
                 configureEnableTextSelection(configuration.getBoolean(ENABLE_TEXT_SELECTION));
+            }
+            if (configuration.hasKey(SHOW_THUMBNAIL_BAR)) {
+                configureShowThumbnailBar(configuration.getString(SHOW_THUMBNAIL_BAR));
             }
         }
     }
@@ -191,12 +194,16 @@ public class ConfigurationAdapter {
         configuration.useImmersiveMode(immersiveMode);
     }
 
-    private void configureShowThumbnailBar(boolean showThumbnailBar) {
-        if (showThumbnailBar) {
-            configuration.showThumbnailBar();
-        } else {
-            configuration.hideThumbnailBar();
+    private void configureShowThumbnailBar(String showThumbnailBar) {
+        ThumbnailBarMode thumbnailBarMode = ThumbnailBarMode.THUMBNAIL_BAR_MODE_DEFAULT;
+        if (showThumbnailBar.equals(SHOW_THUMBNAIL_BAR_DEFAULT)) {
+            thumbnailBarMode = ThumbnailBarMode.THUMBNAIL_BAR_MODE_DEFAULT;
+        } else if (showThumbnailBar.equals(SHOW_THUMBNAIL_BAR_SCROLLABLE)) {
+            thumbnailBarMode = ThumbnailBarMode.THUMBNAIL_BAR_MODE_SCROLLABLE;
+        } else if (showThumbnailBar.equals(SHOW_THUMBNAIL_BAR_NONE)) {
+            thumbnailBarMode = ThumbnailBarMode.THUMBNAIL_BAR_MODE_NONE;
         }
+        configuration.setThumbnailBarMode(thumbnailBarMode);
     }
 
     private void configureShowThumbnailGridAction(boolean showThumbnailGridAction) {
@@ -240,13 +247,11 @@ public class ConfigurationAdapter {
     }
 
     private void configureEnableAnnotationEditing(boolean enableAnnotationEditing) {
-        AnnotationEditingConfiguration.Builder annotationEditingConfiguration = new AnnotationEditingConfiguration.Builder(activity);
         if (enableAnnotationEditing) {
-            annotationEditingConfiguration.enableAnnotationEditing();
+            configuration.enableAnnotationEditing();
         } else {
-            annotationEditingConfiguration.disableAnnotationEditing();
+            configuration.disableAnnotationEditing();
         }
-        configuration.annotationEditingConfiguration(annotationEditingConfiguration.build());
     }
 
     private void configureShowShareAction(boolean showShareAction) {
@@ -280,6 +285,7 @@ public class ConfigurationAdapter {
         final PageFitMode pageFitMode = PageFitMode.FIT_TO_WIDTH;
         final int searchType = PdfActivityConfiguration.SEARCH_INLINE;
         final HudViewMode hudViewMode = HudViewMode.HUD_VIEW_MODE_AUTOMATIC;
+        final ThumbnailBarMode thumbnailBarMode = ThumbnailBarMode.THUMBNAIL_BAR_MODE_DEFAULT;
         int startPage = 0;
 
         PdfActivityConfiguration.Builder configuration = new PdfActivityConfiguration.Builder(context)
@@ -288,10 +294,9 @@ public class ConfigurationAdapter {
                 .fitMode(pageFitMode)
                 .setHudViewMode(hudViewMode)
                 .setSearchType(searchType)
+                .setThumbnailBarMode(thumbnailBarMode)
                 .page(startPage);
 
-        AnnotationEditingConfiguration.Builder annotationEditingConfiguration = new AnnotationEditingConfiguration.Builder(context);
-        configuration.annotationEditingConfiguration(annotationEditingConfiguration.build());
         return configuration;
     }
 }
