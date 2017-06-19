@@ -1,13 +1,14 @@
 //
-//  index.android.js
-//  PSPDFKit
+// index.android.js
 //
-//  Copyright (c) 2016 PSPDFKit GmbH. All rights reserved.
+//   PSPDFKit
 //
-//  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
-//  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
-//  UNAUTHORIZED REPRODUCTION OR DISTRIBUTION IS SUBJECT TO CIVIL AND CRIMINAL PENALTIES.
-//  This notice may not be removed from this file.
+//   Copyright © 2017 PSPDFKit GmbH. All rights reserved.
+//
+//   THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
+//   AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
+//   UNAUTHORIZED REPRODUCTION OR DISTRIBUTION IS SUBJECT TO CIVIL AND CRIMINAL PENALTIES.
+//   This notice may not be removed from this file.
 //
 
 import React, { Component } from 'react';
@@ -33,7 +34,8 @@ const CONFIGURATION = {
   showPageNumberOverlay : true,
   grayScale : true,
   showPageLabels : false,
-  pageScrollDirection : "vertical"
+  pageScrollDirection : "vertical",
+  showThumbnailBar : "scrollable"
 };
 
 var examples = [
