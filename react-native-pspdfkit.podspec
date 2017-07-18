@@ -6,6 +6,7 @@ Pod::Spec.new do |s|
   s.name         = "react-native-pspdfkit"
   s.version      = package['version']
   s.summary      = "PSPDFKit for React Native applications"
+  s.authors		 = ["PSPDFKit"]
 
   s.homepage     = "https://github.com/PSPDFKit/react-native#readme"
   s.license      = package['license']
