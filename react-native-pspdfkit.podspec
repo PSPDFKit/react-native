@@ -15,7 +15,7 @@ Pod::Spec.new do |s|
   s.module_name  = 'NativeNavigation'
 
   s.source       = { :git => "https://github.com/PSPDFKit/react-native", :branch => "rad/podspec" }
-  s.source_files  = "ios/RCTPSPDFKit/*.{h,m,swift}"
+  s.source_files  = "ios/RCTPSPDFKit/*"
 
   s.dependency 'React'
   s.frameworks = 'UIKit'
