@@ -10,7 +10,7 @@ Pod::Spec.new do |s|
 
   s.homepage     = "https://github.com/PSPDFKit/react-native#readme"
   s.license      = package['license']
-  s.platform     = :ios, "8.0"
+  s.platform     = :ios, "9.0"
 
   s.module_name  = 'NativeNavigation'
 
