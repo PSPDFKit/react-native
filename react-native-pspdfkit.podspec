@@ -17,5 +17,5 @@ Pod::Spec.new do |s|
 
   s.dependency 'React'
   s.frameworks = 'UIKit'
-  s.vendored_frameworks = 'PSPDFKit.framework'
+  s.vendored_frameworks = '../../PSPDFKit/PSPDFKit.framework'
 end
