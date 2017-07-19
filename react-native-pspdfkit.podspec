@@ -16,6 +16,7 @@ Pod::Spec.new do |s|
   s.source_files  = "ios/*.{xcodeproj}", "ios/RCTPSPDFKit/*.{h,m,swift}", "ios/RCTPSPDFKit/Converters/*.{h,m,swift}"
 
   s.dependency 'React'
-  s.frameworks = 'UIKit'
+  s.dependency 'PSPDFKit.framework'
+  s.frameworks = 'UIKit', 'PSPDFKit.framework'
   s.vendored_frameworks = 'PSPDFKit.framework'
 end
