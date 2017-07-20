@@ -3,9 +3,9 @@
 ### iOS
 
 #### Requirements
-- Xcode 8.3.2
-- PSPDFKit >=6.6
-- react-native >= 0.41.2
+- Xcode 8.3.3
+- PSPDFKit >=6.8
+- react-native >= 0.46.4
 
 #### Getting Started
 
@@ -22,15 +22,13 @@ Lets create a simple app that integrates `PSPDFKit.framework` and uses the `reac
 ![Deployment Target](screenshots/deployment-target.png)
 9. Change "View controller-based status bar appearance" to `YES` in `Info.plist`:
 ![View Controller-Based Status Bar Appearance](screenshots/view-controller-based-status-bar-appearance.png)
-10. Open `node_modules/react-native-pspdfkit/ios` and drag and drop `RCTPSPDFKit.xcodproj` into the YourApp Xcode project:
-![Project Dependency](screenshots/project-dependency.png)
-11. Link with the `libRCTPSPDFKit.a` static library:
+10. Make sure the `libRCTPSPDFKit.a` static library is linked to the "YourApp" target:
 ![Linking Static Library](screenshots/linking-static-library.png)
-12. Embed `PSPDFKit.framework` by drag and dropping it into the "Embedded Binaries" section of the "YourApp" target (Select "Create groups"). This will also add it to the "Linked Framworks and Libraries" section:
+11. Embed `PSPDFKit.framework` by drag and dropping it into the "Embedded Binaries" section of the "YourApp" target (Select "Create groups"). This will also add it to the "Linked Framworks and Libraries" section:
 ![Embedding PSPDFKit](screenshots/embedding-pspdfkit.png)
-13. Add a PDF by drag and dropping it into your Xcode project (Select "Create groups" and add to target "YourApp"). This will add the document to the "Copy Bundle Resources" build phase:
+12. Add a PDF by drag and dropping it into your Xcode project (Select "Create groups" and add to target "YourApp"). This will add the document to the "Copy Bundle Resources" build phase:
 ![Adding PDF](screenshots/adding-pdf.png)
-14. Replace the default component from `index.ios.js` with a simple touch area to present the bundled PDF:
+13. Replace the default component from `index.ios.js` with a simple touch area to present the bundled PDF:
 
 ```javascript
 import React, { Component } from 'react';
