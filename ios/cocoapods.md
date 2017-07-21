@@ -65,7 +65,7 @@ end
 ![Embedding PSPDFKit](../screenshots/embedding-pspdfkit.png)
 19. Add a PDF by drag and dropping it into your Xcode project (Select "Create groups" and add to target "YourApp"). This will add the document to the "Copy Bundle Resources" build phase: 
 ![Adding PDF](../screenshots/adding-pdf.png)
-20. Replace the default component from index.ios.js`` with a simple touch area to present the bundled PDF:
+20. Replace the default component from `index.ios.js` with a simple touch area to present the bundled PDF:
 
 ```javascript
 import React, { Component } from 'react';
