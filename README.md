@@ -24,7 +24,7 @@ Let's create a simple app that integrates `PSPDFKit.framework` and uses the `rea
 ![Deployment Target](screenshots/deployment-target.png)
 9. Change "View controller-based status bar appearance" to `YES` in `Info.plist`:
 ![View Controller-Based Status Bar Appearance](screenshots/view-controller-based-status-bar-appearance.png)
-10. Make sure the `libRCTPSPDFKit.a` static library is linked to the "YourApp" target:
+10. Link with the `libRCTPSPDFKit.a` static library (if `libRCTPSPDFKit.a` is already there but greyed out, delete it and link it again): 
 ![Linking Static Library](screenshots/linking-static-library.png)
 11. Embed `PSPDFKit.framework` by drag and dropping it into the "Embedded Binaries" section of the "YourApp" target (Select "Create groups"). This will also add it to the "Linked Framworks and Libraries" section:
 ![Embedding PSPDFKit](screenshots/embedding-pspdfkit.png)
