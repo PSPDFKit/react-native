@@ -27,7 +27,7 @@ Lets create a simple app that integrates `PSPDFKit.framework` using CocoaPods.
 11. Go back to the Terminal, `cd ios` then run `pod init`
 12. Replace the content of your newly created `Podfile` with this:
 
-```Podfile
+```podfile
 target 'YourApp' do
   use_frameworks!
 
