@@ -57,7 +57,7 @@ end
 13. Run `pod install`
 14. Open the newly created workspace: `YourApp.workspace`
 15. Copy `PSPDFKit.framework` into the Pods folder: `YourApp/ios/Pods`
-16. Drag and drop if from the Finder into the `RCTPSPDFKit` group:
+16. Drag and drop it from the Finder into the `RCTPSPDFKit` group:
 ![Deployment Target](../screenshots/embedding-pspdfkit-pods.png)
 17. Add it to the `react-native-pspdfkit` framework:
 ![Deployment Target](../screenshots/adding-to-react-native-pspdfkit.png)
