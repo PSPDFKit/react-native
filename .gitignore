@@ -42,5 +42,6 @@ buck-out/
 android/app/libs
 *.keystore
 
+PSPDFKit/PSPDFKit.framework
 samples/Catalog/android/pspdfkit-lib/*.aar
 
