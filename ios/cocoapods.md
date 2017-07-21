@@ -27,9 +27,8 @@ Lets create a simple app that integrates `PSPDFKit.framework` using CocoaPods.
 11. Go back to the Terminal, `cd ios` then run `pod init`
 12. Replace the content of your newly created `Podfile` with this:
 
-```
+```Podfile
 target 'YourApp' do
-  # Native Navigation uses Swift, so this line is required!
   use_frameworks!
 
   pod 'react-native-pspdfkit', :path => '../node_modules/react-native-pspdfkit'
