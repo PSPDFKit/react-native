@@ -9,7 +9,9 @@
 
 #### Getting Started
 
-Lets create a simple app that integrates `PSPDFKit.framework` and uses the `react-native-pspdfkit` module.
+**Note:** If you want to integrate PSPDFKit using CocoaPods, use [these instructions](ios/cocoapods.md) instead.
+
+Let's create a simple app that integrates `PSPDFKit.framework` and uses the `react-native-pspdfkit` module.
 
 1. Make sure `react-native-cli` is installed: `yarn global add react-native-cli`
 2. Create the app with `react-native init YourApp`.
@@ -22,7 +24,7 @@ Lets create a simple app that integrates `PSPDFKit.framework` and uses the `reac
 ![Deployment Target](screenshots/deployment-target.png)
 9. Change "View controller-based status bar appearance" to `YES` in `Info.plist`:
 ![View Controller-Based Status Bar Appearance](screenshots/view-controller-based-status-bar-appearance.png)
-10. Make sure the `libRCTPSPDFKit.a` static library is linked to the "YourApp" target:
+10. Link with the `libRCTPSPDFKit.a` static library (if `libRCTPSPDFKit.a` is already there but greyed out, delete it and link it again): 
 ![Linking Static Library](screenshots/linking-static-library.png)
 11. Embed `PSPDFKit.framework` by drag and dropping it into the "Embedded Binaries" section of the "YourApp" target (Select "Create groups"). This will also add it to the "Linked Framworks and Libraries" section:
 ![Embedding PSPDFKit](screenshots/embedding-pspdfkit.png)
