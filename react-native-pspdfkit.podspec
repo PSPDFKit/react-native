@@ -11,7 +11,7 @@ Pod::Spec.new do |s|
   s.license      = package['license']
   s.platform     = :ios, "9.0"
   s.module_name  = 'PSPDFKitReactNativeiOS'
-  s.source       = { :git => "https://github.com/PSPDFKit/react-native", :branch => "rad/podspec" }
+  s.source       = { :git => "https://github.com/PSPDFKit/react-native" }
   s.source_files = "ios/*.{xcodeproj}", "ios/RCTPSPDFKit/*.{h,m,swift}", "ios/RCTPSPDFKit/Converters/*.{h,m,swift}"
   s.dependency 'React'
   s.frameworks = 'UIKit'
