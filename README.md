@@ -9,7 +9,9 @@
 
 #### Getting Started
 
-Lets create a simple app that integrates `PSPDFKit.framework` and uses the `react-native-pspdfkit` module.
+**Note:** If you want to integrate PSPDFKit using CocoaPods, use [these instructions](ios/cocoapods.md) instead.
+
+Let's create a simple app that integrates `PSPDFKit.framework` and uses the `react-native-pspdfkit` module.
 
 1. Make sure `react-native-cli` is installed: `yarn global add react-native-cli`
 2. Create the app with `react-native init YourApp`.
