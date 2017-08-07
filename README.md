@@ -1,5 +1,7 @@
 ## PSPDFKit for React Native
 
+See our [announcement blog post](https://pspdfkit.com/blog/2016/react-native-module/) for more details.
+
 ### iOS
 
 #### Requirements
