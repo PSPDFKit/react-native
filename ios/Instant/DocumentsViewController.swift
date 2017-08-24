@@ -53,6 +53,7 @@ class DocumentsViewController: UITableViewController, PSPDFInstantClientDelegate
 
       super.init(style: style)
     }
+
     init(instantClient: PSPDFInstantClient, apiClient: APIClient) {
         self.instantClient = instantClient
         self.apiClient = apiClient
@@ -81,11 +82,13 @@ class DocumentsViewController: UITableViewController, PSPDFInstantClientDelegate
             reloadList()
         }
     }
+
     func close() {
       self.dismiss(animated: true) {
 
       }
     }
+
     func reloadList() {
         let task = apiClient.fetchDocumentListTask { result in
             switch result {
