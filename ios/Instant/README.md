@@ -25,8 +25,11 @@
 	* `DocumentsViewControllerBrigde.m`
 
 ![Add Files to Project](../../screenshots/adding-files-to-target.png)
+
 9. This step is optional: Create a bridging header if Xcode prompts you to create one.
+
 ![Create Bridging Header](../../screenshots/create-bridging-header.png)
+
 10. Replace the default component from `index.ios.js` with a touch area to start Instant:
 
 ```javascript
