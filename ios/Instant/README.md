@@ -10,7 +10,7 @@
 
 #### Getting Started
 
-1. Make sure you app already has the integration for PSPDFKit. See the main [README](../../README.md) for the instructions,
+1. Make sure you app already integrates PSPDFKit. See the main [README](../../README.md) for the instructions.
 2. [Run PSPDFKit Server](https://pspdfkit.com/guides/server/current/deployment/getting-started/) locally.
 3. Get one of our example server apps and follow the instructions in its README file. They have the same API.
 	* [Ruby on Rails example](https://github.com/pspdfkit/pspdfkit-server-example-rails)
@@ -18,7 +18,7 @@
 4. In a web browser, log in to the example app with the same user ID the iOS app uses in [DocumentsViewController.swift](https://github.com/PSPDFKit/react-native/blob/master/ios/Instant/DocumentsViewController.swift#L52), which by default is "test".
 5. Add a document to the server using the `Upload PDF` button.
 6. Select the document to view it with PSPDFKit for Web.
-7. Open `YourApp.xcodeproj` in Xcode
+7. Open `YourApp.xcodeproj` in Xcode.
 8. Add the following files from the this folder (`ios/Instant/`) to your project:
 	* `APIClient.swift`
 	* `DocumentsViewController.swift`
