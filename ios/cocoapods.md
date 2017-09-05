@@ -4,9 +4,9 @@
 
 #### Requirements
 - Xcode 8.3.3
-- PSPDFKit >=6.8
-- react-native >= 0.46.4
-- CocoaPods >= 1.2.1
+- PSPDFKit >=6.9.3
+- react-native >= 0.48.1
+- CocoaPods >= 1.3.1
 
 #### Getting Started
 
@@ -42,10 +42,9 @@ target 'YourApp' do
     'RCTText',
     'RCTNetwork',
     'RCTWebSocket', # needed for debugging
-    'RCTAnimation',
     'RCTImage',
     'RCTNetwork',
-        'BatchedBridge', # https://github.com/facebook/react-native/issues/14749
+    'BatchedBridge', # https://github.com/facebook/react-native/issues/14749
     # Add any other subspecs you want to use in your project
   ]
 
