@@ -400,3 +400,7 @@ This project can be used for evaluation or if you have a valid PSPDFKit license.
 All items and source code Copyright © 2010-2017 PSPDFKit GmbH.
 
 See LICENSE for details.
+
+## Contributing
+  
+Please ensure [you signed our CLA](https://pspdfkit.com/guides/web/current/miscellaneous/contributing/) so we can accept your contributions.
