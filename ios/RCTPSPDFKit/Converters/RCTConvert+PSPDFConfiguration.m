@@ -56,9 +56,8 @@
     SET(pageTransition, PSPDFPageTransition)
     SET(scrollDirection, PSPDFScrollDirection)
     SET(scrollViewInsetAdjustment, PSPDFScrollInsetAdjustment)
-    SET(doublePageModeOnFirstPage, BOOL)
+    SET(firstPageAlwaysSingle, BOOL)
     SET(zoomingSmallDocumentsEnabled, BOOL)
-    SET(pageCurlDirectionLeftToRight, BOOL)
     SET(fitToWidthEnabled, BOOL)
     SET(showsHorizontalScrollIndicator, BOOL)
     SET(showsVerticalScrollIndicator, BOOL)
@@ -93,8 +92,7 @@
     SET(shouldScrollToChangedPage, BOOL)
     SET(searchMode, PSPDFSearchMode)
     SET(searchResultZoomScale, CGFloat)
-    SET(signatureSavingEnabled, BOOL)
-    SET(customerSignatureFeatureEnabled, BOOL)
+    SET(signatureSavingStrategy, PSPDFSignatureSavingStrategy)
     SET(naturalSignatureDrawingEnabled, BOOL)
     // currently unsupported: SET(*galleryConfiguration, PSPDFGalleryConfiguration)
     SET(showBackActionButton, BOOL)
@@ -223,6 +221,13 @@ RCT_ENUM_CONVERTER(PSPDFSearchMode,
                    (@{@"modal" : @(PSPDFSearchModeModal),
                       @"inline" : @(PSPDFSearchModeInline)}),
                    PSPDFSearchModeModal,
+                   unsignedIntegerValue)
+
+RCT_ENUM_CONVERTER(PSPDFSignatureSavingStrategy,
+                   (@{@"alwaysSave" : @(PSPDFSignatureSavingStrategyAlwaysSave),
+                      @"neverSave" : @(PSPDFSignatureSavingStrategyNeverSave),
+                      @"saveIfSelected" : @(PSPDFSignatureSavingStrategySaveIfSelected)}),
+                   PSPDFSignatureSavingStrategyAlwaysSave,
                    unsignedIntegerValue)
 
 RCT_MULTI_ENUM_CONVERTER(PSPDFAnnotationType,
