@@ -17,6 +17,7 @@
 #import <React/RCTConvert.h>
 
 @import PSPDFKit;
+@import PSPDFKitUI;
 
 @implementation RCTPSPDFKitManager
 
