@@ -23,7 +23,7 @@
     url = [[NSBundle mainBundle] URLForResource:string withExtension:nil];
   }
 
-  return [PSPDFDocument documentWithURL:url];
+  return [[PSPDFDocument alloc] initWithURL:url];
 }
 
 @end
