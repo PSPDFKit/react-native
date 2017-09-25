@@ -20,9 +20,6 @@
   NSDictionary *dictionary = [self NSDictionary:json];
 
   return [PSPDFConfiguration configurationWithBuilder:^(PSPDFConfigurationBuilder * _Nonnull builder) {
-    SET(margin, UIEdgeInsets)
-    SET(padding, UIEdgeInsets)
-    SET(pagePadding, CGFloat)
     SET(doubleTapAction, PSPDFTapAction)
     SET(formElementZoomEnabled, BOOL)
     SET(scrollOnTapPageEndEnabled, BOOL)
@@ -40,13 +37,13 @@
     SET(shouldRestoreNavigationBarStyle, BOOL)
     SET(linkAction, PSPDFLinkAction)
     SET(allowedMenuActions, PSPDFTextSelectionMenuAction)
-    SET(HUDViewMode, PSPDFHUDViewMode)
-    SET(HUDViewAnimation, PSPDFHUDViewAnimation)
+    SET(userInterfaceViewMode, PSPDFUserInterfaceViewMode)
+    SET(userInterfaceViewAnimation, PSPDFUserInterfaceViewAnimation)
     SET(thumbnailBarMode, PSPDFThumbnailBarMode)
     SET(pageLabelEnabled, BOOL)
     SET(documentLabelEnabled, PSPDFAdaptiveConditional)
-    SET(shouldHideHUDOnPageChange, BOOL)
-    SET(shouldShowHUDOnViewWillAppear, BOOL)
+    SET(shouldHideUserInterfaceOnPageChange, BOOL)
+    SET(shouldShowUserInterfaceOnViewWillAppear, BOOL)
     SET(allowToolbarTitleChange, BOOL)
     SET(renderAnimationEnabled, BOOL)
     SET(renderStatusViewPosition, PSPDFRenderStatusViewPosition)
@@ -57,20 +54,17 @@
     SET(scrollDirection, PSPDFScrollDirection)
     SET(scrollViewInsetAdjustment, PSPDFScrollInsetAdjustment)
     SET(firstPageAlwaysSingle, BOOL)
-    SET(zoomingSmallDocumentsEnabled, BOOL)
-    SET(fitToWidthEnabled, BOOL)
-    SET(showsHorizontalScrollIndicator, BOOL)
-    SET(showsVerticalScrollIndicator, BOOL)
-    SET(alwaysBouncePages, BOOL)
-    SET(fixedVerticalPositionForFitToWidthEnabledMode, BOOL)
+    SET(spreadFitting, PSPDFConfigurationSpreadFitting)
+    SET(showsScrollIndicator, BOOL)
+    SET(alwaysBounce, BOOL)
     SET(clipToPageBoundaries, BOOL)
     SET(minimumZoomScale, float)
     SET(maximumZoomScale, float)
     SET(shadowEnabled, BOOL)
     SET(shadowOpacity, CGFloat)
-    SET(shouldHideNavigationBarWithHUD, BOOL)
+    SET(shouldHideNavigationBarWithUserInterface, BOOL)
     SET(shouldHideStatusBar, BOOL)
-    SET(shouldHideStatusBarWithHUD, BOOL)
+    SET(shouldHideStatusBarWithUserInterface, BOOL)
     SET(backgroundColor, UIColor)
     SET(allowedAppearanceModes, PSPDFAppearanceMode)
     SET(thumbnailSize, CGSize)
@@ -141,19 +135,19 @@ RCT_ENUM_CONVERTER(PSPDFLinkAction,
                    PSPDFLinkActionNone,
                    unsignedIntegerValue)
 
-RCT_ENUM_CONVERTER(PSPDFHUDViewMode,
-                   (@{@"always" : @(PSPDFHUDViewModeAlways),
-                      @"automatic" : @(PSPDFHUDViewModeAutomatic),
-                      @"automaticNoFirstLastPage" : @(PSPDFHUDViewModeAutomaticNoFirstLastPage),
-                      @"never" : @(PSPDFHUDViewModeNever)}),
-                   PSPDFHUDViewModeAutomatic,
+RCT_ENUM_CONVERTER(PSPDFUserInterfaceViewMode,
+                   (@{@"always" : @(PSPDFUserInterfaceViewModeAlways),
+                      @"automatic" : @(PSPDFUserInterfaceViewModeAutomatic),
+                      @"automaticNoFirstLastPage" : @(PSPDFUserInterfaceViewModeAutomaticNoFirstLastPage),
+                      @"never" : @(PSPDFUserInterfaceViewModeNever)}),
+                   PSPDFUserInterfaceViewModeAutomatic,
                    unsignedIntegerValue)
 
-RCT_ENUM_CONVERTER(PSPDFHUDViewAnimation,
-                   (@{@"none" : @(PSPDFHUDViewAnimationNone),
-                      @"fade" : @(PSPDFHUDViewAnimationFade),
-                      @"slide" : @(PSPDFHUDViewAnimationSlide)}),
-                   PSPDFHUDViewAnimationNone,
+RCT_ENUM_CONVERTER(PSPDFUserInterfaceViewAnimation,
+                   (@{@"none" : @(PSPDFUserInterfaceViewAnimationNone),
+                      @"fade" : @(PSPDFUserInterfaceViewAnimationFade),
+                      @"slide" : @(PSPDFUserInterfaceViewAnimationSlide)}),
+                   PSPDFUserInterfaceViewAnimationNone,
                    unsignedIntegerValue)
 
 RCT_ENUM_CONVERTER(PSPDFThumbnailBarMode,
@@ -198,10 +192,10 @@ RCT_ENUM_CONVERTER(PSPDFThumbnailGrouping,
                    unsignedIntegerValue)
 
 RCT_ENUM_CONVERTER(PSPDFPageTransition,
-                   (@{@"scrollPerPage" : @(PSPDFPageTransitionScrollPerPage),
+                   (@{@"scrollPerSpread" : @(PSPDFPageTransitionScrollPerSpread),
                       @"scrollContinuous" : @(PSPDFPageTransitionScrollContinuous),
                       @"curl" : @(PSPDFPageTransitionCurl)}),
-                   PSPDFPageTransitionScrollPerPage,
+                   PSPDFPageTransitionScrollPerSpread,
                    unsignedIntegerValue)
 
 RCT_ENUM_CONVERTER(PSPDFScrollInsetAdjustment,
@@ -305,4 +299,12 @@ RCT_MULTI_ENUM_CONVERTER(PSPDFSettingsOptions,
                          PSPDFSettingsOptionAll,
                          unsignedIntegerValue)
 
+RCT_ENUM_CONVERTER(PSPDFConfigurationSpreadFitting,
+                   (@{@"fit" : @(PSPDFConfigurationSpreadFittingFit),
+                      @"fill" : @(PSPDFConfigurationSpreadFittingFill),
+                      @"adaptive" : @(PSPDFConfigurationSpreadFittingAdaptive)}),
+                   PSPDFScrollInsetAdjustmentNone,
+                   unsignedIntegerValue)
+
 @end
+
