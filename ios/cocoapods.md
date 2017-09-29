@@ -5,7 +5,7 @@
 #### Requirements
 - Xcode 9
 - PSPDFKit >=7.0.0
-- react-native >= 0.48.1
+- react-native >= 0.48.4
 - CocoaPods >= 1.3.1
 
 #### Getting Started
