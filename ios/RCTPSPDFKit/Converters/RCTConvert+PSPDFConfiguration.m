@@ -128,7 +128,7 @@ RCT_ENUM_CONVERTER(PSPDFLinkAction,
                       @"alertView" : @(PSPDFLinkActionAlertView),
                       @"openSafari" : @(PSPDFLinkActionOpenSafari),
                       @"inlineBrowser" : @(PSPDFLinkActionInlineBrowser),
-                      @"browserLegacy" : @(PSPDFLinkActionInlineBrowserLegacy)}),
+                      @"InlineWebViewController" : @(PSPDFLinkActionInlineWebViewController)}),
                    PSPDFLinkActionNone,
                    unsignedIntegerValue)
 
