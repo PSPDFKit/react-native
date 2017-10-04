@@ -3,21 +3,21 @@
 ### CocoaPods integration
 
 #### Requirements
-- Xcode 8.3.3
-- PSPDFKit >=6.9.3
-- react-native >= 0.48.1
+- Xcode 9
+- PSPDFKit >=7.0.0
+- react-native >= 0.48.4
 - CocoaPods >= 1.3.1
 
 #### Getting Started
 
-Lets create a simple app that integrates `PSPDFKit.framework` using CocoaPods.
+Lets create a simple app that integrates PSPDFKit using CocoaPods.
 
 1. Make sure `react-native-cli` is installed: `yarn global add react-native-cli`
 2. Create the app with `react-native init YourApp`.
 3. Step into your newly created app folder: `cd YourApp`
 4. Install `react-native-pspdfkit` from GitHub: `yarn add github:PSPDFKit/react-native`
 5. IMPORTANT: Do not link module react-native-pspdfkit: Do not use react-native link react-native-pspdfkit
-6. Create the folder `ios/PSPDFKit` and copy `PSPDFKit.framework` into it.
+6. Create the folder `ios/PSPDFKit` and copy `PSPDFKit.framework` and `PSPDFKitUI.framework` into it.
 7. Open ios/YourApp.xcodeproj in Xcode: open ios/YourApp.xcodeproj
 8. Make sure the deployment target is set to 9.0 or higher: 
 ![Deployment Target](../screenshots/deployment-target.png)
@@ -55,12 +55,12 @@ end
 
 13. Run `pod install`
 14. Open the newly created workspace: `YourApp.workspace`
-15. Copy `PSPDFKit.framework` into the Pods folder: `YourApp/ios/Pods`
+15. Copy `PSPDFKit.framework` and `PSPDFKitUI.framework` into the Pods folder: `YourApp/ios/Pods`
 16. Drag and drop it from the Finder into the `RCTPSPDFKit` group:
 ![Deployment Target](../screenshots/embedding-pspdfkit-pods.png)
 17. Add it to the `react-native-pspdfkit` framework:
 ![Deployment Target](../screenshots/adding-to-react-native-pspdfkit.png)
-18. Embed `YourApp/ios/PSPDFKit/PSPDFKit.framework` (not the copy from `YourApp/ios/Pods/PSPDFKit.framework`) by drag and dropping it into the "Embedded Binaries" section of the "YourApp" target (Select "Create groups"). This will also add it to the "Linked Frameworks and Libraries" section:
+18. Embed `YourApp/ios/PSPDFKit/PSPDFKit.framework` and `YourApp/ios/PSPDFKit/PSPDFKitUI.framework` (not the copies from `YourApp/ios/Pods/`) by drag and dropping it into the "Embedded Binaries" section of the "YourApp" target (Select "Create groups"). This will also add it to the "Linked Frameworks and Libraries" section:
 ![Embedding PSPDFKit](../screenshots/embedding-pspdfkit.png)
 19. Add a PDF by drag and dropping it into your Xcode project (Select "Create groups" and add to target "YourApp"). This will add the document to the "Copy Bundle Resources" build phase: 
 ![Adding PDF](../screenshots/adding-pdf.png)

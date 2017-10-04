@@ -5,22 +5,22 @@ See our [announcement blog post](https://pspdfkit.com/blog/2016/react-native-mod
 ### iOS
 
 #### Requirements
-- Xcode 8.3.3
-- PSPDFKit >= 6.9.3
-- react-native >= 0.48.1
+- Xcode 9
+- PSPDFKit >= 7.0.0
+- react-native >= 0.48.4
 
 #### Getting Started
 
 **Note:** If you want to integrate PSPDFKit using CocoaPods, use [these instructions](ios/cocoapods.md) instead.
 
-Let's create a simple app that integrates `PSPDFKit.framework` and uses the `react-native-pspdfkit` module.
+Let's create a simple app that integrates PSPDFKit and uses the `react-native-pspdfkit` module.
 
 1. Make sure `react-native-cli` is installed: `yarn global add react-native-cli`
 2. Create the app with `react-native init YourApp`.
 3. Step into your newly created app folder: `cd YourApp`
 4. Install `react-native-pspdfkit` from GitHub: `yarn add github:PSPDFKit/react-native`
 5. Link module `react-native-pspdfkit`: `react-native link react-native-pspdfkit` 
-6. Create the folder `ios/PSPDFKit` and copy `PSPDFKit.framework` into it.
+6. Create the folder `ios/PSPDFKit` and copy `PSPDFKit.framework` and `PSPDFKitUI.framework` into it.
 7. Open `ios/YourApp.xcodeproj` in Xcode: `open ios/YourApp.xcodeproj`
 8. Make sure the deployment target is set to 9.0 or higher:
 ![Deployment Target](screenshots/deployment-target.png)
@@ -28,7 +28,7 @@ Let's create a simple app that integrates `PSPDFKit.framework` and uses the `rea
 ![View Controller-Based Status Bar Appearance](screenshots/view-controller-based-status-bar-appearance.png)
 10. Link with the `libRCTPSPDFKit.a` static library (if `libRCTPSPDFKit.a` is already there but greyed out, delete it and link it again): 
 ![Linking Static Library](screenshots/linking-static-library.png)
-11. Embed `PSPDFKit.framework` by drag and dropping it into the "Embedded Binaries" section of the "YourApp" target (Select "Create groups"). This will also add it to the "Linked Framworks and Libraries" section:
+11. Embed `PSPDFKit.framework` and `PSPDFKitUI.framework` by drag and dropping it into the "Embedded Binaries" section of the "YourApp" target (Select "Create groups"). This will also add it to the "Linked Framworks and Libraries" section:
 ![Embedding PSPDFKit](screenshots/embedding-pspdfkit.png)
 12. Add a PDF by drag and dropping it into your Xcode project (Select "Create groups" and add to target "YourApp"). This will add the document to the "Copy Bundle Resources" build phase:
 ![Adding PDF](screenshots/adding-pdf.png)
@@ -102,7 +102,7 @@ PSPDFKit.present('document.pdf', {
   
 #### Running Catalog Project
 
-- Copy `PSPDFKit.framework` into the `PSPDFKit` directory.
+- Copy `PSPDFKit.framework` and `PSPDFKitUI.framework` into the `PSPDFKit` directory.
 - Install dependencies: `yarn install` in `samples/Catalog` directory. (Because of a [bug](https://github.com/yarnpkg/yarn/issues/2165) you may need to clean `yarn`'s cache with `yarn cache clean` before.)
 - Run the app with `react-native-cli`: `react-native run-ios`
 
