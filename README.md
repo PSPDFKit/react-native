@@ -30,9 +30,10 @@ Let's create a simple app that integrates PSPDFKit and uses the `react-native-ps
 ![Linking Static Library](screenshots/linking-static-library.png)
 11. Embed `PSPDFKit.framework` and `PSPDFKitUI.framework` by drag and dropping it into the "Embedded Binaries" section of the "YourApp" target (Select "Create groups"). This will also add it to the "Linked Framworks and Libraries" section:
 ![Embedding PSPDFKit](screenshots/embedding-pspdfkit.png)
-12. Add a PDF by drag and dropping it into your Xcode project (Select "Create groups" and add to target "YourApp"). This will add the document to the "Copy Bundle Resources" build phase:
+12. Add `$(PROJECT_DIR)/PSPDFKit` to `Framework Search Paths` in build settings. Choose `recursive`.
+13. Add a PDF by drag and dropping it into your Xcode project (Select "Create groups" and add to target "YourApp"). This will add the document to the "Copy Bundle Resources" build phase:
 ![Adding PDF](screenshots/adding-pdf.png)
-13. Replace the default component from `index.ios.js` with a simple touch area to present the bundled PDF:
+14. Replace the default component from `index.ios.js` with a simple touch area to present the bundled PDF:
 
 ```javascript
 import React, { Component } from 'react';
