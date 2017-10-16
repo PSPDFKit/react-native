@@ -87,7 +87,7 @@ async function requestExternalStoragePermission(callback) {
   }
 }
 
-class Catalog extends Component {
+export default class Catalog extends Component<{}> {
   // Initialize the hardcoded data
   constructor(props) {
     super(props);

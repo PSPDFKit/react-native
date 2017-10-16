@@ -114,7 +114,7 @@ PSPDFKit.present('document.pdf', {
 - Android Build Tools 23.0.1 (React Native)
 - Android Build Tools 25.0.2 (PSPDFKit module)
 - PSPDFKit >= 3.3.3
-- react-native >= 0.48.1
+- react-native >= 0.48.4
 
 #### Getting Started
 
@@ -194,7 +194,7 @@ with
   ```xml    
 <item name="colorPrimary">#3C97C9</item>
   ```     
-10. <a id="step-10"></a>Replace the default component from `YourApp/index.android.js` with a simple touch area to present a PDF document from the local device filesystem:
+10. <a id="step-10"></a>Replace the default component from `YourApp/App.js` with a simple touch area to present a PDF document from the local device filesystem:
         
    ```javascript
    import React, { Component } from 'react';
@@ -218,7 +218,7 @@ with
    };
 	
    // Change 'YourApp' to your app's name.
-   class YourApp extends Component {
+   export default class YourApp extends Component<{}> {
      _onPressButton() {
      requestExternalStoragePermission();
      }
@@ -264,9 +264,6 @@ with
        margin: 10,
      }
    });
-        
-   // Change both 'YourApp's to your app's name.
-   AppRegistry.registerComponent('YourApp', () => YourApp);
    ```  
 11. Before launching the app you need to copy a PDF document onto your development device or emulator.
 
