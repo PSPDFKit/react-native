@@ -55,6 +55,8 @@
     SET(firstPageAlwaysSingle, BOOL)
     SET(spreadFitting, PSPDFConfigurationSpreadFitting)
     SET(clipToPageBoundaries, BOOL)
+    SET(additionalScrollViewFrameInsets, UIEdgeInsets)
+    SET(additionalContentInsets, UIEdgeInsets)
     SET(minimumZoomScale, float)
     SET(maximumZoomScale, float)
     SET(shadowEnabled, BOOL)

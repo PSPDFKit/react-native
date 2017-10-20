@@ -6,7 +6,7 @@ See our [announcement blog post](https://pspdfkit.com/blog/2016/react-native-mod
 
 #### Requirements
 - Xcode 9
-- PSPDFKit >= 7.0.0
+- PSPDFKit >= 7.0.2
 - react-native >= 0.48.4
 
 #### Getting Started
