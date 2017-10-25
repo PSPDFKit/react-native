@@ -19,7 +19,7 @@ import android.support.annotation.NonNull;
 
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableMapKeySetIterator;
-import com.pspdfkit.configuration.activity.HudViewMode;
+import com.pspdfkit.configuration.activity.UserInterfaceViewMode;
 import com.pspdfkit.configuration.activity.PdfActivityConfiguration;
 import com.pspdfkit.configuration.activity.ThumbnailBarMode;
 import com.pspdfkit.configuration.page.PageFitMode;
@@ -33,11 +33,11 @@ public class ConfigurationAdapter {
     private static final String PAGE_SCROLL_CONTINUOUS = "scrollContinuously";
     private static final String FIT_PAGE_TO_WIDTH = "fitPageToWidth";
     private static final String IMMERSIVE_MODE = "immersiveMode";
-    private static final String SYSTEM_HUD_MODE = "HudViewMode";
-    private static final String HUD_VIEW_MODE_AUTOMATIC = "automatic";
-    private static final String HUD_VIEW_MODE_AUTOMATIC_BORDER_PAGES = "automaticBorderPages";
-    private static final String HUD_VIEW_MODE_ALWAYS_VISIBLE = "alwaysVisible";
-    private static final String HUD_VIEW_MODE_ALWAYS_HIDDEN = "alwaysHidden";
+    private static final String USER_INTERFACE_VIEW_MODE = "userInterfaceViewMode";
+    private static final String USER_INTERFACE_VIEW_MODE_AUTOMATIC = "automatic";
+    private static final String USER_INTERFACE_VIEW_MODE_AUTOMATIC_BORDER_PAGES = "automaticBorderPages";
+    private static final String USER_INTERFACE_VIEW_MODE_ALWAYS_VISIBLE = "alwaysVisible";
+    private static final String USER_INTERFACE_VIEW_MODE_ALWAYS_HIDDEN = "alwaysHidden";
     private static final String SHOW_SEARCH_ACTION = "showSearchAction";
     private static final String INLINE_SEARCH = "inlineSearch";
     private static final String SHOW_THUMBNAIL_BAR = "showThumbnailBar";
@@ -83,8 +83,8 @@ public class ConfigurationAdapter {
             if (configuration.hasKey(INLINE_SEARCH)) {
                 configureInlineSearch(configuration.getBoolean(INLINE_SEARCH));
             }
-            if (configuration.hasKey(SYSTEM_HUD_MODE)) {
-                configureSystemHudMode(configuration.getString(SYSTEM_HUD_MODE));
+            if (configuration.hasKey(USER_INTERFACE_VIEW_MODE)) {
+                configureUserInterfaceViewMode(configuration.getString(USER_INTERFACE_VIEW_MODE));
             }
             if (configuration.hasKey(START_PAGE)) {
                 configureStartPage(configuration.getInt(START_PAGE));
@@ -169,18 +169,18 @@ public class ConfigurationAdapter {
         configuration.page(startPage);
     }
 
-    private void configureSystemHudMode(String systemHudMode) {
-        HudViewMode hudMode = HudViewMode.HUD_VIEW_MODE_AUTOMATIC;
-        if (systemHudMode.equals(HUD_VIEW_MODE_AUTOMATIC)) {
-            hudMode = HudViewMode.HUD_VIEW_MODE_AUTOMATIC;
-        } else if (systemHudMode.equals(HUD_VIEW_MODE_AUTOMATIC_BORDER_PAGES)) {
-            hudMode = HudViewMode.HUD_VIEW_MODE_AUTOMATIC_BORDER_PAGES;
-        } else if (systemHudMode.equals(HUD_VIEW_MODE_ALWAYS_VISIBLE)) {
-            hudMode = HudViewMode.HUD_VIEW_MODE_VISIBLE;
-        } else if (systemHudMode.equals(HUD_VIEW_MODE_ALWAYS_HIDDEN)) {
-            hudMode = HudViewMode.HUD_VIEW_MODE_HIDDEN;
+    private void configureUserInterfaceViewMode(String userInterfaceViewMode) {
+        UserInterfaceViewMode result = UserInterfaceViewMode.USER_INTERFACE_VIEW_MODE_AUTOMATIC;
+        if (userInterfaceViewMode.equals(USER_INTERFACE_VIEW_MODE_AUTOMATIC)) {
+            result = UserInterfaceViewMode.USER_INTERFACE_VIEW_MODE_AUTOMATIC;
+        } else if (userInterfaceViewMode.equals(USER_INTERFACE_VIEW_MODE_AUTOMATIC_BORDER_PAGES)) {
+            result = UserInterfaceViewMode.USER_INTERFACE_VIEW_MODE_AUTOMATIC_BORDER_PAGES;
+        } else if (userInterfaceViewMode.equals(USER_INTERFACE_VIEW_MODE_ALWAYS_VISIBLE)) {
+            result = UserInterfaceViewMode.USER_INTERFACE_VIEW_MODE_VISIBLE;
+        } else if (userInterfaceViewMode.equals(USER_INTERFACE_VIEW_MODE_ALWAYS_HIDDEN)) {
+            result = UserInterfaceViewMode.USER_INTERFACE_VIEW_MODE_HIDDEN;
         }
-        configuration.setHudViewMode(hudMode);
+        configuration.setUserInterfaceViewMode(result);
     }
 
     private void configureShowSearchAction(boolean showSearchAction) {
@@ -285,7 +285,7 @@ public class ConfigurationAdapter {
         final PageScrollMode pageScrollMode = PageScrollMode.PER_PAGE;
         final PageFitMode pageFitMode = PageFitMode.FIT_TO_WIDTH;
         final int searchType = PdfActivityConfiguration.SEARCH_INLINE;
-        final HudViewMode hudViewMode = HudViewMode.HUD_VIEW_MODE_AUTOMATIC;
+        final UserInterfaceViewMode userInterfaceViewMode = UserInterfaceViewMode.USER_INTERFACE_VIEW_MODE_AUTOMATIC;
         final ThumbnailBarMode thumbnailBarMode = ThumbnailBarMode.THUMBNAIL_BAR_MODE_DEFAULT;
         int startPage = 0;
 
@@ -293,7 +293,7 @@ public class ConfigurationAdapter {
                 .scrollDirection(pageScrollDirection)
                 .scrollMode(pageScrollMode)
                 .fitMode(pageFitMode)
-                .setHudViewMode(hudViewMode)
+                .setUserInterfaceViewMode(userInterfaceViewMode)
                 .setSearchType(searchType)
                 .setThumbnailBarMode(thumbnailBarMode)
                 .page(startPage);
