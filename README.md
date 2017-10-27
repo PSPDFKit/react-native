@@ -112,9 +112,9 @@ PSPDFKit.present('document.pdf', {
 
 - Android SDK
 - Android Build Tools 23.0.1 (React Native)
-- Android Build Tools 25.0.2 (PSPDFKit module)
-- PSPDFKit >= 3.3.3
-- react-native >= 0.48.4
+- Android Build Tools 26.0.1 (PSPDFKit module)
+- PSPDFKit >= 4.0.1
+- react-native >= 0.49.3
 
 #### Getting Started
 
@@ -148,22 +148,23 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
     }
   ```
 
-7. PSPDFKit targets modern platforms, so you'll have to update `compileSdkVersion` and `targetSdkVersion` to at least API 25 and enable MultiDex. In `YourApp/android/app/build.gradle` (note **four** places to edit):
+7. PSPDFKit targets modern platforms, so you'll have to update `compileSdkVersion` and `targetSdkVersion` to at least API 26 and enable MultiDex. In `YourApp/android/app/build.gradle` (note **five** places to edit):
     
    ```diff
    ...
    android {
    -   compileSdkVersion 23
-   +   compileSdkVersion 25
+   +   compileSdkVersion 26
    -   buildToolsVersion "23.0.1"
-   +   buildToolsVersion "25.0.2" 
+   +   buildToolsVersion "26.0.1" 
 
    defaultConfig {
        applicationId "com.yourapp"
    +   multiDexEnabled true
-       minSdkVersion 16
+   -   minSdkVersion 16
+   +   minSdkVersion 19
    -   targetSdkVersion 22
-   +   targetSdkVersion 25
+   +   targetSdkVersion 26
        versionCode 1
        versionName "1.0"
        ndk {
