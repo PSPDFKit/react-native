@@ -30,7 +30,6 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule {
 
     private static final String VERSION_KEY = "versionString";
     private static final String FILE_SCHEME = "file:///";
-    private String licenseKey = "LICENSE_KEY_GOES_HERE";
 
     public PSPDFKitModule(ReactApplicationContext reactContext) {
         super(reactContext);

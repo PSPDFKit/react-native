@@ -2,7 +2,7 @@
 *   Contains gradle configuration constants
 */
 ext {
-    PSPDFKIT_VERSION = '3.3.3'
+    PSPDFKIT_VERSION = '4.0.1'
 }
 
 buildscript {
@@ -18,12 +18,12 @@ buildscript {
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    compileSdkVersion 26
+    buildToolsVersion "26.0.1"
 
     defaultConfig {
-        minSdkVersion 16
-        targetSdkVersion 25
+        minSdkVersion 19
+        targetSdkVersion 26
         versionCode 1
         versionName "1.0"
     }
@@ -61,9 +61,13 @@ if (demoVersion) {
 
 dependencies {
     if (demoVersion) {
-        compile "com.pspdfkit:pspdfkit-demo:${PSPDFKIT_VERSION}"
+        compile("com.pspdfkit:pspdfkit-demo:${PSPDFKIT_VERSION}") {
+            exclude group: 'com.google.auto.value', module: 'auto-value'
+        }
     } else {
-        compile "com.pspdfkit:pspdfkit:${PSPDFKIT_VERSION}"
+        compile("com.pspdfkit:pspdfkit:${PSPDFKIT_VERSION}") {
+            exclude group: 'com.google.auto.value', module: 'auto-value'
+        }
     }
     compile "com.facebook.react:react-native:+"
 }
