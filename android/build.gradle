@@ -61,9 +61,13 @@ if (demoVersion) {
 
 dependencies {
     if (demoVersion) {
-        compile "com.pspdfkit:pspdfkit-demo:${PSPDFKIT_VERSION}"
+        compile("com.pspdfkit:pspdfkit-demo:${PSPDFKIT_VERSION}") {
+            exclude group: 'com.google.auto.value', module: 'auto-value'
+        }
     } else {
-        compile "com.pspdfkit:pspdfkit:${PSPDFKIT_VERSION}"
+        compile("com.pspdfkit:pspdfkit:${PSPDFKIT_VERSION}") {
+            exclude group: 'com.google.auto.value', module: 'auto-value'
+        }
     }
     compile "com.facebook.react:react-native:+"
 }
