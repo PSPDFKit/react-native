@@ -5,8 +5,8 @@ See our [announcement blog post](https://pspdfkit.com/blog/2016/react-native-mod
 ### iOS
 
 #### Requirements
-- Xcode 9
-- PSPDFKit >= 7.0.2
+- Xcode 9.1
+- PSPDFKit >= 7.0.3
 - react-native >= 0.48.4
 
 #### Getting Started
@@ -32,7 +32,7 @@ Let's create a simple app that integrates PSPDFKit and uses the `react-native-ps
 ![Embedding PSPDFKit](screenshots/embedding-pspdfkit.png)
 12. Add a PDF by drag and dropping it into your Xcode project (Select "Create groups" and add to target "YourApp"). This will add the document to the "Copy Bundle Resources" build phase:
 ![Adding PDF](screenshots/adding-pdf.png)
-13. Replace the default component from `index.ios.js` with a simple touch area to present the bundled PDF:
+13. Replace the default component from `App.js` with a simple touch area to present the bundled PDF:
 
 ```javascript
 import React, { Component } from 'react';
@@ -46,13 +46,15 @@ import {
 } from 'react-native';
 
 var PSPDFKit = NativeModules.PSPDFKit;
-
 PSPDFKit.setLicenseKey('INSERT_YOUR_LICENSE_KEY_HERE');
 
-// Change 'YourApp' to your app's name.
-class YourApp extends Component {
+export default class App extends Component<{}> {
   _onPressButton() {
-    PSPDFKit.present('document.pdf', {})
+    PSPDFKit.present('document.pdf', {
+        pageTransition: 'scrollContinuous',
+        scrollDirection: 'vertical',
+        documentLabelEnabled: true,
+      })
   }
   
   render() {
@@ -73,15 +75,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#F5FCFF',
   },
-  text: {
+  welcome: {
     fontSize: 20,
     textAlign: 'center',
     margin: 10,
-  }
+  },
+  instructions: {
+    textAlign: 'center',
+    color: '#333333',
+    marginBottom: 5,
+  },
 });
-
-// Change both 'YourApp's to your app's name.
-AppRegistry.registerComponent('YourApp', () => YourApp);
 ```
 
 Your app is now ready to launch. Run the app in Xcode or type `react-native run-ios` in the terminal.

@@ -16,6 +16,8 @@
 #import <React/RCTUtils.h>
 #import <React/RCTConvert.h>
 
+#define PROPERTY(property) NSStringFromSelector(@selector(property))
+
 @import PSPDFKit;
 @import PSPDFKitUI;
 
@@ -48,11 +50,14 @@ RCT_EXPORT_METHOD(dismiss) {
   return dispatch_get_main_queue();
 }
 
-- (NSDictionary *)constantsToExport
-{
-  return @{@"versionString": [PSPDFKit versionString],
-           @"versionNumber": [PSPDFKit versionNumber],
-           @"version": @([PSPDFKit version]),
-           @"buildNumber": @([PSPDFKit buildNumber])};
+- (NSDictionary *)constantsToExport {
+  return @{PROPERTY(versionString): PSPDFKit.versionString,
+           PROPERTY(versionNumber): PSPDFKit.versionNumber,
+           PROPERTY(buildNumber): @(PSPDFKit.buildNumber)};
 }
+
+- (BOOL)requiresMainQueueSetup {
+  return NO;
+}
+
 @end

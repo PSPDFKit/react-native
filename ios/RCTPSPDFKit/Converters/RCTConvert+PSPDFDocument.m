@@ -20,7 +20,7 @@
   if ([string hasPrefix:@"/"]) {
     url = [NSURL fileURLWithPath:string];
   } else {
-    url = [[NSBundle mainBundle] URLForResource:string withExtension:nil];
+    url = [NSBundle.mainBundle URLForResource:string withExtension:nil];
   }
 
   return [[PSPDFDocument alloc] initWithURL:url];
