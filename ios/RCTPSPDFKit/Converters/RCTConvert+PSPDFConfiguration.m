@@ -97,6 +97,7 @@
     SET(mailSharingOptions, PSPDFDocumentSharingOptions)
     SET(messageSharingOptions, PSPDFDocumentSharingOptions)
     SET(settingsOptions, PSPDFSettingsOptions)
+    SET(editableAnnotationTypes, NSSet)
   }];
 }
 
@@ -223,34 +224,67 @@ RCT_ENUM_CONVERTER(PSPDFSignatureSavingStrategy,
                    PSPDFSignatureSavingStrategyAlwaysSave,
                    unsignedIntegerValue)
 
+/**
+ Strings for reference:
+
+ PSPDFAnnotationString const PSPDFAnnotationStringLink = @"Link";
+ PSPDFAnnotationString const PSPDFAnnotationStringHighlight = @"Highlight";
+ PSPDFAnnotationString const PSPDFAnnotationStringUnderline = @"Underline";
+ PSPDFAnnotationString const PSPDFAnnotationStringSquiggly = @"Squiggly";
+ PSPDFAnnotationString const PSPDFAnnotationStringStrikeOut = @"StrikeOut";
+ PSPDFAnnotationString const PSPDFAnnotationStringNote = @"Text";
+ PSPDFAnnotationString const PSPDFAnnotationStringCaret = @"Caret";
+ PSPDFAnnotationString const PSPDFAnnotationStringFreeText = @"FreeText";
+ PSPDFAnnotationString const PSPDFAnnotationStringInk = @"Ink";
+ PSPDFAnnotationString const PSPDFAnnotationStringSquare = @"Square";
+ PSPDFAnnotationString const PSPDFAnnotationStringCircle = @"Circle";
+ PSPDFAnnotationString const PSPDFAnnotationStringLine = @"Line";
+ PSPDFAnnotationString const PSPDFAnnotationStringSignature = @"Signature";
+ PSPDFAnnotationString const PSPDFAnnotationStringStamp = @"Stamp";
+ PSPDFAnnotationString const PSPDFAnnotationStringEraser = @"Eraser";
+ PSPDFAnnotationString const PSPDFAnnotationStringImage = @"Image";
+ PSPDFAnnotationString const PSPDFAnnotationStringWidget = @"Widget";
+ PSPDFAnnotationString const PSPDFAnnotationStringFile = @"FileAttachment";
+ PSPDFAnnotationString const PSPDFAnnotationStringSound = @"Sound";
+ PSPDFAnnotationString const PSPDFAnnotationStringPolygon = @"Polygon";
+ PSPDFAnnotationString const PSPDFAnnotationStringPolyLine = @"PolyLine";
+ PSPDFAnnotationString const PSPDFAnnotationStringRichMedia = @"RichMedia";
+ PSPDFAnnotationString const PSPDFAnnotationStringScreen = @"Screen";
+ PSPDFAnnotationString const PSPDFAnnotationStringPopup = @"Popup";
+ PSPDFAnnotationString const PSPDFAnnotationStringWatermark = @"Watermark";
+ PSPDFAnnotationString const PSPDFAnnotationStringTrapNet = @"TrapNet";
+ PSPDFAnnotationString const PSPDFAnnotationString3D = @"3D";
+ PSPDFAnnotationString const PSPDFAnnotationStringRedact = @"Redact";
+ */
+
 RCT_MULTI_ENUM_CONVERTER(PSPDFAnnotationType,
                          (@{@"none" : @(PSPDFAnnotationTypeNone),
                             @"undefined" : @(PSPDFAnnotationTypeUndefined),
-                            @"link" : @(PSPDFAnnotationTypeLink),
-                            @"highlight" : @(PSPDFAnnotationTypeHighlight),
-                            @"strikeOut" : @(PSPDFAnnotationTypeStrikeOut),
-                            @"underline" : @(PSPDFAnnotationTypeUnderline),
-                            @"squiggly" : @(PSPDFAnnotationTypeSquiggly),
-                            @"freeText" : @(PSPDFAnnotationTypeFreeText),
-                            @"ink" : @(PSPDFAnnotationTypeInk),
-                            @"square" : @(PSPDFAnnotationTypeSquare),
-                            @"circle" : @(PSPDFAnnotationTypeCircle),
-                            @"line" : @(PSPDFAnnotationTypeLine),
-                            @"note" : @(PSPDFAnnotationTypeNote),
-                            @"stamp" : @(PSPDFAnnotationTypeStamp),
-                            @"caret" : @(PSPDFAnnotationTypeCaret),
-                            @"richMedia" : @(PSPDFAnnotationTypeRichMedia),
-                            @"screen" : @(PSPDFAnnotationTypeScreen),
-                            @"widget" : @(PSPDFAnnotationTypeWidget),
-                            @"file" : @(PSPDFAnnotationTypeFile),
-                            @"sound" : @(PSPDFAnnotationTypeSound),
-                            @"polygon" : @(PSPDFAnnotationTypePolygon),
-                            @"polyLine" : @(PSPDFAnnotationTypePolyLine),
-                            @"popup" : @(PSPDFAnnotationTypePopup),
-                            @"watermark" : @(PSPDFAnnotationTypeWatermark),
-                            @"trapNet" : @(PSPDFAnnotationTypeTrapNet),
-                            @"threeDimensional" : @(PSPDFAnnotationTypeThreeDimensional),
-                            @"redact" : @(PSPDFAnnotationTypeRedact),
+                            PSPDFAnnotationStringLink : @(PSPDFAnnotationTypeLink),
+                            PSPDFAnnotationStringHighlight : @(PSPDFAnnotationTypeHighlight),
+                            PSPDFAnnotationStringStrikeOut : @(PSPDFAnnotationTypeStrikeOut),
+                            PSPDFAnnotationStringUnderline : @(PSPDFAnnotationTypeUnderline),
+                            PSPDFAnnotationStringSquiggly : @(PSPDFAnnotationTypeSquiggly),
+                            PSPDFAnnotationStringFreeText : @(PSPDFAnnotationTypeFreeText),
+                            PSPDFAnnotationStringInk : @(PSPDFAnnotationTypeInk),
+                            PSPDFAnnotationStringSquare : @(PSPDFAnnotationTypeSquare),
+                            PSPDFAnnotationStringCircle : @(PSPDFAnnotationTypeCircle),
+                            PSPDFAnnotationStringLine : @(PSPDFAnnotationTypeLine),
+                            PSPDFAnnotationStringNote : @(PSPDFAnnotationTypeNote),
+                            PSPDFAnnotationStringStamp : @(PSPDFAnnotationTypeStamp),
+                            PSPDFAnnotationStringCaret : @(PSPDFAnnotationTypeCaret),
+                            PSPDFAnnotationStringRichMedia : @(PSPDFAnnotationTypeRichMedia),
+                            PSPDFAnnotationStringScreen : @(PSPDFAnnotationTypeScreen),
+                            PSPDFAnnotationStringWidget : @(PSPDFAnnotationTypeWidget),
+                            PSPDFAnnotationStringFile : @(PSPDFAnnotationTypeFile),
+                            PSPDFAnnotationStringSound : @(PSPDFAnnotationTypeSound),
+                            PSPDFAnnotationStringPolygon : @(PSPDFAnnotationTypePolygon),
+                            PSPDFAnnotationStringPolyLine : @(PSPDFAnnotationTypePolyLine),
+                            PSPDFAnnotationStringPopup : @(PSPDFAnnotationTypePopup),
+                            PSPDFAnnotationStringWatermark : @(PSPDFAnnotationTypeWatermark),
+                            PSPDFAnnotationStringTrapNet : @(PSPDFAnnotationTypeTrapNet),
+                            PSPDFAnnotationString3D : @(PSPDFAnnotationTypeThreeDimensional),
+                            PSPDFAnnotationStringRedact : @(PSPDFAnnotationTypeRedact),
                             @"all" : @(PSPDFAnnotationTypeAll)}),
                          PSPDFAnnotationTypeNone,
                          unsignedIntegerValue)

@@ -110,6 +110,18 @@ PSPDFKit.present('document.pdf', {
 - Install dependencies: `yarn install` in `samples/Catalog` directory. (Because of a [bug](https://github.com/yarnpkg/yarn/issues/2165) you may need to clean `yarn`'s cache with `yarn cache clean` before.)
 - Run the app with `react-native-cli`: `react-native run-ios`
 
+#### Configuration Mapping
+
+The PSPDFKit React Native iOS Wrapper maps most configuration options available in `PSPDFConfiguration` from JSON. Please refer to `[RCTConvert+PSPDFConfiguration.m](https://github.com/PSPDFKit/react-native/blob/master/ios/RCTPSPDFKit/Converters/RCTConvert%2BPSPDFConfiguration.m#L19)` for the complete list and for the exact naming of enum values.
+
+Annotations are mapped based on their type name. This is case sensitive. For example, to limit annotation types to ink and highlight, use this:
+
+```
+editableAnnotationTypes: ['Ink', 'Highlight']
+
+```
+
+
 ### Android
 
 #### Requirements
