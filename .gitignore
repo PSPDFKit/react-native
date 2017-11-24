@@ -44,5 +44,4 @@ android/app/libs
 
 PSPDFKit/PSPDFKit.framework
 PSPDFKit/PSPDFKitUI.framework
-samples/Catalog/android/pspdfkit-lib/*.aar
 
