@@ -1,13 +1,13 @@
 {
   "name": "Catalog",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "private": true,
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start"
   },
   "dependencies": {
-    "react": "16.0.0-beta.5",
-    "react-native": "0.49.3",
+    "react": "16.0.0",
+    "react-native": "0.50.3",
     "react-native-fs": "github:johanneslumpe/react-native-fs#55dd2a7624f4617e04a895a9a319cb012c1002a5",
     "react-native-pspdfkit": "file:../../"
   }
