@@ -137,8 +137,8 @@ editableAnnotationTypes: ['Ink', 'Highlight']
 - Android SDK
 - Android Build Tools 23.0.1 (React Native)
 - Android Build Tools 26.0.1 (PSPDFKit module)
-- PSPDFKit >= 4.2.0
-- react-native >= 0.50.3
+- PSPDFKit >= 4.2.1
+- react-native >= 0.51.0
 
 #### Getting Started
 
