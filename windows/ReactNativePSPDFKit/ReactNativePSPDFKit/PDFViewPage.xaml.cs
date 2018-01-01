@@ -9,9 +9,8 @@ using Windows.UI.Xaml.Controls;
 namespace ReactNativePSPDFKit
 {
     /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
+    /// A webview which will hold the pdf render
     /// </summary>
-
     public sealed partial class PDFViewPage : Page
     {
 
@@ -23,7 +22,6 @@ namespace ReactNativePSPDFKit
             _API = api;
             InitializeComponent();
         }
-
 
         private void PDFView_NavigationStarting(WebView sender, WebViewNavigationStartingEventArgs args)
         {
