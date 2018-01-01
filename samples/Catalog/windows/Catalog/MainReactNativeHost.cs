@@ -23,7 +23,6 @@ namespace Catalog
         protected override List<IReactPackage> Packages => new List<IReactPackage>
                 {
                     new MainReactPackage(),
-                    new RNFS.RNFSPackage(),
                     new ReactNativePSPDFKit.PSPDFKitPackage(),
                 };
     }

@@ -106,9 +106,10 @@
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="PSPDFKitModule.cs" />
     <Compile Include="PDFViewPage.xaml.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="PSPDFKitManager.cs" />
+    <Compile Include="PSPDFKitViewManager.cs" />
     <Compile Include="PSPDFKitPackage.cs" />
     <EmbeddedResource Include="Properties\ReactNativePSPDFKit.rd.xml" />
   </ItemGroup>

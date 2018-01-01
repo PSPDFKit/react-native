@@ -203,10 +203,6 @@
     </ApplicationDefinition>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\node_modules\react-native-fs\windows\RNFS\RNFS.csproj">
-      <Project>{746610d0-8693-11e7-a20d-bf83f7366778}</Project>
-      <Name>RNFS</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\node_modules\react-native-pspdfkit\windows\ReactNativePSPDFKit\ReactNativePSPDFKit\ReactNativePSPDFKit.csproj">
       <Project>{475f630c-9ea0-4cd2-823a-0bb2dbb4778a}</Project>
       <Name>ReactNativePSPDFKit</Name>

@@ -1,4 +1,5 @@
-﻿using ReactNative.Bridge;
+﻿using PSPDFKit;
+using ReactNative.Bridge;
 using ReactNative.Modules.Core;
 using ReactNative.UIManager;
 using System;
@@ -6,13 +7,40 @@ using System.Collections.Generic;
 
 namespace ReactNativePSPDFKit
 {
+    /// <summary>
+    /// Package defining core framework modules (e.g., <see cref="UIManagerModule"/>).
+    /// It should be used for modules that require special integration with
+    /// other framework parts (e.g., with the list of packages to load view
+    /// managers from).
+    /// </summary>
     public class PSPDFKitPackage : IReactPackage
     {
-        public IReadOnlyList<INativeModule> CreateNativeModules(ReactContext reactContext)
+        private API _API;
+
+        public PSPDFKitPackage()
         {
-            return new List<INativeModule>(0);
+            _API = new API();
         }
 
+        /// <summary>
+        /// Creates the PSPDFKitModule native modules to register with the react
+        /// instance.
+        /// </summary>
+        /// <param name="reactContext">The react application context.</param>
+        /// <returns>The list of native modules.</returns>
+        public IReadOnlyList<INativeModule> CreateNativeModules(ReactContext reactContext)
+        {
+            return new List<INativeModule>
+            {
+                new PSPDFKitModule(reactContext, _API),
+            };
+        }
+
+        /// <summary>
+        /// Creates the list of JavaScript modules to register with the
+        /// react instance.
+        /// </summary>
+        /// <returns>The list of JavaScript modules.</returns>
         public IReadOnlyList<Type> CreateJavaScriptModulesConfig()
         {
             return new List<Type>(0);
@@ -28,7 +56,7 @@ namespace ReactNativePSPDFKit
         {
             return new List<IViewManager>
             {
-                new PSPDFKitManager(),
+                new PSPDFKitViewManger(_API),
             };
         }
     }

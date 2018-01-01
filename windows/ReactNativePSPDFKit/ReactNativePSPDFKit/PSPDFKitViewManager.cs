@@ -1,12 +1,16 @@
 ﻿using PSPDFKit;
-using ReactNative.Bridge;
 using ReactNative.UIManager;
-using System.Collections.Generic;
 
 namespace ReactNativePSPDFKit
 {
-    public class PSPDFKitManager : SimpleViewManager<PDFViewPage>
+    public class PSPDFKitViewManger : SimpleViewManager<PDFViewPage>
     {
+        private API _API;
+        public PSPDFKitViewManger(API api)
+        {
+            _API = api;
+        }
+
         /// <summary>
         /// The name to be used when creating the js modules
         /// </summary>
@@ -20,7 +24,7 @@ namespace ReactNativePSPDFKit
 
         protected override PDFViewPage CreateViewInstance(ThemedReactContext reactContext)
         {
-            return new PDFViewPage();
+            return new PDFViewPage(_API);
         }
     }
 }
