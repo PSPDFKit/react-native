@@ -1,12 +1,7 @@
-﻿using PSPDFKit;
-using PSPDFKit.PDF;
-using System;
-using System.Data;
+﻿using System;
 using System.Threading.Tasks;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Media;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -20,7 +15,7 @@ namespace ReactNativePSPDFKit
     {
 
         PSPDFKit.API _API;
-        const string _license = "Insert license key here";
+        const string _license = "DhiwxApTjEEXYz2MCnLVepgxa50wbAcvHjQqaSBrSmMvlMuCrtcSmoNMxZyV1ABfzcLzk7s-ck2NNx_H4BTn-pPGD_KT64-9nGjEgbXp31RxQABlSIgS3IBofHUmNCiY8uXo8lV8PtY7twzXdcSiDMeAgxkal9uwGaE8SRpmw609I5G0m3nSj3O3pirOJ8n0PONbWCgo6P8bzwcM9pHrBkvugqqTzgEZUp3W24_8nkwYmBZxvk7iX_Oo6MQQSTyKqWMTCPKd-MScGSTKFMOAO_VvNsexNxht2s5iDh0z1D_ASee6N8RkZMWQb3bYBXR4rQlrUlQmw3zl4L-0wsu4wcamc10gFQeEp2BOTh5BFYVkxlxELnK8TxIJJI2O5BrHJIEDKnsP9Yxo-8kMX1M6d8aOqc-_wcwrWlWNjIi11g87a09-P_8yykoEQWthxHUBGwAmu7rlGAFv-VeYOXd_aYp25OPI3A6-YzDohxhkxee8ETEifn2W6wGnxLLN3gv6z22enArvqcKehfHghOd-8e6tqm4k0E-1B0SXQTI0vbiaNTTVxNAADgcB83wZNgArsne8YlOmCAMliLHj9tzggQ==";
         const string _css = "ms-appx-web:///Assets/pspdfkit/windows.css";
 
         public PDFViewPage()
