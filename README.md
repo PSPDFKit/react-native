@@ -447,6 +447,27 @@ Shows the pdf `document` from the local device filesystem, or your app's assets.
 
 `configuration` can be empty `{}`.
 
+### Windows UWP
+
+#### Requirements
+- Visual studio Community 2017 or greater
+- git
+- cmake
+- npm
+- PSPDFKitSDK.vsix for UWP
+
+#### Running Catalog Project
+
+1. Clone the repository. `git clone https://github.com/PSPDFKit/react-native.git`.
+2. From the command promt `cd react-native\samples\Catalog`
+3. run `npm install -g react-native-cli`
+4. run `npm install`
+5. open the UWP catalog solution in `react-native\samples\Catalog\windows`
+6. Install any required extensions when prompted
+7. If the settings windows opens, click on `Developer` and selected `yes`
+8. From the command prompt run `react-native run-windows`
+9. Enter `y` to accept the certificate when prompted and allow socket access for reactive when prompted.
+
 ## License
 
 This project can be used for evaluation or if you have a valid PSPDFKit license.  
