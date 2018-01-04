@@ -8,7 +8,7 @@
   "dependencies": {
     "react": "16.0.0",
     "react-native": "0.51.0",
-    "react-native-fs": "github:johanneslumpe/react-native-fs#55dd2a7624f4617e04a895a9a319cb012c1002a5",
+    "react-native-fs": "2.9.0",
     "react-native-pspdfkit": "file:../../"
   }
 }

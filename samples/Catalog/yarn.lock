@@ -2622,14 +2622,14 @@ react-devtools-core@^2.5.0:
     shell-quote "^1.6.1"
     ws "^2.0.3"
 
-"react-native-fs@github:johanneslumpe/react-native-fs#55dd2a7624f4617e04a895a9a319cb012c1002a5":
-  version "2.1.0-rc.1"
-  resolved "https://codeload.github.com/johanneslumpe/react-native-fs/tar.gz/55dd2a7624f4617e04a895a9a319cb012c1002a5"
+react-native-fs@2.9.0:
+  version "2.9.0"
+  resolved "https://registry.yarnpkg.com/react-native-fs/-/react-native-fs-2.9.0.tgz#64fefd8093eb78e70fda2bad2fb39c603704348e"
   dependencies:
     base-64 "^0.1.0"
     utf8 "^2.1.1"
 
-"react-native-pspdfkit@file:../../":
+"react-native-pspdfkit@file:../..":
   version "1.8.0"
 
 react-native@0.51.0:
