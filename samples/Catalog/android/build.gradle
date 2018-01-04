@@ -21,6 +21,9 @@ allprojects {
         mavenLocal()
         jcenter()
         maven {
+            url 'https://maven.google.com'
+        }
+        maven {
             url 'https://customers.pspdfkit.com/maven/'
 
             credentials {

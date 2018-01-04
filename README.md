@@ -149,13 +149,16 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
 3. Step into your newly created app folder: `cd YourApp`.
 4. Install `react-native-pspdfkit` from GitHub: `yarn add github:PSPDFKit/react-native`.
 5. Link module `react-native-pspdfkit`: `react-native link react-native-pspdfkit`.
-6. <a id="step-6"></a>Add PSPDFKit repository to `YourApp/android/build.gradle` so PSPDFKit library can be downloaded:
+6. <a id="step-6"></a>Add PSPDFKit and Google repository to `YourApp/android/build.gradle` so PSPDFKit library and Android dependencies can be downloaded:
 
   ```diff
     allprojects {
         repositories {
             mavenLocal()
             jcenter()
+  +         maven {
+  +             url 'https://maven.google.com'
+  +         }         
   +         maven {
   +             url 'https://customers.pspdfkit.com/maven/'
 
