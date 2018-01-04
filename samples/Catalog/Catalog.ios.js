@@ -1,14 +1,13 @@
 //
-// index.android.js
+//  index.ios.js
+//  PSPDFKit
 //
-//   PSPDFKit
+//  Copyright (c) 2016 PSPDFKit GmbH. All rights reserved.
 //
-//   Copyright © 2017 PSPDFKit GmbH. All rights reserved.
-//
-//   THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
-//   AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
-//   UNAUTHORIZED REPRODUCTION OR DISTRIBUTION IS SUBJECT TO CIVIL AND CRIMINAL PENALTIES.
-//   This notice may not be removed from this file.
+//  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
+//  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
+//  UNAUTHORIZED REPRODUCTION OR DISTRIBUTION IS SUBJECT TO CIVIL AND CRIMINAL PENALTIES.
+//  This notice may not be removed from this file.
 //
 
 import React, { Component } from 'react';
@@ -21,43 +20,52 @@ import {
   TouchableHighlight,
   ListView,
   NativeModules,
-  processColor,
-  PermissionsAndroid
+  processColor
 } from 'react-native';
+
+var RNFS = require('react-native-fs');
 
 var PSPDFKit = NativeModules.PSPDFKit;
 
-const DOCUMENT = 'file:///sdcard/PSPDFKit 5 QuickStart Guide.pdf';
-const CONFIGURATION = {
-  startPage : 3,
-  scrollContinuously : false,
-  showPageNumberOverlay : true,
-  grayScale : true,
-  showPageLabels : false,
-  pageScrollDirection : "vertical",
-  showThumbnailBar : "scrollable"
-};
-
 var examples = [
   {
-    name: "Open assets document",
-    description: 'Open document from your project assets folder',
+    name: "Open document using resource path",
+    description: 'Open document from your resource bundle with relative path.',
     action: () => {
-      PSPDFKit.present('file:///android_asset/PSPDFKit 5 QuickStart Guide.pdf', {})
+      PSPDFKit.present('PDFs/PSPDFKit 5 QuickStart Guide.pdf', {})
     }
   },
   {
-    name: "Open local document",
-    description: 'Opens document from external storage directory.',
+    name: "Open document with absolute path",
+    description: 'Opens document from application Documents directory by passing the absolute path.',
     action: () => {
-      requestExternalStoragePermission(function () { PSPDFKit.present(DOCUMENT, {}); });
+      const filename = 'PSPDFKit 5 QuickStart Guide.pdf'
+      
+      const path = RNFS.DocumentDirectoryPath + '/' + filename
+      const src = RNFS.MainBundlePath + '/PDFs/' + filename 
+      
+      RNFS.exists(path).then((exists) => {
+        if (!exists) {
+          return RNFS.copyFile(src, path)
+        }
+      }).then(() => {
+        PSPDFKit.present(path, {})
+      }).catch((err) => {
+        console.log(err.message, err.code);
+      });
     }
   },
   {
-    name: "Configuration Builder",
-    description: "You can configure the builder with dictionary representation of the PSPDFConfiguration object.",
+    name: "Configured Controller",
+    description: "You can configure the controller with dictionary representation of the PSPDFConfiguration object.",
     action: () => {
-      requestExternalStoragePermission(function () { PSPDFKit.present(DOCUMENT, CONFIGURATION) });
+      PSPDFKit.present('PDFs/PSPDFKit 5 QuickStart Guide.pdf', {
+        scrollDirection: "horizontal",
+        backgroundColor: processColor('white'),
+        thumbnailBarMode: 'scrollable',
+        pageTransition: 'scrollContinuous',
+        scrollDirection: 'vertical'
+      })
     }
   },
   {
@@ -70,22 +78,6 @@ var examples = [
     }
   }
 ]
-
-async function requestExternalStoragePermission(callback) {
-  try {
-    const granted = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
-    )
-    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-      console.log("Write external storage permission granted")
-      callback()
-    } else {
-      console.log("Write external storage permission denied")
-    }
-  } catch (err) {
-    console.warn(err)
-  }
-}
 
 export default class Catalog extends Component<{}> {
   // Initialize the hardcoded data
@@ -133,6 +125,8 @@ export default class Catalog extends Component<{}> {
   }
 }
 
+const pspdfkitColor = "#209cca"
+
 var styles = StyleSheet.create({
   separator: {
     height: 0.5,
@@ -176,5 +170,3 @@ var styles = StyleSheet.create({
     padding: 10
   }
 });
-
-AppRegistry.registerComponent('Catalog', () => Catalog);
