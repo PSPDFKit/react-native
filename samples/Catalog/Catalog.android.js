@@ -176,5 +176,3 @@ var styles = StyleSheet.create({
     padding: 10
   }
 });
-
-AppRegistry.registerComponent('Catalog', () => Catalog);

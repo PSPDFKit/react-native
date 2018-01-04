@@ -79,7 +79,7 @@ var examples = [
   }
 ]
 
-class Catalog extends Component {
+export default class Catalog extends Component<{}> {
   // Initialize the hardcoded data
   constructor(props) {
     super(props);
@@ -170,5 +170,3 @@ var styles = StyleSheet.create({
     padding: 10
   }
 });
-
-AppRegistry.registerComponent('Catalog', () => Catalog);
