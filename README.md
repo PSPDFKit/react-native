@@ -472,7 +472,7 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
 10. Open the windows solution in `react-native\YourApp\windows`.
 11. Accept and install any required extensions when prompted.
 12. If the settings windows opens, click on `Developer` and select `yes`.
-13. Add `react-native-pspdfkit` to your soloution: Right click on the solution -> Add -> Existing Item. Navigate to `node_modules/react-native-pspdfkit/windows/ReactNativePSPDFKit/ReactNativePSPDFKit/` and select the `ReactNativePSPDFKit.csproj`
+13. Add `react-native-pspdfkit` to your soloution: Right click on the solution -> Add -> Existing Project. Navigate to `node_modules/react-native-pspdfkit/windows/ReactNativePSPDFKit/ReactNativePSPDFKit/` and select the `ReactNativePSPDFKit.csproj`
 ![Deployment Target](screenshots/windowsAddExistingProject.PNG)
 14. Mark `react-native-pspdfkit`, `PSPDFKit SDK` and `Visual C++ Runtime` as dependancies for `YourApp`: Right click on `YourApp` -> Add -> Refererece... Click on Projects and tick `ReactNativePSPDFKit`. Click on Universal Windows -> Extensions and tick `PSPDFKit for UWP` and `Visual C++ 2015 Runtime for Universal Windows Platform Apps` then click ok.
 ![Deployment Target](screenshots/windowsAddReferences.PNG)
