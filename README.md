@@ -553,8 +553,16 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
 5. open the UWP catalog solution in `react-native\samples\Catalog\windows`.
 6. Install any required extensions when prompted.
 7. If the settings windows opens, click on `Developer` and selected `yes`.
-8. From the command prompt run `react-native run-windows`.
-9. Enter `y` to accept the certificate when prompted and allow socket access for reactive when prompted.
+8. Enter your license key in `react-native\samples\Catalog\windows\MainReactNativeHosts.cs`
+  ```
+    protected override List<IReactPackage> Packages => new List<IReactPackage>
+    {
+        new MainReactPackage(),
+        new ReactNativePSPDFKit.PSPDFKitPackage("INSERT LICENSE KEY HERE"),
+    };
+  ```
+9. From the command prompt run `react-native run-windows`.
+10. Enter `y` to accept the certificate when prompted and allow socket access for reactive when prompted.
 
 #### API
 

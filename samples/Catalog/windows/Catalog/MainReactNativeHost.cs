@@ -23,7 +23,7 @@ namespace Catalog
         protected override List<IReactPackage> Packages => new List<IReactPackage>
                 {
                     new MainReactPackage(),
-                    new ReactNativePSPDFKit.PSPDFKitPackage(),
+                    new ReactNativePSPDFKit.PSPDFKitPackage("INSERT LICENSE KEY HERE"),
                 };
     }
 }

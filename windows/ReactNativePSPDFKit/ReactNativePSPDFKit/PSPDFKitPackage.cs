@@ -16,10 +16,12 @@ namespace ReactNativePSPDFKit
     public class PSPDFKitPackage : IReactPackage
     {
         private API _API;
+        private string _license;
 
-        public PSPDFKitPackage()
+        public PSPDFKitPackage(string license)
         {
             _API = new API();
+            _license = license;
         }
 
         /// <summary>
@@ -56,7 +58,7 @@ namespace ReactNativePSPDFKit
         {
             return new List<IViewManager>
             {
-                new PSPDFKitViewManger(_API),
+                new PSPDFKitViewManger(_API, _license),
             };
         }
     }

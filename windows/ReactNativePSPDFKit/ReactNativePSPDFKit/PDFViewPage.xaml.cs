@@ -15,11 +15,12 @@ namespace ReactNativePSPDFKit
     {
 
         API _API;
-        const string _license = "ENTER LICENSE KEY HERE";
+        string _license;
 
-        public PDFViewPage(API api)
+        public PDFViewPage(API api, string license)
         {
             _API = api;
+            _license = license;
             InitializeComponent();
         }
 

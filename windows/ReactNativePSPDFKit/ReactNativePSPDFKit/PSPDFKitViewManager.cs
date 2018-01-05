@@ -6,9 +6,12 @@ namespace ReactNativePSPDFKit
     public class PSPDFKitViewManger : SimpleViewManager<PDFViewPage>
     {
         private API _API;
-        public PSPDFKitViewManger(API api)
+        private string _license;
+
+        public PSPDFKitViewManger(API api, string license)
         {
             _API = api;
+            _license = license;
         }
 
         /// <summary>
@@ -24,7 +27,7 @@ namespace ReactNativePSPDFKit
 
         protected override PDFViewPage CreateViewInstance(ThemedReactContext reactContext)
         {
-            return new PDFViewPage(_API);
+            return new PDFViewPage(_API, _license);
         }
     }
 }
