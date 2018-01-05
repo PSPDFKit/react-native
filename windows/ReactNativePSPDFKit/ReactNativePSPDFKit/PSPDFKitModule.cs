@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.UI.Popups;
 
 namespace ReactNativePSPDFKit
 {
@@ -54,7 +55,15 @@ namespace ReactNativePSPDFKit
         {
             if (file == null) return;
 
-            await _API.OpenAsync(file);
+            try
+            {
+                await _API.OpenAsync(file);
+            }
+            catch (Exception e)
+            {
+                var dialog = new MessageDialog(e.Message);
+                await dialog.ShowAsync();
+            }
         }
 
         /// <summary>
