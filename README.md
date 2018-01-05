@@ -454,19 +454,119 @@ Shows the pdf `document` from the local device filesystem, or your app's assets.
 - git
 - cmake
 - npm
-- PSPDFKitSDK.vsix for UWP
+- PSPDFKitSDK.vsix for UWP (installed)
+
+#### Getting Started
+
+Let's create a simple app that integrates PSPDFKit and uses the react-native-pspdfkit module.
+
+1. Make sure `react-native-cli` is installed: `npm install -g react-native-cli`.
+2. Create the app with `react-native init YourApp`.
+3. Step into your newly created app folder: `cd YourApp`.
+4. Install the windows helper plugin: `npm install --save-dev rnpm-plugin-windows`.
+5. Initialise the windows project: `react-native windows`.
+6. Install `react-native-pspdfkit` from GitHub: `yarn add github:PSPDFKit/react-native`.
+7. Link module `react-native-pspdfkit`: `react-native link react-native-pspdfkit`.
+5. open the UWP catalog solution in `react-native\samples\Catalog\windows`.
+6. Install any required extensions when prompted.
+7. If the settings windows opens, click on `Developer` and selected `yes`.
+8. open the UWP solution in `windows`.
+9. Mark `PSPDFKit SDK` and `Visual C++ Runtime` as a dependancies for `YourApp`: Right click on `YourApp` -> Add -> Refererece... Click on Projects and tick `PSPDFKit for UWP` and `Visual C++ 2015 Runtime for Universal Windows Platform Apps` then click ok.
+10. Add `react-native-pspdfkit` to your soloution: Right click on the solution -> add -> Existing Item. Navigate to `node_modules/react-native-pspdfkit/windows/ReactNativePSPDFKit/ReactNativePSPDFKit/` and select the `ReactNativePSPDFKit.csproj`
+11. Mark `react-native-pspdfkit` as a dependancy for `YourApp`: Right click on `YourApp` -> Add -> Refererece... Click on Projects and tick `ReactNativePSPDFKit` then click ok.
+12. Add `react-native-pspdfkit` to `YourApp` package list and enter license key: open `MainReactNativeHost.cs` in `YourApp` project and add the following line.
+  ```
+  protected override List<IReactPackage> Packages => new List<IReactPackage>
+  {
+      new MainReactPackage(),
+  +   new ReactNativePSPDFKit.PSPDFKitPackage("INSERT YOU LICENSE KEY HERE")
+  };
+ ```
+13. Replace the default component from `YourApp/App.windows.js` with helper component from the `react-native-pspdfkit` library, and add a open button to allow the user to navigate the file system.
+  ```
+  import React, { Component } from 'react';
+  import {
+      AppRegistry,
+      StyleSheet,
+      View,
+      Text,
+      NativeModules,
+      Button
+  } from 'react-native';
+  
+  var PSPDFKitView = require('react-native-pspdfkit');
+  var PSPDFKit = NativeModules.ReactPSPDFKit;
+  
+  export default class Catalog extends Component<{}> {
+      constructor(props) {
+        super(props);
+      }
+      
+      render() {
+          return (
+          <View style={styles.page}>
+              <PSPDFKitView style={styles.pdfView} />
+              <View style={styles.footer}>
+                  <View style={styles.button}>
+                    <Button onPress={() => PSPDFKit.OpenFile()} title="Open" />
+                  </View>
+                  <Text style={styles.version}>SDK Version : {PSPDFKit.versionString}</Text>
+              </View>
+          </View>
+          );
+      }
+  }
+  
+  var styles = StyleSheet.create({
+      page: {
+          flex: 1,
+          alignItems: 'stretch',
+          backgroundColor: '#eee'
+      },
+      pdfView: {
+        flex: 1,
+      },
+      button: {
+          width: 100,
+          margin: 20
+      },
+      footer: {
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+      },
+      version: {
+          color: '#666666',
+          margin: 20
+      }
+  });
+ ```
+14. Now run the application: `react-native run-windows`
+15. Type 'y' when asking if you want to install the certificate.
 
 #### Running Catalog Project
 
 1. Clone the repository. `git clone https://github.com/PSPDFKit/react-native.git`.
-2. From the command promt `cd react-native\samples\Catalog`
-3. run `npm install -g react-native-cli`
-4. run `npm install`
-5. open the UWP catalog solution in `react-native\samples\Catalog\windows`
-6. Install any required extensions when prompted
-7. If the settings windows opens, click on `Developer` and selected `yes`
-8. From the command prompt run `react-native run-windows`
+2. From the command promt `cd react-native\samples\Catalog`.
+3. Make sure `react-native-cli` is installed: `npm install -g react-native-cli`.
+4. run `npm install`.
+5. open the UWP catalog solution in `react-native\samples\Catalog\windows`.
+6. Install any required extensions when prompted.
+7. If the settings windows opens, click on `Developer` and selected `yes`.
+8. From the command prompt run `react-native run-windows`.
 9. Enter `y` to accept the certificate when prompted and allow socket access for reactive when prompted.
+
+#### API
+
+##### Constants
+
+The following constants are available on the PSPDFKit export:
+
+- `versionString` (`String`) PSPDFKit version number.
+
+##### `OpenFile() : void`
+
+Opens a file picker for the user to select a pdf from. When the user selects an item it will be displayed in the `<PSPDFKitView>`.
 
 ## License
 
