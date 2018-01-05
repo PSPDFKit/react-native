@@ -461,9 +461,9 @@ Shows the pdf `document` from the local device filesystem, or your app's assets.
 Let's create a simple app that integrates PSPDFKit and uses the react-native-pspdfkit module.
 
 1. Make sure `react-native-cli` is installed: `npm install -g react-native-cli`.
-2. Create the app with `react-native init YourApp`.
-3. Step into your newly created app folder: `cd YourApp`.
-4. Install the windows helper plugin: `npm install --save-dev rnpm-plugin-windows`.
+2. Install the windows helper plugin: `npm install --save-dev rnpm-plugin-windows`.
+3. Create the app with `react-native init YourApp`.
+4. Step into your newly created app folder: `cd YourApp`.
 5. Install windows tool for react native: `npm install --global --production windows-build-tools`.
 6. Install `react-native-pspdfkit` from GitHub: `npm add github:PSPDFKit/react-native`.
 7. Install all modules: `npm install`.
