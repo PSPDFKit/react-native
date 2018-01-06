@@ -9,6 +9,8 @@
     "react": "16.0.0",
     "react-native": "0.51.0",
     "react-native-fs": "2.9.0",
-    "react-native-pspdfkit": "file:../../"
+    "react-native-pspdfkit": "file:../../",
+    "react-native-windows": "0.51.0-rc.0",
+    "rnpm-plugin-windows": "0.2.8"
   }
 }

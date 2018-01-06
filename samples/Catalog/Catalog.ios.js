@@ -1,7 +1,3 @@
-//
-//  index.ios.js
-//  PSPDFKit
-//
 //  Copyright (c) 2016 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
