@@ -26,7 +26,7 @@ namespace ReactNativePSPDFKit
 
         private void PDFView_NavigationStarting(WebView sender, WebViewNavigationStartingEventArgs args)
         {
-            _API.InitializeWithWebView(_license, sender);
+            _API.InitializeWithWebView(_license, "", sender);
         }
     }
 }
