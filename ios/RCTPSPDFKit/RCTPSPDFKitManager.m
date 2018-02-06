@@ -46,7 +46,7 @@ RCT_EXPORT_METHOD(dismiss) {
   [navigationController dismissViewControllerAnimated:true completion:nil];
 }
 
-RCT_EXPORT_METHOD(setPageIndex:(NSUInteger)pageIndex aniamted:(BOOL)animated) {
+RCT_EXPORT_METHOD(setPageIndex:(NSUInteger)pageIndex animated:(BOOL)animated) {
   UIViewController *presentedViewController = RCTPresentedViewController();
   NSAssert([presentedViewController isKindOfClass:UINavigationController.class], @"Presented view controller needs to be a UINavigationController");
   UINavigationController *navigationController = (UINavigationController *)presentedViewController;
