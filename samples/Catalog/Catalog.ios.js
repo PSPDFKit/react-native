@@ -46,6 +46,7 @@ var examples = [
         }
       }).then(() => {
         PSPDFKit.present(path, {})
+        PSPDFKit.setPageIndex(3, false)
       }).catch((err) => {
         console.log(err.message, err.code);
       });

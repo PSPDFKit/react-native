@@ -46,6 +46,16 @@ RCT_EXPORT_METHOD(dismiss) {
   [navigationController dismissViewControllerAnimated:true completion:nil];
 }
 
+RCT_EXPORT_METHOD(setPageIndex:(NSUInteger)pageIndex aniamted:(BOOL)animated) {
+  UIViewController *presentedViewController = RCTPresentedViewController();
+  NSAssert([presentedViewController isKindOfClass:UINavigationController.class], @"Presented view controller needs to be a UINavigationController");
+  UINavigationController *navigationController = (UINavigationController *)presentedViewController;
+  NSAssert(navigationController.viewControllers.count == 1 && [navigationController.viewControllers.firstObject isKindOfClass:PSPDFViewController.class], @"Presented view controller needs to contain a PSPDFViewController");
+  PSPDFViewController *pdfViewController = (PSPDFViewController *)navigationController.viewControllers.firstObject;
+
+  [pdfViewController setPageIndex:pageIndex animated:animated];
+}
+
 - (dispatch_queue_t)methodQueue {
   return dispatch_get_main_queue();
 }
