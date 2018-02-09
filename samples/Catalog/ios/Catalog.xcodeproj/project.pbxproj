@@ -1059,6 +1059,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.pspdfkit.react-native.catalog";
 				PRODUCT_NAME = Catalog;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -1080,6 +1081,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.pspdfkit.react-native.catalog";
 				PRODUCT_NAME = Catalog;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
