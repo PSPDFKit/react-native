@@ -28,14 +28,14 @@ var examples = [
     name: "Open document using resource path",
     description: 'Open document from your resource bundle with relative path.',
     action: () => {
-      PSPDFKit.present('PDFs/PSPDFKit 5 QuickStart Guide.pdf', {})
+      PSPDFKit.present('PDFs/Annual Report.pdf', {})
     }
   },
   {
     name: "Open document with absolute path",
     description: 'Opens document from application Documents directory by passing the absolute path.',
     action: () => {
-      const filename = 'PSPDFKit 5 QuickStart Guide.pdf'
+      const filename = 'Annual Report.pdf'
       
       const path = RNFS.DocumentDirectoryPath + '/' + filename
       const src = RNFS.MainBundlePath + '/PDFs/' + filename 
@@ -56,7 +56,7 @@ var examples = [
     name: "Configured Controller",
     description: "You can configure the controller with dictionary representation of the PSPDFConfiguration object.",
     action: () => {
-      PSPDFKit.present('PDFs/PSPDFKit 5 QuickStart Guide.pdf', {
+      PSPDFKit.present('PDFs/Annual Report.pdf', {
         scrollDirection: "horizontal",
         backgroundColor: processColor('white'),
         thumbnailBarMode: 'scrollable',

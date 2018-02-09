@@ -22,7 +22,7 @@ import {
 
 var PSPDFKit = NativeModules.PSPDFKit;
 
-const DOCUMENT = 'file:///sdcard/PSPDFKit 5 QuickStart Guide.pdf';
+const DOCUMENT = 'file:///sdcard/Annual Report.pdf';
 const CONFIGURATION = {
   startPage : 3,
   scrollContinuously : false,
@@ -38,7 +38,7 @@ var examples = [
     name: "Open assets document",
     description: 'Open document from your project assets folder',
     action: () => {
-      PSPDFKit.present('file:///android_asset/PSPDFKit 5 QuickStart Guide.pdf', {})
+      PSPDFKit.present('file:///android_asset/Annual Report.pdf', {})
     }
   },
   {
