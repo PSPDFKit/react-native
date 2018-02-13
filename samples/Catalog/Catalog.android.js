@@ -39,6 +39,7 @@ var examples = [
     description: 'Open document from your project assets folder',
     action: () => {
       PSPDFKit.present('file:///android_asset/Annual Report.pdf', {})
+      PSPDFKit.setPageIndex(5, false)
     }
   },
   {
