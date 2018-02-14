@@ -1,5 +1,5 @@
 //
-//  Copyright © 2016-2018 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2018 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -7,18 +7,8 @@
 //  This notice may not be removed from this file.
 //
 
-#import <React/RCTConvert.h>
-@import PSPDFKit;
-@import PSPDFKitUI;
+#import <React/RCTViewManager.h>
 
-@interface RCTConvert (PSPDFConfiguration)
-
-+ (PSPDFConfiguration *)PSPDFConfiguration:(id)json;
-
-@end
-
-@interface PSPDFConfigurationBuilder (RNAdditions)
-
-- (void)setupFromJSON:(id)json;
+@interface RCTPSPDFKitViewManager : RCTViewManager
 
 @end

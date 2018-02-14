@@ -1,5 +1,5 @@
 //
-//  Copyright © 2016-2018 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2018 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -7,18 +7,17 @@
 //  This notice may not be removed from this file.
 //
 
-#import <React/RCTConvert.h>
+#import <UIKit/UIKit.h>
+#import <React/RCTComponent.h>
+
 @import PSPDFKit;
 @import PSPDFKitUI;
 
-@interface RCTConvert (PSPDFConfiguration)
+@interface RCTPSPDFKitView: UIView
 
-+ (PSPDFConfiguration *)PSPDFConfiguration:(id)json;
+@property (nonatomic, readonly) PSPDFViewController *pdfController;
 
-@end
-
-@interface PSPDFConfigurationBuilder (RNAdditions)
-
-- (void)setupFromJSON:(id)json;
+@property (nonatomic, readonly) UIBarButtonItem *closeButton;
+@property (nonatomic, copy) RCTBubblingEventBlock onCloseButtonPressed;
 
 @end
