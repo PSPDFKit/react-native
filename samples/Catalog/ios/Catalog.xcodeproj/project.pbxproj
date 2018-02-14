@@ -278,6 +278,20 @@
 			remoteGlobalIDString = 3D3CD9181DE5FBD800167DC4;
 			remoteInfo = "jschelpers-tvOS";
 		};
+		F84F8CFD20346BB100153D9E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 146833FF1AC3E56700842450 /* React.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = EBF21BDC1FC498900052F4D5;
+			remoteInfo = jsinspector;
+		};
+		F84F8CFF20346BB100153D9E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 146833FF1AC3E56700842450 /* React.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = EBF21BFA1FC4989A0052F4D5;
+			remoteInfo = "jsinspector-tvOS";
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -467,6 +481,8 @@
 				B9B1CE631E67329100D1ACB7 /* libcxxreact.a */,
 				B9B1CE651E67329100D1ACB7 /* libjschelpers.a */,
 				B9B1CE671E67329100D1ACB7 /* libjschelpers.a */,
+				F84F8CFE20346BB100153D9E /* libjsinspector.a */,
+				F84F8D0020346BB100153D9E /* libjsinspector-tvOS.a */,
 				01107DCA1FFE523400CD9D66 /* libthird-party.a */,
 				01107DCC1FFE523400CD9D66 /* libthird-party.a */,
 				01107DCE1FFE523400CD9D66 /* libdouble-conversion.a */,
@@ -516,8 +532,8 @@
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
-				6540D1851D8A9F9100B8F94F /* RNFS.xcodeproj */,
 				657278851D86C29100A5E1A8 /* PSPDFKit */,
+				6540D1851D8A9F9100B8F94F /* RNFS.xcodeproj */,
 				146833FF1AC3E56700842450 /* React.xcodeproj */,
 				00C302A71ABCB8CE00DB3ED1 /* RCTActionSheet.xcodeproj */,
 				00C302B51ABCB90400DB3ED1 /* RCTGeolocation.xcodeproj */,
@@ -925,6 +941,20 @@
 			fileType = archive.ar;
 			path = libjschelpers.a;
 			remoteRef = B9B1CE661E67329100D1ACB7 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		F84F8CFE20346BB100153D9E /* libjsinspector.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libjsinspector.a;
+			remoteRef = F84F8CFD20346BB100153D9E /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		F84F8D0020346BB100153D9E /* libjsinspector-tvOS.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = "libjsinspector-tvOS.a";
+			remoteRef = F84F8CFF20346BB100153D9E /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */

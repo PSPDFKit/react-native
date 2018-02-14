@@ -1,4 +1,4 @@
-//  Copyright (c) 2018 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2018 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -6,7 +6,7 @@
 //  This notice may not be removed from this file.
 //
 
-import { AppRegistry } from 'react-native';
-import Catalog from './Catalog';
+import { AppRegistry } from 'react-native'
+import Catalog from './Catalog'
 
-AppRegistry.registerComponent('Catalog', () => Catalog);
+AppRegistry.registerComponent('Catalog', () => Catalog)
