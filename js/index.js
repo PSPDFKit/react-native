@@ -34,16 +34,18 @@ PSPDFKitView.propTypes = {
    * Configuration object, to customize the appearance and behavior of PSPDFKit.
    * See https://pspdfkit.com/guides/ios/current/getting-started/pspdfconfiguration/ for more information.
    *
-   * Note: On iOS `useParentNavigationBar` controls wheter a navigation bar is created or not.
-   * By default this is set to `false`, therefore a new navigation bar will be created and shown.
-   * When set to `true`, no navigation bar is created and used, if not contained in a navigation controller already.
-   * When wrapped in a navigation controller (like when using NavigatorIOS) set this to `true`, to allow the view to control this navigation bar.
+   * Note: On iOS, set `useParentNavigationBar` to `true`, to use the parent navigation bar instead of creating its own,
+   * if the view is already contained in a navigation controller (like when using NavigatorIOS, react-native-navigation, ...).
    */
   configuration: PropTypes.object,
   /**
    * Page index of the document that will be shown.
    */
   pageIndex: PropTypes.number,
+  /**
+   * Controls wheter a navigation bar is created and shown or not. Defaults to showing a navigation bar (false).
+   */
+  hideNavigationBar: PropTypes.bool,
   /**
    * Wheter the close button should be shown in the navigation bar. Disabled by default.
    * Will call `onCloseButtonPressed` if it was provided, when tapped.

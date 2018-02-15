@@ -16,6 +16,7 @@
 @interface RCTPSPDFKitView: UIView
 
 @property (nonatomic, readonly) PSPDFViewController *pdfController;
+@property (nonatomic) BOOL hideNavigationBar;
 
 @property (nonatomic, readonly) UIBarButtonItem *closeButton;
 @property (nonatomic, copy) RCTBubblingEventBlock onCloseButtonPressed;

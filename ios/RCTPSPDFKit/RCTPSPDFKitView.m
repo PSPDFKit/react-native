@@ -37,7 +37,7 @@
     return;
   }
 
-  if (self.pdfController.configuration.useParentNavigationBar) {
+  if (self.pdfController.configuration.useParentNavigationBar || self.hideNavigationBar) {
     self.topController = self.pdfController;
 
   } else {
