@@ -5,8 +5,8 @@ See our [announcement blog post](https://pspdfkit.com/blog/2016/react-native-mod
 ### iOS
 
 #### Requirements
-- Xcode 9.2
-- PSPDFKit >= 7.0.3
+- Xcode 9
+- PSPDFKit 7 for iOS
 - react-native >= 0.48.4
 
 #### Getting Started
@@ -40,7 +40,7 @@ bash "$BUILT_PRODUCTS_DIR/$FRAMEWORKS_FOLDER_PATH/PSPDFKit.framework/strip-frame
 ![Run Script Phase](screenshots/run-script-phase.png)
 13. Add a PDF by drag and dropping it into your Xcode project (Select "Create groups" and add to target "YourApp"). This will add the document to the "Copy Bundle Resources" build phase:
 ![Adding PDF](screenshots/adding-pdf.png)
-14. Replace the default component from `App.js` with a simple touch area to present the bundled PDF:
+14. Replace the default component from `App.js` with a simple touch area to present the bundled PDF. (Note that you can also use a [Native UI Component](#native-ui-component) to show a PDF.)
 
 ```javascript
 import React, { Component } from 'react';
@@ -54,7 +54,7 @@ import {
 } from 'react-native';
 
 var PSPDFKit = NativeModules.PSPDFKit;
-PSPDFKit.setLicenseKey('INSERT_YOUR_LICENSE_KEY_HERE');
+PSPDFKit.setLicenseKey('YOUR_LICENSE_KEY_GOES_HERE');
 
 export default class App extends Component<{}> {
   _onPressButton() {
@@ -98,20 +98,108 @@ const styles = StyleSheet.create({
 
 Your app is now ready to launch. Run the app in Xcode or type `react-native run-ios` in the terminal.
 
+### Usage
+
+There are 2 different ways on how to use the PSPDFKit React Native wrapper on iOS. 
+- Present a document via a Native Module modally.
+- Show a PSPDFKit view via a Native UI component.
+
+Depending on your needs you might want to use one or the other.
+
+### Native Module
+
+Using the Native Module (`PSPDFKit.present()`), you can present a document with PSPDFKit modally in fullscreen.
+You can specify the path to the document you want to present, and [configuration options](#configuration).
+
+```javascript
+...
+var PSPDFKit = NativeModules.PSPDFKit;
+PSPDFKit.setLicenseKey('YOUR_LICENSE_KEY_GOES_HERE');
+
+export default class App extends Component<{}> {
+  _onPressButton() {
+    PSPDFKit.present('document.pdf', {
+        pageTransition: 'scrollContinuous',
+        scrollDirection: 'vertical',
+        documentLabelEnabled: true,
+      })
+  }
+
+  render() {
+    return (
+      <View style={styles.container}>
+        <TouchableHighlight onPress={this._onPressButton}>
+          <Text style={styles.text}>Tap to Open Document</Text>
+        </TouchableHighlight>
+      </View>
+    )
+  }
+}
+```
+
+### Native UI Component
+
+With `PSPDFKitView` you can use PSPDFKit like any other React component in your app.
+Using this approach, you have more flexibility over how a document is presented and displayed.
+
+The layout is completely flexible, and can be adjust with flexbox.
+Note that you still need to set your license key with the Native Module.
+
+For all the `props` that you can pass to `PSPDFKitView`, have a look at the [source documentation](./js/index.js)
+
+This is how you would show a PDF as a React component:
+
+```javascript
+...
+import PSPDFKitView from 'react-native-pspdfkit'
+
+var PSPDFKit = NativeModules.PSPDFKit;
+PSPDFKit.setLicenseKey('YOUR_LICENSE_KEY_GOES_HERE');
+
+export default class App extends Component<{}> {
+  render() {
+    return (
+      <PSPDFKitView
+        document={'document.pdf'}
+        configuration={{
+          pageTransition: 'scrollContinuous',
+          scrollDirection: 'vertical',
+          documentLabelEnabled: true,
+        }}
+        style={{ flex: 1, color: '#267AD4' }}
+      />
+    )
+  }
+}
+```
+
 #### Configuration
 
 You can configure the presentation with a configuration dictionary which is a mirror of the [`PSPDFConfiguration`](https://pspdfkit.com/api/ios/Classes/PSPDFConfiguration.html) class.
 
-Example:
+Example - Native Module:
 
 ```javascript
 PSPDFKit.present('document.pdf', {
   thumbnailBarMode: 'scrollable',
   pageTransition: 'scrollContinuous',
-  scrollDirection: 'vertical'
+  scrollDirection: 'vertical',
 })
 ```
   
+Example - Native UI Component:
+
+```javascript
+<PSPDFKitView
+document={'document.pdf'}
+configuration={{
+  thumbnailBarMode: 'scrollable',
+  pageTransition: 'scrollContinuous',
+  scrollDirection: 'vertical',
+}}
+/>
+```
+
 #### Running Catalog Project
 
 - Copy `PSPDFKit.framework` and `PSPDFKitUI.framework` into the `PSPDFKit` directory.
@@ -120,7 +208,7 @@ PSPDFKit.present('document.pdf', {
 
 #### Configuration Mapping
 
-The PSPDFKit React Native iOS Wrapper maps most configuration options available in `PSPDFConfiguration` from JSON. Please refer to `[RCTConvert+PSPDFConfiguration.m](https://github.com/PSPDFKit/react-native/blob/master/ios/RCTPSPDFKit/Converters/RCTConvert%2BPSPDFConfiguration.m#L19)` for the complete list and for the exact naming of enum values.
+The PSPDFKit React Native iOS Wrapper maps most configuration options available in `PSPDFConfiguration` from JSON. Please refer to [`RCTConvert+PSPDFConfiguration.m`](./ios/RCTPSPDFKit/Converters/RCTConvert+PSPDFConfiguration.m#L267) for the complete list and for the exact naming of enum values.
 
 Annotations are mapped based on their type name. This is case sensitive. For example, to limit annotation types to ink and highlight, use this:
 
