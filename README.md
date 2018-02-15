@@ -450,11 +450,11 @@ Shows the pdf `document` from the local device filesystem, or your app's assets.
 ### Windows UWP
 
 #### Requirements
-- Visual studio Community 2017 or greater
+- Visual Studio Community 2017 or greater
 - git
 - cmake
 - npm
-- PSPDFKitSDK.vsix for UWP (installed)
+- PSPDFKit for Windows.vsix (installed)
 
 #### Getting Started
 
@@ -585,7 +585,7 @@ Opens a file picker for the user to select a pdf from. When the user selects an 
 ## License
 
 This project can be used for evaluation or if you have a valid PSPDFKit license.  
-All items and source code Copyright © 2010-2017 PSPDFKit GmbH.
+All items and source code Copyright © 2010-2018 PSPDFKit GmbH.
 
 See LICENSE for details.
 
