@@ -170,11 +170,13 @@ public class PdfView extends FrameLayout implements AnnotationManager.OnAnnotati
                     fragmentManager.beginTransaction()
                             .remove(pdfFragment)
                             .commitNow();
+                    resetToolbars();
                     // The document changed create a new PdfFragment.
                     pdfFragment = PdfFragment.newInstance(document, new PdfConfiguration.Builder().build());
                     prepareFragment(pdfFragment);
                 } else if (parent != this) {
                     // We only need to detach the fragment if the parent view changed.
+                    resetToolbars();
                     fragmentManager.beginTransaction()
                             .remove(pdfFragment)
                             .commitNow();
@@ -226,6 +228,18 @@ public class PdfView extends FrameLayout implements AnnotationManager.OnAnnotati
             child.layout(0, 0, child.getMeasuredWidth(), child.getMeasuredHeight());
         }
         container.bringToFront();
+    }
+
+    private void resetToolbars() {
+        toolbarCoordinatorLayout.removeContextualToolbar(false);
+        annotationCreationToolbar.unbindController();
+        annotationCreationActive = false;
+        annotationCreationInspectorController.unbindAnnotationCreationController();
+        annotationEditingToolbar.unbindController();
+        annotationEditingInspectorController.unbindAnnotationEditingController();
+        textSelectionToolbar.unbindController();
+        formEditingInspectorController.unbindFormEditingController();
+        formEditingBar.unbindController();
     }
 
     @Override
