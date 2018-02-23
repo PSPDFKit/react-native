@@ -19,7 +19,7 @@ import com.pspdfkit.views.PdfView;
 public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
     @Override
     public String getName() {
-        return "ReactPSPDFKitView";
+        return "RCTPSPDFKitView";
     }
 
     @Override
@@ -36,6 +36,11 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
         }
     }
 
+    @Override
+    public void onDropViewInstance(PdfView view) {
+        view.removeFragment();
+    }
+
     @ReactProp(name = "fragmentTag")
     public void setFragmentTag(PdfView view, @NonNull String fragmentTag) {
         view.setFragmentTag(fragmentTag);
@@ -45,6 +50,11 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
     public void setConfiguration(PdfView view, @NonNull ReadableMap configuration) {
         ConfigurationAdapter configurationAdapter = new ConfigurationAdapter(view.getContext(), configuration);
         view.setConfiguration(configurationAdapter.build());
+    }
+
+    @ReactProp(name = "document")
+    public void setDocument(PdfView view, @NonNull String document) {
+        view.setDocument(document);
     }
 
     @Override

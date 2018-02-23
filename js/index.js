@@ -12,7 +12,7 @@ import { requireNativeComponent, Platform } from 'react-native'
 
 class PSPDFKitView extends React.Component {
   render() {
-    if (Platform.OS === 'ios') {
+    if (Platform.OS === 'ios' || Platform.OS === 'android') {
       const onCloseButtonPressedHandler = this.props.onCloseButtonPressed
         ? event => {
           this.props.onCloseButtonPressed(event.nativeEvent)
@@ -67,10 +67,26 @@ PSPDFKitView.propTypes = {
    *
    * @platform ios
    */
+
+   /**
+   * fragmentTag: A tag used to identify a single PdfFragment in the view hierarchy.
+   * This needs to be unique in the view hierarchy.
+   * @platform android
+   */
+   fragmentTag: PropTypes.string,
 }
 
-if (Platform.OS === 'ios') {
-  var RCTPSPDFKitView = requireNativeComponent('RCTPSPDFKitView', PSPDFKitView)
+if (Platform.OS === 'ios' || Platform.OS === 'android') {
+  var RCTPSPDFKitView = requireNativeComponent('RCTPSPDFKitView', PSPDFKitView, {nativeOnly: {
+  testID: true,
+  accessibilityComponentType: true,
+  renderToHardwareTextureAndroid: true,
+  accessibilityLabel: true,
+  accessibilityLiveRegion: true,
+  importantForAccessibility: true,
+  onLayout: true,
+  nativeID: true,
+}})
   module.exports = PSPDFKitView
 } else if (Platform.OS === 'windows') {
   module.exports = requireNativeComponent('ReactPSPDFKitView', null);

@@ -17,10 +17,17 @@ import {
   ListView,
   NativeModules,
   processColor,
-  PermissionsAndroid
+  PermissionsAndroid,
+  Dimensions
 } from 'react-native';
+import { StackNavigator } from 'react-navigation';
+
+import PSPDFKitView from 'react-native-pspdfkit'
 
 var PSPDFKit = NativeModules.PSPDFKit;
+
+const pspdfkitColor = '#267AD4'
+const pspdfkitColorAlpha = '#267AD450'
 
 const DOCUMENT = 'file:///sdcard/Annual Report.pdf';
 const CONFIGURATION = {
@@ -56,6 +63,13 @@ var examples = [
     }
   },
   {
+    name: 'PDF View Component',
+    description: 'Show how to use the PSPDFKitView component with react-navigation.',
+    action: component => {
+      component.props.navigation.navigate('PdfView')
+    },
+  },
+  {
     name: "Debug Log",
     description: "Action used for printing stuff during development and debugging.",
     action: () => {
@@ -82,7 +96,7 @@ async function requestExternalStoragePermission(callback) {
   }
 }
 
-export default class Catalog extends Component<{}> {
+class CatalogScreen extends Component<{}> {
   // Initialize the hardcoded data
   constructor(props) {
     super(props);
@@ -116,9 +130,13 @@ export default class Catalog extends Component<{}> {
     );
   }
   
-  _renderRow(example: object) {
+  _renderRow = example => {
     return (
-      <TouchableHighlight onPress={example.action} style={styles.row} underlayColor='#209cca50'>
+      <TouchableHighlight 
+        onPress={() => {
+          example.action(this)
+        }} 
+        style={styles.row} underlayColor='#209cca50'>
         <View style={styles.rowContent}>
           <Text style={styles.name}>{example.name}</Text>
           <Text style={styles.description}>{example.description}</Text>
@@ -127,6 +145,74 @@ export default class Catalog extends Component<{}> {
     )
   }
 }
+
+class PdfViewScreen extends Component<{}> {
+  constructor(props) {
+    super(props)
+    this.state = { dimensions: undefined }
+  }
+
+  render() {
+    const layoutDirection = this._getOptimalLayoutDirection()
+    return (
+      <View
+        style={{ flex: 1, flexDirection: layoutDirection, justifyContent: 'center' }}
+        onLayout={this._onLayout}
+      >
+        <PSPDFKitView
+          document='file:///android_asset/Annual Report.pdf'
+          configuration={{
+            backgroundColor: processColor('lightgrey'),
+            thumbnailBarMode: 'scrollable',
+          }}
+          pageIndex={4}
+          showCloseButton={true}
+          fragmentTag='PDF1'
+          onCloseButtonPressed={this.props.onClose}
+          style={{ flex: 1, color: pspdfkitColor }}
+        />
+        <PSPDFKitView
+          document='file:///android_asset/Business Report.pdf'
+          configuration={{
+            pageTransition: 'scrollContinuous',
+            scrollDirection: 'vertical',
+            pageMode: 'single',
+          }}
+          fragmentTag='PDF2'
+          style={{ flex: 1, color: '#9932CC' }}
+        />
+      </View>
+    )
+  }
+
+  _getOptimalLayoutDirection = () => {
+    const width = this.state.dimensions
+      ? this.state.dimensions.width
+      : Dimensions.get('window').width
+    return width > 450 ? 'row' : 'column'
+  }
+
+  _onLayout = event => {
+    let { width, height } = event.nativeEvent.layout
+    this.setState({ dimensions: { width, height } })
+  }
+}
+
+export default StackNavigator(
+  {
+    Catalog: {
+      screen: CatalogScreen,
+    },
+    PdfView: {
+      screen: PdfViewScreen,
+    },
+  },
+  {
+    initialRouteName: 'Catalog',
+  }
+);
+
+
 
 var styles = StyleSheet.create({
   separator: {

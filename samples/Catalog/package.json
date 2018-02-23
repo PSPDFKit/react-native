@@ -11,6 +11,7 @@
     "react-native-fs": "2.9.0",
     "react-native-pspdfkit": "file:../../",
     "react-native-windows": "0.51.0-rc.0",
+    "react-navigation": "^1.0.3",
     "rnpm-plugin-windows": "0.2.8"
   }
 }
