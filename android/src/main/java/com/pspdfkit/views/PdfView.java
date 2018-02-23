@@ -4,12 +4,12 @@ import android.content.Context;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.util.AttributeSet;
 import android.view.Choreographer;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.pspdfkit.configuration.PdfConfiguration;
@@ -34,11 +34,10 @@ import com.pspdfkit.ui.toolbar.AnnotationEditingToolbar;
 import com.pspdfkit.ui.toolbar.TextSelectionToolbar;
 import com.pspdfkit.ui.toolbar.ToolbarCoordinatorLayout;
 
-import java.util.concurrent.TimeUnit;
-
-import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * This view displays a {@link com.pspdfkit.ui.PdfFragment} and all associated toolbars.
@@ -50,9 +49,11 @@ public class PdfView extends FrameLayout implements AnnotationManager.OnAnnotati
     private FragmentManager fragmentManager;
     private String fragmentTag;
     private PdfActivityConfiguration configuration;
-    private Uri document;
+    private Disposable documentOpeningDisposable;
+    private PdfDocument document;
+    private int pageIndex = 0;
 
-    private boolean isActive= true;
+    private boolean isActive = true;
     private boolean annotationCreationActive = false;
 
     private FrameLayout container;
@@ -136,7 +137,24 @@ public class PdfView extends FrameLayout implements AnnotationManager.OnAnnotati
         if (Uri.parse(document).getScheme() == null) {
             document = FILE_SCHEME + document;
         }
-        this.document = Uri.parse(document);
+        if (documentOpeningDisposable != null) {
+            documentOpeningDisposable.dispose();
+        }
+        documentOpeningDisposable = PdfDocument.openDocumentAsync(getContext(), Uri.parse(document))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<PdfDocument>() {
+
+                    @Override
+                    public void accept(PdfDocument pdfDocument) throws Exception {
+                        PdfView.this.document = pdfDocument;
+                        setupFragment();
+                    }
+                });
+    }
+
+    public void setPageIndex(int pageIndex) {
+        this.pageIndex = pageIndex;
         setupFragment();
     }
 
@@ -145,30 +163,49 @@ public class PdfView extends FrameLayout implements AnnotationManager.OnAnnotati
             PdfFragment pdfFragment = (PdfFragment) fragmentManager.findFragmentByTag(fragmentTag);
             if (pdfFragment == null) {
                 pdfFragment = PdfFragment.newInstance(document, new PdfConfiguration.Builder().build());
+                prepareFragment(pdfFragment);
             } else {
-                fragmentManager.beginTransaction()
-                        .remove(pdfFragment)
-                        .commitNow();
+                ViewGroup parent = (ViewGroup) pdfFragment.getView().getParent();
+                if (pdfFragment.getDocument() != null && !pdfFragment.getDocument().getUid().equals(document.getUid())) {
+                    fragmentManager.beginTransaction()
+                            .remove(pdfFragment)
+                            .commitNow();
+                    // The document changed create a new PdfFragment.
+                    pdfFragment = PdfFragment.newInstance(document, new PdfConfiguration.Builder().build());
+                    prepareFragment(pdfFragment);
+                } else if (parent != this) {
+                    // We only need to detach the fragment if the parent view changed.
+                    fragmentManager.beginTransaction()
+                            .remove(pdfFragment)
+                            .commitNow();
+                    prepareFragment(pdfFragment);
+                }
             }
 
-            pdfFragment.addDocumentListener(new SimpleDocumentListener() {
-                @Override
-                public void onDocumentLoaded(@NonNull PdfDocument document) {
-                    manuallyLayoutChildren();
-                }
-            });
-
-            pdfFragment.addOnAnnotationCreationModeChangeListener(this);
-            pdfFragment.addOnAnnotationEditingModeChangeListener(this);
-            pdfFragment.addOnFormElementEditingModeChangeListener(this);
-            pdfFragment.addOnTextSelectionModeChangeListener(this);
-
-            final Fragment fragment = pdfFragment;
-            fragmentManager.beginTransaction()
-                    .add(getId(), fragment, fragmentTag)
-                    .commit();
-
+            if (pdfFragment.getDocument() != null) {
+                pdfFragment.setPageIndex(pageIndex, true);
+            }
         }
+    }
+
+    private void prepareFragment(final PdfFragment pdfFragment) {
+        pdfFragment.addDocumentListener(new SimpleDocumentListener() {
+            @Override
+            public void onDocumentLoaded(@NonNull PdfDocument document) {
+                manuallyLayoutChildren();
+                pdfFragment.setPageIndex(pageIndex);
+            }
+        });
+
+        pdfFragment.addOnAnnotationCreationModeChangeListener(this);
+        pdfFragment.addOnAnnotationEditingModeChangeListener(this);
+        pdfFragment.addOnFormElementEditingModeChangeListener(this);
+        pdfFragment.addOnTextSelectionModeChangeListener(this);
+
+
+        fragmentManager.beginTransaction()
+                .add(getId(), pdfFragment, fragmentTag)
+                .commit();
     }
 
     public void removeFragment() {

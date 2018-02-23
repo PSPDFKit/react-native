@@ -47,7 +47,7 @@ PSPDFKitView.propTypes = {
    */
   hideNavigationBar: PropTypes.bool,
   /**
-   * Wheter the close button should be shown in the navigation bar. Disabled by default.
+   * Whether the close button should be shown in the navigation bar. Disabled by default.
    * Will call `onCloseButtonPressed` if it was provided, when tapped.
    * If `onCloseButtonPressed` was not provided, PSPDFKitView will be automatically dismissed.
    *

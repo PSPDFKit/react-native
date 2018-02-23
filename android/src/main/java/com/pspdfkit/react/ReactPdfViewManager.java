@@ -57,6 +57,11 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
         view.setDocument(document);
     }
 
+    @ReactProp(name = "pageIndex")
+    public void setPageIndex(PdfView view, int pageIndex) {
+        view.setPageIndex(pageIndex);
+    }
+
     @Override
     public boolean needsCustomLayoutForChildren() {
         return true;
