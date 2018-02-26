@@ -38,17 +38,14 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
     private static final String FILE_SCHEME = "file:///";
 
     @Nullable
-    private Activity currentActivity;
+    private Activity resumedActivity;
     @Nullable
     private Runnable onPdfActivityOpenedTask;
 
-    public PSPDFKitModule(ReactApplicationContext reactContext) {
+    public PSPDFKitModule(ReactApplicationContext reactContext, Application application) {
         super(reactContext);
-        if (reactContext.getApplicationContext() instanceof Application) {
-            Application application = (Application) reactContext.getApplicationContext();
-            // We register an activity lifecycle callback so we can get notified of the current activity.
-            application.registerActivityLifecycleCallbacks(this);
-        }
+        // We register an activity lifecycle callback so we can get notified of the current activity.
+        application.registerActivityLifecycleCallbacks(this);
     }
 
     @Override
@@ -70,9 +67,9 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
     }
 
     @ReactMethod
-    public void setPageIndex(final int pageIndex, final boolean animated) {
-        if (currentActivity instanceof PdfActivity) {
-            final PdfActivity activity = (PdfActivity) currentActivity;
+    public synchronized void setPageIndex(final int pageIndex, final boolean animated) {
+        if (resumedActivity instanceof PdfActivity) {
+            final PdfActivity activity = (PdfActivity) resumedActivity;
             activity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -119,9 +116,9 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
     }
 
     @Override
-    public void onActivityResumed(Activity activity) {
-        currentActivity = activity;
-        if (currentActivity instanceof PdfActivity && onPdfActivityOpenedTask != null) {
+    public synchronized void onActivityResumed(Activity activity) {
+        resumedActivity = activity;
+        if (resumedActivity instanceof PdfActivity && onPdfActivityOpenedTask != null) {
             // Run our queued up task when a PdfActivity is displayed.
             onPdfActivityOpenedTask.run();
             onPdfActivityOpenedTask = null;
@@ -129,9 +126,9 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
     }
 
     @Override
-    public void onActivityPaused(Activity activity) {
-        if (activity == currentActivity) {
-            currentActivity = null;
+    public synchronized void onActivityPaused(Activity activity) {
+        if (activity == resumedActivity) {
+            resumedActivity = null;
         }
     }
 
@@ -144,9 +141,9 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
     }
 
     @Override
-    public void onActivityDestroyed(Activity activity) {
-        if (activity == currentActivity) {
-            currentActivity = null;
+    public synchronized void onActivityDestroyed(Activity activity) {
+        if (activity == resumedActivity) {
+            resumedActivity = null;
         }
     }
 }

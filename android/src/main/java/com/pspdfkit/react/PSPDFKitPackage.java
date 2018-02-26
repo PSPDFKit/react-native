@@ -13,6 +13,8 @@
 
 package com.pspdfkit.react;
 
+import android.app.Application;
+
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.JavaScriptModule;
 import com.facebook.react.bridge.NativeModule;
@@ -24,10 +26,18 @@ import java.util.Collections;
 import java.util.List;
 
 public class PSPDFKitPackage implements ReactPackage {
+
+    private final Application application;
+
+    public PSPDFKitPackage(Application application) {
+        super();
+        this.application = application;
+    }
+
     @Override
     public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
         List<NativeModule> modules = new ArrayList<>();
-        modules.add(new PSPDFKitModule(reactContext));
+        modules.add(new PSPDFKitModule(reactContext, application));
         return modules;
     }
 
