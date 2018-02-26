@@ -3956,8 +3956,8 @@ react-native-fs@2.9.0:
     base-64 "^0.1.0"
     utf8 "^2.1.1"
 
-"react-native-pspdfkit@file:../../":
-  version "1.8.0"
+"react-native-pspdfkit@file:../..":
+  version "1.9.0"
 
 react-native-windows@0.51.0-rc.0:
   version "0.51.0-rc.0"
