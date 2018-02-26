@@ -3,7 +3,7 @@
  *
  *   PSPDFKit
  *
- *   Copyright © 2017 PSPDFKit GmbH. All rights reserved.
+ *   Copyright © 2017-2018 PSPDFKit GmbH. All rights reserved.
  *
  *   THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
  *   AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -12,6 +12,8 @@
  */
 
 package com.pspdfkit.react;
+
+import android.app.Application;
 
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.JavaScriptModule;
@@ -24,10 +26,18 @@ import java.util.Collections;
 import java.util.List;
 
 public class PSPDFKitPackage implements ReactPackage {
+
+    private final Application application;
+
+    public PSPDFKitPackage(Application application) {
+        super();
+        this.application = application;
+    }
+
     @Override
     public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
         List<NativeModule> modules = new ArrayList<>();
-        modules.add(new PSPDFKitModule(reactContext));
+        modules.add(new PSPDFKitModule(reactContext, application));
         return modules;
     }
 
