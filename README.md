@@ -112,7 +112,14 @@ Using the Native Module (`PSPDFKit.present()`), you can present a document with 
 You can specify the path to the document you want to present, and [configuration options](#configuration).
 
 ```javascript
-...
+import React, { Component } from 'react';
+import {
+  NativeModules,
+  Text,
+  TouchableHighlight,
+  View
+} from 'react-native';
+
 var PSPDFKit = NativeModules.PSPDFKit;
 PSPDFKit.setLicenseKey('YOUR_LICENSE_KEY_GOES_HERE');
 
@@ -150,7 +157,8 @@ For all the `props` that you can pass to `PSPDFKitView`, have a look at the [sou
 This is how you would show a PDF as a React component:
 
 ```javascript
-...
+import React, { Component } from 'react';
+import { NativeModules } from 'react-native';
 import PSPDFKitView from 'react-native-pspdfkit'
 
 var PSPDFKit = NativeModules.PSPDFKit;
