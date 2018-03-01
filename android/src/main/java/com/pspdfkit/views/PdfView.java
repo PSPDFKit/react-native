@@ -12,10 +12,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
+import com.facebook.react.uimanager.events.EventDispatcher;
 import com.pspdfkit.configuration.PdfConfiguration;
 import com.pspdfkit.configuration.activity.PdfActivityConfiguration;
 import com.pspdfkit.document.PdfDocument;
 import com.pspdfkit.listeners.SimpleDocumentListener;
+import com.pspdfkit.react.events.PdfViewStateChangedEvent;
 import com.pspdfkit.ui.PdfFragment;
 import com.pspdfkit.ui.forms.FormEditingBar;
 import com.pspdfkit.ui.inspector.PropertyInspectorCoordinatorLayout;
@@ -47,6 +49,7 @@ public class PdfView extends FrameLayout implements AnnotationManager.OnAnnotati
     private static final String FILE_SCHEME = "file:///";
 
     private FragmentManager fragmentManager;
+    private EventDispatcher eventDispatcher;
     private String fragmentTag;
     private PdfActivityConfiguration configuration;
     private Disposable documentOpeningDisposable;
@@ -66,6 +69,8 @@ public class PdfView extends FrameLayout implements AnnotationManager.OnAnnotati
     private AnnotationEditingToolbar annotationEditingToolbar;
     private FormEditingInspectorController formEditingInspectorController;
     private FormEditingBar formEditingBar;
+
+    private PdfFragment fragment;
 
     public PdfView(@NonNull Context context) {
         super(context);
@@ -123,6 +128,10 @@ public class PdfView extends FrameLayout implements AnnotationManager.OnAnnotati
         this.fragmentManager = fragmentManager;
     }
 
+    public void setEventDispatcher(EventDispatcher eventDispatcher) {
+        this.eventDispatcher = eventDispatcher;
+    }
+
     public void setFragmentTag(String fragmentTag) {
         this.fragmentTag = fragmentTag;
         setupFragment();
@@ -140,6 +149,7 @@ public class PdfView extends FrameLayout implements AnnotationManager.OnAnnotati
         if (documentOpeningDisposable != null) {
             documentOpeningDisposable.dispose();
         }
+        updateState();
         documentOpeningDisposable = PdfDocument.openDocumentAsync(getContext(), Uri.parse(document))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -187,6 +197,8 @@ public class PdfView extends FrameLayout implements AnnotationManager.OnAnnotati
             if (pdfFragment.getDocument() != null) {
                 pdfFragment.setPageIndex(pageIndex, true);
             }
+
+            fragment = pdfFragment;
         }
     }
 
@@ -195,7 +207,13 @@ public class PdfView extends FrameLayout implements AnnotationManager.OnAnnotati
             @Override
             public void onDocumentLoaded(@NonNull PdfDocument document) {
                 manuallyLayoutChildren();
-                pdfFragment.setPageIndex(pageIndex);
+                pdfFragment.setPageIndex(pageIndex, false);
+                updateState();
+            }
+
+            @Override
+            public void onPageChanged(@NonNull PdfDocument document, int pageIndex) {
+                updateState(pageIndex);
             }
         });
 
@@ -207,7 +225,7 @@ public class PdfView extends FrameLayout implements AnnotationManager.OnAnnotati
 
         fragmentManager.beginTransaction()
                 .add(getId(), pdfFragment, fragmentTag)
-                .commit();
+                .commitNow();
     }
 
     public void removeFragment() {
@@ -218,6 +236,8 @@ public class PdfView extends FrameLayout implements AnnotationManager.OnAnnotati
                     .commit();
         }
         isActive = false;
+
+        fragment = null;
     }
 
     private void manuallyLayoutChildren() {
@@ -257,6 +277,7 @@ public class PdfView extends FrameLayout implements AnnotationManager.OnAnnotati
         toolbarCoordinatorLayout.displayContextualToolbar(annotationCreationToolbar, true);
         annotationCreationActive = true;
         manuallyLayoutChildren();
+        updateState();
     }
 
     @Override
@@ -276,6 +297,7 @@ public class PdfView extends FrameLayout implements AnnotationManager.OnAnnotati
         // Also unbind the annotation creation controller from the inspector controller.
         annotationCreationInspectorController.unbindAnnotationCreationController();
         manuallyLayoutChildren();
+        updateState();
     }
 
     @Override
@@ -285,6 +307,7 @@ public class PdfView extends FrameLayout implements AnnotationManager.OnAnnotati
         annotationEditingToolbar.bindController(controller);
         toolbarCoordinatorLayout.displayContextualToolbar(annotationEditingToolbar, true);
         manuallyLayoutChildren();
+        updateState();
     }
 
     @Override
@@ -299,6 +322,7 @@ public class PdfView extends FrameLayout implements AnnotationManager.OnAnnotati
 
         annotationEditingInspectorController.unbindAnnotationEditingController();
         manuallyLayoutChildren();
+        updateState();
     }
 
     @Override
@@ -306,6 +330,7 @@ public class PdfView extends FrameLayout implements AnnotationManager.OnAnnotati
         textSelectionToolbar.bindController(controller);
         toolbarCoordinatorLayout.displayContextualToolbar(textSelectionToolbar, true);
         manuallyLayoutChildren();
+        updateState();
     }
 
     @Override
@@ -313,6 +338,7 @@ public class PdfView extends FrameLayout implements AnnotationManager.OnAnnotati
         toolbarCoordinatorLayout.removeContextualToolbar(true);
         textSelectionToolbar.unbindController();
         manuallyLayoutChildren();
+        updateState();
     }
 
     @Override
@@ -320,6 +346,7 @@ public class PdfView extends FrameLayout implements AnnotationManager.OnAnnotati
         formEditingInspectorController.bindFormEditingController(controller);
         formEditingBar.bindController(controller);
         manuallyLayoutChildren();
+        updateState();
     }
 
     @Override
@@ -332,5 +359,40 @@ public class PdfView extends FrameLayout implements AnnotationManager.OnAnnotati
         formEditingInspectorController.unbindFormEditingController();
         formEditingBar.unbindController();
         manuallyLayoutChildren();
+        updateState();
+    }
+
+    private void updateState() {
+        if (fragment != null) {
+            updateState(fragment.getPageIndex());
+        } else {
+            updateState(-1);
+        }
+    }
+
+    private void updateState(int pageIndex) {
+        if (fragment != null) {
+            if (fragment.getDocument() != null) {
+                eventDispatcher.dispatchEvent(new PdfViewStateChangedEvent(
+                        getId(),
+                        pageIndex,
+                        fragment.getDocument().getPageCount(),
+                        annotationCreationActive));
+            } else {
+                eventDispatcher.dispatchEvent(new PdfViewStateChangedEvent(getId()));
+            }
+        }
+    }
+
+    public void enterAnnotationCreationMode() {
+        if (fragment != null) {
+            fragment.enterAnnotationCreationMode();
+        }
+    }
+
+    public void exitCurrentlyActiveMode() {
+        if (fragment != null) {
+            fragment.exitCurrentlyActiveMode();
+        }
     }
 }
