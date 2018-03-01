@@ -1,4 +1,4 @@
-//  Copyright (c) 2016 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2016-2018 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -6,9 +6,8 @@
 //  This notice may not be removed from this file.
 //
 
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 import {
-  AppRegistry,
   StyleSheet,
   Text,
   View,
@@ -16,103 +15,165 @@ import {
   TouchableHighlight,
   ListView,
   NativeModules,
-  processColor
-} from 'react-native';
+  processColor,
+  NavigatorIOS,
+  Modal,
+  Dimensions,
+} from 'react-native'
+const RNFS = require('react-native-fs')
 
-var RNFS = require('react-native-fs');
+import PSPDFKitView from 'react-native-pspdfkit'
+const PSPDFKit = NativeModules.PSPDFKit
 
-var PSPDFKit = NativeModules.PSPDFKit;
+PSPDFKit.setLicenseKey('YOUR_LICENSE_KEY_GOES_HERE')
+
+const pspdfkitColor = '#267AD4'
+const pspdfkitColorAlpha = '#267AD450'
 
 var examples = [
   {
-    name: "Open document using resource path",
+    name: 'Open document using resource path',
     description: 'Open document from your resource bundle with relative path.',
     action: () => {
       PSPDFKit.present('PDFs/Annual Report.pdf', {})
-    }
+    },
   },
   {
-    name: "Open document with absolute path",
-    description: 'Opens document from application Documents directory by passing the absolute path.',
+    name: 'Open document with absolute path',
+    description:
+      'Opens document from application Documents directory by passing the absolute path.',
     action: () => {
       const filename = 'Annual Report.pdf'
-      
+
       const path = RNFS.DocumentDirectoryPath + '/' + filename
-      const src = RNFS.MainBundlePath + '/PDFs/' + filename 
-      
-      RNFS.exists(path).then((exists) => {
-        if (!exists) {
-          return RNFS.copyFile(src, path)
-        }
-      }).then(() => {
-        PSPDFKit.present(path, {})
-        PSPDFKit.setPageIndex(3, false)
-      }).catch((err) => {
-        console.log(err.message, err.code);
-      });
-    }
+      const src = RNFS.MainBundlePath + '/PDFs/' + filename
+
+      RNFS.exists(path)
+        .then(exists => {
+          if (!exists) {
+            return RNFS.copyFile(src, path)
+          }
+        })
+        .then(() => {
+          PSPDFKit.present(path, {})
+          PSPDFKit.setPageIndex(3, false)
+        })
+        .catch(err => {
+          console.log(err.message, err.code)
+        })
+    },
   },
   {
-    name: "Configured Controller",
-    description: "You can configure the controller with dictionary representation of the PSPDFConfiguration object.",
+    name: 'Configured Controller',
+    description:
+      'You can configure the controller with dictionary representation of the PSPDFConfiguration object.',
     action: () => {
       PSPDFKit.present('PDFs/Annual Report.pdf', {
-        scrollDirection: "horizontal",
+        scrollDirection: 'horizontal',
         backgroundColor: processColor('white'),
         thumbnailBarMode: 'scrollable',
         pageTransition: 'scrollContinuous',
-        scrollDirection: 'vertical'
+        scrollDirection: 'vertical',
       })
-    }
+    },
   },
   {
-    name: "Debug Log",
-    description: "Action used for printing stuff during development and debugging.",
+    name: 'PDF View Component',
+    description: 'Show how to use the PSPDFKitView component with NavigatorIOS.',
+    action: component => {
+      const nextRoute = {
+        component: PSPDFKitView,
+        passProps: {
+          document: 'PDFs/Annual Report.pdf',
+          configuration: {
+            useParentNavigationBar: true,
+          },
+          style: { flex: 1 },
+        },
+      }
+      component.props.navigator.push(nextRoute)
+    },
+  },
+  {
+    name: 'Split PDF',
+    description: 'Show two PDFs side by side by using PSPDFKitView components.',
+    action: component => {
+      component.openModal()
+    },
+  },
+  {
+    name: 'Debug Log',
+    description: 'Action used for printing stuff during development and debugging.',
     action: () => {
       console.log(PSPDFKit)
       console.log(PSPDFKit.versionString)
-      // console.log(NativeModules)
-    }
-  }
+    },
+  },
 ]
 
-export default class Catalog extends Component<{}> {
-  // Initialize the hardcoded data
-  constructor(props) {
-    super(props);
-    const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
-    this.state = {
-      dataSource: ds.cloneWithRows(examples)
-    };
+class ExampleList extends Component {
+  openModal = () => {
+    this.setState({ modalVisible: true })
   }
-  
+
+  closeModal = () => {
+    this.setState({ modalVisible: false })
+  }
+
+  constructor(props) {
+    super(props)
+    const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 })
+    this.state = {
+      dataSource: ds.cloneWithRows(examples),
+      modalVisible: false,
+    }
+  }
+
   render() {
     return (
-      <View style={styles.page}>
-        <View style={styles.header}>
-          <Image source={require('./assets/logo-flat.png')} style={styles.logo} />
-          <Text style={styles.version}>{PSPDFKit.versionString}</Text>
-        </View>
+      <View style={{ flex: 1 }}>
+        <Modal
+          visible={this.state.modalVisible}
+          animationType={'slide'}
+          onRequestClose={this.closeModal}
+          supportedOrientations={['portrait', 'landscape']}
+        >
+          <SplitPDF onClose={this.closeModal} style={{ flex: 1 }} />
+        </Modal>
         <ListView
           dataSource={this.state.dataSource}
+          renderHeader={this._renderHeader}
           renderRow={this._renderRow}
           renderSeparator={this._renderSeparator}
           contentContainerStyle={styles.listContainer}
           style={styles.list}
         />
       </View>
-    );
+    )
   }
-  
+
+  _renderHeader() {
+    return (
+      <View style={styles.header}>
+        <Image source={require('./assets/logo-flat.png')} style={styles.logo} />
+        <Text style={styles.version}>{PSPDFKit.versionString}</Text>
+      </View>
+    )
+  }
+
   _renderSeparator(sectionId, rowId) {
-    return (
-      <View key={rowId} style={styles.separator} />
-    );
+    return <View key={rowId} style={styles.separator} />
   }
-  
-  _renderRow(example: object) {
+
+  _renderRow = example => {
     return (
-      <TouchableHighlight onPress={example.action} style={styles.row} underlayColor='#209cca50'>
+      <TouchableHighlight
+        onPress={() => {
+          example.action(this)
+        }}
+        style={styles.row}
+        underlayColor={pspdfkitColorAlpha}
+      >
         <View style={styles.rowContent}>
           <Text style={styles.name}>{example.name}</Text>
           <Text style={styles.description}>{example.description}</Text>
@@ -122,48 +183,107 @@ export default class Catalog extends Component<{}> {
   }
 }
 
-const pspdfkitColor = "#209cca"
+class SplitPDF extends Component {
+  constructor(props) {
+    super(props)
+    this.state = { dimensions: undefined }
+  }
+
+  render() {
+    const layoutDirection = this._getOptimalLayoutDirection()
+    return (
+      <View
+        style={{ flex: 1, flexDirection: layoutDirection, justifyContent: 'center' }}
+        onLayout={this._onLayout}
+      >
+        <PSPDFKitView
+          document={'PDFs/Annual Report.pdf'}
+          configuration={{
+            backgroundColor: processColor('lightgrey'),
+            thumbnailBarMode: 'scrollable',
+          }}
+          pageIndex={4}
+          showCloseButton={true}
+          onCloseButtonPressed={this.props.onClose}
+          style={{ flex: 1, color: pspdfkitColor }}
+        />
+        <PSPDFKitView
+          document={'PDFs/Business Report.pdf'}
+          configuration={{
+            pageTransition: 'scrollContinuous',
+            scrollDirection: 'vertical',
+            pageMode: 'single',
+          }}
+          style={{ flex: 1, color: '#9932CC' }}
+        />
+      </View>
+    )
+  }
+
+  _getOptimalLayoutDirection = () => {
+    const width = this.state.dimensions
+      ? this.state.dimensions.width
+      : Dimensions.get('window').width
+    return width > 450 ? 'row' : 'column'
+  }
+
+  _onLayout = event => {
+    let { width, height } = event.nativeEvent.layout
+    this.setState({ dimensions: { width, height } })
+  }
+}
+
+export default class Catalog extends Component {
+  render() {
+    return (
+      <NavigatorIOS
+        initialRoute={{
+          component: ExampleList,
+          title: 'PSPDFKit Catalog',
+        }}
+        style={{ flex: 1 }}
+      />
+    )
+  }
+}
 
 var styles = StyleSheet.create({
   separator: {
     height: 0.5,
     backgroundColor: '#ccc',
-    marginLeft: 10
-  },
-  page: {
-    flex: 1,
-    alignItems: 'stretch',
-    backgroundColor: '#eee'
+    marginLeft: 10,
   },
   header: {
     alignItems: 'center',
     borderBottomWidth: 0.5,
-    borderColor: '#ccc'
+    borderColor: '#ccc',
+    backgroundColor: '#eee',
   },
   version: {
     color: '#666666',
     marginTop: 10,
-    marginBottom: 20
+    marginBottom: 20,
   },
   logo: {
-    marginTop: 40
+    marginTop: 20,
   },
   listContainer: {
     backgroundColor: 'white',
   },
   list: {
+    backgroundColor: '#eee',
   },
   name: {
-    color: '#209cca',
+    color: pspdfkitColor,
     fontWeight: '700',
     fontSize: 14,
-    marginBottom: 4
+    marginBottom: 4,
   },
   description: {
-    color: "#666666",
-    fontSize: 12
+    color: '#666666',
+    fontSize: 12,
   },
   rowContent: {
-    padding: 10
-  }
-});
+    padding: 10,
+  },
+})

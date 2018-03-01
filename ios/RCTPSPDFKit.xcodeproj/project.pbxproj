@@ -10,6 +10,8 @@
 		6540D1841D89D22E00B8F94F /* RCTPSPDFKitManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 6540D1831D89D22E00B8F94F /* RCTPSPDFKitManager.m */; };
 		6572780C1D86AE7300A5E1A8 /* RCTConvert+PSPDFConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 657278071D86AE7300A5E1A8 /* RCTConvert+PSPDFConfiguration.m */; };
 		657278111D86AEC600A5E1A8 /* RCTConvert+PSPDFDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 657278101D86AEC600A5E1A8 /* RCTConvert+PSPDFDocument.m */; };
+		F84F8B192032D54F00153D9E /* RCTPSPDFKitView.m in Sources */ = {isa = PBXBuildFile; fileRef = F84F8B182032D54F00153D9E /* RCTPSPDFKitView.m */; };
+		F8C1A2E5202DCC9700E98192 /* RCTPSPDFKitViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F8C1A2E4202DCC9700E98192 /* RCTPSPDFKitViewManager.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -32,6 +34,10 @@
 		657278071D86AE7300A5E1A8 /* RCTConvert+PSPDFConfiguration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "RCTConvert+PSPDFConfiguration.m"; sourceTree = "<group>"; };
 		6572780F1D86AEC600A5E1A8 /* RCTConvert+PSPDFDocument.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "RCTConvert+PSPDFDocument.h"; sourceTree = "<group>"; };
 		657278101D86AEC600A5E1A8 /* RCTConvert+PSPDFDocument.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "RCTConvert+PSPDFDocument.m"; sourceTree = "<group>"; };
+		F84F8B182032D54F00153D9E /* RCTPSPDFKitView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RCTPSPDFKitView.m; sourceTree = "<group>"; };
+		F84F8B1A2032D55E00153D9E /* RCTPSPDFKitView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RCTPSPDFKitView.h; sourceTree = "<group>"; };
+		F8C1A2E4202DCC9700E98192 /* RCTPSPDFKitViewManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RCTPSPDFKitViewManager.m; sourceTree = "<group>"; };
+		F8C1A2E6202DCD3800E98192 /* RCTPSPDFKitViewManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RCTPSPDFKitViewManager.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -50,6 +56,10 @@
 			children = (
 				6540D1821D89D22E00B8F94F /* RCTPSPDFKitManager.h */,
 				6540D1831D89D22E00B8F94F /* RCTPSPDFKitManager.m */,
+				F8C1A2E6202DCD3800E98192 /* RCTPSPDFKitViewManager.h */,
+				F8C1A2E4202DCC9700E98192 /* RCTPSPDFKitViewManager.m */,
+				F84F8B1A2032D55E00153D9E /* RCTPSPDFKitView.h */,
+				F84F8B182032D54F00153D9E /* RCTPSPDFKitView.m */,
 				657278051D86AE7300A5E1A8 /* Converters */,
 			);
 			path = RCTPSPDFKit;
@@ -143,7 +153,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				657278111D86AEC600A5E1A8 /* RCTConvert+PSPDFDocument.m in Sources */,
+				F8C1A2E5202DCC9700E98192 /* RCTPSPDFKitViewManager.m in Sources */,
 				6540D1841D89D22E00B8F94F /* RCTPSPDFKitManager.m in Sources */,
+				F84F8B192032D54F00153D9E /* RCTPSPDFKitView.m in Sources */,
 				6572780C1D86AE7300A5E1A8 /* RCTConvert+PSPDFConfiguration.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

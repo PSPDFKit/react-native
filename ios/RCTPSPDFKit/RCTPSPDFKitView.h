@@ -1,3 +1,4 @@
+//
 //  Copyright © 2018 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
@@ -6,7 +7,18 @@
 //  This notice may not be removed from this file.
 //
 
-import { AppRegistry } from 'react-native'
-import Catalog from './Catalog'
+#import <UIKit/UIKit.h>
+#import <React/RCTComponent.h>
 
-AppRegistry.registerComponent('Catalog', () => Catalog)
+@import PSPDFKit;
+@import PSPDFKitUI;
+
+@interface RCTPSPDFKitView: UIView
+
+@property (nonatomic, readonly) PSPDFViewController *pdfController;
+@property (nonatomic) BOOL hideNavigationBar;
+
+@property (nonatomic, readonly) UIBarButtonItem *closeButton;
+@property (nonatomic, copy) RCTBubblingEventBlock onCloseButtonPressed;
+
+@end
