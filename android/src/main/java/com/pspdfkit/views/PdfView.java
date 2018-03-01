@@ -124,11 +124,8 @@ public class PdfView extends FrameLayout implements AnnotationManager.OnAnnotati
         });
     }
 
-    public void setFragmentManager(FragmentManager fragmentManager) {
+    public void inject(FragmentManager fragmentManager, EventDispatcher eventDispatcher) {
         this.fragmentManager = fragmentManager;
-    }
-
-    public void setEventDispatcher(EventDispatcher eventDispatcher) {
         this.eventDispatcher = eventDispatcher;
     }
 
@@ -271,8 +268,6 @@ public class PdfView extends FrameLayout implements AnnotationManager.OnAnnotati
         // When entering the annotation creation mode we bind the toolbar to the provided controller, and
         // issue the coordinator layout to animate the toolbar in place.
         // Whenever the user presses an action, the toolbar forwards this command to the controller.
-        // Instead of using the `AnnotationEditingToolbar` you could use a custom UI that operates on the controller.
-        // Same principle is used on all other toolbars.
         annotationCreationToolbar.bindController(controller);
         toolbarCoordinatorLayout.displayContextualToolbar(annotationCreationToolbar, true);
         annotationCreationActive = true;
@@ -289,7 +284,6 @@ public class PdfView extends FrameLayout implements AnnotationManager.OnAnnotati
     public void onExitAnnotationCreationMode(@NonNull AnnotationCreationController controller) {
         // Once we're done with editing, unbind the controller from the toolbar, and remove it from the
         // toolbar coordinator layout (with animation in this case).
-        // Same principle is used on all other toolbars.
         toolbarCoordinatorLayout.removeContextualToolbar(true);
         annotationCreationToolbar.unbindController();
         annotationCreationActive = false;

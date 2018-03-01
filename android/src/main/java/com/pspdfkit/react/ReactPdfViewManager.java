@@ -38,8 +38,8 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
             // Since we require a FragmentManager this only works in FragmentActivities.
             FragmentActivity fragmentActivity = (FragmentActivity) reactContext.getCurrentActivity();
             PdfView pdfView = new PdfView(reactContext);
-            pdfView.setFragmentManager(fragmentActivity.getSupportFragmentManager());
-            pdfView.setEventDispatcher(reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher());
+            pdfView.inject(fragmentActivity.getSupportFragmentManager(),
+                    reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher());
             return pdfView;
         } else {
             throw new IllegalStateException("ReactPSPDFKitView can only be used in FragmentActivity subclasses.");
@@ -94,7 +94,7 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
             case COMMAND_ENTER_ANNOTATION_CREATION_MODE:
                 root.enterAnnotationCreationMode();
                 break;
-            case  COMMAND_EXIT_CURRENTLY_ACTIVE_MODE:
+            case COMMAND_EXIT_CURRENTLY_ACTIVE_MODE:
                 root.exitCurrentlyActiveMode();
                 break;
         }
@@ -104,6 +104,4 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
     public boolean needsCustomLayoutForChildren() {
         return true;
     }
-
-
 }

@@ -453,6 +453,15 @@ const CONFIGURATION = {
 };
 ```
 
+#### Native UI Component
+
+Just like on iOS we also support integrating PSPDFKit directly into the react-native view hierarchy. There are a few thing you need to consider when using this approach:
+
+- Your activity hosting the react component needs to extend from `FragmentActivity`. The default `ReactActivity` doesn't so you will need to update your java code to either manually use a `FragmentActivity` our use our drop-in replacement the `ReactFragmentActivity`.
+- Because of [issues](https://github.com/facebook/react-native/issues/17968) in react-native our `PdfView` needs to call `layout` and `dispatchOnGlobalLayout` on every frame, this might negatively affect your apps performance or even cause it to misbehave.
+- `PSPDFKitView` doesn't yet support all the features (outline, bookmarks, thubmnail grid, view settings) using `PSPDFKit.present` provides.
+
+
 #### Update
 Upgrading yarn's lock file is required in order to update react-native-pspdfkit module in a project that has been already setup following the steps in [Getting Started](#getting-started-1) section.  
 From root project folder (e.g.`YourApp` for upgrading example project) launch `yarn upgrade`.
