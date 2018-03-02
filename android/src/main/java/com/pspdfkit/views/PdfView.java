@@ -91,6 +91,7 @@ public class PdfView extends FrameLayout {
         container.addView(formEditingBar, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, Gravity.BOTTOM));
 
         pdfThumbnailBar = new PdfThumbnailBar(getContext());
+        pdfThumbnailBar.setVisibility(View.GONE);
         container.addView(pdfThumbnailBar, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, Gravity.BOTTOM));
 
         pdfViewModeController = new PdfViewModeController(this,

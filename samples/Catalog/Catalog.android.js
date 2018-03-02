@@ -113,6 +113,10 @@ async function requestExternalStoragePermission(callback) {
 }
 
 class CatalogScreen extends Component<{}> {
+  static navigationOptions = {
+    title: "Catalog"
+  };
+
   // Initialize the hardcoded data
   constructor(props) {
     super(props);
@@ -168,6 +172,17 @@ class CatalogScreen extends Component<{}> {
 }
 
 class PdfViewScreen extends Component<{}> {
+  static navigationOptions = ({ navigation }) => {
+    const params = navigation.state.params || {};
+
+    return {
+      title: "PDF",
+      headerRight: (
+        <Button onPress={params.enterAnnotationCreation} title="Annotations" />
+      )
+    };
+  };
+
   constructor(props) {
     super(props);
     this.state = {
@@ -177,6 +192,23 @@ class PdfViewScreen extends Component<{}> {
       annotationEditingActive: false
     };
   }
+
+  componentWillMount() {
+    this.props.navigation.setParams({
+      enterAnnotationCreation: this._enterAnnotationCreation
+    });
+  }
+
+  _enterAnnotationCreation = () => {
+    if (
+      this.state.annotationCreationActive ||
+      this.state.annotationEditingActive
+    ) {
+      this.refs.pdfView.exitCurrentlyActiveMode();
+    } else {
+      this.refs.pdfView.enterAnnotationCreationMode();
+    }
+  };
 
   render() {
     let buttonTitle = "";
@@ -215,25 +247,16 @@ class PdfViewScreen extends Component<{}> {
             " of " +
             this.state.pageCount}
         </Text>
-        <Button
-          onPress={() => {
-            if (
-              this.state.annotationCreationActive ||
-              this.state.annotationEditingActive
-            ) {
-              this.refs.pdfView.exitCurrentlyActiveMode();
-            } else {
-              this.refs.pdfView.enterAnnotationCreationMode();
-            }
-          }}
-          title={buttonTitle}
-        />
       </View>
     );
   }
 }
 
 class PdfViewSplitScreen extends Component<{}> {
+  static navigationOptions = {
+    title: "PDF"
+  };
+
   constructor(props) {
     super(props);
     this.state = { dimensions: undefined };
