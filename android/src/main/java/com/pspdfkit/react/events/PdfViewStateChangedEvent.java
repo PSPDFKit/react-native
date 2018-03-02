@@ -19,6 +19,9 @@ public class PdfViewStateChangedEvent extends Event<PdfViewStateChangedEvent> {
     private final int currentPageIndex;
     private final int pageCount;
     private final boolean annotationCreationActive;
+    private final boolean annotationEditingActive;
+    private final boolean textSelectionActive;
+    private final boolean formEditingActive;
 
     public PdfViewStateChangedEvent(@IdRes int viewId) {
         super(viewId);
@@ -26,14 +29,26 @@ public class PdfViewStateChangedEvent extends Event<PdfViewStateChangedEvent> {
         this.currentPageIndex = -1;
         this.pageCount = -1;
         this.annotationCreationActive = false;
+        this.annotationEditingActive = false;
+        this.textSelectionActive = false;
+        this.formEditingActive = false;
     }
 
-    public PdfViewStateChangedEvent(@IdRes int viewID, int currentPageIndex, int pageCount, boolean annotationCreationActive) {
+    public PdfViewStateChangedEvent(@IdRes int viewID,
+                                    int currentPageIndex,
+                                    int pageCount,
+                                    boolean annotationCreationActive,
+                                    boolean annotationEditingActive,
+                                    boolean textSelectionActive,
+                                    boolean formEditingActive) {
         super(viewID);
         this.documentIsLoaded = true;
         this.currentPageIndex = currentPageIndex;
         this.pageCount = pageCount;
         this.annotationCreationActive = annotationCreationActive;
+        this.annotationEditingActive = annotationEditingActive;
+        this.textSelectionActive = textSelectionActive;
+        this.formEditingActive = formEditingActive;
     }
 
     @Override
@@ -48,6 +63,9 @@ public class PdfViewStateChangedEvent extends Event<PdfViewStateChangedEvent> {
         eventData.putInt("currentPageIndex", currentPageIndex);
         eventData.putInt("pageCount", pageCount);
         eventData.putBoolean("annotationCreationActive", annotationCreationActive);
+        eventData.putBoolean("annotationEditingActive", annotationEditingActive);
+        eventData.putBoolean("textSelectionActive", textSelectionActive);
+        eventData.putBoolean("formEditingActive", formEditingActive);
         rctEventEmitter.receiveEvent(getViewTag(), getEventName(), eventData);
     }
 }

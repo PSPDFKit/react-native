@@ -13,27 +13,17 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.facebook.react.uimanager.events.EventDispatcher;
-import com.pspdfkit.configuration.PdfConfiguration;
 import com.pspdfkit.configuration.activity.PdfActivityConfiguration;
+import com.pspdfkit.configuration.activity.ThumbnailBarMode;
 import com.pspdfkit.document.PdfDocument;
 import com.pspdfkit.listeners.SimpleDocumentListener;
+import com.pspdfkit.react.R;
 import com.pspdfkit.react.events.PdfViewStateChangedEvent;
 import com.pspdfkit.ui.PdfFragment;
+import com.pspdfkit.ui.PdfThumbnailBar;
 import com.pspdfkit.ui.forms.FormEditingBar;
 import com.pspdfkit.ui.inspector.PropertyInspectorCoordinatorLayout;
-import com.pspdfkit.ui.inspector.annotation.DefaultAnnotationCreationInspectorController;
-import com.pspdfkit.ui.inspector.annotation.DefaultAnnotationEditingInspectorController;
-import com.pspdfkit.ui.inspector.forms.FormEditingInspectorController;
-import com.pspdfkit.ui.special_mode.controller.AnnotationCreationController;
-import com.pspdfkit.ui.special_mode.controller.AnnotationEditingController;
-import com.pspdfkit.ui.special_mode.controller.FormEditingController;
-import com.pspdfkit.ui.special_mode.controller.TextSelectionController;
-import com.pspdfkit.ui.special_mode.manager.AnnotationManager;
-import com.pspdfkit.ui.special_mode.manager.FormManager;
-import com.pspdfkit.ui.special_mode.manager.TextSelectionManager;
-import com.pspdfkit.ui.toolbar.AnnotationCreationToolbar;
-import com.pspdfkit.ui.toolbar.AnnotationEditingToolbar;
-import com.pspdfkit.ui.toolbar.TextSelectionToolbar;
+import com.pspdfkit.ui.thumbnail.PdfThumbnailBarController;
 import com.pspdfkit.ui.toolbar.ToolbarCoordinatorLayout;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -44,7 +34,7 @@ import io.reactivex.schedulers.Schedulers;
 /**
  * This view displays a {@link com.pspdfkit.ui.PdfFragment} and all associated toolbars.
  */
-public class PdfView extends FrameLayout implements AnnotationManager.OnAnnotationCreationModeChangeListener, AnnotationManager.OnAnnotationEditingModeChangeListener, FormManager.OnFormElementEditingModeChangeListener, TextSelectionManager.OnTextSelectionModeChangeListener {
+public class PdfView extends FrameLayout {
 
     private static final String FILE_SCHEME = "file:///";
 
@@ -57,18 +47,11 @@ public class PdfView extends FrameLayout implements AnnotationManager.OnAnnotati
     private int pageIndex = 0;
 
     private boolean isActive = true;
-    private boolean annotationCreationActive = false;
 
     private FrameLayout container;
-    private ToolbarCoordinatorLayout toolbarCoordinatorLayout;
-    private AnnotationCreationToolbar annotationCreationToolbar;
-    private TextSelectionToolbar textSelectionToolbar;
-    private PropertyInspectorCoordinatorLayout inspectorCoordinatorLayout;
-    private DefaultAnnotationEditingInspectorController annotationEditingInspectorController;
-    private DefaultAnnotationCreationInspectorController annotationCreationInspectorController;
-    private AnnotationEditingToolbar annotationEditingToolbar;
-    private FormEditingInspectorController formEditingInspectorController;
-    private FormEditingBar formEditingBar;
+    private PdfViewModeController pdfViewModeController;
+
+    private PdfThumbnailBar pdfThumbnailBar;
 
     private PdfFragment fragment;
 
@@ -96,21 +79,23 @@ public class PdfView extends FrameLayout implements AnnotationManager.OnAnnotati
         container = new FrameLayout(getContext());
         addView(container, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 
-        toolbarCoordinatorLayout = new ToolbarCoordinatorLayout(getContext());
+        ToolbarCoordinatorLayout toolbarCoordinatorLayout = new ToolbarCoordinatorLayout(getContext());
         container.addView(toolbarCoordinatorLayout, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 
-        annotationCreationToolbar = new AnnotationCreationToolbar(getContext());
-        textSelectionToolbar = new TextSelectionToolbar(getContext());
-        annotationEditingToolbar = new AnnotationEditingToolbar(getContext());
-
-        inspectorCoordinatorLayout = new PropertyInspectorCoordinatorLayout(getContext());
+        PropertyInspectorCoordinatorLayout inspectorCoordinatorLayout = new PropertyInspectorCoordinatorLayout(getContext());
         container.addView(inspectorCoordinatorLayout, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-        annotationEditingInspectorController = new DefaultAnnotationEditingInspectorController(getContext(), inspectorCoordinatorLayout);
-        annotationCreationInspectorController = new DefaultAnnotationCreationInspectorController(getContext(), inspectorCoordinatorLayout);
 
-        formEditingInspectorController = new FormEditingInspectorController(getContext(), inspectorCoordinatorLayout);
-        formEditingBar = new FormEditingBar(getContext());
+
+        FormEditingBar formEditingBar = new FormEditingBar(getContext());
         container.addView(formEditingBar, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, Gravity.BOTTOM));
+
+        pdfThumbnailBar = new PdfThumbnailBar(getContext());
+        container.addView(pdfThumbnailBar, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, Gravity.BOTTOM));
+
+        pdfViewModeController = new PdfViewModeController(this,
+                inspectorCoordinatorLayout,
+                toolbarCoordinatorLayout,
+                formEditingBar);
 
         Choreographer.getInstance().postFrameCallback(new Choreographer.FrameCallback() {
             @Override
@@ -169,7 +154,7 @@ public class PdfView extends FrameLayout implements AnnotationManager.OnAnnotati
         if (fragmentTag != null && configuration != null && document != null) {
             PdfFragment pdfFragment = (PdfFragment) fragmentManager.findFragmentByTag(fragmentTag);
             if (pdfFragment == null) {
-                pdfFragment = PdfFragment.newInstance(document, new PdfConfiguration.Builder().build());
+                pdfFragment = PdfFragment.newInstance(document, this.configuration.getConfiguration());
                 prepareFragment(pdfFragment);
             } else {
                 ViewGroup parent = (ViewGroup) pdfFragment.getView().getParent();
@@ -177,13 +162,13 @@ public class PdfView extends FrameLayout implements AnnotationManager.OnAnnotati
                     fragmentManager.beginTransaction()
                             .remove(pdfFragment)
                             .commitNow();
-                    resetToolbars();
+                    pdfViewModeController.resetToolbars();
                     // The document changed create a new PdfFragment.
-                    pdfFragment = PdfFragment.newInstance(document, new PdfConfiguration.Builder().build());
+                    pdfFragment = PdfFragment.newInstance(document, this.configuration.getConfiguration());
                     prepareFragment(pdfFragment);
                 } else if (parent != this) {
                     // We only need to detach the fragment if the parent view changed.
-                    resetToolbars();
+                    pdfViewModeController.resetToolbars();
                     fragmentManager.beginTransaction()
                             .remove(pdfFragment)
                             .commitNow();
@@ -205,6 +190,7 @@ public class PdfView extends FrameLayout implements AnnotationManager.OnAnnotati
             public void onDocumentLoaded(@NonNull PdfDocument document) {
                 manuallyLayoutChildren();
                 pdfFragment.setPageIndex(pageIndex, false);
+                pdfThumbnailBar.setDocument(document, configuration.getConfiguration(), pdfFragment.getEventBus());
                 updateState();
             }
 
@@ -214,15 +200,32 @@ public class PdfView extends FrameLayout implements AnnotationManager.OnAnnotati
             }
         });
 
-        pdfFragment.addOnAnnotationCreationModeChangeListener(this);
-        pdfFragment.addOnAnnotationEditingModeChangeListener(this);
-        pdfFragment.addOnFormElementEditingModeChangeListener(this);
-        pdfFragment.addOnTextSelectionModeChangeListener(this);
+        pdfFragment.addOnAnnotationCreationModeChangeListener(pdfViewModeController);
+        pdfFragment.addOnAnnotationEditingModeChangeListener(pdfViewModeController);
+        pdfFragment.addOnFormElementEditingModeChangeListener(pdfViewModeController);
+        pdfFragment.addOnTextSelectionModeChangeListener(pdfViewModeController);
 
+        setupThumbnailBar(pdfFragment);
 
         fragmentManager.beginTransaction()
                 .add(getId(), pdfFragment, fragmentTag)
                 .commitNow();
+    }
+
+    private void setupThumbnailBar(final PdfFragment pdfFragment) {
+        if (configuration.getThumbnailBarMode() != ThumbnailBarMode.THUMBNAIL_BAR_MODE_NONE) {
+            pdfThumbnailBar.setThumbnailBarMode(configuration.getThumbnailBarMode());
+            pdfThumbnailBar.setVisibility(VISIBLE);
+        } else {
+            pdfThumbnailBar.setVisibility(GONE);
+        }
+        pdfFragment.addDocumentListener(pdfThumbnailBar.getDocumentListener());
+        pdfThumbnailBar.setOnPageChangedListener(new PdfThumbnailBar.OnPageChangedListener() {
+            @Override
+            public void onPageChanged(@NonNull PdfThumbnailBarController pdfThumbnailBarController, int pageIndex) {
+                pdfFragment.setPageIndex(pageIndex);
+            }
+        });
     }
 
     public void removeFragment() {
@@ -237,7 +240,8 @@ public class PdfView extends FrameLayout implements AnnotationManager.OnAnnotati
         fragment = null;
     }
 
-    private void manuallyLayoutChildren() {
+    void manuallyLayoutChildren() {
+        applyThumbnailBarPadding();
         for (int i = 0; i < getChildCount(); i++) {
             View child = getChildAt(i);
             child.measure(MeasureSpec.makeMeasureSpec(getMeasuredWidth(), MeasureSpec.EXACTLY),
@@ -247,116 +251,14 @@ public class PdfView extends FrameLayout implements AnnotationManager.OnAnnotati
         container.bringToFront();
     }
 
-    private void resetToolbars() {
-        toolbarCoordinatorLayout.removeContextualToolbar(false);
-        annotationCreationToolbar.unbindController();
-        annotationCreationActive = false;
-        annotationCreationInspectorController.unbindAnnotationCreationController();
-        annotationEditingToolbar.unbindController();
-        annotationEditingInspectorController.unbindAnnotationEditingController();
-        textSelectionToolbar.unbindController();
-        formEditingInspectorController.unbindFormEditingController();
-        formEditingBar.unbindController();
+    private void applyThumbnailBarPadding() {
+        View fragmentView = findViewById(R.id.pspdf__fragment_layout);
+        if (fragmentView != null && configuration.getThumbnailBarMode() != ThumbnailBarMode.THUMBNAIL_BAR_MODE_NONE) {
+            fragmentView.setPadding(0, 0, 0, pdfThumbnailBar.getHeight());
+        }
     }
 
-    @Override
-    public void onEnterAnnotationCreationMode(@NonNull AnnotationCreationController controller) {
-        // When entering the annotation creation mode we bind the creation inspector to the provided controller.
-        // Controller handles request for toggling annotation inspector.
-        annotationCreationInspectorController.bindAnnotationCreationController(controller);
-
-        // When entering the annotation creation mode we bind the toolbar to the provided controller, and
-        // issue the coordinator layout to animate the toolbar in place.
-        // Whenever the user presses an action, the toolbar forwards this command to the controller.
-        annotationCreationToolbar.bindController(controller);
-        toolbarCoordinatorLayout.displayContextualToolbar(annotationCreationToolbar, true);
-        annotationCreationActive = true;
-        manuallyLayoutChildren();
-        updateState();
-    }
-
-    @Override
-    public void onChangeAnnotationCreationMode(@NonNull AnnotationCreationController controller) {
-        // Nothing to be done here, if toolbar is bound to the controller it will pick up the changes.
-    }
-
-    @Override
-    public void onExitAnnotationCreationMode(@NonNull AnnotationCreationController controller) {
-        // Once we're done with editing, unbind the controller from the toolbar, and remove it from the
-        // toolbar coordinator layout (with animation in this case).
-        toolbarCoordinatorLayout.removeContextualToolbar(true);
-        annotationCreationToolbar.unbindController();
-        annotationCreationActive = false;
-
-        // Also unbind the annotation creation controller from the inspector controller.
-        annotationCreationInspectorController.unbindAnnotationCreationController();
-        manuallyLayoutChildren();
-        updateState();
-    }
-
-    @Override
-    public void onEnterAnnotationEditingMode(@NonNull AnnotationEditingController controller) {
-        annotationEditingInspectorController.bindAnnotationEditingController(controller);
-
-        annotationEditingToolbar.bindController(controller);
-        toolbarCoordinatorLayout.displayContextualToolbar(annotationEditingToolbar, true);
-        manuallyLayoutChildren();
-        updateState();
-    }
-
-    @Override
-    public void onChangeAnnotationEditingMode(@NonNull AnnotationEditingController controller) {
-        // Nothing to be done here, if toolbar is bound to the controller it will pick up the changes.
-    }
-
-    @Override
-    public void onExitAnnotationEditingMode(@NonNull AnnotationEditingController controller) {
-        toolbarCoordinatorLayout.removeContextualToolbar(true);
-        annotationEditingToolbar.unbindController();
-
-        annotationEditingInspectorController.unbindAnnotationEditingController();
-        manuallyLayoutChildren();
-        updateState();
-    }
-
-    @Override
-    public void onEnterTextSelectionMode(@NonNull TextSelectionController controller) {
-        textSelectionToolbar.bindController(controller);
-        toolbarCoordinatorLayout.displayContextualToolbar(textSelectionToolbar, true);
-        manuallyLayoutChildren();
-        updateState();
-    }
-
-    @Override
-    public void onExitTextSelectionMode(@NonNull TextSelectionController controller) {
-        toolbarCoordinatorLayout.removeContextualToolbar(true);
-        textSelectionToolbar.unbindController();
-        manuallyLayoutChildren();
-        updateState();
-    }
-
-    @Override
-    public void onEnterFormElementEditingMode(@NonNull FormEditingController controller) {
-        formEditingInspectorController.bindFormEditingController(controller);
-        formEditingBar.bindController(controller);
-        manuallyLayoutChildren();
-        updateState();
-    }
-
-    @Override
-    public void onChangeFormElementEditingMode(@NonNull FormEditingController controller) {
-
-    }
-
-    @Override
-    public void onExitFormElementEditingMode(@NonNull FormEditingController controller) {
-        formEditingInspectorController.unbindFormEditingController();
-        formEditingBar.unbindController();
-        manuallyLayoutChildren();
-        updateState();
-    }
-
-    private void updateState() {
+    void updateState() {
         if (fragment != null) {
             updateState(fragment.getPageIndex());
         } else {
@@ -364,14 +266,17 @@ public class PdfView extends FrameLayout implements AnnotationManager.OnAnnotati
         }
     }
 
-    private void updateState(int pageIndex) {
+    void updateState(int pageIndex) {
         if (fragment != null) {
             if (fragment.getDocument() != null) {
                 eventDispatcher.dispatchEvent(new PdfViewStateChangedEvent(
                         getId(),
                         pageIndex,
                         fragment.getDocument().getPageCount(),
-                        annotationCreationActive));
+                        pdfViewModeController.isAnnotationCreationActive(),
+                        pdfViewModeController.isAnnotationEditingActive(),
+                        pdfViewModeController.isTextSelectionActive(),
+                        pdfViewModeController.isFormEditingActive()));
             } else {
                 eventDispatcher.dispatchEvent(new PdfViewStateChangedEvent(getId()));
             }

@@ -116,6 +116,9 @@ PSPDFKitView.propTypes = {
    *    currentPageIndex: int,
    *    pageCount: int,
    *    annotationCreationActive: bool,
+   *    annotationEditingActive: bool,
+   *    textSelectionActive: bool,
+   *    formEditingActive: bool,
    * }
    *
    * @platform android

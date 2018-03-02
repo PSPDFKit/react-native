@@ -174,11 +174,21 @@ class PdfViewScreen extends Component<{}> {
     this.state = {
       currentPageIndex: 0,
       pageCount: 0,
-      annotationCreationActive: false
+      annotationCreationActive: false,
+      annotationEditingActive: false
     };
   }
 
   render() {
+    let buttonTitle = "";
+    if (this.state.annotationCreationActive) {
+      buttonTitle = "Exit Annotation Creation Mode";
+    } else if (this.state.annotationEditingActive) {
+      buttonTitle = "Exit Annotation Editing Mode";
+    } else {
+      buttonTitle = "Enter Annotation Creation Mode";
+    }
+
     return (
       <View style={{ flex: 1 }}>
         <PSPDFKitView
@@ -186,7 +196,7 @@ class PdfViewScreen extends Component<{}> {
           document="file:///android_asset/Annual Report.pdf"
           configuration={{
             backgroundColor: processColor("lightgrey"),
-            thumbnailBarMode: "scrollable"
+            showThumbnailBar: "scrollable"
           }}
           pageIndex={4}
           fragmentTag="PDF1"
@@ -194,7 +204,8 @@ class PdfViewScreen extends Component<{}> {
             this.setState({
               currentPageIndex: event.currentPageIndex,
               pageCount: event.pageCount,
-              annotationCreationActive: event.annotationCreationActive
+              annotationCreationActive: event.annotationCreationActive,
+              annotationEditingActive: event.annotationEditingActive
             });
           }}
           style={{ flex: 1, color: pspdfkitColor }}
@@ -207,17 +218,16 @@ class PdfViewScreen extends Component<{}> {
         </Text>
         <Button
           onPress={() => {
-            if (this.state.annotationCreationActive) {
+            if (
+              this.state.annotationCreationActive ||
+              this.state.annotationEditingActive
+            ) {
               this.refs.pdfView.exitCurrentlyActiveMode();
             } else {
               this.refs.pdfView.enterAnnotationCreationMode();
             }
           }}
-          title={
-            this.state.annotationCreationActive
-              ? "Exit Annotation Creation Mode!"
-              : "Enter Annotation Creation Mode!"
-          }
+          title={buttonTitle}
         />
       </View>
     );
@@ -244,8 +254,7 @@ class PdfViewSplitScreen extends Component<{}> {
         <PSPDFKitView
           document="file:///android_asset/Annual Report.pdf"
           configuration={{
-            backgroundColor: processColor("lightgrey"),
-            thumbnailBarMode: "scrollable"
+            backgroundColor: processColor("lightgrey")
           }}
           pageIndex={4}
           fragmentTag="PDF1"
@@ -254,9 +263,9 @@ class PdfViewSplitScreen extends Component<{}> {
         <PSPDFKitView
           document="file:///android_asset/Business Report.pdf"
           configuration={{
-            pageTransition: "scrollContinuous",
-            scrollDirection: "vertical",
-            pageMode: "single"
+            scrollContinuously: true,
+            pageScrollDirection: "vertical",
+            showThumbnailBar: "none"
           }}
           fragmentTag="PDF2"
           style={{ flex: 1, color: "#9932CC" }}
