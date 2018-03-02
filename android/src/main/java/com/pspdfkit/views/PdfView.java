@@ -8,6 +8,7 @@ import android.support.v4.app.FragmentManager;
 import android.util.AttributeSet;
 import android.view.Choreographer;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -208,8 +209,10 @@ public class PdfView extends FrameLayout {
         setupThumbnailBar(pdfFragment);
 
         fragmentManager.beginTransaction()
-                .add(getId(), pdfFragment, fragmentTag)
+                .add(pdfFragment, fragmentTag)
                 .commitNow();
+        View fragmentView = pdfFragment.onCreateView(LayoutInflater.from(getContext()), this, null);
+        addView(fragmentView, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
     }
 
     private void setupThumbnailBar(final PdfFragment pdfFragment) {
@@ -233,7 +236,7 @@ public class PdfView extends FrameLayout {
         if (pdfFragment != null) {
             fragmentManager.beginTransaction()
                     .remove(pdfFragment)
-                    .commit();
+                    .commitAllowingStateLoss();
         }
         isActive = false;
 

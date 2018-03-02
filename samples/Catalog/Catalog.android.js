@@ -78,9 +78,8 @@ var examples = [
     }
   },
   {
-    name: "Split PDF View Component",
-    description:
-      "Show how to use two PSPDFKitView components next to each other.",
+    name: "Split PDF",
+    description: "Show two PDFs side by side by using PSPDFKitView components.",
     action: component => {
       component.props.navigation.navigate("PdfViewSplitScreen");
     }
