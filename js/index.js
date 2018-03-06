@@ -6,23 +6,67 @@
 //  This notice may not be removed from this file.
 //
 
-import PropTypes from 'prop-types'
-import React from 'react'
-import { requireNativeComponent, Platform } from 'react-native'
+import PropTypes from "prop-types";
+import React from "react";
+import {
+  requireNativeComponent,
+  Platform,
+  findNodeHandle,
+  UIManager
+} from "react-native";
 
 class PSPDFKitView extends React.Component {
   render() {
-    if (Platform.OS === 'ios') {
+    if (Platform.OS === "ios" || Platform.OS === "android") {
       const onCloseButtonPressedHandler = this.props.onCloseButtonPressed
         ? event => {
-          this.props.onCloseButtonPressed(event.nativeEvent)
-        }
-        : null
-      return <RCTPSPDFKitView {...this.props} onCloseButtonPressed={onCloseButtonPressedHandler} />
+            this.props.onCloseButtonPressed(event.nativeEvent);
+          }
+        : null;
+      return (
+        <RCTPSPDFKitView
+          ref="pdfView"
+          {...this.props}
+          onCloseButtonPressed={onCloseButtonPressedHandler}
+          onStateChanged={this._onStateChanged}
+        />
+      );
     } else {
-      return null
+      return null;
     }
   }
+
+  _onStateChanged = event => {
+    if (this.props.onStateChanged) {
+      this.props.onStateChanged(event.nativeEvent);
+    }
+  };
+
+  /**
+   * Enters the annotation creation mode, showing the annotation creation toolbar.
+   *
+   * @platform android
+   */
+  enterAnnotationCreationMode = function() {
+    UIManager.dispatchViewManagerCommand(
+      findNodeHandle(this.refs.pdfView),
+      UIManager.RCTPSPDFKitView.Commands.enterAnnotationCreationMode,
+      []
+    );
+  };
+
+  /**
+   * Exits the currently active mode, hiding all toolbars.
+   *
+   * @platform android
+   */
+  exitCurrentlyActiveMode = function() {
+    UIManager.dispatchViewManagerCommand(
+      findNodeHandle(this.refs.pdfView),
+      UIManager.RCTPSPDFKitView.Commands.exitCurrentlyActiveMode,
+      []
+    );
+  };
 }
 
 PSPDFKitView.propTypes = {
@@ -44,10 +88,12 @@ PSPDFKitView.propTypes = {
   pageIndex: PropTypes.number,
   /**
    * Controls wheter a navigation bar is created and shown or not. Defaults to showing a navigation bar (false).
+   *
+   * @platform ios
    */
   hideNavigationBar: PropTypes.bool,
   /**
-   * Wheter the close button should be shown in the navigation bar. Disabled by default.
+   * Whether the close button should be shown in the navigation bar. Disabled by default.
    * Will call `onCloseButtonPressed` if it was provided, when tapped.
    * If `onCloseButtonPressed` was not provided, PSPDFKitView will be automatically dismissed.
    *
@@ -63,15 +109,49 @@ PSPDFKitView.propTypes = {
    */
   onCloseButtonPressed: PropTypes.func,
   /**
-   * style: {color} allows customizing the tint color of the view.
+   * Callback that is called when the state of the PSPDFKitView changes.
+   * Returns an object with the following structure:
+   * {
+   *    documentLoaded: bool,
+   *    currentPageIndex: int,
+   *    pageCount: int,
+   *    annotationCreationActive: bool,
+   *    annotationEditingActive: bool,
+   *    textSelectionActive: bool,
+   *    formEditingActive: bool,
+   * }
    *
-   * @platform ios
+   * @platform android
    */
-}
+  onStateChanged: PropTypes.func,
 
-if (Platform.OS === 'ios') {
-  var RCTPSPDFKitView = requireNativeComponent('RCTPSPDFKitView', PSPDFKitView)
-  module.exports = PSPDFKitView
-} else if (Platform.OS === 'windows') {
-  module.exports = requireNativeComponent('ReactPSPDFKitView', null);
+  /**
+   * fragmentTag: A tag used to identify a single PdfFragment in the view hierarchy.
+   * This needs to be unique in the view hierarchy.
+   *
+   * @platform android
+   */
+  fragmentTag: PropTypes.string
+};
+
+if (Platform.OS === "ios" || Platform.OS === "android") {
+  var RCTPSPDFKitView = requireNativeComponent(
+    "RCTPSPDFKitView",
+    PSPDFKitView,
+    {
+      nativeOnly: {
+        testID: true,
+        accessibilityComponentType: true,
+        renderToHardwareTextureAndroid: true,
+        accessibilityLabel: true,
+        accessibilityLiveRegion: true,
+        importantForAccessibility: true,
+        onLayout: true,
+        nativeID: true
+      }
+    }
+  );
+  module.exports = PSPDFKitView;
+} else if (Platform.OS === "windows") {
+  module.exports = requireNativeComponent("ReactPSPDFKitView", null);
 }

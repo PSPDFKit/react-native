@@ -58,18 +58,15 @@ public class ConfigurationAdapter {
     private static final String SHOW_PRINT_ACTION = "showPrintAction";
 
     private final PdfActivityConfiguration.Builder configuration;
-    private final Activity activity;
 
 
-    public ConfigurationAdapter(@NonNull Activity activity, ReadableMap configuration) {
-
-        this.activity = activity;
+    public ConfigurationAdapter(@NonNull Context context, ReadableMap configuration) {
         ReadableMapKeySetIterator iterator = configuration.keySetIterator();
         boolean emptyConfiguration = iterator.hasNextKey() ? false : true;
         if (emptyConfiguration) {
-            this.configuration = getDefaultConfiguration(activity);
+            this.configuration = getDefaultConfiguration(context);
         } else {
-            this.configuration = new PdfActivityConfiguration.Builder(activity);
+            this.configuration = new PdfActivityConfiguration.Builder(context);
 
             if (configuration.hasKey(PAGE_SCROLL_DIRECTION)) {
                 configurePageScrollDirection(configuration.getString(PAGE_SCROLL_DIRECTION));
