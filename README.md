@@ -560,15 +560,15 @@ Shows the pdf `document` from the local device filesystem, or your app's assets.
 - cmake
 - npm
 - PSPDFKit for Windows.vsix (installed)
-- Powershell
+- PowerShell
 
 #### Getting Started
 
 Let's create a simple app that integrates PSPDFKit and uses the react-native-pspdfkit module.
 
-1. Open `Powershell` as administrator.
+1. Open `PowerShell` as administrator.
 2. Make sure `react-native-cli` is installed: `npm install -g react-native-cli`.
-3. Install windows tool for react native: `npm install --global --production windows-build-tools`.
+3. Install Windows Tool for React Native: `npm install --global --production windows-build-tools`.
 4. Open `x64 Native Tools Command Prompt for VS 2017` program.
 5. Create the app with `react-native init YourApp` in a location of your choice.
 6. Step into your newly created app folder: `cd YourApp`.
@@ -581,15 +581,15 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
 "react-native-pspdfkit": "github:PSPDFKit/react-native"
 },
 ```
-8. Install the windows helper plugin: `npm install --save-dev rnpm-plugin-windows`.
+8. Install the Windows helper plugin: `npm install --save-dev rnpm-plugin-windows`.
 9. Install `react-native-pspdfkit` from GitHub: `npm add github:PSPDFKit/react-native`.
 10. Install all modules: `npm install`.
 11. Link module `react-native-pspdfkit`: `react-native link react-native-pspdfkit`.
-12. Initialise the windows project: `react-native windows`.
-13. Install all modules for windows: `npm install`.
+12. Initialize the windows project: `react-native windows`.
+13. Install all modules for Windows: `npm install`.
 14. Open the windows solution in `react-native\YourApp\windows`.
 15. Accept and install any required extensions when prompted.
-16. If the settings windows opens, click on `Developer` and select `yes`.
+16. If the settings window opens, click on `Developer` and select `yes`.
 17. Add `react-native-pspdfkit` to your soloution: Right click on the solution -> Add -> Existing Project. Navigate to `node_modules/react-native-pspdfkit/windows/ReactNativePSPDFKit/ReactNativePSPDFKit/` and select the `ReactNativePSPDFKit.csproj`
 ![Deployment Target](screenshots/windowsAddExistingProject.PNG)
 18. Mark `react-native-pspdfkit`, `PSPDFKit SDK` and `Visual C++ Runtime` as dependancies for `YourApp`: Right click on `YourApp` -> Add -> Refererece... Click on Projects and tick `ReactNativePSPDFKit`. Click on Universal Windows -> Extensions and tick `PSPDFKit for UWP` and `Visual C++ 2015 Runtime for Universal Windows Platform Apps` then click ok.
@@ -665,7 +665,7 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
   });
  ```
 22. Now run the application on the command line: `react-native run-windows`.
-23. Press Yes when Power shell wants to run.
+23. Press Yes when PowerShell wants to run.
 24. Type 'y' when asking if you want to install the certificate.
 
 #### Running Catalog Project
