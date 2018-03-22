@@ -27,17 +27,10 @@ import java.util.List;
 
 public class PSPDFKitPackage implements ReactPackage {
 
-    private final Application application;
-
-    public PSPDFKitPackage(Application application) {
-        super();
-        this.application = application;
-    }
-
     @Override
     public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
         List<NativeModule> modules = new ArrayList<>();
-        modules.add(new PSPDFKitModule(reactContext, application));
+        modules.add(new PSPDFKitModule(reactContext));
         return modules;
     }
 
