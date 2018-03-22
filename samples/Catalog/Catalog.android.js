@@ -1,4 +1,4 @@
-//   Copyright © 2017 PSPDFKit GmbH. All rights reserved.
+//   Copyright © 2018 PSPDFKit GmbH. All rights reserved.
 //
 //   THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //   AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -178,7 +178,7 @@ class PdfViewScreen extends Component<{}> {
     return {
       title: "PDF",
       headerRight: (
-        <Button onPress={params.enterAnnotationCreation} title="Annotations" />
+        <Button onPress={() => params.handleAnnotationButtonPress()} title="Annotations" />
       )
     };
   };
@@ -195,20 +195,18 @@ class PdfViewScreen extends Component<{}> {
 
   componentWillMount() {
     this.props.navigation.setParams({
-      enterAnnotationCreation: this._enterAnnotationCreation
+      handleAnnotationButtonPress: () => {
+        if (
+          this.state.annotationCreationActive ||
+          this.state.annotationEditingActive
+        ) {
+          this.refs.pdfView.exitCurrentlyActiveMode();
+        } else {
+          this.refs.pdfView.enterAnnotationCreationMode();
+        }
+      }
     });
   }
-
-  _enterAnnotationCreation = () => {
-    if (
-      this.state.annotationCreationActive ||
-      this.state.annotationEditingActive
-    ) {
-      this.refs.pdfView.exitCurrentlyActiveMode();
-    } else {
-      this.refs.pdfView.enterAnnotationCreationMode();
-    }
-  };
 
   render() {
     let buttonTitle = "";

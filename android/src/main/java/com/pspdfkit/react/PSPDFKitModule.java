@@ -42,10 +42,8 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
     @Nullable
     private Runnable onPdfActivityOpenedTask;
 
-    public PSPDFKitModule(ReactApplicationContext reactContext, Application application) {
+    public PSPDFKitModule(ReactApplicationContext reactContext) {
         super(reactContext);
-        // We register an activity lifecycle callback so we can get notified of the current activity.
-        application.registerActivityLifecycleCallbacks(this);
     }
 
     @Override
@@ -56,6 +54,10 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
     @ReactMethod
     public void present(@NonNull String document, @NonNull ReadableMap configuration) {
         if (getCurrentActivity() != null) {
+            if (resumedActivity == null) {
+                // We register an activity lifecycle callback so we can get notified of the current activity.
+                getCurrentActivity().getApplication().registerActivityLifecycleCallbacks(this);
+            }
             ConfigurationAdapter configurationAdapter = new ConfigurationAdapter(getCurrentActivity(), configuration);
             // This is an edge case where file scheme is missing.
             if (Uri.parse(document).getScheme() == null) {
