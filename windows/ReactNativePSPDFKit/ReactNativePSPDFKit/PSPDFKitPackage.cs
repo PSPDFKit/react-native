@@ -1,4 +1,6 @@
 ﻿using PSPDFKit;
+using PSPDFKit.Pdf;
+using PSPDFKit.UI;
 using ReactNative.Bridge;
 using ReactNative.Modules.Core;
 using ReactNative.UIManager;
@@ -15,13 +17,12 @@ namespace ReactNativePSPDFKit
     /// </summary>
     public class PSPDFKitPackage : IReactPackage
     {
-        private API _API;
-        private string _license;
+        private PSPDFKitViewManger _pspdfkitViewManger;
 
         public PSPDFKitPackage(string license)
         {
-            _API = new API();
-            _license = license;
+            Sdk.Initialize(license);
+            _pspdfkitViewManger = new PSPDFKitViewManger();
         }
 
         /// <summary>
@@ -34,7 +35,7 @@ namespace ReactNativePSPDFKit
         {
             return new List<INativeModule>
             {
-                new PSPDFKitModule(reactContext, _API),
+                new PSPDFKitModule(reactContext, _pspdfkitViewManger),
             };
         }
 
@@ -58,7 +59,7 @@ namespace ReactNativePSPDFKit
         {
             return new List<IViewManager>
             {
-                new PSPDFKitViewManger(_API, _license),
+                _pspdfkitViewManger,
             };
         }
     }
