@@ -17,7 +17,6 @@ namespace ReactNativePSPDFKit
     {
 
         Controller _controller;
-
         const string _css = "ms-appx-web:///Assets/pspdfkit/windows.css";
 
         public PDFViewPage()
@@ -30,6 +29,10 @@ namespace ReactNativePSPDFKit
             _controller = new Controller(sender, _css);
         }
 
+        /// <summary>
+        /// Take the file and call the conroller to open the document.
+        /// </summary>
+        /// <param name="file">File to open.</param>
         internal async void OpenFile(StorageFile file)
         {
             try
@@ -38,6 +41,7 @@ namespace ReactNativePSPDFKit
             }
             catch (Exception e)
             {
+                // Show a dialog with the exception message.
                 var dialog = new MessageDialog(e.Message);
                 await dialog.ShowAsync();
             }

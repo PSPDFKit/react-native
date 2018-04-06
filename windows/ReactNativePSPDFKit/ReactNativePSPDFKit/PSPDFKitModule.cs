@@ -37,6 +37,10 @@ namespace ReactNativePSPDFKit
             });
         }
 
+        /// <summary>
+        /// Opens the native file picker.
+        /// </summary>
+        /// <returns>The file chosen in the file picker.</returns>
         private async Task<Windows.Storage.StorageFile> PickPDF()
         {
             var picker = new Windows.Storage.Pickers.FileOpenPicker
@@ -49,6 +53,10 @@ namespace ReactNativePSPDFKit
             return await picker.PickSingleFileAsync();
         }
 
+        /// <summary>
+        /// Call to the PDFView to open a file. Fails if file is null.
+        /// </summary>
+        /// <param name="file">File to open</param>
         private void LoadFile(Windows.Storage.StorageFile file)
         {
             if (file == null) return;

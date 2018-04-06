@@ -17,6 +17,11 @@ namespace ReactNativePSPDFKit
             _pdfViewPage = new PDFViewPage();
         }
 
+        protected override PDFViewPage CreateViewInstance(ThemedReactContext reactContext)
+        {
+            return _pdfViewPage;
+        }
+
         /// <summary>
         /// The name to be used when creating the js modules
         /// </summary>
@@ -28,11 +33,10 @@ namespace ReactNativePSPDFKit
             }
         }
 
-        protected override PDFViewPage CreateViewInstance(ThemedReactContext reactContext)
-        {
-            return _pdfViewPage;
-        }
-
+        /// <summary>
+        /// Pass a file to the PDFView to display.
+        /// </summary>
+        /// <param name="file">file to be displayed</param>
         internal void OpenFile(StorageFile file)
         {
             _pdfViewPage.OpenFile(file);
