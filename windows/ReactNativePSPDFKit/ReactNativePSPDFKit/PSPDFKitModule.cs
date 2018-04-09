@@ -1,12 +1,10 @@
-﻿using PSPDFKit;
+﻿using PSPDFKit.Document;
+using PSPDFKit.UI;
 using ReactNative.Bridge;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
-using Windows.UI.Popups;
 
 namespace ReactNativePSPDFKit
 {
@@ -15,12 +13,12 @@ namespace ReactNativePSPDFKit
     /// </summary>
     class PSPDFKitModule : ReactContextNativeModuleBase
     {
-        private API _API;
+        private PSPDFKitViewManger _pspdfKitViewManger;
         private string VERSION_KEY = "versionString";
 
-        public PSPDFKitModule(ReactContext reactContext, API api) : base(reactContext)
+        public PSPDFKitModule(ReactContext reactContext, PSPDFKitViewManger pspdfKitViewManger) : base(reactContext)
         {
-            _API = api;
+            _pspdfKitViewManger = pspdfKitViewManger;
         }
 
         /// <summary>
@@ -34,11 +32,15 @@ namespace ReactNativePSPDFKit
                 var file = await PickPDF();
                 if (file != null)
                 {
-                    LoadViaAPI(file);
+                    LoadFile(file);
                 }
             });
         }
 
+        /// <summary>
+        /// Opens the native file picker.
+        /// </summary>
+        /// <returns>The file chosen in the file picker.</returns>
         private async Task<Windows.Storage.StorageFile> PickPDF()
         {
             var picker = new Windows.Storage.Pickers.FileOpenPicker
@@ -51,19 +53,15 @@ namespace ReactNativePSPDFKit
             return await picker.PickSingleFileAsync();
         }
 
-        private async void LoadViaAPI(Windows.Storage.StorageFile file)
+        /// <summary>
+        /// Call to the PDFView to open a file. Fails if file is null.
+        /// </summary>
+        /// <param name="file">File to open</param>
+        private void LoadFile(Windows.Storage.StorageFile file)
         {
             if (file == null) return;
 
-            try
-            {
-                await _API.OpenAsync(file);
-            }
-            catch (Exception e)
-            {
-                var dialog = new MessageDialog(e.Message);
-                await dialog.ShowAsync();
-            }
+            _pspdfKitViewManger.OpenFile(file);
         }
 
         /// <summary>
@@ -75,7 +73,7 @@ namespace ReactNativePSPDFKit
             {
                 return new Dictionary<string, object>
                 {
-                    { VERSION_KEY, typeof(API).GetTypeInfo().Assembly.GetName().Version.ToString() },
+                    { VERSION_KEY, typeof(PSPDFKit.Sdk).GetTypeInfo().Assembly.GetName().Version.ToString() },
                 };
             }
         }

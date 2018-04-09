@@ -1,17 +1,25 @@
-﻿using PSPDFKit;
+﻿using System;
+using System.Threading.Tasks;
+using PSPDFKit;
+using PSPDFKit.Document;
+using PSPDFKit.UI;
 using ReactNative.UIManager;
+using Windows.Storage;
 
 namespace ReactNativePSPDFKit
 {
     public class PSPDFKitViewManger : SimpleViewManager<PDFViewPage>
     {
-        private API _API;
-        private string _license;
+        private PDFViewPage _pdfViewPage;
 
-        public PSPDFKitViewManger(API api, string license)
+        public PSPDFKitViewManger()
         {
-            _API = api;
-            _license = license;
+            _pdfViewPage = new PDFViewPage();
+        }
+
+        protected override PDFViewPage CreateViewInstance(ThemedReactContext reactContext)
+        {
+            return _pdfViewPage;
         }
 
         /// <summary>
@@ -25,9 +33,13 @@ namespace ReactNativePSPDFKit
             }
         }
 
-        protected override PDFViewPage CreateViewInstance(ThemedReactContext reactContext)
+        /// <summary>
+        /// Pass a file to the PDFView to display.
+        /// </summary>
+        /// <param name="file">file to be displayed</param>
+        internal void OpenFile(StorageFile file)
         {
-            return new PDFViewPage(_API, _license);
+            _pdfViewPage.OpenFile(file);
         }
     }
 }
