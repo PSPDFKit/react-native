@@ -7,7 +7,7 @@ See our blog post announcements for details:
 * [Announcement blog post](https://pspdfkit.com/blog/2016/react-native-module/).
 * [React Native UI Component for iOS](https://pspdfkit.com/blog/2018/react-native-ui-component-for-ios/)
 * [React Native UI Component for Android](https://pspdfkit.com/blog/2018/react-native-ui-component-for-android/)
-* [PSPDFKit for Windows UWP with React Native](https://pspdfkit.com/2018/introducing-pspdfkit-windows/#react-native-for-windows-support).**
+* [PSPDFKit for Windows UWP with React Native](https://pspdfkit.com/2018/introducing-pspdfkit-windows/#react-native-for-windows-support).
 
 ### iOS
 
