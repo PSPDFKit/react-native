@@ -1,11 +1,19 @@
-## PSPDFKit for React Native
+## React Native wrapper for PSPDFKit for iOS, Android and Windows UWP.
 
-See our [announcement blog post](https://pspdfkit.com/blog/2016/react-native-module/) for more details.
+This wrapper requires a valid license of PSPDFKit. Licenses are per platform. You can request [a trial license here](https://pspdfkit.com/try/).
+
+See our blog post announcements for details:
+
+* [Announcement blog post](https://pspdfkit.com/blog/2016/react-native-module/).
+* [React Native UI Component for iOS](https://pspdfkit.com/blog/2018/react-native-ui-component-for-ios/)
+* [React Native UI Component for Android](https://pspdfkit.com/blog/2018/react-native-ui-component-for-android/)
+* [PSPDFKit for Windows UWP with React Native](https://pspdfkit.com/2018/introducing-pspdfkit-windows/#react-native-for-windows-support).**
 
 ### iOS
 
 #### Requirements
-- Xcode 9
+
+- Xcode 9.3
 - PSPDFKit 7 for iOS
 - react-native >= 0.48.4
 
