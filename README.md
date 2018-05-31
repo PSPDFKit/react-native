@@ -33,8 +33,8 @@ Let's create a simple app that integrates PSPDFKit and uses the `react-native-ps
 2. Create the app with `react-native init YourApp`.
 3. Step into your newly created app folder: `cd YourApp`
 4. Install `react-native-pspdfkit` from GitHub: `yarn add github:PSPDFKit/react-native`
-5. Run `yarn install`
-6. Link module `react-native-pspdfkit`: `react-native link react-native-pspdfkit` 
+5. Install all the dependencies for the project: `yarn install`. (Because of a [bug](https://github.com/yarnpkg/yarn/issues/2165) you may need to clean `yarn`'s cache with `yarn cache clean` before.)
+6. Link module `react-native-pspdfkit`: `react-native link react-native-pspdfkit`. 
 7. Create the folder `ios/PSPDFKit` and copy `PSPDFKit.framework` and `PSPDFKitUI.framework` into it.
 8. Open `ios/YourApp.xcodeproj` in Xcode: `open ios/YourApp.xcodeproj`
 9. Make sure the deployment target is set to 10.0 or higher:
