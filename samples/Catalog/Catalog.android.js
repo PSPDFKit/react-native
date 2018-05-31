@@ -25,6 +25,11 @@ import { StackNavigator } from "react-navigation";
 
 import PSPDFKitView from "react-native-pspdfkit";
 
+// React Native bug that hopefully will be fixed soon:
+// https://github.com/facebook/react-native/issues/18868
+import { YellowBox } from 'react-native'
+YellowBox.ignoreWarnings(['Warning: isMounted(...) is deprecated'])
+
 var PSPDFKit = NativeModules.PSPDFKit;
 
 const pspdfkitColor = "#267AD4";
