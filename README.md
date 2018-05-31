@@ -257,9 +257,10 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
 1. Make sure `react-native-cli` is installed: `yarn global add react-native-cli`
 2. Create the app with `react-native init YourApp`.
 3. Step into your newly created app folder: `cd YourApp`.
-4. Install `react-native-pspdfkit` from GitHub: `yarn add github:PSPDFKit/react-native`.
-5. Link module `react-native-pspdfkit`: `react-native link react-native-pspdfkit`.
-6. <a id="step-6"></a>Add PSPDFKit and Google repository to `YourApp/android/build.gradle` so PSPDFKit library and Android dependencies can be downloaded:
+4. Add `react-native-pspdfkit` module from GitHub: `yarn add github:PSPDFKit/react-native`.
+5. Install all the dependencies for the project: `yarn install`. (Because of a [bug](https://github.com/yarnpkg/yarn/issues/2165) you may need to clean `yarn`'s cache with `yarn cache clean` before.)
+6. Link module `react-native-pspdfkit`: `react-native link react-native-pspdfkit`.
+7. <a id="step-6"></a>Add PSPDFKit and Google repository to `YourApp/android/build.gradle` so PSPDFKit library and Android dependencies can be downloaded:
 
   ```diff
     allprojects {
@@ -285,7 +286,7 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
     }
   ```
 
-7. PSPDFKit targets modern platforms, so you'll have to update `compileSdkVersion` and `targetSdkVersion` to at least API 26 and enable MultiDex. In `YourApp/android/app/build.gradle` (note **five** places to edit):
+8. PSPDFKit targets modern platforms, so you'll have to update `compileSdkVersion` and `targetSdkVersion` to at least API 26 and enable MultiDex. In `YourApp/android/app/build.gradle` (note **five** places to edit):
     
    ```diff
    ...
@@ -311,7 +312,7 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
    ...
    ```
      
-8. <a id="step-8"></a>Enter your PSPDFKit license key into `YourApp/android/app/src/main/AndroidManifest.xml` file: 
+9. <a id="step-8"></a>Enter your PSPDFKit license key into `YourApp/android/app/src/main/AndroidManifest.xml` file: 
 
   ```diff
      <application>
@@ -324,7 +325,7 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
      </application> 
   ```
 
-9. Set primary color. In `YourApp/android/app/src/main/res/values/styles.xml` replace
+10. Set primary color. In `YourApp/android/app/src/main/res/values/styles.xml` replace
   ```xml    
 <!-- Customize your theme here. -->
   ```
@@ -332,7 +333,7 @@ with
   ```xml    
 <item name="colorPrimary">#3C97C9</item>
   ```     
-10. <a id="step-10"></a>Replace the default component from `YourApp/App.js` with a simple touch area to present a PDF document from the local device filesystem:
+11. <a id="step-10"></a>Replace the default component from `YourApp/App.js` with a simple touch area to present a PDF document from the local device filesystem:
         
    ```javascript
    import React, { Component } from 'react';
@@ -403,13 +404,13 @@ with
      }
    });
    ```  
-11. Before launching the app you need to copy a PDF document onto your development device or emulator.
+12. Before launching the app you need to copy a PDF document onto your development device or emulator.
 
 	```bash
 	adb push /path/to/your/document.pdf /sdcard/document.pdf
 	```
 
-12. Your app is now ready to launch.  From `YourApp` directory run `react-native run-android`.
+13. Your app is now ready to launch.  From `YourApp` directory run `react-native run-android`.
 
 	```bash
 	react-native run-android
