@@ -3,10 +3,10 @@
 ### CocoaPods integration
 
 #### Requirements
-- Xcode 9
-- PSPDFKit >=7.0.2
-- react-native >= 0.48.4
-- CocoaPods >= 1.3.1
+- Xcode 9.4.1
+- PSPDFKit 7.6.1 for iOS or later
+- react-native >= 0.55.4
+- CocoaPods >= 1.5.3
 
 #### Getting Started
 
@@ -19,7 +19,7 @@ Lets create a simple app that integrates PSPDFKit using CocoaPods.
 5. IMPORTANT: Do not link module react-native-pspdfkit: Do not use react-native link react-native-pspdfkit
 6. Create the folder `ios/PSPDFKit` and copy `PSPDFKit.framework` and `PSPDFKitUI.framework` into it.
 7. Open ios/YourApp.xcodeproj in Xcode: open ios/YourApp.xcodeproj
-8. Make sure the deployment target is set to 9.0 or higher: 
+8. Make sure the deployment target is set to 10.0 or higher: 
 ![Deployment Target](../screenshots/deployment-target.png)
 9. Change "View controller-based status bar appearance" to YES in Info.plist: 
  deployment-target.png 
