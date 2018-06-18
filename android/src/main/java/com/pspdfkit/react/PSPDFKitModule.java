@@ -69,6 +69,23 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
     }
 
     @ReactMethod
+    public void presentImage(@NonNull String imageDocument, @NonNull ReadableMap configuration) {
+        if (getCurrentActivity() != null) {
+            if (resumedActivity == null) {
+                // We register an activity lifecycle callback so we can get notified of the current activity.
+                getCurrentActivity().getApplication().registerActivityLifecycleCallbacks(this);
+            }
+            ConfigurationAdapter configurationAdapter = new ConfigurationAdapter(getCurrentActivity(), configuration);
+            // This is an edge case where file scheme is missing.
+            if (Uri.parse(imageDocument).getScheme() == null) {
+                imageDocument = FILE_SCHEME + imageDocument;
+            }
+
+            PdfActivity.showImage(getCurrentActivity(), Uri.parse(imageDocument), configurationAdapter.build());
+        }
+    }
+
+    @ReactMethod
     public synchronized void setPageIndex(final int pageIndex, final boolean animated) {
         if (resumedActivity instanceof PdfActivity) {
             final PdfActivity activity = (PdfActivity) resumedActivity;

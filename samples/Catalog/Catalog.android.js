@@ -31,11 +31,19 @@ import { YellowBox } from 'react-native'
 YellowBox.ignoreWarnings(['Warning: isMounted(...) is deprecated'])
 
 var PSPDFKit = NativeModules.PSPDFKit;
+var RNFS = require('react-native-fs');
 
 const pspdfkitColor = "#267AD4";
 const pspdfkitColorAlpha = "#267AD450";
 
 const DOCUMENT = "file:///sdcard/Annual Report.pdf";
+const IMAGE_DOCUMENT = "file:///sdcard/android.png";
+const CONFIGURATION_IMAGE_DOCUMENT = {
+  showPageNumberOverlay: false,
+  showPageLabels: false,
+  showThumbnailBar: "none"
+};
+
 const CONFIGURATION = {
   startPage: 3,
   scrollContinuously: false,
@@ -57,10 +65,23 @@ var examples = [
   },
   {
     name: "Open local document",
-    description: "Opens document from external storage directory.",
+    description: "Open document from external storage directory.",
     action: () => {
       requestExternalStoragePermission(function() {
-        PSPDFKit.present(DOCUMENT, {});
+        extractFromAssetsIfMissing("Annual Report.pdf", function() {
+          PSPDFKit.present(DOCUMENT, {});
+        });
+      });
+    }
+  },
+  {
+    name: "Open local image document",
+    description: "Open image image document from external storage directory.",
+    action: () => {
+      requestExternalStoragePermission(function() {
+        extractFromAssetsIfMissing("android.png", function() {
+          PSPDFKit.presentImage(IMAGE_DOCUMENT, CONFIGURATION_IMAGE_DOCUMENT);
+        });
       });
     }
   },
@@ -100,6 +121,39 @@ var examples = [
     }
   }
 ];
+
+function extractFromAssetsIfMissing(assetFile, callback) {
+  RNFS.exists("/sdcard/" + assetFile).then((exist) => {
+    if (exist) {
+      console.log(assetFile + " exists in the external storage directory.");
+      callback();
+    } else {
+      console.log(assetFile + " does not exist, extracting it from assets folder to the external storage directory.");
+      RNFS.existsAssets(assetFile).then((exist) => {
+        // Check if the file is present in the assets folder.
+        if(exist) {
+          // File exists so it can be extracted to the external storage directory.
+          RNFS.copyFileAssets(assetFile, "/sdcard/" + assetFile).then(() => {
+            // File copied successfully from assets folder to external storage directory.
+            callback();
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+        } else {
+          // File does not exist, it should never happen.
+          throw new Error(assetFile + " couldn't be extracted as it was not found in the project assets folder.");
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    }
+  })
+  .catch((error) => {
+    console.log(error);
+  });
+}
 
 async function requestExternalStoragePermission(callback) {
   try {
