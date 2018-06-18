@@ -9,7 +9,7 @@ Pod::Spec.new do |s|
   s.authors		 = ["PSPDFKit"]
   s.homepage     = "https://github.com/PSPDFKit/react-native#readme"
   s.license      = package['license']
-  s.platform     = :ios, "9.0"
+  s.platform     = :ios, "10.0"
   s.module_name  = 'PSPDFKitReactNativeiOS'
   s.source       = { :git => "https://github.com/PSPDFKit/react-native" }
   s.source_files = "ios/*.{xcodeproj}", "ios/RCTPSPDFKit/*.{h,m,swift}", "ios/RCTPSPDFKit/Converters/*.{h,m,swift}"
