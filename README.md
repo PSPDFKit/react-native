@@ -20,7 +20,7 @@ The [PSPDFKit SDK](https://pspdfkit.com/) is a framework that allows you to view
 #### Requirements
 
 - Xcode 9.4.1
-- PSPDFKit 7.6 .1 for iOS or later
+- PSPDFKit 7.6.1 for iOS or later
 - react-native >= 0.55.4
 
 #### Getting Started
