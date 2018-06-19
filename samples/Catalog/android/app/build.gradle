@@ -128,7 +128,7 @@ android {
             }
         }
     }
-    sourceSets { main { assets.srcDirs = ['src/main/assets', '../../../PDFs'] } }
+    sourceSets { main { assets.srcDirs = ['src/main/assets', '../../../PDFs' , '../../../Images'] } }
 }
 
 dependencies {
@@ -136,6 +136,7 @@ dependencies {
     compile 'com.facebook.react:react-native:+'
     // From node_modules
     compile project(':react-native-pspdfkit')
+    compile project(':react-native-fs')
 }
 
 // Run this once to be able to run the application with BUCK
