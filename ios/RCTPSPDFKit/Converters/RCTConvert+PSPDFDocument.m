@@ -20,7 +20,13 @@
     url = [NSBundle.mainBundle URLForResource:string withExtension:nil];
   }
 
-  return [[PSPDFDocument alloc] initWithURL:url];
+  NSString *fileExtension = url.pathExtension.lowercaseString;
+  BOOL isImageFile = [fileExtension isEqualToString:@"png"] || [fileExtension isEqualToString:@"jpeg"] || [fileExtension isEqualToString:@"jpg"];
+  if (isImageFile) {
+    return [[PSPDFImageDocument alloc] initWithImageURL:url];
+  } else {
+    return [[PSPDFDocument alloc] initWithURL:url];
+  }
 }
 
 @end
