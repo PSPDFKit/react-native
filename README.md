@@ -689,11 +689,24 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
 1. Clone the repository. `git clone https://github.com/PSPDFKit/react-native.git`.
 2. From the command promt `cd react-native\samples\Catalog`.
 3. Make sure `react-native-cli` is installed: `npm install -g react-native-cli`.
-4. run `npm install`.
-5. Open the UWP catalog solution in `react-native\samples\Catalog\windows`.
-6. Accept and install any required extensions when prompted.
-7. If the settings windows opens, click on `Developer` and selected `yes`.
-8. Enter your license key in `react-native\samples\Catalog\windows\MainReactNativeHosts.cs`
+4. Edit `package.json` to change the version of `react-native` to `0.52.0`
+```diff
+"dependencies": {
+"react": "16.3.1",
+-"react-native": "0.55.4",
++"react-native": "0.52.0",
+"react-native-fs": "2.10.14",
+"react-native-pspdfkit": "file:../../",
+"react-native-windows": "0.51.0-rc.0",
+"react-navigation": "^1.0.3",
+"rnpm-plugin-windows": "0.2.8"
+}
+```
+5. run `npm install`.
+6. Open the UWP catalog solution in `react-native\samples\Catalog\windows`.
+7. Accept and install any required extensions when prompted.
+8. If the settings windows opens, click on `Developer` and selected `yes`.
+9. Enter your license key in `react-native\samples\Catalog\windows\MainReactNativeHosts.cs`
   ```
     protected override List<IReactPackage> Packages => new List<IReactPackage>
     {
@@ -701,8 +714,8 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
         new ReactNativePSPDFKit.PSPDFKitPackage("INSERT LICENSE KEY HERE"),
     };
   ```
-9. From the command prompt run `react-native run-windows`.
-10. Enter `y` to accept the certificate when prompted and allow socket access for reactive when prompted.
+10. From the command prompt run `react-native run-windows`.
+11. Enter `y` to accept the certificate when prompted and allow socket access for reactive when prompted.
 
 #### API
 
