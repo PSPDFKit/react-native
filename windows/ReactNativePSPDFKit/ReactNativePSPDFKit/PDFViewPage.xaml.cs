@@ -17,8 +17,8 @@ namespace ReactNativePSPDFKit
     {
 
         Controller _controller;
-        const string _css = "ms-appx-web:///Assets/pspdfkit/windows.css";
-
+        private static Uri _css = new Uri("ms-appx-web:///Assets/pspdfkit/windows.css");
+    
         public PDFViewPage()
         {
             InitializeComponent();
