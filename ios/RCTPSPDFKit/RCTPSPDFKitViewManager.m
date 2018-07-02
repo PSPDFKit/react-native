@@ -9,16 +9,25 @@
 
 #import "RCTPSPDFKitViewManager.h"
 #import "RCTConvert+PSPDFConfiguration.h"
+#import "RCTConvert+PSPDFDocument.h"
 #import "RCTPSPDFKitView.h"
 
 @import PSPDFKit;
 @import PSPDFKitUI;
 
+@interface RCTPSPDFKitViewManager() <PSPDFDocumentDelegate>
+@end
+
 @implementation RCTPSPDFKitViewManager
 
 RCT_EXPORT_MODULE()
 
-RCT_REMAP_VIEW_PROPERTY(document, pdfController.document, PSPDFDocument)
+RCT_CUSTOM_VIEW_PROPERTY(document, pdfController.document, RCTPSPDFKitView) {
+  if (json) {
+    view.pdfController.document = [RCTConvert PSPDFDocument:json];
+    view.pdfController.document.delegate = (id<PSPDFDocumentDelegate>)view;
+  }
+}
 
 RCT_REMAP_VIEW_PROPERTY(pageIndex, pdfController.pageIndex, NSUInteger)
 
@@ -41,6 +50,8 @@ RCT_CUSTOM_VIEW_PROPERTY(showCloseButton, BOOL, RCTPSPDFKitView) {
 }
 
 RCT_EXPORT_VIEW_PROPERTY(onCloseButtonPressed, RCTBubblingEventBlock)
+
+RCT_EXPORT_VIEW_PROPERTY(onDocumentSaved, RCTBubblingEventBlock)
 
 - (UIView *)view {
   return [[RCTPSPDFKitView alloc] init];
