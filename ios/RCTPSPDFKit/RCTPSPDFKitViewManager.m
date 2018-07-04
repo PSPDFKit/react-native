@@ -38,6 +38,8 @@ RCT_CUSTOM_VIEW_PROPERTY(configuration, PSPDFConfiguration, RCTPSPDFKitView) {
 
 RCT_EXPORT_VIEW_PROPERTY(hideNavigationBar, BOOL)
 
+RCT_EXPORT_VIEW_PROPERTY(disableDefaultActionForTappedAnnotations, BOOL)
+
 RCT_REMAP_VIEW_PROPERTY(color, tintColor, UIColor)
 
 RCT_CUSTOM_VIEW_PROPERTY(showCloseButton, BOOL, RCTPSPDFKitView) {
@@ -49,6 +51,8 @@ RCT_CUSTOM_VIEW_PROPERTY(showCloseButton, BOOL, RCTPSPDFKitView) {
 RCT_EXPORT_VIEW_PROPERTY(onCloseButtonPressed, RCTBubblingEventBlock)
 
 RCT_EXPORT_VIEW_PROPERTY(onDocumentSaved, RCTBubblingEventBlock)
+
+RCT_EXPORT_VIEW_PROPERTY(onAnnotationTapped, RCTBubblingEventBlock)
 
 - (UIView *)view {
   return [[RCTPSPDFKitView alloc] init];

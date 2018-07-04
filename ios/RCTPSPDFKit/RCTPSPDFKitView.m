@@ -10,7 +10,7 @@
 #import "RCTPSPDFKitView.h"
 #import <React/RCTUtils.h>
 
-@interface RCTPSPDFKitView ()<PSPDFDocumentDelegate>
+@interface RCTPSPDFKitView ()<PSPDFDocumentDelegate, PSPDFViewControllerDelegate>
 
 @property (nonatomic, nullable) UIViewController *topController;
 
@@ -21,6 +21,7 @@
 - (instancetype)initWithFrame:(CGRect)frame {
   if ((self = [super initWithFrame:frame])) {
     _pdfController = [[PSPDFViewController alloc] init];
+    _pdfController.delegate = self;
     _closeButton = [[UIBarButtonItem alloc] initWithImage:[PSPDFKit imageNamed:@"x"] style:UIBarButtonItemStylePlain target:self action:@selector(closeButtonPressed:)];
   }
 
@@ -103,6 +104,17 @@
   if (self.onDocumentSaved) {
     self.onDocumentSaved(@{});
   }
+}
+
+#pragma mark - PSPDFViewControllerDelegate
+
+- (BOOL)pdfViewController:(PSPDFViewController *)pdfController didTapOnAnnotation:(PSPDFAnnotation *)annotation annotationPoint:(CGPoint)annotationPoint annotationView:(UIView<PSPDFAnnotationPresenting> *)annotationView pageView:(PSPDFPageView *)pageView viewPoint:(CGPoint)viewPoint {
+  if (self.onAnnotationTapped) {
+    NSData *annotationData = [annotation generateInstantJSONWithError:NULL];
+    NSDictionary *annotationDictionary = [NSJSONSerialization JSONObjectWithData:annotationData options:kNilOptions error:NULL];
+    self.onAnnotationTapped(annotationDictionary);
+  }
+  return self.disableDefaultActionForTappedAnnotations;
 }
 
 @end
