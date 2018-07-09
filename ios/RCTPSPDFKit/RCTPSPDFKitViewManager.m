@@ -15,9 +15,6 @@
 @import PSPDFKit;
 @import PSPDFKitUI;
 
-@interface RCTPSPDFKitViewManager() <PSPDFDocumentDelegate>
-@end
-
 @implementation RCTPSPDFKitViewManager
 
 RCT_EXPORT_MODULE()
