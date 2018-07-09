@@ -29,6 +29,7 @@ class PSPDFKitView extends React.Component {
                     {...this.props}
                     onCloseButtonPressed={onCloseButtonPressedHandler}
                     onStateChanged={this._onStateChanged}
+                    onDocumentSaved={this._onDocumentSaved}
                 />
             );
         } else {
@@ -39,6 +40,12 @@ class PSPDFKitView extends React.Component {
     _onStateChanged = event => {
         if (this.props.onStateChanged) {
             this.props.onStateChanged(event.nativeEvent);
+        }
+    };
+    
+    _onDocumentSaved = (event) => {
+        if (this.props.onDocumentSaved) {
+            this.props.onDocumentSaved(event.nativeEvent);
         }
     };
 
@@ -108,6 +115,12 @@ PSPDFKitView.propTypes = {
      * @platform ios
      */
     onCloseButtonPressed: PropTypes.func,
+    /**
+     * Callback that is called when the document is saved.
+     *
+     * @platform ios
+     */
+    onDocumentSaved: PropTypes.func, 
     /**
      * Callback that is called when the state of the PSPDFKitView changes.
      * Returns an object with the following structure:

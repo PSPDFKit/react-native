@@ -10,7 +10,7 @@
 #import "RCTPSPDFKitView.h"
 #import <React/RCTUtils.h>
 
-@interface RCTPSPDFKitView ()
+@interface RCTPSPDFKitView ()<PSPDFDocumentDelegate>
 
 @property (nonatomic, nullable) UIViewController *topController;
 
@@ -95,6 +95,14 @@
     }
   }
   return nil;
+}
+
+#pragma mark - PSPDFDocumentDelegate
+
+- (void)pdfDocumentDidSave:(nonnull PSPDFDocument *)document {
+  if (self.onDocumentSaved) {
+    self.onDocumentSaved(@{});
+  }
 }
 
 @end
