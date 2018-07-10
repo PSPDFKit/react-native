@@ -30,6 +30,7 @@ class PSPDFKitView extends React.Component {
                     onCloseButtonPressed={onCloseButtonPressedHandler}
                     onStateChanged={this._onStateChanged}
                     onDocumentSaved={this._onDocumentSaved}
+                    onAnnotationTapped={this._onAnnotationTapped}
                 />
             );
         } else {
@@ -46,6 +47,12 @@ class PSPDFKitView extends React.Component {
     _onDocumentSaved = (event) => {
         if (this.props.onDocumentSaved) {
             this.props.onDocumentSaved(event.nativeEvent);
+        }
+    };
+    
+    _onAnnotationTapped = (event) => {
+        if (this.props.onAnnotationTapped) {
+            this.props.onAnnotationTapped(event.nativeEvent);
         }
     };
 
@@ -108,6 +115,12 @@ PSPDFKitView.propTypes = {
      */
     showCloseButton: PropTypes.bool,
     /**
+     * Controls wheter or not the default action for tapped annotations is processed. Defaults to processing the action (false).
+     *
+     * @platform ios
+     */
+    disableDefaultActionForTappedAnnotations: PropTypes.bool, 
+    /**
      * Callback that is called when the user tapped the close button.
      * If you provide this function, you need to handle dismissal yourself.
      * If you don't provide this function, PSPDFKitView will be automatically dismissed.
@@ -120,7 +133,13 @@ PSPDFKitView.propTypes = {
      *
      * @platform ios
      */
-    onDocumentSaved: PropTypes.func, 
+    onDocumentSaved: PropTypes.func,
+    /**
+     * Callback that is called when the user taps on an annotation.
+     *
+     * @platform ios
+     */
+    onAnnotationTapped: PropTypes.func,    
     /**
      * Callback that is called when the state of the PSPDFKitView changes.
      * Returns an object with the following structure:
@@ -137,7 +156,6 @@ PSPDFKitView.propTypes = {
      * @platform android
      */
     onStateChanged: PropTypes.func,
-
     /**
      * fragmentTag: A tag used to identify a single PdfFragment in the view hierarchy.
      * This needs to be unique in the view hierarchy.
