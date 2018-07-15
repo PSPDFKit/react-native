@@ -10,41 +10,63 @@ using Windows.UI.Xaml.Controls;
 
 namespace ReactNativePSPDFKit
 {
-    /// <summary>
-    /// A webview which will hold the pdf render
-    /// </summary>
     public sealed partial class PDFViewPage : Page
     {
-
-        Controller _controller;
-        private static Uri _css = new Uri("ms-appx-web:///Assets/pspdfkit/windows.css");
-    
+        private ViewState _viewStateCache = new ViewState();
+        private StorageFile _fileToOpen = null;
+        private bool _pdfViewInitialised = false;
+        
         public PDFViewPage()
         {
             InitializeComponent();
-        }
 
-        private void PDFView_NavigationStarting(WebView sender, WebViewNavigationStartingEventArgs args)
-        {
-            _controller = new Controller(sender, _css);
+            PDFView.InitializationCompletedHandler += PDFView_InitializationCompletedHandlerAsync;
         }
 
         /// <summary>
         /// Take the file and call the conroller to open the document.
         /// </summary>
         /// <param name="file">File to open.</param>
-        internal async void OpenFile(StorageFile file)
+        internal async Task OpenFileAsync(StorageFile file)
         {
-            try
+            _fileToOpen = file;
+
+            if(_pdfViewInitialised)
             {
-                await _controller.ShowDocumentAsync(DocumentSource.CreateFromStorageFile(file));
+                try
+                {
+                    await PDFView.Controller.ShowDocumentAsync(DocumentSource.CreateFromStorageFile(file));
+                }
+                catch (Exception e)
+                {
+                    // Show a dialog with the exception message.
+                    var dialog = new MessageDialog(e.Message);
+                    await dialog.ShowAsync();
+                }
             }
-            catch (Exception e)
+        }
+
+        internal async Task SetPageIndexAsync(int index)
+        {
+            _viewStateCache.CurrentPageIndex = index;
+
+            if (_pdfViewInitialised)
             {
-                // Show a dialog with the exception message.
-                var dialog = new MessageDialog(e.Message);
-                await dialog.ShowAsync();
+                await PDFView.Controller.SetCurrentPageIndexAsync(index);
             }
+        }
+
+        internal void SetShowToolbar(bool showToolbar)
+        {
+            _viewStateCache.ShowToolbar = showToolbar;
+
+            PDFView.ShowToolbar = showToolbar;
+        }
+
+        private async void PDFView_InitializationCompletedHandlerAsync(PdfView sender, PSPDFKit.Pdf.Document args)
+        {
+            await PDFView.Controller.ShowDocumentWithViewStateAsync(DocumentSource.CreateFromStorageFile(_fileToOpen), _viewStateCache);
+            _pdfViewInitialised = true;
         }
     }
 }

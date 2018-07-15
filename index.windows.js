@@ -5,6 +5,26 @@
 //  UNAUTHORIZED REPRODUCTION OR DISTRIBUTION IS SUBJECT TO CIVIL AND CRIMINAL PENALTIES.
 //  This notice may not be removed from this file.
 //
-import { requireNativeComponent } from "react-native";
+import { requireNativeComponent, ViewPropTypes } from "react-native";
+import PropTypes from 'prop-types';
 
-module.exports = requireNativeComponent("ReactPSPDFKitView", null);
+var iface = {
+    name: 'PSPDFKitView',
+    propTypes: {
+         /**
+         * Path to the PDF file that should be displayed.
+         */
+        document: PropTypes.string,
+        /**
+         * Page index of the document that will be shown.
+         */
+        pageIndex: PropTypes.number,
+        /**
+         * Controls wheter a navigation bar is created and shown or not. Defaults to showing a navigation bar (false).
+         */
+        hideNavigationBar: PropTypes.bool,
+        ...ViewPropTypes
+    },
+};
+
+module.exports = requireNativeComponent("ReactPSPDFKitView", iface);
