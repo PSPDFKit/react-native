@@ -588,12 +588,12 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
 4. Open `x64 Native Tools Command Prompt for VS 2017` program.
 5. Create the app with `react-native init YourApp` in a location of your choice.
 6. Step into your newly created app folder: `cd YourApp`.
-7. Edit `package.json` to change the version of `react-native` to `0.52.0`
+7. Edit `package.json` to change the version of `react-native` to `0.53.0`
 ```diff
 "dependencies": {
 "react": "16.3.0-alpha.1",
--"react-native": "0.54.0",
-+"react-native": "0.52.0",
+-"react-native": "0.55.4",
++"react-native": "0.53.0",
 "react-native-pspdfkit": "github:PSPDFKit/react-native"
 },
 ```
