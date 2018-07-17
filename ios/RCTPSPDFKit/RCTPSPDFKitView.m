@@ -9,6 +9,7 @@
 
 #import "RCTPSPDFKitView.h"
 #import <React/RCTUtils.h>
+#import "RCTLog.h"
 
 @interface RCTPSPDFKitView ()<PSPDFDocumentDelegate, PSPDFViewControllerDelegate>
 
@@ -23,6 +24,10 @@
     _pdfController = [[PSPDFViewController alloc] init];
     _pdfController.delegate = self;
     _closeButton = [[UIBarButtonItem alloc] initWithImage:[PSPDFKit imageNamed:@"x"] style:UIBarButtonItemStylePlain target:self action:@selector(closeButtonPressed:)];
+
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(annotationChangedNotification:) name:PSPDFAnnotationChangedNotification object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(annotationChangedNotification:) name:PSPDFAnnotationsAddedNotification object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(annotationChangedNotification:) name:PSPDFAnnotationsRemovedNotification object:nil];
   }
 
   return self;
@@ -30,6 +35,7 @@
 
 - (void)dealloc {
   [self destroyViewControllerRelationship];
+  [NSNotificationCenter.defaultCenter removeObserver:self];
 }
 
 - (void)didMoveToWindow {
@@ -115,6 +121,38 @@
     self.onAnnotationTapped(annotationDictionary);
   }
   return self.disableDefaultActionForTappedAnnotations;
+}
+
+
+- (void)annotationChangedNotification:(NSNotification *)notification {
+  id object = notification.object;
+  PSPDFAnnotation *annotation;
+  if ([object isKindOfClass:NSArray.class]) {
+    annotation = object[0];
+  } else if ([object isKindOfClass:PSPDFAnnotation.class]) {
+    annotation = object;
+  } else {
+    RCTLogError(@"Unsupported annotation");
+    return;
+  }
+
+  // We only generate Instant JSON data for attached annotations. So this returns nil when an annotation is deleted.
+  NSData *annotationData = [annotation generateInstantJSONWithError:NULL];
+  NSDictionary *annotationDictionary = annotationData ? [NSJSONSerialization JSONObjectWithData:annotationData options:kNilOptions error:NULL] : annotation.dictionaryValue;
+
+  NSString *name = notification.name;
+  NSString *change;
+  if ([name isEqualToString:PSPDFAnnotationChangedNotification]) {
+    change = @"changed";
+  } else if ([name isEqualToString:PSPDFAnnotationsAddedNotification]) {
+    change = @"added";
+  } else if ([name isEqualToString:PSPDFAnnotationsRemovedNotification]) {
+    change = @"removed";
+  }
+
+  if (self.onAnnotationChanged) {
+    self.onAnnotationChanged(@{@"change" : change, @"annotation" : annotationDictionary});
+  }
 }
 
 @end
