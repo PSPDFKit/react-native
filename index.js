@@ -31,6 +31,7 @@ class PSPDFKitView extends React.Component {
                     onStateChanged={this._onStateChanged}
                     onDocumentSaved={this._onDocumentSaved}
                     onAnnotationTapped={this._onAnnotationTapped}
+                    onAnnotationChanged={this._onAnnotationChanged}
                 />
             );
         } else {
@@ -55,6 +56,12 @@ class PSPDFKitView extends React.Component {
             this.props.onAnnotationTapped(event.nativeEvent);
         }
     };
+
+    _onAnnotationChanged = event => {
+        if (this.props.onAnnotationChanged) {
+            this.props.onAnnotationChanged(event.nativeEvent)
+        }
+    }
 
     /**
      * Enters the annotation creation mode, showing the annotation creation toolbar.
@@ -134,7 +141,16 @@ PSPDFKitView.propTypes = {
      * Callback that is called when the user taps on an annotation.
      * Returns the annotation data as instant json.
      */
-    onAnnotationTapped: PropTypes.func,    
+    onAnnotationTapped: PropTypes.func,
+    /**
+     * Callback that is called when an annotation is added, changed, or removed.
+     * Returns an object with the following structure:
+     * {
+     *    change: "changed"|"added"|"removed",
+     *    annotation: instantJson
+     * }
+     */
+    onAnnotationChanged: PropTypes.func,  
     /**
      * Callback that is called when the state of the PSPDFKitView changes.
      * Returns an object with the following structure:

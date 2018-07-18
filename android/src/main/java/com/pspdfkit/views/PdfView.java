@@ -216,6 +216,7 @@ public class PdfView extends FrameLayout {
         pdfFragment.addOnTextSelectionModeChangeListener(pdfViewModeController);
         pdfFragment.addDocumentListener(pdfViewDocumentListener);
         pdfFragment.addOnAnnotationSelectedListener(pdfViewDocumentListener);
+        pdfFragment.addOnAnnotationUpdatedListener(pdfViewDocumentListener);
 
         setupThumbnailBar(pdfFragment);
 
