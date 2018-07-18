@@ -32,7 +32,7 @@ namespace ReactNativePSPDFKit
                 var file = await PickPDF();
                 if (file != null)
                 {
-                    LoadFile(file);
+                    await LoadFileAsync(file);
                 }
             });
         }
@@ -57,11 +57,11 @@ namespace ReactNativePSPDFKit
         /// Call to the PDFView to open a file. Fails if file is null.
         /// </summary>
         /// <param name="file">File to open</param>
-        private void LoadFile(Windows.Storage.StorageFile file)
+        private async Task LoadFileAsync(Windows.Storage.StorageFile file)
         {
             if (file == null) return;
 
-            _pspdfKitViewManger.OpenFile(file);
+            await _pspdfKitViewManger.OpenFileAsync(file);
         }
 
         /// <summary>
