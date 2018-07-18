@@ -10,9 +10,12 @@ import com.pspdfkit.annotations.Annotation;
 import com.pspdfkit.document.DocumentSaveOptions;
 import com.pspdfkit.document.PdfDocument;
 import com.pspdfkit.listeners.DocumentListener;
+import com.pspdfkit.react.events.PdfViewAnnotationTappedEvent;
 import com.pspdfkit.react.events.PdfViewDocumentSavedEvent;
+import com.pspdfkit.ui.special_mode.controller.AnnotationSelectionController;
+import com.pspdfkit.ui.special_mode.manager.AnnotationManager;
 
-class PdfViewDocumentListener implements DocumentListener {
+class PdfViewDocumentListener implements DocumentListener, AnnotationManager.OnAnnotationSelectedListener {
 
     @NonNull
     private final PdfView parent;
@@ -20,9 +23,16 @@ class PdfViewDocumentListener implements DocumentListener {
     @NonNull
     private final EventDispatcher eventDispatcher;
 
+    private boolean disableDefaultActionForTappedAnnotations = false;
+
     PdfViewDocumentListener(@NonNull PdfView parent, @NonNull EventDispatcher eventDispatcher) {
         this.parent = parent;
         this.eventDispatcher = eventDispatcher;
+    }
+
+
+    public void setDisableDefaultActionForTappedAnnotations(boolean disableDefaultActionForTappedAnnotations) {
+        this.disableDefaultActionForTappedAnnotations = disableDefaultActionForTappedAnnotations;
     }
 
     @Override
@@ -78,5 +88,15 @@ class PdfViewDocumentListener implements DocumentListener {
     @Override
     public void onPageUpdated(@NonNull PdfDocument pdfDocument, int i) {
 
+    }
+
+    @Override
+    public boolean onPrepareAnnotationSelection(@NonNull AnnotationSelectionController annotationSelectionController, @NonNull Annotation annotation, boolean annotationCreated) {
+        eventDispatcher.dispatchEvent(new PdfViewAnnotationTappedEvent(parent.getId(), annotation));
+        return !disableDefaultActionForTappedAnnotations;
+    }
+
+    @Override
+    public void onAnnotationSelected(@NonNull Annotation annotation, boolean annotationCreated) {
     }
 }

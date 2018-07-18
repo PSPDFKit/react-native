@@ -17,7 +17,6 @@ import com.facebook.react.uimanager.events.EventDispatcher;
 import com.pspdfkit.configuration.activity.PdfActivityConfiguration;
 import com.pspdfkit.configuration.activity.ThumbnailBarMode;
 import com.pspdfkit.document.PdfDocument;
-import com.pspdfkit.listeners.DocumentListener;
 import com.pspdfkit.listeners.SimpleDocumentListener;
 import com.pspdfkit.react.R;
 import com.pspdfkit.react.events.PdfViewStateChangedEvent;
@@ -157,6 +156,10 @@ public class PdfView extends FrameLayout {
         setupFragment();
     }
 
+    public void setDisableDefaultActionForTappedAnnotations(boolean disableDefaultActionForTappedAnnotations) {
+        pdfViewDocumentListener.setDisableDefaultActionForTappedAnnotations(disableDefaultActionForTappedAnnotations);
+    }
+
     private void setupFragment() {
         if (fragmentTag != null && configuration != null && document != null) {
             PdfFragment pdfFragment = (PdfFragment) fragmentManager.findFragmentByTag(fragmentTag);
@@ -212,6 +215,7 @@ public class PdfView extends FrameLayout {
         pdfFragment.addOnFormElementEditingModeChangeListener(pdfViewModeController);
         pdfFragment.addOnTextSelectionModeChangeListener(pdfViewModeController);
         pdfFragment.addDocumentListener(pdfViewDocumentListener);
+        pdfFragment.addOnAnnotationSelectedListener(pdfViewDocumentListener);
 
         setupThumbnailBar(pdfFragment);
 

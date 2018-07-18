@@ -116,8 +116,6 @@ PSPDFKitView.propTypes = {
     showCloseButton: PropTypes.bool,
     /**
      * Controls wheter or not the default action for tapped annotations is processed. Defaults to processing the action (false).
-     *
-     * @platform ios
      */
     disableDefaultActionForTappedAnnotations: PropTypes.bool, 
     /**
@@ -134,8 +132,7 @@ PSPDFKitView.propTypes = {
     onDocumentSaved: PropTypes.func,
     /**
      * Callback that is called when the user taps on an annotation.
-     *
-     * @platform ios
+     * Returns the annotation data as instant json.
      */
     onAnnotationTapped: PropTypes.func,    
     /**
