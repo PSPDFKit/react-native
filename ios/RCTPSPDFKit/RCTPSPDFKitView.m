@@ -9,7 +9,6 @@
 
 #import "RCTPSPDFKitView.h"
 #import <React/RCTUtils.h>
-#import "RCTLog.h"
 
 @interface RCTPSPDFKitView ()<PSPDFDocumentDelegate, PSPDFViewControllerDelegate>
 
@@ -126,19 +125,29 @@
 
 - (void)annotationChangedNotification:(NSNotification *)notification {
   id object = notification.object;
-  PSPDFAnnotation *annotation;
+  NSArray <PSPDFAnnotation *> *annotations;
   if ([object isKindOfClass:NSArray.class]) {
-    annotation = object[0];
+    annotations = object;
   } else if ([object isKindOfClass:PSPDFAnnotation.class]) {
-    annotation = object;
+    annotations = @[object];
   } else {
-    RCTLogError(@"Unsupported annotation");
+    if (self.onAnnotationsChanged) {
+      self.onAnnotationsChanged(@{@"error" : @"Invalid annotation error."});
+    }
     return;
   }
 
   // We only generate Instant JSON data for attached annotations. So this returns nil when an annotation is deleted.
-  NSData *annotationData = [annotation generateInstantJSONWithError:NULL];
-  NSDictionary *annotationDictionary = annotationData ? [NSJSONSerialization JSONObjectWithData:annotationData options:kNilOptions error:NULL] : annotation.dictionaryValue;
+  NSMutableArray <NSDictionary *> *annotationsJSON = [NSMutableArray new];
+  for (PSPDFAnnotation *annotation in annotations) {
+    NSData *annotationData = [annotation generateInstantJSONWithError:NULL];
+    if (annotationData) {
+      NSDictionary *annotationDictionary = [NSJSONSerialization JSONObjectWithData:annotationData options:kNilOptions error:NULL];
+      if (annotationDictionary) {
+        [annotationsJSON addObject:annotationDictionary];
+      }
+    }
+  }
 
   NSString *name = notification.name;
   NSString *change;
@@ -150,8 +159,8 @@
     change = @"removed";
   }
 
-  if (self.onAnnotationChanged) {
-    self.onAnnotationChanged(@{@"change" : change, @"annotation" : annotationDictionary});
+  if (self.onAnnotationsChanged) {
+    self.onAnnotationsChanged(@{@"change" : change, @"annotations" : annotationsJSON});
   }
 }
 

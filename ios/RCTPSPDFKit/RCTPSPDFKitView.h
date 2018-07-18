@@ -22,6 +22,6 @@
 @property (nonatomic, copy) RCTBubblingEventBlock onCloseButtonPressed;
 @property (nonatomic, copy) RCTBubblingEventBlock onDocumentSaved;
 @property (nonatomic, copy) RCTBubblingEventBlock onAnnotationTapped;
-@property (nonatomic, copy) RCTBubblingEventBlock onAnnotationChanged;
+@property (nonatomic, copy) RCTBubblingEventBlock onAnnotationsChanged;
 
 @end
