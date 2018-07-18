@@ -17,6 +17,7 @@ import com.facebook.react.uimanager.events.EventDispatcher;
 import com.pspdfkit.configuration.activity.PdfActivityConfiguration;
 import com.pspdfkit.configuration.activity.ThumbnailBarMode;
 import com.pspdfkit.document.PdfDocument;
+import com.pspdfkit.listeners.DocumentListener;
 import com.pspdfkit.listeners.SimpleDocumentListener;
 import com.pspdfkit.react.R;
 import com.pspdfkit.react.events.PdfViewStateChangedEvent;
@@ -51,6 +52,7 @@ public class PdfView extends FrameLayout {
 
     private FrameLayout container;
     private PdfViewModeController pdfViewModeController;
+    private PdfViewDocumentListener pdfViewDocumentListener;
 
     private PdfThumbnailBar pdfThumbnailBar;
 
@@ -114,6 +116,9 @@ public class PdfView extends FrameLayout {
     public void inject(FragmentManager fragmentManager, EventDispatcher eventDispatcher) {
         this.fragmentManager = fragmentManager;
         this.eventDispatcher = eventDispatcher;
+
+        pdfViewDocumentListener = new PdfViewDocumentListener(this,
+                eventDispatcher);
     }
 
     public void setFragmentTag(String fragmentTag) {
@@ -206,6 +211,7 @@ public class PdfView extends FrameLayout {
         pdfFragment.addOnAnnotationEditingModeChangeListener(pdfViewModeController);
         pdfFragment.addOnFormElementEditingModeChangeListener(pdfViewModeController);
         pdfFragment.addOnTextSelectionModeChangeListener(pdfViewModeController);
+        pdfFragment.addDocumentListener(pdfViewDocumentListener);
 
         setupThumbnailBar(pdfFragment);
 

@@ -1,4 +1,4 @@
-//  Copyright © 2018 PSPDFKit GmbH. All rights reserved.
+//  Copyright ï¿½ 2018 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -130,8 +130,6 @@ PSPDFKitView.propTypes = {
     onCloseButtonPressed: PropTypes.func,
     /**
      * Callback that is called when the document is saved.
-     *
-     * @platform ios
      */
     onDocumentSaved: PropTypes.func,
     /**
