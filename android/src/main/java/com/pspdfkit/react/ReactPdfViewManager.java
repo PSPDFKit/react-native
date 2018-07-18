@@ -28,6 +28,7 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
 
     public static final int COMMAND_ENTER_ANNOTATION_CREATION_MODE = 1;
     public static final int COMMAND_EXIT_CURRENTLY_ACTIVE_MODE = 2;
+    public static final int COMMAND_SAVE_CURRENT_DOCUMENT = 3;
 
     @Override
     public String getName() {
@@ -61,7 +62,9 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
                 "enterAnnotationCreationMode",
                 COMMAND_ENTER_ANNOTATION_CREATION_MODE,
                 "exitCurrentlyActiveMode",
-                COMMAND_EXIT_CURRENTLY_ACTIVE_MODE);
+                COMMAND_EXIT_CURRENTLY_ACTIVE_MODE,
+                "saveCurrentDocument",
+                COMMAND_SAVE_CURRENT_DOCUMENT);
     }
 
     @ReactProp(name = "fragmentTag")
@@ -107,6 +110,9 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
                 break;
             case COMMAND_EXIT_CURRENTLY_ACTIVE_MODE:
                 root.exitCurrentlyActiveMode();
+                break;
+            case COMMAND_SAVE_CURRENT_DOCUMENT:
+                root.saveCurrentDocument();
                 break;
         }
     }

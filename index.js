@@ -1,4 +1,4 @@
-//  Copyright � 2018 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2018 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -88,6 +88,17 @@ class PSPDFKitView extends React.Component {
             []
         );
     };
+
+    /**
+     * Saves the currently opened document.
+     */
+    saveCurrentDocument = function () {
+        UIManager.dispatchViewManagerCommand(
+            findNodeHandle(this.refs.pdfView),
+            UIManager.RCTPSPDFKitView.Commands.saveCurrentDocument,
+            []
+        )
+    }
 }
 
 PSPDFKitView.propTypes = {

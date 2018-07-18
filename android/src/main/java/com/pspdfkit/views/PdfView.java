@@ -309,4 +309,10 @@ public class PdfView extends FrameLayout {
             fragment.exitCurrentlyActiveMode();
         }
     }
+
+    public void saveCurrentDocument() {
+        if (fragment != null) {
+            fragment.save();
+        }
+    }
 }
