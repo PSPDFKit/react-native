@@ -31,7 +31,7 @@ class PSPDFKitView extends React.Component {
                     onStateChanged={this._onStateChanged}
                     onDocumentSaved={this._onDocumentSaved}
                     onAnnotationTapped={this._onAnnotationTapped}
-                    onAnnotationChanged={this._onAnnotationChanged}
+                    onAnnotationsChanged={this._onAnnotationsChanged}
                 />
             );
         } else {
@@ -57,9 +57,9 @@ class PSPDFKitView extends React.Component {
         }
     };
 
-    _onAnnotationChanged = event => {
-        if (this.props.onAnnotationChanged) {
-            this.props.onAnnotationChanged(event.nativeEvent)
+    _onAnnotationsChanged = event => {
+        if (this.props.onAnnotationsChanged) {
+            this.props.onAnnotationsChanged(event.nativeEvent)
         }
     }
 
@@ -158,10 +158,10 @@ PSPDFKitView.propTypes = {
      * Returns an object with the following structure:
      * {
      *    change: "changed"|"added"|"removed",
-     *    annotation: instantJson
+     *    annotations: [instantJson]
      * }
      */
-    onAnnotationChanged: PropTypes.func,  
+    onAnnotationsChanged: PropTypes.func,  
     /**
      * Callback that is called when the state of the PSPDFKitView changes.
      * Returns an object with the following structure:

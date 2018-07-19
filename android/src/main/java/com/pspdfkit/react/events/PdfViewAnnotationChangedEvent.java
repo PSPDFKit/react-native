@@ -13,7 +13,9 @@ import com.pspdfkit.react.helper.JsonUtilities;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -49,17 +51,20 @@ public class PdfViewAnnotationChangedEvent extends Event<PdfViewAnnotationChange
             Map<String, Object> map = new HashMap<>();
             map.put("change", eventType);
 
+            Map<String, Object> annotationMap;
             if (EVENT_TYPE_REMOVED.equalsIgnoreCase(eventType)) {
                 // For removed annotation we can't get the instant json so manually create something.
-                Map<String, Object> annotationMap = new HashMap<>();
+                annotationMap = new HashMap<>();
                 annotationMap.put("name", annotation.getName());
                 annotationMap.put("creatorName", annotation.getCreator());
-                map.put("annotation", annotationMap);
             } else {
                 JSONObject instantJson = new JSONObject(annotation.toInstantJson());
-                Map<String, Object> instantJsonMap = JsonUtilities.jsonObjectToMap(instantJson);
-                map.put("annotation", instantJsonMap);
+                annotationMap = JsonUtilities.jsonObjectToMap(instantJson);
             }
+
+            List<Map<String, Object>> annotations = new ArrayList<>();
+            annotations.add(annotationMap);
+            map.put("annotations", annotations);
 
             WritableMap eventData = Arguments.makeNativeMap(map);
             rctEventEmitter.receiveEvent(getViewTag(), getEventName(), eventData);
