@@ -137,7 +137,6 @@
     return;
   }
 
-  // We only generate Instant JSON data for attached annotations. So this returns nil when an annotation is deleted.
   NSMutableArray <NSDictionary *> *annotationsJSON = [NSMutableArray new];
   for (PSPDFAnnotation *annotation in annotations) {
     NSData *annotationData = [annotation generateInstantJSONWithError:NULL];
@@ -146,6 +145,9 @@
       if (annotationDictionary) {
         [annotationsJSON addObject:annotationDictionary];
       }
+    } else if (annotation.name) {
+      // We only generate Instant JSON data for attached annotations. When an annotation is deleted, we only send the annotation name.
+      [annotationsJSON addObject:@{@"name" : annotation.name}];
     }
   }
 

@@ -148,11 +148,13 @@ PSPDFKitView.propTypes = {
      */
     onAnnotationTapped: PropTypes.func,
     /**
-     * Callback that is called when one or more annotations are added, changed, or removed.
-     * Returns the annotation change (added, changed, removed) and the annotation in Instant JSON format. Otherwise, returns an error fpr invalid annotations.
-     *
-     * @platform ios
-     */
+     * Callback that is called when an annotation is added, changed, or removed.
+     * Returns an object with the following structure:
+     * {
+     *    change: "changed"|"added"|"removed",
+     *    annotations: [instantJson]
+     * }
+     */ 
     onAnnotationsChanged: PropTypes.func,    
     /**
      * Callback that is called when the state of the PSPDFKitView changes.
