@@ -167,7 +167,7 @@ public class PdfView extends FrameLayout {
                 pdfFragment = PdfFragment.newInstance(document, this.configuration.getConfiguration());
                 prepareFragment(pdfFragment);
             } else {
-                ViewGroup parent = (ViewGroup) pdfFragment.getView().getParent();
+                View fragmentView = pdfFragment.getView();
                 if (pdfFragment.getDocument() != null && !pdfFragment.getDocument().getUid().equals(document.getUid())) {
                     fragmentManager.beginTransaction()
                             .remove(pdfFragment)
@@ -176,7 +176,7 @@ public class PdfView extends FrameLayout {
                     // The document changed create a new PdfFragment.
                     pdfFragment = PdfFragment.newInstance(document, this.configuration.getConfiguration());
                     prepareFragment(pdfFragment);
-                } else if (parent != this) {
+                } else if (fragmentView != null && fragmentView.getParent() != this) {
                     // We only need to detach the fragment if the parent view changed.
                     pdfViewModeController.resetToolbars();
                     fragmentManager.beginTransaction()
@@ -223,7 +223,7 @@ public class PdfView extends FrameLayout {
         fragmentManager.beginTransaction()
                 .add(pdfFragment, fragmentTag)
                 .commitNow();
-        View fragmentView = pdfFragment.onCreateView(LayoutInflater.from(getContext()), this, null);
+        View fragmentView = pdfFragment.getView();
         addView(fragmentView, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
     }
 

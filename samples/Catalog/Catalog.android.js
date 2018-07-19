@@ -67,8 +67,8 @@ var examples = [
     name: "Open local document",
     description: "Open document from external storage directory.",
     action: () => {
-      requestExternalStoragePermission(function() {
-        extractFromAssetsIfMissing("Annual Report.pdf", function() {
+      requestExternalStoragePermission(function () {
+        extractFromAssetsIfMissing("Annual Report.pdf", function () {
           PSPDFKit.present(DOCUMENT, {});
         });
       });
@@ -78,8 +78,8 @@ var examples = [
     name: "Open local image document",
     description: "Open image image document from external storage directory.",
     action: () => {
-      requestExternalStoragePermission(function() {
-        extractFromAssetsIfMissing("android.png", function() {
+      requestExternalStoragePermission(function () {
+        extractFromAssetsIfMissing("android.png", function () {
           PSPDFKit.presentImage(IMAGE_DOCUMENT, CONFIGURATION_IMAGE_DOCUMENT);
         });
       });
@@ -90,7 +90,7 @@ var examples = [
     description:
       "You can configure the builder with dictionary representation of the PSPDFConfiguration object.",
     action: () => {
-      requestExternalStoragePermission(function() {
+      requestExternalStoragePermission(function () {
         PSPDFKit.present(DOCUMENT, CONFIGURATION);
       });
     }
@@ -131,28 +131,28 @@ function extractFromAssetsIfMissing(assetFile, callback) {
       console.log(assetFile + " does not exist, extracting it from assets folder to the external storage directory.");
       RNFS.existsAssets(assetFile).then((exist) => {
         // Check if the file is present in the assets folder.
-        if(exist) {
+        if (exist) {
           // File exists so it can be extracted to the external storage directory.
           RNFS.copyFileAssets(assetFile, "/sdcard/" + assetFile).then(() => {
             // File copied successfully from assets folder to external storage directory.
             callback();
           })
-          .catch((error) => {
-            console.log(error);
-          });
+            .catch((error) => {
+              console.log(error);
+            });
         } else {
           // File does not exist, it should never happen.
           throw new Error(assetFile + " couldn't be extracted as it was not found in the project assets folder.");
         }
       })
-      .catch((error) => {
-        console.log(error);
-      });
+        .catch((error) => {
+          console.log(error);
+        });
     }
   })
-  .catch((error) => {
-    console.log(error);
-  });
+    .catch((error) => {
+      console.log(error);
+    });
 }
 
 async function requestExternalStoragePermission(callback) {
@@ -286,7 +286,7 @@ class PdfViewScreen extends Component<{}> {
             backgroundColor: processColor("lightgrey"),
             showThumbnailBar: "scrollable"
           }}
-          pageIndex={4}
+          pageIndex={this.state.currentPageIndex}
           fragmentTag="PDF1"
           onStateChanged={event => {
             this.setState({
@@ -298,12 +298,28 @@ class PdfViewScreen extends Component<{}> {
           }}
           style={{ flex: 1, color: pspdfkitColor }}
         />
-        <Text>
-          {"Page " +
-            (this.state.currentPageIndex + 1) +
-            " of " +
-            this.state.pageCount}
-        </Text>
+        <View style={{ flexDirection: 'row', height: 40, alignItems: 'center', padding: 10 }}>
+          <Text style={{ flex: 1 }}>
+            {"Page " +
+              (this.state.currentPageIndex + 1) +
+              " of " +
+              this.state.pageCount}
+          </Text>
+          <View>
+            <Button onPress={() => {
+              this.setState(previousState => {
+                return { currentPageIndex: previousState.currentPageIndex - 1 }
+              })
+            }} disabled={this.state.currentPageIndex == 0} title="Previous Page" />
+          </View>
+          <View style={{ marginLeft: 10 }}>
+            <Button onPress={() => {
+              this.setState(previousState => {
+                return { currentPageIndex: previousState.currentPageIndex + 1 }
+              })
+            }} disabled={this.state.currentPageIndex == this.state.pageCount - 1} title="Next Page" />
+          </View>
+        </View>
       </View>
     );
   }
