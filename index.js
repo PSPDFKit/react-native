@@ -44,13 +44,13 @@ class PSPDFKitView extends React.Component {
             this.props.onStateChanged(event.nativeEvent);
         }
     };
-    
+
     _onDocumentSaved = (event) => {
         if (this.props.onDocumentSaved) {
             this.props.onDocumentSaved(event.nativeEvent);
         }
     };
-    
+
     _onAnnotationTapped = (event) => {
         if (this.props.onAnnotationTapped) {
             this.props.onAnnotationTapped(event.nativeEvent);
@@ -91,6 +91,8 @@ class PSPDFKitView extends React.Component {
 
     /**
      * Saves the currently opened document.
+     * 
+     * @platform android
      */
     saveCurrentDocument = function () {
         UIManager.dispatchViewManagerCommand(
@@ -135,7 +137,7 @@ PSPDFKitView.propTypes = {
     /**
      * Controls wheter or not the default action for tapped annotations is processed. Defaults to processing the action (false).
      */
-    disableDefaultActionForTappedAnnotations: PropTypes.bool, 
+    disableDefaultActionForTappedAnnotations: PropTypes.bool,
     /**
      * Callback that is called when the user tapped the close button.
      * If you provide this function, you need to handle dismissal yourself.
@@ -161,7 +163,7 @@ PSPDFKitView.propTypes = {
      *    annotations: [instantJson]
      * }
      */
-    onAnnotationsChanged: PropTypes.func,  
+    onAnnotationsChanged: PropTypes.func,
     /**
      * Callback that is called when the state of the PSPDFKitView changes.
      * Returns an object with the following structure:
