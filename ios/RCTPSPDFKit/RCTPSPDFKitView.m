@@ -23,6 +23,10 @@
     _pdfController = [[PSPDFViewController alloc] init];
     _pdfController.delegate = self;
     _closeButton = [[UIBarButtonItem alloc] initWithImage:[PSPDFKit imageNamed:@"x"] style:UIBarButtonItemStylePlain target:self action:@selector(closeButtonPressed:)];
+
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(annotationChangedNotification:) name:PSPDFAnnotationChangedNotification object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(annotationChangedNotification:) name:PSPDFAnnotationsAddedNotification object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(annotationChangedNotification:) name:PSPDFAnnotationsRemovedNotification object:nil];
   }
 
   return self;
@@ -30,6 +34,7 @@
 
 - (void)dealloc {
   [self destroyViewControllerRelationship];
+  [NSNotificationCenter.defaultCenter removeObserver:self];
 }
 
 - (void)didMoveToWindow {
@@ -115,6 +120,50 @@
     self.onAnnotationTapped(annotationDictionary);
   }
   return self.disableDefaultActionForTappedAnnotations;
+}
+
+
+- (void)annotationChangedNotification:(NSNotification *)notification {
+  id object = notification.object;
+  NSArray <PSPDFAnnotation *> *annotations;
+  if ([object isKindOfClass:NSArray.class]) {
+    annotations = object;
+  } else if ([object isKindOfClass:PSPDFAnnotation.class]) {
+    annotations = @[object];
+  } else {
+    if (self.onAnnotationsChanged) {
+      self.onAnnotationsChanged(@{@"error" : @"Invalid annotation error."});
+    }
+    return;
+  }
+
+  NSMutableArray <NSDictionary *> *annotationsJSON = [NSMutableArray new];
+  for (PSPDFAnnotation *annotation in annotations) {
+    NSData *annotationData = [annotation generateInstantJSONWithError:NULL];
+    if (annotationData) {
+      NSDictionary *annotationDictionary = [NSJSONSerialization JSONObjectWithData:annotationData options:kNilOptions error:NULL];
+      if (annotationDictionary) {
+        [annotationsJSON addObject:annotationDictionary];
+      }
+    } else if (annotation.name) {
+      // We only generate Instant JSON data for attached annotations. When an annotation is deleted, we only send the annotation name.
+      [annotationsJSON addObject:@{@"name" : annotation.name}];
+    }
+  }
+
+  NSString *name = notification.name;
+  NSString *change;
+  if ([name isEqualToString:PSPDFAnnotationChangedNotification]) {
+    change = @"changed";
+  } else if ([name isEqualToString:PSPDFAnnotationsAddedNotification]) {
+    change = @"added";
+  } else if ([name isEqualToString:PSPDFAnnotationsRemovedNotification]) {
+    change = @"removed";
+  }
+
+  if (self.onAnnotationsChanged) {
+    self.onAnnotationsChanged(@{@"change" : change, @"annotations" : annotationsJSON});
+  }
 }
 
 @end
