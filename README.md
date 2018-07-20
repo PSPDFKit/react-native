@@ -620,7 +620,7 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
 		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 		xmlns:local="using:Catalog"
 		RequestedTheme="Light">
-    
+
 	+	<Application.Resources>
 	+		<ResourceDictionary>
 	+			<ResourceDictionary.MergedDictionaries>

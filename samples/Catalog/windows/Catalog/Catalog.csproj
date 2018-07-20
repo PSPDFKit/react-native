@@ -174,10 +174,10 @@
     <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
     <Content Include="Assets\pdf\annualReport.pdf" />
     <Content Include="Assets\pdf\Business Report.pdf" />
-    <None Include="License.xaml.bak">
+    <Page Include="License.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </None>
+    </Page>
     <None Include="Catalog_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>

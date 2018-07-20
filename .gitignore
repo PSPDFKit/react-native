@@ -46,4 +46,4 @@ PSPDFKit/PSPDFKit.framework
 PSPDFKit/PSPDFKitUI.framework
 
 # UWP license file
-samples/Catalog/windows/Catalog/License.xml
+samples/Catalog/windows/Catalog/License.xaml
