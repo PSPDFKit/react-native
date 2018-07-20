@@ -111,7 +111,7 @@ class PSPDFKitView extends React.Component {
      * @param pageIndex The page to get the annotations for.
      * @param type The type of annotations to get (See here for types https://pspdfkit.com/guides/server/current/api/json-format/) or null to get all annotations.
      * 
-     * Returns an array with the following structure:
+     * Returns a promise resolving an array with the following structure:
      * [instantJson]
      * 
      * @platform android
@@ -147,6 +147,31 @@ class PSPDFKitView extends React.Component {
             UIManager.RCTPSPDFKitView.Commands.addAnnotation,
             [annotation]
         );
+    }
+
+    /**
+     * Gets all unsaved changes to annotations.
+     * 
+     * Returns a promise resolving to document instant json (https://pspdfkit.com/guides/android/current/importing-exporting/instant-json/#instant-document-json-api-a56628).
+     * 
+     * @platform android
+     */
+    getAllUnsavedAnnotations = function () {
+        let requestId = this._nextRequestId++
+        let requestMap = this._requestMap;
+
+        // We create a promise here that will be resolved once onDataReturned is called.
+        let promise = new Promise(function (resolve, reject) {
+            requestMap[requestId] = { 'resolve': resolve, 'reject': reject }
+        })
+
+        UIManager.dispatchViewManagerCommand(
+            findNodeHandle(this.refs.pdfView),
+            UIManager.RCTPSPDFKitView.Commands.getAllUnsavedAnnotations,
+            [requestId]
+        );
+
+        return promise
     }
 }
 

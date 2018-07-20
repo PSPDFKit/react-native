@@ -20,6 +20,7 @@ import com.pspdfkit.annotations.AnnotationType;
 import com.pspdfkit.configuration.activity.PdfActivityConfiguration;
 import com.pspdfkit.configuration.activity.ThumbnailBarMode;
 import com.pspdfkit.document.PdfDocument;
+import com.pspdfkit.document.formatters.DocumentJsonFormatter;
 import com.pspdfkit.listeners.SimpleDocumentListener;
 import com.pspdfkit.react.R;
 import com.pspdfkit.react.events.PdfViewStateChangedEvent;
@@ -32,12 +33,15 @@ import com.pspdfkit.ui.toolbar.ToolbarCoordinatorLayout;
 
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
@@ -366,5 +370,19 @@ public class PdfView extends FrameLayout {
     public void addAnnotation(ReadableMap annotation) {
         JSONObject json = new JSONObject(annotation.toHashMap());
         fragment.getDocument().getAnnotationProvider().createAnnotationFromInstantJson(json.toString());
+    }
+
+    public Single<JSONObject> getAllUnsavedAnnotations() {
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        return DocumentJsonFormatter.exportDocumentJsonAsync(document, outputStream)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .toSingle(new Callable<JSONObject>() {
+                    @Override
+                    public JSONObject call() throws Exception {
+                        final String jsonString = outputStream.toString();
+                        return new JSONObject(jsonString);
+                    }
+                });
     }
 }

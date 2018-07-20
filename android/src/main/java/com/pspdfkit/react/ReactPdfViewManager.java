@@ -16,6 +16,8 @@ import com.pspdfkit.react.events.PdfViewDataReturnedEvent;
 import com.pspdfkit.react.events.PdfViewStateChangedEvent;
 import com.pspdfkit.views.PdfView;
 
+import org.json.JSONObject;
+
 import java.util.List;
 import java.util.Map;
 
@@ -35,6 +37,7 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
     public static final int COMMAND_EXIT_CURRENTLY_ACTIVE_MODE = 2;
     public static final int COMMAND_GET_ANNOTATIONS = 4;
     public static final int COMMAND_ADD_ANNOTATION = 5;
+    public static final int COMMAND_GET_ALL_UNSAVED_ANNOTATIONS = 6;
 
     @Override
     public String getName() {
@@ -72,7 +75,9 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
                 "getAnnotations",
                 COMMAND_GET_ANNOTATIONS,
                 "addAnnotation",
-                COMMAND_ADD_ANNOTATION);
+                COMMAND_ADD_ANNOTATION,
+                "getAllUnsavedAnnotations",
+                COMMAND_GET_ALL_UNSAVED_ANNOTATIONS);
     }
 
     @ReactProp(name = "fragmentTag")
@@ -129,6 +134,20 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
             case COMMAND_ADD_ANNOTATION:
                 if (args != null) {
                     root.addAnnotation(args.getMap(0));
+                }
+                break;
+            case COMMAND_GET_ALL_UNSAVED_ANNOTATIONS:
+                if (args != null) {
+                    final int requestId = args.getInt(0);
+                    Disposable annotationDisposable = root.getAllUnsavedAnnotations()
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(new Consumer<JSONObject>() {
+                                @Override
+                                public void accept(JSONObject jsonObject) {
+                                    root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, jsonObject));
+                                }
+                            });
                 }
                 break;
         }
