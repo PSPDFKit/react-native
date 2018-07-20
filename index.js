@@ -133,6 +133,21 @@ class PSPDFKitView extends React.Component {
 
         return promise
     }
+
+    /**
+     * Adds a new annotation to the current document.
+     * 
+     * @param annotation InstantJson of the annotation to add.
+     * 
+     * @platform android
+     */
+    addAnnotation = function (annotation) {
+        UIManager.dispatchViewManagerCommand(
+            findNodeHandle(this.refs.pdfView),
+            UIManager.RCTPSPDFKitView.Commands.addAnnotation,
+            [annotation]
+        );
+    }
 }
 
 PSPDFKitView.propTypes = {

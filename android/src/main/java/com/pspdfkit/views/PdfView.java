@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.uimanager.events.EventDispatcher;
 import com.pspdfkit.annotations.Annotation;
 import com.pspdfkit.annotations.AnnotationType;
@@ -28,6 +29,8 @@ import com.pspdfkit.ui.forms.FormEditingBar;
 import com.pspdfkit.ui.inspector.PropertyInspectorCoordinatorLayout;
 import com.pspdfkit.ui.thumbnail.PdfThumbnailBarController;
 import com.pspdfkit.ui.toolbar.ToolbarCoordinatorLayout;
+
+import org.json.JSONObject;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -358,5 +361,10 @@ public class PdfView extends FrameLayout {
             return EnumSet.of(AnnotationType.FREETEXT);
         }
         return EnumSet.noneOf(AnnotationType.class);
+    }
+
+    public void addAnnotation(ReadableMap annotation) {
+        JSONObject json = new JSONObject(annotation.toHashMap());
+        fragment.getDocument().getAnnotationProvider().createAnnotationFromInstantJson(json.toString());
     }
 }
