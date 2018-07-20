@@ -632,7 +632,7 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
 	</Application>
 ```
 20. Create a new file resouce called `License.xaml` with your PSPDFKit license key at the top level of the project. (Replace `ENTER LICENSE KEY HERE` with your key)
-  ``` xaml
+  ```xaml
 	<ResourceDictionary
 		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
@@ -728,7 +728,7 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
 7. Accept and install any required extensions when prompted.
 8. If the settings windows opens, click on `Developer` and selected `yes`.
 9. Create a new file resouce called `License.xaml` with your PSPDFKit license key at the top level of the project. (Replace `ENTER LICENSE KEY HERE` with your key)
-  ``` xaml
+  ```xaml
 	<ResourceDictionary
 		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
