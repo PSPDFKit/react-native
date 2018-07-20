@@ -14,6 +14,8 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.facebook.react.uimanager.events.EventDispatcher;
+import com.pspdfkit.annotations.Annotation;
+import com.pspdfkit.annotations.AnnotationType;
 import com.pspdfkit.configuration.activity.PdfActivityConfiguration;
 import com.pspdfkit.configuration.activity.ThumbnailBarMode;
 import com.pspdfkit.document.PdfDocument;
@@ -27,6 +29,10 @@ import com.pspdfkit.ui.inspector.PropertyInspectorCoordinatorLayout;
 import com.pspdfkit.ui.thumbnail.PdfThumbnailBarController;
 import com.pspdfkit.ui.toolbar.ToolbarCoordinatorLayout;
 
+import java.util.EnumSet;
+import java.util.List;
+
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
@@ -287,6 +293,10 @@ public class PdfView extends FrameLayout {
         }
     }
 
+    public EventDispatcher getEventDispatcher() {
+        return eventDispatcher;
+    }
+
     public void enterAnnotationCreationMode() {
         if (fragment != null) {
             fragment.enterAnnotationCreationMode();
@@ -297,5 +307,56 @@ public class PdfView extends FrameLayout {
         if (fragment != null) {
             fragment.exitCurrentlyActiveMode();
         }
+    }
+
+    public Single<List<Annotation>> getAnnotations(int pageIndex, @Nullable String type) {
+        return fragment.getDocument().getAnnotationProvider().getAllAnnotationsOfType(getTypeFromString(type), pageIndex, 1)
+                .toList();
+    }
+
+    private EnumSet<AnnotationType> getTypeFromString(@Nullable String type) {
+        if (type == null) {
+            return EnumSet.allOf(AnnotationType.class);
+        }
+        if ("pspdfkit/ink".equalsIgnoreCase(type)) {
+            return EnumSet.of(AnnotationType.INK);
+        }
+        if ("pspdfkit/link".equalsIgnoreCase(type)) {
+            return EnumSet.of(AnnotationType.LINK);
+        }
+        if ("pspdfkit/markup/highlight".equalsIgnoreCase(type)) {
+            return EnumSet.of(AnnotationType.HIGHLIGHT);
+        }
+        if ("pspdfkit/markup/squiggly".equalsIgnoreCase(type)) {
+            return EnumSet.of(AnnotationType.SQUIGGLY);
+        }
+        if ("pspdfkit/markup/strikeout".equalsIgnoreCase(type)) {
+            return EnumSet.of(AnnotationType.STRIKEOUT);
+        }
+        if ("pspdfkit/markup/underline".equalsIgnoreCase(type)) {
+            return EnumSet.of(AnnotationType.UNDERLINE);
+        }
+        if ("pspdfkit/note".equalsIgnoreCase(type)) {
+            return EnumSet.of(AnnotationType.NOTE);
+        }
+        if ("pspdfkit/shape/ellipse".equalsIgnoreCase(type)) {
+            return EnumSet.of(AnnotationType.CIRCLE);
+        }
+        if ("pspdfkit/shape/line".equalsIgnoreCase(type)) {
+            return EnumSet.of(AnnotationType.LINE);
+        }
+        if ("pspdfkit/shape/polygon".equalsIgnoreCase(type)) {
+            return EnumSet.of(AnnotationType.POLYGON);
+        }
+        if ("pspdfkit/shape/polyline".equalsIgnoreCase(type)) {
+            return EnumSet.of(AnnotationType.POLYLINE);
+        }
+        if ("pspdfkit/shape/rectangle".equalsIgnoreCase(type)) {
+            return EnumSet.of(AnnotationType.SQUARE);
+        }
+        if ("pspdfkit/text".equalsIgnoreCase(type)) {
+            return EnumSet.of(AnnotationType.FREETEXT);
+        }
+        return EnumSet.noneOf(AnnotationType.class);
     }
 }

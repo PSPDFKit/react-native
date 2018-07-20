@@ -1,4 +1,4 @@
-//  Copyright © 2018 PSPDFKit GmbH. All rights reserved.
+//  Copyright ï¿½ 2018 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -16,6 +16,10 @@ import {
 } from "react-native";
 
 class PSPDFKitView extends React.Component {
+
+    _nextRequestId = 1;
+    _requestMap = new Map();
+
     render() {
         if (Platform.OS === "ios" || Platform.OS === "android") {
             const onCloseButtonPressedHandler = this.props.onCloseButtonPressed
@@ -32,6 +36,7 @@ class PSPDFKitView extends React.Component {
                     onDocumentSaved={this._onDocumentSaved}
                     onAnnotationTapped={this._onAnnotationTapped}
                     onAnnotationsChanged={this._onAnnotationsChanged}
+                    onDataReturned={this._onDataReturned}
                 />
             );
         } else {
@@ -44,13 +49,13 @@ class PSPDFKitView extends React.Component {
             this.props.onStateChanged(event.nativeEvent);
         }
     };
-    
+
     _onDocumentSaved = (event) => {
         if (this.props.onDocumentSaved) {
             this.props.onDocumentSaved(event.nativeEvent);
         }
     };
-    
+
     _onAnnotationTapped = (event) => {
         if (this.props.onAnnotationTapped) {
             this.props.onAnnotationTapped(event.nativeEvent);
@@ -62,6 +67,17 @@ class PSPDFKitView extends React.Component {
             this.props.onAnnotationsChanged(event.nativeEvent);
         }
     };
+
+    _onDataReturned = (event) => {
+        let { requestId, result, error } = event.nativeEvent
+        let promise = this._requestMap[requestId]
+        if (result) {
+            promise.resolve(result)
+        } else {
+            promise.reject(error)
+        }
+        this._requestMap.delete(requestId)
+    }
 
     /**
      * Enters the annotation creation mode, showing the annotation creation toolbar.
@@ -88,6 +104,35 @@ class PSPDFKitView extends React.Component {
             []
         );
     };
+
+    /**
+     * Gets all annotations of the given type from the page.
+     * 
+     * @param pageIndex The page to get the annotations for.
+     * @param type The type of annotations to get (See here for types https://pspdfkit.com/guides/server/current/api/json-format/) or null to get all annotations.
+     * 
+     * Returns an array with the following structure:
+     * [instantJson]
+     * 
+     * @platform android
+     */
+    getAnnotations = function (pageIndex, type) {
+        let requestId = this._nextRequestId++
+        let requestMap = this._requestMap;
+
+        // We create a promise here that will be resolved once onDataReturned is called.
+        let promise = new Promise(function (resolve, reject) {
+            requestMap[requestId] = { 'resolve': resolve, 'reject': reject }
+        })
+
+        UIManager.dispatchViewManagerCommand(
+            findNodeHandle(this.refs.pdfView),
+            UIManager.RCTPSPDFKitView.Commands.getAnnotations,
+            [requestId, pageIndex, type]
+        );
+
+        return promise
+    }
 }
 
 PSPDFKitView.propTypes = {
@@ -126,7 +171,7 @@ PSPDFKitView.propTypes = {
      *
      * @platform ios
      */
-    disableDefaultActionForTappedAnnotations: PropTypes.bool, 
+    disableDefaultActionForTappedAnnotations: PropTypes.bool,
     /**
      * Callback that is called when the user tapped the close button.
      * If you provide this function, you need to handle dismissal yourself.
@@ -154,8 +199,8 @@ PSPDFKitView.propTypes = {
      *    change: "changed"|"added"|"removed",
      *    annotations: [instantJson]
      * }
-     */ 
-    onAnnotationsChanged: PropTypes.func,    
+     */
+    onAnnotationsChanged: PropTypes.func,
     /**
      * Callback that is called when the state of the PSPDFKitView changes.
      * Returns an object with the following structure:
