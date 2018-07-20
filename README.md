@@ -614,32 +614,32 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
 ![Deployment Target](screenshots/windowsSelectPSPDFKit+UWP.PNG)
 19. Add an application resource to your `Appl.xaml` to reference your License key.
 ```diff
-	<Application
-		x:Class="Catalog.App"
-		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-		xmlns:local="using:Catalog"
-		RequestedTheme="Light">
+<Application
+	x:Class="Catalog.App"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:local="using:Catalog"
+	RequestedTheme="Light">
 
-	+	<Application.Resources>
-	+		<ResourceDictionary>
-	+			<ResourceDictionary.MergedDictionaries>
-	+				<ResourceDictionary Source="License.xaml"/>
-	+			</ResourceDictionary.MergedDictionaries>
-	+		</ResourceDictionary>
-	+	</Application.Resources>
++	<Application.Resources>
++		<ResourceDictionary>
++			<ResourceDictionary.MergedDictionaries>
++				<ResourceDictionary Source="License.xaml"/>
++			</ResourceDictionary.MergedDictionaries>
++		</ResourceDictionary>
++	</Application.Resources>
 
-	</Application>
+</Application>
 ```
 20. Create a new file resouce called `License.xaml` with your PSPDFKit license key at the top level of the project. (Replace `ENTER LICENSE KEY HERE` with your key)
   ```xaml
-	<ResourceDictionary
-		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+<ResourceDictionary
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-	  <x:String x:Key="PSPDFKitLicense">ENTER LICENSE KEY HERE</x:String>
+	<x:String x:Key="PSPDFKitLicense">ENTER LICENSE KEY HERE</x:String>
 
-	</ResourceDictionary>
+</ResourceDictionary>
   ```
 21. Save Changes: File -> Save All
 22. Add the `PSPDFKitView` and `PSPDFKit` module into your `App.windows.js` file, and add a open button to allow the user to navigate the file system.
