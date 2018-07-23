@@ -177,6 +177,10 @@ public class PdfView extends FrameLayout {
         pdfViewDocumentListener.setDisableDefaultActionForTappedAnnotations(disableDefaultActionForTappedAnnotations);
     }
 
+    public void setDisableAutomaticSaving(boolean disableAutomaticSaving) {
+        pdfViewDocumentListener.setDisableAutomaticSaving(disableAutomaticSaving);
+    }
+
     private void setupFragment() {
         if (fragmentTag != null && configuration != null && document != null) {
             PdfFragment pdfFragment = (PdfFragment) fragmentManager.findFragmentByTag(fragmentTag);

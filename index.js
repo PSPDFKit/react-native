@@ -238,6 +238,12 @@ PSPDFKitView.propTypes = {
      */
     disableDefaultActionForTappedAnnotations: PropTypes.bool,
     /**
+     * Controls whether or not the document will be automatically saved. Defaults to automatically saving (false).
+     * 
+     * @platform android
+     */
+    disableAutomaticSaving: PropTypes.bool,
+    /**
      * Callback that is called when the user tapped the close button.
      * If you provide this function, you need to handle dismissal yourself.
      * If you don't provide this function, PSPDFKitView will be automatically dismissed.

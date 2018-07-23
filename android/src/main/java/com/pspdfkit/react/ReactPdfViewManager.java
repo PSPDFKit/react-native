@@ -115,6 +115,11 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
         view.setDisableDefaultActionForTappedAnnotations(disableDefaultActionForTappedAnnotations);
     }
 
+    @ReactProp(name = "disableAutomaticSaving")
+    public void setDisableAutomaticSaving(PdfView view, boolean disableAutomaticSaving) {
+        view.setDisableAutomaticSaving(disableAutomaticSaving);
+    }
+
     @Nullable
     @Override
     public Map getExportedCustomDirectEventTypeConstants() {
