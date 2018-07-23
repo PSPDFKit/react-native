@@ -11,6 +11,7 @@ import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.UIManagerModule;
 import com.facebook.react.uimanager.ViewGroupManager;
 import com.facebook.react.uimanager.annotations.ReactProp;
+import com.pspdfkit.preferences.PSPDFKitPreferences;
 import com.pspdfkit.react.events.PdfViewAnnotationChangedEvent;
 import com.pspdfkit.react.events.PdfViewAnnotationTappedEvent;
 import com.pspdfkit.react.events.PdfViewDocumentSavedEvent;
@@ -118,6 +119,11 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
     @ReactProp(name = "disableAutomaticSaving")
     public void setDisableAutomaticSaving(PdfView view, boolean disableAutomaticSaving) {
         view.setDisableAutomaticSaving(disableAutomaticSaving);
+    }
+
+    @ReactProp(name = "annotationAuthorName")
+    public void setAnnotationAuthorName(PdfView view, String annotationAuthorName) {
+        PSPDFKitPreferences.get(view.getContext()).setAnnotationCreator(annotationAuthorName);
     }
 
     @Nullable

@@ -244,6 +244,14 @@ PSPDFKitView.propTypes = {
      */
     disableAutomaticSaving: PropTypes.bool,
     /**
+     * Controls the author name that is set for new annotations.
+     * If not set and the user hasn't specified it before the user will be asked and the result will be saved.
+     * The value set here will be persisted and the user will not be asked even if this is not set the next time.
+     * 
+     * @platform android
+     */
+    annotationAuthorName: PropTypes.string,
+    /**
      * Callback that is called when the user tapped the close button.
      * If you provide this function, you need to handle dismissal yourself.
      * If you don't provide this function, PSPDFKitView will be automatically dismissed.
