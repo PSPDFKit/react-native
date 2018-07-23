@@ -1,4 +1,4 @@
-//  Copyright � 2018 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2018 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -105,6 +105,18 @@ class PSPDFKitView extends React.Component {
         );
     };
 
+    /**
+     * Saves the currently opened document.
+     * 
+     * @platform android
+     */
+    saveCurrentDocument = function () {
+        UIManager.dispatchViewManagerCommand(
+            findNodeHandle(this.refs.pdfView),
+            UIManager.RCTPSPDFKitView.Commands.saveCurrentDocument,
+            []
+        )
+    }
     /**
      * Gets all annotations of the given type from the page.
      * 
@@ -223,8 +235,6 @@ PSPDFKitView.propTypes = {
     showCloseButton: PropTypes.bool,
     /**
      * Controls wheter or not the default action for tapped annotations is processed. Defaults to processing the action (false).
-     *
-     * @platform ios
      */
     disableDefaultActionForTappedAnnotations: PropTypes.bool,
     /**
@@ -237,14 +247,11 @@ PSPDFKitView.propTypes = {
     onCloseButtonPressed: PropTypes.func,
     /**
      * Callback that is called when the document is saved.
-     *
-     * @platform ios
      */
     onDocumentSaved: PropTypes.func,
     /**
      * Callback that is called when the user taps on an annotation.
-     *
-     * @platform ios
+     * Returns the annotation data as instant json.
      */
     onAnnotationTapped: PropTypes.func,
     /**
