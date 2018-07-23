@@ -21,9 +21,11 @@ import com.pspdfkit.configuration.activity.PdfActivityConfiguration;
 import com.pspdfkit.configuration.activity.ThumbnailBarMode;
 import com.pspdfkit.document.PdfDocument;
 import com.pspdfkit.document.formatters.DocumentJsonFormatter;
+import com.pspdfkit.document.providers.DataProvider;
 import com.pspdfkit.listeners.SimpleDocumentListener;
 import com.pspdfkit.react.R;
 import com.pspdfkit.react.events.PdfViewStateChangedEvent;
+import com.pspdfkit.react.helper.DocumentJsonDataProvider;
 import com.pspdfkit.ui.PdfFragment;
 import com.pspdfkit.ui.PdfThumbnailBar;
 import com.pspdfkit.ui.forms.FormEditingBar;
@@ -384,5 +386,12 @@ public class PdfView extends FrameLayout {
                         return new JSONObject(jsonString);
                     }
                 });
+    }
+
+    public void addAnnotations(ReadableMap annotation) {
+        JSONObject json = new JSONObject(annotation.toHashMap());
+        final DataProvider dataProvider = new DocumentJsonDataProvider(json);
+        DocumentJsonFormatter.importDocumentJson(fragment.getDocument(), dataProvider);
+
     }
 }

@@ -173,6 +173,21 @@ class PSPDFKitView extends React.Component {
 
         return promise
     }
+
+    /**
+     * Applies the passed in document instant json.
+     * 
+     * @param annotations The document instant json to apply.
+     * 
+     * @platform android
+     */
+    addAnnotations = function (annotations) {
+        UIManager.dispatchViewManagerCommand(
+            findNodeHandle(this.refs.pdfView),
+            UIManager.RCTPSPDFKitView.Commands.addAnnotations,
+            [annotations]
+        );
+    }
 }
 
 PSPDFKitView.propTypes = {

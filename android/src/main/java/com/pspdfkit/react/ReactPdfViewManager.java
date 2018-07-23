@@ -38,6 +38,7 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
     public static final int COMMAND_GET_ANNOTATIONS = 4;
     public static final int COMMAND_ADD_ANNOTATION = 5;
     public static final int COMMAND_GET_ALL_UNSAVED_ANNOTATIONS = 6;
+    public static final int COMMAND_ADD_ANNOTATIONS = 7;
 
     @Override
     public String getName() {
@@ -77,7 +78,9 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
                 "addAnnotation",
                 COMMAND_ADD_ANNOTATION,
                 "getAllUnsavedAnnotations",
-                COMMAND_GET_ALL_UNSAVED_ANNOTATIONS);
+                COMMAND_GET_ALL_UNSAVED_ANNOTATIONS,
+                "addAnnotations",
+                COMMAND_ADD_ANNOTATIONS);
     }
 
     @ReactProp(name = "fragmentTag")
@@ -148,6 +151,11 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
                                     root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, jsonObject));
                                 }
                             });
+                }
+                break;
+            case COMMAND_ADD_ANNOTATIONS:
+                if (args != null) {
+                    root.addAnnotations(args.getMap(0));
                 }
                 break;
         }
