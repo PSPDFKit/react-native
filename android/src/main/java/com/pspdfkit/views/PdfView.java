@@ -8,9 +8,7 @@ import android.support.v4.app.FragmentManager;
 import android.util.AttributeSet;
 import android.view.Choreographer;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.facebook.react.uimanager.events.EventDispatcher;
@@ -51,6 +49,7 @@ public class PdfView extends FrameLayout {
 
     private FrameLayout container;
     private PdfViewModeController pdfViewModeController;
+    private PdfViewDocumentListener pdfViewDocumentListener;
 
     private PdfThumbnailBar pdfThumbnailBar;
 
@@ -114,6 +113,8 @@ public class PdfView extends FrameLayout {
     public void inject(FragmentManager fragmentManager, EventDispatcher eventDispatcher) {
         this.fragmentManager = fragmentManager;
         this.eventDispatcher = eventDispatcher;
+        pdfViewDocumentListener = new PdfViewDocumentListener(this,
+                eventDispatcher);
     }
 
     public void setFragmentTag(String fragmentTag) {
@@ -152,6 +153,10 @@ public class PdfView extends FrameLayout {
         setupFragment();
     }
 
+    public void setDisableDefaultActionForTappedAnnotations(boolean disableDefaultActionForTappedAnnotations) {
+        pdfViewDocumentListener.setDisableDefaultActionForTappedAnnotations(disableDefaultActionForTappedAnnotations);
+    }
+
     private void setupFragment() {
         if (fragmentTag != null && configuration != null && document != null) {
             PdfFragment pdfFragment = (PdfFragment) fragmentManager.findFragmentByTag(fragmentTag);
@@ -159,7 +164,7 @@ public class PdfView extends FrameLayout {
                 pdfFragment = PdfFragment.newInstance(document, this.configuration.getConfiguration());
                 prepareFragment(pdfFragment);
             } else {
-                ViewGroup parent = (ViewGroup) pdfFragment.getView().getParent();
+                View fragmentView = pdfFragment.getView();
                 if (pdfFragment.getDocument() != null && !pdfFragment.getDocument().getUid().equals(document.getUid())) {
                     fragmentManager.beginTransaction()
                             .remove(pdfFragment)
@@ -168,7 +173,7 @@ public class PdfView extends FrameLayout {
                     // The document changed create a new PdfFragment.
                     pdfFragment = PdfFragment.newInstance(document, this.configuration.getConfiguration());
                     prepareFragment(pdfFragment);
-                } else if (parent != this) {
+                } else if (fragmentView != null && fragmentView.getParent() != this) {
                     // We only need to detach the fragment if the parent view changed.
                     pdfViewModeController.resetToolbars();
                     fragmentManager.beginTransaction()
@@ -206,13 +211,16 @@ public class PdfView extends FrameLayout {
         pdfFragment.addOnAnnotationEditingModeChangeListener(pdfViewModeController);
         pdfFragment.addOnFormElementEditingModeChangeListener(pdfViewModeController);
         pdfFragment.addOnTextSelectionModeChangeListener(pdfViewModeController);
+        pdfFragment.addDocumentListener(pdfViewDocumentListener);
+        pdfFragment.addOnAnnotationSelectedListener(pdfViewDocumentListener);
+        pdfFragment.addOnAnnotationUpdatedListener(pdfViewDocumentListener);
 
         setupThumbnailBar(pdfFragment);
 
         fragmentManager.beginTransaction()
                 .add(pdfFragment, fragmentTag)
                 .commitNow();
-        View fragmentView = pdfFragment.onCreateView(LayoutInflater.from(getContext()), this, null);
+        View fragmentView = pdfFragment.getView();
         addView(fragmentView, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
     }
 
@@ -296,6 +304,12 @@ public class PdfView extends FrameLayout {
     public void exitCurrentlyActiveMode() {
         if (fragment != null) {
             fragment.exitCurrentlyActiveMode();
+        }
+    }
+
+    public void saveCurrentDocument() {
+        if (fragment != null) {
+            fragment.save();
         }
     }
 }

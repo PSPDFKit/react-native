@@ -1,4 +1,4 @@
-//  Copyright © 2018 PSPDFKit GmbH. All rights reserved.
+//  Copyright Â© 2018 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -44,13 +44,13 @@ class PSPDFKitView extends React.Component {
             this.props.onStateChanged(event.nativeEvent);
         }
     };
-    
+
     _onDocumentSaved = (event) => {
         if (this.props.onDocumentSaved) {
             this.props.onDocumentSaved(event.nativeEvent);
         }
     };
-    
+
     _onAnnotationTapped = (event) => {
         if (this.props.onAnnotationTapped) {
             this.props.onAnnotationTapped(event.nativeEvent);
@@ -88,6 +88,19 @@ class PSPDFKitView extends React.Component {
             []
         );
     };
+
+    /**
+     * Saves the currently opened document.
+     * 
+     * @platform android
+     */
+    saveCurrentDocument = function () {
+        UIManager.dispatchViewManagerCommand(
+            findNodeHandle(this.refs.pdfView),
+            UIManager.RCTPSPDFKitView.Commands.saveCurrentDocument,
+            []
+        )
+    }
 }
 
 PSPDFKitView.propTypes = {
@@ -123,10 +136,8 @@ PSPDFKitView.propTypes = {
     showCloseButton: PropTypes.bool,
     /**
      * Controls wheter or not the default action for tapped annotations is processed. Defaults to processing the action (false).
-     *
-     * @platform ios
      */
-    disableDefaultActionForTappedAnnotations: PropTypes.bool, 
+    disableDefaultActionForTappedAnnotations: PropTypes.bool,
     /**
      * Callback that is called when the user tapped the close button.
      * If you provide this function, you need to handle dismissal yourself.
@@ -137,14 +148,15 @@ PSPDFKitView.propTypes = {
     onCloseButtonPressed: PropTypes.func,
     /**
      * Callback that is called when the document is saved.
-     *
-     * @platform ios
      */
     onDocumentSaved: PropTypes.func,
     /**
-     * Callback that is called when the user taps on an annotation.
-     *
-     * @platform ios
+     * Callback that is called when an annotation is added, changed, or removed.
+     * Returns an object with the following structure:
+     * {
+     *    change: "changed"|"added"|"removed",
+     *    annotations: [instantJson]
+     * }
      */
     onAnnotationTapped: PropTypes.func,
     /**

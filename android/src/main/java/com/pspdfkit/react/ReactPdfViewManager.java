@@ -11,6 +11,9 @@ import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.UIManagerModule;
 import com.facebook.react.uimanager.ViewGroupManager;
 import com.facebook.react.uimanager.annotations.ReactProp;
+import com.pspdfkit.react.events.PdfViewAnnotationChangedEvent;
+import com.pspdfkit.react.events.PdfViewAnnotationTappedEvent;
+import com.pspdfkit.react.events.PdfViewDocumentSavedEvent;
 import com.pspdfkit.react.events.PdfViewStateChangedEvent;
 import com.pspdfkit.views.PdfView;
 
@@ -25,6 +28,7 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
 
     public static final int COMMAND_ENTER_ANNOTATION_CREATION_MODE = 1;
     public static final int COMMAND_EXIT_CURRENTLY_ACTIVE_MODE = 2;
+    public static final int COMMAND_SAVE_CURRENT_DOCUMENT = 3;
 
     @Override
     public String getName() {
@@ -58,7 +62,9 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
                 "enterAnnotationCreationMode",
                 COMMAND_ENTER_ANNOTATION_CREATION_MODE,
                 "exitCurrentlyActiveMode",
-                COMMAND_EXIT_CURRENTLY_ACTIVE_MODE);
+                COMMAND_EXIT_CURRENTLY_ACTIVE_MODE,
+                "saveCurrentDocument",
+                COMMAND_SAVE_CURRENT_DOCUMENT);
     }
 
     @ReactProp(name = "fragmentTag")
@@ -82,10 +88,18 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
         view.setPageIndex(pageIndex);
     }
 
+    @ReactProp(name = "disableDefaultActionForTappedAnnotations")
+    public void setDisableDefaultActionForTappedAnnotations(PdfView view, boolean disableDefaultActionForTappedAnnotations) {
+        view.setDisableDefaultActionForTappedAnnotations(disableDefaultActionForTappedAnnotations);
+    }
+
     @Nullable
     @Override
     public Map getExportedCustomDirectEventTypeConstants() {
-        return MapBuilder.of(PdfViewStateChangedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onStateChanged"));
+        return MapBuilder.of(PdfViewStateChangedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onStateChanged"),
+                PdfViewDocumentSavedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onDocumentSaved"),
+                PdfViewAnnotationTappedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onAnnotationTapped"),
+                PdfViewAnnotationChangedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onAnnotationsChanged"));
     }
 
     @Override
@@ -96,6 +110,9 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
                 break;
             case COMMAND_EXIT_CURRENTLY_ACTIVE_MODE:
                 root.exitCurrentlyActiveMode();
+                break;
+            case COMMAND_SAVE_CURRENT_DOCUMENT:
+                root.saveCurrentDocument();
                 break;
         }
     }
