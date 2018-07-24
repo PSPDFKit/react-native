@@ -612,16 +612,37 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
 ![Deployment Target](screenshots/windowsAddReferences.PNG)
 ![Deployment Target](screenshots/windowsSelectRNPSPDFKit.PNG)
 ![Deployment Target](screenshots/windowsSelectPSPDFKit+UWP.PNG)
-19. Add `react-native-pspdfkit` to `YourApp` package list and enter license key: open `MainReactNativeHost.cs` in `YourApp` project and add the following line.
-  ```diff
-  protected override List<IReactPackage> Packages => new List<IReactPackage>
-  {
-      new MainReactPackage(),
-  +   new ReactNativePSPDFKit.PSPDFKitPackage("INSERT YOUR LICENSE KEY HERE")
-  };
- ```
-20. Save Changes: File -> Save All
-21. Add the `PSPDFKitView` and `PSPDFKit` module into your `App.windows.js` file, and add a open button to allow the user to navigate the file system.
+19. Add an application resource to your `Appl.xaml` to reference your License key.
+```diff
+<Application
+	x:Class="Catalog.App"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:local="using:Catalog"
+	RequestedTheme="Light">
+
++	<Application.Resources>
++		<ResourceDictionary>
++			<ResourceDictionary.MergedDictionaries>
++				<ResourceDictionary Source="License.xaml"/>
++			</ResourceDictionary.MergedDictionaries>
++		</ResourceDictionary>
++	</Application.Resources>
+
+</Application>
+```
+20. Create a new file resouce called `License.xaml` with your PSPDFKit license key at the top level of the project. (Replace `ENTER LICENSE KEY HERE` with your key)
+  ```xaml
+<ResourceDictionary
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+	<x:String x:Key="PSPDFKitLicense">ENTER LICENSE KEY HERE</x:String>
+
+</ResourceDictionary>
+  ```
+21. Save Changes: File -> Save All
+22. Add the `PSPDFKitView` and `PSPDFKit` module into your `App.windows.js` file, and add a open button to allow the user to navigate the file system.
   ```
   import React, { Component } from 'react';
   import {
@@ -680,9 +701,9 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
       }
   });
  ```
-22. Now run the application on the command line: `react-native run-windows`.
-23. Press Yes when PowerShell wants to run.
-24. Type 'y' when asking if you want to install the certificate.
+23. Now run the application on the command line: `react-native run-windows`.
+24. Press Yes when PowerShell wants to run.
+25. Type 'y' when asking if you want to install the certificate.
 
 #### Running Catalog Project
 
@@ -706,13 +727,15 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
 6. Open the UWP catalog solution in `react-native\samples\Catalog\windows`.
 7. Accept and install any required extensions when prompted.
 8. If the settings windows opens, click on `Developer` and selected `yes`.
-9. Enter your license key in `react-native\samples\Catalog\windows\MainReactNativeHosts.cs`
-  ```
-    protected override List<IReactPackage> Packages => new List<IReactPackage>
-    {
-        new MainReactPackage(),
-        new ReactNativePSPDFKit.PSPDFKitPackage("INSERT LICENSE KEY HERE"),
-    };
+9. Create a new file resouce called `License.xaml` with your PSPDFKit license key at the top level of the project. (Replace `ENTER LICENSE KEY HERE` with your key)
+  ```xaml
+	<ResourceDictionary
+		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+	  <x:String x:Key="PSPDFKitLicense">ENTER LICENSE KEY HERE</x:String>
+
+	</ResourceDictionary>
   ```
 10. From the command prompt run `react-native run-windows`.
 11. Enter `y` to accept the certificate when prompted and allow socket access for reactive when prompted.
