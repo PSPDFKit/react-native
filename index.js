@@ -188,7 +188,6 @@ PSPDFKitView.propTypes = {
      * fragmentTag: A tag used to identify a single PdfFragment in the view hierarchy.
      * This needs to be unique in the view hierarchy.
      *
-     * @platform android
      */
     fragmentTag: PropTypes.string
 };

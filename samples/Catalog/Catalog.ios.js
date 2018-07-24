@@ -11,6 +11,7 @@ import {
   StyleSheet,
   Text,
   View,
+  Button,
   Image,
   TouchableHighlight,
   ListView,
@@ -83,6 +84,24 @@ var examples = [
     action: component => {
       const nextRoute = {
         component: PSPDFKitView,
+        passProps: {
+          document: 'PDFs/Annual Report.pdf',
+          configuration: {
+            useParentNavigationBar: true,
+          },
+          style: { flex: 1 },
+        },
+      }
+      component.props.navigator.push(nextRoute)
+    },
+  },
+  {
+    name: 'Change Pages Buttons',
+    description:
+      'Adds a toolbar at the bottom with buttons to the change pages.',
+    action: component => {
+      const nextRoute = {
+        component: ChangePages,
         passProps: {
           document: 'PDFs/Annual Report.pdf',
           configuration: {
@@ -231,6 +250,71 @@ class SplitPDF extends Component {
     let { width, height } = event.nativeEvent.layout
     this.setState({ dimensions: { width, height } })
   }
+}
+
+ class ChangePages extends Component {
+   constructor(props) {
+     super(props)
+     this.state = {
+       currentPageIndex: 0,
+       pageCount: 0,
+     };
+   }
+
+   render() {
+       return (
+         <View style={{ flex: 1 }}>
+           <PSPDFKitView
+             document={'PDFs/Annual Report.pdf'}
+             configuration={{
+               backgroundColor: processColor('lightgrey'),
+               thumbnailBarMode: 'scrollable',
+             }}
+             pageIndex={this.state.currentPageIndex}
+             showCloseButton={true}
+             onCloseButtonPressed={this.props.onClose}
+             style={{ flex: 1, color: pspdfkitColor }}
+             onStateChanged={event => {
+               this.setState({
+                 currentPageIndex: event.currentPageIndex,
+                 pageCount: event.pageCount,
+               });
+             }}
+           />
+           <View style={{ flexDirection: 'row', height: 60, alignItems: 'center', padding: 10 }}>
+             <Text>
+             {"Page " + (this.state.currentPageIndex + 1) + " of " + this.state.pageCount}
+            </Text>
+           <View>
+             <Button onPress={() => {
+                 this.setState(previousState => {
+                 return { currentPageIndex: previousState.currentPageIndex - 1 }
+               })
+             }} disabled={this.state.currentPageIndex == 0} title="Previous Page" />
+           </View>
+           <View style={{ marginLeft: 10 }}>
+             <Button onPress={() => {
+                 this.setState(previousState => {
+                 return { currentPageIndex: previousState.currentPageIndex + 1 }
+               })
+             }} disabled={this.state.currentPageIndex == this.state.pageCount - 1} title="Next Page" />
+             </View>
+           </View>
+         </View>
+       )
+   }
+   
+   _getOptimalLayoutDirection = () => {
+     const width = this.state.dimensions
+       ? this.state.dimensions.width
+       : Dimensions.get('window').width
+     return width > 450 ? 'row' : 'column'
+   }
+
+   _onLayout = event => {
+     let { width, height } = event.nativeEvent.layout
+     this.setState({ dimensions: { width, height } })
+   }
 }
 
 export default class Catalog extends Component {
