@@ -16,7 +16,7 @@ public class JsonUtilities {
      * Converts the given {@link JSONObject} to a {@link Map}.
      */
     public static Map<String, Object> jsonObjectToMap(JSONObject object) throws JSONException {
-        Map<String, Object> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>(object.length());
 
         Iterator<String> keysItr = object.keys();
         while (keysItr.hasNext()) {
@@ -34,7 +34,7 @@ public class JsonUtilities {
     }
 
     private static List<Object> toList(JSONArray array) throws JSONException {
-        List<Object> list = new ArrayList<>();
+        List<Object> list = new ArrayList<>(array.length());
         for (int i = 0; i < array.length(); i++) {
             Object value = array.get(i);
             if (value instanceof JSONArray) {

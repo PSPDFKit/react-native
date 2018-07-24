@@ -2,18 +2,7 @@
     x:Class="ReactNativePSPDFKit.PDFViewPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d"
-    RequestedTheme="Dark">
-    
-    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-        <WebView Grid.Row="0"
-                 Name="PDFView"
-                 NavigationStarting="PDFView_NavigationStarting"
-                 Source="ms-appx-web:///Assets/pspdfkit/index.html"/>
-    </Grid>
+    xmlns:ui="using:PSPDFKit.UI">
+
+    <ui:PdfView License="{StaticResource PSPDFKitLicense}" Name="PDFView"/>
 </Page>

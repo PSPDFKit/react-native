@@ -30,7 +30,9 @@ export default class Catalog extends Component<{}> {
     render() {
         return (
             <View style={styles.page}>
-                <PSPDFKitView style={styles.pdfView}/>
+                <PSPDFKitView style={styles.pdfView}
+                    document="ms-appx:///Assets/pdf/annualReport.pdf"
+                    pageIndex={4}/>
                 <View style={styles.footer}>
                     <View style={styles.button}>
                         <Button onPress={() => PSPDFKit.OpenFile()} title="Open"/>

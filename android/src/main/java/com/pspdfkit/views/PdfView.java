@@ -8,9 +8,7 @@ import android.support.v4.app.FragmentManager;
 import android.util.AttributeSet;
 import android.view.Choreographer;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.facebook.react.uimanager.events.EventDispatcher;
@@ -115,7 +113,6 @@ public class PdfView extends FrameLayout {
     public void inject(FragmentManager fragmentManager, EventDispatcher eventDispatcher) {
         this.fragmentManager = fragmentManager;
         this.eventDispatcher = eventDispatcher;
-
         pdfViewDocumentListener = new PdfViewDocumentListener(this,
                 eventDispatcher);
     }

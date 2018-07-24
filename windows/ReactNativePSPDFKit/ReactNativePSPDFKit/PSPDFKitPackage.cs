@@ -17,13 +17,7 @@ namespace ReactNativePSPDFKit
     /// </summary>
     public class PSPDFKitPackage : IReactPackage
     {
-        private PSPDFKitViewManger _pspdfkitViewManger;
-
-        public PSPDFKitPackage(string license)
-        {
-            Sdk.Initialize(license);
-            _pspdfkitViewManger = new PSPDFKitViewManger();
-        }
+        private PSPDFKitViewManger _pspdfkitViewManger = new PSPDFKitViewManger();
 
         /// <summary>
         /// Creates the PSPDFKitModule native modules to register with the react
