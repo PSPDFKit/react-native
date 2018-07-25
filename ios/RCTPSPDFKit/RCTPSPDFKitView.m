@@ -103,6 +103,10 @@
   return nil;
 }
 
+- (void)saveCurrentDocument {
+  [self.pdfController.document saveWithOptions:nil error:NULL];
+}
+
 #pragma mark - PSPDFDocumentDelegate
 
 - (void)pdfDocumentDidSave:(nonnull PSPDFDocument *)document {
@@ -120,6 +124,10 @@
     self.onAnnotationTapped(annotationDictionary);
   }
   return self.disableDefaultActionForTappedAnnotations;
+}
+
+- (BOOL)pdfViewController:(PSPDFViewController *)pdfController shouldSaveDocument:(nonnull PSPDFDocument *)document withOptions:(NSDictionary<PSPDFDocumentSaveOption,id> *__autoreleasing  _Nonnull * _Nonnull)options {
+  return !self.disableAutomaticSaving;
 }
 
 - (void)pdfViewController:(PSPDFViewController *)pdfController willBeginDisplayingPageView:(PSPDFPageView *)pageView forPageAtIndex:(NSInteger)pageIndex {

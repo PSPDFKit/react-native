@@ -91,8 +91,6 @@ class PSPDFKitView extends React.Component {
 
     /**
      * Saves the currently opened document.
-     * 
-     * @platform android
      */
     saveCurrentDocument = function () {
         UIManager.dispatchViewManagerCommand(
@@ -138,6 +136,10 @@ PSPDFKitView.propTypes = {
      * Controls wheter or not the default action for tapped annotations is processed. Defaults to processing the action (false).
      */
     disableDefaultActionForTappedAnnotations: PropTypes.bool,
+    /**
+     * Controls whether or not the document will be automatically saved. Defaults to automatically saving (false).
+     */
+    disableAutomaticSaving: PropTypes.bool,
     /**
      * Callback that is called when the user tapped the close button.
      * If you provide this function, you need to handle dismissal yourself.

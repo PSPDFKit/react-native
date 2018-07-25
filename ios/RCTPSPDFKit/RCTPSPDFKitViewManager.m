@@ -11,6 +11,7 @@
 #import "RCTConvert+PSPDFConfiguration.h"
 #import "RCTConvert+PSPDFDocument.h"
 #import "RCTPSPDFKitView.h"
+#import <React/RCTUIManager.h>
 
 @import PSPDFKit;
 @import PSPDFKitUI;
@@ -40,6 +41,8 @@ RCT_EXPORT_VIEW_PROPERTY(hideNavigationBar, BOOL)
 
 RCT_EXPORT_VIEW_PROPERTY(disableDefaultActionForTappedAnnotations, BOOL)
 
+RCT_EXPORT_VIEW_PROPERTY(disableAutomaticSaving, BOOL)
+
 RCT_REMAP_VIEW_PROPERTY(color, tintColor, UIColor)
 
 RCT_CUSTOM_VIEW_PROPERTY(showCloseButton, BOOL, RCTPSPDFKitView) {
@@ -57,6 +60,13 @@ RCT_EXPORT_VIEW_PROPERTY(onAnnotationTapped, RCTBubblingEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onAnnotationsChanged, RCTBubblingEventBlock)
 
 RCT_EXPORT_VIEW_PROPERTY(onStateChanged, RCTBubblingEventBlock)
+
+RCT_EXPORT_METHOD(saveCurrentDocument:(nonnull NSNumber *)reactTag) {
+  dispatch_async(dispatch_get_main_queue(), ^{
+    RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
+    [component saveCurrentDocument];
+  });
+}
 
 - (UIView *)view {
   return [[RCTPSPDFKitView alloc] init];
