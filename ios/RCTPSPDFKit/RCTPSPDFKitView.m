@@ -122,6 +122,13 @@
   return self.disableDefaultActionForTappedAnnotations;
 }
 
+- (void)pdfViewController:(PSPDFViewController *)pdfController willBeginDisplayingPageView:(PSPDFPageView *)pageView forPageAtIndex:(NSInteger)pageIndex {
+  if (self.onStateChanged) {
+    self.onStateChanged(@{@"currentPageIndex" : @(pageIndex), @"pageCount" : @(pdfController.document.pageCount)});
+  }
+}
+
+#pragma mark - Notifications
 
 - (void)annotationChangedNotification:(NSNotification *)notification {
   id object = notification.object;

@@ -181,7 +181,6 @@ PSPDFKitView.propTypes = {
      *    formEditingActive: bool,
      * }
      *
-     * @platform android
      */
     onStateChanged: PropTypes.func,
     /**

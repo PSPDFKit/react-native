@@ -56,6 +56,8 @@ RCT_EXPORT_VIEW_PROPERTY(onAnnotationTapped, RCTBubblingEventBlock)
 
 RCT_EXPORT_VIEW_PROPERTY(onAnnotationsChanged, RCTBubblingEventBlock)
 
+RCT_EXPORT_VIEW_PROPERTY(onStateChanged, RCTBubblingEventBlock)
+
 - (UIView *)view {
   return [[RCTPSPDFKitView alloc] init];
 }
