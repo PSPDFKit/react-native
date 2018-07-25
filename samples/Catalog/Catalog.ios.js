@@ -20,7 +20,6 @@ import {
   NavigatorIOS,
   Modal,
   Dimensions,
-  findNodeHandle,
 } from 'react-native'
 const RNFS = require('react-native-fs')
 
@@ -340,7 +339,7 @@ class ManualSave extends Component {
             <View>
               <Button onPress={() => {
                 // Manual Save
-                NativeModules.PSPDFKitViewManager.saveCurrentDocument(findNodeHandle(this.refs.pdfView));
+                this.refs.pdfView.saveCurrentDocument();
               }} disabled={false} title="Save" />
             </View>
           </View>
