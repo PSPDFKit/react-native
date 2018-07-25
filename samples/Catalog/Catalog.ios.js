@@ -101,14 +101,7 @@ var examples = [
       'Adds a toolbar at the bottom with buttons to the change pages.',
     action: component => {
       const nextRoute = {
-        component: ChangePages,
-        passProps: {
-          document: 'PDFs/Annual Report.pdf',
-          configuration: {
-            useParentNavigationBar: true,
-          },
-          style: { flex: 1 },
-        },
+        component: ChangePages
       }
       component.props.navigator.push(nextRoute)
     },
