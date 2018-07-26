@@ -307,18 +307,6 @@ class SplitPDF extends Component {
          </View>
        )
    }
-   
-   _getOptimalLayoutDirection = () => {
-     const width = this.state.dimensions
-       ? this.state.dimensions.width
-       : Dimensions.get('window').width
-     return width > 450 ? 'row' : 'column'
-   }
-
-   _onLayout = event => {
-     let { width, height } = event.nativeEvent.layout
-     this.setState({ dimensions: { width, height } })
-   }
 }
 
 class ManualSave extends Component {
@@ -335,28 +323,17 @@ class ManualSave extends Component {
           }}
           style={{ flex: 1, color: pspdfkitColor }}
           />
-          <View style={{ flexDirection: 'row', height: 60, alignItems: 'center', padding: 10 }}>
-            <View>
-              <Button onPress={() => {
-                // Manual Save
-                this.refs.pdfView.saveCurrentDocument();
-              }} disabled={false} title="Save" />
-            </View>
+        <View style={{ flexDirection: 'row', height: 60, alignItems: 'center', padding: 10 }}>
+          <View>
+            <Button onPress={() => {
+              // Manual Save
+              this.refs.pdfView.saveCurrentDocument();
+            }} disabled={false} title="Save" />
           </View>
         </View>
-       )
-     }
-   _getOptimalLayoutDirection = () => {
-     const width = this.state.dimensions
-       ? this.state.dimensions.width
-       : Dimensions.get('window').width
-     return width > 450 ? 'row' : 'column'
-   }
-
-   _onLayout = event => {
-     let { width, height } = event.nativeEvent.layout
-     this.setState({ dimensions: { width, height } })
-   }
+      </View> 
+    )
+  }
 }
 
 export default class Catalog extends Component {
