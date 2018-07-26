@@ -145,6 +145,8 @@ PSPDFKitView.propTypes = {
     disableDefaultActionForTappedAnnotations: PropTypes.bool,
     /**
      * Controls whether or not the document will be automatically saved. Defaults to automatically saving (false).
+     *
+     * @platform ios
      */
     disableAutomaticSaving: PropTypes.bool,
     /**
