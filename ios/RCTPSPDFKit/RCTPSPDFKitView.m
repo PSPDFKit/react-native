@@ -104,6 +104,7 @@
 }
 
 - (void)saveCurrentDocument {
+  self.pdfController.document.annotationSaveMode = PSPDFAnnotationSaveModeEmbedded;
   [self.pdfController.document saveWithOptions:nil error:NULL];
 }
 
@@ -112,6 +113,12 @@
 - (void)pdfDocumentDidSave:(nonnull PSPDFDocument *)document {
   if (self.onDocumentSaved) {
     self.onDocumentSaved(@{});
+  }
+}
+
+- (void)pdfDocument:(PSPDFDocument *)document saveDidFailWithError:(NSError *)error {
+  if (self.onDocumentSaveFailed) {
+    self.onDocumentSaveFailed(@{@"error": error.description});
   }
 }
 

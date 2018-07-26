@@ -30,6 +30,7 @@ class PSPDFKitView extends React.Component {
                     onCloseButtonPressed={onCloseButtonPressedHandler}
                     onStateChanged={this._onStateChanged}
                     onDocumentSaved={this._onDocumentSaved}
+                    onDocumentSaveFailed={this._onDocumentSaveFailed}
                     onAnnotationTapped={this._onAnnotationTapped}
                     onAnnotationsChanged={this._onAnnotationsChanged}
                 />
@@ -48,6 +49,12 @@ class PSPDFKitView extends React.Component {
     _onDocumentSaved = (event) => {
         if (this.props.onDocumentSaved) {
             this.props.onDocumentSaved(event.nativeEvent);
+        }
+    };
+    
+    _onDocumentSaveFailed = (event) => {
+        if (this.props.onDocumentSaveFailed) {
+            this.props.onDocumentSaveFailed(event.nativeEvent);
         }
     };
 
@@ -152,6 +159,14 @@ PSPDFKitView.propTypes = {
      * Callback that is called when the document is saved.
      */
     onDocumentSaved: PropTypes.func,
+    /**
+     * Callback that is called when the document fails to save.
+     * Returns a string error with the error message.
+     * {
+     *    error: "Error message",
+     * }
+     */
+    onDocumentSaveFailed: PropTypes.func,
     /**
      * Callback that is called when an annotation is added, changed, or removed.
      * Returns an object with the following structure:
