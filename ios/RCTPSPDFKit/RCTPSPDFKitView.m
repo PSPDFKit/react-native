@@ -104,7 +104,6 @@
 }
 
 - (void)saveCurrentDocument {
-  self.pdfController.document.annotationSaveMode = PSPDFAnnotationSaveModeEmbedded;
   [self.pdfController.document saveWithOptions:nil error:NULL];
 }
 
