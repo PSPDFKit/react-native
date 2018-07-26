@@ -11,12 +11,12 @@ import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.UIManagerModule;
 import com.facebook.react.uimanager.ViewGroupManager;
 import com.facebook.react.uimanager.annotations.ReactProp;
+import com.pspdfkit.annotations.Annotation;
 import com.pspdfkit.preferences.PSPDFKitPreferences;
 import com.pspdfkit.react.events.PdfViewAnnotationChangedEvent;
 import com.pspdfkit.react.events.PdfViewAnnotationTappedEvent;
-import com.pspdfkit.react.events.PdfViewDocumentSavedEvent;
-import com.pspdfkit.annotations.Annotation;
 import com.pspdfkit.react.events.PdfViewDataReturnedEvent;
+import com.pspdfkit.react.events.PdfViewDocumentSavedEvent;
 import com.pspdfkit.react.events.PdfViewStateChangedEvent;
 import com.pspdfkit.views.PdfView;
 
@@ -28,6 +28,7 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
@@ -44,6 +45,8 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
     public static final int COMMAND_ADD_ANNOTATION = 5;
     public static final int COMMAND_GET_ALL_UNSAVED_ANNOTATIONS = 6;
     public static final int COMMAND_ADD_ANNOTATIONS = 7;
+
+    private CompositeDisposable annotationDisposables = new CompositeDisposable();
 
     @Override
     public String getName() {
@@ -160,6 +163,7 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
                                     root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, annotations));
                                 }
                             });
+                    annotationDisposables.add(annotationDisposable);
                 }
                 break;
             case COMMAND_ADD_ANNOTATION:
@@ -179,6 +183,7 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
                                     root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, jsonObject));
                                 }
                             });
+                    annotationDisposables.add(annotationDisposable);
                 }
                 break;
             case COMMAND_ADD_ANNOTATIONS:
@@ -192,5 +197,11 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
     @Override
     public boolean needsCustomLayoutForChildren() {
         return true;
+    }
+
+    @Override
+    public void onCatalystInstanceDestroy() {
+        super.onCatalystInstanceDestroy();
+        annotationDisposables.dispose();
     }
 }
