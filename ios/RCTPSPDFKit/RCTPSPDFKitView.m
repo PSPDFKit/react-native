@@ -9,6 +9,7 @@
 
 #import "RCTPSPDFKitView.h"
 #import <React/RCTUtils.h>
+#import "RCTConvert+PSPDFAnnotation.h"
 
 @interface RCTPSPDFKitView ()<PSPDFDocumentDelegate, PSPDFViewControllerDelegate>
 
@@ -142,6 +143,14 @@
   }
 }
 
+#pragma mark - Instant JSON
+
+- (NSDictionary *)getAnnotations:(PSPDFPageIndex)pageIndex type:(PSPDFAnnotationType)type {
+  NSArray <PSPDFAnnotation *>* annotations = [self.pdfController.document annotationsForPageAtIndex:pageIndex type:type];
+  NSArray <NSDictionary *> *annotationsJSON = [RCTConvert instantJSONAnnotationsFromPSPDFAnnotationArray:annotations];
+  return @{@"annotations" : annotationsJSON};
+}
+
 #pragma mark - Notifications
 
 - (void)annotationChangedNotification:(NSNotification *)notification {
@@ -158,20 +167,6 @@
     return;
   }
 
-  NSMutableArray <NSDictionary *> *annotationsJSON = [NSMutableArray new];
-  for (PSPDFAnnotation *annotation in annotations) {
-    NSData *annotationData = [annotation generateInstantJSONWithError:NULL];
-    if (annotationData) {
-      NSDictionary *annotationDictionary = [NSJSONSerialization JSONObjectWithData:annotationData options:kNilOptions error:NULL];
-      if (annotationDictionary) {
-        [annotationsJSON addObject:annotationDictionary];
-      }
-    } else if (annotation.name) {
-      // We only generate Instant JSON data for attached annotations. When an annotation is deleted, we only send the annotation name.
-      [annotationsJSON addObject:@{@"name" : annotation.name}];
-    }
-  }
-
   NSString *name = notification.name;
   NSString *change;
   if ([name isEqualToString:PSPDFAnnotationChangedNotification]) {
@@ -182,6 +177,7 @@
     change = @"removed";
   }
 
+  NSArray <NSDictionary *> *annotationsJSON = [RCTConvert instantJSONAnnotationsFromPSPDFAnnotationArray:annotations];
   if (self.onAnnotationsChanged) {
     self.onAnnotationsChanged(@{@"change" : change, @"annotations" : annotationsJSON});
   }

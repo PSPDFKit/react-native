@@ -29,5 +29,6 @@
 @property (nonatomic, copy) RCTBubblingEventBlock onStateChanged;
 
 - (void)saveCurrentDocument;
+- (NSDictionary *)getAnnotations:(PSPDFPageIndex)pageIndex type:(PSPDFAnnotationType)type;
 
 @end

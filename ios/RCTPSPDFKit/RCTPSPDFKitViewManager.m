@@ -8,6 +8,7 @@
 //
 
 #import "RCTPSPDFKitViewManager.h"
+#import "RCTConvert+PSPDFAnnotation.h"
 #import "RCTConvert+PSPDFConfiguration.h"
 #import "RCTConvert+PSPDFDocument.h"
 #import "RCTPSPDFKitView.h"
@@ -79,6 +80,18 @@ RCT_EXPORT_METHOD(saveCurrentDocument:(nonnull NSNumber *)reactTag) {
   dispatch_async(dispatch_get_main_queue(), ^{
     RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
     [component saveCurrentDocument];
+  });
+}
+
+RCT_REMAP_METHOD(getAnnotations, getAnnotations:(nonnull NSNumber *)pageIndex type:(NSString *)type reactTag:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+  dispatch_async(dispatch_get_main_queue(), ^{
+    RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
+    NSDictionary *annotations = [component getAnnotations:(PSPDFPageIndex)pageIndex.integerValue type:[RCTConvert instantJSONAnnotationType:type]];
+    if (annotations) {
+      resolve(annotations);
+    } else {
+      reject(@"error", @"There were no annotations", nil);
+    }
   });
 }
 
