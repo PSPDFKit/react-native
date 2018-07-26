@@ -107,6 +107,17 @@ var examples = [
     },
   },
   {
+    name: 'Manual Save',
+    description:
+      'Adds a toolbar at the bottom with a Save button and disables automatic saving.',
+    action: component => {
+      const nextRoute = {
+        component: ManualSave
+      }
+      component.props.navigator.push(nextRoute)
+    },
+  },
+  {
     name: 'Split PDF',
     description: 'Show two PDFs side by side by using PSPDFKitView components.',
     action: component => {
@@ -278,36 +289,51 @@ class SplitPDF extends Component {
              <Text>
              {"Page " + (this.state.currentPageIndex + 1) + " of " + this.state.pageCount}
             </Text>
-           <View>
-             <Button onPress={() => {
-                 this.setState(previousState => {
-                 return { currentPageIndex: previousState.currentPageIndex - 1 }
-               })
-             }} disabled={this.state.currentPageIndex == 0} title="Previous Page" />
-           </View>
-           <View style={{ marginLeft: 10 }}>
-             <Button onPress={() => {
-                 this.setState(previousState => {
-                 return { currentPageIndex: previousState.currentPageIndex + 1 }
-               })
-             }} disabled={this.state.currentPageIndex == this.state.pageCount - 1} title="Next Page" />
+             <View>
+               <Button onPress={() => {
+                   this.setState(previousState => {
+                   return { currentPageIndex: previousState.currentPageIndex - 1 }
+                 })
+               }} disabled={this.state.currentPageIndex == 0} title="Previous Page" />
+             </View>
+             <View style={{ marginLeft: 10 }}>
+               <Button onPress={() => {
+                   this.setState(previousState => {
+                   return { currentPageIndex: previousState.currentPageIndex + 1 }
+                 })
+               }} disabled={this.state.currentPageIndex == this.state.pageCount - 1} title="Next Page" />
              </View>
            </View>
          </View>
        )
    }
-   
-   _getOptimalLayoutDirection = () => {
-     const width = this.state.dimensions
-       ? this.state.dimensions.width
-       : Dimensions.get('window').width
-     return width > 450 ? 'row' : 'column'
-   }
+}
 
-   _onLayout = event => {
-     let { width, height } = event.nativeEvent.layout
-     this.setState({ dimensions: { width, height } })
-   }
+class ManualSave extends Component {
+  render() {
+     return (
+      <View style={{ flex: 1 }}>
+        <PSPDFKitView
+          ref="pdfView"
+          document={'PDFs/Annual Report.pdf'}
+          disableAutomaticSaving={true}
+          configuration={{
+            backgroundColor: processColor('lightgrey'),
+            thumbnailBarMode: 'scrollable',
+          }}
+          style={{ flex: 1, color: pspdfkitColor }}
+          />
+        <View style={{ flexDirection: 'row', height: 60, alignItems: 'center', padding: 10 }}>
+          <View>
+            <Button onPress={() => {
+              // Manual Save
+              this.refs.pdfView.saveCurrentDocument();
+            }} disabled={false} title="Save" />
+          </View>
+        </View>
+      </View> 
+    )
+  }
 }
 
 export default class Catalog extends Component {

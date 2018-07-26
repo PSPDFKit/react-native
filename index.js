@@ -30,6 +30,7 @@ class PSPDFKitView extends React.Component {
                     onCloseButtonPressed={onCloseButtonPressedHandler}
                     onStateChanged={this._onStateChanged}
                     onDocumentSaved={this._onDocumentSaved}
+                    onDocumentSaveFailed={this._onDocumentSaveFailed}
                     onAnnotationTapped={this._onAnnotationTapped}
                     onAnnotationsChanged={this._onAnnotationsChanged}
                 />
@@ -48,6 +49,12 @@ class PSPDFKitView extends React.Component {
     _onDocumentSaved = (event) => {
         if (this.props.onDocumentSaved) {
             this.props.onDocumentSaved(event.nativeEvent);
+        }
+    };
+    
+    _onDocumentSaveFailed = (event) => {
+        if (this.props.onDocumentSaveFailed) {
+            this.props.onDocumentSaveFailed(event.nativeEvent);
         }
     };
 
@@ -91,8 +98,6 @@ class PSPDFKitView extends React.Component {
 
     /**
      * Saves the currently opened document.
-     * 
-     * @platform android
      */
     saveCurrentDocument = function () {
         UIManager.dispatchViewManagerCommand(
@@ -139,6 +144,12 @@ PSPDFKitView.propTypes = {
      */
     disableDefaultActionForTappedAnnotations: PropTypes.bool,
     /**
+     * Controls whether or not the document will be automatically saved. Defaults to automatically saving (false).
+     *
+     * @platform ios
+     */
+    disableAutomaticSaving: PropTypes.bool,
+    /**
      * Callback that is called when the user tapped the close button.
      * If you provide this function, you need to handle dismissal yourself.
      * If you don't provide this function, PSPDFKitView will be automatically dismissed.
@@ -150,6 +161,16 @@ PSPDFKitView.propTypes = {
      * Callback that is called when the document is saved.
      */
     onDocumentSaved: PropTypes.func,
+    /**
+     * Callback that is called when the document fails to save.
+     * Returns a string error with the error message.
+     * {
+     *    error: "Error message",
+     * }
+     *
+     * @platform ios
+     */
+    onDocumentSaveFailed: PropTypes.func,
     /**
      * Callback that is called when an annotation is added, changed, or removed.
      * Returns an object with the following structure:
