@@ -167,6 +167,8 @@ PSPDFKitView.propTypes = {
      * {
      *    error: "Error message",
      * }
+     *
+     * @platform ios
      */
     onDocumentSaveFailed: PropTypes.func,
     /**
