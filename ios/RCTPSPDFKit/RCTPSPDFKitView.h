@@ -20,7 +20,7 @@
 @property (nonatomic, readonly) UIBarButtonItem *closeButton;
 @property (nonatomic) BOOL disableDefaultActionForTappedAnnotations;
 @property (nonatomic) BOOL disableAutomaticSaving;
-@property (atomic, copy, nullable) NSString *annotationAuthorName;
+@property (nonatomic, copy, nullable) NSString *annotationAuthorName;
 @property (nonatomic, copy) RCTBubblingEventBlock onCloseButtonPressed;
 @property (nonatomic, copy) RCTBubblingEventBlock onDocumentSaved;
 @property (nonatomic, copy) RCTBubblingEventBlock onDocumentSaveFailed;
