@@ -156,7 +156,6 @@ class PSPDFKitView extends React.Component {
      * 
      * @param annotation InstantJson of the annotation to add.
      * 
-     * @platform android
      */
     addAnnotation = function (annotation) {
         UIManager.dispatchViewManagerCommand(

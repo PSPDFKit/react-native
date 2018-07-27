@@ -151,6 +151,22 @@
   return @{@"annotations" : annotationsJSON};
 }
 
+- (void)addAnnotation:(NSString *)jsonAnnotation {
+  NSData *data = [jsonAnnotation dataUsingEncoding:NSUTF8StringEncoding];
+  PSPDFDocument *document = self.pdfController.document;
+  PSPDFDocumentProvider *documentProvider = document.documentProviders.firstObject;
+
+  BOOL success = NO;
+  if (data) {
+    PSPDFAnnotation *annotation = [PSPDFAnnotation annotationFromInstantJSON:data documentProvider:documentProvider error:NULL];
+    success = [document addAnnotations:@[annotation] options:nil];
+  }
+
+  if (!success){
+    NSLog(@"Failed to add annotation.");
+  }
+}
+
 #pragma mark - Notifications
 
 - (void)annotationChangedNotification:(NSNotification *)notification {

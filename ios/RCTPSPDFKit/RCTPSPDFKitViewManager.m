@@ -90,8 +90,15 @@ RCT_REMAP_METHOD(getAnnotations, getAnnotations:(nonnull NSNumber *)pageIndex ty
     if (annotations) {
       resolve(annotations);
     } else {
-      reject(@"error", @"There were no annotations", nil);
+      reject(@"error", @"Failed to get annotations", nil);
     }
+  });
+}
+
+RCT_EXPORT_METHOD(addAnnotation:(NSString *)jsonAnnotation reactTag:(nonnull NSNumber *)reactTag) {
+  dispatch_async(dispatch_get_main_queue(), ^{
+    RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
+    [component addAnnotation:jsonAnnotation];
   });
 }
 
