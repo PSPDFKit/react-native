@@ -102,6 +102,18 @@ RCT_EXPORT_METHOD(addAnnotation:(NSString *)jsonAnnotation reactTag:(nonnull NSN
   });
 }
 
+RCT_EXPORT_METHOD(getAllUnsavedAnnotations:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+  dispatch_async(dispatch_get_main_queue(), ^{
+    RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
+    NSDictionary *annotations = [component getAllUnsavedAnnotations];
+    if (annotations) {
+      resolve(annotations);
+    } else {
+      reject(@"error", @"Failed to get annotations", nil);
+    }
+  });
+}
+
 - (UIView *)view {
   return [[RCTPSPDFKitView alloc] init];
 }

@@ -167,6 +167,20 @@
   }
 }
 
+- (void)addAnnotations:(NSString *)jsonAnnotations {
+  NSData *data = [jsonAnnotations dataUsingEncoding:NSUTF8StringEncoding];
+  PSPDFDataContainerProvider *dataContainerProvider = [[PSPDFDataContainerProvider alloc] initWithData:data];
+  PSPDFDocument *document = self.pdfController.document;
+  PSPDFDocumentProvider *documentProvider = document.documentProviders.firstObject;
+
+  BOOL success = [document applyInstantJSONFromDataProvider:dataContainerProvider toDocumentProvider:documentProvider error:NULL];
+  if (success){
+    [self.pdfController reloadData];
+  } else {
+    NSLog(@"Failed to add annotations.");
+  }
+}
+
 #pragma mark - Notifications
 
 - (void)annotationChangedNotification:(NSNotification *)notification {
