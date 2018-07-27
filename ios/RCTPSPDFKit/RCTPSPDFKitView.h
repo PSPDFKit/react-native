@@ -31,6 +31,7 @@
 - (void)saveCurrentDocument;
 - (NSDictionary *)getAnnotations:(PSPDFPageIndex)pageIndex type:(PSPDFAnnotationType)type;
 - (void)addAnnotation:(NSString *)jsonAnnotation;
+- (NSDictionary *)getAllUnsavedAnnotations;
 - (void)addAnnotations:(NSString *)jsonAnnotations;
 
 @end

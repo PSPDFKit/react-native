@@ -114,6 +114,13 @@ RCT_EXPORT_METHOD(getAllUnsavedAnnotations:(nonnull NSNumber *)reactTag resolver
   });
 }
 
+RCT_EXPORT_METHOD(addAnnotations:(NSString *)jsonAnnotations reactTag:(nonnull NSNumber *)reactTag) {
+  dispatch_async(dispatch_get_main_queue(), ^{
+    RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
+    [component addAnnotations:jsonAnnotations];
+  });
+}
+
 - (UIView *)view {
   return [[RCTPSPDFKitView alloc] init];
 }

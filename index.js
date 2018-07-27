@@ -170,7 +170,6 @@ class PSPDFKitView extends React.Component {
      * 
      * Returns a promise resolving to document instant json (https://pspdfkit.com/guides/android/current/importing-exporting/instant-json/#instant-document-json-api-a56628).
      * 
-     * @platform android
      */
     getAllUnsavedAnnotations = function () {
         let requestId = this._nextRequestId++
@@ -195,7 +194,6 @@ class PSPDFKitView extends React.Component {
      * 
      * @param annotations The document instant json to apply.
      * 
-     * @platform android
      */
     addAnnotations = function (annotations) {
         UIManager.dispatchViewManagerCommand(

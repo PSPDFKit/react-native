@@ -167,6 +167,14 @@
   }
 }
 
+- (NSDictionary *)getAllUnsavedAnnotations {
+  [self.pdfController.document saveWithOptions:nil error:NULL];
+  PSPDFDocumentProvider *documentProvider = self.pdfController.document.documentProviders.firstObject;
+  NSData *data = [self.pdfController.document generateInstantJSONFromDocumentProvider:documentProvider error:NULL];
+  NSDictionary *annotationsJSON = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:NULL];
+  return annotationsJSON;
+}
+
 - (void)addAnnotations:(NSString *)jsonAnnotations {
   NSData *data = [jsonAnnotations dataUsingEncoding:NSUTF8StringEncoding];
   PSPDFDataContainerProvider *dataContainerProvider = [[PSPDFDataContainerProvider alloc] initWithData:data];
