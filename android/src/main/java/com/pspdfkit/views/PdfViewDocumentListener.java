@@ -13,6 +13,7 @@ import com.pspdfkit.document.PdfDocument;
 import com.pspdfkit.listeners.DocumentListener;
 import com.pspdfkit.react.events.PdfViewAnnotationChangedEvent;
 import com.pspdfkit.react.events.PdfViewAnnotationTappedEvent;
+import com.pspdfkit.react.events.PdfViewDocumentSaveFailedEvent;
 import com.pspdfkit.react.events.PdfViewDocumentSavedEvent;
 import com.pspdfkit.ui.special_mode.controller.AnnotationSelectionController;
 import com.pspdfkit.ui.special_mode.manager.AnnotationManager;
@@ -26,6 +27,7 @@ class PdfViewDocumentListener implements DocumentListener, AnnotationManager.OnA
     private final EventDispatcher eventDispatcher;
 
     private boolean disableDefaultActionForTappedAnnotations = false;
+    private boolean disableAutomaticSaving = false;
 
     PdfViewDocumentListener(@NonNull PdfView parent, @NonNull EventDispatcher eventDispatcher) {
         this.parent = parent;
@@ -35,6 +37,10 @@ class PdfViewDocumentListener implements DocumentListener, AnnotationManager.OnA
 
     public void setDisableDefaultActionForTappedAnnotations(boolean disableDefaultActionForTappedAnnotations) {
         this.disableDefaultActionForTappedAnnotations = disableDefaultActionForTappedAnnotations;
+    }
+
+    public void setDisableAutomaticSaving(boolean disableAutomaticSaving) {
+        this.disableAutomaticSaving = disableAutomaticSaving;
     }
 
     @Override
@@ -49,7 +55,7 @@ class PdfViewDocumentListener implements DocumentListener, AnnotationManager.OnA
 
     @Override
     public boolean onDocumentSave(@NonNull PdfDocument pdfDocument, @NonNull DocumentSaveOptions documentSaveOptions) {
-        return true;
+        return !disableAutomaticSaving;
     }
 
     @Override
@@ -59,7 +65,7 @@ class PdfViewDocumentListener implements DocumentListener, AnnotationManager.OnA
 
     @Override
     public void onDocumentSaveFailed(@NonNull PdfDocument pdfDocument, @NonNull Throwable throwable) {
-
+        eventDispatcher.dispatchEvent(new PdfViewDocumentSaveFailedEvent(parent.getId(), throwable.getMessage()));
     }
 
     @Override

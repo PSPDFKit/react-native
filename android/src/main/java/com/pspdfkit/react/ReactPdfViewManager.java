@@ -11,15 +11,28 @@ import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.UIManagerModule;
 import com.facebook.react.uimanager.ViewGroupManager;
 import com.facebook.react.uimanager.annotations.ReactProp;
+import com.pspdfkit.annotations.Annotation;
+import com.pspdfkit.preferences.PSPDFKitPreferences;
 import com.pspdfkit.react.events.PdfViewAnnotationChangedEvent;
 import com.pspdfkit.react.events.PdfViewAnnotationTappedEvent;
+import com.pspdfkit.react.events.PdfViewDataReturnedEvent;
+import com.pspdfkit.react.events.PdfViewDocumentSaveFailedEvent;
 import com.pspdfkit.react.events.PdfViewDocumentSavedEvent;
 import com.pspdfkit.react.events.PdfViewStateChangedEvent;
 import com.pspdfkit.views.PdfView;
 
+import org.json.JSONObject;
+
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Exposes {@link PdfView} to react-native.
@@ -29,6 +42,12 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
     public static final int COMMAND_ENTER_ANNOTATION_CREATION_MODE = 1;
     public static final int COMMAND_EXIT_CURRENTLY_ACTIVE_MODE = 2;
     public static final int COMMAND_SAVE_CURRENT_DOCUMENT = 3;
+    public static final int COMMAND_GET_ANNOTATIONS = 4;
+    public static final int COMMAND_ADD_ANNOTATION = 5;
+    public static final int COMMAND_GET_ALL_UNSAVED_ANNOTATIONS = 6;
+    public static final int COMMAND_ADD_ANNOTATIONS = 7;
+
+    private CompositeDisposable annotationDisposables = new CompositeDisposable();
 
     @Override
     public String getName() {
@@ -64,7 +83,15 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
                 "exitCurrentlyActiveMode",
                 COMMAND_EXIT_CURRENTLY_ACTIVE_MODE,
                 "saveCurrentDocument",
-                COMMAND_SAVE_CURRENT_DOCUMENT);
+                COMMAND_SAVE_CURRENT_DOCUMENT,
+                "getAnnotations",
+                COMMAND_GET_ANNOTATIONS,
+                "addAnnotation",
+                COMMAND_ADD_ANNOTATION,
+                "getAllUnsavedAnnotations",
+                COMMAND_GET_ALL_UNSAVED_ANNOTATIONS,
+                "addAnnotations",
+                COMMAND_ADD_ANNOTATIONS);
     }
 
     @ReactProp(name = "fragmentTag")
@@ -93,17 +120,29 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
         view.setDisableDefaultActionForTappedAnnotations(disableDefaultActionForTappedAnnotations);
     }
 
+    @ReactProp(name = "disableAutomaticSaving")
+    public void setDisableAutomaticSaving(PdfView view, boolean disableAutomaticSaving) {
+        view.setDisableAutomaticSaving(disableAutomaticSaving);
+    }
+
+    @ReactProp(name = "annotationAuthorName")
+    public void setAnnotationAuthorName(PdfView view, String annotationAuthorName) {
+        PSPDFKitPreferences.get(view.getContext()).setAnnotationCreator(annotationAuthorName);
+    }
+
     @Nullable
     @Override
     public Map getExportedCustomDirectEventTypeConstants() {
         return MapBuilder.of(PdfViewStateChangedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onStateChanged"),
                 PdfViewDocumentSavedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onDocumentSaved"),
                 PdfViewAnnotationTappedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onAnnotationTapped"),
-                PdfViewAnnotationChangedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onAnnotationsChanged"));
+                PdfViewAnnotationChangedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onAnnotationsChanged"),
+                PdfViewDataReturnedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onDataReturned"),
+                PdfViewDocumentSaveFailedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onDocumentSaveFailed"));
     }
 
     @Override
-    public void receiveCommand(PdfView root, int commandId, @Nullable ReadableArray args) {
+    public void receiveCommand(final PdfView root, int commandId, @Nullable ReadableArray args) {
         switch (commandId) {
             case COMMAND_ENTER_ANNOTATION_CREATION_MODE:
                 root.enterAnnotationCreationMode();
@@ -114,11 +153,57 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
             case COMMAND_SAVE_CURRENT_DOCUMENT:
                 root.saveCurrentDocument();
                 break;
+            case COMMAND_GET_ANNOTATIONS:
+                if (args != null) {
+                    final int requestId = args.getInt(0);
+                    Disposable annotationDisposable = root.getAnnotations(args.getInt(1), args.getString(2))
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(new Consumer<List<Annotation>>() {
+                                @Override
+                                public void accept(List<Annotation> annotations) {
+                                    root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, annotations));
+                                }
+                            });
+                    annotationDisposables.add(annotationDisposable);
+                }
+                break;
+            case COMMAND_ADD_ANNOTATION:
+                if (args != null) {
+                    root.addAnnotation(args.getMap(0));
+                }
+                break;
+            case COMMAND_GET_ALL_UNSAVED_ANNOTATIONS:
+                if (args != null) {
+                    final int requestId = args.getInt(0);
+                    Disposable annotationDisposable = root.getAllUnsavedAnnotations()
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(new Consumer<JSONObject>() {
+                                @Override
+                                public void accept(JSONObject jsonObject) {
+                                    root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, jsonObject));
+                                }
+                            });
+                    annotationDisposables.add(annotationDisposable);
+                }
+                break;
+            case COMMAND_ADD_ANNOTATIONS:
+                if (args != null) {
+                    root.addAnnotations(args.getMap(0));
+                }
+                break;
         }
     }
 
     @Override
     public boolean needsCustomLayoutForChildren() {
         return true;
+    }
+
+    @Override
+    public void onCatalystInstanceDestroy() {
+        super.onCatalystInstanceDestroy();
+        annotationDisposables.dispose();
     }
 }

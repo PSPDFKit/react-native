@@ -11,13 +11,21 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.FrameLayout;
 
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.uimanager.events.EventDispatcher;
+import com.pspdfkit.annotations.Annotation;
+import com.pspdfkit.annotations.AnnotationType;
 import com.pspdfkit.configuration.activity.PdfActivityConfiguration;
 import com.pspdfkit.configuration.activity.ThumbnailBarMode;
 import com.pspdfkit.document.PdfDocument;
+import com.pspdfkit.document.formatters.DocumentJsonFormatter;
+import com.pspdfkit.document.providers.DataProvider;
 import com.pspdfkit.listeners.SimpleDocumentListener;
 import com.pspdfkit.react.R;
+import com.pspdfkit.react.events.PdfViewDocumentSaveFailedEvent;
+import com.pspdfkit.react.events.PdfViewDocumentSavedEvent;
 import com.pspdfkit.react.events.PdfViewStateChangedEvent;
+import com.pspdfkit.react.helper.DocumentJsonDataProvider;
 import com.pspdfkit.ui.PdfFragment;
 import com.pspdfkit.ui.PdfThumbnailBar;
 import com.pspdfkit.ui.forms.FormEditingBar;
@@ -25,8 +33,18 @@ import com.pspdfkit.ui.inspector.PropertyInspectorCoordinatorLayout;
 import com.pspdfkit.ui.thumbnail.PdfThumbnailBarController;
 import com.pspdfkit.ui.toolbar.ToolbarCoordinatorLayout;
 
+import org.json.JSONObject;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.concurrent.Callable;
+
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
@@ -155,6 +173,10 @@ public class PdfView extends FrameLayout {
 
     public void setDisableDefaultActionForTappedAnnotations(boolean disableDefaultActionForTappedAnnotations) {
         pdfViewDocumentListener.setDisableDefaultActionForTappedAnnotations(disableDefaultActionForTappedAnnotations);
+    }
+
+    public void setDisableAutomaticSaving(boolean disableAutomaticSaving) {
+        pdfViewDocumentListener.setDisableAutomaticSaving(disableAutomaticSaving);
     }
 
     private void setupFragment() {
@@ -295,6 +317,10 @@ public class PdfView extends FrameLayout {
         }
     }
 
+    public EventDispatcher getEventDispatcher() {
+        return eventDispatcher;
+    }
+
     public void enterAnnotationCreationMode() {
         if (fragment != null) {
             fragment.enterAnnotationCreationMode();
@@ -309,7 +335,91 @@ public class PdfView extends FrameLayout {
 
     public void saveCurrentDocument() {
         if (fragment != null) {
-            fragment.save();
+            try {
+                if (document.saveIfModified()) {
+                    // Since the document listeners won't be called when manually saving we also dispatch this event here.
+                    eventDispatcher.dispatchEvent(new PdfViewDocumentSavedEvent(getId()));
+                }
+            } catch (Exception e) {
+                eventDispatcher.dispatchEvent(new PdfViewDocumentSaveFailedEvent(getId(), e.getMessage()));
+            }
         }
+	}
+	
+    public Single<List<Annotation>> getAnnotations(int pageIndex, @Nullable String type) {
+        return fragment.getDocument().getAnnotationProvider().getAllAnnotationsOfType(getTypeFromString(type), pageIndex, 1)
+                .toList();
+    }
+
+    private EnumSet<AnnotationType> getTypeFromString(@Nullable String type) {
+        if (type == null) {
+            return EnumSet.allOf(AnnotationType.class);
+        }
+        if ("pspdfkit/ink".equalsIgnoreCase(type)) {
+            return EnumSet.of(AnnotationType.INK);
+        }
+        if ("pspdfkit/link".equalsIgnoreCase(type)) {
+            return EnumSet.of(AnnotationType.LINK);
+        }
+        if ("pspdfkit/markup/highlight".equalsIgnoreCase(type)) {
+            return EnumSet.of(AnnotationType.HIGHLIGHT);
+        }
+        if ("pspdfkit/markup/squiggly".equalsIgnoreCase(type)) {
+            return EnumSet.of(AnnotationType.SQUIGGLY);
+        }
+        if ("pspdfkit/markup/strikeout".equalsIgnoreCase(type)) {
+            return EnumSet.of(AnnotationType.STRIKEOUT);
+        }
+        if ("pspdfkit/markup/underline".equalsIgnoreCase(type)) {
+            return EnumSet.of(AnnotationType.UNDERLINE);
+        }
+        if ("pspdfkit/note".equalsIgnoreCase(type)) {
+            return EnumSet.of(AnnotationType.NOTE);
+        }
+        if ("pspdfkit/shape/ellipse".equalsIgnoreCase(type)) {
+            return EnumSet.of(AnnotationType.CIRCLE);
+        }
+        if ("pspdfkit/shape/line".equalsIgnoreCase(type)) {
+            return EnumSet.of(AnnotationType.LINE);
+        }
+        if ("pspdfkit/shape/polygon".equalsIgnoreCase(type)) {
+            return EnumSet.of(AnnotationType.POLYGON);
+        }
+        if ("pspdfkit/shape/polyline".equalsIgnoreCase(type)) {
+            return EnumSet.of(AnnotationType.POLYLINE);
+        }
+        if ("pspdfkit/shape/rectangle".equalsIgnoreCase(type)) {
+            return EnumSet.of(AnnotationType.SQUARE);
+        }
+        if ("pspdfkit/text".equalsIgnoreCase(type)) {
+            return EnumSet.of(AnnotationType.FREETEXT);
+        }
+        return EnumSet.noneOf(AnnotationType.class);
+    }
+
+    public void addAnnotation(ReadableMap annotation) {
+        JSONObject json = new JSONObject(annotation.toHashMap());
+        fragment.getDocument().getAnnotationProvider().createAnnotationFromInstantJson(json.toString());
+    }
+
+    public Single<JSONObject> getAllUnsavedAnnotations() {
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        return DocumentJsonFormatter.exportDocumentJsonAsync(document, outputStream)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .toSingle(new Callable<JSONObject>() {
+                    @Override
+                    public JSONObject call() throws Exception {
+                        final String jsonString = outputStream.toString();
+                        return new JSONObject(jsonString);
+                    }
+                });
+    }
+
+    public void addAnnotations(ReadableMap annotation) {
+        JSONObject json = new JSONObject(annotation.toHashMap());
+        final DataProvider dataProvider = new DocumentJsonDataProvider(json);
+        DocumentJsonFormatter.importDocumentJson(fragment.getDocument(), dataProvider);
+
     }
 }
