@@ -104,6 +104,14 @@ var examples = [
     }
   },
   {
+    name: "PDF View Component Listeners",
+    description:
+      "Show how to use the listeners exposed by PSPDFKitView component.",
+    action: component => {
+      component.props.navigation.navigate("PdfViewListenersScreen");
+    }
+  },
+  {
     name: "Split PDF",
     description: "Show two PDFs side by side by using PSPDFKitView components.",
     action: component => {
@@ -382,6 +390,84 @@ class PdfViewSplitScreen extends Component<{}> {
   };
 }
 
+class PdfViewListenersScreen extends Component<{}> {
+  static navigationOptions = ({ navigation }) => {
+    const params = navigation.state.params || {};
+
+    return {
+      title: "Listeners",
+      headerRight: (
+        <Button onPress={() => params.handleAnnotationButtonPress()} title="Annotations" />
+      )
+    };
+  };
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      annotationCreationActive: false,
+      annotationEditingActive: false
+    };
+  }
+
+  componentWillMount() {
+    this.props.navigation.setParams({
+      handleAnnotationButtonPress: () => {
+        if (
+          this.state.annotationCreationActive ||
+          this.state.annotationEditingActive
+        ) {
+          this.refs.pdfView.exitCurrentlyActiveMode();
+        } else {
+          this.refs.pdfView.enterAnnotationCreationMode();
+        }
+      }
+    });
+  }
+
+  render() {
+    let buttonTitle = "";
+    if (this.state.annotationCreationActive) {
+      buttonTitle = "Exit Annotation Creation Mode";
+    } else if (this.state.annotationEditingActive) {
+      buttonTitle = "Exit Annotation Editing Mode";
+    } else {
+      buttonTitle = "Enter Annotation Creation Mode";
+    }
+
+    return (
+      <View style={{ flex: 1 }}>
+        <PSPDFKitView
+          ref="pdfView"
+          // If you want saving to work point this to a file on the sdcard.
+          document="file:///android_asset/Annual Report.pdf"
+          configuration={{}}
+          fragmentTag="PDF1"
+          onStateChanged={event => {
+            this.setState({
+              annotationCreationActive: event.annotationCreationActive,
+              annotationEditingActive: event.annotationEditingActive
+            });
+          }}
+          onDocumentSaved={e => {
+            alert("Document was saved!")
+          }}
+          onDocumentSaveFailed={e => {
+            alert("Document couldn't be saved: " + e.error)
+          }}
+          onAnnotationTapped={e => {
+            alert("Annotation was tapped\n" + JSON.stringify(e))
+          }}
+          onAnnotationsChanged={e => {
+            alert("Annotations changed\n" + JSON.stringify(e))
+          }}
+          style={{ flex: 1, color: pspdfkitColor }}
+        />
+      </View>
+    )
+  }
+}
+
 export default StackNavigator(
   {
     Catalog: {
@@ -392,6 +478,9 @@ export default StackNavigator(
     },
     PdfViewSplitScreen: {
       screen: PdfViewSplitScreen
+    },
+    PdfViewListenersScreen: {
+      screen: PdfViewListenersScreen
     }
   },
   {
