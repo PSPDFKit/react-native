@@ -24,6 +24,11 @@ RCT_CUSTOM_VIEW_PROPERTY(document, pdfController.document, RCTPSPDFKitView) {
   if (json) {
     view.pdfController.document = [RCTConvert PSPDFDocument:json];
     view.pdfController.document.delegate = (id<PSPDFDocumentDelegate>)view;
+
+    // The author name may be set before the document exists. We set it again here when the document exists.
+    if (view.annotationAuthorName) {
+      view.pdfController.document.defaultAnnotationUsername = view.annotationAuthorName;
+    }
   }
 }
 
@@ -34,6 +39,13 @@ RCT_CUSTOM_VIEW_PROPERTY(configuration, PSPDFConfiguration, RCTPSPDFKitView) {
     [view.pdfController updateConfigurationWithBuilder:^(PSPDFConfigurationBuilder *builder) {
       [builder setupFromJSON:json];
     }];
+  }
+}
+
+RCT_CUSTOM_VIEW_PROPERTY(annotationAuthorName, pdfController.document.defaultAnnotationUsername, RCTPSPDFKitView) {
+  if (json) {
+    view.pdfController.document.defaultAnnotationUsername = json;
+    view.annotationAuthorName = json;
   }
 }
 
