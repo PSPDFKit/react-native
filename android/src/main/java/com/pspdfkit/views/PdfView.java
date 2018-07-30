@@ -22,6 +22,7 @@ import com.pspdfkit.document.formatters.DocumentJsonFormatter;
 import com.pspdfkit.document.providers.DataProvider;
 import com.pspdfkit.listeners.SimpleDocumentListener;
 import com.pspdfkit.react.R;
+import com.pspdfkit.react.events.PdfViewDocumentSaveFailedEvent;
 import com.pspdfkit.react.events.PdfViewDocumentSavedEvent;
 import com.pspdfkit.react.events.PdfViewStateChangedEvent;
 import com.pspdfkit.react.helper.DocumentJsonDataProvider;
@@ -339,8 +340,8 @@ public class PdfView extends FrameLayout {
                     // Since the document listeners won't be called when manually saving we also dispatch this event here.
                     eventDispatcher.dispatchEvent(new PdfViewDocumentSavedEvent(getId()));
                 }
-            } catch (IOException e) {
-                // We have no easy way to notify react about this so just swallow it for now.
+            } catch (Exception e) {
+                eventDispatcher.dispatchEvent(new PdfViewDocumentSaveFailedEvent(getId(), e.getMessage()));
             }
         }
 	}

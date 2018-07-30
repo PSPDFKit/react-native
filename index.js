@@ -56,7 +56,7 @@ class PSPDFKitView extends React.Component {
             this.props.onDocumentSaved(event.nativeEvent);
         }
     };
-    
+
     _onDocumentSaveFailed = (event) => {
         if (this.props.onDocumentSaveFailed) {
             this.props.onDocumentSaveFailed(event.nativeEvent);
@@ -272,8 +272,6 @@ PSPDFKitView.propTypes = {
      * {
      *    error: "Error message",
      * }
-     *
-     * @platform ios
      */
     onDocumentSaveFailed: PropTypes.func,
     /**
@@ -293,7 +291,7 @@ PSPDFKitView.propTypes = {
      *    annotations: [instantJson]
      * }
      */
-    onAnnotationsChanged: PropTypes.func,    
+    onAnnotationsChanged: PropTypes.func,
     /**
      * Callback that is called when the state of the PSPDFKitView changes.
      * Returns an object with the following structure:
