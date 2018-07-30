@@ -152,6 +152,11 @@
 }
 
 - (void)addAnnotation:(NSString *)jsonAnnotation {
+  if (jsonAnnotation.length == 0) {
+    NSLog(@"Invalid JSON Annotation.");
+    return;
+  }
+
   NSData *data = [jsonAnnotation dataUsingEncoding:NSUTF8StringEncoding];
   PSPDFDocument *document = self.pdfController.document;
   PSPDFDocumentProvider *documentProvider = document.documentProviders.firstObject;
@@ -176,6 +181,11 @@
 }
 
 - (void)addAnnotations:(NSString *)jsonAnnotations {
+  if (jsonAnnotations.length == 0) {
+    NSLog(@"Invalid JSON Annotations.");
+    return;
+  }
+  
   NSData *data = [jsonAnnotations dataUsingEncoding:NSUTF8StringEncoding];
   PSPDFDataContainerProvider *dataContainerProvider = [[PSPDFDataContainerProvider alloc] initWithData:data];
   PSPDFDocument *document = self.pdfController.document;
