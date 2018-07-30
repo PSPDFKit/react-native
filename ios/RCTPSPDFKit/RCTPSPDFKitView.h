@@ -19,9 +19,14 @@
 @property (nonatomic) BOOL hideNavigationBar;
 @property (nonatomic, readonly) UIBarButtonItem *closeButton;
 @property (nonatomic) BOOL disableDefaultActionForTappedAnnotations;
+@property (nonatomic) BOOL disableAutomaticSaving;
 @property (nonatomic, copy) RCTBubblingEventBlock onCloseButtonPressed;
 @property (nonatomic, copy) RCTBubblingEventBlock onDocumentSaved;
+@property (nonatomic, copy) RCTBubblingEventBlock onDocumentSaveFailed;
 @property (nonatomic, copy) RCTBubblingEventBlock onAnnotationTapped;
 @property (nonatomic, copy) RCTBubblingEventBlock onAnnotationsChanged;
+@property (nonatomic, copy) RCTBubblingEventBlock onStateChanged;
+
+- (void)saveCurrentDocument;
 
 @end

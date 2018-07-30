@@ -103,11 +103,21 @@
   return nil;
 }
 
+- (void)saveCurrentDocument {
+  [self.pdfController.document saveWithOptions:nil error:NULL];
+}
+
 #pragma mark - PSPDFDocumentDelegate
 
 - (void)pdfDocumentDidSave:(nonnull PSPDFDocument *)document {
   if (self.onDocumentSaved) {
     self.onDocumentSaved(@{});
+  }
+}
+
+- (void)pdfDocument:(PSPDFDocument *)document saveDidFailWithError:(NSError *)error {
+  if (self.onDocumentSaveFailed) {
+    self.onDocumentSaveFailed(@{@"error": error.description});
   }
 }
 
@@ -122,6 +132,17 @@
   return self.disableDefaultActionForTappedAnnotations;
 }
 
+- (BOOL)pdfViewController:(PSPDFViewController *)pdfController shouldSaveDocument:(nonnull PSPDFDocument *)document withOptions:(NSDictionary<PSPDFDocumentSaveOption,id> *__autoreleasing  _Nonnull * _Nonnull)options {
+  return !self.disableAutomaticSaving;
+}
+
+- (void)pdfViewController:(PSPDFViewController *)pdfController willBeginDisplayingPageView:(PSPDFPageView *)pageView forPageAtIndex:(NSInteger)pageIndex {
+  if (self.onStateChanged) {
+    self.onStateChanged(@{@"currentPageIndex" : @(pageIndex), @"pageCount" : @(pdfController.document.pageCount)});
+  }
+}
+
+#pragma mark - Notifications
 
 - (void)annotationChangedNotification:(NSNotification *)notification {
   id object = notification.object;
