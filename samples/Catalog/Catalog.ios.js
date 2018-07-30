@@ -96,6 +96,17 @@ var examples = [
     },
   },
   {
+    name: 'Event Listeners',
+    description:
+      'Shows alerts when an annotation is tapped or changes and when the document is saved.',
+    action: component => {
+      const nextRoute = {
+        component: EventListeners
+      }
+      component.props.navigator.push(nextRoute)
+    },
+  },
+  {
     name: 'Change Pages Buttons',
     description:
       'Adds a toolbar at the bottom with buttons to the change pages.',
@@ -267,7 +278,48 @@ class SplitPDF extends Component {
   }
 }
 
- class ChangePages extends Component {
+ class EventListeners extends Component {
+   render() {
+       return (
+         <View style={{ flex: 1 }}>
+           <PSPDFKitView
+             document={'PDFs/Annual Report.pdf'}
+             configuration={{
+               backgroundColor: processColor('lightgrey'),
+               thumbnailBarMode: 'scrollable',
+             }}
+             showCloseButton={true}
+             style={{ flex: 1, color: pspdfkitColor }}
+             
+             // Event Listeners
+             onAnnotationsChanged={event => {
+                 if (event['error']) {
+                     alert(event['error']);
+                 } else {
+                     alert('Annotations ' +event['change'] + ': ' + JSON.stringify(event['annotations']));
+                 }
+             }}
+             onAnnotationTapped={event => {
+                 if (event['error']) {
+                     alert(event['error']);
+                 } else {
+                     alert('tapped on Annotation: ' + JSON.stringify(event))                 
+                 }
+             }}
+             onDocumentSaved={event => {
+                 if (event['error']) {
+                     alert(event['error']);
+                 } else {
+                     alert('Document Saved!')                 
+                 }
+             }}
+           />
+         </View>
+       )
+   }
+}
+
+class ChangePages extends Component {
    constructor(props) {
      super(props)
      this.state = {
