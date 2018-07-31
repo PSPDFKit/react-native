@@ -1,5 +1,5 @@
 //
-//  Copyright © 2016-2018 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2018 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -11,7 +11,7 @@
 
 @implementation RCTConvert (PSPDFAnnotation)
 
-+ (NSArray <NSDictionary *> *)instantJSONAnnotationsFromPSPDFAnnotationArray:(NSArray <PSPDFAnnotation *> *) annotations {
++ (NSArray <NSDictionary *> *)instantJSONFromAnnotations:(NSArray <PSPDFAnnotation *> *) annotations {
   NSMutableArray <NSDictionary *> *annotationsJSON = [NSMutableArray new];
   for (PSPDFAnnotation *annotation in annotations) {
     NSData *annotationData = [annotation generateInstantJSONWithError:NULL];
@@ -29,7 +29,7 @@
   return [annotationsJSON copy];
 }
 
-+ (PSPDFAnnotationType)instantJSONAnnotationType:(NSString *)type {
++ (PSPDFAnnotationType)annotationTypeFromInstantJSONType:(NSString *)type {
   if (!type) {
     return PSPDFAnnotationTypeAll;
   } else if ([type isEqualToString:@"pspdfkit/ink"]) {

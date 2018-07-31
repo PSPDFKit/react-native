@@ -29,9 +29,9 @@
 @property (nonatomic, copy) RCTBubblingEventBlock onStateChanged;
 
 - (void)saveCurrentDocument;
-- (NSDictionary *)getAnnotations:(PSPDFPageIndex)pageIndex type:(PSPDFAnnotationType)type;
+- (NSDictionary<NSString *, NSArray<NSDictionary *> *> *)getAnnotations:(PSPDFPageIndex)pageIndex type:(PSPDFAnnotationType)type;
 - (void)addAnnotation:(NSString *)jsonAnnotation;
-- (NSDictionary *)getAllUnsavedAnnotations;
+- (NSDictionary<NSString *, NSArray<NSDictionary *> *> *)getAllUnsavedAnnotations;
 - (void)addAnnotations:(NSString *)jsonAnnotations;
 
 @end

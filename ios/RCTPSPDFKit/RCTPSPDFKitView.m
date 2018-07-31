@@ -145,9 +145,9 @@
 
 #pragma mark - Instant JSON
 
-- (NSDictionary *)getAnnotations:(PSPDFPageIndex)pageIndex type:(PSPDFAnnotationType)type {
-  NSArray <PSPDFAnnotation *>* annotations = [self.pdfController.document annotationsForPageAtIndex:pageIndex type:type];
-  NSArray <NSDictionary *> *annotationsJSON = [RCTConvert instantJSONAnnotationsFromPSPDFAnnotationArray:annotations];
+- (NSDictionary<NSString *, NSArray<NSDictionary *> *> *)getAnnotations:(PSPDFPageIndex)pageIndex type:(PSPDFAnnotationType)type {
+  NSArray <PSPDFAnnotation *> *annotations = [self.pdfController.document annotationsForPageAtIndex:pageIndex type:type];
+  NSArray <NSDictionary *> *annotationsJSON = [RCTConvert instantJSONFromAnnotations:annotations];
   return @{@"annotations" : annotationsJSON};
 }
 
@@ -172,8 +172,7 @@
   }
 }
 
-- (NSDictionary *)getAllUnsavedAnnotations {
-  [self.pdfController.document saveWithOptions:nil error:NULL];
+- (NSDictionary<NSString *, NSArray<NSDictionary *> *> *)getAllUnsavedAnnotations {
   PSPDFDocumentProvider *documentProvider = self.pdfController.document.documentProviders.firstObject;
   NSData *data = [self.pdfController.document generateInstantJSONFromDocumentProvider:documentProvider error:NULL];
   NSDictionary *annotationsJSON = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:NULL];
@@ -225,7 +224,7 @@
     change = @"removed";
   }
 
-  NSArray <NSDictionary *> *annotationsJSON = [RCTConvert instantJSONAnnotationsFromPSPDFAnnotationArray:annotations];
+  NSArray <NSDictionary *> *annotationsJSON = [RCTConvert instantJSONFromAnnotations:annotations];
   if (self.onAnnotationsChanged) {
     self.onAnnotationsChanged(@{@"change" : change, @"annotations" : annotationsJSON});
   }

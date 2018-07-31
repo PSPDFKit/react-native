@@ -1,5 +1,5 @@
 //
-//  Copyright © 2016-2018 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2018 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -13,7 +13,7 @@
 
 @interface RCTConvert (PSPDFAnnotation)
 
-+ (NSArray <NSDictionary *> *)instantJSONAnnotationsFromPSPDFAnnotationArray:(NSArray <PSPDFAnnotation *> *) annotations;
-+ (PSPDFAnnotationType)instantJSONAnnotationType:(NSString *)type;
++ (NSArray <NSDictionary *> *)instantJSONFromAnnotations:(NSArray <PSPDFAnnotation *> *) annotations;
++ (PSPDFAnnotationType)annotationTypeFromInstantJSONType:(NSString *)type;
 
 @end
