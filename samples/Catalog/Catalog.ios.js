@@ -127,7 +127,7 @@ var examples = [
   {
     name: 'Programmatic Annotations',
     description:
-      'Adds a toolbar at the bottom with a buttons that add annotations programmatically.',
+      'Shows how to get and add new annotations using Instant JSON.',
     action: component => {
       const nextRoute = {
         component: ProgrammaticAnnotations
