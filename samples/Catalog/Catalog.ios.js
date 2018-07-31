@@ -98,7 +98,7 @@ var examples = [
   {
     name: 'Event Listeners',
     description:
-      'Shows alerts when an annotation is tapped or changes and when the document is saved.',
+      'Shows alerts when an annotation is tapped or changed and when the document is saved.',
     action: component => {
       const nextRoute = {
         component: EventListeners
