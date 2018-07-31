@@ -17,7 +17,7 @@
 @import PSPDFKit;
 @import PSPDFKitUI;
 
-// Custom annotation toolbar subclass that adds a "Clear" button that removes all visible annotations OR the current drawing view state.
+// Custom annotation toolbar subclass that adds a "Clear" button that removes all visible annotations.
 @interface CustomButtonAnnotationToolbar : PSPDFAnnotationToolbar
 @property (nonatomic) PSPDFToolbarButton *clearAnnotationsButton;
 @end
@@ -174,7 +174,7 @@ RCT_EXPORT_METHOD(addAnnotations:(NSString *)jsonAnnotations reactTag:(nonnull N
 #pragma mark - Clear Button Action
 
 - (void)clearButtonPressed:(id)sender {
-  // Iterate over all visible pages and remove all but links.
+  // Iterate over all visible pages and remove all but links and widgets (forms).
   PSPDFViewController *pdfController = self.annotationStateManager.pdfController;
   PSPDFDocument *document = pdfController.document;
   for (PSPDFPageView *pageView in pdfController.visiblePageViews) {
