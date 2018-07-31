@@ -98,7 +98,7 @@ var examples = [
   {
     name: 'Event Listeners',
     description:
-      'Shows alerts when an annotation is tapped or changed and when the document is saved.',
+      'Show how to use the listeners exposed by PSPDFKitView component.',
     action: component => {
       const nextRoute = {
         component: EventListeners
@@ -303,7 +303,7 @@ class SplitPDF extends Component {
                  if (event['error']) {
                      alert(event['error']);
                  } else {
-                     alert('tapped on Annotation: ' + JSON.stringify(event))                 
+                     alert('Tapped on Annotation: ' + JSON.stringify(event))                 
                  }
              }}
              onDocumentSaved={event => {
