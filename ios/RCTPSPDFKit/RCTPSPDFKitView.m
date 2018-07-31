@@ -9,6 +9,7 @@
 
 #import "RCTPSPDFKitView.h"
 #import <React/RCTUtils.h>
+#import "RCTConvert+PSPDFAnnotation.h"
 
 @interface RCTPSPDFKitView ()<PSPDFDocumentDelegate, PSPDFViewControllerDelegate>
 
@@ -142,6 +143,61 @@
   }
 }
 
+#pragma mark - Instant JSON
+
+- (NSDictionary<NSString *, NSArray<NSDictionary *> *> *)getAnnotations:(PSPDFPageIndex)pageIndex type:(PSPDFAnnotationType)type {
+  NSArray <PSPDFAnnotation *> *annotations = [self.pdfController.document annotationsForPageAtIndex:pageIndex type:type];
+  NSArray <NSDictionary *> *annotationsJSON = [RCTConvert instantJSONFromAnnotations:annotations];
+  return @{@"annotations" : annotationsJSON};
+}
+
+- (void)addAnnotation:(NSString *)jsonAnnotation {
+  if (jsonAnnotation.length == 0) {
+    NSLog(@"Invalid JSON Annotation.");
+    return;
+  }
+
+  NSData *data = [jsonAnnotation dataUsingEncoding:NSUTF8StringEncoding];
+  PSPDFDocument *document = self.pdfController.document;
+  PSPDFDocumentProvider *documentProvider = document.documentProviders.firstObject;
+
+  BOOL success = NO;
+  if (data) {
+    PSPDFAnnotation *annotation = [PSPDFAnnotation annotationFromInstantJSON:data documentProvider:documentProvider error:NULL];
+    success = [document addAnnotations:@[annotation] options:nil];
+  }
+
+  if (!success){
+    NSLog(@"Failed to add annotation.");
+  }
+}
+
+- (NSDictionary<NSString *, NSArray<NSDictionary *> *> *)getAllUnsavedAnnotations {
+  PSPDFDocumentProvider *documentProvider = self.pdfController.document.documentProviders.firstObject;
+  NSData *data = [self.pdfController.document generateInstantJSONFromDocumentProvider:documentProvider error:NULL];
+  NSDictionary *annotationsJSON = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:NULL];
+  return annotationsJSON;
+}
+
+- (void)addAnnotations:(NSString *)jsonAnnotations {
+  if (jsonAnnotations.length == 0) {
+    NSLog(@"Invalid JSON Annotations.");
+    return;
+  }
+  
+  NSData *data = [jsonAnnotations dataUsingEncoding:NSUTF8StringEncoding];
+  PSPDFDataContainerProvider *dataContainerProvider = [[PSPDFDataContainerProvider alloc] initWithData:data];
+  PSPDFDocument *document = self.pdfController.document;
+  PSPDFDocumentProvider *documentProvider = document.documentProviders.firstObject;
+
+  BOOL success = [document applyInstantJSONFromDataProvider:dataContainerProvider toDocumentProvider:documentProvider error:NULL];
+  if (success){
+    [self.pdfController reloadData];
+  } else {
+    NSLog(@"Failed to add annotations.");
+  }
+}
+
 #pragma mark - Notifications
 
 - (void)annotationChangedNotification:(NSNotification *)notification {
@@ -158,20 +214,6 @@
     return;
   }
 
-  NSMutableArray <NSDictionary *> *annotationsJSON = [NSMutableArray new];
-  for (PSPDFAnnotation *annotation in annotations) {
-    NSData *annotationData = [annotation generateInstantJSONWithError:NULL];
-    if (annotationData) {
-      NSDictionary *annotationDictionary = [NSJSONSerialization JSONObjectWithData:annotationData options:kNilOptions error:NULL];
-      if (annotationDictionary) {
-        [annotationsJSON addObject:annotationDictionary];
-      }
-    } else if (annotation.name) {
-      // We only generate Instant JSON data for attached annotations. When an annotation is deleted, we only send the annotation name.
-      [annotationsJSON addObject:@{@"name" : annotation.name}];
-    }
-  }
-
   NSString *name = notification.name;
   NSString *change;
   if ([name isEqualToString:PSPDFAnnotationChangedNotification]) {
@@ -182,6 +224,7 @@
     change = @"removed";
   }
 
+  NSArray <NSDictionary *> *annotationsJSON = [RCTConvert instantJSONFromAnnotations:annotations];
   if (self.onAnnotationsChanged) {
     self.onAnnotationsChanged(@{@"change" : change, @"annotations" : annotationsJSON});
   }
