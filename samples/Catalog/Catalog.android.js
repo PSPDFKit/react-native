@@ -104,7 +104,7 @@ var examples = [
     }
   },
   {
-    name: "PDF View Component Listeners",
+    name: "Event Listeners",
     description:
       "Show how to use the listeners exposed by PSPDFKitView component.",
     action: component => {
@@ -112,9 +112,9 @@ var examples = [
     }
   },
   {
-    name: "PDF View Instant JSON",
+    name: "Programmatic Annotations",
     description:
-      "Shows how to get and add new annotations using instant json.",
+      "Shows how to get and add new annotations using Instant JSON.",
     action: component => {
       component.props.navigation.navigate("PdfViewInstantJsonScreen");
     }
@@ -403,7 +403,7 @@ class PdfViewListenersScreen extends Component<{}> {
     const params = navigation.state.params || {};
 
     return {
-      title: "Listeners",
+      title: "Event Listeners",
       headerRight: (
         <Button onPress={() => params.handleAnnotationButtonPress()} title="Annotations" />
       )
@@ -481,7 +481,7 @@ class PdfViewInstantJsonScreen extends Component<{}> {
     const params = navigation.state.params || {};
 
     return {
-      title: "Instant JSON",
+      title: "Programmatic Annotations",
       headerRight: (
         <Button onPress={() => params.handleAnnotationButtonPress()} title="Annotations" />
       )
