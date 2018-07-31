@@ -1,7 +1,11 @@
 package com.pspdfkit.views;
 
+import android.graphics.Color;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
+import android.widget.Toast;
 
+import com.pspdfkit.react.R;
 import com.pspdfkit.ui.forms.FormEditingBar;
 import com.pspdfkit.ui.inspector.PropertyInspectorCoordinatorLayout;
 import com.pspdfkit.ui.inspector.annotation.DefaultAnnotationCreationInspectorController;
@@ -16,8 +20,13 @@ import com.pspdfkit.ui.special_mode.manager.FormManager;
 import com.pspdfkit.ui.special_mode.manager.TextSelectionManager;
 import com.pspdfkit.ui.toolbar.AnnotationCreationToolbar;
 import com.pspdfkit.ui.toolbar.AnnotationEditingToolbar;
+import com.pspdfkit.ui.toolbar.ContextualToolbar;
+import com.pspdfkit.ui.toolbar.ContextualToolbarMenuItem;
 import com.pspdfkit.ui.toolbar.TextSelectionToolbar;
 import com.pspdfkit.ui.toolbar.ToolbarCoordinatorLayout;
+import com.pspdfkit.views.toolbar.CustomGrouping;
+
+import java.util.List;
 
 /**
  * Keeps track of the currently active mode and handles updating the toolbar states.
@@ -74,6 +83,43 @@ class PdfViewModeController implements AnnotationManager.OnAnnotationCreationMod
         toolbarCoordinatorLayout.displayContextualToolbar(annotationCreationToolbar, true);
         parent.manuallyLayoutChildren();
         parent.updateState();
+
+        setupCustomToolbarItems();
+    }
+
+    private void setupCustomToolbarItems() {
+        annotationCreationToolbar.setMenuItemGroupingRule(new CustomGrouping(parent.getContext()));
+
+        // Get the existing menu items so we can add our item later.
+        final List<ContextualToolbarMenuItem> menuItems = annotationCreationToolbar.getMenuItems();
+
+        // Create our custom menu item.
+        final ContextualToolbarMenuItem customItem = ContextualToolbarMenuItem.createSingleItem(
+                parent.getContext(),
+                R.id.pspdf_menu_custom,
+                ContextCompat.getDrawable(parent.getContext(), R.drawable.ic_bookmark),
+                "Bookmark",
+                Color.WHITE,
+                Color.WHITE,
+                ContextualToolbarMenuItem.Position.START,
+                false
+        );
+
+        // Tell the toolbar about our new item.
+        menuItems.add(customItem);
+        annotationCreationToolbar.setMenuItems(menuItems);
+
+        // Add a listener so we can handle clicking on our item.
+        annotationCreationToolbar.setOnMenuItemClickListener(new ContextualToolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onToolbarMenuItemClick(@NonNull ContextualToolbar toolbar, @NonNull ContextualToolbarMenuItem menuItem) {
+                if (menuItem.getId() == R.id.pspdf_menu_custom) {
+                    Toast.makeText(parent.getContext(), "Custom Action clicked", Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
     @Override
