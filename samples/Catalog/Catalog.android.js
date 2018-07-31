@@ -112,6 +112,14 @@ var examples = [
     }
   },
   {
+    name: "PDF View Instant JSON",
+    description:
+      "Shows how to get and add new annotations using instant json.",
+    action: component => {
+      component.props.navigation.navigate("PdfViewInstantJsonScreen");
+    }
+  },
+  {
     name: "Split PDF",
     description: "Show two PDFs side by side by using PSPDFKitView components.",
     action: component => {
@@ -468,6 +476,129 @@ class PdfViewListenersScreen extends Component<{}> {
   }
 }
 
+class PdfViewInstantJsonScreen extends Component<{}> {
+  static navigationOptions = ({ navigation }) => {
+    const params = navigation.state.params || {};
+
+    return {
+      title: "Instant JSON",
+      headerRight: (
+        <Button onPress={() => params.handleAnnotationButtonPress()} title="Annotations" />
+      )
+    };
+  };
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      annotationCreationActive: false,
+      annotationEditingActive: false
+    };
+  }
+
+  componentWillMount() {
+    this.props.navigation.setParams({
+      handleAnnotationButtonPress: () => {
+        if (
+          this.state.annotationCreationActive ||
+          this.state.annotationEditingActive
+        ) {
+          this.refs.pdfView.exitCurrentlyActiveMode();
+        } else {
+          this.refs.pdfView.enterAnnotationCreationMode();
+        }
+      }
+    });
+  }
+
+  render() {
+    let buttonTitle = "";
+    if (this.state.annotationCreationActive) {
+      buttonTitle = "Exit Annotation Creation Mode";
+    } else if (this.state.annotationEditingActive) {
+      buttonTitle = "Exit Annotation Editing Mode";
+    } else {
+      buttonTitle = "Enter Annotation Creation Mode";
+    }
+
+    return (
+      <View style={{ flex: 1 }}>
+        <PSPDFKitView
+          ref="pdfView"
+          document="file:///android_asset/Annual Report.pdf"
+          configuration={{}}
+          fragmentTag="PDF1"
+          onStateChanged={event => {
+            this.setState({
+              annotationCreationActive: event.annotationCreationActive,
+              annotationEditingActive: event.annotationEditingActive
+            });
+          }}
+          style={{ flex: 1, color: pspdfkitColor }}
+        />
+        <View style={{ flexDirection: 'row', height: 40, alignItems: 'center', padding: 10 }}>
+          <View>
+            <Button onPress={() => {
+              // This gets all annotations on the first page.
+              this.refs.pdfView.getAnnotations(0, null)
+                .then(annotations => {
+                  alert(JSON.stringify(annotations))
+                })
+            }} title="Get annotations" />
+          </View>
+          <View style={{ marginLeft: 10 }}>
+            <Button onPress={() => {
+              // This adds a new ink annotation to the first page.
+              this.refs.pdfView.addAnnotation({
+                "bbox": [
+                  89.58633422851562,
+                  98.5791015625,
+                  143.12948608398438,
+                  207.1583251953125
+                ],
+                "blendMode": "normal",
+                "createdAt": "2018-07-03T13:53:03Z",
+                "isDrawnNaturally": false,
+                "lineWidth": 5,
+                "lines": {
+                  "intensities": [[0.5, 0.5, 0.5], [0.5, 0.5, 0.5]],
+                  "points": [
+                    [
+                      [92.08633422851562, 101.07916259765625],
+                      [92.08633422851562, 202.15826416015625],
+                      [138.12950134277344, 303.2374267578125]
+                    ],
+                    [
+                      [184.17266845703125, 101.07916259765625],
+                      [184.17266845703125, 202.15826416015625],
+                      [230.2158203125, 303.2374267578125]
+                    ]
+                  ]
+                },
+                "opacity": 1,
+                "pageIndex": 0,
+                "strokeColor": "#AA47BE",
+                "type": "pspdfkit/ink",
+                "updatedAt": "2018-07-03T13:53:03Z",
+                "v": 1
+              });
+            }} title="Add annotation" />
+          </View>
+          <View style={{ marginLeft: 10 }}>
+            <Button onPress={() => {
+              // This gets all annotations on the first page.
+              this.refs.pdfView.getAllUnsavedAnnotations()
+                .then(annotations => {
+                  alert(JSON.stringify(annotations))
+                })
+            }} title="Get unsaved annotations" />
+          </View>
+        </View>
+      </View>
+    )
+  }
+}
+
 export default StackNavigator(
   {
     Catalog: {
@@ -481,6 +612,9 @@ export default StackNavigator(
     },
     PdfViewListenersScreen: {
       screen: PdfViewListenersScreen
+    },
+    PdfViewInstantJsonScreen: {
+      screen: PdfViewInstantJsonScreen
     }
   },
   {
