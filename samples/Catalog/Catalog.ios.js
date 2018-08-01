@@ -147,6 +147,17 @@ var examples = [
     },
   },
   {
+    name: 'Programmatic Form Filling',
+    description:
+      'Shows how to get and add new annotations using Instant JSON.',
+    action: component => {
+      const nextRoute = {
+        component: ProgrammaticFormFilling
+      }
+      component.props.navigator.push(nextRoute)
+    },
+  },
+  {
     name: 'Debug Log',
     description: 'Action used for printing stuff during development and debugging.',
     action: () => {
@@ -452,6 +463,51 @@ class ProgrammaticAnnotations extends Component {
               const unsavedAnnotations = await this.refs.pdfView.getAllUnsavedAnnotations();
               alert(JSON.stringify(unsavedAnnotations));
             }} title="getAllUnsavedAnnotations" />
+          </View>
+        </View>
+      </View> 
+    )
+  }
+}
+
+class ProgrammaticFormFilling extends Component {
+  render() {
+     return (
+      <View style={{ flex: 1 }}>
+        <PSPDFKitView
+          ref="pdfView"
+          document={'PDFs/Form_example.pdf'}
+          disableAutomaticSaving={true}
+          configuration={{
+            backgroundColor: processColor('lightgrey'),
+            thumbnailBarMode: 'scrollable',
+          }}
+          style={{ flex: 1, color: pspdfkitColor }}
+          />
+        <View style={{ flexDirection: 'row', height: 60, alignItems: 'center', padding: 10 }}>
+          <View>
+            <Button onPress={() => {
+              // Fill Text Form Fields.
+              this.refs.pdfView.setFormFieldValue('Appleseed', 'Name_Last');
+              this.refs.pdfView.setFormFieldValue('John', 'Name_First');
+              this.refs.pdfView.setFormFieldValue('1 Infinite Loop', 'Address_1');
+              this.refs.pdfView.setFormFieldValue('Cupertino', 'City');
+              this.refs.pdfView.setFormFieldValue('CA', 'STATE');
+              this.refs.pdfView.setFormFieldValue('123456789', 'SSN');
+              this.refs.pdfView.setFormFieldValue('(123) 456-7890', 'Telephone_Home');
+              this.refs.pdfView.setFormFieldValue('1/1/1983', 'Birthdate');
+              
+              // Select a button form elements.
+              this.refs.pdfView.setFormFieldValue('selected', 'Sex.0');
+              this.refs.pdfView.setFormFieldValue('selected', 'PHD');
+            }} title="Fill Forms" />
+          </View>
+          <View>
+            <Button onPress={ async () => {
+              // Get the First Name Value.
+              const firstNameValue = await this.refs.pdfView.getFormFieldValue('Name_Last');
+              alert(JSON.stringify(firstNameValue));
+            }} title="Get Last Name Value" />
           </View>
         </View>
       </View> 
