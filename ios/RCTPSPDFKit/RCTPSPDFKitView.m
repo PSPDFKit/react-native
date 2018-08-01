@@ -189,12 +189,59 @@
   PSPDFDataContainerProvider *dataContainerProvider = [[PSPDFDataContainerProvider alloc] initWithData:data];
   PSPDFDocument *document = self.pdfController.document;
   PSPDFDocumentProvider *documentProvider = document.documentProviders.firstObject;
-
   BOOL success = [document applyInstantJSONFromDataProvider:dataContainerProvider toDocumentProvider:documentProvider error:NULL];
   if (success){
     [self.pdfController reloadData];
   } else {
     NSLog(@"Failed to add annotations.");
+  }
+}
+
+#pragma mark - Forms
+
+- (NSDictionary<NSString *, id> *)getFormFieldValue:(NSString *)fullyQualifiedName {
+  if (fullyQualifiedName.length == 0) {
+    NSLog(@"Invalid fully qualified name.");
+    return nil;
+  }
+
+  PSPDFDocument *document = self.pdfController.document;
+  for (PSPDFFormElement *formElement in document.formParser.forms) {
+    if ([formElement.fullyQualifiedFieldName isEqualToString:fullyQualifiedName]) {
+      id formFieldValue = formElement.value;
+      return @{@"value": formFieldValue ?: [NSNull new]};
+    }
+  }
+
+  return @{@"error": @"Failied to get the form field value."};
+}
+
+- (void)setFormFieldValue:(NSString *)value fullyQualifiedName:(NSString *)fullyQualifiedName {
+  if (fullyQualifiedName.length == 0) {
+    NSLog(@"Invalid fully qualified name.");
+    return;
+  }
+
+  PSPDFDocument *document = self.pdfController.document;
+  for (PSPDFFormElement *formElement in document.formParser.forms) {
+    if ([formElement.fullyQualifiedFieldName isEqualToString:fullyQualifiedName]) {
+      if ([formElement isKindOfClass:PSPDFButtonFormElement.class]) {
+        if ([value isEqualToString:@"selected"]) {
+          [(PSPDFButtonFormElement *)formElement select];
+        } else if ([value isEqualToString:@"deselected"]) {
+          [(PSPDFButtonFormElement *)formElement deselect];
+        }
+      } else if ([formElement isKindOfClass:PSPDFChoiceFormElement.class]) {
+        ((PSPDFChoiceFormElement *)formElement).selectedIndices = [NSIndexSet indexSetWithIndex:value.integerValue];
+      } else if ([formElement isKindOfClass:PSPDFTextFieldFormElement.class]) {
+        formElement.contents = value;
+      } else if ([formElement isKindOfClass:PSPDFSignatureFormElement.class]) {
+        NSLog(@"Signature form elements are not supported.");
+      } else {
+        NSLog(@"Unsupported form element.");
+      }
+      break;
+    }
   }
 }
 

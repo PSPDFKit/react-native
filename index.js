@@ -219,6 +219,32 @@ class PSPDFKitView extends React.Component {
              NativeModules.PSPDFKitViewManager.addAnnotations(annotations, findNodeHandle(this.refs.pdfView));
         }
     }
+    
+    /**
+     * Gets the value of the form element of the fully qualified name.
+     * 
+     * @param fullyQualifiedName The fully qualified name of the form element.
+     *
+     * Returns a promise resolving a dictionary with the following structure:
+     * {'formElement' : value} or ['error' : Failied to get the form field value.]
+    *
+     * @platform ios
+     */
+    getFormFieldValue = function (fullyQualifiedName) {
+        return NativeModules.PSPDFKitViewManager.getFormFieldValue(fullyQualifiedName, findNodeHandle(this.refs.pdfView));
+    }
+    
+    /**
+     * Set the value of the form element of the fully qualified name.
+     * 
+     * @param value The string value form element. For button form elements pass 'selected' or 'deselected'. For choice form elements, pass the index of the choice to select, for example '1'.
+     * @param fullyQualifiedName The fully qualified name of the form element.
+     *
+     * @platform ios
+     */
+    setFormFieldValue = function (value, fullyQualifiedName) {
+        NativeModules.PSPDFKitViewManager.setFormFieldValue(value, fullyQualifiedName, findNodeHandle(this.refs.pdfView));
+    }   
 }
 
 PSPDFKitView.propTypes = {
