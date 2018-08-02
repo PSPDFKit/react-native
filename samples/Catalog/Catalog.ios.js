@@ -149,7 +149,7 @@ var examples = [
   {
     name: 'Programmatic Form Filling',
     description:
-      'Shows how to get and add new annotations using Instant JSON.',
+      'Shows how to get the value of a form element and how to programmatically fill forms.',
     action: component => {
       const nextRoute = {
         component: ProgrammaticFormFilling

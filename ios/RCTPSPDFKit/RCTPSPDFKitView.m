@@ -213,7 +213,7 @@
     }
   }
 
-  return @{@"error": @"Failied to get the form field value."};
+  return @{@"error": @"Failed to get the form field value."};
 }
 
 - (void)setFormFieldValue:(NSString *)value fullyQualifiedName:(NSString *)fullyQualifiedName {

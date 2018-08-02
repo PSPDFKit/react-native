@@ -226,7 +226,7 @@ class PSPDFKitView extends React.Component {
      * @param fullyQualifiedName The fully qualified name of the form element.
      *
      * Returns a promise resolving a dictionary with the following structure:
-     * {'formElement' : value} or ['error' : Failied to get the form field value.]
+     * {'value' : value} or ['error' : Failed to get the form field value.]
     *
      * @platform ios
      */
