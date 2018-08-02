@@ -109,10 +109,21 @@ var examples = [
   {
     name: 'Change Pages Buttons',
     description:
-      'Adds a toolbar at the bottom with buttons to the change pages.',
+      'Adds a toolbar at the bottom with buttons to change pages.',
     action: component => {
       const nextRoute = {
         component: ChangePages
+      }
+      component.props.navigator.push(nextRoute)
+    },
+  },
+  {
+    name: 'Show and Hide the Annotation Toolbar',
+    description:
+      'Adds a toolbar at the bottom with a button to toggle the visibility of the annotation toolbar.',
+    action: component => {
+      const nextRoute = {
+        component: ToggleAnnotationToolbar
       }
       component.props.navigator.push(nextRoute)
     },
@@ -376,6 +387,53 @@ class ChangePages extends Component {
                    return { currentPageIndex: previousState.currentPageIndex + 1 }
                  })
                }} disabled={this.state.currentPageIndex == this.state.pageCount - 1} title="Next Page" />
+             </View>
+           </View>
+         </View>
+       )
+   }
+}
+
+class ToggleAnnotationToolbar extends Component {
+   constructor(props) {
+     super(props)
+     this.state = {
+       isVisible: false,
+     };
+   }
+
+   render() {
+       return (
+         <View style={{ flex: 1 }}>
+           <PSPDFKitView
+             ref="pdfView"
+             document={'PDFs/Annual Report.pdf'}
+             configuration={{
+               backgroundColor: processColor('lightgrey'),
+               thumbnailBarMode: 'scrollable',
+             }}
+             pageIndex={this.state.currentPageIndex}
+             showCloseButton={true}
+             onCloseButtonPressed={this.props.onClose}
+             style={{ flex: 1, color: pspdfkitColor }}
+             onStateChanged={event => {
+               this.setState({
+                 isVisible: event.currentPageIndex
+               });
+             }}
+           />
+           <View style={{ flexDirection: 'row', height: 60, alignItems: 'center', padding: 10 }}>
+             <View>
+               <Button onPress={() => {
+                   if (this.state.isVisible) {
+                     this.refs.pdfView.exitCurrentlyActiveMode(); 
+                   } else {
+                     this.refs.pdfView.enterAnnotationCreationMode();
+                   }
+                   this.setState(previousState => {                       
+                   return { isVisible: !previousState.isVisible }
+                 })
+               }} title="Toggle" />
              </View>
            </View>
          </View>
