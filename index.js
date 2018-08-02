@@ -123,11 +123,11 @@ class PSPDFKitView extends React.Component {
                 UIManager.RCTPSPDFKitView.Commands.saveCurrentDocument,
                 []
             )
-        } else if (Platform.OS === "ios"){
+        } else if (Platform.OS === "ios") {
             NativeModules.PSPDFKitViewManager.saveCurrentDocument(findNodeHandle(this.refs.pdfView));
         }
     }
-    
+
     /**
      * Gets all annotations of the given type from the page.
      * 
@@ -154,7 +154,7 @@ class PSPDFKitView extends React.Component {
             );
 
             return promise
-        } else if (Platform.OS === "ios"){
+        } else if (Platform.OS === "ios") {
             return NativeModules.PSPDFKitViewManager.getAnnotations(pageIndex, type, findNodeHandle(this.refs.pdfView));
         }
     }
@@ -171,8 +171,8 @@ class PSPDFKitView extends React.Component {
                 UIManager.RCTPSPDFKitView.Commands.addAnnotation,
                 [annotation]
             );
-        } else if (Platform.OS === "ios"){
-             NativeModules.PSPDFKitViewManager.addAnnotation(annotation, findNodeHandle(this.refs.pdfView));
+        } else if (Platform.OS === "ios") {
+            NativeModules.PSPDFKitViewManager.addAnnotation(annotation, findNodeHandle(this.refs.pdfView));
         }
     }
 
@@ -198,7 +198,7 @@ class PSPDFKitView extends React.Component {
             );
 
             return promise
-        } else if (Platform.OS === "ios"){
+        } else if (Platform.OS === "ios") {
             return NativeModules.PSPDFKitViewManager.getAllUnsavedAnnotations(findNodeHandle(this.refs.pdfView));
         }
     }
@@ -215,8 +215,56 @@ class PSPDFKitView extends React.Component {
                 UIManager.RCTPSPDFKitView.Commands.addAnnotations,
                 [annotations]
             );
-        } else if (Platform.OS === "ios"){
-             NativeModules.PSPDFKitViewManager.addAnnotations(annotations, findNodeHandle(this.refs.pdfView));
+        } else if (Platform.OS === "ios") {
+            NativeModules.PSPDFKitViewManager.addAnnotations(annotations, findNodeHandle(this.refs.pdfView));
+        }
+    }
+
+    /**
+     * Gets the value of the form element of the fully qualified name.
+     * 
+     * @param fullyQualifiedName The fully qualified name of the form element.
+     *
+     * Returns a promise resolving a dictionary with the following structure:
+     * {'formElement' : value} or {'error' : 'Failed to get the form field value.'}
+     *
+     * @platform android
+     */
+    getFormFieldValue = function (fullyQualifiedName) {
+        if (Platform.OS === "android") {
+            let requestId = this._nextRequestId++
+            let requestMap = this._requestMap;
+
+            // We create a promise here that will be resolved once onDataReturned is called.
+            let promise = new Promise(function (resolve, reject) {
+                requestMap[requestId] = { 'resolve': resolve, 'reject': reject }
+            });
+
+            UIManager.dispatchViewManagerCommand(
+                findNodeHandle(this.refs.pdfView),
+                UIManager.RCTPSPDFKitView.Commands.getFormFieldValue,
+                [requestId, fullyQualifiedName]
+            );
+
+            return promise;
+        }
+    }
+
+    /**
+     * Set the value of the form element of the fully qualified name.
+     * 
+     * @param value The string value form element. For button form elements pass 'selected' or 'deselected'. For choice form elements, pass the index of the choice to select, for example '1'.
+     * @param fullyQualifiedName The fully qualified name of the form element.
+     *
+     * @platform android
+     */
+    setFormFieldValue = function (value, fullyQualifiedName) {
+        if (Platform.OS === "android") {
+            UIManager.dispatchViewManagerCommand(
+                findNodeHandle(this.refs.pdfView),
+                UIManager.RCTPSPDFKitView.Commands.setFormFieldValue,
+                [fullyQualifiedName, value]
+            );
         }
     }
 }
