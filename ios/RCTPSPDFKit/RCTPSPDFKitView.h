@@ -28,6 +28,10 @@
 @property (nonatomic, copy) RCTBubblingEventBlock onAnnotationsChanged;
 @property (nonatomic, copy) RCTBubblingEventBlock onStateChanged;
 
+/// Annotation Toolbar
+- (void)enterAnnotationCreationMode;
+- (void)exitCurrentlyActiveMode;
+
 /// Document
 - (void)saveCurrentDocument;
 

@@ -104,6 +104,16 @@
   return nil;
 }
 
+- (void)enterAnnotationCreationMode {
+  [self.pdfController setViewMode:PSPDFViewModeDocument animated:YES];
+  [self.pdfController.annotationToolbarController updateHostView:nil container:nil viewController:self.pdfController];
+  [self.pdfController.annotationToolbarController showToolbarAnimated:YES];
+}
+
+- (void)exitCurrentlyActiveMode {
+  [self.pdfController.annotationToolbarController hideToolbarAnimated:YES];
+}
+
 - (void)saveCurrentDocument {
   [self.pdfController.document saveWithOptions:nil error:NULL];
 }

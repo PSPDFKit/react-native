@@ -76,6 +76,20 @@ RCT_EXPORT_VIEW_PROPERTY(onAnnotationsChanged, RCTBubblingEventBlock)
 
 RCT_EXPORT_VIEW_PROPERTY(onStateChanged, RCTBubblingEventBlock)
 
+RCT_EXPORT_METHOD(enterAnnotationCreationMode:(nonnull NSNumber *)reactTag) {
+  dispatch_async(dispatch_get_main_queue(), ^{
+    RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
+    [component enterAnnotationCreationMode];
+  });
+}
+
+RCT_EXPORT_METHOD(exitCurrentlyActiveMode:(nonnull NSNumber *)reactTag) {
+  dispatch_async(dispatch_get_main_queue(), ^{
+    RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
+    [component exitCurrentlyActiveMode];
+  });
+}
+
 RCT_EXPORT_METHOD(saveCurrentDocument:(nonnull NSNumber *)reactTag) {
   dispatch_async(dispatch_get_main_queue(), ^{
     RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];

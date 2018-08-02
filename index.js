@@ -89,28 +89,32 @@ class PSPDFKitView extends React.Component {
 
     /**
      * Enters the annotation creation mode, showing the annotation creation toolbar.
-     *
-     * @platform android
      */
     enterAnnotationCreationMode = function () {
-        UIManager.dispatchViewManagerCommand(
-            findNodeHandle(this.refs.pdfView),
-            UIManager.RCTPSPDFKitView.Commands.enterAnnotationCreationMode,
-            []
-        );
+        if (Platform.OS === "android") {
+            UIManager.dispatchViewManagerCommand(
+                findNodeHandle(this.refs.pdfView),
+                UIManager.RCTPSPDFKitView.Commands.enterAnnotationCreationMode,
+                []
+            );
+        } else if (Platform.OS === "ios") {
+            NativeModules.PSPDFKitViewManager.enterAnnotationCreationMode(findNodeHandle(this.refs.pdfView));
+        }
     };
 
     /**
      * Exits the currently active mode, hiding all toolbars.
-     *
-     * @platform android
      */
     exitCurrentlyActiveMode = function () {
-        UIManager.dispatchViewManagerCommand(
-            findNodeHandle(this.refs.pdfView),
-            UIManager.RCTPSPDFKitView.Commands.exitCurrentlyActiveMode,
-            []
-        );
+        if (Platform.OS === "android") {
+            UIManager.dispatchViewManagerCommand(
+                findNodeHandle(this.refs.pdfView),
+                UIManager.RCTPSPDFKitView.Commands.exitCurrentlyActiveMode,
+                []
+            );
+        } else if (Platform.OS === "ios") {
+            NativeModules.PSPDFKitViewManager.exitCurrentlyActiveMode(findNodeHandle(this.refs.pdfView));
+        }
     };
 
     /**
