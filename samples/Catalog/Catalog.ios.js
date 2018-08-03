@@ -109,10 +109,21 @@ var examples = [
   {
     name: 'Change Pages Buttons',
     description:
-      'Adds a toolbar at the bottom with buttons to the change pages.',
+      'Adds a toolbar at the bottom with buttons to change pages.',
     action: component => {
       const nextRoute = {
         component: ChangePages
+      }
+      component.props.navigator.push(nextRoute)
+    },
+  },
+  {
+    name: 'Enter and Exit the Annotation Creation Mode',
+    description:
+      'Adds a toolbar at the bottom with a button to toggle the annotation toolbar.',
+    action: component => {
+      const nextRoute = {
+        component: AnnotationCreationMode
       }
       component.props.navigator.push(nextRoute)
     },
@@ -298,6 +309,7 @@ class SplitPDF extends Component {
              configuration={{
                backgroundColor: processColor('lightgrey'),
                thumbnailBarMode: 'scrollable',
+               useParentNavigationBar: true,
              }}
              showCloseButton={true}
              style={{ flex: 1, color: pspdfkitColor }}
@@ -347,6 +359,7 @@ class ChangePages extends Component {
              configuration={{
                backgroundColor: processColor('lightgrey'),
                thumbnailBarMode: 'scrollable',
+               useParentNavigationBar: true,
              }}
              pageIndex={this.state.currentPageIndex}
              showCloseButton={true}
@@ -383,6 +396,67 @@ class ChangePages extends Component {
    }
 }
 
+class AnnotationCreationMode extends Component {
+   constructor(props) {
+     super(props)
+     this.state = {
+      annotationCreationActive: false,
+      annotationEditingActive: false,
+     };
+   }
+   
+   render() {
+       let buttonTitle = "";
+       if (this.state.annotationCreationActive) {
+         buttonTitle = "Exit Annotation Creation Mode";
+       } else if (this.state.annotationEditingActive) {
+         buttonTitle = "Exit Annotation Editing Mode";
+       } else {
+         buttonTitle = "Enter Annotation Creation Mode";
+       }
+       return (
+         <View style={{ flex: 1 }}>
+           <PSPDFKitView
+             ref="pdfView"
+             document={'PDFs/Annual Report.pdf'}
+             configuration={{
+               backgroundColor: processColor('lightgrey'),
+               thumbnailBarMode: 'scrollable',
+               useParentNavigationBar: true,  
+             }}
+             pageIndex={this.state.currentPageIndex}
+             showCloseButton={true}
+             onCloseButtonPressed={this.props.onClose}
+             style={{ flex: 1, color: pspdfkitColor }}
+             onStateChanged={event => {
+               this.setState({
+                 annotationCreationActive: event.annotationCreationActive,
+                 annotationEditingActive: event.annotationEditingActive,
+               });
+             }}
+           />
+           <View style={{ flexDirection: 'row', height: 60, alignItems: 'center', padding: 10 }}>
+             <View>
+               <Button onPress={() => {
+                   if (this.state.annotationCreationActive || this.state.annotationEditingActive) {
+                     this.refs.pdfView.exitCurrentlyActiveMode();
+                   } else {
+                     this.refs.pdfView.enterAnnotationCreationMode();
+                   }
+                   this.setState(previousState => {                       
+                   return { 
+                       annotationCreationActive: !previousState.annotationCreationActive, 
+                       annotationEditingActive: !previousState.annotationEditingActive
+                   }
+                 })
+               }} title={buttonTitle} />
+             </View>
+           </View>
+         </View>
+       )
+   }
+}
+
 class ManualSave extends Component {
   render() {
      return (
@@ -394,6 +468,7 @@ class ManualSave extends Component {
           configuration={{
             backgroundColor: processColor('lightgrey'),
             thumbnailBarMode: 'scrollable',
+            useParentNavigationBar: true,
           }}
           style={{ flex: 1, color: pspdfkitColor }}
           />
@@ -427,6 +502,7 @@ class ProgrammaticAnnotations extends Component {
           configuration={{
             backgroundColor: processColor('lightgrey'),
             thumbnailBarMode: 'scrollable',
+            useParentNavigationBar: true, 
           }}
           style={{ flex: 1, color: pspdfkitColor }}
           onStateChanged={event => {
@@ -481,6 +557,7 @@ class ProgrammaticFormFilling extends Component {
           configuration={{
             backgroundColor: processColor('lightgrey'),
             thumbnailBarMode: 'scrollable',
+            useParentNavigationBar: true,
           }}
           style={{ flex: 1, color: pspdfkitColor }}
           />
