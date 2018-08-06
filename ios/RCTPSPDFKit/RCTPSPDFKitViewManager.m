@@ -109,7 +109,7 @@ RCT_REMAP_METHOD(getAnnotations, getAnnotations:(nonnull NSNumber *)pageIndex ty
   });
 }
 
-RCT_EXPORT_METHOD(addAnnotation:(NSString *)jsonAnnotation reactTag:(nonnull NSNumber *)reactTag) {
+RCT_EXPORT_METHOD(addAnnotation:(id)jsonAnnotation reactTag:(nonnull NSNumber *)reactTag) {
   dispatch_async(dispatch_get_main_queue(), ^{
     RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
     [component addAnnotation:jsonAnnotation];
@@ -128,7 +128,7 @@ RCT_EXPORT_METHOD(getAllUnsavedAnnotations:(nonnull NSNumber *)reactTag resolver
   });
 }
 
-RCT_EXPORT_METHOD(addAnnotations:(NSString *)jsonAnnotations reactTag:(nonnull NSNumber *)reactTag) {
+RCT_EXPORT_METHOD(addAnnotations:(id)jsonAnnotations reactTag:(nonnull NSNumber *)reactTag) {
   dispatch_async(dispatch_get_main_queue(), ^{
     RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
     [component addAnnotations:jsonAnnotations];

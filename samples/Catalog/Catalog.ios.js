@@ -407,33 +407,33 @@ class AnnotationCreationMode extends Component {
 
   render() {
     let buttonTitle = "";
-    if (this.state.annotationCreationActive) {
-      buttonTitle = "Exit Annotation Creation Mode";
-    } else if (this.state.annotationEditingActive) {
-      buttonTitle = "Exit Annotation Editing Mode";
-    } else {
-      buttonTitle = "Enter Annotation Creation Mode";
-    }
-    return (
-      <View style={{ flex: 1 }}>
-        <PSPDFKitView
-          ref="pdfView"
-          document={'PDFs/Annual Report.pdf'}
-          configuration={{
-            backgroundColor: processColor('lightgrey'),
-            thumbnailBarMode: 'scrollable',
-            useParentNavigationBar: true,
-          }}
-          pageIndex={this.state.currentPageIndex}
-          showCloseButton={true}
-          onCloseButtonPressed={this.props.onClose}
-          style={{ flex: 1, color: pspdfkitColor }}
-          onStateChanged={event => {
-            this.setState({
-              annotationCreationActive: event.annotationCreationActive,
-              annotationEditingActive: event.annotationEditingActive,
-            });
-          }}
+      if (this.state.annotationCreationActive) {
+        buttonTitle = "Exit Annotation Creation Mode";
+      } else if (this.state.annotationEditingActive) {
+        buttonTitle = "Exit Annotation Editing Mode";
+      } else {
+        buttonTitle = "Enter Annotation Creation Mode";
+      }
+      return (
+        <View style={{ flex: 1 }}>
+          <PSPDFKitView
+            ref="pdfView"
+            document={'PDFs/Annual Report.pdf'}
+            configuration={{
+              backgroundColor: processColor('lightgrey'),
+              thumbnailBarMode: 'scrollable',
+              useParentNavigationBar: true,
+            }}
+            pageIndex={this.state.currentPageIndex}
+            showCloseButton={true}
+            onCloseButtonPressed={this.props.onClose}
+            style={{ flex: 1, color: pspdfkitColor }}
+            onStateChanged={event => {
+              this.setState({
+                annotationCreationActive: event.annotationCreationActive,
+                annotationEditingActive: event.annotationEditingActive,
+              });
+            }}
         />
         <View style={{ flexDirection: 'row', height: 60, alignItems: 'center', padding: 10 }}>
           <View>
@@ -443,12 +443,6 @@ class AnnotationCreationMode extends Component {
               } else {
                 this.refs.pdfView.enterAnnotationCreationMode();
               }
-              this.setState(previousState => {
-                return {
-                  annotationCreationActive: !previousState.annotationCreationActive,
-                  annotationEditingActive: !previousState.annotationEditingActive
-                }
-              })
             }} title={buttonTitle} />
           </View>
         </View>
