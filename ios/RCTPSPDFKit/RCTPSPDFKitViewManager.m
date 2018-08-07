@@ -76,6 +76,20 @@ RCT_EXPORT_VIEW_PROPERTY(onAnnotationsChanged, RCTBubblingEventBlock)
 
 RCT_EXPORT_VIEW_PROPERTY(onStateChanged, RCTBubblingEventBlock)
 
+RCT_EXPORT_METHOD(enterAnnotationCreationMode:(nonnull NSNumber *)reactTag) {
+  dispatch_async(dispatch_get_main_queue(), ^{
+    RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
+    [component enterAnnotationCreationMode];
+  });
+}
+
+RCT_EXPORT_METHOD(exitCurrentlyActiveMode:(nonnull NSNumber *)reactTag) {
+  dispatch_async(dispatch_get_main_queue(), ^{
+    RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
+    [component exitCurrentlyActiveMode];
+  });
+}
+
 RCT_EXPORT_METHOD(saveCurrentDocument:(nonnull NSNumber *)reactTag) {
   dispatch_async(dispatch_get_main_queue(), ^{
     RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
@@ -90,7 +104,7 @@ RCT_REMAP_METHOD(getAnnotations, getAnnotations:(nonnull NSNumber *)pageIndex ty
     if (annotations) {
       resolve(annotations);
     } else {
-      reject(@"error", @"Failed to get annotations", nil);
+      reject(@"error", @"Failed to get annotations.", nil);
     }
   });
 }
@@ -109,7 +123,7 @@ RCT_EXPORT_METHOD(getAllUnsavedAnnotations:(nonnull NSNumber *)reactTag resolver
     if (annotations) {
       resolve(annotations);
     } else {
-      reject(@"error", @"Failed to get annotations", nil);
+      reject(@"error", @"Failed to get annotations.", nil);
     }
   });
 }
@@ -118,6 +132,25 @@ RCT_EXPORT_METHOD(addAnnotations:(NSString *)jsonAnnotations reactTag:(nonnull N
   dispatch_async(dispatch_get_main_queue(), ^{
     RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
     [component addAnnotations:jsonAnnotations];
+  });
+}
+
+RCT_EXPORT_METHOD(getFormFieldValue:(NSString *)fullyQualifiedName reactTag:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+  dispatch_async(dispatch_get_main_queue(), ^{
+    RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
+    NSDictionary *formElementDictionary = [component getFormFieldValue:fullyQualifiedName];
+    if (formElementDictionary) {
+      resolve(formElementDictionary);
+    } else {
+      reject(@"error", @"Failed to get form field value.", nil);
+    }
+  });
+}
+
+RCT_EXPORT_METHOD(setFormFieldValue:(nullable NSString *)value fullyQualifiedName:(NSString *)fullyQualifiedName reactTag:(nonnull NSNumber *)reactTag) {
+  dispatch_async(dispatch_get_main_queue(), ^{
+    RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
+    [component setFormFieldValue:value fullyQualifiedName:fullyQualifiedName];
   });
 }
 

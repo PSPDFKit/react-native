@@ -89,28 +89,32 @@ class PSPDFKitView extends React.Component {
 
     /**
      * Enters the annotation creation mode, showing the annotation creation toolbar.
-     *
-     * @platform android
      */
     enterAnnotationCreationMode = function () {
-        UIManager.dispatchViewManagerCommand(
-            findNodeHandle(this.refs.pdfView),
-            UIManager.RCTPSPDFKitView.Commands.enterAnnotationCreationMode,
-            []
-        );
+        if (Platform.OS === "android") {
+            UIManager.dispatchViewManagerCommand(
+                findNodeHandle(this.refs.pdfView),
+                UIManager.RCTPSPDFKitView.Commands.enterAnnotationCreationMode,
+                []
+            );
+        } else if (Platform.OS === "ios") {
+            NativeModules.PSPDFKitViewManager.enterAnnotationCreationMode(findNodeHandle(this.refs.pdfView));
+        }
     };
 
     /**
      * Exits the currently active mode, hiding all toolbars.
-     *
-     * @platform android
      */
     exitCurrentlyActiveMode = function () {
-        UIManager.dispatchViewManagerCommand(
-            findNodeHandle(this.refs.pdfView),
-            UIManager.RCTPSPDFKitView.Commands.exitCurrentlyActiveMode,
-            []
-        );
+        if (Platform.OS === "android") {
+            UIManager.dispatchViewManagerCommand(
+                findNodeHandle(this.refs.pdfView),
+                UIManager.RCTPSPDFKitView.Commands.exitCurrentlyActiveMode,
+                []
+            );
+        } else if (Platform.OS === "ios") {
+            NativeModules.PSPDFKitViewManager.exitCurrentlyActiveMode(findNodeHandle(this.refs.pdfView));
+        }
     };
 
     /**
@@ -267,6 +271,32 @@ class PSPDFKitView extends React.Component {
             );
         }
     }
+    
+    /**
+     * Gets the value of the form element of the fully qualified name.
+     * 
+     * @param fullyQualifiedName The fully qualified name of the form element.
+     *
+     * Returns a promise resolving a dictionary with the following structure:
+     * {'value' : value} or {'error' : 'Failed to get the form field value.'}
+    *
+     * @platform ios
+     */
+    getFormFieldValue = function (fullyQualifiedName) {
+        return NativeModules.PSPDFKitViewManager.getFormFieldValue(fullyQualifiedName, findNodeHandle(this.refs.pdfView));
+    }
+    
+    /**
+     * Set the value of the form element of the fully qualified name.
+     * 
+     * @param value The string value form element. For button form elements pass 'selected' or 'deselected'. For choice form elements, pass the index of the choice to select, for example '1'.
+     * @param fullyQualifiedName The fully qualified name of the form element.
+     *
+     * @platform ios
+     */
+    setFormFieldValue = function (value, fullyQualifiedName) {
+        NativeModules.PSPDFKitViewManager.setFormFieldValue(value, fullyQualifiedName, findNodeHandle(this.refs.pdfView));
+    }   
 }
 
 PSPDFKitView.propTypes = {
