@@ -122,7 +122,7 @@ var examples = [
   {
     name: "Programmatic Form Filling",
     description:
-      "Shows how to programatically read and write PDF forms.",
+      "Shows how to programatically read and write PDF form values.",
     action: component => {
       component.props.navigation.navigate("PdfViewFormFillingScreen");
     }
@@ -631,18 +631,18 @@ class PdfViewFormFillingScreen extends Component<{}> {
           <View>
             <Button onPress={() => {
               // Fill Text Form Fields.
-              this.refs.pdfView.setFormFieldValue('Appleseed', 'Name_Last');
-              this.refs.pdfView.setFormFieldValue('John', 'Name_First');
-              this.refs.pdfView.setFormFieldValue('1 Infinite Loop', 'Address_1');
-              this.refs.pdfView.setFormFieldValue('Cupertino', 'City');
-              this.refs.pdfView.setFormFieldValue('CA', 'STATE');
-              this.refs.pdfView.setFormFieldValue('123456789', 'SSN');
-              this.refs.pdfView.setFormFieldValue('(123) 456-7890', 'Telephone_Home');
-              this.refs.pdfView.setFormFieldValue('1/1/1983', 'Birthdate');
+              this.refs.pdfView.setFormFieldValue('Name_Last', 'Appleseed');
+              this.refs.pdfView.setFormFieldValue('Name_First', 'John');
+              this.refs.pdfView.setFormFieldValue('Address_1', '1 Infinite Loop');
+              this.refs.pdfView.setFormFieldValue('City', 'Cupertino');
+              this.refs.pdfView.setFormFieldValue('STATE', 'CA');
+              this.refs.pdfView.setFormFieldValue('SSN', '123456789');
+              this.refs.pdfView.setFormFieldValue('Telephone_Home', '(123) 456-7890');
+              this.refs.pdfView.setFormFieldValue('Birthdate', '1/1/1983');
 
               // Select a button form elements.
-              this.refs.pdfView.setFormFieldValue('selected', 'Sex.0');
-              this.refs.pdfView.setFormFieldValue('selected', 'PHD');
+              this.refs.pdfView.setFormFieldValue('Sex.0', 'selected');
+              this.refs.pdfView.setFormFieldValue('PHD', 'selected');
             }} title="Fill Forms" />
           </View>
           <View>

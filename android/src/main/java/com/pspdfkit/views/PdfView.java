@@ -39,6 +39,8 @@ import com.pspdfkit.ui.inspector.PropertyInspectorCoordinatorLayout;
 import com.pspdfkit.ui.thumbnail.PdfThumbnailBarController;
 import com.pspdfkit.ui.toolbar.ToolbarCoordinatorLayout;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
@@ -516,9 +518,19 @@ public class PdfView extends FrameLayout {
                                 selectedIndices.add(selectedIndex);
                                 choiceFormElement.setSelectedIndexes(selectedIndices);
                             } catch (NumberFormatException e) {
-                                // This isn't an index maybe we can set a custom value on a combobox.
-                                if (formElement instanceof ComboBoxFormElement) {
-                                    ((ComboBoxFormElement) formElement).setCustomText(value);
+                                try {
+                                    // Maybe it's multiple indices.
+                                    JSONArray indices = new JSONArray(value);
+                                    List<Integer> selectedIndices = new ArrayList<>();
+                                    for (int i = 0; i < indices.length(); i++) {
+                                        selectedIndices.add(indices.getInt(i));
+                                    }
+                                    choiceFormElement.setSelectedIndexes(selectedIndices);
+                                }catch (JSONException ex) {
+                                    // This isn't an index maybe we can set a custom value on a combobox.
+                                    if (formElement instanceof ComboBoxFormElement) {
+                                        ((ComboBoxFormElement) formElement).setCustomText(value);
+                                    }
                                 }
                             }
                         }

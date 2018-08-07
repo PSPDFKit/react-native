@@ -24,7 +24,7 @@ public class PdfViewDataReturnedEvent extends Event<PdfViewDataReturnedEvent> {
 
     private final WritableMap payload;
 
-    public PdfViewDataReturnedEvent(@IdRes int viewId, int requestId, List<Annotation> annotations) {
+    public PdfViewDataReturnedEvent(@IdRes int viewId, int requestId, @NonNull List<Annotation> annotations) {
         super(viewId);
         Map<String, Object> map = new HashMap<>();
         map.put("requestId", requestId);
