@@ -20,8 +20,14 @@ import com.pspdfkit.configuration.activity.ThumbnailBarMode;
 import com.pspdfkit.document.PdfDocument;
 import com.pspdfkit.document.formatters.DocumentJsonFormatter;
 import com.pspdfkit.document.providers.DataProvider;
+import com.pspdfkit.forms.ChoiceFormElement;
+import com.pspdfkit.forms.ComboBoxFormElement;
+import com.pspdfkit.forms.EditableButtonFormElement;
+import com.pspdfkit.forms.FormElement;
+import com.pspdfkit.forms.TextFormElement;
 import com.pspdfkit.listeners.SimpleDocumentListener;
 import com.pspdfkit.react.R;
+import com.pspdfkit.react.events.PdfViewDataReturnedEvent;
 import com.pspdfkit.react.events.PdfViewDocumentSaveFailedEvent;
 import com.pspdfkit.react.events.PdfViewDocumentSavedEvent;
 import com.pspdfkit.react.events.PdfViewStateChangedEvent;
@@ -33,10 +39,12 @@ import com.pspdfkit.ui.inspector.PropertyInspectorCoordinatorLayout;
 import com.pspdfkit.ui.thumbnail.PdfThumbnailBarController;
 import com.pspdfkit.ui.toolbar.ToolbarCoordinatorLayout;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -344,8 +352,8 @@ public class PdfView extends FrameLayout {
                 eventDispatcher.dispatchEvent(new PdfViewDocumentSaveFailedEvent(getId(), e.getMessage()));
             }
         }
-	}
-	
+    }
+
     public Single<List<Annotation>> getAnnotations(int pageIndex, @Nullable String type) {
         return fragment.getDocument().getAnnotationProvider().getAllAnnotationsOfType(getTypeFromString(type), pageIndex, 1)
                 .toList();
@@ -420,6 +428,113 @@ public class PdfView extends FrameLayout {
         JSONObject json = new JSONObject(annotation.toHashMap());
         final DataProvider dataProvider = new DocumentJsonDataProvider(json);
         DocumentJsonFormatter.importDocumentJson(fragment.getDocument(), dataProvider);
+    }
 
+    public Disposable getFormFieldValue(final int requestId, @NonNull String formElementName) {
+        return document.getFormProvider().getFormElementWithNameAsync(formElementName)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<FormElement>() {
+                    @Override
+                    public void accept(FormElement formElement) throws Exception {
+                        JSONObject result = new JSONObject();
+                        if (formElement instanceof TextFormElement) {
+                            TextFormElement textFormElement = (TextFormElement) formElement;
+                            String text = textFormElement.getText();
+                            if (text == null || text.isEmpty()) {
+                                result.put("value", JSONObject.NULL);
+                            } else {
+                                result.put("value", text);
+                            }
+                        } else if (formElement instanceof EditableButtonFormElement) {
+                            EditableButtonFormElement editableButtonFormElement = (EditableButtonFormElement) formElement;
+                            if (editableButtonFormElement.isSelected()) {
+                                result.put("value", "selected");
+                            } else {
+                                result.put("value", "deselected");
+                            }
+                        } else if (formElement instanceof ComboBoxFormElement) {
+                            ComboBoxFormElement comboBoxFormElement = (ComboBoxFormElement) formElement;
+                            if (comboBoxFormElement.isCustomTextSet()) {
+                                result.put("value", comboBoxFormElement.getCustomText());
+                            } else {
+                                result.put("value", comboBoxFormElement.getSelectedIndexes());
+                            }
+                        } else if (formElement instanceof ChoiceFormElement) {
+                            result.put("value", ((ChoiceFormElement) formElement).getSelectedIndexes());
+                        }
+
+                        if (result.length() == 0) {
+                            // No type was applicable.
+                            result.put("error", "Unsupported form field encountered");
+                            eventDispatcher.dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, result));
+                        } else {
+                            eventDispatcher.dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, result));
+                        }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) {
+                        eventDispatcher.dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, throwable));
+                    }
+                }, new Action() {
+                    @Override
+                    public void run() {
+                        try {
+                            JSONObject result = new JSONObject();
+                            result.put("error", "Failed to get the form field value.");
+                            eventDispatcher.dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, result));
+                        } catch (Exception e) {
+                            eventDispatcher.dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, e));
+                        }
+                    }
+                });
+
+    }
+
+    public Disposable setFormFieldValue(@NonNull String formElementName, @NonNull final String value) {
+        return document.getFormProvider().getFormElementWithNameAsync(formElementName)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<FormElement>() {
+
+                    @Override
+                    public void accept(FormElement formElement) {
+                        if (formElement instanceof TextFormElement) {
+                            TextFormElement textFormElement = (TextFormElement) formElement;
+                            textFormElement.setText(value);
+                        } else if (formElement instanceof EditableButtonFormElement) {
+                            EditableButtonFormElement editableButtonFormElement = (EditableButtonFormElement) formElement;
+                            if (value.equalsIgnoreCase("selected")) {
+                                editableButtonFormElement.select();
+                            } else if (value.equalsIgnoreCase("deselected")) {
+                                editableButtonFormElement.deselect();
+                            }
+                        } else if (formElement instanceof ChoiceFormElement) {
+                            ChoiceFormElement choiceFormElement = (ChoiceFormElement) formElement;
+                            try {
+                                int selectedIndex = Integer.parseInt(value);
+                                List<Integer> selectedIndices = new ArrayList<>();
+                                selectedIndices.add(selectedIndex);
+                                choiceFormElement.setSelectedIndexes(selectedIndices);
+                            } catch (NumberFormatException e) {
+                                try {
+                                    // Maybe it's multiple indices.
+                                    JSONArray indices = new JSONArray(value);
+                                    List<Integer> selectedIndices = new ArrayList<>();
+                                    for (int i = 0; i < indices.length(); i++) {
+                                        selectedIndices.add(indices.getInt(i));
+                                    }
+                                    choiceFormElement.setSelectedIndexes(selectedIndices);
+                                }catch (JSONException ex) {
+                                    // This isn't an index maybe we can set a custom value on a combobox.
+                                    if (formElement instanceof ComboBoxFormElement) {
+                                        ((ComboBoxFormElement) formElement).setCustomText(value);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
     }
 }

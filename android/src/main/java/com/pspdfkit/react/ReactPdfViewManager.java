@@ -46,6 +46,8 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
     public static final int COMMAND_ADD_ANNOTATION = 5;
     public static final int COMMAND_GET_ALL_UNSAVED_ANNOTATIONS = 6;
     public static final int COMMAND_ADD_ANNOTATIONS = 7;
+    public static final int COMMAND_GET_FORM_FIELD_VALUE = 8;
+    public static final int COMMAND_SET_FORM_FIELD_VALUE = 9;
 
     private CompositeDisposable annotationDisposables = new CompositeDisposable();
 
@@ -77,7 +79,7 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
     @Nullable
     @Override
     public Map<String, Integer> getCommandsMap() {
-        return MapBuilder.of(
+        Map<String, Integer> commandMap = MapBuilder.of(
                 "enterAnnotationCreationMode",
                 COMMAND_ENTER_ANNOTATION_CREATION_MODE,
                 "exitCurrentlyActiveMode",
@@ -92,6 +94,9 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
                 COMMAND_GET_ALL_UNSAVED_ANNOTATIONS,
                 "addAnnotations",
                 COMMAND_ADD_ANNOTATIONS);
+        commandMap.put("getFormFieldValue", COMMAND_GET_FORM_FIELD_VALUE);
+        commandMap.put("setFormFieldValue", COMMAND_SET_FORM_FIELD_VALUE);
+        return commandMap;
     }
 
     @ReactProp(name = "fragmentTag")
@@ -189,8 +194,19 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
                 }
                 break;
             case COMMAND_ADD_ANNOTATIONS:
-                if (args != null) {
+                if (args != null && args.size() == 1) {
                     root.addAnnotations(args.getMap(0));
+                }
+                break;
+            case COMMAND_GET_FORM_FIELD_VALUE:
+                if (args != null && args.size() == 2) {
+                    final int requestId = args.getInt(0);
+                    annotationDisposables.add(root.getFormFieldValue(requestId, args.getString(1)));
+                }
+                break;
+            case COMMAND_SET_FORM_FIELD_VALUE:
+                if (args != null && args.size() == 2) {
+                    annotationDisposables.add(root.setFormFieldValue(args.getString(0), args.getString(1)));
                 }
                 break;
         }

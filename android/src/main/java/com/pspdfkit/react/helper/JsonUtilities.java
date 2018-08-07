@@ -27,6 +27,8 @@ public class JsonUtilities {
                 value = toList((JSONArray) value);
             } else if (value instanceof JSONObject) {
                 value = jsonObjectToMap((JSONObject) value);
+            } else if ( value == JSONObject.NULL) {
+                value = null;
             }
             map.put(key, value);
         }
@@ -41,6 +43,8 @@ public class JsonUtilities {
                 value = toList((JSONArray) value);
             } else if (value instanceof JSONObject) {
                 value = jsonObjectToMap((JSONObject) value);
+            } else if ( value == JSONObject.NULL) {
+                value = null;
             }
             list.add(value);
         }

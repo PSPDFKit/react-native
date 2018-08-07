@@ -1,6 +1,7 @@
 package com.pspdfkit.react.events;
 
 import android.support.annotation.IdRes;
+import android.support.annotation.NonNull;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableMap;
@@ -23,7 +24,7 @@ public class PdfViewDataReturnedEvent extends Event<PdfViewDataReturnedEvent> {
 
     private final WritableMap payload;
 
-    public PdfViewDataReturnedEvent(@IdRes int viewId, int requestId, List<Annotation> annotations) {
+    public PdfViewDataReturnedEvent(@IdRes int viewId, int requestId, @NonNull List<Annotation> annotations) {
         super(viewId);
         Map<String, Object> map = new HashMap<>();
         map.put("requestId", requestId);
@@ -41,7 +42,7 @@ public class PdfViewDataReturnedEvent extends Event<PdfViewDataReturnedEvent> {
         payload = Arguments.makeNativeMap(map);
     }
 
-    public PdfViewDataReturnedEvent(@IdRes int viewId, int requestId, JSONObject jsonObject) {
+    public PdfViewDataReturnedEvent(@IdRes int viewId, int requestId, @NonNull JSONObject jsonObject) {
         super(viewId);
         Map<String, Object> map = new HashMap<>();
         map.put("requestId", requestId);
@@ -53,6 +54,14 @@ public class PdfViewDataReturnedEvent extends Event<PdfViewDataReturnedEvent> {
         }
 
         payload = Arguments.makeNativeMap(map);
+    }
+
+    public PdfViewDataReturnedEvent(@IdRes int viewId, int requestId, @NonNull Throwable throwable) {
+        super(viewId);
+
+        payload = Arguments.createMap();
+        payload.putInt("requestId", requestId);
+        payload.putString("error", throwable.getMessage());
     }
 
     @Override

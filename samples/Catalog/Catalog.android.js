@@ -120,6 +120,14 @@ var examples = [
     }
   },
   {
+    name: "Programmatic Form Filling",
+    description:
+      "Shows how to programatically read and write PDF form values.",
+    action: component => {
+      component.props.navigation.navigate("PdfViewFormFillingScreen");
+    }
+  },
+  {
     name: "Split PDF",
     description: "Show two PDFs side by side by using PSPDFKitView components.",
     action: component => {
@@ -599,6 +607,57 @@ class PdfViewInstantJsonScreen extends Component<{}> {
   }
 }
 
+class PdfViewFormFillingScreen extends Component<{}> {
+  static navigationOptions = ({ navigation }) => {
+    const params = navigation.state.params || {};
+
+    return {
+      title: "Programmatic Form Filling"
+    };
+  };
+
+  render() {
+
+    return (
+      <View style={{ flex: 1 }}>
+        <PSPDFKitView
+          ref="pdfView"
+          document="file:///android_asset/Form_example.pdf"
+          configuration={{}}
+          fragmentTag="PDF1"
+          style={{ flex: 1, color: pspdfkitColor }}
+        />
+        <View style={{ flexDirection: 'row', height: 40, alignItems: 'center', padding: 10 }}>
+          <View>
+            <Button onPress={() => {
+              // Fill Text Form Fields.
+              this.refs.pdfView.setFormFieldValue('Name_Last', 'Appleseed');
+              this.refs.pdfView.setFormFieldValue('Name_First', 'John');
+              this.refs.pdfView.setFormFieldValue('Address_1', '1 Infinite Loop');
+              this.refs.pdfView.setFormFieldValue('City', 'Cupertino');
+              this.refs.pdfView.setFormFieldValue('STATE', 'CA');
+              this.refs.pdfView.setFormFieldValue('SSN', '123456789');
+              this.refs.pdfView.setFormFieldValue('Telephone_Home', '(123) 456-7890');
+              this.refs.pdfView.setFormFieldValue('Birthdate', '1/1/1983');
+
+              // Select a button form elements.
+              this.refs.pdfView.setFormFieldValue('Sex.0', 'selected');
+              this.refs.pdfView.setFormFieldValue('PHD', 'selected');
+            }} title="Fill Forms" />
+          </View>
+          <View>
+            <Button onPress={async () => {
+              // Get the First Name Value.
+              const firstNameValue = await this.refs.pdfView.getFormFieldValue('Name_Last');
+              alert(JSON.stringify(firstNameValue));
+            }} title="Get Last Name Value" />
+          </View>
+        </View>
+      </View>
+    )
+  }
+}
+
 export default StackNavigator(
   {
     Catalog: {
@@ -615,6 +674,9 @@ export default StackNavigator(
     },
     PdfViewInstantJsonScreen: {
       screen: PdfViewInstantJsonScreen
+    },
+    PdfViewFormFillingScreen: {
+      screen: PdfViewFormFillingScreen
     }
   },
   {
