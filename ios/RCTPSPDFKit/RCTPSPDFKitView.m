@@ -23,6 +23,7 @@
   if ((self = [super initWithFrame:frame])) {
     _pdfController = [[PSPDFViewController alloc] init];
     _pdfController.delegate = self;
+    _pdfController.annotationToolbarController.delegate = self;
     _closeButton = [[UIBarButtonItem alloc] initWithImage:[PSPDFKit imageNamed:@"x"] style:UIBarButtonItemStylePlain target:self action:@selector(closeButtonPressed:)];
 
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(annotationChangedNotification:) name:PSPDFAnnotationChangedNotification object:nil];
@@ -147,10 +148,26 @@
   return !self.disableAutomaticSaving;
 }
 
+- (void)pdfViewController:(PSPDFViewController *)pdfController didConfigurePageView:(PSPDFPageView *)pageView forPageAtIndex:(NSInteger)pageIndex {
+  [self onStateChangedForPDFViewController:pdfController pageView:pageView pageAtIndex:pageIndex];
+}
+
 - (void)pdfViewController:(PSPDFViewController *)pdfController willBeginDisplayingPageView:(PSPDFPageView *)pageView forPageAtIndex:(NSInteger)pageIndex {
-  if (self.onStateChanged) {
-    self.onStateChanged(@{@"currentPageIndex" : @(pageIndex), @"pageCount" : @(pdfController.document.pageCount)});
-  }
+  [self onStateChangedForPDFViewController:pdfController pageView:pageView pageAtIndex:pageIndex];
+}
+
+#pragma mark - PSPDFFlexibleToolbarContainerDelegate
+
+- (void)flexibleToolbarContainerDidShow:(PSPDFFlexibleToolbarContainer *)container {
+  PSPDFPageIndex pageIndex = self.pdfController.pageIndex;
+  PSPDFPageView *pageView = [self.pdfController pageViewForPageAtIndex:pageIndex];
+  [self onStateChangedForPDFViewController:self.pdfController pageView:pageView pageAtIndex:pageIndex];
+}
+
+- (void)flexibleToolbarContainerDidHide:(PSPDFFlexibleToolbarContainer *)container {
+  PSPDFPageIndex pageIndex = self.pdfController.pageIndex;
+  PSPDFPageView *pageView = [self.pdfController pageViewForPageAtIndex:pageIndex];
+  [self onStateChangedForPDFViewController:self.pdfController pageView:pageView pageAtIndex:pageIndex];
 }
 
 #pragma mark - Instant JSON
@@ -161,13 +178,17 @@
   return @{@"annotations" : annotationsJSON};
 }
 
-- (void)addAnnotation:(NSString *)jsonAnnotation {
-  if (jsonAnnotation.length == 0) {
+- (void)addAnnotation:(id)jsonAnnotation {
+  NSData *data;
+  if ([jsonAnnotation isKindOfClass:NSString.class]) {
+    data = [jsonAnnotation dataUsingEncoding:NSUTF8StringEncoding];
+  } else if ([jsonAnnotation isKindOfClass:NSDictionary.class])  {
+    data = [NSJSONSerialization dataWithJSONObject:jsonAnnotation options:0 error:nil];
+  } else {
     NSLog(@"Invalid JSON Annotation.");
     return;
   }
-
-  NSData *data = [jsonAnnotation dataUsingEncoding:NSUTF8StringEncoding];
+  
   PSPDFDocument *document = self.pdfController.document;
   PSPDFDocumentProvider *documentProvider = document.documentProviders.firstObject;
 
@@ -177,7 +198,7 @@
     success = [document addAnnotations:@[annotation] options:nil];
   }
 
-  if (!success){
+  if (!success) {
     NSLog(@"Failed to add annotation.");
   }
 }
@@ -189,20 +210,22 @@
   return annotationsJSON;
 }
 
-- (void)addAnnotations:(NSString *)jsonAnnotations {
-  if (jsonAnnotations.length == 0) {
+- (void)addAnnotations:(id)jsonAnnotations {
+  NSData *data;
+  if ([jsonAnnotations isKindOfClass:NSString.class]) {
+    data = [jsonAnnotations dataUsingEncoding:NSUTF8StringEncoding];
+  } else if ([jsonAnnotations isKindOfClass:NSDictionary.class])  {
+    data = [NSJSONSerialization dataWithJSONObject:jsonAnnotations options:0 error:nil];;
+  } else {
     NSLog(@"Invalid JSON Annotations.");
     return;
   }
   
-  NSData *data = [jsonAnnotations dataUsingEncoding:NSUTF8StringEncoding];
   PSPDFDataContainerProvider *dataContainerProvider = [[PSPDFDataContainerProvider alloc] initWithData:data];
   PSPDFDocument *document = self.pdfController.document;
   PSPDFDocumentProvider *documentProvider = document.documentProviders.firstObject;
   BOOL success = [document applyInstantJSONFromDataProvider:dataContainerProvider toDocumentProvider:documentProvider error:NULL];
-  if (success){
-    [self.pdfController reloadData];
-  } else {
+  if (!success) {
     NSLog(@"Failed to add annotations.");
   }
 }
@@ -284,6 +307,32 @@
   NSArray <NSDictionary *> *annotationsJSON = [RCTConvert instantJSONFromAnnotations:annotations];
   if (self.onAnnotationsChanged) {
     self.onAnnotationsChanged(@{@"change" : change, @"annotations" : annotationsJSON});
+  }
+}
+
+#pragma mark - Helpers
+
+- (void)onStateChangedForPDFViewController:(PSPDFViewController *)pdfController pageView:(PSPDFPageView *)pageView pageAtIndex:(NSInteger)pageIndex {
+  if (self.onStateChanged) {
+    PSPDFPageCount pageCount = pdfController.document.pageCount;
+    BOOL isAnnotationToolBarVisible = [pdfController.annotationToolbarController isToolbarVisible];
+    BOOL hasSelectedAnnotations = pageView.selectedAnnotations.count > 0;
+    BOOL hasSelectedText = pageView.selectionView.selectedText.length > 0;
+    BOOL isFormEditingActive = NO;
+    for (PSPDFAnnotation *annotation in pageView.selectedAnnotations) {
+      if ([annotation isKindOfClass:PSPDFWidgetAnnotation.class]) {
+        isFormEditingActive = YES;
+        break;
+      }
+    }
+    
+    self.onStateChanged(@{@"currentPageIndex" : @(pageIndex),
+                          @"pageCount" : @(pageCount),
+                          @"annotationCreationActive" : @(isAnnotationToolBarVisible),
+                          @"annotationEditingActive" : @(hasSelectedAnnotations),
+                          @"textSelectionActive" : @(hasSelectedText),
+                          @"formEditingActive" : @(isFormEditingActive)
+                          });
   }
 }
 
