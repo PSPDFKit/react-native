@@ -644,8 +644,8 @@ project. (Replace `ENTER LICENSE KEY HERE` with your key)
   +   new ReactNativePSPDFKit.PSPDFKitPackage()
   };
  ``` 
-20. Change the target SDK of YourApp to > 10.0.16299 : Right Click on YourApp -> Properties. Go to 
-Application and change Target Version to > 10.0.16299.
+20. Change the target SDK of YourApp to >= 10.0.16299 : Right Click on YourApp -> Properties. Go to 
+Application and change Target Version to >= 10.0.16299.
 ![Development Target](screenshots/changeVersionSDK.png)
 21. Save Changes: File -> Save All 
 22. Add the `PSPDFKitView` and `PSPDFKit` module into your `App.windows.js` file, and add a open button to allow the user 
