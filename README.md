@@ -8,8 +8,7 @@ This wrapper requires a valid license of PSPDFKit. Licenses are per platform. Yo
 * [React Native UI Component for iOS](https://pspdfkit.com/blog/2018/react-native-ui-component-for-ios/) ([See iOS](https://github.com/PSPDFKit/react-native#ios))
 * [React Native UI Component for Android](https://pspdfkit.com/blog/2018/react-native-ui-component-for-android/) ([See Android](https://github.com/PSPDFKit/react-native#android))
 * [PSPDFKit for Windows UWP with React 
-Native](https://pspdfkit.com/blog/2018/introducing-pspdfkit-windows/#react-native-for-windows-support) ([See 
-Windows UWP](https://github.com/PSPDFKit/react-native#windows-uwp))
+Native](https://pspdfkit.com/blog/2018/introducing-pspdfkit-windows/#react-native-for-windows-support) ([See Windows UWP](https://github.com/PSPDFKit/react-native#windows-uwp))
 
 #### PSPDFKit
 
@@ -649,8 +648,7 @@ project. (Replace `ENTER LICENSE KEY HERE` with your key)
 Application and change Target Version to > 10.0.16299.
 ![Development Target](screenshots/changeVersionSDK.png)
 21. Save Changes: File -> Save All 
-22. Add the 
-`PSPDFKitView` and `PSPDFKit` module into your `App.windows.js` file, and add a open button to allow the user 
+22. Add the `PSPDFKitView` and `PSPDFKit` module into your `App.windows.js` file, and add a open button to allow the user 
 to navigate the file system.
   ```
   import React, { Component } from 'react';
