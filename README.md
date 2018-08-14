@@ -648,7 +648,8 @@ project. (Replace `ENTER LICENSE KEY HERE` with your key)
 20. Change the target SDK of YourApp to > 10.0.16299 : Right Click on YourApp -> Properties. Go to 
 Application and change Target Version to > 10.0.16299.
 ![Development Target](screenshots/changeTargetSDK.png)
-21. Save Changes: File -> Save All 22. Add the 
+21. Save Changes: File -> Save All 
+22. Add the 
 `PSPDFKitView` and `PSPDFKit` module into your `App.windows.js` file, and add a open button to allow the user 
 to navigate the file system.
   ```
@@ -709,9 +710,9 @@ to navigate the file system.
       }
   });
  ```
-22. Now run the application on the command line: `react-native run-windows`.
-23. Press Yes when PowerShell wants to run.
-24. Type 'y' when asking if you want to install the certificate.
+23. Now run the application on the command line: `react-native run-windows`.
+24. Press Yes when PowerShell wants to run.
+25. Type 'y' when asking if you want to install the certificate.
 
 #### Running Catalog Project
 
