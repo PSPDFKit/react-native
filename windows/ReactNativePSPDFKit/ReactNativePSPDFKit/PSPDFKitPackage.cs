@@ -1,6 +1,12 @@
-﻿using PSPDFKit;
-using PSPDFKit.Pdf;
-using PSPDFKit.UI;
+﻿//
+//  Copyright © 2018 PSPDFKit GmbH. All rights reserved.
+//
+//  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
+//  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
+//  UNAUTHORIZED REPRODUCTION OR DISTRIBUTION IS SUBJECT TO CIVIL AND CRIMINAL PENALTIES.
+//  This notice may not be removed from this file.
+//
+
 using ReactNative.Bridge;
 using ReactNative.Modules.Core;
 using ReactNative.UIManager;
@@ -17,7 +23,7 @@ namespace ReactNativePSPDFKit
     /// </summary>
     public class PSPDFKitPackage : IReactPackage
     {
-        private PSPDFKitViewManger _pspdfkitViewManger = new PSPDFKitViewManger();
+        private readonly PSPDFKitViewManger _pspdfkitViewManger = new PSPDFKitViewManger();
 
         /// <summary>
         /// Creates the PSPDFKitModule native modules to register with the react
