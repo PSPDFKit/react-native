@@ -1,9 +1,7 @@
 ﻿{
-  "dependencies": {
-    "Microsoft.NETCore.UniversalWindowsPlatform": "6.1.5"
-  },
+  "dependencies": {},
   "frameworks": {
-    "uap10.0.14393": {}
+    "uap10.0.10586": {}
   },
   "runtimes": {
     "win10-arm": {},

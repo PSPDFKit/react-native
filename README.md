@@ -717,17 +717,18 @@ to navigate the file system.
 1. Clone the repository. `git clone https://github.com/PSPDFKit/react-native.git`.
 2. From the command promt `cd react-native\samples\Catalog`.
 3. Make sure `react-native-cli` is installed: `npm install -g react-native-cli`.
-4. Edit `package.json` to change the version of `react-native` to `0.53.0`
+4. Edit `package.json` to change the version of `react-native` to `0.53.0` and refernce the react-native 
+pspdfkit repo online.
 ```diff
 "dependencies": {
 "react": "16.3.1",
 -"react-native": "0.55.4",
 +"react-native": "0.53.0",
 "react-native-fs": "2.10.14",
-"react-native-pspdfkit": "file:../../",
+-"react-native-pspdfkit": "file:../../",
++"react-native-pspdfkit": "github:PSPDFKit/react-native",
 "react-native-windows": "0.53.0",
-"react-navigation": "^1.0.3",
-"rnpm-plugin-windows": "0.2.8"
+"react-navigation": "^1.0.3"
 }
 ```
 5. run `npm install`.
