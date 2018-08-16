@@ -139,7 +139,7 @@ class PSPDFKitView extends React.Component {
      * @param type The type of annotations to get (See here for types https://pspdfkit.com/guides/server/current/api/json-format/) or null to get all annotations.
      * 
      * Returns a promise resolving an array with the following structure:
-     * [instantJson]
+     * {'annotations' : [instantJson]}
      */
     getAnnotations = function (pageIndex, type) {
         if (Platform.OS === "android") {
