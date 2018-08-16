@@ -15,24 +15,33 @@ package com.pspdfkit.react;
 
 import android.app.Activity;
 import android.app.Application;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 
+import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
 import com.pspdfkit.PSPDFKit;
 import com.pspdfkit.document.PdfDocument;
+import com.pspdfkit.document.image.CameraImagePickerFragment;
+import com.pspdfkit.document.image.GalleryImagePickerFragment;
 import com.pspdfkit.listeners.SimpleDocumentListener;
 import com.pspdfkit.ui.PdfActivity;
+import com.pspdfkit.ui.PdfFragment;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class PSPDFKitModule extends ReactContextBaseJavaModule implements Application.ActivityLifecycleCallbacks {
+public class PSPDFKitModule extends ReactContextBaseJavaModule implements Application.ActivityLifecycleCallbacks, ActivityEventListener {
 
     private static final String VERSION_KEY = "versionString";
     private static final String FILE_SCHEME = "file:///";
@@ -42,8 +51,26 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
     @Nullable
     private Runnable onPdfActivityOpenedTask;
 
+    /**
+     * Used to dispatch onActivityResult calls to our fragments.
+     */
+    @NonNull
+    private Handler handler = new Handler(Looper.getMainLooper());
+
     public PSPDFKitModule(ReactApplicationContext reactContext) {
         super(reactContext);
+    }
+
+    @Override
+    public void initialize() {
+        super.initialize();
+        getReactApplicationContext().addActivityEventListener(this);
+    }
+
+    @Override
+    public void onCatalystInstanceDestroy() {
+        super.onCatalystInstanceDestroy();
+        getReactApplicationContext().removeActivityEventListener(this);
     }
 
     @Override
@@ -164,5 +191,37 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
         if (activity == resumedActivity) {
             resumedActivity = null;
         }
+    }
+
+    @Override
+    public void onActivityResult(Activity activity, final int requestCode, final int resultCode, final Intent data) {
+        if (activity instanceof FragmentActivity) {
+            // Forward the result to all our fragments.
+            FragmentActivity fragmentActivity = (FragmentActivity) activity;
+            for (final Fragment fragment : fragmentActivity.getSupportFragmentManager().getFragments()) {
+                if (fragment instanceof PdfFragment ||
+                        fragment instanceof GalleryImagePickerFragment ||
+                        fragment instanceof CameraImagePickerFragment) {
+                    // When starting an intent from a fragment its request code is shifted to make it unique,
+                    // we undo it here manually since react by default eats all activity results.
+                    int requestIndex = requestCode >> 16;
+                    if (requestIndex != 0) {
+                        // We need to wait until the next frame with delivering the result to the fragment,
+                        // otherwise the app will crash since the fragment won't be ready.
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                fragment.onActivityResult(requestCode & 0xffff, resultCode, data);
+                            }
+                        });
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onNewIntent(Intent intent) {
+        // Not required right now.
     }
 }
