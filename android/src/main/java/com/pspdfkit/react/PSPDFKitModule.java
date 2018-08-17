@@ -46,6 +46,9 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
     private static final String VERSION_KEY = "versionString";
     private static final String FILE_SCHEME = "file:///";
 
+    private static final int REQUEST_CODE_TO_INDEX = 16;
+    private static final int MASKED_REQUEST_CODE_TO_REAL_CODE = 0xffff;
+
     @Nullable
     private Activity resumedActivity;
     @Nullable
@@ -55,7 +58,7 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
      * Used to dispatch onActivityResult calls to our fragments.
      */
     @NonNull
-    private Handler handler = new Handler(Looper.getMainLooper());
+    private Handler activityResultHandler = new Handler(Looper.getMainLooper());
 
     public PSPDFKitModule(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -204,14 +207,14 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
                         fragment instanceof CameraImagePickerFragment) {
                     // When starting an intent from a fragment its request code is shifted to make it unique,
                     // we undo it here manually since react by default eats all activity results.
-                    int requestIndex = requestCode >> 16;
+                    int requestIndex = requestCode >> REQUEST_CODE_TO_INDEX;
                     if (requestIndex != 0) {
                         // We need to wait until the next frame with delivering the result to the fragment,
                         // otherwise the app will crash since the fragment won't be ready.
-                        handler.post(new Runnable() {
+                        activityResultHandler.post(new Runnable() {
                             @Override
                             public void run() {
-                                fragment.onActivityResult(requestCode & 0xffff, resultCode, data);
+                                fragment.onActivityResult(requestCode & MASKED_REQUEST_CODE_TO_REAL_CODE, resultCode, data);
                             }
                         });
                     }
