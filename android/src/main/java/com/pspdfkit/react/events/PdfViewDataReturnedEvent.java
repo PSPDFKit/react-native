@@ -24,17 +24,20 @@ public class PdfViewDataReturnedEvent extends Event<PdfViewDataReturnedEvent> {
 
     private final WritableMap payload;
 
-    public PdfViewDataReturnedEvent(@IdRes int viewId, int requestId, @NonNull List<Annotation> annotations) {
+    public PdfViewDataReturnedEvent(@IdRes int viewId, int requestId, @NonNull List<Annotation> annotationsToSerialize) {
         super(viewId);
         Map<String, Object> map = new HashMap<>();
         map.put("requestId", requestId);
         try {
             List<Map<String, Object>> annotationsSerialized = new ArrayList<>();
-            for (Annotation annotation : annotations) {
+            for (Annotation annotation : annotationsToSerialize) {
                 JSONObject instantJson = new JSONObject(annotation.toInstantJson());
                 annotationsSerialized.add(JsonUtilities.jsonObjectToMap(instantJson));
             }
-            map.put("result", annotationsSerialized);
+
+            Map<String, Object> annotations = new HashMap<>();
+            annotations.put("annotations", annotationsSerialized);
+            map.put("result", annotations);
         } catch (JSONException e) {
             map.put("error", e.getMessage());
         }
