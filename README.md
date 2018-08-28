@@ -726,8 +726,7 @@ pspdfkit repo online.
 -"react-native": "0.55.4",
 +"react-native": "0.53.0",
 "react-native-fs": "2.10.14",
--"react-native-pspdfkit": "file:../../",
-+"react-native-pspdfkit": "github:PSPDFKit/react-native",
+"react-native-pspdfkit": "file:../../",
 "react-native-windows": "0.53.0",
 "react-navigation": "^1.0.3"
 }
