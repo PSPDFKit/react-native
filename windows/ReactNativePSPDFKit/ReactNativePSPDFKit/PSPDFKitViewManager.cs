@@ -32,7 +32,7 @@ namespace ReactNativePSPDFKit
         public async void SetDocumentAsync(PDFViewPage view, String document)
         {
             var storagefile = await StorageFile.GetFileFromApplicationUriAsync(new Uri(document));
-            await view.OpenFileAsync(storagefile);
+            await view.SetDefaultDocument(storagefile);
         }
 
         [ReactProp("pageIndex")]

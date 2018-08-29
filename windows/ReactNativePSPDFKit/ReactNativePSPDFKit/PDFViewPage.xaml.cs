@@ -36,6 +36,18 @@ namespace ReactNativePSPDFKit
         }
 
         /// <summary>
+        /// Only set the document to show if there is no document staged yet.
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
+        internal async Task SetDefaultDocument(StorageFile file)
+        {
+            if (_fileToOpen != null) return;
+
+            await OpenFileAsync(file);
+        }
+
+        /// <summary>
         /// Take the file and call the conroller to open the document.
         /// </summary>
         /// <param name="file">File to open.</param>

@@ -31,6 +31,16 @@ var examples = [
         action: component => {
             component.props.navigation.navigate("PdfView");
         }
+    },
+    {
+        name: "Present a file from source",
+        description: "Open document from source",
+        action: component => {
+            component.props.navigation.navigate("PdfView");
+            // Present can only take files loaded in the Visual studio Project's Assets.
+            // See https://docs.microsoft.com/en-us/windows/uwp/files/file-access-permissions
+            PSPDFKit.Present("ms-appx:///Assets/pdf/Business Report.pdf");
+        }
     }
 ];
 
@@ -54,15 +64,15 @@ class CatalogScreen extends Component<{}> {
                 source={require("./assets/logo-flat.png")}
                 style={styles.logo}
             />
-        <Text style={styles.version}>{PSPDFKit.versionString}</Text>
-        </View>
-        <ListView
-            dataSource={this.state.dataSource}
-            renderRow={this._renderRow}
-            renderSeparator={this._renderSeparator}
-            contentContainerStyle={styles.listContainer}
-            style={styles.list}
-        />
+            <Text style={styles.version}>{PSPDFKit.versionString}</Text>
+            </View>
+            <ListView
+                dataSource={this.state.dataSource}
+                renderRow={this._renderRow}
+                renderSeparator={this._renderSeparator}
+                contentContainerStyle={styles.listContainer}
+                style={styles.list}
+            />
         </View>
     );
     }
@@ -98,10 +108,11 @@ class PdfViewScreen extends Component<{}> {
         return (
             <View style={styles.page}>
                 <PSPDFKitView style={styles.pdfView}
+                    // The default file to open.
                     document="ms-appx:///Assets/pdf/annualReport.pdf"/>
                 <View style={styles.footer}>
                 <View style={styles.button}>
-                <Button onPress={() => PSPDFKit.OpenFile()} title="Open" />
+                    <Button onPress={() => PSPDFKit.OpenFilePicker()} title="Open" />
                 </View>
                     <Image source={require('./assets/logo-flat.png')} style={styles.logo} />
                     <Text style={styles.version}>SDK Version : {PSPDFKit.versionString}</Text>

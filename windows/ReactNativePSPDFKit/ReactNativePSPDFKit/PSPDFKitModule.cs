@@ -12,6 +12,8 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
+using Windows.Storage;
+using Windows.UI.Popups;
 
 namespace ReactNativePSPDFKit
 {
@@ -32,7 +34,7 @@ namespace ReactNativePSPDFKit
         /// Open the native file picker for the user to select a pdf.
         /// </summary>
         [ReactMethod]
-        public void OpenFile()
+        public void OpenFilePicker()
         {
             DispatcherHelpers.RunOnDispatcher(async () =>
             {
@@ -40,6 +42,30 @@ namespace ReactNativePSPDFKit
                 if (file != null)
                 {
                     await LoadFileAsync(file);
+                }
+            });
+        }
+
+        /// <summary>
+        /// Open a file from a path presented from javascript.
+        /// Files loaded in the Visual studio Project's Assets.
+        /// See https://docs.microsoft.com/en-us/windows/uwp/files/file-access-permissions
+        /// </summary>
+        [ReactMethod]
+        public void Present(string assetPath)
+        {
+            DispatcherHelpers.RunOnDispatcher(async () =>
+            {
+                try
+                {
+                    var file = await StorageFile.GetFileFromApplicationUriAsync(new Uri(assetPath));
+                    
+                    await LoadFileAsync(file);
+                }
+                catch (Exception)
+                {
+                    var dialog = new MessageDialog("Unable to open the file specified.");
+                    await dialog.ShowAsync();
                 }
             });
         }
