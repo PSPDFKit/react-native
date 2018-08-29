@@ -59,7 +59,7 @@ namespace ReactNativePSPDFKit
                 try
                 {
                     var file = await StorageFile.GetFileFromApplicationUriAsync(new Uri(assetPath));
-                    
+
                     await LoadFileAsync(file);
                 }
                 catch (Exception)
