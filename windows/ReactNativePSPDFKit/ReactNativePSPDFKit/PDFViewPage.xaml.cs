@@ -8,7 +8,6 @@
 //
 
 using System;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using PSPDFKit.Document;
 using PSPDFKit.UI;

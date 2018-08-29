@@ -12,7 +12,6 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
-using PSPDFKit.UI;
 
 namespace ReactNativePSPDFKit
 {
@@ -75,26 +74,14 @@ namespace ReactNativePSPDFKit
         /// <summary>
         /// Constants that can be used in the JS
         /// </summary>
-        public override IReadOnlyDictionary<string, object> Constants
+        public override IReadOnlyDictionary<string, object> Constants => new Dictionary<string, object>
         {
-            get
-            {
-                return new Dictionary<string, object>
-                {
-                    { VERSION_KEY, typeof(PSPDFKit.Sdk).GetTypeInfo().Assembly.GetName().Version.ToString() },
-                };
-            }
-        }
+            { VERSION_KEY, typeof(PSPDFKit.Sdk).GetTypeInfo().Assembly.GetName().Version.ToString() },
+        };
 
         /// <summary>
         /// The name to be used when creating the js modules
         /// </summary>
-        public override string Name
-        {
-            get
-            {
-                return "ReactPSPDFKit";
-            }
-        }
+        public override string Name => "ReactPSPDFKit";
     }
 }

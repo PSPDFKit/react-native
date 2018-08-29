@@ -8,7 +8,6 @@
 //
 
 using System;
-using System.Threading.Tasks;
 using ReactNative.UIManager;
 using ReactNative.UIManager.Annotations;
 using Windows.Storage;
