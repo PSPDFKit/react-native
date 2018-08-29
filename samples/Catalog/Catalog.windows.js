@@ -12,17 +12,84 @@ import {
     StyleSheet,
     Text,
     View,
+    ListView,
     Image,
     TouchableHighlight,
     NativeModules,
     processColor,
     Button
 } from 'react-native';
+import { StackNavigator } from "react-navigation";
 
 var PSPDFKitView = require('react-native-pspdfkit');
 var PSPDFKit = NativeModules.ReactPSPDFKit;
 
-export default class Catalog extends Component<{}> {
+var examples = [
+    {
+        name: "Open assets document",
+        description: "Open document from your project assets folder",
+        action: component => {
+            component.props.navigation.navigate("PdfView");
+        }
+    }
+];
+
+class CatalogScreen extends Component<{}> {
+    // Initialize the hardcoded data
+    constructor(props) {
+        super(props);
+        const ds = new ListView.DataSource({
+            rowHasChanged: (r1, r2) => r1 !== r2
+        });
+        this.state = {
+            dataSource: ds.cloneWithRows(examples)
+        };
+    }
+
+    render() {
+        return (
+        <View style={styles.page}>
+            <View style={styles.header}>
+            <Image
+                source={require("./assets/logo-flat.png")}
+                style={styles.logo}
+            />
+        <Text style={styles.version}>{PSPDFKit.versionString}</Text>
+        </View>
+        <ListView
+            dataSource={this.state.dataSource}
+            renderRow={this._renderRow}
+            renderSeparator={this._renderSeparator}
+            contentContainerStyle={styles.listContainer}
+            style={styles.list}
+        />
+        </View>
+    );
+    }
+
+    _renderSeparator(sectionId, rowId) {
+        return <View key={rowId} style={styles.separator} />;
+    }
+
+    _renderRow = example => {
+        return (
+            <TouchableHighlight
+                onPress={() => {
+                    example.action(this);
+                }}
+                style={styles.row}
+                underlayColor="#209cca50"
+            >
+                <View style={styles.rowContent}>
+                    <Text style={styles.name}>{example.name}</Text>
+                    <Text style={styles.description}>{example.description}</Text>
+                </View>
+            </TouchableHighlight>
+        );
+    };
+}
+
+class PdfViewScreen extends Component<{}> {
     constructor(props) {
         super(props);
     }
@@ -31,19 +98,32 @@ export default class Catalog extends Component<{}> {
         return (
             <View style={styles.page}>
                 <PSPDFKitView style={styles.pdfView}
-                    document="ms-appx:///Assets/pdf/annualReport.pdf"
-                    pageIndex={4}/>
+                    document="ms-appx:///Assets/pdf/annualReport.pdf"/>
                 <View style={styles.footer}>
-                    <View style={styles.button}>
-                        <Button onPress={() => PSPDFKit.OpenFile()} title="Open"/>
-                    </View>
-                    <Image source={require('./assets/logo-flat.png')} style={styles.logo}/>
+                <View style={styles.button}>
+                <Button onPress={() => PSPDFKit.OpenFile()} title="Open" />
+                </View>
+                    <Image source={require('./assets/logo-flat.png')} style={styles.logo} />
                     <Text style={styles.version}>SDK Version : {PSPDFKit.versionString}</Text>
                 </View>
             </View>
         );
     }
 }
+
+export default StackNavigator(
+    {
+        Catalog: {
+            screen: CatalogScreen
+        },
+        PdfView: {
+            screen: PdfViewScreen
+        },
+    },
+    {
+        initialRouteName: "Catalog"
+    }
+);
 
 var styles = StyleSheet.create({
 
@@ -73,4 +153,31 @@ var styles = StyleSheet.create({
         width: 50,
         margin: 10
     },
+    separator: {
+        height: 0.5,
+        backgroundColor: "#ccc",
+        marginLeft: 10
+    },
+    header: {
+        alignItems: "center",
+        borderBottomWidth: 0.5,
+        borderColor: "#ccc"
+    },
+    listContainer: {
+        backgroundColor: "white"
+    },
+    list: {},
+    name: {
+        color: "#209cca",
+        fontWeight: "700",
+        fontSize: 14,
+        marginBottom: 4
+    },
+    description: {
+        color: "#666666",
+        fontSize: 12
+    },
+    rowContent: {
+        padding: 10
+    }
 });

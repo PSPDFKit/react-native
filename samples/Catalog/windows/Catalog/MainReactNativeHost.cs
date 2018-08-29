@@ -2,6 +2,8 @@ using ReactNative;
 using ReactNative.Modules.Core;
 using ReactNative.Shell;
 using System.Collections.Generic;
+using Windows.UI.Core;
+
 namespace Catalog
 {
     class MainReactNativeHost : ReactNativeHost

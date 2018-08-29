@@ -8,6 +8,7 @@
 //
 
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using PSPDFKit.Document;
 using PSPDFKit.UI;
@@ -19,13 +20,20 @@ namespace ReactNativePSPDFKit
 {
     public sealed partial class PDFViewPage : Page
     {
-        private readonly ViewState _viewStateCache = new ViewState();
-        private StorageFile _fileToOpen = null;
+        private StorageFile _fileToOpen;
         private bool _pdfViewInitialised = false;
         
         public PDFViewPage()
         {
             InitializeComponent();
+
+            PDFView.OnSuspendUnloading += (sender, args) =>
+            {
+                // Reset the displated document.
+                // This is a work aronud to ensure that if the user navigates away from
+                // the Page and then back, a document will still be shown.
+                _fileToOpen = null;
+            };
         }
 
         /// <summary>
@@ -41,7 +49,7 @@ namespace ReactNativePSPDFKit
             {
                 try
                 {
-                    await PDFView.Controller.ShowDocumentWithViewStateAsync(DocumentSource.CreateFromStorageFile(file), _viewStateCache);
+                    await PDFView.Controller.ShowDocumentAsync(DocumentSource.CreateFromStorageFile(file));
                 }
                 catch (Exception e)
                 {
@@ -54,19 +62,11 @@ namespace ReactNativePSPDFKit
 
         internal async Task SetPageIndexAsync(int index)
         {
-            _viewStateCache.CurrentPageIndex = index;
-
-            // If the PdfView is already initialised we can change the page index.
-            if (_pdfViewInitialised)
-            {
-                await PDFView.Controller.SetCurrentPageIndexAsync(index);
-            }
+           await PDFView.Controller.SetCurrentPageIndexAsync(index);
         }
 
         internal void SetShowToolbar(bool showToolbar)
         {
-            _viewStateCache.ShowToolbar = showToolbar;
-
             PDFView.ShowToolbar = showToolbar;
         }
 
@@ -75,7 +75,7 @@ namespace ReactNativePSPDFKit
             // If we already have a file to open lets proceed with that here.
             if (_fileToOpen != null)
             {
-                await PDFView.Controller.ShowDocumentWithViewStateAsync(DocumentSource.CreateFromStorageFile(_fileToOpen), _viewStateCache);
+                await PDFView.Controller.ShowDocumentAsync(DocumentSource.CreateFromStorageFile(_fileToOpen));
             }
             _pdfViewInitialised = true;
         }

@@ -17,28 +17,17 @@ namespace ReactNativePSPDFKit
 {
     public class PSPDFKitViewManger : SimpleViewManager<PDFViewPage>
     {
-        private PDFViewPage _pdfViewPage;
-
-        public PSPDFKitViewManger()
-        {
-            _pdfViewPage = new PDFViewPage();
-        }
+        internal readonly PDFViewPage PdfViewPage = new PDFViewPage();
 
         protected override PDFViewPage CreateViewInstance(ThemedReactContext reactContext)
         {
-            return _pdfViewPage;
+            return PdfViewPage;
         }
 
         /// <summary>
         /// The name to be used when creating the js modules
         /// </summary>
-        public override string Name
-        {
-            get
-            {
-                return "ReactPSPDFKitView";
-            }
-        }
+        public override string Name => "ReactPSPDFKitView";
 
         [ReactProp("document")]
         public async void SetDocumentAsync(PDFViewPage view, String document)
@@ -57,15 +46,6 @@ namespace ReactNativePSPDFKit
         public void SetHideNavigationBar(PDFViewPage view, bool hideNavigationBar)
         {
             view.SetShowToolbar(!hideNavigationBar);
-        }
-
-        /// <summary>
-        /// Pass a file to the PDFView to display.
-        /// </summary>
-        /// <param name="file">file to be displayed</param>
-        internal async Task OpenFileAsync(StorageFile file)
-        {
-            await _pdfViewPage.OpenFileAsync(file);
         }
     }
 }

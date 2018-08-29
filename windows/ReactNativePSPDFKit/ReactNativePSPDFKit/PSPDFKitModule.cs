@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
+using PSPDFKit.UI;
 
 namespace ReactNativePSPDFKit
 {
@@ -20,12 +21,12 @@ namespace ReactNativePSPDFKit
     /// </summary>
     class PSPDFKitModule : ReactContextNativeModuleBase
     {
-        private readonly PSPDFKitViewManger _pspdfKitViewManger;
+        private readonly PDFViewPage _pdfViewPage;
         private string VERSION_KEY = "versionString";
 
-        public PSPDFKitModule(ReactContext reactContext, PSPDFKitViewManger pspdfKitViewManger) : base(reactContext)
+        public PSPDFKitModule(ReactContext reactContext, PDFViewPage pdfViewPage) : base(reactContext)
         {
-            _pspdfKitViewManger = pspdfKitViewManger;
+            _pdfViewPage = pdfViewPage;
         }
 
         /// <summary>
@@ -68,7 +69,7 @@ namespace ReactNativePSPDFKit
         {
             if (file == null) return;
 
-            await _pspdfKitViewManger.OpenFileAsync(file);
+            await _pdfViewPage.OpenFileAsync(file);
         }
 
         /// <summary>
