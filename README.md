@@ -9,7 +9,8 @@ This wrapper requires a valid license of PSPDFKit. Licenses are per platform. Yo
 * [React Native UI Component for Android](https://pspdfkit.com/blog/2018/react-native-ui-component-for-android/) ([See Android](https://github.com/PSPDFKit/react-native#android))
 * [PSPDFKit for Windows UWP with React 
 Native](https://pspdfkit.com/blog/2018/introducing-pspdfkit-windows/#react-native-for-windows-support) ([See Windows UWP](https://github.com/PSPDFKit/react-native#windows-uwp))
-* [How to Extend React Native API](https://pspdfkit.com/blog/2018/how-to-extend-react-native-api/)
+* [How to Extend React Native APIs](https://pspdfkit.com/blog/2018/how-to-extend-react-native-api/)
+* [Advanced Techniques for React Native UI Components](https://pspdfkit.com/blog/2018/advanced-techniques-for-react-native-ui-components/)
 
 #### PSPDFKit
 
