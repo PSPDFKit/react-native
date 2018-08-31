@@ -11,7 +11,6 @@ import {
     requireNativeComponent,
     ViewPropTypes,
     findNodeHandle,
-    NativeModules,
     UIManager
 } from "react-native";
 
@@ -20,9 +19,16 @@ class PSPDFKitView extends React.Component {
         return (
             <RCTPSPDFKitView
                 ref = "pdfView"
-                {...this.props}/>
+                {...this.props}
+                onAnnotationsChanged= { this._onAnnotationsChanged } />
         );
     }
+
+    _onAnnotationsChanged = (event) => {
+        if (this.props.onAnnotationsChanged) {
+            this.props.onAnnotationsChanged(event.nativeEvent);
+        }
+    };
 
     /**
      * Enters the annotation creation mode, showing the annotation creation toolbar.
@@ -31,7 +37,7 @@ class PSPDFKitView extends React.Component {
     enterAnnotationCreationMode = function () {
         UIManager.dispatchViewManagerCommand(
             findNodeHandle(this.refs.pdfView),
-            NativeModules.RCTPSPDFKitView.Commands.enterAnnotationCreationMode,
+            UIManager.RCTPSPDFKitView.Commands.enterAnnotationCreationMode,
            []
         );
     };
@@ -42,7 +48,7 @@ class PSPDFKitView extends React.Component {
     exitCurrentlyActiveMode = function () {
         UIManager.dispatchViewManagerCommand(
             findNodeHandle(this.refs.pdfView),
-            NativeModules.RCTPSPDFKitView.Commands.exitCurrentlyActiveMode,
+            UIManager.RCTPSPDFKitView.Commands.exitCurrentlyActiveMode,
             []
         );
     };
@@ -53,7 +59,7 @@ class PSPDFKitView extends React.Component {
     saveCurrentDocument = function () {
         UIManager.dispatchViewManagerCommand(
             findNodeHandle(this.refs.pdfView),
-            NativeModules.RCTPSPDFKitView.Commands.saveCurrentDocument,
+            UIManager.RCTPSPDFKitView.Commands.saveCurrentDocument,
             []
         );
     }
@@ -78,7 +84,7 @@ class PSPDFKitView extends React.Component {
 
         UIManager.dispatchViewManagerCommand(
             findNodeHandle(this.refs.pdfView),
-            NativeModules.RCTPSPDFKitView.Commands.getAnnotations,
+            UIManager.RCTPSPDFKitView.Commands.getAnnotations,
             []
         );
 
@@ -93,7 +99,7 @@ class PSPDFKitView extends React.Component {
     addAnnotation = function (annotation) {
         UIManager.dispatchViewManagerCommand(
             findNodeHandle(this.refs.pdfView),
-            NativeModules.RCTPSPDFKitView.Commands.addAnnotation,
+            UIManager.RCTPSPDFKitView.Commands.addAnnotation,
             []
         );
     }
@@ -114,7 +120,7 @@ class PSPDFKitView extends React.Component {
 
         UIManager.dispatchViewManagerCommand(
             findNodeHandle(this.refs.pdfView),
-            NativeModules.RCTPSPDFKitView.Commands.getAllUnsavedAnnotations,
+            UIManager.RCTPSPDFKitView.Commands.getAllUnsavedAnnotations,
             []
         );
 
@@ -129,7 +135,7 @@ class PSPDFKitView extends React.Component {
     addAnnotations = function (annotations) {
         UIManager.dispatchViewManagerCommand(
             findNodeHandle(this.refs.pdfView),
-            NativeModules.RCTPSPDFKitView.Commands.addAnnotations,
+            UIManager.RCTPSPDFKitView.Commands.addAnnotations,
             []
         );
     }
@@ -145,7 +151,7 @@ class PSPDFKitView extends React.Component {
     getFormFieldValue = function (fullyQualifiedName) {
         UIManager.dispatchViewManagerCommand(
             findNodeHandle(this.refs.pdfView),
-            NativeModules.RCTPSPDFKitView.Commands.getFormFieldValue,
+            UIManager.RCTPSPDFKitView.Commands.getFormFieldValue,
             []
         );
     }
@@ -159,7 +165,7 @@ class PSPDFKitView extends React.Component {
     setFormFieldValue = function (fullyQualifiedName, value) {
         UIManager.dispatchViewManagerCommand(
             findNodeHandle(this.refs.pdfView),
-            NativeModules.RCTPSPDFKitView.Commands.setFormFieldValue,
+            UIManager.RCTPSPDFKitView.Commands.setFormFieldValue,
             []
         );
     }
@@ -178,6 +184,15 @@ PSPDFKitView.propTypes = {
      * Controls wheter a navigation bar is created and shown or not. Defaults to showing a navigation bar (false).
      */
     hideNavigationBar: PropTypes.bool,
+    /**
+     * Callback that is called when an annotation is added, changed, or removed.
+     * Returns an object with the following structure:
+     * {
+     *    change: "changed"|"added"|"removed",
+     *    annotations: [instantJson]
+     * }
+     */
+    onAnnotationsChanged: PropTypes.func,
     ...ViewPropTypes
 };
 

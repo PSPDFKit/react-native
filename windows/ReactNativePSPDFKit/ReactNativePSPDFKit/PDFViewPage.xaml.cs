@@ -21,10 +21,12 @@ namespace ReactNativePSPDFKit
     {
         private StorageFile _fileToOpen;
         private bool _pdfViewInitialised = false;
+        public readonly PdfView Pdfview;
         
         public PDFViewPage()
         {
             InitializeComponent();
+            Pdfview = PDFView;
 
             PDFView.OnSuspendUnloading += (sender, args) =>
             {
@@ -60,7 +62,7 @@ namespace ReactNativePSPDFKit
             {
                 try
                 {
-                    await PDFView.Controller.ShowDocumentAsync(DocumentSource.CreateFromStorageFile(file));
+                    await PDFView.OpenStorageFileAsync(file);
                 }
                 catch (Exception e)
                 {
@@ -86,7 +88,7 @@ namespace ReactNativePSPDFKit
             // If we already have a file to open lets proceed with that here.
             if (_fileToOpen != null)
             {
-                await PDFView.Controller.ShowDocumentAsync(DocumentSource.CreateFromStorageFile(_fileToOpen));
+                await PDFView.OpenStorageFileAsync(_fileToOpen);
             }
             _pdfViewInitialised = true;
         }

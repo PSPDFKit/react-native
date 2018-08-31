@@ -41,7 +41,15 @@ var examples = [
             // See https://docs.microsoft.com/en-us/windows/uwp/files/file-access-permissions
             PSPDFKit.Present("ms-appx:///Assets/pdf/Business Report.pdf");
         }
-    }
+    },
+    {
+        name: "Event Listeners",
+        description:
+            "Show how to use the listeners exposed by PSPDFKitView component.",
+        action: component => {
+            component.props.navigation.navigate("PdfViewListenersScreen");
+        }
+    },
 ];
 
 class CatalogScreen extends Component<{}> {
@@ -100,52 +108,7 @@ class CatalogScreen extends Component<{}> {
 }
 
 class PdfViewScreen extends Component<{}> {
-    static navigationOptions = ({ navigation }) => {
-        const params = navigation.state.params || {};
-
-        return {
-            title: "PDF",
-            headerRight: (
-                <Button onPress={() => params.handleAnnotationButtonPress()} title="Annotations" />
-            )
-        };
-    };
-
-    constructor(props) {
-        super(props);
-        this.state = {
-            currentPageIndex: 0,
-            pageCount: 0,
-            annotationCreationActive: false,
-            annotationEditingActive: false
-        };
-    }
-
-    componentWillMount() {
-        this.props.navigation.setParams({
-            handleAnnotationButtonPress: () => {
-                if (
-                    this.state.annotationCreationActive ||
-                        this.state.annotationEditingActive
-                ) {
-                    this.refs.pdfView.exitCurrentlyActiveMode();
-                } else {
-                    this.refs.pdfView.enterAnnotationCreationMode();
-                }
-            }
-        });
-    }
-
     render() {
-        let buttonTitle = "";
-        if (this.state.annotationCreationActive) {
-            buttonTitle = "Exit Annotation Creation Mode";
-        } else if (this.state.annotationEditingActive) {
-            buttonTitle = "Exit Annotation Editing Mode";
-        } else {
-            buttonTitle = "Enter Annotation Creation Mode";
-        }
-
         return (
             <View style={styles.page}>
                 <PSPDFKitView
@@ -165,6 +128,39 @@ class PdfViewScreen extends Component<{}> {
     }
 }
 
+class PdfViewListenersScreen extends Component<{}> {
+    static navigationOptions = ({ navigation }) => {
+        return {
+            title: "Event Listeners"
+        };
+    };
+
+    render() {
+        return (
+            <View style={styles.page}>
+                <PSPDFKitView
+                    ref="pdfView"
+                    style={styles.pdfView}
+                    // The default file to open.
+                    document="ms-appx:///Assets/pdf/annualReport.pdf"
+                    onDocumentSaved={e => {
+                        alert("Document was saved!")
+                    }}
+                    onDocumentSaveFailed={e => {
+                        alert("Document couldn't be saved: " + e.error)
+                    }}
+                    onAnnotationTapped={e => {
+                        alert("Annotation was tapped\n" + JSON.stringify(e))
+                    }}
+                    onAnnotationsChanged={e => {
+                        alert("Annotations changed\n" + JSON.stringify(e))
+                    }}
+                />
+            </View>
+        )
+    }
+}
+
 export default StackNavigator(
     {
         Catalog: {
@@ -172,6 +168,9 @@ export default StackNavigator(
         },
         PdfView: {
             screen: PdfViewScreen
+        },
+        PdfViewListenersScreen: {
+            screen: PdfViewListenersScreen
         },
     },
     {
