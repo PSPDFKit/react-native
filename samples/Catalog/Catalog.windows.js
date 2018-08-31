@@ -20,8 +20,8 @@ import {
     Button
 } from 'react-native';
 import { StackNavigator } from "react-navigation";
+import PSPDFKitView from "react-native-pspdfkit";
 
-var PSPDFKitView = require('react-native-pspdfkit');
 var PSPDFKit = NativeModules.ReactPSPDFKit;
 
 var examples = [
@@ -100,14 +100,57 @@ class CatalogScreen extends Component<{}> {
 }
 
 class PdfViewScreen extends Component<{}> {
+    static navigationOptions = ({ navigation }) => {
+        const params = navigation.state.params || {};
+
+        return {
+            title: "PDF",
+            headerRight: (
+                <Button onPress={() => params.handleAnnotationButtonPress()} title="Annotations" />
+            )
+        };
+    };
+
     constructor(props) {
         super(props);
+        this.state = {
+            currentPageIndex: 0,
+            pageCount: 0,
+            annotationCreationActive: false,
+            annotationEditingActive: false
+        };
+    }
+
+    componentWillMount() {
+        this.props.navigation.setParams({
+            handleAnnotationButtonPress: () => {
+                if (
+                    this.state.annotationCreationActive ||
+                        this.state.annotationEditingActive
+                ) {
+                    this.refs.pdfView.exitCurrentlyActiveMode();
+                } else {
+                    this.refs.pdfView.enterAnnotationCreationMode();
+                }
+            }
+        });
     }
 
     render() {
+        let buttonTitle = "";
+        if (this.state.annotationCreationActive) {
+            buttonTitle = "Exit Annotation Creation Mode";
+        } else if (this.state.annotationEditingActive) {
+            buttonTitle = "Exit Annotation Editing Mode";
+        } else {
+            buttonTitle = "Enter Annotation Creation Mode";
+        }
+
         return (
             <View style={styles.page}>
-                <PSPDFKitView style={styles.pdfView}
+                <PSPDFKitView
+                    ref="pdfView"
+                    style={styles.pdfView}
                     // The default file to open.
                     document="ms-appx:///Assets/pdf/annualReport.pdf"/>
                 <View style={styles.footer}>
