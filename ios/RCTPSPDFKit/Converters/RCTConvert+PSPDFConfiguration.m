@@ -170,7 +170,7 @@ RCT_ENUM_CONVERTER(PSPDFSignatureSavingStrategy,
  PSPDFAnnotationString const PSPDFAnnotationStringWatermark = @"Watermark";
  PSPDFAnnotationString const PSPDFAnnotationStringTrapNet = @"TrapNet";
  PSPDFAnnotationString const PSPDFAnnotationString3D = @"3D";
- PSPDFAnnotationString const PSPDFAnnotationStringRedact = @"Redact";
+ PSPDFAnnotationString const PSPDFAnnotationStringRedaction = @"Redact";
  */
 
 RCT_MULTI_ENUM_CONVERTER(PSPDFAnnotationType,
@@ -200,7 +200,7 @@ RCT_MULTI_ENUM_CONVERTER(PSPDFAnnotationType,
                             PSPDFAnnotationStringWatermark : @(PSPDFAnnotationTypeWatermark),
                             PSPDFAnnotationStringTrapNet : @(PSPDFAnnotationTypeTrapNet),
                             PSPDFAnnotationString3D : @(PSPDFAnnotationTypeThreeDimensional),
-                            PSPDFAnnotationStringRedact : @(PSPDFAnnotationTypeRedact),
+                            PSPDFAnnotationStringRedaction : @(PSPDFAnnotationTypeRedaction),
                             @"all" : @(PSPDFAnnotationTypeAll)}),
                          PSPDFAnnotationTypeNone,
                          unsignedIntegerValue)
