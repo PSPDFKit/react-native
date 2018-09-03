@@ -8,12 +8,17 @@
 //
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using PSPDFKit.Document;
 using PSPDFKit.UI;
 using Windows.Storage;
 using Windows.UI.Popups;
 using Windows.UI.Xaml.Controls;
+using PSPDFKit.Pdf.Annotation;
+using ReactNative.UIManager;
+using ReactNative.UIManager.Events;
+using ReactNativePSPDFKit.Events;
 
 namespace ReactNativePSPDFKit
 {
@@ -34,6 +39,13 @@ namespace ReactNativePSPDFKit
                 // This is a work aronud to ensure that if the user navigates away from
                 // the Page and then back, a document will still be shown.
                 _fileToOpen = null;
+            };
+
+            PDFView.OnDocumentOpened += (pdfView, document) =>
+            {
+                document.AnnotationsCreated += DocumentOnAnnotationsCreated;
+                document.AnnotationsUpdated += DocumentOnAnnotationsUpdated;
+                document.AnnotationsDeleted += DocumentOnAnnotationsDeleted;
             };
         }
 
@@ -73,6 +85,30 @@ namespace ReactNativePSPDFKit
             }
         }
 
+        internal async Task ExportCurrentDocument()
+        {
+            try
+            {
+                // Get the StorageFile
+                var file = PDFView.Controller?.GetPdfDocument()?.DocumentSource.GetFile();
+                if (file != null)
+                {
+                    // Save it.
+                    await PDFView.Document.ExportAsync(file);
+                }
+
+                this.GetReactContext().GetNativeModule<UIManagerModule>().EventDispatcher.DispatchEvent(
+                    new PdfViewDocumentSavedEvent(this.GetTag())
+                );
+            }
+            catch (Exception e)
+            {
+                this.GetReactContext().GetNativeModule<UIManagerModule>().EventDispatcher.DispatchEvent(
+                    new PdfViewDocumentSaveFailedEvent(this.GetTag(), e.Message)
+                );
+            }
+        }
+
         internal async Task SetPageIndexAsync(int index)
         {
            await PDFView.Controller.SetCurrentPageIndexAsync(index);
@@ -92,5 +128,39 @@ namespace ReactNativePSPDFKit
             }
             _pdfViewInitialised = true;
         }
+
+        private void DocumentOnAnnotationsCreated(object sender, IList<IAnnotation> annotationList)
+        {
+            foreach (var annotation in annotationList)
+            {
+                this.GetReactContext().GetNativeModule<UIManagerModule>().EventDispatcher.DispatchEvent(
+                        new PdfViewAnnotationChangedEvent(this.GetTag(),
+                            PdfViewAnnotationChangedEvent.EVENT_TYPE_ADDED, annotation)
+                    );
+            }
+        }
+
+        private void DocumentOnAnnotationsUpdated(object sender, IList<IAnnotation> annotationList)
+        {
+            foreach (var annotation in annotationList)
+            {
+                this.GetReactContext().GetNativeModule<UIManagerModule>().EventDispatcher.DispatchEvent(
+                        new PdfViewAnnotationChangedEvent(this.GetTag(),
+                            PdfViewAnnotationChangedEvent.EVENT_TYPE_CHANGED, annotation)
+                    );
+            }
+        }
+
+        private void DocumentOnAnnotationsDeleted(object sender, IList<IAnnotation> annotationList)
+        {
+            foreach (var annotation in annotationList)
+            {
+                this.GetReactContext().GetNativeModule<UIManagerModule>().EventDispatcher.DispatchEvent(
+                        new PdfViewAnnotationChangedEvent(this.GetTag(),
+                            PdfViewAnnotationChangedEvent.EVENT_TYPE_REMOVED, annotation)
+                    );
+            }
+        }
+
     }
 }

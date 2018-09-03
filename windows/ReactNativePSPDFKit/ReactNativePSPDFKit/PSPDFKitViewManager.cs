@@ -34,61 +34,7 @@ namespace ReactNativePSPDFKit
         private const int COMMAND_GET_FORM_FIELD_VALUE = 8;
         private const int COMMAND_SET_FORM_FIELD_VALUE = 9;
 
-        internal readonly PDFViewPage PdfViewPage;
-
-        public PSPDFKitViewManger()
-        {
-            PdfViewPage = new PDFViewPage();
-            PdfViewPage.Pdfview.OnDocumentOpened += (pdfView, document) =>
-            {
-                document.AnnotationsCreated += DocumentOnAnnotationsCreated;
-                document.AnnotationsUpdated += DocumentOnAnnotationsUpdated;
-                document.AnnotationsDeleted += DocumentOnAnnotationsDeleted;
-            };
-        }
-
-        private void DocumentOnAnnotationsCreated(object sender, IList<IAnnotation> annotationList)
-        {
-            foreach (var annotation in annotationList)
-            {
-                PdfViewPage.GetReactContext()
-                    .GetNativeModule<UIManagerModule>()
-                    .EventDispatcher
-                    .DispatchEvent(
-                        new PdfViewAnnotationChangedEvent(PdfViewPage.GetTag(),
-                            PdfViewAnnotationChangedEvent.EVENT_TYPE_ADDED, annotation)
-                    );
-            }
-        }
-
-        private void DocumentOnAnnotationsUpdated(object sender, IList<IAnnotation> annotationList)
-        {
-            foreach (var annotation in annotationList)
-            {
-                PdfViewPage.GetReactContext()
-                    .GetNativeModule<UIManagerModule>()
-                    .EventDispatcher
-                    .DispatchEvent(
-                        new PdfViewAnnotationChangedEvent(PdfViewPage.GetTag(),
-                            PdfViewAnnotationChangedEvent.EVENT_TYPE_CHANGED, annotation)
-                    );
-            }
-        }
-
-        private void DocumentOnAnnotationsDeleted(object sender, IList<IAnnotation> annotationList)
-        {
-            foreach (var annotation in annotationList)
-            {
-                PdfViewPage.GetReactContext()
-                    .GetNativeModule<UIManagerModule>()
-                    .EventDispatcher
-                    .DispatchEvent(
-                        new PdfViewAnnotationChangedEvent(PdfViewPage.GetTag(),
-                            PdfViewAnnotationChangedEvent.EVENT_TYPE_REMOVED, annotation)
-                    );
-            }
-        }
-
+        internal readonly PDFViewPage PdfViewPage = new PDFViewPage();
 
         protected override PDFViewPage CreateViewInstance(ThemedReactContext reactContext)
         {
@@ -162,8 +108,7 @@ namespace ReactNativePSPDFKit
                     await PdfViewPage.Pdfview.Controller.SetInteractionModeAsync(InteractionMode.None);
                     break;
                 case COMMAND_SAVE_CURRENT_DOCUMENT:
-                    // TODO Save to current document?
-                    // await PdfViewPage.Pdfview.Document.ExportAsync()
+                    await PdfViewPage.ExportCurrentDocument();
                     break;
                 case COMMAND_GET_ANNOTATIONS:
                     break;
@@ -188,6 +133,20 @@ namespace ReactNativePSPDFKit
                     new Dictionary<string, object>
                     {
                         {"registrationName", "onAnnotationsChanged"},
+                    }
+                },
+                {
+                    PdfViewDocumentSavedEvent.EVENT_NAME,
+                    new Dictionary<string, object>
+                    {
+                        {"registrationName", "onDocumentSaved"},
+                    }
+                },
+                {
+                    PdfViewDocumentSaveFailedEvent.EVENT_NAME,
+                    new Dictionary<string, object>
+                    {
+                        {"registrationName", "onDocumentSaveFailed"},
                     }
                 }
             };

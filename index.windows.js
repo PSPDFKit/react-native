@@ -20,13 +20,27 @@ class PSPDFKitView extends React.Component {
             <RCTPSPDFKitView
                 ref = "pdfView"
                 {...this.props}
-                onAnnotationsChanged= { this._onAnnotationsChanged } />
+                onAnnotationsChanged={this._onAnnotationsChanged}
+                onDocumentSaved={this._onDocumentSaved}
+                onDocumentSaveFailed={this._onDocumentSaveFailed} />
         );
     }
 
     _onAnnotationsChanged = (event) => {
         if (this.props.onAnnotationsChanged) {
             this.props.onAnnotationsChanged(event.nativeEvent);
+        }
+    };
+
+    _onDocumentSaved = (event) => {
+        if (this.props.onDocumentSaved) {
+            this.props.onDocumentSaved(event.nativeEvent);
+        }
+    };
+
+    _onDocumentSaveFailed = (event) => {
+        if (this.props.onDocumentSaveFailed) {
+            this.props.onDocumentSaveFailed(event.nativeEvent);
         }
     };
 

@@ -130,10 +130,17 @@ class PdfViewScreen extends Component<{}> {
 
 class PdfViewListenersScreen extends Component<{}> {
     static navigationOptions = ({ navigation }) => {
+        const params = navigation.state.params || {};
+
         return {
-            title: "Event Listeners"
+            title: "Event Listeners",
+        headerRight: (<Button onPress={() => params.handleSaveButtonPress()} title="Save" />)
         };
     };
+
+    componentWillMount() {
+        this.props.navigation.setParams({ handleSaveButtonPress: () => this.refs.pdfView.saveCurrentDocument() });
+    }
 
     render() {
         return (
