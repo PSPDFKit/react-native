@@ -10,6 +10,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Windows.Data.Json;
 using ReactNative.UIManager;
 using ReactNative.UIManager.Annotations;
 using Windows.Storage;
@@ -29,10 +30,6 @@ namespace ReactNativePSPDFKit
         private const int COMMAND_SAVE_CURRENT_DOCUMENT = 3;
         private const int COMMAND_GET_ANNOTATIONS = 4;
         private const int COMMAND_ADD_ANNOTATION = 5;
-        private const int COMMAND_GET_ALL_UNSAVED_ANNOTATIONS = 6;
-        private const int COMMAND_ADD_ANNOTATIONS = 7;
-        private const int COMMAND_GET_FORM_FIELD_VALUE = 8;
-        private const int COMMAND_SET_FORM_FIELD_VALUE = 9;
 
         internal readonly PDFViewPage PdfViewPage = new PDFViewPage();
 
@@ -81,20 +78,7 @@ namespace ReactNativePSPDFKit
             },
             {
                 "addAnnotation", COMMAND_ADD_ANNOTATION
-            },
-            {
-                "getAllUnsavedAnnotations", COMMAND_GET_ALL_UNSAVED_ANNOTATIONS
-            },
-            {
-                "addAnnotations", COMMAND_ADD_ANNOTATIONS
-            },
-            {
-                "getFormFieldValue", COMMAND_GET_FORM_FIELD_VALUE
-            },
-            {
-                "setFormFieldValue", COMMAND_SET_FORM_FIELD_VALUE
             }
-
         };
 
         public override async void ReceiveCommand(PDFViewPage view, int commandId, JArray args)
@@ -111,16 +95,10 @@ namespace ReactNativePSPDFKit
                     await PdfViewPage.ExportCurrentDocument();
                     break;
                 case COMMAND_GET_ANNOTATIONS:
+                    await PdfViewPage.GetAnnotations(args[0].Value<int>(), args[1].Value<int>());
                     break;
                 case COMMAND_ADD_ANNOTATION:
-                    break;
-                case COMMAND_GET_ALL_UNSAVED_ANNOTATIONS:
-                    break;
-                case COMMAND_ADD_ANNOTATIONS:
-                    break;
-                case COMMAND_GET_FORM_FIELD_VALUE:
-                    break;
-                case COMMAND_SET_FORM_FIELD_VALUE:
+                    await PdfViewPage.Pdfview.Document.CreateAnnotationAsync(Factory.FromJson(JsonObject.Parse(args[0].ToString())));
                     break;
             }
         }
@@ -147,6 +125,13 @@ namespace ReactNativePSPDFKit
                     new Dictionary<string, object>
                     {
                         {"registrationName", "onDocumentSaveFailed"},
+                    }
+                },
+                {
+                    PdfViewDataReturnedEvent.EVENT_NAME,
+                    new Dictionary<string, object>
+                    {
+                        {"registrationName", "onDataReturned"},
                     }
                 }
             };

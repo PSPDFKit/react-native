@@ -109,6 +109,24 @@ namespace ReactNativePSPDFKit
             }
         }
 
+        internal async Task GetAnnotations(int requestId, int pageIndex)
+        {
+            try
+            {
+                var annotations = await Pdfview.Document.GetAnnotationsAsync(pageIndex);
+
+                this.GetReactContext().GetNativeModule<UIManagerModule>().EventDispatcher.DispatchEvent(
+                    new PdfViewDataReturnedEvent(this.GetTag(), requestId, annotations)
+                );
+            }
+            catch (Exception e)
+            {
+                this.GetReactContext().GetNativeModule<UIManagerModule>().EventDispatcher.DispatchEvent(
+                    new PdfViewDataReturnedEvent(this.GetTag(), requestId, e.Message)
+                );
+            }
+        }
+
         internal async Task SetPageIndexAsync(int index)
         {
            await PDFView.Controller.SetCurrentPageIndexAsync(index);
@@ -161,6 +179,5 @@ namespace ReactNativePSPDFKit
                     );
             }
         }
-
     }
 }
