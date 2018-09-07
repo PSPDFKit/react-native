@@ -143,7 +143,7 @@ PSPDFKitView.propTypes = {
      */
     pageIndex: PropTypes.number,
     /**
-     * Controls wheter a navigation bar is created and shown or not. Defaults to showing a navigation bar (false).
+     * Controls whether a navigation bar is created and shown or not. Defaults to showing a navigation bar (false).
      */
     hideNavigationBar: PropTypes.bool,
     /**
