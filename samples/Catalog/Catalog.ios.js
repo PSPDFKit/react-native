@@ -311,7 +311,6 @@ class EventListeners extends Component {
             thumbnailBarMode: 'scrollable',
             useParentNavigationBar: true,
           }}
-          showCloseButton={true}
           style={{ flex: 1, color: pspdfkitColor }}
 
           // Event Listeners
@@ -362,8 +361,6 @@ class ChangePages extends Component {
             useParentNavigationBar: true,
           }}
           pageIndex={this.state.currentPageIndex}
-          showCloseButton={true}
-          onCloseButtonPressed={this.props.onClose}
           style={{ flex: 1, color: pspdfkitColor }}
           onStateChanged={event => {
             this.setState({
@@ -425,8 +422,6 @@ class AnnotationCreationMode extends Component {
               useParentNavigationBar: true,
             }}
             pageIndex={this.state.currentPageIndex}
-            showCloseButton={true}
-            onCloseButtonPressed={this.props.onClose}
             style={{ flex: 1, color: pspdfkitColor }}
             onStateChanged={event => {
               this.setState({
