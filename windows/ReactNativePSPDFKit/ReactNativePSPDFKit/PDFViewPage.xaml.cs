@@ -10,14 +10,12 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using PSPDFKit.Document;
 using PSPDFKit.UI;
 using Windows.Storage;
 using Windows.UI.Popups;
 using Windows.UI.Xaml.Controls;
 using PSPDFKit.Pdf.Annotation;
 using ReactNative.UIManager;
-using ReactNative.UIManager.Events;
 using ReactNativePSPDFKit.Events;
 
 namespace ReactNativePSPDFKit

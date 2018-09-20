@@ -7,6 +7,10 @@
 //  This notice may not be removed from this file.
 //
 
+using Newtonsoft.Json.Linq;
+using PSPDFKit;
+using PSPDFKit.Search;
+using PSPDFKitFoundation.Search;
 using ReactNative.Bridge;
 using System;
 using System.Collections.Generic;
@@ -24,6 +28,7 @@ namespace ReactNativePSPDFKit
     {
         private readonly PDFViewPage _pdfViewPage;
         private string VERSION_KEY = "versionString";
+        private Library library;
 
         public PSPDFKitModule(ReactContext reactContext, PDFViewPage pdfViewPage) : base(reactContext)
         {
@@ -67,6 +72,68 @@ namespace ReactNativePSPDFKit
                     var dialog = new MessageDialog("Unable to open the file specified.");
                     await dialog.ShowAsync();
                 }
+            });
+        }
+
+        [ReactMethod]
+        public void OpenLibrary(string libraryName, IPromise promise)
+        { 
+            DispatcherHelpers.RunOnDispatcher(async () =>
+            {
+                try
+                {
+                    Sdk.Initialize(_pdfViewPage.Pdfview.License);
+
+                    // Opening a library creates one if it doesn't already exist.
+                    library = await Library.OpenLibraryAsync(libraryName);
+
+                    // Find a folder containing PDFs.
+                    var folderPicker = new Windows.Storage.Pickers.FolderPicker
+                    {
+                        SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.Desktop
+                    };
+                    folderPicker.FileTypeFilter.Add("*");
+
+                    Windows.Storage.StorageFolder folder = await folderPicker.PickSingleFolderAsync();
+                    if (folder != null)
+                    {
+                        // Queue up the PDFs in the folder for indexing.
+                        await library.EnqueueDocumentsInFolderAsync(folder);
+
+                        promise.Resolve(true);
+                    } else
+                    {
+                        promise.Reject("Unable to open the folder specified");
+                    }
+                }
+                catch (Exception e)
+                {
+                    promise.Reject(e);
+                }
+            });
+        }
+
+        [ReactMethod]
+        public void SearchLibrary(string searchTerm, IPromise promise)
+        {
+            DispatcherHelpers.RunOnDispatcher(async () =>
+            {
+                // Wait for indexing to finish.
+                await library.WaitForAllIndexingTasksToFinishAsync();
+
+                var resultsFromHandlerTcs = new TaskCompletionSource<IDictionary<string, LibraryQueryResult>>();
+                library.OnSearchComplete += (sender, args) => { resultsFromHandlerTcs.SetResult(args); };
+
+                // Search all documents in the library for the text "Acme."
+                var succeeded = await library.SearchAsync(new LibraryQuery(searchTerm));
+
+                if(!succeeded)
+                {
+                    promise.Reject("");
+                }
+
+                var resultsFromHandler = await resultsFromHandlerTcs.Task;
+                promise.Resolve($"{resultsFromHandler.Count} we found");
             });
         }
 

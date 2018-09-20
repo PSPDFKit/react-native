@@ -23,38 +23,52 @@ import PSPDFKitView from "react-native-pspdfkit";
 var PSPDFKit = NativeModules.ReactPSPDFKit;
 
 var examples = [
-  {
-    name: "Open assets document",
-    description: "Open document from your project assets folder",
-    action: component => {
-      component.props.navigation.navigate("PdfView");
+    {
+        name: "Open assets document",
+        description: "Open document from your project assets folder",
+        action: component => {
+            component.props.navigation.navigate("PdfView");
+        }
+    },
+    {
+        name: "Present a file from source",
+        description: "Open document from source",
+        action: component => {
+            component.props.navigation.navigate("PdfView");
+            // Present can only take files loaded in the Visual studio Project's Assets.
+            // See https://docs.microsoft.com/en-us/windows/uwp/files/file-access-permissions
+            PSPDFKit.Present("ms-appx:///Assets/pdf/Business Report.pdf");
+        }
+    },
+    {
+        name: "Event Listeners",
+        description:
+            "Show how to use the listeners exposed by PSPDFKitView component.",
+        action: component => {
+            component.props.navigation.navigate("PdfViewListenersScreen");
+        }
+    },
+    {
+        name: "Programmatic Annotations",
+        description:
+            "Shows how to get and add new annotations using Instant JSON.",
+        action: component => {
+            component.props.navigation.navigate("PdfViewInstantJsonScreen");
+        }
+    },
+    {
+        name: "Index Full Text Search",
+        description:
+            "A simple full text search over a folder of the users choice.",
+        action: component => {
+            PSPDFKit.OpenLibrary("MyLibrary")
+                .then(() => {
+                    PSPDFKit.SearchLibrary("pspdfkit")
+                        .then(result =>
+                            alert("We found strings : \n" + JSON.stringify(result)))
+                })
+        }
     }
-  },
-  {
-    name: "Present a file from source",
-    description: "Open document from source",
-    action: component => {
-      component.props.navigation.navigate("PdfView");
-      // Present can only take files loaded in the Visual studio Project's Assets.
-      // See https://docs.microsoft.com/en-us/windows/uwp/files/file-access-permissions
-      PSPDFKit.Present("ms-appx:///Assets/pdf/Business Report.pdf");
-    }
-  },
-  {
-    name: "Event Listeners",
-    description:
-      "Show how to use the listeners exposed by PSPDFKitView component.",
-    action: component => {
-      component.props.navigation.navigate("PdfViewListenersScreen");
-    }
-  },
-  {
-    name: "Programmatic Annotations",
-    description: "Shows how to get and add new annotations using Instant JSON.",
-    action: component => {
-      component.props.navigation.navigate("PdfViewInstantJsonScreen");
-    }
-  }
 ];
 
 class CatalogScreen extends Component<{}> {
