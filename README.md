@@ -593,7 +593,7 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
 7. Install the Windows helper plugin: `yarn add --dev rnpm-plugin-windows`.
 8. Install `react-native-pspdfkit` from GitHub: `yarn add github:PSPDFKit/react-native`.
 9. Install all modules for Windows: `yarn install`. (Because of a [bug](https://github.com/yarnpkg/yarn/issues/2165) you may need to clean `yarn`'s cache with `yarn cache clean` before.)
-10. Link module `react-native-pspdfkit`: `react-native link react-native-pspdfkit`.
+10. Link module `react-native-pspdfkit`: `react-native link react-native-pspdfkit`. (Note: On windows yarn does not link correctly, therefore any chages made in the ReactNativePSPDFKit project will have to be manually copied to the `windows` folder at the base of the repo in order to commit changes.)
 11. Initialize the windows project: `react-native windows`.
 12. Open the Visual Studio solution in `react-native\YourApp\windows`.
 13. Accept and install any required extensions when prompted.
