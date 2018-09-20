@@ -576,7 +576,7 @@ Shows the pdf `document` from the local device filesystem, or your app's assets.
 - Visual Studio Community 2017 or greater
 - git
 - cmake
-- npm
+- yarn
 - PSPDFKit for Windows.vsix (installed)
 - PowerShell
 
@@ -585,16 +585,16 @@ Shows the pdf `document` from the local device filesystem, or your app's assets.
 Let's create a simple app that integrates PSPDFKit and uses the react-native-pspdfkit module.
 
 1. Open `PowerShell` as administrator.
-2. Make sure `react-native-cli` is installed: `npm install -g react-native-cli`.
-3. Install Windows Tool for React Native: `npm install --global --production windows-build-tools`.
+2. Make sure `react-native-cli` is installed: `yarn global add react-native-cli`.
+3. Install Windows Tool for React Native: `yarn add global windows-build-tools`.
 4. Open `x64 Native Tools Command Prompt for VS 2017` program.
 5. Create the app with `react-native init --version=0.53.0 YourApp` in a location of your choice.
 6. Step into your newly created app folder: `cd YourApp`.
-7. Install the Windows helper plugin: `npm install --save-dev rnpm-plugin-windows`.
-8. Install `react-native-pspdfkit` from GitHub: `npm add github:PSPDFKit/react-native`.
-9. Link module `react-native-pspdfkit`: `react-native link react-native-pspdfkit`.
-10. Initialize the windows project: `react-native windows`.
-11. Install all modules for Windows: `npm install`.
+7. Install the Windows helper plugin: `yarn add --dev rnpm-plugin-windows`.
+8. Install `react-native-pspdfkit` from GitHub: `yarn add github:PSPDFKit/react-native`.
+9. Install all modules for Windows: `yarn install`. (Because of a [bug](https://github.com/yarnpkg/yarn/issues/2165) you may need to clean `yarn`'s cache with `yarn cache clean` before.)
+10. Link module `react-native-pspdfkit`: `react-native link react-native-pspdfkit`.
+11. Initialize the windows project: `react-native windows`.
 12. Open the Visual Studio solution in `react-native\YourApp\windows`.
 13. Accept and install any required extensions when prompted.
 14. If the settings window opens, click on `Developer` and select `yes`.
@@ -672,15 +672,17 @@ to navigate the file system.
       
       render() {
           return (
-          <View style={styles.page}>
-              <PSPDFKitView style={styles.pdfView} />
-              <View style={styles.footer}>
-                  <View style={styles.button}>
-                    <Button onPress={() => PSPDFKit.OpenFile()} title="Open" />
-                  </View>
-                  <Text style={styles.version}>SDK Version : {PSPDFKit.versionString}</Text>
-              </View>
-          </View>
+            <View style={styles.page}>
+                <PSPDFKitView
+                    ref="pdfView"
+                    style={styles.pdfView} />
+                <View style={styles.footer}>
+                    <View style={styles.button}>
+                        <Button onPress={() => PSPDFKit.OpenFilePicker()} title="Open" />
+                    </View>
+                    <Text style={styles.version}>SDK Version : {PSPDFKit.versionString}</Text>
+                </View>
+            </View> 
           );
       }
   }
@@ -717,7 +719,7 @@ to navigate the file system.
 
 1. Clone the repository. `git clone https://github.com/PSPDFKit/react-native.git`.
 2. From the command promt `cd react-native\samples\Catalog`.
-3. Make sure `react-native-cli` is installed: `npm install -g react-native-cli`.
+2. Make sure `react-native-cli` is installed: `yarn global add react-native-cli`.
 4. Edit `package.json` to change the version of `react-native` to `0.53.0` and refernce the react-native 
 pspdfkit repo online.
 ```diff
@@ -731,7 +733,7 @@ pspdfkit repo online.
 "react-navigation": "^1.0.3"
 }
 ```
-5. run `npm install`.
+5. run `yarn install`. (Because of a [bug](https://github.com/yarnpkg/yarn/issues/2165) you may need to clean `yarn`'s cache with `yarn cache clean` before.)
 6. Open the UWP catalog solution in `react-native\samples\Catalog\windows`.
 7. Accept and install any required extensions when prompted.
 8. If the settings windows opens, click on `Developer` and selected `yes`.
@@ -756,9 +758,16 @@ The following constants are available on the PSPDFKit export:
 
 - `versionString` (`String`) PSPDFKit version number.
 
-##### `OpenFile() : void`
+##### `OpenFilePicker() : void`
 
 Opens a file picker for the user to select a pdf from. When the user selects an item it will be displayed in the `<PSPDFKitView>`.
+
+##### `Present(document : string) : void`
+
+Opens a document in the available `<PSPDFKitView>`. If the element is not displayed `Present` will fail. The document has to be accessible by the application, for example needs to be located in the application assets. 
+```javascript
+    PSPDFKit.Present("ms-appx:///Assets/pdf/Business Report.pdf");
+```
 
 ## License
 
