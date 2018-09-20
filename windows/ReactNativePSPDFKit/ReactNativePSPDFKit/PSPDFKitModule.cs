@@ -12,6 +12,8 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
+using Windows.Storage;
+using Windows.UI.Popups;
 
 namespace ReactNativePSPDFKit
 {
@@ -20,19 +22,19 @@ namespace ReactNativePSPDFKit
     /// </summary>
     class PSPDFKitModule : ReactContextNativeModuleBase
     {
-        private readonly PSPDFKitViewManger _pspdfKitViewManger;
+        private readonly PDFViewPage _pdfViewPage;
         private string VERSION_KEY = "versionString";
 
-        public PSPDFKitModule(ReactContext reactContext, PSPDFKitViewManger pspdfKitViewManger) : base(reactContext)
+        public PSPDFKitModule(ReactContext reactContext, PDFViewPage pdfViewPage) : base(reactContext)
         {
-            _pspdfKitViewManger = pspdfKitViewManger;
+            _pdfViewPage = pdfViewPage;
         }
 
         /// <summary>
         /// Open the native file picker for the user to select a pdf.
         /// </summary>
         [ReactMethod]
-        public void OpenFile()
+        public void OpenFilePicker()
         {
             DispatcherHelpers.RunOnDispatcher(async () =>
             {
@@ -40,6 +42,30 @@ namespace ReactNativePSPDFKit
                 if (file != null)
                 {
                     await LoadFileAsync(file);
+                }
+            });
+        }
+
+        /// <summary>
+        /// Open a file from a path presented from javascript.
+        /// Files loaded in the Visual studio Project's Assets.
+        /// See https://docs.microsoft.com/en-us/windows/uwp/files/file-access-permissions
+        /// </summary>
+        [ReactMethod]
+        public void Present(string assetPath)
+        {
+            DispatcherHelpers.RunOnDispatcher(async () =>
+            {
+                try
+                {
+                    var file = await StorageFile.GetFileFromApplicationUriAsync(new Uri(assetPath));
+
+                    await LoadFileAsync(file);
+                }
+                catch (Exception)
+                {
+                    var dialog = new MessageDialog("Unable to open the file specified.");
+                    await dialog.ShowAsync();
                 }
             });
         }
@@ -68,32 +94,20 @@ namespace ReactNativePSPDFKit
         {
             if (file == null) return;
 
-            await _pspdfKitViewManger.OpenFileAsync(file);
+            await _pdfViewPage.OpenFileAsync(file);
         }
 
         /// <summary>
         /// Constants that can be used in the JS
         /// </summary>
-        public override IReadOnlyDictionary<string, object> Constants
+        public override IReadOnlyDictionary<string, object> Constants => new Dictionary<string, object>
         {
-            get
-            {
-                return new Dictionary<string, object>
-                {
-                    { VERSION_KEY, typeof(PSPDFKit.Sdk).GetTypeInfo().Assembly.GetName().Version.ToString() },
-                };
-            }
-        }
+            { VERSION_KEY, typeof(PSPDFKit.Sdk).GetTypeInfo().Assembly.GetName().Version.ToString() },
+        };
 
         /// <summary>
         /// The name to be used when creating the js modules
         /// </summary>
-        public override string Name
-        {
-            get
-            {
-                return "ReactPSPDFKit";
-            }
-        }
+        public override string Name => "ReactPSPDFKit";
     }
 }

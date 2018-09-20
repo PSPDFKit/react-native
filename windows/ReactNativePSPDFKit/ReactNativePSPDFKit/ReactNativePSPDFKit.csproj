@@ -106,6 +106,10 @@
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Events\PdfViewAnnotationChangedEvent.cs" />
+    <Compile Include="Events\PdfViewDocumentSavedEvent.cs" />
+    <Compile Include="Events\PdfViewDataReturnedEvent.cs" />
+    <Compile Include="Events\PdfViewDocumentSaveFailedEvent.cs" />
     <Compile Include="PSPDFKitModule.cs" />
     <Compile Include="PDFViewPage.xaml.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
