@@ -21,10 +21,12 @@ import { StackNavigator } from "react-navigation";
 import PSPDFKitView from "react-native-pspdfkit";
 
 var PSPDFKit = NativeModules.ReactPSPDFKit;
+var RNFS = require('react-native-fs');
+
 var myLibraryCreated = false;
 
 const complexSearchConfiguration = {
-    searchString: "pspdfkit",
+    searchString: "the",
     excludeAnnotations: false,
     excludeDocumentText: false,
     matchExactPhrases: false,
@@ -37,7 +39,7 @@ const complexSearchConfiguration = {
 }
 
 const simpleSearch = {
-    searchString: "pspdfkit"
+    searchString: "the"
 }
 
 var examples = [
@@ -53,9 +55,10 @@ var examples = [
         description: "Open document from source",
         action: component => {
             component.props.navigation.navigate("PdfView");
-            // Present can only take files loaded in the Visual studio Project's Assets.
+            // Present can only take files loaded in the Visual studio Project's Assets. Please use RNFS.
             // See https://docs.microsoft.com/en-us/windows/uwp/files/file-access-permissions
-            PSPDFKit.Present("ms-appx:///Assets/pdf/Business Report.pdf");
+            var path = RNFS.MainBundlePath + "\\Assets\\pdf\\Business Report.pdf"
+            PSPDFKit.Present(path);
         }
     },
     {
@@ -75,21 +78,32 @@ var examples = [
         }
     },
     {
-        name: "Index Full Text Search",
+        name: "Index Full Text Search From Picker",
         description:
             "A simple full text search over a folder of the users choice.",
         action: component => {
-            if (myLibraryCreated) {
-                PSPDFKit.SearchLibrary("MyLibrary", simpleSearch)
-                    .then(result => alert("Search : \n" + JSON.stringify(result)))
-            } else {
-                PSPDFKit.OpenLibraryPicker("MyLibrary")
-                    .then(() => {
-                        myLibraryCreated = true;
-                        PSPDFKit.SearchLibrary("MyLibrary", complexSearchConfiguration)
-                            .then(result => alert("Search : \n" + JSON.stringify(result)))
-                    })
-            }
+            PSPDFKit.DeleteAllLibraries();
+
+            PSPDFKit.OpenLibraryPicker("MyLibrary")
+                .then(() => {
+                    PSPDFKit.SearchLibrary("MyLibrary", simpleSearch)
+                        .then(result => alert("Search : \n" + JSON.stringify(result)))
+                });
+        }
+    },
+    {
+        name: "Index Full Text Search From Assets",
+        description:
+            "A simple full text search over the assets folder.",
+        action: component => {
+            PSPDFKit.DeleteAllLibraries();
+
+            var path = RNFS.MainBundlePath + "\\Assets\\pdf"
+            PSPDFKit.OpenLibrary("AssetsLibrary", path)
+                .then(() => {
+                    PSPDFKit.SearchLibrary("AssetsLibrary", complexSearchConfiguration)
+                        .then(result => alert("Search : \n" + JSON.stringify(result)))
+                })
         }
     }
 ];

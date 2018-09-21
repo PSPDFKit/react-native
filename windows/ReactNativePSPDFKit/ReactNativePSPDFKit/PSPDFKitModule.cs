@@ -77,6 +77,45 @@ namespace ReactNativePSPDFKit
         }
 
         /// <summary>
+        /// Open a search library from a ms path.
+        /// Multiple libraries maybe open at once. Use the name to reference each library.
+        /// Promise will resolve with true if library is opened. Promise will reject if folder is inaccessible.
+        /// <param name="libraryName">Name to give the library</param>
+        /// <param name="uri">A path to a folder to index. The application must have permission to the path.</param>
+        /// See https://docs.microsoft.com/en-us/windows/uwp/files/file-access-permissions
+        /// </summary>
+        [ReactMethod]
+        public void OpenLibrary(string libraryName, string path, IPromise promise)
+        {
+            DispatcherHelpers.RunOnDispatcher(async () =>
+            {
+                try
+                {
+                    Sdk.Initialize(_pdfViewPage.Pdfview.License);
+
+                    // If we have already opened a library with the same name, reject.
+                    if (_libraries.ContainsKey(libraryName))
+                    {
+                        promise.Reject(new Exception($"{libraryName} has already been added."));
+                        return;
+                    }
+                    _libraries.Add(libraryName, await Library.OpenLibraryAsync(libraryName));
+
+                    var storageFolder = await StorageFolder.GetFolderFromPathAsync(path);
+                    
+                    // Queue up the PDFs in the folder for indexing.
+                    await _libraries[libraryName].EnqueueDocumentsInFolderAsync(storageFolder);
+
+                    promise.Resolve(true);
+                }
+                catch (Exception e)
+                {
+                    promise.Reject(e);
+                }
+            });
+        }
+
+        /// <summary>
         /// Open a search library with the use of a folder picker.
         /// Multiple libraries maybe open at once. Use the name to reference each library.
         /// Promise will resolve with true if library is opened. Promise will reject if folder is inaccessible.
@@ -213,6 +252,19 @@ namespace ReactNativePSPDFKit
                 }
             });
         }
+
+        [ReactMethod]
+        public void DeleteAllLibraries()
+        {
+            DispatcherHelpers.RunOnDispatcher(async () =>
+            {
+                foreach (var library in _libraries.Values)
+                {
+                    await library.CancelAllTasksAsync();
+                }
+                await Library.DeleteAllLibrariesAsync(); });
+        }
+        
 
         private static TaskCompletionSource<IDictionary<string, LibraryQueryResult>> GetSearchCompleteTcs(Library library)
         {
