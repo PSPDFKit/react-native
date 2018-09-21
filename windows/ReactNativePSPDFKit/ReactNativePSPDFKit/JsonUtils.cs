@@ -1,12 +1,72 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
+using PSPDFKit.Search;
 using PSPDFKitFoundation;
 using PSPDFKitFoundation.Search;
+using PSPDFKitNative;
 
 namespace ReactNativePSPDFKit
 {
     static class JsonUtils
     {
+        public static LibraryQuery ToLibraryQuery(JObject libraryQueryJson)
+        {
+            var libraryQuery = new LibraryQuery(libraryQueryJson.Value<string>("searchString"));
+
+            if (libraryQueryJson.ContainsKey("excludeAnnotations"))
+            {
+                libraryQuery.ExcludeAnnotations = libraryQueryJson.Value<bool>("excludeAnnotations");
+            }
+
+            if (libraryQueryJson.ContainsKey("excludeDocumentText"))
+            {
+                libraryQuery.ExcludeDocumentText = libraryQueryJson.Value<bool>("excludeDocumentText");
+            }
+
+            if (libraryQueryJson.ContainsKey("matchExactPhrases"))
+            {
+                libraryQuery.MatchExactPhrases = libraryQueryJson.Value<bool>("matchExactPhrases");
+            }
+
+            if (libraryQueryJson.ContainsKey("maximumSearchResultsPerDocument"))
+            {
+                libraryQuery.MaximumSearchResultsPerDocument = libraryQueryJson.Value<int>("maximumSearchResultsPerDocument");
+            }
+
+            if (libraryQueryJson.ContainsKey("maximumSearchResultsTotal"))
+            {
+                libraryQuery.MaximumSearchResultsTotal = libraryQueryJson.Value<int>("maximumSearchResultsTotal");
+            }
+
+
+            if (libraryQueryJson.ContainsKey("maximumPreviewResultsPerDocument"))
+            {
+                libraryQuery.MaximumPreviewResultsPerDocument = libraryQueryJson.Value<int>("maximumPreviewResultsPerDocument");
+            }
+
+            if (libraryQueryJson.ContainsKey("maximumPreviewResultsTotal"))
+            {
+                libraryQuery.MaximumPreviewResultsTotal = libraryQueryJson.Value<int>("maximumPreviewResultsTotal");
+            }
+
+            if (libraryQueryJson.ContainsKey("generateTextPreviews"))
+            {
+                libraryQuery.GenerateTextPreviews = libraryQueryJson.Value<bool>("generateTextPreviews");
+            }
+
+            if (libraryQueryJson.ContainsKey("generateTextPreviews"))
+            {
+                libraryQuery.GenerateTextPreviews = libraryQueryJson.Value<bool>("generateTextPreviews");
+            }
+
+            if (libraryQueryJson.ContainsKey("previewRange"))
+            {
+                libraryQuery.PreviewRange = ToRange(libraryQueryJson.GetValue("previewRange"));
+            }
+
+            return libraryQuery;
+        }
+
         internal static JToken PreviewResultsToJson(IEnumerable<LibraryPreviewResult> previewResults)
         {
             var previewResultsJson = new JArray();
@@ -53,6 +113,11 @@ namespace ReactNativePSPDFKit
                 { "position", range.Position},
                 { "length", range.Length}
             };
+        }
+
+        private static IRange ToRange(JToken rangeJson)
+        {
+            return new Range(rangeJson.Value<int>("postion"), rangeJson.Value<int>("length"));
         }
 
         private static JArray LibraryQueryReultToJson(LibraryQueryResult libraryQueryResult)

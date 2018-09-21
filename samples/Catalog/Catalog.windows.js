@@ -23,6 +23,23 @@ import PSPDFKitView from "react-native-pspdfkit";
 var PSPDFKit = NativeModules.ReactPSPDFKit;
 var myLibraryCreated = false;
 
+const complexSearchConfiguration = {
+    searchString: "pspdfkit",
+    excludeAnnotations: false,
+    excludeDocumentText: false,
+    matchExactPhrases: false,
+    maximumSearchResultsPerDocument: 0,
+    maximumSearchResultsTotal: 500,
+    maximumPreviewResultsPerDocument: 0,
+    maximumPreviewResultsTotal: 500,
+    generateTextPreviews: true,
+    previewRange: { position: 20, length: 120 }
+}
+
+const simpleSearch = {
+    searchString: "pspdfkit"
+}
+
 var examples = [
     {
         name: "Open assets document",
@@ -63,16 +80,14 @@ var examples = [
             "A simple full text search over a folder of the users choice.",
         action: component => {
             if (myLibraryCreated) {
-                PSPDFKit.SearchLibrary("MyLibrary", "pspdfkit")
+                PSPDFKit.SearchLibrary("MyLibrary", simpleSearch)
                     .then(result => alert("Search : \n" + JSON.stringify(result)))
             } else {
                 PSPDFKit.OpenLibraryPicker("MyLibrary")
                     .then(() => {
                         myLibraryCreated = true;
-                        PSPDFKit.SearchLibrary("MyLibrary", "pspdfkit")
+                        PSPDFKit.SearchLibrary("MyLibrary", complexSearchConfiguration)
                             .then(result => alert("Search : \n" + JSON.stringify(result)))
-                        PSPDFKit.SearchLibraryGeneratePreviews("MyLibrary", "pspdfkit")
-                            .then(result => alert("Previews : \n" + JSON.stringify(result)))
                     })
             }
         }

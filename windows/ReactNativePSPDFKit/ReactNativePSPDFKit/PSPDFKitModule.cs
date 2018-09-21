@@ -18,6 +18,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.UI.Popups;
+using Newtonsoft.Json.Linq;
 
 namespace ReactNativePSPDFKit
 {
@@ -126,9 +127,16 @@ namespace ReactNativePSPDFKit
 
         /// <summary>
         /// Search a given library for the searchTerm and provide a promise
-        /// to retreive the results and preview text of found instances.
-        ///
+        /// to retreive the page indexes of found instances.
+        /// 
         /// Json return example
+        /// [
+        ///     {
+        ///         "uid": "{2B94FFD0-F846-4902-8A11-75C3D1E5B2A3}/default.pdf",
+        ///         "pageResults": [ 2 ]
+        ///     }
+        /// ]
+        /// or if previews are generated.
         /// [
         ///     {
         ///         "uid": "{2B94FFD0-F846-4902-8A11-75C3D1E5B2A3}/default.pdf",
@@ -148,9 +156,22 @@ namespace ReactNativePSPDFKit
         /// 
         /// </summary>
         /// <param name="libraryName">Name of library to search.</param>
-        /// <param name="searchTerm">What string to search</param>
+        /// <param name="searchLibraryQuery">Configuration of query </param>
+        /// Example of configuration. All Items except search string are optional.
+        /// const libraryConfiguration = {
+        ///     searchString: "pspdfkit",
+        ///     excludeAnnotations: false,
+        ///     excludeDocumentText: false,
+        ///     matchExactPhrases: false,
+        ///     maximumSearchResultsPerDocument: 0,
+        ///     maximumSearchResultsTotal: 500,
+        ///     maximumPreviewResultsPerDocument: 0,
+        ///     maximumPreviewResultsTotal: 500,
+        ///     generateTextPreviews: true,
+        ///     previewRange: { position: 20, length: 120 }
+        /// }
         [ReactMethod]
-        public void SearchLibraryGeneratePreviews(string libraryName, string searchTerm, IPromise promise)
+        public void SearchLibrary(string libraryName, JObject searchLibraryQuery, IPromise promise)
         {
             DispatcherHelpers.RunOnDispatcher(async () =>
             {
@@ -162,60 +183,34 @@ namespace ReactNativePSPDFKit
                 }
                 await library.WaitForAllIndexingTasksToFinishAsync();
 
-                var previewsFromHandlerTcs = GetPreviewCompleteTcs(library);
+                var libraryQuery = JsonUtils.ToLibraryQuery(searchLibraryQuery);
 
-                var libraryQuery = new LibraryQuery(searchTerm)
+                TaskCompletionSource<IList<LibraryPreviewResult>> previewsFromHandlerTcs = null;
+                TaskCompletionSource<IDictionary<string, LibraryQueryResult>> resultsFromHandlerTcs = null;
+                if (libraryQuery.GenerateTextPreviews)
                 {
-                    GenerateTextPreviews = true
-                };
+                    previewsFromHandlerTcs = GetPreviewCompleteTcs(library);
+                }
+                else
+                {
+                    resultsFromHandlerTcs = GetSearchCompleteTcs(library);
+                }
 
                 // We can do the searching in the background as the callbacks will receive the results.
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
                 library.SearchAsync(libraryQuery);
 #pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 
-
-                var previewResults = await previewsFromHandlerTcs.Task;
-                promise.Resolve(JsonUtils.PreviewResultsToJson(previewResults));
-            });
-        }
-
-        /// <summary>
-        /// Search a given library for the searchTerm and provide a promise
-        /// to retreive the page indexes of found instances.
-        /// 
-        /// Json return example
-        /// [
-        ///     {
-        ///         "uid": "{2B94FFD0-F846-4902-8A11-75C3D1E5B2A3}/default.pdf",
-        ///         "pageResults": [ 2 ]
-        ///     }
-        /// ]
-        /// 
-        /// </summary>
-        /// <param name="libraryName">Name of library to search.</param>
-        /// <param name="searchTerm">What string to search</param>
-        [ReactMethod]
-        public void SearchLibrary(string libraryName, string searchTerm, IPromise promise)
-        {
-            DispatcherHelpers.RunOnDispatcher(async () =>
-            {
-                // Find the library to search and reject if not present.
-                if (!_libraries.TryGetValue(libraryName, out var library))
+                if (libraryQuery.GenerateTextPreviews)
                 {
-                    promise.Resolve(new Exception($"Library {libraryName} not loaded. Please use OpenLibrary."));
-                    return;
+                    var previewResults = await previewsFromHandlerTcs.Task;
+                    promise.Resolve(JsonUtils.PreviewResultsToJson(previewResults));
                 }
-                await library.WaitForAllIndexingTasksToFinishAsync();
-                var resultsFromHandlerTcs = GetSearchCompleteTcs(library);
-
-                // We can do the searching in the background as the callbacks will receive the results.
-#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-                library.SearchAsync(new LibraryQuery(searchTerm));
-#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-
-                var resultsFromHandler = await resultsFromHandlerTcs.Task;
-                promise.Resolve(JsonUtils.SearchResultsToJson(resultsFromHandler));
+                else
+                {
+                    var resultsFromHandler = await resultsFromHandlerTcs.Task;
+                    promise.Resolve(JsonUtils.SearchResultsToJson(resultsFromHandler));
+                }
             });
         }
 
