@@ -21,6 +21,7 @@ import { StackNavigator } from "react-navigation";
 import PSPDFKitView from "react-native-pspdfkit";
 
 var PSPDFKit = NativeModules.ReactPSPDFKit;
+var myLibraryCreated = false;
 
 var examples = [
     {
@@ -61,12 +62,19 @@ var examples = [
         description:
             "A simple full text search over a folder of the users choice.",
         action: component => {
-            PSPDFKit.OpenLibrary("MyLibrary")
-                .then(() => {
-                    PSPDFKit.SearchLibrary("pspdfkit")
-                        .then(result =>
-                            alert("We found strings : \n" + JSON.stringify(result)))
-                })
+            if (myLibraryCreated) {
+                PSPDFKit.SearchLibrary("MyLibrary", "pspdfkit")
+                    .then(result => alert("Search : \n" + JSON.stringify(result)))
+            } else {
+                PSPDFKit.OpenLibraryPicker("MyLibrary")
+                    .then(() => {
+                        myLibraryCreated = true;
+                        PSPDFKit.SearchLibrary("MyLibrary", "pspdfkit")
+                            .then(result => alert("Search : \n" + JSON.stringify(result)))
+                        PSPDFKit.SearchLibraryGeneratePreviews("MyLibrary", "pspdfkit")
+                            .then(result => alert("Previews : \n" + JSON.stringify(result)))
+                    })
+            }
         }
     }
 ];

@@ -7,13 +7,13 @@
 //  This notice may not be removed from this file.
 //
 
-using Newtonsoft.Json.Linq;
 using PSPDFKit;
 using PSPDFKit.Search;
 using PSPDFKitFoundation.Search;
 using ReactNative.Bridge;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection;
 using System.Threading.Tasks;
 using Windows.Storage;
@@ -28,7 +28,7 @@ namespace ReactNativePSPDFKit
     {
         private readonly PDFViewPage _pdfViewPage;
         private string VERSION_KEY = "versionString";
-        private Library library;
+        private readonly Dictionary<string,Library> _libraries = new Dictionary<string, Library>();
 
         public PSPDFKitModule(ReactContext reactContext, PDFViewPage pdfViewPage) : base(reactContext)
         {
@@ -75,8 +75,14 @@ namespace ReactNativePSPDFKit
             });
         }
 
+        /// <summary>
+        /// Open a search library with the use of a folder picker.
+        /// Multiple libraries maybe open at once. Use the name to reference each library.
+        /// Promise will resolve with true if library is opened. Promise will reject if folder is inaccessible.
+        /// <param name="libraryName">Name to give the library</param>
+        /// </summary>
         [ReactMethod]
-        public void OpenLibrary(string libraryName, IPromise promise)
+        public void OpenLibraryPicker(string libraryName, IPromise promise)
         { 
             DispatcherHelpers.RunOnDispatcher(async () =>
             {
@@ -84,26 +90,31 @@ namespace ReactNativePSPDFKit
                 {
                     Sdk.Initialize(_pdfViewPage.Pdfview.License);
 
-                    // Opening a library creates one if it doesn't already exist.
-                    library = await Library.OpenLibraryAsync(libraryName);
+                    // If we have already opened a library with the same name, reject.
+                    if (_libraries.ContainsKey(libraryName))
+                    {
+                        promise.Reject(new Exception($"{libraryName} has already been added."));
+                        return;
+                    }
+                    _libraries.Add(libraryName, await Library.OpenLibraryAsync(libraryName));
 
-                    // Find a folder containing PDFs.
+                    // Allow the user to choose a folder to index.
                     var folderPicker = new Windows.Storage.Pickers.FolderPicker
                     {
                         SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.Desktop
                     };
                     folderPicker.FileTypeFilter.Add("*");
 
-                    Windows.Storage.StorageFolder folder = await folderPicker.PickSingleFolderAsync();
+                    var folder = await folderPicker.PickSingleFolderAsync();
                     if (folder != null)
                     {
                         // Queue up the PDFs in the folder for indexing.
-                        await library.EnqueueDocumentsInFolderAsync(folder);
+                        await _libraries[libraryName].EnqueueDocumentsInFolderAsync(folder);
 
                         promise.Resolve(true);
                     } else
                     {
-                        promise.Reject("Unable to open the folder specified");
+                        promise.Reject(new System.IO.FileNotFoundException("Folder not accessible"));
                     }
                 }
                 catch (Exception e)
@@ -113,28 +124,127 @@ namespace ReactNativePSPDFKit
             });
         }
 
+        /// <summary>
+        /// Search a given library for the searchTerm and provide a promise
+        /// to retreive the results and preview text of found instances.
+        ///
+        /// Json return example
+        /// [
+        ///     {
+        ///         "uid": "{2B94FFD0-F846-4902-8A11-75C3D1E5B2A3}/default.pdf",
+        ///         "pageIndex": 2,
+        ///         "previewText": "example in PSPDFKit.",
+        ///         "rangeInText": {
+        ///             "position": 27,
+        ///             "length": 8
+        ///         },
+        ///         "rangeInPreviewText": {
+        ///             "position": 11,
+        ///             "length": 8
+        ///         },
+        ///         "annotationId": 55
+        ///     },
+        /// ]
+        /// 
+        /// </summary>
+        /// <param name="libraryName">Name of library to search.</param>
+        /// <param name="searchTerm">What string to search</param>
         [ReactMethod]
-        public void SearchLibrary(string searchTerm, IPromise promise)
+        public void SearchLibraryGeneratePreviews(string libraryName, string searchTerm, IPromise promise)
         {
             DispatcherHelpers.RunOnDispatcher(async () =>
             {
-                // Wait for indexing to finish.
+                // Find the library to search and reject if not present.
+                if (!_libraries.TryGetValue(libraryName, out var library))
+                {
+                    promise.Resolve(new Exception($"Library {libraryName} not loaded. Please use OpenLibrary."));
+                    return;
+                }
                 await library.WaitForAllIndexingTasksToFinishAsync();
 
-                var resultsFromHandlerTcs = new TaskCompletionSource<IDictionary<string, LibraryQueryResult>>();
-                library.OnSearchComplete += (sender, args) => { resultsFromHandlerTcs.SetResult(args); };
+                var previewsFromHandlerTcs = GetPreviewCompleteTcs(library);
 
-                // Search all documents in the library for the text "Acme."
-                var succeeded = await library.SearchAsync(new LibraryQuery(searchTerm));
-
-                if(!succeeded)
+                var libraryQuery = new LibraryQuery(searchTerm)
                 {
-                    promise.Reject("");
+                    GenerateTextPreviews = true
+                };
+
+                // We can do the searching in the background as the callbacks will receive the results.
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+                library.SearchAsync(libraryQuery);
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+
+
+                var previewResults = await previewsFromHandlerTcs.Task;
+                promise.Resolve(JsonUtils.PreviewResultsToJson(previewResults));
+            });
+        }
+
+        /// <summary>
+        /// Search a given library for the searchTerm and provide a promise
+        /// to retreive the page indexes of found instances.
+        /// 
+        /// Json return example
+        /// [
+        ///     {
+        ///         "uid": "{2B94FFD0-F846-4902-8A11-75C3D1E5B2A3}/default.pdf",
+        ///         "pageResults": [ 2 ]
+        ///     }
+        /// ]
+        /// 
+        /// </summary>
+        /// <param name="libraryName">Name of library to search.</param>
+        /// <param name="searchTerm">What string to search</param>
+        [ReactMethod]
+        public void SearchLibrary(string libraryName, string searchTerm, IPromise promise)
+        {
+            DispatcherHelpers.RunOnDispatcher(async () =>
+            {
+                // Find the library to search and reject if not present.
+                if (!_libraries.TryGetValue(libraryName, out var library))
+                {
+                    promise.Resolve(new Exception($"Library {libraryName} not loaded. Please use OpenLibrary."));
+                    return;
                 }
+                await library.WaitForAllIndexingTasksToFinishAsync();
+                var resultsFromHandlerTcs = GetSearchCompleteTcs(library);
+
+                // We can do the searching in the background as the callbacks will receive the results.
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+                library.SearchAsync(new LibraryQuery(searchTerm));
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 
                 var resultsFromHandler = await resultsFromHandlerTcs.Task;
-                promise.Resolve($"{resultsFromHandler.Count} we found");
+                promise.Resolve(JsonUtils.SearchResultsToJson(resultsFromHandler));
             });
+        }
+
+        private static TaskCompletionSource<IDictionary<string, LibraryQueryResult>> GetSearchCompleteTcs(Library library)
+        {
+            var resultsFromHandlerTcs = new TaskCompletionSource<IDictionary<string, LibraryQueryResult>>();
+            void SearchHandler(object sender, IDictionary<string, LibraryQueryResult> args)
+            {
+                library.OnSearchComplete -= SearchHandler;
+                resultsFromHandlerTcs.SetResult(args);
+            }
+
+            library.OnSearchComplete += SearchHandler;
+
+            return resultsFromHandlerTcs;
+        }
+
+        private static TaskCompletionSource<IList<LibraryPreviewResult>> GetPreviewCompleteTcs(Library library)
+        {
+            var previewsFromHandlerTcs = new TaskCompletionSource<IList<LibraryPreviewResult>>();
+            void Previewhandler(object sender, IList<LibraryPreviewResult> args)
+            {
+                library.OnSearchPreviewComplete -= Previewhandler;
+                previewsFromHandlerTcs.SetResult(args);
+            }
+
+            library.OnSearchPreviewComplete += Previewhandler;
+
+            return previewsFromHandlerTcs;
         }
 
         /// <summary>
@@ -169,7 +279,7 @@ namespace ReactNativePSPDFKit
         /// </summary>
         public override IReadOnlyDictionary<string, object> Constants => new Dictionary<string, object>
         {
-            { VERSION_KEY, typeof(PSPDFKit.Sdk).GetTypeInfo().Assembly.GetName().Version.ToString() },
+            { VERSION_KEY, typeof(Sdk).GetTypeInfo().Assembly.GetName().Version.ToString() },
         };
 
         /// <summary>

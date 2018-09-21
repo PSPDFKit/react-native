@@ -46,7 +46,7 @@ namespace ReactNativePSPDFKit.Events
             _payload.Add("error", errorMessage);
         }
 
-        public override String EventName => EVENT_NAME;
+        public override string EventName => EVENT_NAME;
 
         public override void Dispatch(RCTEventEmitter eventEmitter)
         {
