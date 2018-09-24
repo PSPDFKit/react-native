@@ -18,12 +18,16 @@
     "url": "https://github.com/PSPDFKit/react-native.git"
   },
   "scripts": {
-    "start": "node node_modules/react-native/local-cli/cli.js start"
+    "start": "node node_modules/react-native/local-cli/cli.js start",
+    "format": "prettier \"{samples/**/*.{md,js},*.{md,js}}\" --write"
   },
   "peerDependencies": {
+    "prop-types": "*",
     "react": "*",
-    "react-native": "*",
-    "prop-types": "*"
+    "react-native": "*"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "devDependencies": {
+    "prettier": "^1.14.3"
+  }
 }
