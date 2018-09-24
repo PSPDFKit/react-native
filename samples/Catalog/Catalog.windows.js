@@ -50,8 +50,7 @@ var examples = [
   },
   {
     name: "Programmatic Annotations",
-    description:
-      "Shows how to get and add new annotations using Instant JSON.",
+    description: "Shows how to get and add new annotations using Instant JSON.",
     action: component => {
       component.props.navigation.navigate("PdfViewInstantJsonScreen");
     }
@@ -125,10 +124,7 @@ class PdfViewScreen extends Component<{}> {
         />
         <View style={styles.footer}>
           <View style={styles.button}>
-            <Button
-              onPress={() => PSPDFKit.OpenFilePicker()}
-              title="Open"
-            />
+            <Button onPress={() => PSPDFKit.OpenFilePicker()} title="Open" />
           </View>
           <Image
             source={require("./assets/logo-flat.png")}
@@ -150,10 +146,7 @@ class PdfViewListenersScreen extends Component<{}> {
     return {
       title: "Event Listeners",
       headerRight: (
-        <Button
-          onPress={() => params.handleSaveButtonPress()}
-          title="Save"
-        />
+        <Button onPress={() => params.handleSaveButtonPress()} title="Save" />
       )
     };
   };

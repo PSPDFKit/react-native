@@ -34,8 +34,7 @@ const pspdfkitColorAlpha = "#267AD450";
 var examples = [
   {
     name: "Open document using resource path",
-    description:
-      "Open document from your resource bundle with relative path.",
+    description: "Open document from your resource bundle with relative path.",
     action: () => {
       PSPDFKit.present("PDFs/Annual Report.pdf", {});
     }
@@ -110,8 +109,7 @@ var examples = [
   },
   {
     name: "Change Pages Buttons",
-    description:
-      "Adds a toolbar at the bottom with buttons to change pages.",
+    description: "Adds a toolbar at the bottom with buttons to change pages.",
     action: component => {
       const nextRoute = {
         component: ChangePages
@@ -143,16 +141,14 @@ var examples = [
   },
   {
     name: "Split PDF",
-    description:
-      "Show two PDFs side by side by using PSPDFKitView components.",
+    description: "Show two PDFs side by side by using PSPDFKitView components.",
     action: component => {
       component.openModal();
     }
   },
   {
     name: "Programmatic Annotations",
-    description:
-      "Shows how to get and add new annotations using Instant JSON.",
+    description: "Shows how to get and add new annotations using Instant JSON.",
     action: component => {
       const nextRoute = {
         component: ProgrammaticAnnotations
@@ -228,10 +224,7 @@ class ExampleList extends Component {
   _renderHeader() {
     return (
       <View style={styles.header}>
-        <Image
-          source={require("./assets/logo-flat.png")}
-          style={styles.logo}
-        />
+        <Image source={require("./assets/logo-flat.png")} style={styles.logo} />
         <Text style={styles.version}>{PSPDFKit.versionString}</Text>
       </View>
     );
@@ -422,9 +415,7 @@ class ChangePages extends Component {
                   };
                 });
               }}
-              disabled={
-                this.state.currentPageIndex == this.state.pageCount - 1
-              }
+              disabled={this.state.currentPageIndex == this.state.pageCount - 1}
               title="Next Page"
             />
           </View>
@@ -801,10 +792,7 @@ class ProgrammaticFormFilling extends Component {
             <Button
               onPress={() => {
                 // Fill Text Form Fields.
-                this.refs.pdfView.setFormFieldValue(
-                  "Name_Last",
-                  "Appleseed"
-                );
+                this.refs.pdfView.setFormFieldValue("Name_Last", "Appleseed");
                 this.refs.pdfView.setFormFieldValue("Name_First", "John");
                 this.refs.pdfView.setFormFieldValue(
                   "Address_1",
@@ -817,10 +805,7 @@ class ProgrammaticFormFilling extends Component {
                   "Telephone_Home",
                   "(123) 456-7890"
                 );
-                this.refs.pdfView.setFormFieldValue(
-                  "Birthdate",
-                  "1/1/1983"
-                );
+                this.refs.pdfView.setFormFieldValue("Birthdate", "1/1/1983");
 
                 // Select a button form elements.
                 this.refs.pdfView.setFormFieldValue("Sex.0", "selected");

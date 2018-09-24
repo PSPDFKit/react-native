@@ -76,15 +76,11 @@ var examples = [
   },
   {
     name: "Open local image document",
-    description:
-      "Open image image document from external storage directory.",
+    description: "Open image image document from external storage directory.",
     action: () => {
       requestExternalStoragePermission(function() {
         extractFromAssetsIfMissing("android.png", function() {
-          PSPDFKit.presentImage(
-            IMAGE_DOCUMENT,
-            CONFIGURATION_IMAGE_DOCUMENT
-          );
+          PSPDFKit.presentImage(IMAGE_DOCUMENT, CONFIGURATION_IMAGE_DOCUMENT);
         });
       });
     }
@@ -117,24 +113,21 @@ var examples = [
   },
   {
     name: "Programmatic Annotations",
-    description:
-      "Shows how to get and add new annotations using Instant JSON.",
+    description: "Shows how to get and add new annotations using Instant JSON.",
     action: component => {
       component.props.navigation.navigate("PdfViewInstantJsonScreen");
     }
   },
   {
     name: "Programmatic Form Filling",
-    description:
-      "Shows how to programatically read and write PDF form values.",
+    description: "Shows how to programatically read and write PDF form values.",
     action: component => {
       component.props.navigation.navigate("PdfViewFormFillingScreen");
     }
   },
   {
     name: "Split PDF",
-    description:
-      "Show two PDFs side by side by using PSPDFKitView components.",
+    description: "Show two PDFs side by side by using PSPDFKitView components.",
     action: component => {
       component.props.navigation.navigate("PdfViewSplitScreen");
     }
@@ -155,9 +148,7 @@ function extractFromAssetsIfMissing(assetFile, callback) {
   RNFS.exists("/sdcard/" + assetFile)
     .then(exist => {
       if (exist) {
-        console.log(
-          assetFile + " exists in the external storage directory."
-        );
+        console.log(assetFile + " exists in the external storage directory.");
         callback();
       } else {
         console.log(
@@ -377,9 +368,7 @@ class PdfViewScreen extends Component<{}> {
                   };
                 });
               }}
-              disabled={
-                this.state.currentPageIndex == this.state.pageCount - 1
-              }
+              disabled={this.state.currentPageIndex == this.state.pageCount - 1}
               title="Next Page"
             />
           </View>
@@ -602,11 +591,9 @@ class PdfViewInstantJsonScreen extends Component<{}> {
             <Button
               onPress={() => {
                 // This gets all annotations on the first page.
-                this.refs.pdfView
-                  .getAnnotations(0, null)
-                  .then(annotations => {
-                    alert(JSON.stringify(annotations));
-                  });
+                this.refs.pdfView.getAnnotations(0, null).then(annotations => {
+                  alert(JSON.stringify(annotations));
+                });
               }}
               title="Get annotations"
             />
@@ -702,10 +689,7 @@ class PdfViewFormFillingScreen extends Component<{}> {
             <Button
               onPress={() => {
                 // Fill Text Form Fields.
-                this.refs.pdfView.setFormFieldValue(
-                  "Name_Last",
-                  "Appleseed"
-                );
+                this.refs.pdfView.setFormFieldValue("Name_Last", "Appleseed");
                 this.refs.pdfView.setFormFieldValue("Name_First", "John");
                 this.refs.pdfView.setFormFieldValue(
                   "Address_1",
@@ -718,10 +702,7 @@ class PdfViewFormFillingScreen extends Component<{}> {
                   "Telephone_Home",
                   "(123) 456-7890"
                 );
-                this.refs.pdfView.setFormFieldValue(
-                  "Birthdate",
-                  "1/1/1983"
-                );
+                this.refs.pdfView.setFormFieldValue("Birthdate", "1/1/1983");
 
                 // Select a button form elements.
                 this.refs.pdfView.setFormFieldValue("Sex.0", "selected");
