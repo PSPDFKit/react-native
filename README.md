@@ -61,7 +61,7 @@ bash "$BUILT_PRODUCTS_DIR/$FRAMEWORKS_FOLDER_PATH/PSPDFKit.framework/strip-frame
 15. Replace the default component from `App.js` with a simple touch area to present the bundled PDF. (Note that you can also use a [Native UI Component](#native-ui-component) to show a PDF.)
 
 ```javascript
-import React, { Component } from 'react';
+import React, { Component } from "react";
 import {
   AppRegistry,
   StyleSheet,
@@ -69,20 +69,20 @@ import {
   Text,
   TouchableHighlight,
   View
-} from 'react-native';
+} from "react-native";
 
 var PSPDFKit = NativeModules.PSPDFKit;
-PSPDFKit.setLicenseKey('YOUR_LICENSE_KEY_GOES_HERE');
+PSPDFKit.setLicenseKey("YOUR_LICENSE_KEY_GOES_HERE");
 
 export default class App extends Component<{}> {
   _onPressButton() {
-    PSPDFKit.present('document.pdf', {
-        pageTransition: 'scrollContinuous',
-        scrollDirection: 'vertical',
-        documentLabelEnabled: true,
-      })
+    PSPDFKit.present("document.pdf", {
+      pageTransition: "scrollContinuous",
+      scrollDirection: "vertical",
+      documentLabelEnabled: true
+    });
   }
-  
+
   render() {
     return (
       <View style={styles.container}>
@@ -97,20 +97,20 @@ export default class App extends Component<{}> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#F5FCFF"
   },
   welcome: {
     fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
+    textAlign: "center",
+    margin: 10
   },
   instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
+    textAlign: "center",
+    color: "#333333",
+    marginBottom: 5
+  }
 });
 ```
 
@@ -130,24 +130,24 @@ Using the Native Module (`PSPDFKit.present()`), you can present a document with 
 You can specify the path to the document you want to present, and [configuration options](#configuration).
 
 ```javascript
-import React, { Component } from 'react';
+import React, { Component } from "react";
 import {
   NativeModules,
   Text,
   TouchableHighlight,
   View
-} from 'react-native';
+} from "react-native";
 
 var PSPDFKit = NativeModules.PSPDFKit;
-PSPDFKit.setLicenseKey('YOUR_LICENSE_KEY_GOES_HERE');
+PSPDFKit.setLicenseKey("YOUR_LICENSE_KEY_GOES_HERE");
 
 export default class App extends Component<{}> {
   _onPressButton() {
-    PSPDFKit.present('document.pdf', {
-        pageTransition: 'scrollContinuous',
-        scrollDirection: 'vertical',
-        documentLabelEnabled: true,
-      })
+    PSPDFKit.present("document.pdf", {
+      pageTransition: "scrollContinuous",
+      scrollDirection: "vertical",
+      documentLabelEnabled: true
+    });
   }
 
   render() {
@@ -157,7 +157,7 @@ export default class App extends Component<{}> {
           <Text style={styles.text}>Tap to Open Document</Text>
         </TouchableHighlight>
       </View>
-    )
+    );
   }
 }
 ```
@@ -175,26 +175,26 @@ For all the `props` that you can pass to `PSPDFKitView`, have a look at the [sou
 This is how you would show a PDF as a React component:
 
 ```javascript
-import React, { Component } from 'react';
-import { NativeModules } from 'react-native';
-import PSPDFKitView from 'react-native-pspdfkit'
+import React, { Component } from "react";
+import { NativeModules } from "react-native";
+import PSPDFKitView from "react-native-pspdfkit";
 
 var PSPDFKit = NativeModules.PSPDFKit;
-PSPDFKit.setLicenseKey('YOUR_LICENSE_KEY_GOES_HERE');
+PSPDFKit.setLicenseKey("YOUR_LICENSE_KEY_GOES_HERE");
 
 export default class App extends Component<{}> {
   render() {
     return (
       <PSPDFKitView
-        document={'document.pdf'}
+        document={"document.pdf"}
         configuration={{
-          pageTransition: 'scrollContinuous',
-          scrollDirection: 'vertical',
-          documentLabelEnabled: true,
+          pageTransition: "scrollContinuous",
+          scrollDirection: "vertical",
+          documentLabelEnabled: true
         }}
-        style={{ flex: 1, color: '#267AD4' }}
+        style={{ flex: 1, color: "#267AD4" }}
       />
-    )
+    );
   }
 }
 ```
@@ -206,24 +206,24 @@ You can configure the presentation with a configuration dictionary which is a mi
 Example - Native Module:
 
 ```javascript
-PSPDFKit.present('document.pdf', {
-  thumbnailBarMode: 'scrollable',
-  pageTransition: 'scrollContinuous',
-  scrollDirection: 'vertical',
-})
+PSPDFKit.present("document.pdf", {
+  thumbnailBarMode: "scrollable",
+  pageTransition: "scrollContinuous",
+  scrollDirection: "vertical"
+});
 ```
   
 Example - Native UI Component:
 
 ```javascript
 <PSPDFKitView
-document={'document.pdf'}
-configuration={{
-  thumbnailBarMode: 'scrollable',
-  pageTransition: 'scrollContinuous',
-  scrollDirection: 'vertical',
-}}
-/>
+  document={"document.pdf"}
+  configuration={{
+    thumbnailBarMode: "scrollable",
+    pageTransition: "scrollContinuous",
+    scrollDirection: "vertical"
+  }}
+/>;
 ```
 
 #### Running Catalog Project
@@ -238,9 +238,8 @@ The PSPDFKit React Native iOS Wrapper maps most configuration options available 
 
 Annotations are mapped based on their type name. This is case sensitive. For example, to limit annotation types to ink and highlight, use this:
 
-```
-editableAnnotationTypes: ['Ink', 'Highlight']
-
+```javascript
+editableAnnotationTypes: ["Ink", "Highlight"];
 ```
 
 
@@ -340,7 +339,7 @@ with
 11. <a id="step-10"></a>Replace the default component from `YourApp/App.js` with a simple touch area to present a PDF document from the local device filesystem:
         
    ```javascript
-   import React, { Component } from 'react';
+   import React, { Component } from "react";
    import {
      AppRegistry,
      StyleSheet,
@@ -349,62 +348,62 @@ with
      TouchableHighlight,
      View,
      PermissionsAndroid
-   } from 'react-native';
-	
+   } from "react-native";
+
    var PSPDFKit = NativeModules.PSPDFKit;
-	
+
    const DOCUMENT = "file:///sdcard/document.pdf";
    const CONFIGURATION = {
-     scrollContinuously : false,
-     showPageNumberOverlay : true,
-     pageScrollDirection : "vertical"
+     scrollContinuously: false,
+     showPageNumberOverlay: true,
+     pageScrollDirection: "vertical"
    };
-	
+
    // Change 'YourApp' to your app's name.
    export default class YourApp extends Component<{}> {
      _onPressButton() {
-     requestExternalStoragePermission();
+       requestExternalStoragePermission();
      }
-        
+
      render() {
        return (
          <View style={styles.container}>
            <Text>{PSPDFKit.versionString}</Text>
-             <TouchableHighlight onPress={this._onPressButton}>
-               <Text style={styles.text}>Tap to Open Document</Text>
-               </TouchableHighlight>
+           <TouchableHighlight onPress={this._onPressButton}>
+             <Text style={styles.text}>Tap to Open Document</Text>
+           </TouchableHighlight>
          </View>
        );
      }
    }
-        
+
    async function requestExternalStoragePermission() {
      try {
        const granted = await PermissionsAndroid.request(
          PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
-       )
+       );
        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-         console.log("Write external storage permission granted")
+         console.log("Write external storage permission granted");
          PSPDFKit.present(DOCUMENT, CONFIGURATION);
        } else {
-         console.log("Write external storage permission denied")
+         console.log("Write external storage permission denied");
        }
      } catch (err) {
-       console.warn(err)
+       console.warn(err);
      }
    }
-        
+
    const styles = StyleSheet.create({
      container: {
        flex: 1,
-       justifyContent: 'center',
-       alignItems: 'center',
-       backgroundColor: '#F5FCFF',
+       justifyContent: "center",
+       alignItems: "center",
+       backgroundColor: "#F5FCFF"
      },
      text: {
        fontSize: 20,
-       textAlign: 'center',
-       margin: 10,
+       textAlign: "center",
+       margin: 10
      }
    });
    ```  
@@ -652,64 +651,67 @@ Application and change Target Version to >= 10.0.16299.
 21. Save Changes: File -> Save All 
 22. Add the `PSPDFKitView` and `PSPDFKit` module into your `App.windows.js` file, and add a open button to allow the user 
 to navigate the file system.
-  ```
-  import React, { Component } from 'react';
+  ```javascript
+  import React, { Component } from "react";
   import {
-      AppRegistry,
-      StyleSheet,
-      View,
-      Text,
-      NativeModules,
-      Button
-  } from 'react-native';
-  
-  var PSPDFKitView = require('react-native-pspdfkit');
+    AppRegistry,
+    StyleSheet,
+    View,
+    Text,
+    NativeModules,
+    Button
+  } from "react-native";
+
+  var PSPDFKitView = require("react-native-pspdfkit");
   var PSPDFKit = NativeModules.ReactPSPDFKit;
-  
+
   export default class Catalog extends Component<{}> {
-      constructor(props) {
-        super(props);
-      }
-      
-      render() {
-          return (
-            <View style={styles.page}>
-                <PSPDFKitView
-                    ref="pdfView"
-                    style={styles.pdfView} />
-                <View style={styles.footer}>
-                    <View style={styles.button}>
-                        <Button onPress={() => PSPDFKit.OpenFilePicker()} title="Open" />
-                    </View>
-                    <Text style={styles.version}>SDK Version : {PSPDFKit.versionString}</Text>
-                </View>
-            </View> 
-          );
-      }
+    constructor(props) {
+      super(props);
+    }
+
+    render() {
+      return (
+        <View style={styles.page}>
+          <PSPDFKitView ref="pdfView" style={styles.pdfView} />
+          <View style={styles.footer}>
+            <View style={styles.button}>
+              <Button
+                onPress={() => PSPDFKit.OpenFilePicker()}
+                title="Open"
+              />
+            </View>
+            <Text style={styles.version}>
+              SDK Version : {PSPDFKit.versionString}
+            </Text>
+          </View>
+        </View>
+      );
+    }
   }
-  
+
   var styles = StyleSheet.create({
-      page: {
-          flex: 1,
-          alignItems: 'stretch',
-          backgroundColor: '#eee'
-      },
-      pdfView: {
-        flex: 1,
-      },
-      button: {
-          width: 100,
-          margin: 20
-      },
-      footer: {
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-      },
-      version: {
-          color: '#666666',
-          margin: 20
-      }
+    page: {
+      flex: 1,
+      alignItems: "stretch",
+      backgroundColor: "#eee"
+    },
+    pdfView: {
+      flex: 1
+    },
+    button: {
+      width: 100,
+      margin: 20
+    },
+    footer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center"
+    },
+    version: {
+      color: "#666666",
+      margin: 20
+    }
   });
  ```
 23. Now run the application on the command line: `react-native run-windows`.
@@ -767,7 +769,7 @@ Opens a file picker for the user to select a pdf from. When the user selects an 
 
 Opens a document in the available `<PSPDFKitView>`. If the element is not displayed `Present` will fail. The document has to be accessible by the application, for example needs to be located in the application assets. 
 ```javascript
-    PSPDFKit.Present("ms-appx:///Assets/pdf/Business Report.pdf");
+PSPDFKit.Present("ms-appx:///Assets/pdf/Business Report.pdf");
 ```
 
 ## License

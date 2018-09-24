@@ -6,7 +6,7 @@
 //  This notice may not be removed from this file.
 //
 
-import { AppRegistry } from 'react-native'
-import Catalog from './Catalog'
+import { AppRegistry } from "react-native";
+import Catalog from "./Catalog";
 
-AppRegistry.registerComponent('Catalog', () => Catalog)
+AppRegistry.registerComponent("Catalog", () => Catalog);
