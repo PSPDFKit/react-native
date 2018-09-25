@@ -21,6 +21,7 @@ import { StackNavigator } from "react-navigation";
 import PSPDFKitView from "react-native-pspdfkit";
 
 var PSPDFKit = NativeModules.ReactPSPDFKit;
+var PSPDFKitLibrary = NativeModules.ReactPSPDFKitLibrary;
 var RNFS = require('react-native-fs');
 
 var myLibraryCreated = false;
@@ -82,12 +83,13 @@ var examples = [
         description:
             "A simple full text search over a folder of the users choice.",
         action: component => {
-            PSPDFKit.DeleteAllLibraries();
-
-            PSPDFKit.OpenLibraryPicker("MyLibrary")
+            PSPDFKitLibrary.OpenLibraryPicker("MyLibrary")
                 .then(() => {
-                    PSPDFKit.SearchLibrary("MyLibrary", simpleSearch)
-                        .then(result => alert("Search : \n" + JSON.stringify(result)))
+                    PSPDFKitLibrary.SearchLibrary("MyLibrary", simpleSearch)
+                        .then(async result => {
+                            alert("Search : \n" + JSON.stringify(result));
+                            await PSPDFKitLibrary.DeleteAllLibraries();
+                        });
                 });
         }
     },
@@ -96,14 +98,16 @@ var examples = [
         description:
             "A simple full text search over the assets folder.",
         action: component => {
-            PSPDFKit.DeleteAllLibraries();
+            var path = RNFS.MainBundlePath + "\\Assets\\pdf";
 
-            var path = RNFS.MainBundlePath + "\\Assets\\pdf"
-            PSPDFKit.OpenLibrary("AssetsLibrary", path)
+            PSPDFKitLibrary.OpenLibrary("AssetsLibrary", path)
                 .then(() => {
-                    PSPDFKit.SearchLibrary("AssetsLibrary", complexSearchConfiguration)
-                        .then(result => alert("Search : \n" + JSON.stringify(result)))
-                })
+                    PSPDFKitLibrary.SearchLibrary("AssetsLibrary", complexSearchConfiguration)
+                        .then(async result => {
+                            alert("Search : \n" + JSON.stringify(result));
+                            await PSPDFKitLibrary.DeleteAllLibraries();
+                        });
+                });
         }
     }
 ];
