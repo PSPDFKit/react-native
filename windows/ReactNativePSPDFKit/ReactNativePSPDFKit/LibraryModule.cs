@@ -13,6 +13,7 @@ using PSPDFKitFoundation.Search;
 using ReactNative.Bridge;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
 using Windows.Storage;
@@ -36,31 +37,32 @@ namespace ReactNativePSPDFKit
         /// Multiple libraries maybe open at once. Use the name to reference each library.
         /// Promise will resolve with true if library is opened. Promise will reject if folder is inaccessible.
         /// <param name="libraryName">Name to give the library</param>
-        /// <param name="uri">A path to a folder to index. The application must have permission to the path.</param>
+        /// <param name="path">A path to a folder to index. The application must have permission to the path. Please use RNFS</param>
         /// See https://docs.microsoft.com/en-us/windows/uwp/files/file-access-permissions
         /// </summary>
         [ReactMethod]
         public async void OpenLibrary(string libraryName, string path, IPromise promise)
         {
-            await CoreApplication.MainView.Dispatcher.AwaitableRunAsync(async () =>
+            try
             {
-                try
-                {
-                    var storageFolder = await StorageFolder.GetFolderFromPathAsync(path);
+                var storageFolder = await StorageFolder.GetFolderFromPathAsync(path);
 
-                    using (var library = await Library.OpenLibraryAsync(libraryName))
-                    {
-                        // Queue up the PDFs in the folder for indexing.
-                        await library.EnqueueDocumentsInFolderAsync(storageFolder);
-                    }
-
-                    promise.Resolve(true);
-                }
-                catch (Exception e)
+                using (var library = await Library.OpenLibraryAsync(libraryName))
                 {
-                    promise.Reject(e);
+                    // Queue up the PDFs in the folder for indexing.
+                    await library.EnqueueDocumentsInFolderAsync(storageFolder);
+
+                    // TODO This is the only way to get this working right now.
+                    // The way of opening the library for a second time and waiting for indexing does not work.
+                    await library.WaitForAllIndexingTasksToFinishAsync();
                 }
-            });
+
+                promise.Resolve(null);
+            }
+            catch (Exception e)
+            {
+                promise.Reject(e);
+            }
         }
 
         /// <summary>
@@ -72,37 +74,42 @@ namespace ReactNativePSPDFKit
         [ReactMethod]
         public async void OpenLibraryPicker(string libraryName, IPromise promise)
         {
-            await CoreApplication.MainView.Dispatcher.AwaitableRunAsync(async () =>
+            try
             {
-                try
+                // Allow the user to choose a folder to index.
+                var folderPicker = new Windows.Storage.Pickers.FolderPicker
                 {
-                    // Allow the user to choose a folder to index.
-                    var folderPicker = new Windows.Storage.Pickers.FolderPicker
-                    {
-                        SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.Desktop
-                    };
-                    folderPicker.FileTypeFilter.Add("*");
+                    SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.Desktop
+                };
+                folderPicker.FileTypeFilter.Add("*");
 
-                    var folder = await folderPicker.PickSingleFolderAsync();
-                    if (folder != null)
-                    {
-                        using (var library = await Library.OpenLibraryAsync(libraryName))
-                        {
-                            // Queue up the PDFs in the folder for indexing.
-                            await library.EnqueueDocumentsInFolderAsync(folder);
-                        }
-                        promise.Resolve(true);
-                    }
-                    else
-                    {
-                        promise.Reject(new System.IO.FileNotFoundException("Folder not accessible"));
-                    }
-                }
-                catch (Exception e)
+                StorageFolder folder = null;
+                await CoreApplication.MainView.Dispatcher.AwaitableRunAsync(async () => { 
+                    folder = await folderPicker.PickSingleFolderAsync();
+                });
+
+                if (folder != null)
                 {
-                    promise.Reject(e);
+                    using (var library = await Library.OpenLibraryAsync(libraryName))
+                    {
+                        // Queue up the PDFs in the folder for indexing.
+                        await library.EnqueueDocumentsInFolderAsync(folder);
+
+                        // TODO This is the only way to get this working right now.
+                        // The way of opening the library for a second time and waiting for indexing does not work.
+                        await library.WaitForAllIndexingTasksToFinishAsync();
+                    }
+                    promise.Resolve(true);
                 }
-            });
+                else
+                {
+                    promise.Reject(new System.IO.FileNotFoundException("Folder not accessible"));
+                }
+            }
+            catch (Exception e)
+            {
+                promise.Reject(e);
+            }
         }
 
         /// <summary>
@@ -153,56 +160,44 @@ namespace ReactNativePSPDFKit
         [ReactMethod]
         public async void SearchLibrary(string libraryName, JObject searchLibraryQuery, IPromise promise)
         {
-            await CoreApplication.MainView.Dispatcher.AwaitableRunAsync(async () =>
+            using (var library = await Library.OpenLibraryAsync(libraryName))
             {
-                JToken resultJson = null;
-                using (var library = await Library.OpenLibraryAsync(libraryName))
+                var libraryQuery = JsonUtils.ToLibraryQuery(searchLibraryQuery);
+
+                TaskCompletionSource<IList<LibraryPreviewResult>> previewsFromHandlerTcs = null;
+                TaskCompletionSource<IDictionary<string, LibraryQueryResult>> resultsFromHandlerTcs = null;
+                if (libraryQuery.GenerateTextPreviews)
                 {
-                    await library.WaitForAllIndexingTasksToFinishAsync();
+                    previewsFromHandlerTcs = GetPreviewCompleteTcs(library);
+                }
+                else
+                {
+                    resultsFromHandlerTcs = GetSearchCompleteTcs(library);
+                }
 
-                    var libraryQuery = JsonUtils.ToLibraryQuery(searchLibraryQuery);
-
-                    TaskCompletionSource<IList<LibraryPreviewResult>> previewsFromHandlerTcs = null;
-                    TaskCompletionSource<IDictionary<string, LibraryQueryResult>> resultsFromHandlerTcs = null;
-                    if (libraryQuery.GenerateTextPreviews)
-                    {
-                        previewsFromHandlerTcs = GetPreviewCompleteTcs(library);
-                    }
-                    else
-                    {
-                        resultsFromHandlerTcs = GetSearchCompleteTcs(library);
-                    }
-
-                    // We can do the searching in the background as the callbacks will receive the results.
+                // We can do the searching in the background as the callbacks will receive the results.
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-                    library.SearchAsync(libraryQuery);
+                library.SearchAsync(libraryQuery);
 #pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 
-                    if (previewsFromHandlerTcs != null)
-                    {
-                        var previewResults = await previewsFromHandlerTcs.Task;
-                        resultJson = JsonUtils.PreviewResultsToJson(previewResults);
-                    }
-
-                    if (resultsFromHandlerTcs != null)
-                    {
-                        var resultsFromHandler = await resultsFromHandlerTcs.Task;
-                        resultJson = JsonUtils.SearchResultsToJson(resultsFromHandler);
-                    }
+                if (previewsFromHandlerTcs != null)
+                {
+                    var previewResults = await previewsFromHandlerTcs.Task;
+                    promise.Resolve(JsonUtils.PreviewResultsToJson(previewResults));
                 }
-                promise.Resolve(resultJson);
-            });
+
+                if (resultsFromHandlerTcs != null)
+                {
+                    var resultsFromHandler = await resultsFromHandlerTcs.Task;
+                    promise.Resolve(JsonUtils.SearchResultsToJson(resultsFromHandler));
+                }
+            }
         }
 
         [ReactMethod]
-        public async void DeleteAllLibraries(IPromise promise)
+        public async void DeleteAllLibraries()
         {
-            await CoreApplication.MainView.Dispatcher.AwaitableRunAsync(async () =>
-            {
-                await Library.DeleteAllLibrariesAsync();
-            });
-
-            promise.Resolve(null);
+            await Library.DeleteAllLibrariesAsync();
         }
 
 

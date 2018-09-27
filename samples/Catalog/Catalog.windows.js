@@ -82,32 +82,28 @@ var examples = [
         name: "Index Full Text Search From Picker",
         description:
             "A simple full text search over a folder of the users choice.",
-        action: component => {
-            PSPDFKitLibrary.OpenLibraryPicker("MyLibrary")
-                .then(() => {
-                    PSPDFKitLibrary.SearchLibrary("MyLibrary", simpleSearch)
-                        .then(async result => {
-                            alert("Search : \n" + JSON.stringify(result));
-                            await PSPDFKitLibrary.DeleteAllLibraries();
-                        });
-                });
+        action: async component => {
+            await PSPDFKitLibrary.OpenLibraryPicker("MyLibrary");
+            PSPDFKitLibrary.SearchLibrary("MyLibrary", simpleSearch)
+                .then(async result => {
+                    alert("Search : \n" + JSON.stringify(result));
+                })
+                .finally(() => PSPDFKitLibrary.DeleteAllLibraries());
         }
     },
     {
         name: "Index Full Text Search From Assets",
         description:
             "A simple full text search over the assets folder.",
-        action: component => {
+        action: async component => {
             var path = RNFS.MainBundlePath + "\\Assets\\pdf";
 
-            PSPDFKitLibrary.OpenLibrary("AssetsLibrary", path)
-                .then(() => {
-                    PSPDFKitLibrary.SearchLibrary("AssetsLibrary", complexSearchConfiguration)
-                        .then(async result => {
-                            alert("Search : \n" + JSON.stringify(result));
-                            await PSPDFKitLibrary.DeleteAllLibraries();
-                        });
-                });
+            await PSPDFKitLibrary.OpenLibrary("AssetsLibrary", path);
+            PSPDFKitLibrary.SearchLibrary("AssetsLibrary", complexSearchConfiguration)
+                .then(async result => {
+                    alert("Search : \n" + JSON.stringify(result));
+                })
+                .finally(() => PSPDFKitLibrary.DeleteAllLibraries());
         }
     }
 ];
