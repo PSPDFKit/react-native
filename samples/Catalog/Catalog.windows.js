@@ -22,95 +22,99 @@ import PSPDFKitView from "react-native-pspdfkit";
 
 var PSPDFKit = NativeModules.ReactPSPDFKit;
 var PSPDFKitLibrary = NativeModules.ReactPSPDFKitLibrary;
-var RNFS = require('react-native-fs');
+var RNFS = require("react-native-fs");
 
 var myLibraryCreated = false;
 
 const complexSearchConfiguration = {
-    searchString: "the",
-    excludeAnnotations: false,
-    excludeDocumentText: false,
-    matchExactPhrases: false,
-    maximumSearchResultsPerDocument: 0,
-    maximumSearchResultsTotal: 500,
-    maximumPreviewResultsPerDocument: 0,
-    maximumPreviewResultsTotal: 500,
-    generateTextPreviews: true,
-    previewRange: { position: 20, length: 120 }
-}
+  searchString: "the",
+  excludeAnnotations: false,
+  excludeDocumentText: false,
+  matchExactPhrases: false,
+  maximumSearchResultsPerDocument: 0,
+  maximumSearchResultsTotal: 500,
+  maximumPreviewResultsPerDocument: 0,
+  maximumPreviewResultsTotal: 500,
+  generateTextPreviews: true,
+  previewRange: { position: 20, length: 120 }
+};
 
 const simpleSearch = {
-    searchString: "the"
-}
+  searchString: "the"
+};
 
 var examples = [
-    {
-        name: "Open assets document",
-        description: "Open document from your project assets folder",
-        action: component => {
-            component.props.navigation.navigate("PdfView");
-        }
-    },
-    {
-        name: "Present a file from source",
-        description: "Open document from source",
-        action: component => {
-            component.props.navigation.navigate("PdfView");
-            // Present can only take files loaded in the Visual studio Project's Assets. Please use RNFS.
-            // See https://docs.microsoft.com/en-us/windows/uwp/files/file-access-permissions
-            var path = RNFS.MainBundlePath + "\\Assets\\pdf\\Business Report.pdf"
-            PSPDFKit.Present(path);
-        }
-    },
-    {
-        name: "Event Listeners",
-        description:
-            "Show how to use the listeners exposed by PSPDFKitView component.",
-        action: component => {
-            component.props.navigation.navigate("PdfViewListenersScreen");
-        }
-    },
-    {
-        name: "Programmatic Annotations",
-        description:
-            "Shows how to get and add new annotations using Instant JSON.",
-        action: component => {
-            component.props.navigation.navigate("PdfViewInstantJsonScreen");
-        }
-    },
-    {
-        name: "Index Full Text Search From Picker",
-        description:
-            "A simple full text search over a folder of the users choice.",
-        action: async component => {
-
-            await PSPDFKitLibrary.OpenLibrary("MyLibrary");
-            await PSPDFKitLibrary.EnqueueDocumentsInFolderPicker("MyLibrary");
-            alert("Searching Library for \"" + simpleSearch.searchString + "\". Please wait.");
-            PSPDFKitLibrary.SearchLibrary("MyLibrary", simpleSearch)
-                .then(result => {
-                    alert("Search : \n" + JSON.stringify(result));
-                })
-                .finally(() => PSPDFKitLibrary.DeleteAllLibraries());
-        }
-    },
-    {
-        name: "Index Full Text Search From Assets",
-        description:
-            "A simple full text search over the assets folder.",
-        action: async component => {
-            var path = RNFS.MainBundlePath + "\\Assets\\pdf";
-
-            await PSPDFKitLibrary.OpenLibrary("AssetsLibrary");
-            await PSPDFKitLibrary.EnqueueDocumentsInFolder("AssetsLibrary", path);
-            alert("Searching Library for \"" + complexSearchConfiguration.searchString + "\". Please wait.");
-            PSPDFKitLibrary.SearchLibrary("AssetsLibrary", complexSearchConfiguration)
-                .then(result => {
-                    alert("Search : \n" + JSON.stringify(result));
-                })
-                .finally(() => PSPDFKitLibrary.DeleteAllLibraries());
-        }
+  {
+    name: "Open assets document",
+    description: "Open document from your project assets folder",
+    action: component => {
+      component.props.navigation.navigate("PdfView");
     }
+  },
+  {
+    name: "Present a file from source",
+    description: "Open document from source",
+    action: component => {
+      component.props.navigation.navigate("PdfView");
+      // Present can only take files loaded in the Visual studio Project's Assets. Please use RNFS.
+      // See https://docs.microsoft.com/en-us/windows/uwp/files/file-access-permissions
+      var path = RNFS.MainBundlePath + "\\Assets\\pdf\\Business Report.pdf";
+      PSPDFKit.Present(path);
+    }
+  },
+  {
+    name: "Event Listeners",
+    description:
+      "Show how to use the listeners exposed by PSPDFKitView component.",
+    action: component => {
+      component.props.navigation.navigate("PdfViewListenersScreen");
+    }
+  },
+  {
+    name: "Programmatic Annotations",
+    description: "Shows how to get and add new annotations using Instant JSON.",
+    action: component => {
+      component.props.navigation.navigate("PdfViewInstantJsonScreen");
+    }
+  },
+  {
+    name: "Index Full Text Search From Picker",
+    description: "A simple full text search over a folder of the users choice.",
+    action: async component => {
+      await PSPDFKitLibrary.OpenLibrary("MyLibrary");
+      await PSPDFKitLibrary.EnqueueDocumentsInFolderPicker("MyLibrary");
+      alert(
+        'Searching Library for "' +
+          simpleSearch.searchString +
+          '". Please wait.'
+      );
+      PSPDFKitLibrary.SearchLibrary("MyLibrary", simpleSearch)
+        .then(result => {
+          alert("Search : \n" + JSON.stringify(result));
+        })
+        .finally(() => PSPDFKitLibrary.DeleteAllLibraries());
+    }
+  },
+  {
+    name: "Index Full Text Search From Assets",
+    description: "A simple full text search over the assets folder.",
+    action: async component => {
+      var path = RNFS.MainBundlePath + "\\Assets\\pdf";
+
+      await PSPDFKitLibrary.OpenLibrary("AssetsLibrary");
+      await PSPDFKitLibrary.EnqueueDocumentsInFolder("AssetsLibrary", path);
+      alert(
+        'Searching Library for "' +
+          complexSearchConfiguration.searchString +
+          '". Please wait.'
+      );
+      PSPDFKitLibrary.SearchLibrary("AssetsLibrary", complexSearchConfiguration)
+        .then(result => {
+          alert("Search : \n" + JSON.stringify(result));
+        })
+        .finally(() => PSPDFKitLibrary.DeleteAllLibraries());
+    }
+  }
 ];
 
 class CatalogScreen extends Component<{}> {
