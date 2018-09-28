@@ -83,9 +83,12 @@ var examples = [
         description:
             "A simple full text search over a folder of the users choice.",
         action: async component => {
-            await PSPDFKitLibrary.OpenLibraryPicker("MyLibrary");
+
+            await PSPDFKitLibrary.OpenLibrary("MyLibrary");
+            await PSPDFKitLibrary.EnqueueDocumentsInFolderPicker("MyLibrary");
+            alert("Searching Library for \"" + simpleSearch.searchString + "\". Please wait.");
             PSPDFKitLibrary.SearchLibrary("MyLibrary", simpleSearch)
-                .then(async result => {
+                .then(result => {
                     alert("Search : \n" + JSON.stringify(result));
                 })
                 .finally(() => PSPDFKitLibrary.DeleteAllLibraries());
@@ -98,9 +101,11 @@ var examples = [
         action: async component => {
             var path = RNFS.MainBundlePath + "\\Assets\\pdf";
 
-            await PSPDFKitLibrary.OpenLibrary("AssetsLibrary", path);
+            await PSPDFKitLibrary.OpenLibrary("AssetsLibrary");
+            await PSPDFKitLibrary.EnqueueDocumentsInFolder("AssetsLibrary", path);
+            alert("Searching Library for \"" + complexSearchConfiguration.searchString + "\". Please wait.");
             PSPDFKitLibrary.SearchLibrary("AssetsLibrary", complexSearchConfiguration)
-                .then(async result => {
+                .then(result => {
                     alert("Search : \n" + JSON.stringify(result));
                 })
                 .finally(() => PSPDFKitLibrary.DeleteAllLibraries());
