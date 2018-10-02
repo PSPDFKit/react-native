@@ -13,10 +13,8 @@ using PSPDFKitFoundation.Search;
 using ReactNative.Bridge;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
-using Windows.ApplicationModel.Background;
 using Windows.ApplicationModel.Core;
 using Windows.Storage;
 using Microsoft.Toolkit.Uwp.Helpers;
@@ -29,6 +27,11 @@ namespace ReactNativePSPDFKit
     /// </summary>
     class LibraryModule : ReactContextNativeModuleBase
     {
+        /// <summary>
+        /// The name to be used when creating the js modules
+        /// </summary>
+        public override string Name => "ReactPSPDFKitLibrary";
+
         private readonly Dictionary<string, Library> _libraries = new Dictionary<string, Library>();
 
         public LibraryModule(ReactContext reactContext, string license) : base(reactContext)
@@ -36,15 +39,9 @@ namespace ReactNativePSPDFKit
             Sdk.Initialize(license);
         }
 
-        ~LibraryModule()
+        public override void OnReactInstanceDispose()
         {
-            // We have unmanaged memory in Library therefore we have to ensure we dispose
-            // of it correctly.
-            foreach (var library in _libraries.Values)
-            {
-                library.Dispose();
-            }
-            _libraries.Clear();
+            DisposeNativeLibraries();
         }
 
         /// <summary>
@@ -64,7 +61,7 @@ namespace ReactNativePSPDFKit
 
             try
             {
-                _libraries.Add(libraryName, await Library.OpenLibraryAsync(libraryName));
+                _libraries.Add(libraryName, await Library.OpenLibraryAsync(libraryName).AsTask().ConfigureAwait(false));
                 
                 promise.Resolve(null);
             }
@@ -92,9 +89,9 @@ namespace ReactNativePSPDFKit
 
             try
             {
-                var storageFolder = await StorageFolder.GetFolderFromPathAsync(path);
+                var storageFolder = await StorageFolder.GetFolderFromPathAsync(path).AsTask().ConfigureAwait(false); ;
                 // Queue up the PDFs in the folder for indexing.
-                await EnqueueDocuments(_libraries[libraryName], storageFolder);
+                await EnqueueDocuments(_libraries[libraryName], storageFolder).ConfigureAwait(false); ;
 
                 promise.Resolve(null);
             }
@@ -131,10 +128,10 @@ namespace ReactNativePSPDFKit
                 StorageFolder folder = null;
                 await CoreApplication.MainView.Dispatcher.AwaitableRunAsync(async () => {
                     folder = await folderPicker.PickSingleFolderAsync();
-                });
+                }).ConfigureAwait(false); ;
 
                 // Queue up the PDFs in the folder for indexing.
-                await EnqueueDocuments(_libraries[libraryName], folder);
+                await EnqueueDocuments(_libraries[libraryName], folder).ConfigureAwait(false); ;
 
                 promise.Resolve(null);
             }
@@ -151,7 +148,7 @@ namespace ReactNativePSPDFKit
                 throw new FileNotFoundException("Folder not accessible");
             }
             // Queue up the PDFs in the folder for indexing.
-            await library.EnqueueDocumentsInFolderAsync(folder);
+            await library.EnqueueDocumentsInFolderAsync(folder).AsTask().ConfigureAwait(false);
         }
 
         /// <summary>
@@ -205,40 +202,39 @@ namespace ReactNativePSPDFKit
             try
             {
                 // If the library is not found KeyNotFoundException will be thrown and the promise will be rejected.
-                using (var library = _libraries[libraryName])
-                {
-                    var libraryQuery = JsonUtils.ToLibraryQuery(searchLibraryQuery);
-
-                    TaskCompletionSource<IList<LibraryPreviewResult>> previewsFromHandlerTcs = null;
-                    TaskCompletionSource<IDictionary<string, LibraryQueryResult>> resultsFromHandlerTcs = null;
-                    if (libraryQuery.GenerateTextPreviews)
-                    {
-                        previewsFromHandlerTcs = GetPreviewCompleteTcs(library);
-                    }
-                    else
-                    {
-                        resultsFromHandlerTcs = GetSearchCompleteTcs(library);
-                    }
+                var library = _libraries[libraryName];
                     
-                    // Ensure all indexing is complete before search.
-                    await library.WaitForAllIndexingTasksToFinishAsync();
+                var libraryQuery = JsonUtils.ToLibraryQuery(searchLibraryQuery);
 
-                    // We can do the searching in the background as the callbacks will receive the results.
-    #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-                    library.SearchAsync(libraryQuery);
-    #pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+                TaskCompletionSource<IList<LibraryPreviewResult>> previewsFromHandlerTcs = null;
+                TaskCompletionSource<IDictionary<string, LibraryQueryResult>> resultsFromHandlerTcs = null;
+                if (libraryQuery.GenerateTextPreviews)
+                {
+                    previewsFromHandlerTcs = GetPreviewCompleteTcs(library);
+                }
+                else
+                {
+                    resultsFromHandlerTcs = GetSearchCompleteTcs(library);
+                }
+                
+                // Ensure all indexing is complete before search.
+                await library.WaitForAllIndexingTasksToFinishAsync().AsTask().ConfigureAwait(false);
 
-                    if (previewsFromHandlerTcs != null)
-                    {
-                        var previewResults = await previewsFromHandlerTcs.Task;
-                        promise.Resolve(JsonUtils.PreviewResultsToJson(previewResults));
-                    }
+                // We can do the searching in the background as the callbacks will receive the results.
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+                library.SearchAsync(libraryQuery);
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 
-                    if (resultsFromHandlerTcs != null)
-                    {
-                        var resultsFromHandler = await resultsFromHandlerTcs.Task;
-                        promise.Resolve(JsonUtils.SearchResultsToJson(resultsFromHandler));
-                    }
+                if (previewsFromHandlerTcs != null)
+                {
+                    var previewResults = await previewsFromHandlerTcs.Task.ConfigureAwait(false);
+                    promise.Resolve(JsonUtils.PreviewResultsToJson(previewResults));
+                }
+
+                if (resultsFromHandlerTcs != null)
+                {
+                    var resultsFromHandler = await resultsFromHandlerTcs.Task.ConfigureAwait(false);
+                    promise.Resolve(JsonUtils.SearchResultsToJson(resultsFromHandler));
                 }
             }
             catch (Exception e)
@@ -251,13 +247,8 @@ namespace ReactNativePSPDFKit
         public async void DeleteAllLibraries()
         {
             // We have to ensure that we remove all handles to the database before deleting.
-            foreach (var library in _libraries.Values)
-            {
-                library.Dispose();
-            }
-            _libraries.Clear();
-
-            await Library.DeleteAllLibrariesAsync();
+            DisposeNativeLibraries();
+            await Library.DeleteAllLibrariesAsync().AsTask().ConfigureAwait(false); ;
         }
 
 
@@ -289,9 +280,13 @@ namespace ReactNativePSPDFKit
             return previewsFromHandlerTcs;
         }
 
-        /// <summary>
-        /// The name to be used when creating the js modules
-        /// </summary>
-        public override string Name => "ReactPSPDFKitLibrary";
+        private void DisposeNativeLibraries()
+        {
+            foreach (var library in _libraries.Values)
+            {
+                library.Dispose();
+            }
+            _libraries.Clear();
+        }
     }
 }

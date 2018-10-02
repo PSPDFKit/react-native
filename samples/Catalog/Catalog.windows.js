@@ -24,8 +24,6 @@ var PSPDFKit = NativeModules.ReactPSPDFKit;
 var PSPDFKitLibrary = NativeModules.ReactPSPDFKitLibrary;
 var RNFS = require("react-native-fs");
 
-var myLibraryCreated = false;
-
 const complexSearchConfiguration = {
   searchString: "the",
   excludeAnnotations: false,
