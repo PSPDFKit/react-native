@@ -2,7 +2,7 @@ using ReactNative;
 using ReactNative.Modules.Core;
 using ReactNative.Shell;
 using System.Collections.Generic;
-using Windows.UI.Core;
+using RNFS;
 
 namespace Catalog
 {
@@ -26,6 +26,7 @@ namespace Catalog
         {
             new MainReactPackage(),
             new ReactNativePSPDFKit.PSPDFKitPackage(),
+            new RNFSPackage()
         };
     }
 }

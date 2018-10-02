@@ -7,6 +7,7 @@
 //  This notice may not be removed from this file.
 //
 
+using PSPDFKit;
 using ReactNative.Bridge;
 using System;
 using System.Collections.Generic;
@@ -58,11 +59,11 @@ namespace ReactNativePSPDFKit
             {
                 try
                 {
-                    var file = await StorageFile.GetFileFromApplicationUriAsync(new Uri(assetPath));
+                    var file = await StorageFile.GetFileFromPathAsync(assetPath);
 
                     await LoadFileAsync(file);
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
                     var dialog = new MessageDialog("Unable to open the file specified.");
                     await dialog.ShowAsync();
@@ -74,7 +75,7 @@ namespace ReactNativePSPDFKit
         /// Opens the native file picker.
         /// </summary>
         /// <returns>The file chosen in the file picker.</returns>
-        private async Task<Windows.Storage.StorageFile> PickPDF()
+        private static async Task<Windows.Storage.StorageFile> PickPDF()
         {
             var picker = new Windows.Storage.Pickers.FileOpenPicker
             {
@@ -102,7 +103,7 @@ namespace ReactNativePSPDFKit
         /// </summary>
         public override IReadOnlyDictionary<string, object> Constants => new Dictionary<string, object>
         {
-            { VERSION_KEY, typeof(PSPDFKit.Sdk).GetTypeInfo().Assembly.GetName().Version.ToString() },
+            { VERSION_KEY, typeof(Sdk).GetTypeInfo().Assembly.GetName().Version.ToString() },
         };
 
         /// <summary>
