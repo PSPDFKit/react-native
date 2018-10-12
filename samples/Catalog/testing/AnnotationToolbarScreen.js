@@ -2,7 +2,8 @@ import React, { Component } from "react";
 
 import {
     View,
-    Button
+    Button,
+    NativeModules
 } from "react-native"
 
 import PSPDFKitView from "react-native-pspdfkit";
@@ -13,6 +14,10 @@ export default class AnnotationToolbarScreen extends Component<{}> {
             title: "PDF"
         };
     };
+
+    componentDidMount() {
+        NativeModules.TestingModule.setValue("did_load", "true");
+    }
 
     render() {
         return (

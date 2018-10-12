@@ -1,5 +1,7 @@
 import React, { Component } from "react";
-
+import {
+    NativeModules
+} from "react-native"
 import PSPDFKitView from "react-native-pspdfkit";
 
 export default class AuthorNameScreen extends Component<{}> {
@@ -8,6 +10,10 @@ export default class AuthorNameScreen extends Component<{}> {
             title: "PDF"
         };
     };
+
+    componentDidMount() {
+        NativeModules.TestingModule.setValue("did_load", "true");
+    }
 
     render() {
         return (

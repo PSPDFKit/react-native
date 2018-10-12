@@ -37,8 +37,11 @@ public class TestingModule extends ReactContextBaseJavaModule {
 
     public static String getValue(@NonNull String key) throws InterruptedException {
         synchronized (values) {
-            while (!values.containsKey(key)) {
-                values.wait(1000);
+            if (!values.containsKey(key)) {
+                values.wait(60000);
+                if (!values.containsKey(key)) {
+                    throw new IllegalArgumentException("Key " + key + " was not found.");
+                }
             }
             return values.get(key);
         }

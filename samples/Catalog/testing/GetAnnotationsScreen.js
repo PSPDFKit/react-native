@@ -15,6 +15,14 @@ export default class GetAnnotationsScreen extends Component<{}> {
         };
     };
 
+    componentDidMount() {
+        NativeModules.TestingModule.setValue("did_load", "true");
+        // We want to make sure that immediately accessing the pdf view doesn't crash.
+        this.refs.pdfView.getAnnotations(0, null).then(annotations => {
+            NativeModules.TestingModule.setValue("on_load_annotations", JSON.stringify(annotations));
+        })
+    }
+
     render() {
         return (
             <View style={{ flex: 1 }}>

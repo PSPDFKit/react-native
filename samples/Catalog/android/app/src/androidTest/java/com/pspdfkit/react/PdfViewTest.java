@@ -11,7 +11,6 @@ import com.pspdfkit.react.helper.JsonUtilities;
 import com.pspdfkit.react.test.TestActivity;
 import com.pspdfkit.ui.PdfFragment;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
@@ -21,8 +20,6 @@ import org.junit.runner.RunWith;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
-import static android.support.test.espresso.assertion.ViewAssertions.matches;
-import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.isRoot;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
@@ -43,35 +40,27 @@ public class PdfViewTest {
     }
 
     @Test
-    public void testAuthorNameProp() {
+    public void testAuthorNameProp() throws InterruptedException {
         // AuthorNameScreen.js
 
         // Pre Condition: No annotation creator is set.
         assertFalse(PSPDFKitPreferences.get(activityRule.getActivity()).isAnnotationCreatorSet());
 
-        // Wait until react is loaded.
-        onView(isRoot()).perform(waitForView(withText("Test Cases")));
-
-        // Open the screen containing the logic we want to test.
-        onView(withText("AuthorName")).perform(click());
+        openExample("AuthorName");
 
         // Check that annotation creator is set.
         assertEquals("Author", PSPDFKitPreferences.get(activityRule.getActivity()).getAnnotationCreator(null));
     }
 
     @Test
-    public void testEnterAndExitAnnotationCreation() {
+    public void testEnterAndExitAnnotationCreation() throws InterruptedException {
         // AnnotationToolbarScreen.js
 
-        // Wait until react is loaded.
-        onView(isRoot()).perform(waitForView(withText("Test Cases")));
-
-        // Open the screen containing the logic we want to test.
-        onView(withText("AnnotationToolbar")).perform(click());
+        openExample("AnnotationToolbar");
 
         // Open toolbar and check that it is displayed,
         onView(withText("OPEN")).perform(click());
-        onView(withId(R.id.pspdf__annotation_creation_toolbar)).check(matches(isDisplayed()));
+        onView(isRoot()).perform(waitForView(withId(R.id.pspdf__annotation_creation_toolbar)));
 
         // Now close it again.
         onView(withText("CLOSE")).perform(click());
@@ -82,11 +71,7 @@ public class PdfViewTest {
     public void testGetEmptyAnnotations() throws InterruptedException {
         // GetAnnotationsScreen.js
 
-        // Wait until react is loaded.
-        onView(isRoot()).perform(waitForView(withText("Test Cases")));
-
-        // Open the screen containing the logic we want to test.
-        onView(withText("GetAnnotations")).perform(click());
+        openExample("GetAnnotations");
 
         // Get annotations for first page should return nothing.
         onView(withText("GET")).perform(click());
@@ -99,11 +84,7 @@ public class PdfViewTest {
     public void testGetAnnotation() throws InterruptedException, JSONException {
         // GetAnnotationsScreen.js
 
-        // Wait until react is loaded.
-        onView(isRoot()).perform(waitForView(withText("Test Cases")));
-
-        // Open the screen containing the logic we want to test.
-        onView(withText("GetAnnotations")).perform(click());
+        openExample("GetAnnotations");
 
         PdfFragment fragment = (PdfFragment) activityRule.getActivity().getSupportFragmentManager().findFragmentByTag("PDF1");
         FreeTextAnnotation annotation = new FreeTextAnnotation(0, new RectF(0, 0, 100, 100), "Test");
@@ -112,9 +93,35 @@ public class PdfViewTest {
         // Get annotations for first page should return nothing.
         onView(withText("GET")).perform(click());
         JSONObject annotations = new JSONObject(TestingModule.getValue("annotations"));
-        
+
         JSONObject originalInstantJson = new JSONObject(annotation.toInstantJson());
         assertEquals(JsonUtilities.jsonObjectToMap(originalInstantJson), JsonUtilities.jsonObjectToMap(annotations.getJSONArray("annotations").getJSONObject(0)));
+    }
+
+    @Test
+    public void testGettingAnnotationsInComponentDidMount() throws InterruptedException {
+        // GetAnnotationsScreen.js
+
+        openExample("GetAnnotations");
+
+        // The ComponentDidMount calls get annotations, make sure we don't crash.
+        String annotations = TestingModule.getValue("on_load_annotations");
+
+        assertEquals("{\"annotations\":[]}", annotations);
+    }
+
+    private void openExample(String exampleName) throws InterruptedException {
+        // Wait until react is loaded.
+        onView(isRoot()).perform(waitForView(withText("Test Cases")));
+
+        // Open the screen containing the logic we want to test.
+        onView(withText(exampleName)).perform(click());
+
+        // Wait till react is ready.
+        TestingModule.getValue("did_load");
+
+        // And just give it a moment more.
+        Thread.sleep(500);
     }
 
 }
