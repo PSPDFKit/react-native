@@ -223,21 +223,6 @@ RCT_MULTI_ENUM_CONVERTER(PSPDFAppearanceMode,
                          PSPDFAppearanceModeDefault,
                          unsignedIntegerValue)
 
-//RCT_MULTI_ENUM_CONVERTER(PSPDFDocumentSharingOptions,
-//                         (@{@"none" : @(PSPDFDocumentSharingOptionNone),
-//                            @"currentPageOnly" : @(PSPDFDocumentSharingOptionCurrentPageOnly),
-//                            @"pageRange" : @(PSPDFDocumentSharingOptionPageRange),
-//                            @"allPages" : @(PSPDFDocumentSharingOptionAllPages),
-//                            @"annotatedPages" : @(PSPDFDocumentSharingOptionAnnotatedPages),
-//                            @"embedAnnotations" : @(PSPDFDocumentSharingOptionEmbedAnnotations),
-//                            @"flattenAnnotations" : @(PSPDFDocumentSharingOptionFlattenAnnotations),
-//                            @"annotationsSummary" : @(PSPDFDocumentSharingOptionAnnotationsSummary),
-//                            @"removeAnnotations" : @(PSPDFDocumentSharingOptionRemoveAnnotations),
-//                            @"originalFile" : @(PSPDFDocumentSharingOptionOriginalFile),
-//                            @"image" : @(PSPDFDocumentSharingOptionImage)}),
-//                         PSPDFDocumentSharingOptionNone,
-//                         unsignedIntegerValue)
-
 RCT_MULTI_ENUM_CONVERTER(PSPDFSettingsOptions,
                          (@{@"scrollDirection" : @(PSPDFSettingsOptionScrollDirection),
                             @"pageTransition" : @(PSPDFSettingsOptionPageTransition),
@@ -334,11 +319,7 @@ RCT_ENUM_CONVERTER(PSPDFConfigurationSpreadFitting,
   SET(showBackActionButton, BOOL)
   SET(showForwardActionButton, BOOL)
   SET(showBackForwardActionButtonLabels, BOOL)
-  // currently unsupported: SET(*applicationActivities, NSArray)
-//  SET(printSharingOptions, PSPDFDocumentSharingOptions)
-//  SET(openInSharingOptions, PSPDFDocumentSharingOptions)
-//  SET(mailSharingOptions, PSPDFDocumentSharingOptions)
-//  SET(messageSharingOptions, PSPDFDocumentSharingOptions)
+  SET(sharingConfigurations, NSArray)
   SET(settingsOptions, PSPDFSettingsOptions)
   SET(editableAnnotationTypes, NSSet)
 }
