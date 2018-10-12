@@ -92,7 +92,7 @@ public class PdfViewTest {
         onView(withText("GET")).perform(click());
         String annotations = TestingModule.getValue("annotations");
 
-        assertEquals("[]", annotations);
+        assertEquals("{\"annotations\":[]}", annotations);
     }
 
     @Test
@@ -111,11 +111,10 @@ public class PdfViewTest {
 
         // Get annotations for first page should return nothing.
         onView(withText("GET")).perform(click());
-        JSONArray annotations = new JSONArray(TestingModule.getValue("annotations"));
-
-
+        JSONObject annotations = new JSONObject(TestingModule.getValue("annotations"));
+        
         JSONObject originalInstantJson = new JSONObject(annotation.toInstantJson());
-        assertEquals(JsonUtilities.jsonObjectToMap(originalInstantJson), JsonUtilities.jsonObjectToMap(annotations.getJSONObject(0)));
+        assertEquals(JsonUtilities.jsonObjectToMap(originalInstantJson), JsonUtilities.jsonObjectToMap(annotations.getJSONArray("annotations").getJSONObject(0)));
     }
 
 }
