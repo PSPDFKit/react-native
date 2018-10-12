@@ -56,6 +56,8 @@ public class ConfigurationAdapter {
     private static final String ENABLE_TEXT_SELECTION = "enableTextSelection";
     private static final String SHOW_SHARE_ACTION = "showShareAction";
     private static final String SHOW_PRINT_ACTION = "showPrintAction";
+    private static final String SHOW_DOCUMENT_INFO_VIEW = "showDocumentInfoView";
+
 
     private final PdfActivityConfiguration.Builder configuration;
 
@@ -127,6 +129,9 @@ public class ConfigurationAdapter {
             }
             if (configuration.hasKey(SHOW_THUMBNAIL_BAR)) {
                 configureShowThumbnailBar(configuration.getString(SHOW_THUMBNAIL_BAR));
+            }
+            if (configuration.hasKey(SHOW_DOCUMENT_INFO_VIEW)) {
+                configureDocumentInfoView(configuration.getBoolean(SHOW_DOCUMENT_INFO_VIEW));
             }
         }
     }
@@ -270,6 +275,14 @@ public class ConfigurationAdapter {
 
     private void configureEnableTextSelection(boolean enableTextSelection) {
         configuration.textSelectionEnabled(enableTextSelection);
+    }
+
+    private void configureDocumentInfoView(boolean enableDocumentInfoView) {
+        if (enableDocumentInfoView) {
+            configuration.enableDocumentInfoView();
+        } else {
+            configuration.disableDocumentInfoView();
+        }
     }
 
     public PdfActivityConfiguration build() {

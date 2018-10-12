@@ -209,6 +209,10 @@
     </ApplicationDefinition>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\node_modules\react-native-fs\windows\RNFS\RNFS.csproj">
+      <Project>{746610D0-8693-11E7-A20D-BF83F7366778}</Project>
+      <Name>RNFS</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\node_modules\react-native-pspdfkit\windows\ReactNativePSPDFKit\ReactNativePSPDFKit\ReactNativePSPDFKit.csproj">
       <Project>{475f630c-9ea0-4cd2-823a-0bb2dbb4778a}</Project>
       <Name>ReactNativePSPDFKit</Name>
@@ -230,14 +234,9 @@
     <SDKReference Include="Microsoft.VCLibs, Version=14.0">
       <Name>Visual C++ 2015 Runtime for Universal Windows Platform Apps</Name>
     </SDKReference>
-    <SDKReference Include="PSPDFKitSDK, Version=1.5.2">
+    <SDKReference Include="PSPDFKitSDK, Version=1.6.1">
       <Name>PSPDFKit for UWP</Name>
     </SDKReference>
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
-      <Version>6.1.5</Version>
-    </PackageReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

@@ -2,6 +2,8 @@ using ReactNative;
 using ReactNative.Modules.Core;
 using ReactNative.Shell;
 using System.Collections.Generic;
+using RNFS;
+
 namespace Catalog
 {
     class MainReactNativeHost : ReactNativeHost
@@ -24,6 +26,7 @@ namespace Catalog
         {
             new MainReactPackage(),
             new ReactNativePSPDFKit.PSPDFKitPackage(),
+            new RNFSPackage()
         };
     }
 }

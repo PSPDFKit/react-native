@@ -27,11 +27,11 @@ import PSPDFKitView from "react-native-pspdfkit";
 
 // React Native bug that hopefully will be fixed soon:
 // https://github.com/facebook/react-native/issues/18868
-import { YellowBox } from 'react-native'
-YellowBox.ignoreWarnings(['Warning: isMounted(...) is deprecated'])
+import { YellowBox } from "react-native";
+YellowBox.ignoreWarnings(["Warning: isMounted(...) is deprecated"]);
 
 var PSPDFKit = NativeModules.PSPDFKit;
-var RNFS = require('react-native-fs');
+var RNFS = require("react-native-fs");
 
 const pspdfkitColor = "#267AD4";
 const pspdfkitColorAlpha = "#267AD450";
@@ -67,8 +67,8 @@ var examples = [
     name: "Open local document",
     description: "Open document from external storage directory.",
     action: () => {
-      requestExternalStoragePermission(function () {
-        extractFromAssetsIfMissing("Annual Report.pdf", function () {
+      requestExternalStoragePermission(function() {
+        extractFromAssetsIfMissing("Annual Report.pdf", function() {
           PSPDFKit.present(DOCUMENT, {});
         });
       });
@@ -78,8 +78,8 @@ var examples = [
     name: "Open local image document",
     description: "Open image image document from external storage directory.",
     action: () => {
-      requestExternalStoragePermission(function () {
-        extractFromAssetsIfMissing("android.png", function () {
+      requestExternalStoragePermission(function() {
+        extractFromAssetsIfMissing("android.png", function() {
           PSPDFKit.presentImage(IMAGE_DOCUMENT, CONFIGURATION_IMAGE_DOCUMENT);
         });
       });
@@ -90,7 +90,7 @@ var examples = [
     description:
       "You can configure the builder with dictionary representation of the PSPDFConfiguration object.",
     action: () => {
-      requestExternalStoragePermission(function () {
+      requestExternalStoragePermission(function() {
         PSPDFKit.present(DOCUMENT, CONFIGURATION);
       });
     }
@@ -113,16 +113,14 @@ var examples = [
   },
   {
     name: "Programmatic Annotations",
-    description:
-      "Shows how to get and add new annotations using Instant JSON.",
+    description: "Shows how to get and add new annotations using Instant JSON.",
     action: component => {
       component.props.navigation.navigate("PdfViewInstantJsonScreen");
     }
   },
   {
     name: "Programmatic Form Filling",
-    description:
-      "Shows how to programatically read and write PDF form values.",
+    description: "Shows how to programatically read and write PDF form values.",
     action: component => {
       component.props.navigation.navigate("PdfViewFormFillingScreen");
     }
@@ -147,34 +145,43 @@ var examples = [
 ];
 
 function extractFromAssetsIfMissing(assetFile, callback) {
-  RNFS.exists("/sdcard/" + assetFile).then((exist) => {
-    if (exist) {
-      console.log(assetFile + " exists in the external storage directory.");
-      callback();
-    } else {
-      console.log(assetFile + " does not exist, extracting it from assets folder to the external storage directory.");
-      RNFS.existsAssets(assetFile).then((exist) => {
-        // Check if the file is present in the assets folder.
-        if (exist) {
-          // File exists so it can be extracted to the external storage directory.
-          RNFS.copyFileAssets(assetFile, "/sdcard/" + assetFile).then(() => {
-            // File copied successfully from assets folder to external storage directory.
-            callback();
+  RNFS.exists("/sdcard/" + assetFile)
+    .then(exist => {
+      if (exist) {
+        console.log(assetFile + " exists in the external storage directory.");
+        callback();
+      } else {
+        console.log(
+          assetFile +
+            " does not exist, extracting it from assets folder to the external storage directory."
+        );
+        RNFS.existsAssets(assetFile)
+          .then(exist => {
+            // Check if the file is present in the assets folder.
+            if (exist) {
+              // File exists so it can be extracted to the external storage directory.
+              RNFS.copyFileAssets(assetFile, "/sdcard/" + assetFile)
+                .then(() => {
+                  // File copied successfully from assets folder to external storage directory.
+                  callback();
+                })
+                .catch(error => {
+                  console.log(error);
+                });
+            } else {
+              // File does not exist, it should never happen.
+              throw new Error(
+                assetFile +
+                  " couldn't be extracted as it was not found in the project assets folder."
+              );
+            }
           })
-            .catch((error) => {
-              console.log(error);
-            });
-        } else {
-          // File does not exist, it should never happen.
-          throw new Error(assetFile + " couldn't be extracted as it was not found in the project assets folder.");
-        }
-      })
-        .catch((error) => {
-          console.log(error);
-        });
-    }
-  })
-    .catch((error) => {
+          .catch(error => {
+            console.log(error);
+          });
+      }
+    })
+    .catch(error => {
       console.log(error);
     });
 }
@@ -261,7 +268,10 @@ class PdfViewScreen extends Component<{}> {
     return {
       title: "PDF",
       headerRight: (
-        <Button onPress={() => params.handleAnnotationButtonPress()} title="Annotations" />
+        <Button
+          onPress={() => params.handleAnnotationButtonPress()}
+          title="Annotations"
+        />
       )
     };
   };
@@ -322,7 +332,14 @@ class PdfViewScreen extends Component<{}> {
           }}
           style={{ flex: 1, color: pspdfkitColor }}
         />
-        <View style={{ flexDirection: 'row', height: 40, alignItems: 'center', padding: 10 }}>
+        <View
+          style={{
+            flexDirection: "row",
+            height: 40,
+            alignItems: "center",
+            padding: 10
+          }}
+        >
           <Text style={{ flex: 1 }}>
             {"Page " +
               (this.state.currentPageIndex + 1) +
@@ -330,18 +347,30 @@ class PdfViewScreen extends Component<{}> {
               this.state.pageCount}
           </Text>
           <View>
-            <Button onPress={() => {
-              this.setState(previousState => {
-                return { currentPageIndex: previousState.currentPageIndex - 1 }
-              })
-            }} disabled={this.state.currentPageIndex == 0} title="Previous Page" />
+            <Button
+              onPress={() => {
+                this.setState(previousState => {
+                  return {
+                    currentPageIndex: previousState.currentPageIndex - 1
+                  };
+                });
+              }}
+              disabled={this.state.currentPageIndex == 0}
+              title="Previous Page"
+            />
           </View>
           <View style={{ marginLeft: 10 }}>
-            <Button onPress={() => {
-              this.setState(previousState => {
-                return { currentPageIndex: previousState.currentPageIndex + 1 }
-              })
-            }} disabled={this.state.currentPageIndex == this.state.pageCount - 1} title="Next Page" />
+            <Button
+              onPress={() => {
+                this.setState(previousState => {
+                  return {
+                    currentPageIndex: previousState.currentPageIndex + 1
+                  };
+                });
+              }}
+              disabled={this.state.currentPageIndex == this.state.pageCount - 1}
+              title="Next Page"
+            />
           </View>
         </View>
       </View>
@@ -413,7 +442,10 @@ class PdfViewListenersScreen extends Component<{}> {
     return {
       title: "Event Listeners",
       headerRight: (
-        <Button onPress={() => params.handleAnnotationButtonPress()} title="Annotations" />
+        <Button
+          onPress={() => params.handleAnnotationButtonPress()}
+          title="Annotations"
+        />
       )
     };
   };
@@ -466,21 +498,21 @@ class PdfViewListenersScreen extends Component<{}> {
             });
           }}
           onDocumentSaved={e => {
-            alert("Document was saved!")
+            alert("Document was saved!");
           }}
           onDocumentSaveFailed={e => {
-            alert("Document couldn't be saved: " + e.error)
+            alert("Document couldn't be saved: " + e.error);
           }}
           onAnnotationTapped={e => {
-            alert("Annotation was tapped\n" + JSON.stringify(e))
+            alert("Annotation was tapped\n" + JSON.stringify(e));
           }}
           onAnnotationsChanged={e => {
-            alert("Annotations changed\n" + JSON.stringify(e))
+            alert("Annotations changed\n" + JSON.stringify(e));
           }}
           style={{ flex: 1, color: pspdfkitColor }}
         />
       </View>
-    )
+    );
   }
 }
 
@@ -491,7 +523,10 @@ class PdfViewInstantJsonScreen extends Component<{}> {
     return {
       title: "Programmatic Annotations",
       headerRight: (
-        <Button onPress={() => params.handleAnnotationButtonPress()} title="Annotations" />
+        <Button
+          onPress={() => params.handleAnnotationButtonPress()}
+          title="Annotations"
+        />
       )
     };
   };
@@ -544,66 +579,82 @@ class PdfViewInstantJsonScreen extends Component<{}> {
           }}
           style={{ flex: 1, color: pspdfkitColor }}
         />
-        <View style={{ flexDirection: 'row', height: 40, alignItems: 'center', padding: 10 }}>
+        <View
+          style={{
+            flexDirection: "row",
+            height: 40,
+            alignItems: "center",
+            padding: 10
+          }}
+        >
           <View>
-            <Button onPress={() => {
-              // This gets all annotations on the first page.
-              this.refs.pdfView.getAnnotations(0, null)
-                .then(annotations => {
-                  alert(JSON.stringify(annotations))
-                })
-            }} title="Get annotations" />
+            <Button
+              onPress={() => {
+                // This gets all annotations on the first page.
+                this.refs.pdfView.getAnnotations(0, null).then(annotations => {
+                  alert(JSON.stringify(annotations));
+                });
+              }}
+              title="Get annotations"
+            />
           </View>
           <View style={{ marginLeft: 10 }}>
-            <Button onPress={() => {
-              // This adds a new ink annotation to the first page.
-              this.refs.pdfView.addAnnotation({
-                "bbox": [
-                  89.58633422851562,
-                  98.5791015625,
-                  143.12948608398438,
-                  207.1583251953125
-                ],
-                "blendMode": "normal",
-                "createdAt": "2018-07-03T13:53:03Z",
-                "isDrawnNaturally": false,
-                "lineWidth": 5,
-                "lines": {
-                  "intensities": [[0.5, 0.5, 0.5], [0.5, 0.5, 0.5]],
-                  "points": [
-                    [
-                      [92.08633422851562, 101.07916259765625],
-                      [92.08633422851562, 202.15826416015625],
-                      [138.12950134277344, 303.2374267578125]
-                    ],
-                    [
-                      [184.17266845703125, 101.07916259765625],
-                      [184.17266845703125, 202.15826416015625],
-                      [230.2158203125, 303.2374267578125]
+            <Button
+              onPress={() => {
+                // This adds a new ink annotation to the first page.
+                this.refs.pdfView.addAnnotation({
+                  bbox: [
+                    89.58633422851562,
+                    98.5791015625,
+                    143.12948608398438,
+                    207.1583251953125
+                  ],
+                  blendMode: "normal",
+                  createdAt: "2018-07-03T13:53:03Z",
+                  isDrawnNaturally: false,
+                  lineWidth: 5,
+                  lines: {
+                    intensities: [[0.5, 0.5, 0.5], [0.5, 0.5, 0.5]],
+                    points: [
+                      [
+                        [92.08633422851562, 101.07916259765625],
+                        [92.08633422851562, 202.15826416015625],
+                        [138.12950134277344, 303.2374267578125]
+                      ],
+                      [
+                        [184.17266845703125, 101.07916259765625],
+                        [184.17266845703125, 202.15826416015625],
+                        [230.2158203125, 303.2374267578125]
+                      ]
                     ]
-                  ]
-                },
-                "opacity": 1,
-                "pageIndex": 0,
-                "strokeColor": "#AA47BE",
-                "type": "pspdfkit/ink",
-                "updatedAt": "2018-07-03T13:53:03Z",
-                "v": 1
-              });
-            }} title="Add annotation" />
+                  },
+                  opacity: 1,
+                  pageIndex: 0,
+                  strokeColor: "#AA47BE",
+                  type: "pspdfkit/ink",
+                  updatedAt: "2018-07-03T13:53:03Z",
+                  v: 1
+                });
+              }}
+              title="Add annotation"
+            />
           </View>
           <View style={{ marginLeft: 10 }}>
-            <Button onPress={() => {
-              // This gets all annotations on the first page.
-              this.refs.pdfView.getAllUnsavedAnnotations()
-                .then(annotations => {
-                  alert(JSON.stringify(annotations))
-                })
-            }} title="Get unsaved annotations" />
+            <Button
+              onPress={() => {
+                // This gets all annotations on the first page.
+                this.refs.pdfView
+                  .getAllUnsavedAnnotations()
+                  .then(annotations => {
+                    alert(JSON.stringify(annotations));
+                  });
+              }}
+              title="Get unsaved annotations"
+            />
           </View>
         </View>
       </View>
-    )
+    );
   }
 }
 
@@ -617,7 +668,6 @@ class PdfViewFormFillingScreen extends Component<{}> {
   };
 
   render() {
-
     return (
       <View style={{ flex: 1 }}>
         <PSPDFKitView
@@ -627,34 +677,55 @@ class PdfViewFormFillingScreen extends Component<{}> {
           fragmentTag="PDF1"
           style={{ flex: 1, color: pspdfkitColor }}
         />
-        <View style={{ flexDirection: 'row', height: 40, alignItems: 'center', padding: 10 }}>
+        <View
+          style={{
+            flexDirection: "row",
+            height: 40,
+            alignItems: "center",
+            padding: 10
+          }}
+        >
           <View>
-            <Button onPress={() => {
-              // Fill Text Form Fields.
-              this.refs.pdfView.setFormFieldValue('Name_Last', 'Appleseed');
-              this.refs.pdfView.setFormFieldValue('Name_First', 'John');
-              this.refs.pdfView.setFormFieldValue('Address_1', '1 Infinite Loop');
-              this.refs.pdfView.setFormFieldValue('City', 'Cupertino');
-              this.refs.pdfView.setFormFieldValue('STATE', 'CA');
-              this.refs.pdfView.setFormFieldValue('SSN', '123456789');
-              this.refs.pdfView.setFormFieldValue('Telephone_Home', '(123) 456-7890');
-              this.refs.pdfView.setFormFieldValue('Birthdate', '1/1/1983');
+            <Button
+              onPress={() => {
+                // Fill Text Form Fields.
+                this.refs.pdfView.setFormFieldValue("Name_Last", "Appleseed");
+                this.refs.pdfView.setFormFieldValue("Name_First", "John");
+                this.refs.pdfView.setFormFieldValue(
+                  "Address_1",
+                  "1 Infinite Loop"
+                );
+                this.refs.pdfView.setFormFieldValue("City", "Cupertino");
+                this.refs.pdfView.setFormFieldValue("STATE", "CA");
+                this.refs.pdfView.setFormFieldValue("SSN", "123456789");
+                this.refs.pdfView.setFormFieldValue(
+                  "Telephone_Home",
+                  "(123) 456-7890"
+                );
+                this.refs.pdfView.setFormFieldValue("Birthdate", "1/1/1983");
 
-              // Select a button form elements.
-              this.refs.pdfView.setFormFieldValue('Sex.0', 'selected');
-              this.refs.pdfView.setFormFieldValue('PHD', 'selected');
-            }} title="Fill Forms" />
+                // Select a button form elements.
+                this.refs.pdfView.setFormFieldValue("Sex.0", "selected");
+                this.refs.pdfView.setFormFieldValue("PHD", "selected");
+              }}
+              title="Fill Forms"
+            />
           </View>
           <View>
-            <Button onPress={async () => {
-              // Get the First Name Value.
-              const firstNameValue = await this.refs.pdfView.getFormFieldValue('Name_Last');
-              alert(JSON.stringify(firstNameValue));
-            }} title="Get Last Name Value" />
+            <Button
+              onPress={async () => {
+                // Get the First Name Value.
+                const firstNameValue = await this.refs.pdfView.getFormFieldValue(
+                  "Name_Last"
+                );
+                alert(JSON.stringify(firstNameValue));
+              }}
+              title="Get Last Name Value"
+            />
           </View>
         </View>
       </View>
-    )
+    );
   }
 }
 
