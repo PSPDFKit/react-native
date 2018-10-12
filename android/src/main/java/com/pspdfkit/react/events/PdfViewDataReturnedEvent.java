@@ -22,10 +22,12 @@ public class PdfViewDataReturnedEvent extends Event<PdfViewDataReturnedEvent> {
 
     public static final String EVENT_NAME = "pdfViewDataReturned";
 
+    private final int requestId;
     private final WritableMap payload;
 
     public PdfViewDataReturnedEvent(@IdRes int viewId, int requestId, @NonNull List<Annotation> annotationsToSerialize) {
         super(viewId);
+        this.requestId = requestId;
         Map<String, Object> map = new HashMap<>();
         map.put("requestId", requestId);
         try {
@@ -47,6 +49,7 @@ public class PdfViewDataReturnedEvent extends Event<PdfViewDataReturnedEvent> {
 
     public PdfViewDataReturnedEvent(@IdRes int viewId, int requestId, @NonNull JSONObject jsonObject) {
         super(viewId);
+        this.requestId = requestId;
         Map<String, Object> map = new HashMap<>();
         map.put("requestId", requestId);
 
@@ -61,7 +64,7 @@ public class PdfViewDataReturnedEvent extends Event<PdfViewDataReturnedEvent> {
 
     public PdfViewDataReturnedEvent(@IdRes int viewId, int requestId, @NonNull Throwable throwable) {
         super(viewId);
-
+        this.requestId = requestId;
         payload = Arguments.createMap();
         payload.putInt("requestId", requestId);
         payload.putString("error", throwable.getMessage());
@@ -75,5 +78,10 @@ public class PdfViewDataReturnedEvent extends Event<PdfViewDataReturnedEvent> {
     @Override
     public void dispatch(RCTEventEmitter rctEventEmitter) {
         rctEventEmitter.receiveEvent(getViewTag(), getEventName(), payload);
+    }
+
+    @Override
+    public short getCoalescingKey() {
+        return (short) requestId;
     }
 }

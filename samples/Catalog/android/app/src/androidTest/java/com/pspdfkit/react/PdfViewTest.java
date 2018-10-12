@@ -6,6 +6,7 @@ import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.pspdfkit.annotations.FreeTextAnnotation;
+import com.pspdfkit.forms.TextFormField;
 import com.pspdfkit.preferences.PSPDFKitPreferences;
 import com.pspdfkit.react.helper.JsonUtilities;
 import com.pspdfkit.react.test.TestActivity;
@@ -27,6 +28,7 @@ import static com.pspdfkit.react.utils.ViewActions.waitForView;
 import static com.pspdfkit.react.utils.ViewActions.waitForViewNotDisplayed;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertNull;
 
 @RunWith(AndroidJUnit4.class)
 public class PdfViewTest {
@@ -108,6 +110,50 @@ public class PdfViewTest {
         String annotations = TestingModule.getValue("on_load_annotations");
 
         assertEquals("{\"annotations\":[]}", annotations);
+    }
+
+    @Test
+    public void testSettingsFormValues() throws InterruptedException {
+        // FormsScreen.js
+
+        openExample("Forms");
+
+        // Check with the form provider that the fields are empty.
+        PdfFragment fragment = (PdfFragment) activityRule.getActivity().getSupportFragmentManager().findFragmentByTag("PDF1");
+        TextFormField lastname = (TextFormField) fragment.getDocument().getFormProvider().getFormFieldWithFullyQualifiedName("Name_Last");
+        TextFormField firstname = (TextFormField)fragment.getDocument().getFormProvider().getFormFieldWithFullyQualifiedName("Name_First");
+        assertNull(lastname.getFormElement().getText());
+        assertNull(firstname.getFormElement().getText());
+
+        // Perform setting the form values.
+        onView(withText("SET")).perform(click());
+
+        assertEquals("Appleseed", lastname.getFormElement().getText());
+        assertEquals("John", firstname.getFormElement().getText());
+    }
+
+    @Test
+    public void testGettingFormValues() throws InterruptedException {
+        // FormsScreen.js
+
+        openExample("Forms");
+
+        // Check with the form provider that the fields are empty.
+        PdfFragment fragment = (PdfFragment) activityRule.getActivity().getSupportFragmentManager().findFragmentByTag("PDF1");
+        TextFormField lastname = (TextFormField) fragment.getDocument().getFormProvider().getFormFieldWithFullyQualifiedName("Name_Last");
+        TextFormField firstname = (TextFormField)fragment.getDocument().getFormProvider().getFormFieldWithFullyQualifiedName("Name_First");
+        assertNull(lastname.getFormElement().getText());
+        assertNull(firstname.getFormElement().getText());
+
+        // Set the form fields.
+        lastname.getFormElement().setText("Appleseed");
+        firstname.getFormElement().setText("John");
+
+        // Get the form values in our react code.
+        onView(withText("GET")).perform(click());
+
+        assertEquals("{\"value\":\"Appleseed\"}", TestingModule.getValue("lastName"));
+        assertEquals("{\"value\":\"John\"}", TestingModule.getValue("firstName"));
     }
 
     private void openExample(String exampleName) throws InterruptedException {

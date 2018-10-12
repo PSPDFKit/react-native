@@ -40,7 +40,7 @@ public class TestingModule extends ReactContextBaseJavaModule {
             if (!values.containsKey(key)) {
                 values.wait(60000);
                 if (!values.containsKey(key)) {
-                    throw new IllegalArgumentException("Key " + key + " was not found.");
+                    throw new IllegalArgumentException("Key " + key + " was not found. Got: " + values.toString());
                 }
             }
             return values.get(key);
