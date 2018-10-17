@@ -49,12 +49,16 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import io.reactivex.ObservableSource;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subjects.BehaviorSubject;
 
 /**
  * This view displays a {@link com.pspdfkit.ui.PdfFragment} and all associated toolbars.
@@ -79,7 +83,12 @@ public class PdfView extends FrameLayout {
 
     private PdfThumbnailBar pdfThumbnailBar;
 
+    @NonNull
+    private CompositeDisposable pendingFragmentActions = new CompositeDisposable();
+
+    @Nullable
     private PdfFragment fragment;
+    private BehaviorSubject<PdfFragment> fragmentGetter = BehaviorSubject.create();
 
     public PdfView(@NonNull Context context) {
         super(context);
@@ -218,6 +227,7 @@ public class PdfView extends FrameLayout {
             }
 
             fragment = pdfFragment;
+            fragmentGetter.onNext(fragment);
         }
     }
 
@@ -280,6 +290,10 @@ public class PdfView extends FrameLayout {
         isActive = false;
 
         fragment = null;
+        fragmentGetter.onComplete();
+        fragmentGetter = BehaviorSubject.create();
+        pendingFragmentActions.dispose();
+        pendingFragmentActions = new CompositeDisposable();
     }
 
     void manuallyLayoutChildren() {
@@ -330,15 +344,25 @@ public class PdfView extends FrameLayout {
     }
 
     public void enterAnnotationCreationMode() {
-        if (fragment != null) {
-            fragment.enterAnnotationCreationMode();
-        }
+        pendingFragmentActions.add(fragmentGetter.take(1)
+                .observeOn(Schedulers.io())
+                .subscribe(new Consumer<PdfFragment>() {
+                    @Override
+                    public void accept(PdfFragment pdfFragment) {
+                        pdfFragment.enterAnnotationCreationMode();
+                    }
+                }));
     }
 
     public void exitCurrentlyActiveMode() {
-        if (fragment != null) {
-            fragment.exitCurrentlyActiveMode();
-        }
+        pendingFragmentActions.add(fragmentGetter.take(1)
+                .observeOn(Schedulers.io())
+                .subscribe(new Consumer<PdfFragment>() {
+                    @Override
+                    public void accept(PdfFragment pdfFragment) {
+                        pdfFragment.exitCurrentlyActiveMode();
+                    }
+                }));
     }
 
     public void saveCurrentDocument() {
@@ -354,9 +378,19 @@ public class PdfView extends FrameLayout {
         }
     }
 
-    public Single<List<Annotation>> getAnnotations(int pageIndex, @Nullable String type) {
-        return fragment.getDocument().getAnnotationProvider().getAllAnnotationsOfType(getTypeFromString(type), pageIndex, 1)
-                .toList();
+    public Single<List<Annotation>> getAnnotations(final int pageIndex, @Nullable final String type) {
+        return fragmentGetter.take(1).map(new Function<PdfFragment, PdfDocument>() {
+
+            @Override
+            public PdfDocument apply(PdfFragment pdfFragment) {
+                return pdfFragment.getDocument();
+            }
+        }).flatMap(new Function<PdfDocument, ObservableSource<Annotation>>() {
+            @Override
+            public ObservableSource<Annotation> apply(PdfDocument pdfDocument) {
+                return pdfDocument.getAnnotationProvider().getAllAnnotationsOfType(getTypeFromString(type), pageIndex, 1);
+            }
+        }).toList();
     }
 
     private EnumSet<AnnotationType> getTypeFromString(@Nullable String type) {
@@ -526,7 +560,7 @@ public class PdfView extends FrameLayout {
                                         selectedIndices.add(indices.getInt(i));
                                     }
                                     choiceFormElement.setSelectedIndexes(selectedIndices);
-                                }catch (JSONException ex) {
+                                } catch (JSONException ex) {
                                     // This isn't an index maybe we can set a custom value on a combobox.
                                     if (formElement instanceof ComboBoxFormElement) {
                                         ((ComboBoxFormElement) formElement).setCustomText(value);

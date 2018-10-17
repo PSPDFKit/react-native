@@ -8,5 +8,7 @@
 
 import { AppRegistry } from "react-native";
 import Catalog from "./Catalog";
+import Testing from './testing/Testing';
 
 AppRegistry.registerComponent("Catalog", () => Catalog);
+AppRegistry.registerComponent('Testing', () => Testing);
