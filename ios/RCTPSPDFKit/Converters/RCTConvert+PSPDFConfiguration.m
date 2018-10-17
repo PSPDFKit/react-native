@@ -170,7 +170,7 @@ RCT_ENUM_CONVERTER(PSPDFSignatureSavingStrategy,
  PSPDFAnnotationString const PSPDFAnnotationStringWatermark = @"Watermark";
  PSPDFAnnotationString const PSPDFAnnotationStringTrapNet = @"TrapNet";
  PSPDFAnnotationString const PSPDFAnnotationString3D = @"3D";
- PSPDFAnnotationString const PSPDFAnnotationStringRedact = @"Redact";
+ PSPDFAnnotationString const PSPDFAnnotationStringRedaction = @"Redact";
  */
 
 RCT_MULTI_ENUM_CONVERTER(PSPDFAnnotationType,
@@ -200,7 +200,7 @@ RCT_MULTI_ENUM_CONVERTER(PSPDFAnnotationType,
                             PSPDFAnnotationStringWatermark : @(PSPDFAnnotationTypeWatermark),
                             PSPDFAnnotationStringTrapNet : @(PSPDFAnnotationTypeTrapNet),
                             PSPDFAnnotationString3D : @(PSPDFAnnotationTypeThreeDimensional),
-                            PSPDFAnnotationStringRedact : @(PSPDFAnnotationTypeRedact),
+                            PSPDFAnnotationStringRedaction : @(PSPDFAnnotationTypeRedaction),
                             @"all" : @(PSPDFAnnotationTypeAll)}),
                          PSPDFAnnotationTypeNone,
                          unsignedIntegerValue)
@@ -223,20 +223,20 @@ RCT_MULTI_ENUM_CONVERTER(PSPDFAppearanceMode,
                          PSPDFAppearanceModeDefault,
                          unsignedIntegerValue)
 
-RCT_MULTI_ENUM_CONVERTER(PSPDFDocumentSharingOptions,
-                         (@{@"none" : @(PSPDFDocumentSharingOptionNone),
-                            @"currentPageOnly" : @(PSPDFDocumentSharingOptionCurrentPageOnly),
-                            @"pageRange" : @(PSPDFDocumentSharingOptionPageRange),
-                            @"allPages" : @(PSPDFDocumentSharingOptionAllPages),
-                            @"annotatedPages" : @(PSPDFDocumentSharingOptionAnnotatedPages),
-                            @"embedAnnotations" : @(PSPDFDocumentSharingOptionEmbedAnnotations),
-                            @"flattenAnnotations" : @(PSPDFDocumentSharingOptionFlattenAnnotations),
-                            @"annotationsSummary" : @(PSPDFDocumentSharingOptionAnnotationsSummary),
-                            @"removeAnnotations" : @(PSPDFDocumentSharingOptionRemoveAnnotations),
-                            @"originalFile" : @(PSPDFDocumentSharingOptionOriginalFile),
-                            @"image" : @(PSPDFDocumentSharingOptionImage)}),
-                         PSPDFDocumentSharingOptionNone,
-                         unsignedIntegerValue)
+//RCT_MULTI_ENUM_CONVERTER(PSPDFDocumentSharingOptions,
+//                         (@{@"none" : @(PSPDFDocumentSharingOptionNone),
+//                            @"currentPageOnly" : @(PSPDFDocumentSharingOptionCurrentPageOnly),
+//                            @"pageRange" : @(PSPDFDocumentSharingOptionPageRange),
+//                            @"allPages" : @(PSPDFDocumentSharingOptionAllPages),
+//                            @"annotatedPages" : @(PSPDFDocumentSharingOptionAnnotatedPages),
+//                            @"embedAnnotations" : @(PSPDFDocumentSharingOptionEmbedAnnotations),
+//                            @"flattenAnnotations" : @(PSPDFDocumentSharingOptionFlattenAnnotations),
+//                            @"annotationsSummary" : @(PSPDFDocumentSharingOptionAnnotationsSummary),
+//                            @"removeAnnotations" : @(PSPDFDocumentSharingOptionRemoveAnnotations),
+//                            @"originalFile" : @(PSPDFDocumentSharingOptionOriginalFile),
+//                            @"image" : @(PSPDFDocumentSharingOptionImage)}),
+//                         PSPDFDocumentSharingOptionNone,
+//                         unsignedIntegerValue)
 
 RCT_MULTI_ENUM_CONVERTER(PSPDFSettingsOptions,
                          (@{@"none" : @(PSPDFSettingsOptionNone),
@@ -336,10 +336,10 @@ RCT_ENUM_CONVERTER(PSPDFConfigurationSpreadFitting,
   SET(showForwardActionButton, BOOL)
   SET(showBackForwardActionButtonLabels, BOOL)
   // currently unsupported: SET(*applicationActivities, NSArray)
-  SET(printSharingOptions, PSPDFDocumentSharingOptions)
-  SET(openInSharingOptions, PSPDFDocumentSharingOptions)
-  SET(mailSharingOptions, PSPDFDocumentSharingOptions)
-  SET(messageSharingOptions, PSPDFDocumentSharingOptions)
+//  SET(printSharingOptions, PSPDFDocumentSharingOptions)
+//  SET(openInSharingOptions, PSPDFDocumentSharingOptions)
+//  SET(mailSharingOptions, PSPDFDocumentSharingOptions)
+//  SET(messageSharingOptions, PSPDFDocumentSharingOptions)
   SET(settingsOptions, PSPDFSettingsOptions)
   SET(editableAnnotationTypes, NSSet)
 }
