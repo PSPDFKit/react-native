@@ -239,8 +239,7 @@ RCT_MULTI_ENUM_CONVERTER(PSPDFAppearanceMode,
 //                         unsignedIntegerValue)
 
 RCT_MULTI_ENUM_CONVERTER(PSPDFSettingsOptions,
-                         (@{@"none" : @(PSPDFSettingsOptionNone),
-                            @"scrollDirection" : @(PSPDFSettingsOptionScrollDirection),
+                         (@{@"scrollDirection" : @(PSPDFSettingsOptionScrollDirection),
                             @"pageTransition" : @(PSPDFSettingsOptionPageTransition),
                             @"appearance" : @(PSPDFSettingsOptionAppearance),
                             @"brightness" : @(PSPDFSettingsOptionBrightness),
