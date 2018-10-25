@@ -33,23 +33,25 @@ target 'YourApp' do
 
   pod 'react-native-pspdfkit', :path => '../node_modules/react-native-pspdfkit'
 
-  # To use CocoaPods with React Native, you need to add this specific Yoga spec as well
-  pod 'Yoga', :path => '../node_modules/react-native/ReactCommon/yoga/Yoga.podspec'
-
-  # You don't necessarily need all of these subspecs, but this would be a typical setup.
+  # Your 'node_modules' directory is probably in the root of your project,
+  # but if not, adjust the `:path` accordingly
   pod 'React', :path => '../node_modules/react-native', :subspecs => [
     'Core',
+    'CxxBridge', # Include this for RN >= 0.47
+    'DevSupport', # Include this to enable In-App Devmenu if RN >= 0.43
     'RCTText',
     'RCTNetwork',
-    'RCTWebSocket', # needed for debugging
-    'RCTImage',
-    'RCTNetwork',
-    'BatchedBridge', # https://github.com/facebook/react-native/issues/14749
+    'RCTWebSocket', # Needed for debugging
+    'RCTAnimation', # Needed for FlatList and animations running on native UI thread
     # Add any other subspecs you want to use in your project
   ]
+  # Explicitly include Yoga if you are using RN >= 0.42.0
+  pod 'yoga', :path => '../node_modules/react-native/ReactCommon/yoga'
 
-  # Add any other dependencies here, including any 3rd party native libraries that you depend on for
-  # React Native.
+  # Third party deps podspec link
+  pod 'DoubleConversion', :podspec => '../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec'
+  pod 'glog', :podspec => '../node_modules/react-native/third-party-podspecs/glog.podspec'
+  pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec'
 end
 ```
 
