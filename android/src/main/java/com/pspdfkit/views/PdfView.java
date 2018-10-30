@@ -25,6 +25,7 @@ import com.pspdfkit.forms.ComboBoxFormElement;
 import com.pspdfkit.forms.EditableButtonFormElement;
 import com.pspdfkit.forms.FormElement;
 import com.pspdfkit.forms.TextFormElement;
+import com.pspdfkit.listeners.OnPreparePopupToolbarListener;
 import com.pspdfkit.listeners.SimpleDocumentListener;
 import com.pspdfkit.react.R;
 import com.pspdfkit.react.events.PdfViewDataReturnedEvent;
@@ -38,6 +39,7 @@ import com.pspdfkit.ui.forms.FormEditingBar;
 import com.pspdfkit.ui.inspector.PropertyInspectorCoordinatorLayout;
 import com.pspdfkit.ui.thumbnail.PdfThumbnailBarController;
 import com.pspdfkit.ui.toolbar.ToolbarCoordinatorLayout;
+import com.pspdfkit.ui.toolbar.popup.PdfTextSelectionPopupToolbar;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -89,6 +91,7 @@ public class PdfView extends FrameLayout {
     @Nullable
     private PdfFragment fragment;
     private BehaviorSubject<PdfFragment> fragmentGetter = BehaviorSubject.create();
+    @Nullable private PdfTextSelectionPopupToolbar textSelectionPopupToolbar;
 
     public PdfView(@NonNull Context context) {
         super(context);
@@ -254,6 +257,12 @@ public class PdfView extends FrameLayout {
         pdfFragment.addDocumentListener(pdfViewDocumentListener);
         pdfFragment.addOnAnnotationSelectedListener(pdfViewDocumentListener);
         pdfFragment.addOnAnnotationUpdatedListener(pdfViewDocumentListener);
+        pdfFragment.setOnPreparePopupToolbarListener(new OnPreparePopupToolbarListener() {
+            @Override
+            public void onPrepareTextSelectionPopupToolbar(@NonNull PdfTextSelectionPopupToolbar pdfTextSelectionPopupToolbar) {
+                textSelectionPopupToolbar = pdfTextSelectionPopupToolbar;
+            }
+        });
 
         setupThumbnailBar(pdfFragment);
 
@@ -294,6 +303,10 @@ public class PdfView extends FrameLayout {
         fragmentGetter = BehaviorSubject.create();
         pendingFragmentActions.dispose();
         pendingFragmentActions = new CompositeDisposable();
+        if (textSelectionPopupToolbar != null) {
+            textSelectionPopupToolbar.dismiss();
+            textSelectionPopupToolbar = null;
+        }
     }
 
     void manuallyLayoutChildren() {
