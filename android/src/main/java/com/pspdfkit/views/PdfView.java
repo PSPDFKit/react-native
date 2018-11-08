@@ -454,9 +454,14 @@ public class PdfView extends FrameLayout {
         return EnumSet.noneOf(AnnotationType.class);
     }
 
-    public void addAnnotation(ReadableMap annotation) {
-        JSONObject json = new JSONObject(annotation.toHashMap());
-        fragment.getDocument().getAnnotationProvider().createAnnotationFromInstantJson(json.toString());
+    public Disposable addAnnotation(ReadableMap annotation) {
+        return fragmentGetter.take(1).map(PdfFragment::getDocument).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(pdfDocument -> {
+                    JSONObject json = new JSONObject(annotation.toHashMap());
+                    pdfDocument.getAnnotationProvider().createAnnotationFromInstantJson(json.toString());
+                });
+
     }
 
     public Single<JSONObject> getAllUnsavedAnnotations() {
@@ -473,10 +478,14 @@ public class PdfView extends FrameLayout {
                 });
     }
 
-    public void addAnnotations(ReadableMap annotation) {
-        JSONObject json = new JSONObject(annotation.toHashMap());
-        final DataProvider dataProvider = new DocumentJsonDataProvider(json);
-        DocumentJsonFormatter.importDocumentJson(fragment.getDocument(), dataProvider);
+    public Disposable addAnnotations(ReadableMap annotation) {
+        return fragmentGetter.take(1).map(PdfFragment::getDocument).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(pdfDocument -> {
+                    JSONObject json = new JSONObject(annotation.toHashMap());
+                    final DataProvider dataProvider = new DocumentJsonDataProvider(json);
+                    DocumentJsonFormatter.importDocumentJson(pdfDocument, dataProvider);
+                });
     }
 
     public Disposable getFormFieldValue(final int requestId, @NonNull String formElementName) {

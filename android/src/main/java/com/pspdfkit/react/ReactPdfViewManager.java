@@ -175,7 +175,7 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
                 break;
             case COMMAND_ADD_ANNOTATION:
                 if (args != null) {
-                    root.addAnnotation(args.getMap(0));
+                    annotationDisposables.add(root.addAnnotation(args.getMap(0)));
                 }
                 break;
             case COMMAND_GET_ALL_UNSAVED_ANNOTATIONS:
@@ -195,7 +195,7 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
                 break;
             case COMMAND_ADD_ANNOTATIONS:
                 if (args != null && args.size() == 1) {
-                    root.addAnnotations(args.getMap(0));
+                    annotationDisposables.add(root.addAnnotations(args.getMap(0)));
                 }
                 break;
             case COMMAND_GET_FORM_FIELD_VALUE:
