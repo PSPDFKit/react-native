@@ -15,5 +15,6 @@
 <resources>
     <color name="pspdf_color">#3C97C9</color>
     <color name="pspdf_color_dark">#306F8B</color>
+    <color name="color_gray_light">#E0E0E0</color>
 
 </resources>

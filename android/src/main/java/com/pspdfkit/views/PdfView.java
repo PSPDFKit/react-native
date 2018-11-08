@@ -18,6 +18,7 @@ import com.pspdfkit.annotations.AnnotationType;
 import com.pspdfkit.configuration.activity.PdfActivityConfiguration;
 import com.pspdfkit.configuration.activity.ThumbnailBarMode;
 import com.pspdfkit.document.PdfDocument;
+import com.pspdfkit.document.PdfDocumentLoader;
 import com.pspdfkit.document.formatters.DocumentJsonFormatter;
 import com.pspdfkit.document.providers.DataProvider;
 import com.pspdfkit.forms.ChoiceFormElement;
@@ -91,7 +92,8 @@ public class PdfView extends FrameLayout {
     @Nullable
     private PdfFragment fragment;
     private BehaviorSubject<PdfFragment> fragmentGetter = BehaviorSubject.create();
-    @Nullable private PdfTextSelectionPopupToolbar textSelectionPopupToolbar;
+    @Nullable
+    private PdfTextSelectionPopupToolbar textSelectionPopupToolbar;
 
     public PdfView(@NonNull Context context) {
         super(context);
@@ -173,7 +175,7 @@ public class PdfView extends FrameLayout {
             documentOpeningDisposable.dispose();
         }
         updateState();
-        documentOpeningDisposable = PdfDocument.openDocumentAsync(getContext(), Uri.parse(document))
+        documentOpeningDisposable = PdfDocumentLoader.openDocumentAsync(getContext(), Uri.parse(document))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<PdfDocument>() {
@@ -240,7 +242,7 @@ public class PdfView extends FrameLayout {
             public void onDocumentLoaded(@NonNull PdfDocument document) {
                 manuallyLayoutChildren();
                 pdfFragment.setPageIndex(pageIndex, false);
-                pdfThumbnailBar.setDocument(document, configuration.getConfiguration(), pdfFragment.getEventBus());
+                pdfThumbnailBar.setDocument(document, configuration.getConfiguration());
                 updateState();
             }
 
