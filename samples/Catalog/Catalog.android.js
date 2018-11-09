@@ -21,7 +21,9 @@ import {
   PermissionsAndroid,
   Dimensions
 } from "react-native";
-import { StackNavigator } from "react-navigation";
+import { StackNavigator, NavigationEvents } from "react-navigation";
+
+import QRCodeScanner from 'react-native-qrcode-scanner';
 
 import PSPDFKitView from "react-native-pspdfkit";
 
@@ -67,8 +69,8 @@ var examples = [
     name: "Open local document",
     description: "Open document from external storage directory.",
     action: () => {
-      requestExternalStoragePermission(function() {
-        extractFromAssetsIfMissing("Annual Report.pdf", function() {
+      requestExternalStoragePermission(function () {
+        extractFromAssetsIfMissing("Annual Report.pdf", function () {
           PSPDFKit.present(DOCUMENT, {});
         });
       });
@@ -78,8 +80,8 @@ var examples = [
     name: "Open local image document",
     description: "Open image image document from external storage directory.",
     action: () => {
-      requestExternalStoragePermission(function() {
-        extractFromAssetsIfMissing("android.png", function() {
+      requestExternalStoragePermission(function () {
+        extractFromAssetsIfMissing("android.png", function () {
           PSPDFKit.presentImage(IMAGE_DOCUMENT, CONFIGURATION_IMAGE_DOCUMENT);
         });
       });
@@ -90,7 +92,7 @@ var examples = [
     description:
       "You can configure the builder with dictionary representation of the PSPDFConfiguration object.",
     action: () => {
-      requestExternalStoragePermission(function() {
+      requestExternalStoragePermission(function () {
         PSPDFKit.present(DOCUMENT, CONFIGURATION);
       });
     }
@@ -133,6 +135,13 @@ var examples = [
     }
   },
   {
+    name: "Instant Example",
+    description: "Shows how to open an instant document.",
+    action: component => {
+      component.props.navigation.navigate("InstantExampleScreen");
+    }
+  },
+  {
     name: "Debug Log",
     description:
       "Action used for printing stuff during development and debugging.",
@@ -153,7 +162,7 @@ function extractFromAssetsIfMissing(assetFile, callback) {
       } else {
         console.log(
           assetFile +
-            " does not exist, extracting it from assets folder to the external storage directory."
+          " does not exist, extracting it from assets folder to the external storage directory."
         );
         RNFS.existsAssets(assetFile)
           .then(exist => {
@@ -172,7 +181,7 @@ function extractFromAssetsIfMissing(assetFile, callback) {
               // File does not exist, it should never happen.
               throw new Error(
                 assetFile +
-                  " couldn't be extracted as it was not found in the project assets folder."
+                " couldn't be extracted as it was not found in the project assets folder."
               );
             }
           })
@@ -729,6 +738,49 @@ class PdfViewFormFillingScreen extends Component<{}> {
   }
 }
 
+class InstantExampleScreen extends Component<{}> {
+  static navigationOptions = ({ navigation }) => {
+    const params = navigation.state.params || {};
+    return {
+      title: "PSPDFKit Instant"
+    };
+  };
+
+  onSuccess = qrData => {
+    const documentInfoUrl = qrData.data
+    fetch(documentInfoUrl)
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+        }
+        throw new Error('Error message.');
+      }).then(data => {
+        this.props.navigation.popToTop();
+        PSPDFKit.presentInstant(data.serverUrl, data.jwt, {})
+      }).catch(e => {
+        console.log("failed to load ", url, e.message);
+      })
+  }
+
+  render() {
+
+    return (
+      <View style={{ flex: 1 }}>
+        {this.props.navigation.isFocused && (
+          <QRCodeScanner
+            onRead={this.onSuccess}
+            topContent={
+              <Text style={styles.centerText}>
+                Scan the QR code from <Text style={styles.textBold}>pspdfkit.com/instant/demo</Text> to connect to the document shown in your browser.
+            </Text>
+            }
+          />
+        )}
+      </View>
+    );
+  }
+}
+
 export default StackNavigator(
   {
     Catalog: {
@@ -748,6 +800,9 @@ export default StackNavigator(
     },
     PdfViewFormFillingScreen: {
       screen: PdfViewFormFillingScreen
+    },
+    InstantExampleScreen: {
+      screen: InstantExampleScreen
     }
   },
   {
@@ -795,5 +850,15 @@ var styles = StyleSheet.create({
   },
   rowContent: {
     padding: 10
+  },
+  centerText: {
+    flex: 1,
+    fontSize: 18,
+    padding: 32,
+    color: '#777',
+  },
+  textBold: {
+    fontWeight: '500',
+    color: '#000',
   }
 });
