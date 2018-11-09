@@ -29,11 +29,11 @@
 @property (nonatomic, copy) RCTBubblingEventBlock onStateChanged;
 
 /// Annotation Toolbar
-- (void)enterAnnotationCreationMode;
-- (void)exitCurrentlyActiveMode;
+- (BOOL)enterAnnotationCreationMode;
+- (BOOL)exitCurrentlyActiveMode;
 
 /// Document
-- (void)saveCurrentDocument;
+- (BOOL)saveCurrentDocument;
 
 /// Anotations
 - (NSDictionary<NSString *, NSArray<NSDictionary *> *> *)getAnnotations:(PSPDFPageIndex)pageIndex type:(PSPDFAnnotationType)type;

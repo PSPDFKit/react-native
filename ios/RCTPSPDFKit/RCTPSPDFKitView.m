@@ -105,18 +105,18 @@
   return nil;
 }
 
-- (void)enterAnnotationCreationMode {
+- (BOOL)enterAnnotationCreationMode {
   [self.pdfController setViewMode:PSPDFViewModeDocument animated:YES];
   [self.pdfController.annotationToolbarController updateHostView:nil container:nil viewController:self.pdfController];
-  [self.pdfController.annotationToolbarController showToolbarAnimated:YES];
+  return [self.pdfController.annotationToolbarController showToolbarAnimated:YES];
 }
 
-- (void)exitCurrentlyActiveMode {
-  [self.pdfController.annotationToolbarController hideToolbarAnimated:YES];
+- (BOOL)exitCurrentlyActiveMode {
+  return [self.pdfController.annotationToolbarController hideToolbarAnimated:YES];
 }
 
-- (void)saveCurrentDocument {
-  [self.pdfController.document saveWithOptions:nil error:NULL];
+- (BOOL)saveCurrentDocument {
+  return [self.pdfController.document saveWithOptions:nil error:NULL];
 }
 
 #pragma mark - PSPDFDocumentDelegate
@@ -249,7 +249,7 @@
   if ([jsonAnnotations isKindOfClass:NSString.class]) {
     data = [jsonAnnotations dataUsingEncoding:NSUTF8StringEncoding];
   } else if ([jsonAnnotations isKindOfClass:NSDictionary.class])  {
-    data = [NSJSONSerialization dataWithJSONObject:jsonAnnotations options:0 error:nil];;
+    data = [NSJSONSerialization dataWithJSONObject:jsonAnnotations options:0 error:nil];
   } else {
     NSLog(@"Invalid JSON Annotations.");
     return NO;

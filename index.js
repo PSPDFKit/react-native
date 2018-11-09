@@ -97,7 +97,7 @@ class PSPDFKitView extends React.Component {
         []
       );
     } else if (Platform.OS === "ios") {
-      NativeModules.PSPDFKitViewManager.enterAnnotationCreationMode(
+      return NativeModules.PSPDFKitViewManager.enterAnnotationCreationMode(
         findNodeHandle(this.refs.pdfView)
       );
     }
@@ -114,7 +114,7 @@ class PSPDFKitView extends React.Component {
         []
       );
     } else if (Platform.OS === "ios") {
-      NativeModules.PSPDFKitViewManager.exitCurrentlyActiveMode(
+      return NativeModules.PSPDFKitViewManager.exitCurrentlyActiveMode(
         findNodeHandle(this.refs.pdfView)
       );
     }
@@ -131,7 +131,7 @@ class PSPDFKitView extends React.Component {
         []
       );
     } else if (Platform.OS === "ios") {
-      NativeModules.PSPDFKitViewManager.saveCurrentDocument(
+      return NativeModules.PSPDFKitViewManager.saveCurrentDocument(
         findNodeHandle(this.refs.pdfView)
       );
     }

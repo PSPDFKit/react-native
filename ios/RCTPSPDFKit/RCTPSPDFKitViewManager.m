@@ -76,24 +76,39 @@ RCT_EXPORT_VIEW_PROPERTY(onAnnotationsChanged, RCTBubblingEventBlock)
 
 RCT_EXPORT_VIEW_PROPERTY(onStateChanged, RCTBubblingEventBlock)
 
-RCT_EXPORT_METHOD(enterAnnotationCreationMode:(nonnull NSNumber *)reactTag) {
+RCT_EXPORT_METHOD(enterAnnotationCreationMode:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   dispatch_async(dispatch_get_main_queue(), ^{
     RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
-    [component enterAnnotationCreationMode];
+    BOOL success = [component enterAnnotationCreationMode];
+    if (success) {
+      resolve(@(success));
+    } else {
+      reject(@"error", @"Failed to enter annotation creation mode.", nil);
+    }
   });
 }
 
-RCT_EXPORT_METHOD(exitCurrentlyActiveMode:(nonnull NSNumber *)reactTag) {
+RCT_EXPORT_METHOD(exitCurrentlyActiveMode:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   dispatch_async(dispatch_get_main_queue(), ^{
     RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
-    [component exitCurrentlyActiveMode];
+    BOOL success = [component exitCurrentlyActiveMode];
+    if (success) {
+      resolve(@(success));
+    } else {
+      reject(@"error", @"Failed to exit annotation creation mode.", nil);
+    }
   });
 }
 
-RCT_EXPORT_METHOD(saveCurrentDocument:(nonnull NSNumber *)reactTag) {
+RCT_EXPORT_METHOD(saveCurrentDocument:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   dispatch_async(dispatch_get_main_queue(), ^{
     RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
-    [component saveCurrentDocument];
+    BOOL success = [component saveCurrentDocument];
+    if (success) {
+      resolve(@(success));
+    } else {
+      reject(@"error", @"Failed to save document.", nil);
+    }
   });
 }
 
