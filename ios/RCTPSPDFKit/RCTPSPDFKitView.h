@@ -37,10 +37,10 @@
 
 /// Anotations
 - (NSDictionary<NSString *, NSArray<NSDictionary *> *> *)getAnnotations:(PSPDFPageIndex)pageIndex type:(PSPDFAnnotationType)type;
-- (void)addAnnotation:(id)jsonAnnotation;
-- (void)removeAnnotation:(id)jsonAnnotation;
+- (BOOL)addAnnotation:(id)jsonAnnotation;
+- (BOOL)removeAnnotation:(id)jsonAnnotation;
 - (NSDictionary<NSString *, NSArray<NSDictionary *> *> *)getAllUnsavedAnnotations;
-- (void)addAnnotations:(NSString *)jsonAnnotations;
+- (BOOL)addAnnotations:(NSString *)jsonAnnotations;
 
 /// Forms
 - (NSDictionary<NSString *, NSString *> *)getFormFieldValue:(NSString *)fullyQualifiedName;

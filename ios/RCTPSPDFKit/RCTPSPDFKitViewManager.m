@@ -109,17 +109,27 @@ RCT_REMAP_METHOD(getAnnotations, getAnnotations:(nonnull NSNumber *)pageIndex ty
   });
 }
 
-RCT_EXPORT_METHOD(addAnnotation:(id)jsonAnnotation reactTag:(nonnull NSNumber *)reactTag) {
+RCT_EXPORT_METHOD(addAnnotation:(id)jsonAnnotation reactTag:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   dispatch_async(dispatch_get_main_queue(), ^{
     RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
-    [component addAnnotation:jsonAnnotation];
+    BOOL success = [component addAnnotation:jsonAnnotation];
+    if (success) {
+      resolve(@(success));
+    } else {
+      reject(@"error", @"Failed to add annotation.", nil);
+    }
   });
 }
 
-RCT_EXPORT_METHOD(removeAnnotation:(id)jsonAnnotation reactTag:(nonnull NSNumber *)reactTag) {
+RCT_EXPORT_METHOD(removeAnnotation:(id)jsonAnnotation reactTag:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   dispatch_async(dispatch_get_main_queue(), ^{
     RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
-    [component removeAnnotation:jsonAnnotation];
+    BOOL success = [component removeAnnotation:jsonAnnotation];
+    if (success) {
+      resolve(@(success));
+    } else {
+      reject(@"error", @"Failed to remove annotation.", nil);
+    }
   });
 }
 
@@ -135,10 +145,15 @@ RCT_EXPORT_METHOD(getAllUnsavedAnnotations:(nonnull NSNumber *)reactTag resolver
   });
 }
 
-RCT_EXPORT_METHOD(addAnnotations:(id)jsonAnnotations reactTag:(nonnull NSNumber *)reactTag) {
+RCT_EXPORT_METHOD(addAnnotations:(id)jsonAnnotations reactTag:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   dispatch_async(dispatch_get_main_queue(), ^{
     RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
-    [component addAnnotations:jsonAnnotations];
+    BOOL success = [component addAnnotations:jsonAnnotations];
+    if (success) {
+      resolve(@(success));
+    } else {
+      reject(@"error", @"Failed to add annotations.", nil);
+    }
   });
 }
 

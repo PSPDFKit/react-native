@@ -605,40 +605,14 @@ class ProgrammaticAnnotations extends Component {
           </View>
           <View>
             <Button
-              onPress={() => {
+              onPress={async () => {
                 // Programmatically remove an existing ink annotation.
-                const annotationJSON = {
-                  bbox: [
-                    89.586334228515625,
-                    98.5791015625,
-                    143.12948608398438,
-                    207.1583251953125
-                  ],
-                  isDrawnNaturally: false,
-                  lineWidth: 5,
-                  lines: {
-                    intensities: [[0.5, 0.5, 0.5], [0.5, 0.5, 0.5]],
-                    points: [
-                      [
-                        [92.086334228515625, 101.07916259765625],
-                        [92.086334228515625, 202.15826416015625],
-                        [138.12950134277344, 303.2374267578125]
-                      ],
-                      [
-                        [184.17266845703125, 101.07916259765625],
-                        [184.17266845703125, 202.15826416015625],
-                        [230.2158203125, 303.2374267578125]
-                      ]
-                    ]
-                  },
-                  opacity: 1,
-                  pageIndex: 0,
-                  name: "A167811E-6D10-4546-A147-B7AD775FE8AC",
-                  strokeColor: "#AA47BE",
-                  type: "pspdfkit/ink",
-                  v: 1
-                };
-                this.refs.pdfView.removeAnnotation(annotationJSON);
+                const inkAnnotations = await this.refs.pdfView.getAnnotations(
+                  this.state.currentPageIndex,
+                  "pspdfkit/ink"
+                );
+                const firstInkAnnotation = inkAnnotations["annotations"][0];
+                this.refs.pdfView.removeAnnotation(firstInkAnnotation);
               }}
               title="removeAnnotation"
             />

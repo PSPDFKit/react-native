@@ -178,7 +178,7 @@
   return @{@"annotations" : annotationsJSON};
 }
 
-- (void)addAnnotation:(id)jsonAnnotation {
+- (BOOL)addAnnotation:(id)jsonAnnotation {
   NSData *data;
   if ([jsonAnnotation isKindOfClass:NSString.class]) {
     data = [jsonAnnotation dataUsingEncoding:NSUTF8StringEncoding];
@@ -186,7 +186,7 @@
     data = [NSJSONSerialization dataWithJSONObject:jsonAnnotation options:0 error:nil];
   } else {
     NSLog(@"Invalid JSON Annotation.");
-    return;
+    return NO;
   }
   
   PSPDFDocument *document = self.pdfController.document;
@@ -201,9 +201,11 @@
   if (!success) {
     NSLog(@"Failed to add annotation.");
   }
+
+  return success;
 }
 
-- (void)removeAnnotation:(id)jsonAnnotation {
+- (BOOL)removeAnnotation:(id)jsonAnnotation {
   NSData *data;
   if ([jsonAnnotation isKindOfClass:NSString.class]) {
     data = [jsonAnnotation dataUsingEncoding:NSUTF8StringEncoding];
@@ -211,7 +213,7 @@
     data = [NSJSONSerialization dataWithJSONObject:jsonAnnotation options:0 error:nil];
   } else {
     NSLog(@"Invalid JSON Annotation.");
-    return;
+    return NO;
   }
 
   PSPDFDocument *document = self.pdfController.document;
@@ -232,6 +234,7 @@
   if (!success) {
     NSLog(@"Failed to remove annotation.");
   }
+  return success;
 }
 
 - (NSDictionary<NSString *, NSArray<NSDictionary *> *> *)getAllUnsavedAnnotations {
@@ -241,7 +244,7 @@
   return annotationsJSON;
 }
 
-- (void)addAnnotations:(id)jsonAnnotations {
+- (BOOL)addAnnotations:(id)jsonAnnotations {
   NSData *data;
   if ([jsonAnnotations isKindOfClass:NSString.class]) {
     data = [jsonAnnotations dataUsingEncoding:NSUTF8StringEncoding];
@@ -249,7 +252,7 @@
     data = [NSJSONSerialization dataWithJSONObject:jsonAnnotations options:0 error:nil];;
   } else {
     NSLog(@"Invalid JSON Annotations.");
-    return;
+    return NO;
   }
   
   PSPDFDataContainerProvider *dataContainerProvider = [[PSPDFDataContainerProvider alloc] initWithData:data];
@@ -259,6 +262,8 @@
   if (!success) {
     NSLog(@"Failed to add annotations.");
   }
+
+  return success;
 }
 
 #pragma mark - Forms

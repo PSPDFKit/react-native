@@ -185,7 +185,7 @@ class PSPDFKitView extends React.Component {
         [annotation]
       );
     } else if (Platform.OS === "ios") {
-      NativeModules.PSPDFKitViewManager.addAnnotation(
+      return NativeModules.PSPDFKitViewManager.addAnnotation(
         annotation,
         findNodeHandle(this.refs.pdfView)
       );
@@ -197,7 +197,7 @@ class PSPDFKitView extends React.Component {
    *
    * @param annotation InstantJson of the annotation to remove.
    */
-  removeAnnotation = function(annotationName) {
+  removeAnnotation = function(annotation) {
     if (Platform.OS === "android") {
       // TODO: Uncomment once the Android implementaion is ready.
       // UIManager.dispatchViewManagerCommand(
@@ -206,7 +206,7 @@ class PSPDFKitView extends React.Component {
       //   [annotation]
       // );
     } else if (Platform.OS === "ios") {
-      NativeModules.PSPDFKitViewManager.removeAnnotation(
+      return NativeModules.PSPDFKitViewManager.removeAnnotation(
         annotation,
         findNodeHandle(this.refs.pdfView)
       );
@@ -255,7 +255,7 @@ class PSPDFKitView extends React.Component {
         [annotations]
       );
     } else if (Platform.OS === "ios") {
-      NativeModules.PSPDFKitViewManager.addAnnotations(
+      return NativeModules.PSPDFKitViewManager.addAnnotations(
         annotations,
         findNodeHandle(this.refs.pdfView)
       );
