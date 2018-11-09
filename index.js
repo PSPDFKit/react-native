@@ -193,6 +193,27 @@ class PSPDFKitView extends React.Component {
   };
 
   /**
+   * Removes an existing annotation from the current document.
+   *
+   * @param annotation InstantJson of the annotation to remove.
+   */
+  removeAnnotation = function(annotationName) {
+    if (Platform.OS === "android") {
+      // TODO: Uncomment once the Android implementaion is ready.
+      // UIManager.dispatchViewManagerCommand(
+      //   findNodeHandle(this.refs.pdfView),
+      //   UIManager.RCTPSPDFKitView.Commands.removeAnnotation,
+      //   [annotation]
+      // );
+    } else if (Platform.OS === "ios") {
+      NativeModules.PSPDFKitViewManager.removeAnnotation(
+        annotation,
+        findNodeHandle(this.refs.pdfView)
+      );
+    }
+  };
+
+  /**
    * Gets all unsaved changes to annotations.
    *
    * Returns a promise resolving to document instant json (https://pspdfkit.com/guides/android/current/importing-exporting/instant-json/#instant-document-json-api-a56628).
