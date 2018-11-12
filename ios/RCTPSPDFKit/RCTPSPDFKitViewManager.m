@@ -95,7 +95,7 @@ RCT_EXPORT_METHOD(exitCurrentlyActiveMode:(nonnull NSNumber *)reactTag resolver:
     if (success) {
       resolve(@(success));
     } else {
-      reject(@"error", @"Failed to exit annotation creation mode.", nil);
+      reject(@"error", @"Failed to exit currently active mode.", nil);
     }
   });
 }
