@@ -76,24 +76,39 @@ RCT_EXPORT_VIEW_PROPERTY(onAnnotationsChanged, RCTBubblingEventBlock)
 
 RCT_EXPORT_VIEW_PROPERTY(onStateChanged, RCTBubblingEventBlock)
 
-RCT_EXPORT_METHOD(enterAnnotationCreationMode:(nonnull NSNumber *)reactTag) {
+RCT_EXPORT_METHOD(enterAnnotationCreationMode:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   dispatch_async(dispatch_get_main_queue(), ^{
     RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
-    [component enterAnnotationCreationMode];
+    BOOL success = [component enterAnnotationCreationMode];
+    if (success) {
+      resolve(@(success));
+    } else {
+      reject(@"error", @"Failed to enter annotation creation mode.", nil);
+    }
   });
 }
 
-RCT_EXPORT_METHOD(exitCurrentlyActiveMode:(nonnull NSNumber *)reactTag) {
+RCT_EXPORT_METHOD(exitCurrentlyActiveMode:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   dispatch_async(dispatch_get_main_queue(), ^{
     RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
-    [component exitCurrentlyActiveMode];
+    BOOL success = [component exitCurrentlyActiveMode];
+    if (success) {
+      resolve(@(success));
+    } else {
+      reject(@"error", @"Failed to exit currently active mode.", nil);
+    }
   });
 }
 
-RCT_EXPORT_METHOD(saveCurrentDocument:(nonnull NSNumber *)reactTag) {
+RCT_EXPORT_METHOD(saveCurrentDocument:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   dispatch_async(dispatch_get_main_queue(), ^{
     RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
-    [component saveCurrentDocument];
+    BOOL success = [component saveCurrentDocument];
+    if (success) {
+      resolve(@(success));
+    } else {
+      reject(@"error", @"Failed to save document.", nil);
+    }
   });
 }
 
@@ -109,10 +124,27 @@ RCT_REMAP_METHOD(getAnnotations, getAnnotations:(nonnull NSNumber *)pageIndex ty
   });
 }
 
-RCT_EXPORT_METHOD(addAnnotation:(id)jsonAnnotation reactTag:(nonnull NSNumber *)reactTag) {
+RCT_EXPORT_METHOD(addAnnotation:(id)jsonAnnotation reactTag:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   dispatch_async(dispatch_get_main_queue(), ^{
     RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
-    [component addAnnotation:jsonAnnotation];
+    BOOL success = [component addAnnotation:jsonAnnotation];
+    if (success) {
+      resolve(@(success));
+    } else {
+      reject(@"error", @"Failed to add annotation.", nil);
+    }
+  });
+}
+
+RCT_EXPORT_METHOD(removeAnnotation:(id)jsonAnnotation reactTag:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+  dispatch_async(dispatch_get_main_queue(), ^{
+    RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
+    BOOL success = [component removeAnnotation:jsonAnnotation];
+    if (success) {
+      resolve(@(success));
+    } else {
+      reject(@"error", @"Failed to remove annotation.", nil);
+    }
   });
 }
 
@@ -128,10 +160,15 @@ RCT_EXPORT_METHOD(getAllUnsavedAnnotations:(nonnull NSNumber *)reactTag resolver
   });
 }
 
-RCT_EXPORT_METHOD(addAnnotations:(id)jsonAnnotations reactTag:(nonnull NSNumber *)reactTag) {
+RCT_EXPORT_METHOD(addAnnotations:(id)jsonAnnotations reactTag:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   dispatch_async(dispatch_get_main_queue(), ^{
     RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
-    [component addAnnotations:jsonAnnotations];
+    BOOL success = [component addAnnotations:jsonAnnotations];
+    if (success) {
+      resolve(@(success));
+    } else {
+      reject(@"error", @"Failed to add annotations.", nil);
+    }
   });
 }
 

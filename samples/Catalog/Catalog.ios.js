@@ -593,6 +593,7 @@ class ProgrammaticAnnotations extends Component {
                   },
                   opacity: 1,
                   pageIndex: 0,
+                  name: "A167811E-6D10-4546-A147-B7AD775FE8AC",
                   strokeColor: "#AA47BE",
                   type: "pspdfkit/ink",
                   v: 1
@@ -600,6 +601,20 @@ class ProgrammaticAnnotations extends Component {
                 this.refs.pdfView.addAnnotation(annotationJSON);
               }}
               title="addAnnotation"
+            />
+          </View>
+          <View>
+            <Button
+              onPress={async () => {
+                // Programmatically remove an existing ink annotation.
+                const inkAnnotations = await this.refs.pdfView.getAnnotations(
+                  this.state.currentPageIndex,
+                  "pspdfkit/ink"
+                );
+                const firstInkAnnotation = inkAnnotations["annotations"][0];
+                this.refs.pdfView.removeAnnotation(firstInkAnnotation);
+              }}
+              title="removeAnnotation"
             />
           </View>
           <View>
@@ -635,6 +650,7 @@ class ProgrammaticAnnotations extends Component {
                       },
                       isDrawnNaturally: false,
                       strokeColor: "#AA47BE",
+                      name: "A167811E-6D10-4546-A147-B7AD775FE8AC",
                       updatedAt: "2018-07-30T15:34:48Z",
                       pageIndex: 0,
                       opacity: 1,

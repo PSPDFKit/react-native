@@ -105,18 +105,18 @@
   return nil;
 }
 
-- (void)enterAnnotationCreationMode {
+- (BOOL)enterAnnotationCreationMode {
   [self.pdfController setViewMode:PSPDFViewModeDocument animated:YES];
   [self.pdfController.annotationToolbarController updateHostView:nil container:nil viewController:self.pdfController];
-  [self.pdfController.annotationToolbarController showToolbarAnimated:YES];
+  return [self.pdfController.annotationToolbarController showToolbarAnimated:YES];
 }
 
-- (void)exitCurrentlyActiveMode {
-  [self.pdfController.annotationToolbarController hideToolbarAnimated:YES];
+- (BOOL)exitCurrentlyActiveMode {
+  return [self.pdfController.annotationToolbarController hideToolbarAnimated:YES];
 }
 
-- (void)saveCurrentDocument {
-  [self.pdfController.document saveWithOptions:nil error:NULL];
+- (BOOL)saveCurrentDocument {
+  return [self.pdfController.document saveWithOptions:nil error:NULL];
 }
 
 #pragma mark - PSPDFDocumentDelegate
@@ -178,7 +178,7 @@
   return @{@"annotations" : annotationsJSON};
 }
 
-- (void)addAnnotation:(id)jsonAnnotation {
+- (BOOL)addAnnotation:(id)jsonAnnotation {
   NSData *data;
   if ([jsonAnnotation isKindOfClass:NSString.class]) {
     data = [jsonAnnotation dataUsingEncoding:NSUTF8StringEncoding];
@@ -186,7 +186,7 @@
     data = [NSJSONSerialization dataWithJSONObject:jsonAnnotation options:0 error:nil];
   } else {
     NSLog(@"Invalid JSON Annotation.");
-    return;
+    return NO;
   }
   
   PSPDFDocument *document = self.pdfController.document;
@@ -201,6 +201,40 @@
   if (!success) {
     NSLog(@"Failed to add annotation.");
   }
+
+  return success;
+}
+
+- (BOOL)removeAnnotation:(id)jsonAnnotation {
+  NSData *data;
+  if ([jsonAnnotation isKindOfClass:NSString.class]) {
+    data = [jsonAnnotation dataUsingEncoding:NSUTF8StringEncoding];
+  } else if ([jsonAnnotation isKindOfClass:NSDictionary.class])  {
+    data = [NSJSONSerialization dataWithJSONObject:jsonAnnotation options:0 error:nil];
+  } else {
+    NSLog(@"Invalid JSON Annotation.");
+    return NO;
+  }
+
+  PSPDFDocument *document = self.pdfController.document;
+  PSPDFDocumentProvider *documentProvider = document.documentProviders.firstObject;
+
+  BOOL success = NO;
+  if (data) {
+    PSPDFAnnotation *annotationToRemove = [PSPDFAnnotation annotationFromInstantJSON:data documentProvider:documentProvider error:NULL];
+    for (PSPDFAnnotation *annotation in [document annotationsForPageAtIndex:annotationToRemove.pageIndex type:annotationToRemove.type]) {
+      // Remove the annotation if the name matches.
+      if ([annotation.name isEqualToString:annotationToRemove.name]) {
+        success = [document removeAnnotations:@[annotation] options:nil];
+        break;
+      }
+    }
+  }
+
+  if (!success) {
+    NSLog(@"Failed to remove annotation.");
+  }
+  return success;
 }
 
 - (NSDictionary<NSString *, NSArray<NSDictionary *> *> *)getAllUnsavedAnnotations {
@@ -210,15 +244,15 @@
   return annotationsJSON;
 }
 
-- (void)addAnnotations:(id)jsonAnnotations {
+- (BOOL)addAnnotations:(id)jsonAnnotations {
   NSData *data;
   if ([jsonAnnotations isKindOfClass:NSString.class]) {
     data = [jsonAnnotations dataUsingEncoding:NSUTF8StringEncoding];
   } else if ([jsonAnnotations isKindOfClass:NSDictionary.class])  {
-    data = [NSJSONSerialization dataWithJSONObject:jsonAnnotations options:0 error:nil];;
+    data = [NSJSONSerialization dataWithJSONObject:jsonAnnotations options:0 error:nil];
   } else {
     NSLog(@"Invalid JSON Annotations.");
-    return;
+    return NO;
   }
   
   PSPDFDataContainerProvider *dataContainerProvider = [[PSPDFDataContainerProvider alloc] initWithData:data];
@@ -228,6 +262,8 @@
   if (!success) {
     NSLog(@"Failed to add annotations.");
   }
+
+  return success;
 }
 
 #pragma mark - Forms

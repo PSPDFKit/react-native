@@ -29,17 +29,18 @@
 @property (nonatomic, copy) RCTBubblingEventBlock onStateChanged;
 
 /// Annotation Toolbar
-- (void)enterAnnotationCreationMode;
-- (void)exitCurrentlyActiveMode;
+- (BOOL)enterAnnotationCreationMode;
+- (BOOL)exitCurrentlyActiveMode;
 
 /// Document
-- (void)saveCurrentDocument;
+- (BOOL)saveCurrentDocument;
 
 /// Anotations
 - (NSDictionary<NSString *, NSArray<NSDictionary *> *> *)getAnnotations:(PSPDFPageIndex)pageIndex type:(PSPDFAnnotationType)type;
-- (void)addAnnotation:(NSString *)jsonAnnotation;
+- (BOOL)addAnnotation:(id)jsonAnnotation;
+- (BOOL)removeAnnotation:(id)jsonAnnotation;
 - (NSDictionary<NSString *, NSArray<NSDictionary *> *> *)getAllUnsavedAnnotations;
-- (void)addAnnotations:(NSString *)jsonAnnotations;
+- (BOOL)addAnnotations:(NSString *)jsonAnnotations;
 
 /// Forms
 - (NSDictionary<NSString *, NSString *> *)getFormFieldValue:(NSString *)fullyQualifiedName;

@@ -97,7 +97,7 @@ class PSPDFKitView extends React.Component {
         []
       );
     } else if (Platform.OS === "ios") {
-      NativeModules.PSPDFKitViewManager.enterAnnotationCreationMode(
+      return NativeModules.PSPDFKitViewManager.enterAnnotationCreationMode(
         findNodeHandle(this.refs.pdfView)
       );
     }
@@ -114,7 +114,7 @@ class PSPDFKitView extends React.Component {
         []
       );
     } else if (Platform.OS === "ios") {
-      NativeModules.PSPDFKitViewManager.exitCurrentlyActiveMode(
+      return NativeModules.PSPDFKitViewManager.exitCurrentlyActiveMode(
         findNodeHandle(this.refs.pdfView)
       );
     }
@@ -131,7 +131,7 @@ class PSPDFKitView extends React.Component {
         []
       );
     } else if (Platform.OS === "ios") {
-      NativeModules.PSPDFKitViewManager.saveCurrentDocument(
+      return NativeModules.PSPDFKitViewManager.saveCurrentDocument(
         findNodeHandle(this.refs.pdfView)
       );
     }
@@ -185,7 +185,28 @@ class PSPDFKitView extends React.Component {
         [annotation]
       );
     } else if (Platform.OS === "ios") {
-      NativeModules.PSPDFKitViewManager.addAnnotation(
+      return NativeModules.PSPDFKitViewManager.addAnnotation(
+        annotation,
+        findNodeHandle(this.refs.pdfView)
+      );
+    }
+  };
+
+  /**
+   * Removes an existing annotation from the current document.
+   *
+   * @param annotation InstantJson of the annotation to remove.
+   */
+  removeAnnotation = function(annotation) {
+    if (Platform.OS === "android") {
+      // TODO: Uncomment once the Android implementaion is ready.
+      // UIManager.dispatchViewManagerCommand(
+      //   findNodeHandle(this.refs.pdfView),
+      //   UIManager.RCTPSPDFKitView.Commands.removeAnnotation,
+      //   [annotation]
+      // );
+    } else if (Platform.OS === "ios") {
+      return NativeModules.PSPDFKitViewManager.removeAnnotation(
         annotation,
         findNodeHandle(this.refs.pdfView)
       );
@@ -234,7 +255,7 @@ class PSPDFKitView extends React.Component {
         [annotations]
       );
     } else if (Platform.OS === "ios") {
-      NativeModules.PSPDFKitViewManager.addAnnotations(
+      return NativeModules.PSPDFKitViewManager.addAnnotations(
         annotations,
         findNodeHandle(this.refs.pdfView)
       );
