@@ -67,8 +67,8 @@ var examples = [
     name: "Open local document",
     description: "Open document from external storage directory.",
     action: () => {
-      requestExternalStoragePermission(function() {
-        extractFromAssetsIfMissing("Annual Report.pdf", function() {
+      requestExternalStoragePermission(function () {
+        extractFromAssetsIfMissing("Annual Report.pdf", function () {
           PSPDFKit.present(DOCUMENT, {});
         });
       });
@@ -78,8 +78,8 @@ var examples = [
     name: "Open local image document",
     description: "Open image image document from external storage directory.",
     action: () => {
-      requestExternalStoragePermission(function() {
-        extractFromAssetsIfMissing("android.png", function() {
+      requestExternalStoragePermission(function () {
+        extractFromAssetsIfMissing("android.png", function () {
           PSPDFKit.presentImage(IMAGE_DOCUMENT, CONFIGURATION_IMAGE_DOCUMENT);
         });
       });
@@ -90,7 +90,7 @@ var examples = [
     description:
       "You can configure the builder with dictionary representation of the PSPDFConfiguration object.",
     action: () => {
-      requestExternalStoragePermission(function() {
+      requestExternalStoragePermission(function () {
         PSPDFKit.present(DOCUMENT, CONFIGURATION);
       });
     }
@@ -153,7 +153,7 @@ function extractFromAssetsIfMissing(assetFile, callback) {
       } else {
         console.log(
           assetFile +
-            " does not exist, extracting it from assets folder to the external storage directory."
+          " does not exist, extracting it from assets folder to the external storage directory."
         );
         RNFS.existsAssets(assetFile)
           .then(exist => {
@@ -172,7 +172,7 @@ function extractFromAssetsIfMissing(assetFile, callback) {
               // File does not exist, it should never happen.
               throw new Error(
                 assetFile +
-                  " couldn't be extracted as it was not found in the project assets folder."
+                " couldn't be extracted as it was not found in the project assets folder."
               );
             }
           })
@@ -642,14 +642,16 @@ class PdfViewInstantJsonScreen extends Component<{}> {
           <View style={{ marginLeft: 10 }}>
             <Button
               onPress={() => {
-                // This gets all annotations on the first page.
-                this.refs.pdfView
-                  .getAllUnsavedAnnotations()
-                  .then(annotations => {
-                    alert(JSON.stringify(annotations));
-                  });
+                // This removes the first annotation on the first page.
+                this.refs.pdfView.getAnnotations(0, null).then(results => {
+                  const annotations = results.annotations
+                  if (annotations.length >= 1) {
+                    const annotation = annotations[0];
+                    this.refs.pdfView.removeAnnotation(annotation);
+                  }
+                });
               }}
-              title="Get unsaved annotations"
+              title="Remove annotation"
             />
           </View>
         </View>

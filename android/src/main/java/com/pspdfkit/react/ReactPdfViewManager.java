@@ -48,6 +48,7 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
     public static final int COMMAND_ADD_ANNOTATIONS = 7;
     public static final int COMMAND_GET_FORM_FIELD_VALUE = 8;
     public static final int COMMAND_SET_FORM_FIELD_VALUE = 9;
+    public static final int COMMAND_REMOVE_ANNOTATION = 10;
 
     private CompositeDisposable annotationDisposables = new CompositeDisposable();
 
@@ -96,6 +97,7 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
                 COMMAND_ADD_ANNOTATIONS);
         commandMap.put("getFormFieldValue", COMMAND_GET_FORM_FIELD_VALUE);
         commandMap.put("setFormFieldValue", COMMAND_SET_FORM_FIELD_VALUE);
+        commandMap.put("removeAnnotation", COMMAND_REMOVE_ANNOTATION);
         return commandMap;
     }
 
@@ -176,6 +178,11 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
             case COMMAND_ADD_ANNOTATION:
                 if (args != null) {
                     annotationDisposables.add(root.addAnnotation(args.getMap(0)));
+                }
+                break;
+            case COMMAND_REMOVE_ANNOTATION:
+                if (args != null) {
+                    annotationDisposables.add(root.removeAnnotation(args.getMap(0)));
                 }
                 break;
             case COMMAND_GET_ALL_UNSAVED_ANNOTATIONS:
