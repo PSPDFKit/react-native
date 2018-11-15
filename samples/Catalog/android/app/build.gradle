@@ -152,6 +152,16 @@ dependencies {
     androidTestCompile('com.android.support.test:rules:1.0.2') {
         exclude group: 'com.android.support'
     }
+
+    // For the instant example
+    compile (project(':react-native-camera')) {
+        exclude group: "com.google.android.gms"
+        compile 'com.android.support:exifinterface:27.+'
+        compile ('com.google.android.gms:play-services-vision:12.0.1') {
+            force = true
+        }
+    }
+
     // Optional -- Hamcrest library
     androidTestCompile 'org.hamcrest:hamcrest-library:1.3'
     // Optional -- UI testing with Espresso

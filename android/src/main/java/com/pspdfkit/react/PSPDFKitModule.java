@@ -34,6 +34,7 @@ import com.pspdfkit.PSPDFKit;
 import com.pspdfkit.document.PdfDocument;
 import com.pspdfkit.document.image.CameraImagePickerFragment;
 import com.pspdfkit.document.image.GalleryImagePickerFragment;
+import com.pspdfkit.instant.ui.InstantPdfActivity;
 import com.pspdfkit.listeners.SimpleDocumentListener;
 import com.pspdfkit.ui.PdfActivity;
 import com.pspdfkit.ui.PdfFragment;
@@ -112,6 +113,18 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
             }
 
             PdfActivity.showImage(getCurrentActivity(), Uri.parse(imageDocument), configurationAdapter.build());
+        }
+    }
+
+    @ReactMethod
+    public void presentInstant(@NonNull String serverUrl, @NonNull String jwt, @NonNull ReadableMap configuration) {
+        if (getCurrentActivity() != null) {
+            if (resumedActivity == null) {
+                // We register an activity lifecycle callback so we can get notified of the current activity.
+                getCurrentActivity().getApplication().registerActivityLifecycleCallbacks(this);
+            }
+            ConfigurationAdapter configurationAdapter = new ConfigurationAdapter(getCurrentActivity(), configuration);
+            InstantPdfActivity.showInstantDocument(getCurrentActivity(), serverUrl, jwt, configurationAdapter.build());
         }
     }
 

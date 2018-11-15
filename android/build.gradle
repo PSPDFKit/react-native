@@ -73,8 +73,14 @@ dependencies {
         compile("com.pspdfkit:pspdfkit-demo:${PSPDFKIT_VERSION}") {
             exclude group: 'com.google.auto.value', module: 'auto-value'
         }
+        compile("com.pspdfkit:pspdfkit-instant-demo:${PSPDFKIT_VERSION}") {
+            exclude group: 'com.google.auto.value', module: 'auto-value'
+        }
     } else {
         compile("com.pspdfkit:pspdfkit:${PSPDFKIT_VERSION}") {
+            exclude group: 'com.google.auto.value', module: 'auto-value'
+        }
+        compile("com.pspdfkit:pspdfkit-instant:${PSPDFKIT_VERSION}") {
             exclude group: 'com.google.auto.value', module: 'auto-value'
         }
     }
