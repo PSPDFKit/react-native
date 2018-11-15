@@ -651,14 +651,16 @@ class PdfViewInstantJsonScreen extends Component<{}> {
           <View style={{ marginLeft: 10 }}>
             <Button
               onPress={() => {
-                // This gets all annotations on the first page.
-                this.refs.pdfView
-                  .getAllUnsavedAnnotations()
-                  .then(annotations => {
-                    alert(JSON.stringify(annotations));
-                  });
+                // This removes the first annotation on the first page.
+                this.refs.pdfView.getAnnotations(0, null).then(results => {
+                  const annotations = results.annotations
+                  if (annotations.length >= 1) {
+                    const annotation = annotations[0];
+                    this.refs.pdfView.removeAnnotation(annotation);
+                  }
+                });
               }}
-              title="Get unsaved annotations"
+              title="Remove annotation"
             />
           </View>
         </View>
