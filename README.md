@@ -247,8 +247,8 @@ editableAnnotationTypes: ["Ink", "Highlight"];
 
 - Android SDK
 - Android Build Tools 23.0.1 (React Native)
-- Android Build Tools 26.0.1 (PSPDFKit module)
-- PSPDFKit >= 4.6.0
+- Android Build Tools 28.0.3 (PSPDFKit module)
+- PSPDFKit >= 5.0.1
 - react-native >= 0.55.4
 
 #### Getting Started
@@ -287,15 +287,15 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
   }
 ```
 
-8. PSPDFKit targets modern platforms, so you'll have to update `compileSdkVersion` and `targetSdkVersion` to at least API 26 and enable MultiDex. In `YourApp/android/app/build.gradle` (note **five** places to edit):
+8. PSPDFKit targets modern platforms, so you'll have to update `compileSdkVersion` to at least API 28 and `targetSdkVersion` to at least API 26 and enable MultiDex. You also need to enable Java 8 support. In `YourApp/android/app/build.gradle` (note **six** places to edit):
 
    ```diff
    ...
    android {
    -   compileSdkVersion 23
-   +   compileSdkVersion 26
+   +   compileSdkVersion 28
    -   buildToolsVersion "23.0.1"
-   +   buildToolsVersion "26.0.1"
+   +   buildToolsVersion "28.0.3"
 
    defaultConfig {
        applicationId "com.yourapp"
@@ -309,6 +309,11 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
        ndk {
            abiFilters "armeabi-v7a", "x86"
        }
+   }
+
+   compileOptions {
+   +   sourceCompatibility JavaVersion.VERSION_1_8
+   +   targetCompatibility JavaVersion.VERSION_1_8
    }
    ...
    ```
