@@ -248,6 +248,7 @@ editableAnnotationTypes: ["Ink", "Highlight"];
 - Android SDK
 - Android Build Tools 23.0.1 (React Native)
 - Android Build Tools 28.0.3 (PSPDFKit module)
+- Android Gradle plugin >= 3.2.1
 - PSPDFKit >= 5.0.1
 - react-native >= 0.55.4
 
@@ -318,7 +319,30 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
    ...
    ```
 
-9. <a id="step-8"></a>Enter your PSPDFKit license key into `YourApp/android/app/src/main/AndroidManifest.xml` file:
+9. As of version `0.55.4` react-native doesn't support the Android gradle plugin version `3.2.1` so in order to make bundling work we need to add a gradle task that will move the bundle assets to the correct location. In `YourApp/android/app/build.gradle` add:
+
+```
+task copyDebugJsAndAssets(type: Copy) {
+    from "$buildDir/intermediates/assets/debug"
+    into "$buildDir/intermediates/merged_assets/debug/mergeDebugAssets/out"
+}
+
+task copyReleaseJsAndAssets(type: Copy) {
+    from "$buildDir/intermediates/assets/release"
+    into "$buildDir/intermediates/merged_assets/release/mergeReleaseAssets/out"
+}
+
+tasks.whenTaskAdded { task ->
+    if (task.name.equalsIgnoreCase('bundleDebugJsAndAssets')) {
+        task.finalizedBy(copyDebugJsAndAssets)
+    }
+    if (task.name.equalsIgnoreCase('bundleReleaseJsAndAssets')) {
+        task.finalizedBy(copyReleaseJsAndAssets)
+    }
+}
+```
+
+10. <a id="step-8"></a>Enter your PSPDFKit license key into `YourApp/android/app/src/main/AndroidManifest.xml` file:
 
 ```diff
    <application>
@@ -331,7 +355,7 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
    </application>
 ```
 
-10. Set primary color. In `YourApp/android/app/src/main/res/values/styles.xml` replace
+11. Set primary color. In `YourApp/android/app/src/main/res/values/styles.xml` replace
 
 ```xml
 <!-- Customize your theme here. -->
@@ -343,7 +367,7 @@ with
 <item name="colorPrimary">#3C97C9</item>
 ```
 
-11. <a id="step-10"></a>Replace the default component from `YourApp/App.js` with a simple touch area to present a PDF document from the local device filesystem:
+12. <a id="step-10"></a>Replace the default component from `YourApp/App.js` with a simple touch area to present a PDF document from the local device filesystem:
 
 ```javascript
 import React, { Component } from "react";
@@ -415,13 +439,13 @@ const styles = StyleSheet.create({
 });
 ```
 
-12. Before launching the app you need to copy a PDF document onto your development device or emulator.
+13. Before launching the app you need to copy a PDF document onto your development device or emulator.
 
     ```bash
     adb push /path/to/your/document.pdf /sdcard/document.pdf
     ```
 
-13. Your app is now ready to launch. From `YourApp` directory run `react-native run-android`.
+14. Your app is now ready to launch. From `YourApp` directory run `react-native run-android`.
 
     ```bash
     react-native run-android
