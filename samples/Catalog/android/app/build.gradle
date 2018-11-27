@@ -179,3 +179,23 @@ task copyDownloadableDepsToLibs(type: Copy) {
     from configurations.compile
     into 'libs'
 }
+
+// Workaround for react-native putting the bundled assets in the wrong directory.
+task copyDebugJsAndAssets(type: Copy) {
+    from "$buildDir/intermediates/assets/debug"
+    into "$buildDir/intermediates/merged_assets/debug/mergeDebugAssets/out"
+}
+
+task copyReleaseJsAndAssets(type: Copy) {
+    from "$buildDir/intermediates/assets/release"
+    into "$buildDir/intermediates/merged_assets/release/mergeReleaseAssets/out"
+}
+
+tasks.whenTaskAdded { task ->
+    if (task.name.equalsIgnoreCase('bundleDebugJsAndAssets')) {
+        task.finalizedBy(copyDebugJsAndAssets)
+    }
+    if (task.name.equalsIgnoreCase('bundleReleaseJsAndAssets')) {
+        task.finalizedBy(copyReleaseJsAndAssets)
+    }
+}
