@@ -54,13 +54,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		2CB2F482217155B800A1D5BE /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 		657278041D86AE7300A5E1A8 /* RCTPSPDFKit */ = {
 			isa = PBXGroup;
 			children = (
@@ -93,7 +86,6 @@
 			children = (
 				657278041D86AE7300A5E1A8 /* RCTPSPDFKit */,
 				83CBBA001A601CBA00E9B192 /* Products */,
-				2CB2F482217155B800A1D5BE /* Frameworks */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
