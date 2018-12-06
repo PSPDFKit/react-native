@@ -79,6 +79,26 @@ var examples = [
     }
   },
   {
+    name: "Sharing",
+    description:
+      "Customize the sharing options for a document.",
+    action: () => {
+      PSPDFKit.present("PDFs/Annual Report.pdf", {
+        scrollDirection: "horizontal",
+        backgroundColor: processColor("white"),
+        thumbnailBarMode: "scrollable",
+        pageTransition: "scrollContinuous",
+        scrollDirection: "vertical",
+        sharingConfigurations: [
+        	{
+        		annotationOptions: ["flatten"],
+        		pageSelectionOptions: ["all", "annotated"]
+        	}
+        ]
+      });
+    }
+  },
+  {
     name: "PDF View Component",
     description:
       "Show how to use the PSPDFKitView component with NavigatorIOS.",

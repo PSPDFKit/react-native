@@ -239,9 +239,36 @@ RCT_ENUM_CONVERTER(PSPDFConfigurationSpreadFitting,
                    PSPDFScrollInsetAdjustmentNone,
                    unsignedIntegerValue)
 
+RCT_MULTI_ENUM_CONVERTER(PSPDFDocumentSharingFileFormatOptions,
+                         (@{@"PDF" : @(PSPDFDocumentSharingFileFormatOptionPDF),
+                            @"original": @(PSPDFDocumentSharingFileFormatOptionOriginal),
+                            @"image": @(PSPDFDocumentSharingFileFormatOptionImage)}),
+                         PSPDFDocumentSharingFileFormatOptionPDF,
+                         unsignedIntegerValue);
+
+RCT_MULTI_ENUM_CONVERTER(PSPDFDocumentSharingAnnotationOptions,
+                         (@{@"embed": @(PSPDFDocumentSharingAnnotationOptionEmbed),
+                            @"flatten": @(PSPDFDocumentSharingAnnotationOptionFlatten),
+                            @"flatten_for_print": @(PSPDFDocumentSharingAnnotationOptionFlattenForPrint),
+                            @"summary": @(PSPDFDocumentSharingAnnotationOptionSummary),
+                            @"remove": @(PSPDFDocumentSharingAnnotationOptionRemove)
+                            }),
+                         PSPDFDocumentSharingAnnotationOptionEmbed,
+                         unsignedIntegerValue);
+
+RCT_MULTI_ENUM_CONVERTER(PSPDFDocumentSharingPagesOptions,
+                         (@{@"all": @(PSPDFDocumentSharingPagesOptionAll),
+                            @"range": @(PSPDFDocumentSharingPagesOptionRange),
+                            @"current": @(PSPDFDocumentSharingPagesOptionCurrent),
+                            @"annotated": @(PSPDFDocumentSharingPagesOptionAnnotated)}),
+                         PSPDFDocumentSharingPagesOptionAll,
+                         unsignedIntegerValue)
+
+
 @end
 
 #define SET(property, type) if (dictionary[@#property]) self.property = [RCTConvert type:dictionary[@#property]];
+#define SET_OBJECT(object, property, type) if (dictionary[@#property]) object.property = [RCTConvert type:dictionary[@#property]];
 
 @implementation PSPDFConfigurationBuilder (RNAdditions)
 
@@ -319,9 +346,32 @@ RCT_ENUM_CONVERTER(PSPDFConfigurationSpreadFitting,
   SET(showBackActionButton, BOOL)
   SET(showForwardActionButton, BOOL)
   SET(showBackForwardActionButtonLabels, BOOL)
-  SET(sharingConfigurations, NSArray)
   SET(settingsOptions, PSPDFSettingsOptions)
   SET(editableAnnotationTypes, NSSet)
+
+  if (dictionary[@"sharingConfigurations"]) {
+    [self setRCTSharingConfigurations:[RCTConvert NSArray:dictionary[@"sharingConfigurations"]]];
+  }
+}
+
+- (void)setRCTSharingConfigurations:(NSArray<NSDictionary *> *)sharingConfigurations {
+  __block NSMutableArray<PSPDFDocumentSharingConfiguration *> *rnSharingConfigurations = [NSMutableArray new];
+  [sharingConfigurations enumerateObjectsUsingBlock:^(NSDictionary *dictionary, NSUInteger idx, BOOL * _Nonnull stop) {
+    PSPDFDocumentSharingConfiguration *rnSharingConfiguration = [PSPDFDocumentSharingConfiguration configurationWithBuilder:^(PSPDFDocumentSharingConfigurationBuilder * builder) {
+      // Custom destination not yet supported.
+      builder.destination = PSPDFDocumentSharingDestinationActivity;
+      SET_OBJECT(builder, fileFormatOptions, PSPDFDocumentSharingFileFormatOptions)
+      SET_OBJECT(builder, annotationOptions, PSPDFDocumentSharingAnnotationOptions)
+      SET_OBJECT(builder, pageSelectionOptions, PSPDFDocumentSharingPagesOptions)
+      SET_OBJECT(builder, applicationActivities, NSArray)
+      SET_OBJECT(builder, excludedActivityTypes, NSArray)
+    }];
+
+    [rnSharingConfigurations addObject:rnSharingConfiguration];
+  }];
+
+
+  self.sharingConfigurations = rnSharingConfigurations;
 }
 
 @end

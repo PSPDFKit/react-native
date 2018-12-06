@@ -532,8 +532,8 @@
 			isa = PBXGroup;
 			children = (
 				01107DE51FFE52D800CD9D66 /* PSPDFKitUI.framework */,
-				657278751D86C28800A5E1A8 /* RCTPSPDFKit.xcodeproj */,
 				6572778F1D83184800A5E1A8 /* PSPDFKit.framework */,
+				657278751D86C28800A5E1A8 /* RCTPSPDFKit.xcodeproj */,
 			);
 			name = PSPDFKit;
 			sourceTree = "<group>";
