@@ -79,7 +79,7 @@ var examples = [
     }
   },
   {
-    name: "Sharing",
+    name: "Custom Sharing Options",
     description:
       "Customize the sharing options for a document.",
     action: () => {
