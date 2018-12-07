@@ -175,6 +175,26 @@ var examples = [
       console.log(PSPDFKit);
       console.log(PSPDFKit.versionString);
     }
+  },
+  {
+    name: "Custom Sharing Options",
+    description:
+      "Customize the sharing options for a document.",
+    action: () => {
+      PSPDFKit.present("PDFs/Annual Report.pdf", {
+        scrollDirection: "horizontal",
+        backgroundColor: processColor("white"),
+        thumbnailBarMode: "scrollable",
+        pageTransition: "scrollContinuous",
+        scrollDirection: "vertical",
+        sharingConfigurations: [
+        	{
+        		annotationOptions: ["flatten"],
+        		pageSelectionOptions: ["all", "annotated"]
+        	}
+        ]
+      });
+    }
   }
 ];
 
