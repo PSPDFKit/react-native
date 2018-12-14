@@ -1,8 +1,8 @@
-<Application
+<rn:ReactApplication
     x:Class="Catalog.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Catalog"
+    xmlns:rn="using:ReactNative"
     RequestedTheme="Light">
 
     <Application.Resources>
@@ -13,4 +13,4 @@
         </ResourceDictionary>
     </Application.Resources>
 
-</Application>
+</rn:ReactApplication>

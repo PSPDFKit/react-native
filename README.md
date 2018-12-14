@@ -645,12 +645,12 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
 17. Add an application resource to your `Appl.xaml` to reference your License key.
 
 ```diff
-<Application
-	x:Class="Catalog.App"
-	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-	xmlns:local="using:Catalog"
-	RequestedTheme="Light">
+<rn:ReactApplication
+    x:Class="Catalog.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:rn="using:ReactNative"
+    RequestedTheme="Light">
 
 +	<Application.Resources>
 +		<ResourceDictionary>
@@ -660,7 +660,7 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
 +		</ResourceDictionary>
 +	</Application.Resources>
 
-</Application>
+</rn:ReactApplication>
 ```
 
 18. Create a new file resouce called `License.xaml` with your PSPDFKit license key at the top level of the
@@ -764,26 +764,11 @@ var styles = StyleSheet.create({
 1. Clone the repository. `git clone https://github.com/PSPDFKit/react-native.git`.
 2. From the command promt `cd react-native\samples\Catalog`.
 3. Make sure `react-native-cli` is installed: `yarn global add react-native-cli`.
-4. Edit `package.json` to change the version of `react-native` to `0.53.0` and refernce the react-native
-   pspdfkit repo online.
-
-```diff
-"dependencies": {
-"react": "16.3.1",
--"react-native": "0.55.4",
-+"react-native": "0.53.0",
-"react-native-fs": "2.10.14",
-"react-native-pspdfkit": "file:../../",
-"react-native-windows": "0.53.0",
-"react-navigation": "^1.0.3"
-}
-```
-
-5. run `yarn install`. (Because of a [bug](https://github.com/yarnpkg/yarn/issues/2165) you may need to clean `yarn`'s cache with `yarn cache clean` before.)
-6. Open the UWP catalog solution in `react-native\samples\Catalog\windows`.
-7. Accept and install any required extensions when prompted.
-8. If the settings windows opens, click on `Developer` and selected `yes`.
-9. Create a new file resouce called `License.xaml` with your PSPDFKit license key at the top level of the project. (Replace `ENTER LICENSE KEY HERE` with your key)
+4. run `yarn install`. (Because of a [bug](https://github.com/yarnpkg/yarn/issues/2165) you may need to clean `yarn`'s cache with `yarn cache clean` before.)
+5. Open the UWP catalog solution in `react-native\samples\Catalog\windows`.
+6. Accept and install any required extensions when prompted.
+7. If the settings windows opens, click on `Developer` and selected `yes`.
+8. Create a new file resouce called `License.xaml` with your PSPDFKit license key at the top level of the project. (Replace `ENTER LICENSE KEY HERE` with your key)
 
 ```xaml
 	<ResourceDictionary
@@ -795,8 +780,8 @@ var styles = StyleSheet.create({
 	</ResourceDictionary>
 ```
 
-10. From the command prompt run `react-native run-windows`.
-11. Enter `y` to accept the certificate when prompted and allow socket access for reactive when prompted.
+9. From the command prompt run `react-native run-windows`.
+10. Enter `y` to accept the certificate when prompted and allow socket access for reactive when prompted.
 
 #### API
 
