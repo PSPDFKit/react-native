@@ -19,6 +19,7 @@ import com.pspdfkit.react.events.PdfViewDataReturnedEvent;
 import com.pspdfkit.react.events.PdfViewDocumentSaveFailedEvent;
 import com.pspdfkit.react.events.PdfViewDocumentSavedEvent;
 import com.pspdfkit.react.events.PdfViewStateChangedEvent;
+import com.pspdfkit.react.menu.ReactGroupingRule;
 import com.pspdfkit.views.PdfView;
 
 import org.json.JSONObject;
@@ -135,6 +136,12 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
     @ReactProp(name = "annotationAuthorName")
     public void setAnnotationAuthorName(PdfView view, String annotationAuthorName) {
         PSPDFKitPreferences.get(view.getContext()).setAnnotationCreator(annotationAuthorName);
+    }
+
+    @ReactProp(name = "menuItemGrouping")
+    public void setMenuItemGrouping(PdfView view, @NonNull ReadableArray menuItemGrouping) {
+        ReactGroupingRule groupingRule = new ReactGroupingRule(view.getContext(), menuItemGrouping);
+        view.setMenuItemGroupingRule(groupingRule);
     }
 
     @Nullable

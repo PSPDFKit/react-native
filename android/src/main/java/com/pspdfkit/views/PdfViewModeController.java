@@ -2,6 +2,7 @@ package com.pspdfkit.views;
 
 import android.support.annotation.NonNull;
 
+import com.pspdfkit.react.R;
 import com.pspdfkit.ui.forms.FormEditingBar;
 import com.pspdfkit.ui.inspector.PropertyInspectorCoordinatorLayout;
 import com.pspdfkit.ui.inspector.annotation.DefaultAnnotationCreationInspectorController;
@@ -17,6 +18,9 @@ import com.pspdfkit.ui.special_mode.manager.TextSelectionManager;
 import com.pspdfkit.ui.toolbar.AnnotationCreationToolbar;
 import com.pspdfkit.ui.toolbar.AnnotationEditingToolbar;
 import com.pspdfkit.ui.toolbar.ToolbarCoordinatorLayout;
+import com.pspdfkit.ui.toolbar.grouping.MenuItemGroupingRule;
+
+import javax.annotation.Nullable;
 
 /**
  * Keeps track of the currently active mode and handles updating the toolbar states.
@@ -54,6 +58,10 @@ class PdfViewModeController implements AnnotationManager.OnAnnotationCreationMod
         this.annotationCreationInspectorController = new DefaultAnnotationCreationInspectorController(parent.getContext(), inspectorCoordinatorLayout);
         this.annotationEditingInspectorController = new DefaultAnnotationEditingInspectorController(parent.getContext(), inspectorCoordinatorLayout);
         this.formEditingInspectorController = new FormEditingInspectorController(parent.getContext(), inspectorCoordinatorLayout);
+    }
+
+    public void setMenuItemGroupingRule(@Nullable MenuItemGroupingRule groupingRule) {
+        this.annotationCreationToolbar.setMenuItemGroupingRule(groupingRule);
     }
 
     @Override

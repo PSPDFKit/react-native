@@ -473,6 +473,7 @@ class AnnotationCreationMode extends Component {
             thumbnailBarMode: "scrollable",
             useParentNavigationBar: true
           }}
+          menuItemGrouping={['freetext', {key: 'markup', items: ['highlight', "underline"]}, 'ink', 'image']}
           pageIndex={this.state.currentPageIndex}
           style={{ flex: 1, color: pspdfkitColor }}
           onStateChanged={event => {

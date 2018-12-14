@@ -11,6 +11,7 @@
 #import "RCTConvert+PSPDFAnnotation.h"
 #import "RCTConvert+PSPDFConfiguration.h"
 #import "RCTConvert+PSPDFDocument.h"
+#import "RCTConvert+PSPDFAnnotationToolbarConfiguration.h"
 #import "RCTPSPDFKitView.h"
 #import <React/RCTUIManager.h>
 
@@ -47,6 +48,13 @@ RCT_CUSTOM_VIEW_PROPERTY(annotationAuthorName, pdfController.document.defaultAnn
   if (json) {
     view.pdfController.document.defaultAnnotationUsername = json;
     view.annotationAuthorName = json;
+  }
+}
+
+RCT_CUSTOM_VIEW_PROPERTY(menuItemGrouping, PSPDFAnnotationToolbarConfiguration, RCTPSPDFKitView) {
+  if (json) {
+    PSPDFAnnotationToolbarConfiguration *configuration = [RCTConvert PSPDFAnnotationToolbarConfiguration:json];
+    view.pdfController.annotationToolbarController.annotationToolbar.configurations = @[configuration];
   }
 }
 
