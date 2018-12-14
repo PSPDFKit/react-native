@@ -24,6 +24,13 @@ var PSPDFKit = NativeModules.ReactPSPDFKit;
 var PSPDFKitLibrary = NativeModules.ReactPSPDFKitLibrary;
 var RNFS = require("react-native-fs");
 
+import { YellowBox } from "react-native";
+YellowBox.ignoreWarnings([
+    "Warning: isMounted(...) is deprecated", // React Native bug that hopefully will be fixed soon: https://github.com/facebook/react-native/issues/18868
+    "Warning: Invalid argument supplied to oneOf" // React native windows bug. 
+    ]);
+
+
 const complexSearchConfiguration = {
   searchString: "the",
   excludeAnnotations: false,
