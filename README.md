@@ -1,4 +1,6 @@
-## React Native wrapper for PSPDFKit for iOS, Android and Windows UWP.
+## React Native wrapper for PSPDFKit for iOS, Android and Windows UWP. (PDF SDK for React Native)
+
+![PDF SDK for React Native](https://github.com/PSPDFKit/react-native/blob/master/article-header.png?raw=true)
 
 This wrapper requires a valid license of PSPDFKit. Licenses are per platform. You can request [a trial license here](https://pspdfkit.com/try/).
 
