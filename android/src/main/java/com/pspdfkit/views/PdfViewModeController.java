@@ -60,6 +60,9 @@ class PdfViewModeController implements AnnotationManager.OnAnnotationCreationMod
         this.formEditingInspectorController = new FormEditingInspectorController(parent.getContext(), inspectorCoordinatorLayout);
     }
 
+    /**
+     * Sets the menu item grouping rule that will be used for the annotation creation toolbar.
+     */
     public void setMenuItemGroupingRule(@Nullable MenuItemGroupingRule groupingRule) {
         this.annotationCreationToolbar.setMenuItemGroupingRule(groupingRule);
     }

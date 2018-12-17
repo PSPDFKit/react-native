@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.IdRes;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.facebook.react.bridge.Dynamic;
 import com.facebook.react.bridge.ReadableArray;
@@ -17,8 +18,12 @@ import com.pspdfkit.ui.toolbar.grouping.presets.PresetMenuItemGroupingRule;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A menu item grouping rule that displays only the menu items configured via the menuItemGrouping prop.
+ */
 public class ReactGroupingRule extends PresetMenuItemGroupingRule {
 
+    private static final String TAG = "ReactGroupingRule";
     private static final int INVALID_ID = -1;
 
     private final List<MenuItem> items = new ArrayList<>();
@@ -33,16 +38,9 @@ public class ReactGroupingRule extends PresetMenuItemGroupingRule {
                 if (key == INVALID_ID) {
                     continue;
                 }
-                ReadableArray subitems = groupItem.getArray("items");
-                int[] itemIds = new int[subitems.size()];
-                for (int j = 0; j < itemIds.length; j++) {
-                    int id = getIdFromName(subitems.getString(j));
-                    if (id == INVALID_ID) {
-                        continue;
-                    }
-                    itemIds[j] = id;
-                }
-                items.add(new MenuItem(key, itemIds));
+
+                ReadableArray subItems = groupItem.getArray("items");
+                items.add(new MenuItem(key, collectItemIds(subItems)));
             } else {
                 int id = getIdFromName(menuItem.asString());
                 if (id == INVALID_ID) {
@@ -51,6 +49,23 @@ public class ReactGroupingRule extends PresetMenuItemGroupingRule {
                 items.add(new MenuItem(id));
             }
         }
+    }
+
+    private int[] collectItemIds(ReadableArray items) {
+        List<Integer> itemIds = new ArrayList<>();
+        for (int i = 0; i < items.size(); i++) {
+            int id = getIdFromName(items.getString(i));
+            if (id == INVALID_ID) {
+                continue;
+            }
+            itemIds.add(id);
+        }
+
+        int[] ids = new int[itemIds.size()];
+        for (int i = 0; i < itemIds.size(); i++) {
+            ids[i] = itemIds.get(i);
+        }
+        return ids;
     }
 
     @IdRes
@@ -106,6 +121,7 @@ public class ReactGroupingRule extends PresetMenuItemGroupingRule {
                 return R.id.pspdf__annotation_creation_toolbar_item_picker;
         }
 
+        Log.i(TAG, String.format("Received unknown menu item %s.", name));
         return INVALID_ID;
     }
 

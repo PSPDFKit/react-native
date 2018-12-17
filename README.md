@@ -230,6 +230,7 @@ Example - Native UI Component:
 - Copy `PSPDFKit.framework` and `PSPDFKitUI.framework` into the `PSPDFKit` directory.
 - Install dependencies: `yarn install` in `samples/Catalog` directory. (Because of a [bug](https://github.com/yarnpkg/yarn/issues/2165) you may need to clean `yarn`'s cache with `yarn cache clean` before.)
 - Run the app with `react-native-cli`: `react-native run-ios`
+- If you get an error about `config.h` not being found check out [this blog post](https://tuntunir.blogspot.com/2018/02/react-native-fatal-error-configh-file.html) for information on how to fix it.
 
 #### Configuration Mapping
 
@@ -239,6 +240,18 @@ Annotations are mapped based on their type name. This is case sensitive. For exa
 
 ```javascript
 editableAnnotationTypes: ["Ink", "Highlight"];
+```
+
+#### Menu Item Mapping
+
+The PSPDFKit React Native iOS Wrapper allows you to specify a custom grouping for the annotation creation toolbar. Please refer to [`RCTConvert+PSPDFAnnotationToolbarConfiguration.h.m`](./ios/RCTPSPDFKit/Converters/RCTConvert+PSPDFAnnotationToolbarConfiguration.m#L47) for the complete list of menu items. To set them just specify the `menuItemGrouping` prop on the `PSPDFKitView`. The format used is as follows:
+
+```
+[
+  menuItem,
+  { key: menuItem, items: [subItem, subItem]},
+  ...
+]
 ```
 
 ### Android
@@ -519,6 +532,18 @@ Just like on iOS we also support integrating PSPDFKit directly into the react-na
 - Your activity hosting the react component needs to extend from `ReactFragmentActivity`.
 - Because of [issues](https://github.com/facebook/react-native/issues/17968) in react-native our `PdfView` needs to call `layout` and `dispatchOnGlobalLayout` on every frame, this might negatively affect your apps performance or even cause it to misbehave.
 - `PSPDFKitView` doesn't yet support all the features (outline, bookmarks, thubmnail grid, view settings) using `PSPDFKit.present` provides.
+
+##### Menu Item Mapping
+
+The PSPDFKit React Native Android Wrapper allows you to specify a custom grouping for the annotation creation toolbar. Please refer to [`ReactGroupingRule.java`](https://github.com/PSPDFKit/react-native/blob/master/android/src/main/java/com/pspdfkit/react/menu/ReactGroupingRule.java) for the complete list of menu items. To set them just specify the `menuItemGrouping` prop on the `PSPDFKitView`. The format used is as follows:
+
+```
+[
+  menuItem,
+  { key: menuItem, items: [subItem, subItem]},
+  ...
+]
+```
 
 #### Update
 

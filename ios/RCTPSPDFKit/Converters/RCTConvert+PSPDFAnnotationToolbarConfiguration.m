@@ -7,23 +7,21 @@
 //  This notice may not be removed from this file.
 //
 
-#import "RCTConvert+PSPDFDocument.h"
+#import "RCTConvert+PSPDFAnnotationToolbarConfiguration.h"
 
 @implementation RCTConvert (PSPDFAnnotationToolbarConfiguration)
 
 + (PSPDFAnnotationToolbarConfiguration *)PSPDFAnnotationToolbarConfiguration:(id)json {
   NSArray *itemsToParse = [RCTConvert NSArray:json];
   NSMutableArray *parsedItems = [NSMutableArray arrayWithCapacity:itemsToParse.count];
-  for (int i = 0; i < itemsToParse.count; i++) {
-    id itemToParse = itemsToParse[i];
+  for (id itemToParse in itemsToParse) {
     if ([itemToParse isKindOfClass:[NSDictionary class]]) {
       NSDictionary *dict = itemToParse;
       NSArray *subArray = dict[@"items"];
       NSMutableArray *subItems = [NSMutableArray arrayWithCapacity:subArray.count];
-      for (int j = 0; j < subArray.count; j++) {
-        id subItem = subArray[j];
-        PSPDFAnnotationString annotationString = [RCTConvert PSPDFAnnotationStringFromName:subItem];
+      for (id subItem in subArray) {
         if (subItem) {
+          PSPDFAnnotationString annotationString = [RCTConvert PSPDFAnnotationStringFromName:subItem];
           [subItems addObject:[PSPDFAnnotationGroupItem itemWithType:annotationString]];
         }
       }
@@ -39,47 +37,37 @@
 }
 
 + (PSPDFAnnotationString)PSPDFAnnotationStringFromName:(NSString *)name {
-  if ([name isEqualToString:@"link"]) {
-    return PSPDFAnnotationStringLink;
-  } else if ([name isEqualToString:@"highlight"]) {
-    return PSPDFAnnotationStringHighlight;
-  } else if ([name isEqualToString:@"strikeout"]) {
-    return PSPDFAnnotationMenuStrikeout;
-  } else if ([name isEqualToString:@"underline"]) {
-    return PSPDFAnnotationStringUnderline;
-  } else if ([name isEqualToString:@"squiggly"]) {
-    return PSPDFAnnotationMenuSquiggle;
-  } else if ([name isEqualToString:@"note"]) {
-    return PSPDFAnnotationStringNote;
-  } else if ([name isEqualToString:@"freetext"]) {
-    return PSPDFAnnotationStringFreeText;
-  } else if ([name isEqualToString:@"ink"]) {
-    return PSPDFAnnotationStringInk;
-  } else if ([name isEqualToString:@"square"]) {
-    return PSPDFAnnotationStringSquare;
-  } else if ([name isEqualToString:@"circle"]) {
-    return PSPDFAnnotationStringCircle;
-  } else if ([name isEqualToString:@"line"]) {
-    return PSPDFAnnotationStringLine;
-  } else if ([name isEqualToString:@"polygon"]) {
-    return PSPDFAnnotationStringPolygon;
-  } else if ([name isEqualToString:@"polyline"]) {
-    return PSPDFAnnotationStringPolyLine;
-  } else if ([name isEqualToString:@"signature"]) {
-    return PSPDFAnnotationStringSignature;
-  } else if ([name isEqualToString:@"stamp"]) {
-    return PSPDFAnnotationStringStamp;
-  } else if ([name isEqualToString:@"eraser"]) {
-    return PSPDFAnnotationStringEraser;
-  } else if ([name isEqualToString:@"sound"]) {
-    return PSPDFAnnotationStringSound;
-  } else if ([name isEqualToString:@"image"]) {
-    return PSPDFAnnotationStringImage;
-  } else if ([name isEqualToString:@"redaction"]) {
-    return PSPDFAnnotationStringRedaction;
-  }
   
-  return nil;
+  static NSDictionary *nameToAnnotationStringMapping;
+  
+  static dispatch_once_t onceToken;
+  dispatch_once(&onceToken, ^{
+    NSMutableDictionary *mapping = [[NSMutableDictionary alloc] init];
+    
+    [mapping setValue:PSPDFAnnotationStringLink forKeyPath:@"link"];
+    [mapping setValue:PSPDFAnnotationStringHighlight forKeyPath:@"highlight"];
+    [mapping setValue:PSPDFAnnotationMenuStrikeout forKeyPath:@"strikeout"];
+    [mapping setValue:PSPDFAnnotationStringUnderline forKeyPath:@"underline"];
+    [mapping setValue:PSPDFAnnotationMenuSquiggle forKeyPath:@"squiggly"];
+    [mapping setValue:PSPDFAnnotationStringNote forKeyPath:@"note"];
+    [mapping setValue:PSPDFAnnotationStringFreeText forKeyPath:@"freetext"];
+    [mapping setValue:PSPDFAnnotationStringInk forKeyPath:@"ink"];
+    [mapping setValue:PSPDFAnnotationStringSquare forKeyPath:@"square"];
+    [mapping setValue:PSPDFAnnotationStringCircle forKeyPath:@"circle"];
+    [mapping setValue:PSPDFAnnotationStringLine forKeyPath:@"line"];
+    [mapping setValue:PSPDFAnnotationStringPolygon forKeyPath:@"polygon"];
+    [mapping setValue:PSPDFAnnotationStringPolyLine forKeyPath:@"polyline"];
+    [mapping setValue:PSPDFAnnotationStringSignature forKeyPath:@"signature"];
+    [mapping setValue:PSPDFAnnotationStringStamp forKeyPath:@"stamp"];
+    [mapping setValue:PSPDFAnnotationStringEraser forKeyPath:@"eraser"];
+    [mapping setValue:PSPDFAnnotationStringSound forKeyPath:@"sound"];
+    [mapping setValue:PSPDFAnnotationStringImage forKeyPath:@"image"];
+    [mapping setValue:PSPDFAnnotationStringRedaction forKeyPath:@"redaction"];
+    
+    nameToAnnotationStringMapping = [[NSDictionary alloc] initWithDictionary:mapping];
+  });
+  
+  return nameToAnnotationStringMapping[name];
 }
 
 @end

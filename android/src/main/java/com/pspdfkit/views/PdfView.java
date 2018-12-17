@@ -204,6 +204,9 @@ public class PdfView extends FrameLayout {
         pdfViewDocumentListener.setDisableAutomaticSaving(disableAutomaticSaving);
     }
 
+    /**
+     * Sets the menu item grouping rule that will be used for the annotation creation toolbar.
+     */
     public void setMenuItemGroupingRule(@NonNull MenuItemGroupingRule groupingRule) {
         pdfViewModeController.setMenuItemGroupingRule(groupingRule);
     }
