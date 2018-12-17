@@ -11,6 +11,7 @@
 		6572780C1D86AE7300A5E1A8 /* RCTConvert+PSPDFConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 657278071D86AE7300A5E1A8 /* RCTConvert+PSPDFConfiguration.m */; };
 		657278111D86AEC600A5E1A8 /* RCTConvert+PSPDFDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 657278101D86AEC600A5E1A8 /* RCTConvert+PSPDFDocument.m */; };
 		84545BA4210A5CCF00FBB0A7 /* RCTConvert+PSPDFAnnotation.m in Sources */ = {isa = PBXBuildFile; fileRef = 84545BA2210A5CCF00FBB0A7 /* RCTConvert+PSPDFAnnotation.m */; };
+		B783BA3421C3F55300FD981A /* RCTConvert+PSPDFAnnotationToolbarConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = B783BA3321C3F55300FD981A /* RCTConvert+PSPDFAnnotationToolbarConfiguration.m */; };
 		F84F8B192032D54F00153D9E /* RCTPSPDFKitView.m in Sources */ = {isa = PBXBuildFile; fileRef = F84F8B182032D54F00153D9E /* RCTPSPDFKitView.m */; };
 		F8C1A2E5202DCC9700E98192 /* RCTPSPDFKitViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F8C1A2E4202DCC9700E98192 /* RCTPSPDFKitViewManager.m */; };
 /* End PBXBuildFile section */
@@ -37,6 +38,8 @@
 		657278101D86AEC600A5E1A8 /* RCTConvert+PSPDFDocument.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "RCTConvert+PSPDFDocument.m"; sourceTree = "<group>"; };
 		84545BA2210A5CCF00FBB0A7 /* RCTConvert+PSPDFAnnotation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "RCTConvert+PSPDFAnnotation.m"; sourceTree = "<group>"; };
 		84545BA3210A5CCF00FBB0A7 /* RCTConvert+PSPDFAnnotation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "RCTConvert+PSPDFAnnotation.h"; sourceTree = "<group>"; };
+		B783BA3221C3F55300FD981A /* RCTConvert+PSPDFAnnotationToolbarConfiguration.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RCTConvert+PSPDFAnnotationToolbarConfiguration.h"; sourceTree = "<group>"; };
+		B783BA3321C3F55300FD981A /* RCTConvert+PSPDFAnnotationToolbarConfiguration.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "RCTConvert+PSPDFAnnotationToolbarConfiguration.m"; sourceTree = "<group>"; };
 		F84F8B182032D54F00153D9E /* RCTPSPDFKitView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RCTPSPDFKitView.m; sourceTree = "<group>"; };
 		F84F8B1A2032D55E00153D9E /* RCTPSPDFKitView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RCTPSPDFKitView.h; sourceTree = "<group>"; };
 		F8C1A2E4202DCC9700E98192 /* RCTPSPDFKitViewManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RCTPSPDFKitViewManager.m; sourceTree = "<group>"; };
@@ -77,6 +80,8 @@
 				657278071D86AE7300A5E1A8 /* RCTConvert+PSPDFConfiguration.m */,
 				6572780F1D86AEC600A5E1A8 /* RCTConvert+PSPDFDocument.h */,
 				657278101D86AEC600A5E1A8 /* RCTConvert+PSPDFDocument.m */,
+				B783BA3221C3F55300FD981A /* RCTConvert+PSPDFAnnotationToolbarConfiguration.h */,
+				B783BA3321C3F55300FD981A /* RCTConvert+PSPDFAnnotationToolbarConfiguration.m */,
 			);
 			path = Converters;
 			sourceTree = "<group>";
@@ -161,6 +166,7 @@
 				F8C1A2E5202DCC9700E98192 /* RCTPSPDFKitViewManager.m in Sources */,
 				84545BA4210A5CCF00FBB0A7 /* RCTConvert+PSPDFAnnotation.m in Sources */,
 				6540D1841D89D22E00B8F94F /* RCTPSPDFKitManager.m in Sources */,
+				B783BA3421C3F55300FD981A /* RCTConvert+PSPDFAnnotationToolbarConfiguration.m in Sources */,
 				F84F8B192032D54F00153D9E /* RCTPSPDFKitView.m in Sources */,
 				6572780C1D86AE7300A5E1A8 /* RCTConvert+PSPDFConfiguration.m in Sources */,
 			);

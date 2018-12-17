@@ -41,6 +41,7 @@ import com.pspdfkit.ui.forms.FormEditingBar;
 import com.pspdfkit.ui.inspector.PropertyInspectorCoordinatorLayout;
 import com.pspdfkit.ui.thumbnail.PdfThumbnailBarController;
 import com.pspdfkit.ui.toolbar.ToolbarCoordinatorLayout;
+import com.pspdfkit.ui.toolbar.grouping.MenuItemGroupingRule;
 import com.pspdfkit.ui.toolbar.popup.PdfTextSelectionPopupToolbar;
 
 import org.json.JSONArray;
@@ -201,6 +202,13 @@ public class PdfView extends FrameLayout {
 
     public void setDisableAutomaticSaving(boolean disableAutomaticSaving) {
         pdfViewDocumentListener.setDisableAutomaticSaving(disableAutomaticSaving);
+    }
+
+    /**
+     * Sets the menu item grouping rule that will be used for the annotation creation toolbar.
+     */
+    public void setMenuItemGroupingRule(@NonNull MenuItemGroupingRule groupingRule) {
+        pdfViewModeController.setMenuItemGroupingRule(groupingRule);
     }
 
     private void setupFragment() {

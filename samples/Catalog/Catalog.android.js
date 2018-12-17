@@ -331,6 +331,7 @@ class PdfViewScreen extends Component<{}> {
           }}
           pageIndex={this.state.currentPageIndex}
           fragmentTag="PDF1"
+          menuItemGrouping={['freetext', {key: 'markup', items: ['highlight', "underline"]}, 'ink', 'image']}
           onStateChanged={event => {
             this.setState({
               currentPageIndex: event.currentPageIndex,

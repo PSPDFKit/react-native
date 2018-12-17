@@ -421,7 +421,11 @@ PSPDFKitView.propTypes = {
    *
    * @platform android
    */
-  fragmentTag: PropTypes.string
+  fragmentTag: PropTypes.string,
+  /**
+   * menuItemGrouping: Can be used to specfiy a custom grouping for the menu items in the annotation creation toolbar.
+   */
+  menuItemGrouping: PropTypes.array
 };
 
 if (Platform.OS === "ios" || Platform.OS === "android") {
