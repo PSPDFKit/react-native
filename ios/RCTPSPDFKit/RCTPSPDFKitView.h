@@ -38,7 +38,7 @@
 /// Anotations
 - (NSDictionary<NSString *, NSArray<NSDictionary *> *> *)getAnnotations:(PSPDFPageIndex)pageIndex type:(PSPDFAnnotationType)type;
 - (BOOL)addAnnotation:(id)jsonAnnotation;
-- (BOOL)removeAnnotation:(id)jsonAnnotation;
+- (BOOL)removeAnnotationWithUUID:(NSString *)annotationUUID;
 - (NSDictionary<NSString *, NSArray<NSDictionary *> *> *)getAllUnsavedAnnotations;
 - (BOOL)addAnnotations:(NSString *)jsonAnnotations;
 
