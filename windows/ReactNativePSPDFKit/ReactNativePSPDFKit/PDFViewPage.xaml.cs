@@ -88,11 +88,10 @@ namespace ReactNativePSPDFKit
             try
             {
                 // Get the StorageFile
-                var file = PDFView.Controller?.GetPdfDocument()?.DocumentSource.GetFile();
-                if (file != null)
+                if (_fileToOpen != null)
                 {
                     // Save it.
-                    await PDFView.Document.ExportAsync(file);
+                    await PDFView.Document.ExportAsync(_fileToOpen);
                 }
 
                 this.GetReactContext().GetNativeModule<UIManagerModule>().EventDispatcher.DispatchEvent(
