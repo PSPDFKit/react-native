@@ -14,7 +14,7 @@
 + (NSArray <NSDictionary *> *)instantJSONFromAnnotations:(NSArray <PSPDFAnnotation *> *) annotations {
   NSMutableArray <NSDictionary *> *annotationsJSON = [NSMutableArray new];
   for (PSPDFAnnotation *annotation in annotations) {
-    NSDictionary <NSString *, NSString *> *uuidDict = @{@"uuid" : [annotation valueForKey:@"uuid"]};
+    NSDictionary <NSString *, NSString *> *uuidDict = @{@"uuid" : annotation.uuid};
     NSData *annotationData = [annotation generateInstantJSONWithError:NULL];
     if (annotationData) {
       NSMutableDictionary *annotationDictionary = [[NSJSONSerialization JSONObjectWithData:annotationData options:kNilOptions error:NULL] mutableCopy];
