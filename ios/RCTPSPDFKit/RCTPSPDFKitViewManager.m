@@ -147,7 +147,7 @@ RCT_EXPORT_METHOD(addAnnotation:(id)jsonAnnotation reactTag:(nonnull NSNumber *)
 RCT_EXPORT_METHOD(removeAnnotation:(id)jsonAnnotation reactTag:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   dispatch_async(dispatch_get_main_queue(), ^{
     RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
-    BOOL success = [component removeAnnotation:jsonAnnotation];
+    BOOL success = [component removeAnnotationWithUUID:jsonAnnotation[@"uuid"]];
     if (success) {
       resolve(@(success));
     } else {
