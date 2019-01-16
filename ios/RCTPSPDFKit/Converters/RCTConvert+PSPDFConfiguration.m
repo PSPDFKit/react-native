@@ -268,6 +268,7 @@ RCT_MULTI_ENUM_CONVERTER(PSPDFDocumentSharingPagesOptions,
 @end
 
 #define SET(property, type) if (dictionary[@#property]) self.property = [RCTConvert type:dictionary[@#property]];
+#define SET_PROPERTY(reactProperty, property, type) if (dictionary[@#reactProperty]) self.property = [RCTConvert type:dictionary[@#reactProperty]];
 #define SET_OBJECT(object, property, type) if (dictionary[@#property]) object.property = [RCTConvert type:dictionary[@#property]];
 
 @implementation PSPDFConfigurationBuilder (RNAdditions)
@@ -293,8 +294,11 @@ RCT_MULTI_ENUM_CONVERTER(PSPDFDocumentSharingPagesOptions,
   SET(allowedMenuActions, PSPDFTextSelectionMenuAction)
   SET(userInterfaceViewMode, PSPDFUserInterfaceViewMode)
   SET(userInterfaceViewAnimation, PSPDFUserInterfaceViewAnimation)
+  SET_PROPERTY(showThumbnailBar, thumbnailBarMode, PSPDFThumbnailBarMode)
   SET(thumbnailBarMode, PSPDFThumbnailBarMode)
+  SET_PROPERTY(showPageLabels, pageLabelEnabled, BOOL)
   SET(pageLabelEnabled, BOOL)
+  SET_PROPERTY(showDocumentLabel, documentLabelEnabled, PSPDFAdaptiveConditional)
   SET(documentLabelEnabled, PSPDFAdaptiveConditional)
   SET(shouldHideUserInterfaceOnPageChange, BOOL)
   SET(shouldShowUserInterfaceOnViewWillAppear, BOOL)
@@ -305,6 +309,7 @@ RCT_MULTI_ENUM_CONVERTER(PSPDFDocumentSharingPagesOptions,
   SET(scrubberBarType, PSPDFScrubberBarType)
   SET(thumbnailGrouping, PSPDFThumbnailGrouping)
   SET(pageTransition, PSPDFPageTransition)
+  SET_PROPERTY(pageScrollDirection, scrollDirection, PSPDFScrollDirection)
   SET(scrollDirection, PSPDFScrollDirection)
   SET(scrollViewInsetAdjustment, PSPDFScrollInsetAdjustment)
   SET(firstPageAlwaysSingle, BOOL)

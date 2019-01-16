@@ -70,11 +70,13 @@ var examples = [
       "You can configure the controller with dictionary representation of the PSPDFConfiguration object.",
     action: () => {
       PSPDFKit.present("PDFs/Annual Report.pdf", {
-        scrollDirection: "horizontal",
+        pageScrollDirection: "horizontal",
         backgroundColor: processColor("white"),
-        thumbnailBarMode: "scrollable",
+        showThumbnailBar: "scrollable",
         pageTransition: "scrollContinuous",
-        scrollDirection: "vertical"
+        pageScrollDirection: "vertical",
+        showPageLabels: false,
+        showDocumentLabel: true
       });
     }
   },
@@ -88,7 +90,8 @@ var examples = [
         passProps: {
           document: "PDFs/Annual Report.pdf",
           configuration: {
-            useParentNavigationBar: true
+            useParentNavigationBar: true,
+            showDocumentLabel: true,  
           },
           style: { flex: 1 }
         }
@@ -182,11 +185,11 @@ var examples = [
       "Customize the sharing options for a document.",
     action: () => {
       PSPDFKit.present("PDFs/Annual Report.pdf", {
-        scrollDirection: "horizontal",
+        pageScrollDirection: "horizontal",
         backgroundColor: processColor("white"),
-        thumbnailBarMode: "scrollable",
+        showThumbnailBar: "scrollable",
         pageTransition: "scrollContinuous",
-        scrollDirection: "vertical",
+        pageScrollDirection: "vertical",
         sharingConfigurations: [
         	{
         		annotationOptions: ["flatten"],
@@ -293,7 +296,7 @@ class SplitPDF extends Component {
           document={"PDFs/Annual Report.pdf"}
           configuration={{
             backgroundColor: processColor("lightgrey"),
-            thumbnailBarMode: "scrollable"
+            showThumbnailBar: "scrollable"
           }}
           pageIndex={4}
           showCloseButton={true}
@@ -304,7 +307,7 @@ class SplitPDF extends Component {
           document={"PDFs/Business Report.pdf"}
           configuration={{
             pageTransition: "scrollContinuous",
-            scrollDirection: "vertical",
+            pageScrollDirection: "vertical",
             pageMode: "single"
           }}
           style={{ flex: 1, color: "#9932CC" }}
@@ -334,7 +337,7 @@ class EventListeners extends Component {
           document={"PDFs/Annual Report.pdf"}
           configuration={{
             backgroundColor: processColor("lightgrey"),
-            thumbnailBarMode: "scrollable",
+            showThumbnailBar: "scrollable",
             useParentNavigationBar: true
           }}
           style={{ flex: 1, color: pspdfkitColor }}
@@ -387,7 +390,7 @@ class ChangePages extends Component {
           document={"PDFs/Annual Report.pdf"}
           configuration={{
             backgroundColor: processColor("lightgrey"),
-            thumbnailBarMode: "scrollable",
+            showThumbnailBar: "scrollable",
             useParentNavigationBar: true
           }}
           pageIndex={this.state.currentPageIndex}
@@ -470,7 +473,7 @@ class AnnotationCreationMode extends Component {
           document={"PDFs/Annual Report.pdf"}
           configuration={{
             backgroundColor: processColor("lightgrey"),
-            thumbnailBarMode: "scrollable",
+            showThumbnailBar: "scrollable",
             useParentNavigationBar: true
           }}
           menuItemGrouping={['freetext', {key: 'markup', items: ['highlight', "underline"]}, 'ink', 'image']}
@@ -522,7 +525,7 @@ class ManualSave extends Component {
           disableAutomaticSaving={true}
           configuration={{
             backgroundColor: processColor("lightgrey"),
-            thumbnailBarMode: "scrollable",
+            showThumbnailBar: "scrollable",
             useParentNavigationBar: true
           }}
           style={{ flex: 1, color: pspdfkitColor }}
@@ -566,7 +569,7 @@ class ProgrammaticAnnotations extends Component {
           disableAutomaticSaving={true}
           configuration={{
             backgroundColor: processColor("lightgrey"),
-            thumbnailBarMode: "scrollable",
+            showThumbnailBar: "scrollable",
             useParentNavigationBar: true
           }}
           style={{ flex: 1, color: pspdfkitColor }}
@@ -812,7 +815,7 @@ class ProgrammaticFormFilling extends Component {
           disableAutomaticSaving={true}
           configuration={{
             backgroundColor: processColor("lightgrey"),
-            thumbnailBarMode: "scrollable",
+            showThumbnailBar: "scrollable",
             useParentNavigationBar: true
           }}
           style={{ flex: 1, color: pspdfkitColor }}
