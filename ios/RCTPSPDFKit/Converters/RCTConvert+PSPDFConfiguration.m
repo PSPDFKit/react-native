@@ -53,8 +53,10 @@ RCT_ENUM_CONVERTER(PSPDFLinkAction,
 
 RCT_ENUM_CONVERTER(PSPDFUserInterfaceViewMode,
                    (@{@"always" : @(PSPDFUserInterfaceViewModeAlways),
+                      @"alwaysVisible" : @(PSPDFUserInterfaceViewModeAlways),
                       @"automatic" : @(PSPDFUserInterfaceViewModeAutomatic),
                       @"automaticNoFirstLastPage" : @(PSPDFUserInterfaceViewModeAutomaticNoFirstLastPage),
+                      @"alwaysHidden" : @(PSPDFUserInterfaceViewModeNever),
                       @"never" : @(PSPDFUserInterfaceViewModeNever)}),
                    PSPDFUserInterfaceViewModeAutomatic,
                    unsignedIntegerValue)
@@ -68,6 +70,7 @@ RCT_ENUM_CONVERTER(PSPDFUserInterfaceViewAnimation,
 
 RCT_ENUM_CONVERTER(PSPDFThumbnailBarMode,
                    (@{@"none" : @(PSPDFThumbnailBarModeNone),
+                      @"default": @(PSPDFThumbnailBarModeScrubberBar),
                       @"scrubberBar" : @(PSPDFThumbnailBarModeScrubberBar),
                       @"scrollable" : @(PSPDFThumbnailBarModeScrollable)}),
                    PSPDFThumbnailBarModeNone,
