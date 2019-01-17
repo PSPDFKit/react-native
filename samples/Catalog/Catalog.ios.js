@@ -76,7 +76,8 @@ var examples = [
         pageTransition: "scrollContinuous",
         pageScrollDirection: "vertical",
         showPageLabels: false,
-        showDocumentLabel: true
+        showDocumentLabel: true,
+        inlineSearch: true
       });
     }
   },

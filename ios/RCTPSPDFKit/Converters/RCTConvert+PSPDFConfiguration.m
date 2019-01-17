@@ -355,6 +355,10 @@ RCT_MULTI_ENUM_CONVERTER(PSPDFDocumentSharingPagesOptions,
   SET(settingsOptions, PSPDFSettingsOptions)
   SET(editableAnnotationTypes, NSSet)
 
+  if (dictionary[@"inlineSearch"]) {
+    self.searchMode = [RCTConvert BOOL:dictionary[@"inlineSearch"]] ? PSPDFSearchModeInline : PSPDFSearchModeModal;
+  }
+
   if (dictionary[@"sharingConfigurations"]) {
     [self setRCTSharingConfigurations:[RCTConvert NSArray:dictionary[@"sharingConfigurations"]]];
   }
