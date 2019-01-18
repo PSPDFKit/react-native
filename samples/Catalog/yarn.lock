@@ -5431,7 +5431,7 @@ react-native-permissions@^1.1.1:
   integrity sha512-t0Ujm177bagjUOSzhpmkSz+LqFW04HnY9TeZFavDCmV521fQvFz82aD+POXqWsAdsJVOK3umJYBNNqCjC3g0hQ==
 
 "react-native-pspdfkit@file:../..":
-  version "1.22.0"
+  version "1.23.0"
 
 react-native-qrcode-scanner@^1.1.0:
   version "1.1.0"
@@ -5454,10 +5454,10 @@ react-native-safe-area-view@^0.7.0:
   dependencies:
     prop-types "^15.6.0"
 
-react-native-windows@0.53.0:
-  version "0.53.0"
-  resolved "http://registry.npmjs.org/react-native-windows/-/react-native-windows-0.53.0.tgz#445c146c89f4640ec6983aa567e039062ea96e9c"
-  integrity sha512-TZ3ZFL6nZCIiowesEQF20O5CTDEXthVz8cOIvZurJ9wakaFlnf6/vtV9zeBcwxECVPr+fp2w0SsYtoPyt9criw==
+react-native-windows@0.55.0-rc.0:
+  version "0.55.0-rc.0"
+  resolved "https://registry.yarnpkg.com/react-native-windows/-/react-native-windows-0.55.0-rc.0.tgz#ea4fd497ca9b6f7c448b80ff003c581e5711840c"
+  integrity sha512-sOxJJO/RNfnmKFU3LpQ4WiMj9+l+bMl/MHiR6W/+KiAq5An8OeuycWeI4SOWtWDKhYJXE21UAuke5G3b4ZWZkw==
   dependencies:
     chalk "^1.1.1"
     glob "^7.1.1"
