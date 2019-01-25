@@ -221,6 +221,18 @@
       <Project>{475f630c-9ea0-4cd2-823a-0bb2dbb4778a}</Project>
       <Name>ReactNativePSPDFKit</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\node_modules\react-native-fs\windows\RNFS\RNFS.csproj">
+      <Project>{746610D0-8693-11E7-A20D-BF83F7366778}</Project>
+      <Name>RNFS</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\node_modules\react-native-fs\windows\RNFS\RNFS.csproj">
+      <Project>{746610D0-8693-11E7-A20D-BF83F7366778}</Project>
+      <Name>RNFS</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\node_modules\react-native-fs\windows\RNFS\RNFS.csproj">
+      <Project>{746610D0-8693-11E7-A20D-BF83F7366778}</Project>
+      <Name>RNFS</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\node_modules\react-native-windows\ReactWindows\ReactNative\ReactNative.csproj">
       <Project>{c7673ad5-e3aa-468c-a5fd-fa38154e205c}</Project>
       <Name>ReactNative</Name>
