@@ -101,6 +101,7 @@ namespace ReactNativePSPDFKit
         /// <summary>
         /// Constants that can be used in the JS
         /// </summary>
+        [Obsolete]
         public override IReadOnlyDictionary<string, object> Constants => new Dictionary<string, object>
         {
             { VERSION_KEY, typeof(Sdk).GetTypeInfo().Assembly.GetName().Version.ToString() },
