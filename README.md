@@ -664,9 +664,8 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
 15. If the settings window opens, click on `Developer` and select `yes`.
 16. Mark `PSPDFKit SDK` and `Visual C++ Runtime` as dependencies for `YourApp`:
     Right click on `YourApp` -> Add -> Refererece... Click on Projects and tick `ReactNativePSPDFKit`. Click on Universal Windows -> Extensions and tick `PSPDFKit for UWP` and `Visual C++ 2015 Runtime for Universal Windows Platform Apps` then click ok.
-    ![Deployment Target](screenshots/windowsAddReferences.PNG)
-    ![Deployment Target](screenshots/windowsSelectRNPSPDFKit.PNG)
-    ![Deployment Target]
+    ![Add References Selection](screenshots/windowsAddReferences.PNG)
+    ![Reference Checkboxes](screenshots/windowsSelectPSPDFKit+UWP.PNG)
 17. Add an application resource to your `Appl.xaml` to reference your License key.
 
 ```diff
@@ -703,7 +702,7 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
 
 19. Change the target SDK of YourApp to >= 10.0.16299 and Min Version to >= 10.0.15063 : Right Click on YourApp -> Properties. Go to
     Application and change Target Version to >= 10.0.16299 and change Min Version to >= 10.0.15063.
-    ![Development Target](screenshots/changeVersionSDK.png)
+    ![Change SDK Version](screenshots/changeVersionSDK.png)
 20. Save Changes: File -> Save All
 21. Add the `PSPDFKitView` and `PSPDFKit` module into your `App.windows.js` file, and add a open button to allow the user
     to navigate the file system.
