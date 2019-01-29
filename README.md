@@ -665,7 +665,7 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
 16. Mark `PSPDFKit SDK` and `Visual C++ Runtime` as dependencies for `YourApp`:
     Right click on `YourApp` -> Add -> Refererece... Click on Projects and tick `ReactNativePSPDFKit`. Click on Universal Windows -> Extensions and tick `PSPDFKit for UWP` and `Visual C++ 2015 Runtime for Universal Windows Platform Apps` then click ok.
     ![Deployment Target](screenshots/windowsAddReferences.PNG)
-    ![Deployment Target](screenshots/windowsSelectRNPSPDFKit.PNG)
+    ![Deployment Target](screenshots/windowsSelectPSPDFKit+UWP.PNG)
     ![Deployment Target]
 17. Add an application resource to your `Appl.xaml` to reference your License key.
 
