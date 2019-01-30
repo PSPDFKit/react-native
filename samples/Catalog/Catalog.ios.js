@@ -31,7 +31,7 @@ PSPDFKit.setLicenseKey("YOUR_LICENSE_KEY_GOES_HERE");
 const pspdfkitColor = "#267AD4";
 const pspdfkitColorAlpha = "#267AD450";
 
-var examples = [
+const examples = [
   {
     key: "item1",
     name: "Open document using resource path",
@@ -77,7 +77,6 @@ var examples = [
         backgroundColor: processColor("white"),
         showThumbnailBar: "scrollable",
         pageTransition: "scrollContinuous",
-        pageScrollDirection: "vertical",
         showPageLabels: false,
         showDocumentLabel: true,
         inlineSearch: true
@@ -199,7 +198,6 @@ var examples = [
       "Customize the sharing options for a document.",
     action: () => {
       PSPDFKit.present("PDFs/Annual Report.pdf", {
-        pageScrollDirection: "horizontal",
         backgroundColor: processColor("white"),
         showThumbnailBar: "scrollable",
         pageTransition: "scrollContinuous",
@@ -269,7 +267,7 @@ class ExampleList extends Component {
     return <View key={rowId} style={styles.separator} />;
   }
 
-  _renderRow = ({ item, separators })=> {
+  _renderRow = ({ item }) => {
     return (
       <TouchableHighlight
         onPress={() => {
