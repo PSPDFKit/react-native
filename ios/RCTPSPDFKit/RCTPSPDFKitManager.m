@@ -63,8 +63,8 @@ RCT_EXPORT_METHOD(setPageIndex:(NSUInteger)pageIndex animated:(BOOL)animated) {
            PROPERTY(buildNumber): @(PSPDFKit.buildNumber)};
 }
 
-- (BOOL)requiresMainQueueSetup {
-  return NO;
++ (BOOL)requiresMainQueueSetup {
+  return YES;
 }
 
 @end
