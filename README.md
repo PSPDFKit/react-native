@@ -265,7 +265,7 @@ The PSPDFKit React Native iOS Wrapper allows you to specify a custom grouping fo
 - Android Build Tools 28.0.3 (PSPDFKit module)
 - Android Gradle plugin >= 3.2.1
 - PSPDFKit >= 5.0.1
-- react-native >= 0.55.4
+- react-native >= 0.57.8
 
 #### Getting Started
 
@@ -277,87 +277,65 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
 4. Add `react-native-pspdfkit` module from GitHub: `yarn add github:PSPDFKit/react-native`.
 5. Install all the dependencies for the project: `yarn install`. (Because of a [bug](https://github.com/yarnpkg/yarn/issues/2165) you may need to clean `yarn`'s cache with `yarn cache clean` before.)
 6. Link module `react-native-pspdfkit`: `react-native link react-native-pspdfkit`.
-7. <a id="step-6"></a>Add PSPDFKit and Google repository to `YourApp/android/build.gradle` so PSPDFKit library and Android dependencies can be downloaded:
+7. <a id="step-7"></a>Add PSPDFKit repository to `YourApp/android/build.gradle` so PSPDFKit library can be downloaded:
 
 ```diff
-  allprojects {
-      repositories {
-          mavenLocal()
-          jcenter()
-+         maven {
-+             url 'https://maven.google.com'
-+         }
-+         maven {
-+             url 'https://customers.pspdfkit.com/maven/'
+ allprojects {
+     repositories {
+         mavenLocal()
+         google()
+         jcenter()
++        maven {
++            url 'https://customers.pspdfkit.com/maven/'
++            credentials {
++                username 'pspdfkit'
++                password 'YOUR_MAVEN_KEY_GOES_HERE'
++            }
++        }
+         maven {
+             // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
+             url "$rootDir/../node_modules/react-native/android"
+         }
+     }
+ }
+```
 
-+             credentials {
-+                 username 'pspdfkit'
-+                 password 'YOUR_MAVEN_KEY_GOES_HERE'
-+             }
-+         }
-          maven {
-              // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
-              url "$rootDir/../node_modules/react-native/android"
-          }
-      }
+8. PSPDFKit targets modern platforms, so you'll have to set the `minSdkVersion` to 19. In `YourApp/android/build.gradle` (note **two** places to edit):
+```diff
+...
+  ext {
+-     buildToolsVersion = "28.0.2"
++     buildToolsVersion = "28.0.3"
+-     minSdkVersion = 16
++     minSdkVersion = 19
+      compileSdkVersion = 28
+      targetSdkVersion = 27
+      supportLibVersion = "28.0.0"
   }
+...
 ```
+ 
+9. We will also need to enable MultiDex and enable Java 8 support. In `YourApp/android/app/build.gradle` (note **two** places to edit):
 
-8. PSPDFKit targets modern platforms, so you'll have to update `compileSdkVersion` to at least API 28 and `targetSdkVersion` to at least API 26 and enable MultiDex. You also need to enable Java 8 support. In `YourApp/android/app/build.gradle` (note **six** places to edit):
+```diff
 
-   ```diff
+  defaultConfig {
+      applicationId "com.yourapp"
+      minSdkVersion rootProject.ext.minSdkVersion
+      targetSdkVersion rootProject.ext.targetSdkVersion
+      versionCode 1
+      versionName "1.0"
++     multiDexEnabled true
+  }
+
++ compileOptions {
++     sourceCompatibility JavaVersion.VERSION_1_8
++     targetCompatibility JavaVersion.VERSION_1_8
++ }
    ...
-   android {
-   -   compileSdkVersion 23
-   +   compileSdkVersion 28
-   -   buildToolsVersion "23.0.1"
-   +   buildToolsVersion "28.0.3"
-
-   defaultConfig {
-       applicationId "com.yourapp"
-   +   multiDexEnabled true
-   -   minSdkVersion 16
-   +   minSdkVersion 19
-   -   targetSdkVersion 22
-   +   targetSdkVersion 26
-       versionCode 1
-       versionName "1.0"
-       ndk {
-           abiFilters "armeabi-v7a", "x86"
-       }
-   }
-
-   compileOptions {
-   +   sourceCompatibility JavaVersion.VERSION_1_8
-   +   targetCompatibility JavaVersion.VERSION_1_8
-   }
-   ...
-   ```
-
-9. As of version `0.55.4` react-native doesn't support the Android gradle plugin version `3.2.1` so in order to make bundling work we need to add a gradle task that will move the bundle assets to the correct location. In `YourApp/android/app/build.gradle` add:
-
-```
-task copyDebugJsAndAssets(type: Copy) {
-    from "$buildDir/intermediates/assets/debug"
-    into "$buildDir/intermediates/merged_assets/debug/mergeDebugAssets/out"
-}
-
-task copyReleaseJsAndAssets(type: Copy) {
-    from "$buildDir/intermediates/assets/release"
-    into "$buildDir/intermediates/merged_assets/release/mergeReleaseAssets/out"
-}
-
-tasks.whenTaskAdded { task ->
-    if (task.name.equalsIgnoreCase('bundleDebugJsAndAssets')) {
-        task.finalizedBy(copyDebugJsAndAssets)
-    }
-    if (task.name.equalsIgnoreCase('bundleReleaseJsAndAssets')) {
-        task.finalizedBy(copyReleaseJsAndAssets)
-    }
-}
 ```
 
-10. <a id="step-8"></a>Enter your PSPDFKit license key into `YourApp/android/app/src/main/AndroidManifest.xml` file:
+10. <a id="step-10"></a>Enter your PSPDFKit license key into `YourApp/android/app/src/main/AndroidManifest.xml` file:
 
 ```diff
    <application>
@@ -382,7 +360,7 @@ with
 <item name="colorPrimary">#3C97C9</item>
 ```
 
-12. <a id="step-10"></a>Replace the default component from `YourApp/App.js` with a simple touch area to present a PDF document from the local device filesystem:
+12. <a id="step-12"></a>Replace the default component from `YourApp/App.js` with a simple touch area to present a PDF document from the local device filesystem:
 
 ```javascript
 import React, { Component } from "react";
@@ -554,7 +532,7 @@ From root project folder (e.g.`YourApp` for upgrading example project) launch `y
 
 ##### Migrate from PSPDFKit version 2.9.x to 3.0.0
 
-After launching `yarn upgrade`, apply [step 6](#step-6), [step 8](#step-8) and [step 10](#step-10) from [Getting Started](#getting-started-1) section.  
+After launching `yarn upgrade`, apply [step 7](#step-7), [step 10](#step-10) and [step 12](#step-12) from [Getting Started](#getting-started-1) section.  
 Enable MultiDex in `YourApp/android/app/build.gradle` (note **one** place to edit):
 
 ```diff
