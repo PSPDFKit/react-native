@@ -124,6 +124,24 @@ namespace ReactNativePSPDFKit
             }
         }
 
+        internal void GetToolbarItems(int requestId)
+        {
+            try
+            {
+                var toolbarItems = Pdfview.Controller.GetToolbarItems();
+
+                this.GetReactContext().GetNativeModule<UIManagerModule>().EventDispatcher.DispatchEvent(
+                    new PdfViewDataReturnedEvent(this.GetTag(), requestId, toolbarItems)
+                );
+            }
+            catch (Exception e)
+            {
+                this.GetReactContext().GetNativeModule<UIManagerModule>().EventDispatcher.DispatchEvent(
+                    new PdfViewDataReturnedEvent(this.GetTag(), requestId, e.Message)
+                );
+            }
+        }
+
         internal async Task SetPageIndexAsync(int index)
         {
            await PDFView.Controller.SetCurrentPageIndexAsync(index);

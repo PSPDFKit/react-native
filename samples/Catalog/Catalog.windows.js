@@ -127,6 +127,14 @@ var examples = [
         })
         .finally(() => PSPDFKitLibrary.DeleteAllLibraries());
     }
+  },
+  {
+    key: "item7",
+    name: "Get and Set Toolbar items",
+    description: "An example to show how to customize the toolbar UI.",
+    action: async component => {
+      component.props.navigation.navigate("PdfViewToolbarCustomization");
+    }
   }
 ];
 
@@ -334,6 +342,38 @@ class PdfViewInstantJsonScreen extends Component<{}> {
   }
 }
 
+class PdfViewToolbarCustomizationScreen extends Component<{}> {
+  render() {
+    return (
+    <View style={styles.page}>
+      <PSPDFKitView
+    ref="pdfView"
+    style={styles.pdfView}
+    // The default file to open.
+    document="ms-appx:///Assets/pdf/annualReport.pdf"
+      />
+      <View style={styles.footer}>
+      <View style={styles.button}>
+      <Button onPress= {() =>
+        this.refs.pdfView.getToolbarItems().then(toolbarItems => {
+                alert(JSON.stringify(toolbarItems));
+        })} title="Get Toolbar Items" />
+            <Button onPress={() =>
+this.refs.pdfView.setToolbarItems([{ type: "ink" }])} title="Set Toolbar Items" />
+  </View>
+  <Image
+  source={require("./assets/logo-flat.png")}
+style={styles.logo}
+  />
+  <Text style={styles.version}>
+  SDK Version : {PSPDFKit.versionString}
+</Text>
+  </View>
+  </View>
+);
+}
+}
+
 export default StackNavigator(
   {
     Catalog: {
@@ -347,6 +387,9 @@ export default StackNavigator(
     },
     PdfViewInstantJsonScreen: {
       screen: PdfViewInstantJsonScreen
+    },
+    PdfViewToolbarCustomization: {
+      screen: PdfViewToolbarCustomizationScreen
     }
   },
   {
