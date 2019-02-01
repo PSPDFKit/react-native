@@ -315,7 +315,7 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
 ...
 ```
  
-9. We will also need to enable MultiDex and enable Java 8 support. In `YourApp/android/app/build.gradle` (note **two** places to edit):
+9. We will also need to enable MultiDex and Java 8 support. In `YourApp/android/app/build.gradle` (note **two** places to edit):
 
 ```diff
 
