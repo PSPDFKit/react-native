@@ -39,9 +39,10 @@ namespace ReactNativePSPDFKit
             Sdk.Initialize(license);
         }
 
-        public override void OnReactInstanceDispose()
+        public override Task OnReactInstanceDisposeAsync()
         {
             DisposeNativeLibraries();
+            return base.OnReactInstanceDisposeAsync();
         }
 
         /// <summary>

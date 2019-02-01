@@ -63,7 +63,7 @@ namespace ReactNativePSPDFKit
             view.SetShowToolbar(!hideNavigationBar);
         }
 
-        public override IReadOnlyDictionary<string, object> CommandsMap => new Dictionary<string, object>
+        public override JObject ViewCommandsMap => new JObject
         {
             {
                 "enterAnnotationCreationMode", COMMAND_ENTER_ANNOTATION_CREATION_MODE
@@ -116,33 +116,33 @@ namespace ReactNativePSPDFKit
             }
         }
 
-        public override IReadOnlyDictionary<string, object> ExportedCustomDirectEventTypeConstants =>
-            new Dictionary<string, object>
+        public override JObject CustomDirectEventTypeConstants =>
+            new JObject
             {
                 {
                     PdfViewAnnotationChangedEvent.EVENT_NAME,
-                    new Dictionary<string, object>
+                    new JObject
                     {
                         {"registrationName", "onAnnotationsChanged"},
                     }
                 },
                 {
                     PdfViewDocumentSavedEvent.EVENT_NAME,
-                    new Dictionary<string, object>
+                    new JObject
                     {
                         {"registrationName", "onDocumentSaved"},
                     }
                 },
                 {
                     PdfViewDocumentSaveFailedEvent.EVENT_NAME,
-                    new Dictionary<string, object>
+                    new JObject
                     {
                         {"registrationName", "onDocumentSaveFailed"},
                     }
                 },
                 {
                     PdfViewDataReturnedEvent.EVENT_NAME,
-                    new Dictionary<string, object>
+                    new JObject
                     {
                         {"registrationName", "onDataReturned"},
                     }
