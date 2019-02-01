@@ -14,7 +14,7 @@ import {
   Button,
   Image,
   TouchableHighlight,
-  ListView,
+  FlatList,
   NativeModules,
   processColor,
   NavigatorIOS,
@@ -31,8 +31,9 @@ PSPDFKit.setLicenseKey("YOUR_LICENSE_KEY_GOES_HERE");
 const pspdfkitColor = "#267AD4";
 const pspdfkitColorAlpha = "#267AD450";
 
-var examples = [
+const examples = [
   {
+    key: "item1",
     name: "Open document using resource path",
     description: "Open document from your resource bundle with relative path.",
     action: () => {
@@ -40,6 +41,7 @@ var examples = [
     }
   },
   {
+    key: "item2",
     name: "Open document with absolute path",
     description:
       "Opens document from application Documents directory by passing the absolute path.",
@@ -65,6 +67,7 @@ var examples = [
     }
   },
   {
+    key: "item3",
     name: "Configured Controller",
     description:
       "You can configure the controller with dictionary representation of the PSPDFConfiguration object.",
@@ -74,7 +77,6 @@ var examples = [
         backgroundColor: processColor("white"),
         showThumbnailBar: "scrollable",
         pageTransition: "scrollContinuous",
-        pageScrollDirection: "vertical",
         showPageLabels: false,
         showDocumentLabel: true,
         inlineSearch: true
@@ -82,6 +84,7 @@ var examples = [
     }
   },
   {
+    key: "item4",
     name: "PDF View Component",
     description:
       "Show how to use the PSPDFKitView component with NavigatorIOS.",
@@ -101,6 +104,7 @@ var examples = [
     }
   },
   {
+    key: "item5",
     name: "Event Listeners",
     description:
       "Show how to use the listeners exposed by PSPDFKitView component.",
@@ -112,6 +116,7 @@ var examples = [
     }
   },
   {
+    key: "item6",
     name: "Change Pages Buttons",
     description: "Adds a toolbar at the bottom with buttons to change pages.",
     action: component => {
@@ -122,6 +127,7 @@ var examples = [
     }
   },
   {
+    key: "item7",
     name: "Enter and Exit the Annotation Creation Mode",
     description:
       "Adds a toolbar at the bottom with a button to toggle the annotation toolbar.",
@@ -133,6 +139,7 @@ var examples = [
     }
   },
   {
+    key: "item8",
     name: "Manual Save",
     description:
       "Adds a toolbar at the bottom with a Save button and disables automatic saving.",
@@ -144,6 +151,7 @@ var examples = [
     }
   },
   {
+    key: "item9",
     name: "Split PDF",
     description: "Show two PDFs side by side by using PSPDFKitView components.",
     action: component => {
@@ -151,6 +159,7 @@ var examples = [
     }
   },
   {
+    key: "item10",
     name: "Programmatic Annotations",
     description: "Shows how to get and add new annotations using Instant JSON.",
     action: component => {
@@ -161,6 +170,7 @@ var examples = [
     }
   },
   {
+    key: "item11",
     name: "Programmatic Form Filling",
     description:
       "Shows how to get the value of a form element and how to programmatically fill forms.",
@@ -172,6 +182,7 @@ var examples = [
     }
   },
   {
+    key: "item12",
     name: "Debug Log",
     description:
       "Action used for printing stuff during development and debugging.",
@@ -181,12 +192,12 @@ var examples = [
     }
   },
   {
+    key: "item13",
     name: "Custom Sharing Options",
     description:
       "Customize the sharing options for a document.",
     action: () => {
       PSPDFKit.present("PDFs/Annual Report.pdf", {
-        pageScrollDirection: "horizontal",
         backgroundColor: processColor("white"),
         showThumbnailBar: "scrollable",
         pageTransition: "scrollContinuous",
@@ -211,13 +222,11 @@ class ExampleList extends Component {
     this.setState({ modalVisible: false });
   };
 
+  // Initialize the hardcoded data
   constructor(props) {
     super(props);
-    const ds = new ListView.DataSource({
-      rowHasChanged: (r1, r2) => r1 !== r2
-    });
     this.state = {
-      dataSource: ds.cloneWithRows(examples),
+      dataSource: examples,
       modalVisible: false
     };
   }
@@ -233,11 +242,11 @@ class ExampleList extends Component {
         >
           <SplitPDF onClose={this.closeModal} style={{ flex: 1 }} />
         </Modal>
-        <ListView
-          dataSource={this.state.dataSource}
-          renderHeader={this._renderHeader}
-          renderRow={this._renderRow}
-          renderSeparator={this._renderSeparator}
+        <FlatList
+          data={this.state.dataSource}
+          renderItem={this._renderRow}
+          ListHeaderComponent={this._renderHeader()}
+          ItemSeparatorComponent={this._renderSeparator}
           contentContainerStyle={styles.listContainer}
           style={styles.list}
         />
@@ -258,18 +267,18 @@ class ExampleList extends Component {
     return <View key={rowId} style={styles.separator} />;
   }
 
-  _renderRow = example => {
+  _renderRow = ({ item }) => {
     return (
       <TouchableHighlight
         onPress={() => {
-          example.action(this);
+          item.action(this);
         }}
         style={styles.row}
         underlayColor={pspdfkitColorAlpha}
       >
         <View style={styles.rowContent}>
-          <Text style={styles.name}>{example.name}</Text>
-          <Text style={styles.description}>{example.description}</Text>
+          <Text style={styles.name}>{item.name}</Text>
+          <Text style={styles.description}>{item.description}</Text>
         </View>
       </TouchableHighlight>
     );
