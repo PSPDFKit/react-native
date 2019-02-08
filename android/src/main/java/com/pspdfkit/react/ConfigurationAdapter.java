@@ -13,18 +13,18 @@
 
 package com.pspdfkit.react;
 
-import android.app.Activity;
 import android.content.Context;
-import android.support.annotation.NonNull;
 
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableMapKeySetIterator;
-import com.pspdfkit.configuration.activity.UserInterfaceViewMode;
 import com.pspdfkit.configuration.activity.PdfActivityConfiguration;
 import com.pspdfkit.configuration.activity.ThumbnailBarMode;
+import com.pspdfkit.configuration.activity.UserInterfaceViewMode;
 import com.pspdfkit.configuration.page.PageFitMode;
 import com.pspdfkit.configuration.page.PageScrollDirection;
 import com.pspdfkit.configuration.page.PageScrollMode;
+
+import androidx.annotation.NonNull;
 
 public class ConfigurationAdapter {
     private static final String PAGE_SCROLL_DIRECTION = "pageScrollDirection";

@@ -1,8 +1,6 @@
 package com.pspdfkit.react;
 
 import android.app.Activity;
-import android.support.annotation.NonNull;
-import android.support.v4.app.FragmentActivity;
 
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
@@ -29,6 +27,8 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
+import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentActivity;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;

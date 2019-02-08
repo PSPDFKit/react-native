@@ -1,9 +1,6 @@
 package com.pspdfkit.react.menu;
 
 import android.content.Context;
-import android.support.annotation.IdRes;
-import android.support.annotation.IntRange;
-import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.facebook.react.bridge.Dynamic;
@@ -17,6 +14,10 @@ import com.pspdfkit.ui.toolbar.grouping.presets.PresetMenuItemGroupingRule;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.annotation.IdRes;
+import androidx.annotation.IntRange;
+import androidx.annotation.NonNull;
 
 /**
  * A menu item grouping rule that displays only the menu items configured via the menuItemGrouping prop.

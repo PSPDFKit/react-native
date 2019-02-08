@@ -2,15 +2,13 @@ package com.pspdfkit.views;
 
 import android.content.Context;
 import android.net.Uri;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentManager;
 import android.util.AttributeSet;
 import android.util.Pair;
 import android.view.Choreographer;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.uimanager.events.EventDispatcher;
@@ -54,6 +52,9 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.FragmentManager;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.Single;

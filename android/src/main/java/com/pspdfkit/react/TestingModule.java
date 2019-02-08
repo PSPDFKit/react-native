@@ -1,12 +1,13 @@
 package com.pspdfkit.react;
 
-import android.support.annotation.NonNull;
 
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 
 import java.util.HashMap;
+
+import androidx.annotation.NonNull;
 
 public class TestingModule extends ReactContextBaseJavaModule {
 

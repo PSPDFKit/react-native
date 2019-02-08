@@ -1,12 +1,13 @@
 package com.pspdfkit.react.events;
 
-import android.support.annotation.IdRes;
-import android.support.annotation.NonNull;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.uimanager.events.Event;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
+
+import androidx.annotation.IdRes;
+import androidx.annotation.NonNull;
 
 /**
  * Event sent by the {@link com.pspdfkit.views.PdfView} when the document save failed.

@@ -1,8 +1,5 @@
 package com.pspdfkit.views;
 
-import android.support.annotation.NonNull;
-
-import com.pspdfkit.react.R;
 import com.pspdfkit.ui.forms.FormEditingBar;
 import com.pspdfkit.ui.inspector.PropertyInspectorCoordinatorLayout;
 import com.pspdfkit.ui.inspector.annotation.DefaultAnnotationCreationInspectorController;
@@ -21,6 +18,8 @@ import com.pspdfkit.ui.toolbar.ToolbarCoordinatorLayout;
 import com.pspdfkit.ui.toolbar.grouping.MenuItemGroupingRule;
 
 import javax.annotation.Nullable;
+
+import androidx.annotation.NonNull;
 
 /**
  * Keeps track of the currently active mode and handles updating the toolbar states.

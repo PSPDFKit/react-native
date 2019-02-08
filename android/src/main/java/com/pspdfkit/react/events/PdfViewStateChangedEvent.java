@@ -1,12 +1,13 @@
 package com.pspdfkit.react.events;
 
 
-import android.support.annotation.IdRes;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.uimanager.events.Event;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
+
+import androidx.annotation.IdRes;
 
 /**
  * Event sent by the {@link com.pspdfkit.views.PdfView} containing info about the current state.

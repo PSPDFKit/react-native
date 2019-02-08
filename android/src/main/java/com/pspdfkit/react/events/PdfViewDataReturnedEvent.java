@@ -1,7 +1,5 @@
 package com.pspdfkit.react.events;
 
-import android.support.annotation.IdRes;
-import android.support.annotation.NonNull;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableMap;
@@ -17,6 +15,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import androidx.annotation.IdRes;
+import androidx.annotation.NonNull;
 
 public class PdfViewDataReturnedEvent extends Event<PdfViewDataReturnedEvent> {
 

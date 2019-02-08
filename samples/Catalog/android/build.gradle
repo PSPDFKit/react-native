@@ -36,3 +36,48 @@ allprojects {
         }
     }
 }
+
+// This will create the mapping from the old support library classes to their AndroidX equivalents.
+def androidXMapping = [:]
+new File("$projectDir/androidx-class-mapping.csv").splitEachLine(",") { fields ->
+    androidXMapping[fields[0]] = fields[1]
+}
+
+allprojects {
+
+    // This task copies all sources of the project to a temporary folder and replaces all mentions
+    // of support library classes with their AndroidX equivalents using our mapping.
+    task updateImports(type: Copy) {
+        from "$buildDir/../src/main/java"
+        into "$buildDir/generated/source/updatedImports"
+        filter { line ->
+            androidXMapping.each { support, androidX ->
+                line = line.replaceAll(support, androidX)
+            }
+            return line
+        }
+    }
+
+    tasks.all { task ->
+        // We wanna modify all compile tasks.
+        if (task.name.endsWith("JavaWithJavac")) {
+
+            // We need to generate the updated sources first.
+            task.dependsOn updateImports
+
+            // Before the task is executed change the source set it operates on.
+            task.doFirst {
+                def newSource = task.getSource().matching {
+                    // We remove the original Java sources folder.
+                    exclude {
+                        return it.file.path.contains('src/main/java')
+                    }
+                    // Then add our modified sources instead.
+                }.plus(fileTree("$buildDir/generated/source/updatedImports"))
+
+                // Finally actually update the task to use our new sources.
+                task.source = newSource
+            }
+        }
+    }
+}

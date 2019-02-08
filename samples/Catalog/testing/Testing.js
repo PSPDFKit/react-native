@@ -7,7 +7,7 @@ import {
     Button,
     Image,
     TouchableHighlight,
-    ListView,
+    FlatList,
     NativeModules,
     processColor,
     PermissionsAndroid,
@@ -56,21 +56,21 @@ class CatalogScreen extends Component<{}> {
     // Initialize the hardcoded data
     constructor(props) {
         super(props);
-        const ds = new ListView.DataSource({
-            rowHasChanged: (r1, r2) => r1 !== r2
-        });
         this.state = {
-            dataSource: ds.cloneWithRows(examples)
+            dataSource: examples
         };
     }
+
+    _keyExtractor = (item, index) => item.name;
 
     render() {
         return (
             <View style={styles.page}>
-                <ListView
-                    dataSource={this.state.dataSource}
-                    renderRow={this._renderRow}
-                    renderSeparator={this._renderSeparator}
+                <FlatList
+                    data={this.state.dataSource}
+                    renderItem={this._renderItem}
+                    ItemSeparatorComponent={this._renderSeparator}
+                    keyExtractor={this._keyExtractor}
                     contentContainerStyle={styles.listContainer}
                     style={styles.list}
                 />
@@ -82,17 +82,17 @@ class CatalogScreen extends Component<{}> {
         return <View key={rowId} style={styles.separator} />;
     }
 
-    _renderRow = example => {
+    _renderItem = ({ item }) => {
         return (
             <TouchableHighlight
                 onPress={() => {
-                    example.action(this);
+                    item.action(this);
                 }}
                 style={styles.row}
                 underlayColor="#209cca50"
             >
                 <View style={styles.rowContent}>
-                    <Text style={styles.name}>{example.name}</Text>
+                    <Text style={styles.name}>{item.name}</Text>
                 </View>
             </TouchableHighlight>
         );

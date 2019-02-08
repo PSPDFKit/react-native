@@ -1,13 +1,14 @@
 package com.pspdfkit.react.helper;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import com.pspdfkit.document.providers.DataProvider;
 
 import org.json.JSONObject;
 
 import java.nio.charset.Charset;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 /**
  * {@link DataProvider} that is used when adding document instant json.

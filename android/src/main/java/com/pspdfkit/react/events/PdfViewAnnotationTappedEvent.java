@@ -1,7 +1,5 @@
 package com.pspdfkit.react.events;
 
-import android.support.annotation.IdRes;
-import android.support.annotation.NonNull;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableMap;
@@ -14,6 +12,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Map;
+
+import androidx.annotation.IdRes;
+import androidx.annotation.NonNull;
 
 /**
  * Event sent by the {@link com.pspdfkit.views.PdfView} when an annotation was selected.

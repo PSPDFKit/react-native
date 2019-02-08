@@ -264,7 +264,7 @@ The PSPDFKit React Native iOS Wrapper allows you to specify a custom grouping fo
 - Android Build Tools 23.0.1 (React Native)
 - Android Build Tools 28.0.3 (PSPDFKit module)
 - Android Gradle plugin >= 3.2.1
-- PSPDFKit >= 5.0.1
+- PSPDFKit >= 5.2.0
 - react-native >= 0.57.8
 
 #### Getting Started
@@ -335,7 +335,65 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
    ...
 ```
 
-10. <a id="step-10"></a>Enter your PSPDFKit license key into `YourApp/android/app/src/main/AndroidManifest.xml` file:
+10. PSPDFKit also uses AndroidX so you need to enable this as well in your `gradle.properties`:
+
+```diff
++ android.useAndroidX=true
++ android.enableJetifier=true
+```
+
+Since react-native doesn't have support for AndroidX yet we provide a small gradle script you need to add to the end of your top-level `build.gradle`:
+
+```groovy
+// This will create the mapping from the old support library classes to their AndroidX equivalents.
+def androidXMapping = [:]
+new File("$projectDir/androidx-class-mapping.csv").splitEachLine(",") { fields ->
+    androidXMapping[fields[0]] = fields[1]
+}
+
+allprojects {
+
+    // This task copies all sources of the project to a temporary folder and replaces all mentions
+    // of support library classes with their AndroidX equivalents using our mapping.
+    task updateImports(type: Copy) {
+        from "$buildDir/../src/main/java"
+        into "$buildDir/generated/source/updatedImports"
+        filter { line ->
+            androidXMapping.each { support, androidX ->
+                line = line.replaceAll(support, androidX)
+            }
+            return line
+        }
+    }
+
+    tasks.all { task ->
+        // We wanna modify all compile tasks.
+        if (task.name.endsWith("JavaWithJavac")) {
+
+            // We need to generate the updated sources first.
+            task.dependsOn updateImports
+
+            // Before the task is executed change the source set it operates on.
+            task.doFirst {
+                def newSource = task.getSource().matching {
+                    // We remove the original Java sources folder.
+                    exclude {
+                        return it.file.path.contains('src/main/java')
+                    }
+                    // Then add our modified sources instead.
+                }.plus(fileTree("$buildDir/generated/source/updatedImports"))
+
+                // Finally actually update the task to use our new sources.
+                task.source = newSource
+            }
+        }
+    }
+}
+```
+
+You also need to add the [androidx-class-mapping.csv][] to the root of you project. With these things in place all support library imports will automatically replaced by their AndroidX counterparts. 
+
+11. <a id="step-11"></a>Enter your PSPDFKit license key into `YourApp/android/app/src/main/AndroidManifest.xml` file:
 
 ```diff
    <application>
@@ -348,7 +406,7 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
    </application>
 ```
 
-11. Set primary color. In `YourApp/android/app/src/main/res/values/styles.xml` replace
+12. Set primary color. In `YourApp/android/app/src/main/res/values/styles.xml` replace
 
 ```xml
 <!-- Customize your theme here. -->
@@ -360,7 +418,7 @@ with
 <item name="colorPrimary">#3C97C9</item>
 ```
 
-12. <a id="step-12"></a>Replace the default component from `YourApp/App.js` with a simple touch area to present a PDF document from the local device filesystem:
+13. <a id="step-13"></a>Replace the default component from `YourApp/App.js` with a simple touch area to present a PDF document from the local device filesystem:
 
 ```javascript
 import React, { Component } from "react";
@@ -432,13 +490,13 @@ const styles = StyleSheet.create({
 });
 ```
 
-13. Before launching the app you need to copy a PDF document onto your development device or emulator.
+14. Before launching the app you need to copy a PDF document onto your development device or emulator.
 
     ```bash
     adb push /path/to/your/document.pdf /sdcard/document.pdf
     ```
 
-14. Your app is now ready to launch. From `YourApp` directory run `react-native run-android`.
+15. Your app is now ready to launch. From `YourApp` directory run `react-native run-android`.
 
     ```bash
     react-native run-android

@@ -1,8 +1,6 @@
 package com.pspdfkit.views;
 
 import android.graphics.PointF;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.view.MotionEvent;
 
 import com.facebook.react.uimanager.events.EventDispatcher;
@@ -17,6 +15,9 @@ import com.pspdfkit.react.events.PdfViewDocumentSaveFailedEvent;
 import com.pspdfkit.react.events.PdfViewDocumentSavedEvent;
 import com.pspdfkit.ui.special_mode.controller.AnnotationSelectionController;
 import com.pspdfkit.ui.special_mode.manager.AnnotationManager;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 class PdfViewDocumentListener implements DocumentListener, AnnotationManager.OnAnnotationSelectedListener, AnnotationProvider.OnAnnotationUpdatedListener {
 
