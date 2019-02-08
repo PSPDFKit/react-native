@@ -1,5 +1,5 @@
 //
-//  Copyright © 2016-2018 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2016-2019 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -53,8 +53,10 @@ RCT_ENUM_CONVERTER(PSPDFLinkAction,
 
 RCT_ENUM_CONVERTER(PSPDFUserInterfaceViewMode,
                    (@{@"always" : @(PSPDFUserInterfaceViewModeAlways),
+                      @"alwaysVisible" : @(PSPDFUserInterfaceViewModeAlways),
                       @"automatic" : @(PSPDFUserInterfaceViewModeAutomatic),
                       @"automaticNoFirstLastPage" : @(PSPDFUserInterfaceViewModeAutomaticNoFirstLastPage),
+                      @"alwaysHidden" : @(PSPDFUserInterfaceViewModeNever),
                       @"never" : @(PSPDFUserInterfaceViewModeNever)}),
                    PSPDFUserInterfaceViewModeAutomatic,
                    unsignedIntegerValue)
@@ -68,6 +70,7 @@ RCT_ENUM_CONVERTER(PSPDFUserInterfaceViewAnimation,
 
 RCT_ENUM_CONVERTER(PSPDFThumbnailBarMode,
                    (@{@"none" : @(PSPDFThumbnailBarModeNone),
+                      @"default": @(PSPDFThumbnailBarModeScrubberBar),
                       @"scrubberBar" : @(PSPDFThumbnailBarModeScrubberBar),
                       @"scrollable" : @(PSPDFThumbnailBarModeScrollable)}),
                    PSPDFThumbnailBarModeNone,
@@ -268,6 +271,7 @@ RCT_MULTI_ENUM_CONVERTER(PSPDFDocumentSharingPagesOptions,
 @end
 
 #define SET(property, type) if (dictionary[@#property]) self.property = [RCTConvert type:dictionary[@#property]];
+#define SET_PROPERTY(reactProperty, property, type) if (dictionary[@#reactProperty]) self.property = [RCTConvert type:dictionary[@#reactProperty]];
 #define SET_OBJECT(object, property, type) if (dictionary[@#property]) object.property = [RCTConvert type:dictionary[@#property]];
 
 @implementation PSPDFConfigurationBuilder (RNAdditions)
@@ -280,6 +284,7 @@ RCT_MULTI_ENUM_CONVERTER(PSPDFDocumentSharingPagesOptions,
   SET(scrollOnTapPageEndEnabled, BOOL)
   SET(scrollOnTapPageEndAnimationEnabled, BOOL)
   SET(scrollOnTapPageEndMargin, CGFloat)
+  SET_PROPERTY(enableTextSelection, textSelectionEnabled, BOOL)
   SET(textSelectionEnabled, BOOL)
   SET(imageSelectionEnabled, BOOL)
   SET(textSelectionMode, PSPDFTextSelectionMode)
@@ -293,8 +298,11 @@ RCT_MULTI_ENUM_CONVERTER(PSPDFDocumentSharingPagesOptions,
   SET(allowedMenuActions, PSPDFTextSelectionMenuAction)
   SET(userInterfaceViewMode, PSPDFUserInterfaceViewMode)
   SET(userInterfaceViewAnimation, PSPDFUserInterfaceViewAnimation)
+  SET_PROPERTY(showThumbnailBar, thumbnailBarMode, PSPDFThumbnailBarMode)
   SET(thumbnailBarMode, PSPDFThumbnailBarMode)
+  SET_PROPERTY(showPageLabels, pageLabelEnabled, BOOL)
   SET(pageLabelEnabled, BOOL)
+  SET_PROPERTY(showDocumentLabel, documentLabelEnabled, PSPDFAdaptiveConditional)
   SET(documentLabelEnabled, PSPDFAdaptiveConditional)
   SET(shouldHideUserInterfaceOnPageChange, BOOL)
   SET(shouldShowUserInterfaceOnViewWillAppear, BOOL)
@@ -305,6 +313,7 @@ RCT_MULTI_ENUM_CONVERTER(PSPDFDocumentSharingPagesOptions,
   SET(scrubberBarType, PSPDFScrubberBarType)
   SET(thumbnailGrouping, PSPDFThumbnailGrouping)
   SET(pageTransition, PSPDFPageTransition)
+  SET_PROPERTY(pageScrollDirection, scrollDirection, PSPDFScrollDirection)
   SET(scrollDirection, PSPDFScrollDirection)
   SET(scrollViewInsetAdjustment, PSPDFScrollInsetAdjustment)
   SET(firstPageAlwaysSingle, BOOL)
@@ -348,6 +357,14 @@ RCT_MULTI_ENUM_CONVERTER(PSPDFDocumentSharingPagesOptions,
   SET(showBackForwardActionButtonLabels, BOOL)
   SET(settingsOptions, PSPDFSettingsOptions)
   SET(editableAnnotationTypes, NSSet)
+
+  if (dictionary[@"inlineSearch"]) {
+    self.searchMode = [RCTConvert BOOL:dictionary[@"inlineSearch"]] ? PSPDFSearchModeInline : PSPDFSearchModeModal;
+  }
+
+  if (dictionary[@"enableAnnotationEditing"] && [RCTConvert BOOL:dictionary[@"enableAnnotationEditing"]]) {
+    self.editableAnnotationTypes = nil;
+  }
 
   if (dictionary[@"sharingConfigurations"]) {
     [self setRCTSharingConfigurations:[RCTConvert NSArray:dictionary[@"sharingConfigurations"]]];

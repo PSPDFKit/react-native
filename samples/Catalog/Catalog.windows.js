@@ -1,4 +1,4 @@
-//  Copyright © 2018 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2018-2019 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -11,7 +11,7 @@ import {
   StyleSheet,
   Text,
   View,
-  ListView,
+  FlatList,
   Image,
   TouchableHighlight,
   NativeModules,
@@ -50,6 +50,7 @@ const simpleSearch = {
 
 var examples = [
   {
+    key: "item1",
     name: "Open assets document",
     description: "Open document from your project assets folder",
     action: component => {
@@ -57,6 +58,7 @@ var examples = [
     }
   },
   {
+    key: "item2",
     name: "Present a file from source",
     description: "Open document from source",
     action: component => {
@@ -68,6 +70,7 @@ var examples = [
     }
   },
   {
+    key: "item3",
     name: "Event Listeners",
     description:
       "Show how to use the listeners exposed by PSPDFKitView component.",
@@ -76,6 +79,7 @@ var examples = [
     }
   },
   {
+    key: "item4",
     name: "Programmatic Annotations",
     description: "Shows how to get and add new annotations using Instant JSON.",
     action: component => {
@@ -83,6 +87,7 @@ var examples = [
     }
   },
   {
+    key: "item5",
     name: "Index Full Text Search From Picker",
     description: "A simple full text search over a folder of the users choice.",
     action: async component => {
@@ -101,6 +106,7 @@ var examples = [
     }
   },
   {
+    key: "item6",
     name: "Index Full Text Search From Assets",
     description: "A simple full text search over the assets folder.",
     action: async component => {
@@ -126,11 +132,8 @@ class CatalogScreen extends Component<{}> {
   // Initialize the hardcoded data
   constructor(props) {
     super(props);
-    const ds = new ListView.DataSource({
-      rowHasChanged: (r1, r2) => r1 !== r2
-    });
     this.state = {
-      dataSource: ds.cloneWithRows(examples)
+      dataSource: examples
     };
   }
 
@@ -144,10 +147,10 @@ class CatalogScreen extends Component<{}> {
           />
           <Text style={styles.version}>{PSPDFKit.versionString}</Text>
         </View>
-        <ListView
-          dataSource={this.state.dataSource}
-          renderRow={this._renderRow}
-          renderSeparator={this._renderSeparator}
+        <FlatList
+          data={this.state.dataSource}
+          renderItem={this._renderRow}
+          ItemSeparatorComponent={this._renderSeparator}
           contentContainerStyle={styles.listContainer}
           style={styles.list}
         />
@@ -159,21 +162,20 @@ class CatalogScreen extends Component<{}> {
     return <View key={rowId} style={styles.separator} />;
   }
 
-  _renderRow = example => {
-    return (
-      <TouchableHighlight
-        onPress={() => {
-          example.action(this);
-        }}
-        style={styles.row}
-        underlayColor="#209cca50"
-      >
-        <View style={styles.rowContent}>
-          <Text style={styles.name}>{example.name}</Text>
-          <Text style={styles.description}>{example.description}</Text>
-        </View>
-      </TouchableHighlight>
-    );
+  _renderRow = ({ item, separators }) => {
+        return (
+        <TouchableHighlight
+          onPress={() => {
+            item.action(this);
+          }}
+          onShowUnderlay={separators.highlight}
+          onHideUnderlay={separators.unhighlight}>
+          <View style={styles.rowContent}>
+            <Text style={styles.name}>{item.name}</Text>
+            <Text style={styles.description}>{item.description}</Text>
+          </View>
+        </TouchableHighlight>
+    )
   };
 }
 

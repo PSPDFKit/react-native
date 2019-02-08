@@ -1,5 +1,5 @@
 ﻿//
-//  Copyright © 2018 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2018-2019 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -101,6 +101,7 @@ namespace ReactNativePSPDFKit
         /// <summary>
         /// Constants that can be used in the JS
         /// </summary>
+        [Obsolete]
         public override IReadOnlyDictionary<string, object> Constants => new Dictionary<string, object>
         {
             { VERSION_KEY, typeof(Sdk).GetTypeInfo().Assembly.GetName().Version.ToString() },

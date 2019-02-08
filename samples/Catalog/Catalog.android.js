@@ -1,4 +1,4 @@
-//   Copyright © 2018 PSPDFKit GmbH. All rights reserved.
+//   Copyright © 2018-2019 PSPDFKit GmbH. All rights reserved.
 //
 //   THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //   AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -8,14 +8,13 @@
 
 import React, { Component } from "react";
 import {
-  AppRegistry,
   StyleSheet,
   Text,
   View,
   Button,
   Image,
   TouchableHighlight,
-  ListView,
+  FlatList,
   NativeModules,
   processColor,
   PermissionsAndroid,
@@ -32,11 +31,10 @@ import PSPDFKitView from "react-native-pspdfkit";
 import { YellowBox } from "react-native";
 YellowBox.ignoreWarnings(["Warning: isMounted(...) is deprecated"]);
 
-var PSPDFKit = NativeModules.PSPDFKit;
-var RNFS = require("react-native-fs");
+const PSPDFKit = NativeModules.PSPDFKit;
+const RNFS = require("react-native-fs");
 
 const pspdfkitColor = "#267AD4";
-const pspdfkitColorAlpha = "#267AD450";
 
 const DOCUMENT = "file:///sdcard/Annual Report.pdf";
 const IMAGE_DOCUMENT = "file:///sdcard/android.png";
@@ -56,8 +54,9 @@ const CONFIGURATION = {
   showThumbnailBar: "scrollable"
 };
 
-var examples = [
+const examples = [
   {
+    key: "item1",
     name: "Open assets document",
     description: "Open document from your project assets folder",
     action: () => {
@@ -66,6 +65,7 @@ var examples = [
     }
   },
   {
+    key: "item2",
     name: "Open local document",
     description: "Open document from external storage directory.",
     action: () => {
@@ -77,6 +77,7 @@ var examples = [
     }
   },
   {
+    key: "item3",
     name: "Open local image document",
     description: "Open image image document from external storage directory.",
     action: () => {
@@ -88,6 +89,7 @@ var examples = [
     }
   },
   {
+    key: "item4",
     name: "Configuration Builder",
     description:
       "You can configure the builder with dictionary representation of the PSPDFConfiguration object.",
@@ -98,6 +100,7 @@ var examples = [
     }
   },
   {
+    key: "item5",
     name: "PDF View Component",
     description:
       "Show how to use the PSPDFKitView component with react-navigation.",
@@ -106,6 +109,7 @@ var examples = [
     }
   },
   {
+    key: "item6",
     name: "Event Listeners",
     description:
       "Show how to use the listeners exposed by PSPDFKitView component.",
@@ -114,6 +118,7 @@ var examples = [
     }
   },
   {
+    key: "item7",
     name: "Programmatic Annotations",
     description: "Shows how to get and add new annotations using Instant JSON.",
     action: component => {
@@ -121,6 +126,7 @@ var examples = [
     }
   },
   {
+    key: "item8",
     name: "Programmatic Form Filling",
     description: "Shows how to programatically read and write PDF form values.",
     action: component => {
@@ -128,6 +134,7 @@ var examples = [
     }
   },
   {
+    key: "item9",
     name: "Split PDF",
     description: "Show two PDFs side by side by using PSPDFKitView components.",
     action: component => {
@@ -135,6 +142,7 @@ var examples = [
     }
   },
   {
+    key: "item10",
     name: "Instant Example",
     description: "Shows how to open an instant document.",
     action: component => {
@@ -142,6 +150,7 @@ var examples = [
     }
   },
   {
+    key: "item11",
     name: "Debug Log",
     description:
       "Action used for printing stuff during development and debugging.",
@@ -219,11 +228,8 @@ class CatalogScreen extends Component<{}> {
   // Initialize the hardcoded data
   constructor(props) {
     super(props);
-    const ds = new ListView.DataSource({
-      rowHasChanged: (r1, r2) => r1 !== r2
-    });
     this.state = {
-      dataSource: ds.cloneWithRows(examples)
+      dataSource: examples
     };
   }
 
@@ -237,10 +243,10 @@ class CatalogScreen extends Component<{}> {
           />
           <Text style={styles.version}>{PSPDFKit.versionString}</Text>
         </View>
-        <ListView
-          dataSource={this.state.dataSource}
-          renderRow={this._renderRow}
-          renderSeparator={this._renderSeparator}
+        <FlatList
+          data={this.state.dataSource}
+          renderItem={this._renderRow}
+          ItemSeparatorComponent={this._renderSeparator}
           contentContainerStyle={styles.listContainer}
           style={styles.list}
         />
@@ -252,18 +258,18 @@ class CatalogScreen extends Component<{}> {
     return <View key={rowId} style={styles.separator} />;
   }
 
-  _renderRow = example => {
+  _renderRow = ({ item }) => {
     return (
       <TouchableHighlight
         onPress={() => {
-          example.action(this);
+          item.action(this);
         }}
         style={styles.row}
         underlayColor="#209cca50"
       >
         <View style={styles.rowContent}>
-          <Text style={styles.name}>{example.name}</Text>
-          <Text style={styles.description}>{example.description}</Text>
+          <Text style={styles.name}>{item.name}</Text>
+          <Text style={styles.description}>{item.description}</Text>
         </View>
       </TouchableHighlight>
     );
@@ -484,15 +490,6 @@ class PdfViewListenersScreen extends Component<{}> {
   }
 
   render() {
-    let buttonTitle = "";
-    if (this.state.annotationCreationActive) {
-      buttonTitle = "Exit Annotation Creation Mode";
-    } else if (this.state.annotationEditingActive) {
-      buttonTitle = "Exit Annotation Editing Mode";
-    } else {
-      buttonTitle = "Enter Annotation Creation Mode";
-    }
-
     return (
       <View style={{ flex: 1 }}>
         <PSPDFKitView
@@ -565,15 +562,6 @@ class PdfViewInstantJsonScreen extends Component<{}> {
   }
 
   render() {
-    let buttonTitle = "";
-    if (this.state.annotationCreationActive) {
-      buttonTitle = "Exit Annotation Creation Mode";
-    } else if (this.state.annotationEditingActive) {
-      buttonTitle = "Exit Annotation Editing Mode";
-    } else {
-      buttonTitle = "Enter Annotation Creation Mode";
-    }
-
     return (
       <View style={{ flex: 1 }}>
         <PSPDFKitView

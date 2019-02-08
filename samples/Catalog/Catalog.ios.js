@@ -1,4 +1,4 @@
-//  Copyright © 2016-2018 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2016-2019 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -14,7 +14,7 @@ import {
   Button,
   Image,
   TouchableHighlight,
-  ListView,
+  FlatList,
   NativeModules,
   processColor,
   NavigatorIOS,
@@ -31,8 +31,9 @@ PSPDFKit.setLicenseKey("YOUR_LICENSE_KEY_GOES_HERE");
 const pspdfkitColor = "#267AD4";
 const pspdfkitColorAlpha = "#267AD450";
 
-var examples = [
+const examples = [
   {
+    key: "item1",
     name: "Open document using resource path",
     description: "Open document from your resource bundle with relative path.",
     action: () => {
@@ -40,6 +41,7 @@ var examples = [
     }
   },
   {
+    key: "item2",
     name: "Open document with absolute path",
     description:
       "Opens document from application Documents directory by passing the absolute path.",
@@ -65,20 +67,24 @@ var examples = [
     }
   },
   {
+    key: "item3",
     name: "Configured Controller",
     description:
       "You can configure the controller with dictionary representation of the PSPDFConfiguration object.",
     action: () => {
       PSPDFKit.present("PDFs/Annual Report.pdf", {
-        scrollDirection: "horizontal",
+        pageScrollDirection: "horizontal",
         backgroundColor: processColor("white"),
-        thumbnailBarMode: "scrollable",
+        showThumbnailBar: "scrollable",
         pageTransition: "scrollContinuous",
-        scrollDirection: "vertical"
+        showPageLabels: false,
+        showDocumentLabel: true,
+        inlineSearch: true
       });
     }
   },
   {
+    key: "item4",
     name: "PDF View Component",
     description:
       "Show how to use the PSPDFKitView component with NavigatorIOS.",
@@ -88,7 +94,8 @@ var examples = [
         passProps: {
           document: "PDFs/Annual Report.pdf",
           configuration: {
-            useParentNavigationBar: true
+            useParentNavigationBar: true,
+            showDocumentLabel: true,  
           },
           style: { flex: 1 }
         }
@@ -97,6 +104,7 @@ var examples = [
     }
   },
   {
+    key: "item5",
     name: "Event Listeners",
     description:
       "Show how to use the listeners exposed by PSPDFKitView component.",
@@ -108,6 +116,7 @@ var examples = [
     }
   },
   {
+    key: "item6",
     name: "Change Pages Buttons",
     description: "Adds a toolbar at the bottom with buttons to change pages.",
     action: component => {
@@ -118,6 +127,7 @@ var examples = [
     }
   },
   {
+    key: "item7",
     name: "Enter and Exit the Annotation Creation Mode",
     description:
       "Adds a toolbar at the bottom with a button to toggle the annotation toolbar.",
@@ -129,6 +139,7 @@ var examples = [
     }
   },
   {
+    key: "item8",
     name: "Manual Save",
     description:
       "Adds a toolbar at the bottom with a Save button and disables automatic saving.",
@@ -140,6 +151,7 @@ var examples = [
     }
   },
   {
+    key: "item9",
     name: "Split PDF",
     description: "Show two PDFs side by side by using PSPDFKitView components.",
     action: component => {
@@ -147,6 +159,7 @@ var examples = [
     }
   },
   {
+    key: "item10",
     name: "Programmatic Annotations",
     description: "Shows how to get and add new annotations using Instant JSON.",
     action: component => {
@@ -157,6 +170,7 @@ var examples = [
     }
   },
   {
+    key: "item11",
     name: "Programmatic Form Filling",
     description:
       "Shows how to get the value of a form element and how to programmatically fill forms.",
@@ -168,6 +182,7 @@ var examples = [
     }
   },
   {
+    key: "item12",
     name: "Debug Log",
     description:
       "Action used for printing stuff during development and debugging.",
@@ -177,16 +192,16 @@ var examples = [
     }
   },
   {
+    key: "item13",
     name: "Custom Sharing Options",
     description:
       "Customize the sharing options for a document.",
     action: () => {
       PSPDFKit.present("PDFs/Annual Report.pdf", {
-        scrollDirection: "horizontal",
         backgroundColor: processColor("white"),
-        thumbnailBarMode: "scrollable",
+        showThumbnailBar: "scrollable",
         pageTransition: "scrollContinuous",
-        scrollDirection: "vertical",
+        pageScrollDirection: "vertical",
         sharingConfigurations: [
         	{
         		annotationOptions: ["flatten"],
@@ -207,13 +222,11 @@ class ExampleList extends Component {
     this.setState({ modalVisible: false });
   };
 
+  // Initialize the hardcoded data
   constructor(props) {
     super(props);
-    const ds = new ListView.DataSource({
-      rowHasChanged: (r1, r2) => r1 !== r2
-    });
     this.state = {
-      dataSource: ds.cloneWithRows(examples),
+      dataSource: examples,
       modalVisible: false
     };
   }
@@ -229,11 +242,11 @@ class ExampleList extends Component {
         >
           <SplitPDF onClose={this.closeModal} style={{ flex: 1 }} />
         </Modal>
-        <ListView
-          dataSource={this.state.dataSource}
-          renderHeader={this._renderHeader}
-          renderRow={this._renderRow}
-          renderSeparator={this._renderSeparator}
+        <FlatList
+          data={this.state.dataSource}
+          renderItem={this._renderRow}
+          ListHeaderComponent={this._renderHeader()}
+          ItemSeparatorComponent={this._renderSeparator}
           contentContainerStyle={styles.listContainer}
           style={styles.list}
         />
@@ -254,18 +267,18 @@ class ExampleList extends Component {
     return <View key={rowId} style={styles.separator} />;
   }
 
-  _renderRow = example => {
+  _renderRow = ({ item }) => {
     return (
       <TouchableHighlight
         onPress={() => {
-          example.action(this);
+          item.action(this);
         }}
         style={styles.row}
         underlayColor={pspdfkitColorAlpha}
       >
         <View style={styles.rowContent}>
-          <Text style={styles.name}>{example.name}</Text>
-          <Text style={styles.description}>{example.description}</Text>
+          <Text style={styles.name}>{item.name}</Text>
+          <Text style={styles.description}>{item.description}</Text>
         </View>
       </TouchableHighlight>
     );
@@ -293,7 +306,7 @@ class SplitPDF extends Component {
           document={"PDFs/Annual Report.pdf"}
           configuration={{
             backgroundColor: processColor("lightgrey"),
-            thumbnailBarMode: "scrollable"
+            showThumbnailBar: "scrollable"
           }}
           pageIndex={4}
           showCloseButton={true}
@@ -304,7 +317,7 @@ class SplitPDF extends Component {
           document={"PDFs/Business Report.pdf"}
           configuration={{
             pageTransition: "scrollContinuous",
-            scrollDirection: "vertical",
+            pageScrollDirection: "vertical",
             pageMode: "single"
           }}
           style={{ flex: 1, color: "#9932CC" }}
@@ -334,7 +347,7 @@ class EventListeners extends Component {
           document={"PDFs/Annual Report.pdf"}
           configuration={{
             backgroundColor: processColor("lightgrey"),
-            thumbnailBarMode: "scrollable",
+            showThumbnailBar: "scrollable",
             useParentNavigationBar: true
           }}
           style={{ flex: 1, color: pspdfkitColor }}
@@ -387,7 +400,7 @@ class ChangePages extends Component {
           document={"PDFs/Annual Report.pdf"}
           configuration={{
             backgroundColor: processColor("lightgrey"),
-            thumbnailBarMode: "scrollable",
+            showThumbnailBar: "scrollable",
             useParentNavigationBar: true
           }}
           pageIndex={this.state.currentPageIndex}
@@ -470,7 +483,7 @@ class AnnotationCreationMode extends Component {
           document={"PDFs/Annual Report.pdf"}
           configuration={{
             backgroundColor: processColor("lightgrey"),
-            thumbnailBarMode: "scrollable",
+            showThumbnailBar: "scrollable",
             useParentNavigationBar: true
           }}
           menuItemGrouping={['freetext', {key: 'markup', items: ['highlight', "underline"]}, 'ink', 'image']}
@@ -522,7 +535,7 @@ class ManualSave extends Component {
           disableAutomaticSaving={true}
           configuration={{
             backgroundColor: processColor("lightgrey"),
-            thumbnailBarMode: "scrollable",
+            showThumbnailBar: "scrollable",
             useParentNavigationBar: true
           }}
           style={{ flex: 1, color: pspdfkitColor }}
@@ -566,7 +579,7 @@ class ProgrammaticAnnotations extends Component {
           disableAutomaticSaving={true}
           configuration={{
             backgroundColor: processColor("lightgrey"),
-            thumbnailBarMode: "scrollable",
+            showThumbnailBar: "scrollable",
             useParentNavigationBar: true
           }}
           style={{ flex: 1, color: pspdfkitColor }}
@@ -812,7 +825,7 @@ class ProgrammaticFormFilling extends Component {
           disableAutomaticSaving={true}
           configuration={{
             backgroundColor: processColor("lightgrey"),
-            thumbnailBarMode: "scrollable",
+            showThumbnailBar: "scrollable",
             useParentNavigationBar: true
           }}
           style={{ flex: 1, color: pspdfkitColor }}
