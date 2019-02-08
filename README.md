@@ -391,7 +391,7 @@ allprojects {
 }
 ```
 
-You also need to add the [androidx-class-mapping.csv][] to the root of you project. With these things in place all support library imports will automatically replaced by their AndroidX counterparts. 
+You also need to add the [androidx-class-mapping.csv](https://raw.githubusercontent.com/PSPDFKit/react-native/a2a8720fadeef0da8ea8f26722df7cb070420773/samples/Catalog/android/androidx-class-mapping.csv) to the root of you project. With these things in place all support library imports will automatically replaced by their AndroidX counterparts. 
 
 11. <a id="step-11"></a>Enter your PSPDFKit license key into `YourApp/android/app/src/main/AndroidManifest.xml` file:
 
