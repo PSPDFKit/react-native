@@ -166,11 +166,21 @@ class PSPDFKitView extends React.Component {
    * https://pspdfkit.com/guides/web/current/customizing-the-interface/customizing-the-toolbar/.
    */
   setToolbarItems = function (toolbarItems) {
+    let requestId = this._nextRequestId++;
+    let requestMap = this._requestMap;
+
+    // We create a promise here that will be resolved once onDataReturned is called.
+    let promise = new Promise(function (resolve, reject) {
+      requestMap[requestId] = { resolve: resolve, reject: reject };
+    });
+
     UIManager.dispatchViewManagerCommand(
       findNodeHandle(this.refs.pdfView),
       UIManager.RCTPSPDFKitView.Commands.setToolbarItems,
-      [toolbarItems]
+      [requestId, toolbarItems]
     );
+
+    return promise;
   };
 }
 
