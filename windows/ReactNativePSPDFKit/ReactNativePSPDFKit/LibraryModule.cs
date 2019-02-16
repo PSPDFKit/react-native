@@ -89,9 +89,9 @@ namespace ReactNativePSPDFKit
 
             try
             {
-                var storageFolder = await StorageFolder.GetFolderFromPathAsync(path).AsTask().ConfigureAwait(false); ;
+                var storageFolder = await StorageFolder.GetFolderFromPathAsync(path).AsTask().ConfigureAwait(false);
                 // Queue up the PDFs in the folder for indexing.
-                await EnqueueDocuments(_libraries[libraryName], storageFolder).ConfigureAwait(false); ;
+                await EnqueueDocuments(_libraries[libraryName], storageFolder).ConfigureAwait(false);
 
                 promise.Resolve(null);
             }
@@ -131,7 +131,7 @@ namespace ReactNativePSPDFKit
                 }).ConfigureAwait(false); ;
 
                 // Queue up the PDFs in the folder for indexing.
-                await EnqueueDocuments(_libraries[libraryName], folder).ConfigureAwait(false); ;
+                await EnqueueDocuments(_libraries[libraryName], folder).ConfigureAwait(false);
 
                 promise.Resolve(null);
             }
