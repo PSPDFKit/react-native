@@ -9,13 +9,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Windows.Data.Json;
 using ReactNative.UIManager;
 using ReactNative.UIManager.Annotations;
 using Windows.Storage;
 using Newtonsoft.Json.Linq;
-using PSPDFKit.Pdf;
 using PSPDFKit.Pdf.Annotation;
 using PSPDFKit.UI;
 using ReactNativePSPDFKit.Events;
@@ -44,7 +42,7 @@ namespace ReactNativePSPDFKit
         public override string Name => "RCTPSPDFKitView";
 
         [ReactProp("document")]
-        public async void SetDocumentAsync(PDFViewPage view, String document)
+        public async void SetDocumentAsync(PDFViewPage view, string document)
         {
             var storagefile = await StorageFile.GetFileFromApplicationUriAsync(new Uri(document));
             await view.SetDefaultDocument(storagefile);

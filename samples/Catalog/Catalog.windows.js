@@ -26,9 +26,9 @@ var RNFS = require("react-native-fs");
 
 import { YellowBox } from "react-native";
 YellowBox.ignoreWarnings([
-    "Warning: isMounted(...) is deprecated", // React Native bug that hopefully will be fixed soon: https://github.com/facebook/react-native/issues/18868
-    "Warning: Invalid argument supplied to oneOf" // React native windows bug. 
-    ]);
+  "Warning: isMounted(...) is deprecated", // React Native bug that hopefully will be fixed soon: https://github.com/facebook/react-native/issues/18868
+  "Warning: Invalid argument supplied to oneOf" // React native windows bug. 
+]);
 
 
 const complexSearchConfiguration = {
@@ -66,7 +66,9 @@ var examples = [
       // Present can only take files loaded in the Visual studio Project's Assets. Please use RNFS.
       // See https://docs.microsoft.com/en-us/windows/uwp/files/file-access-permissions
       var path = RNFS.MainBundlePath + "\\Assets\\pdf\\Business Report.pdf";
-      PSPDFKit.Present(path);
+      PSPDFKit.Present(path)
+        .then(() => { alert("File Opened successfully"); })
+        .catch(error => { alert(error); });
     }
   },
   {
@@ -95,8 +97,8 @@ var examples = [
       await PSPDFKitLibrary.EnqueueDocumentsInFolderPicker("MyLibrary");
       alert(
         'Searching Library for "' +
-          simpleSearch.searchString +
-          '". Please wait.'
+        simpleSearch.searchString +
+        '". Please wait.'
       );
       PSPDFKitLibrary.SearchLibrary("MyLibrary", simpleSearch)
         .then(result => {
@@ -116,8 +118,8 @@ var examples = [
       await PSPDFKitLibrary.EnqueueDocumentsInFolder("AssetsLibrary", path);
       alert(
         'Searching Library for "' +
-          complexSearchConfiguration.searchString +
-          '". Please wait.'
+        complexSearchConfiguration.searchString +
+        '". Please wait.'
       );
       PSPDFKitLibrary.SearchLibrary("AssetsLibrary", complexSearchConfiguration)
         .then(result => {
@@ -163,18 +165,18 @@ class CatalogScreen extends Component<{}> {
   }
 
   _renderRow = ({ item, separators }) => {
-        return (
-        <TouchableHighlight
-          onPress={() => {
-            item.action(this);
-          }}
-          onShowUnderlay={separators.highlight}
-          onHideUnderlay={separators.unhighlight}>
-          <View style={styles.rowContent}>
-            <Text style={styles.name}>{item.name}</Text>
-            <Text style={styles.description}>{item.description}</Text>
-          </View>
-        </TouchableHighlight>
+    return (
+      <TouchableHighlight
+        onPress={() => {
+          item.action(this);
+        }}
+        onShowUnderlay={separators.highlight}
+        onHideUnderlay={separators.unhighlight}>
+        <View style={styles.rowContent}>
+          <Text style={styles.name}>{item.name}</Text>
+          <Text style={styles.description}>{item.description}</Text>
+        </View>
+      </TouchableHighlight>
     )
   };
 }
