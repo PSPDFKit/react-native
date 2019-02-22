@@ -191,6 +191,11 @@ const styles = StyleSheet.create({
   },
   rowContent: {
     padding: 10
+  },
+  buttonRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center"
   }
 });
 
@@ -227,7 +232,7 @@ class CatalogScreen extends Component<{}> {
     return <View key={rowId} style={styles.separator} />;
   }
 
-  _renderRow = ({item, separators}) => {
+  _renderRow = ({ item, separators }) => {
     return (
       <TouchableHighlight
         onPress={() => {
@@ -408,13 +413,17 @@ class PdfViewToolbarCustomizationScreen extends Component<{}> {
           document="ms-appx:///Assets/pdf/annualReport.pdf"
         />
         <View style={styles.footer}>
-          <View style={styles.button}>
-            <Button onPress={() =>
-              this.refs.pdfView.getToolbarItems().then(toolbarItems => {
-                alert(JSON.stringify(toolbarItems));
-              })} title="Get Toolbar Items" />
-            <Button onPress={() =>
-              this.refs.pdfView.setToolbarItems([{ type: "ink" }])} title="Set Toolbar Items" />
+          <View style={styles.buttonRow}>
+            <View style={styles.button}>
+              <Button onPress={() =>
+                this.refs.pdfView.getToolbarItems().then(toolbarItems => {
+                  alert(JSON.stringify(toolbarItems));
+                })} title="Get Toolbar Items" />
+            </View>
+            <View style={styles.button}>
+              <Button onPress={() =>
+                this.refs.pdfView.setToolbarItems([{ type: "ink" }])} title="Set Toolbar Items" />
+            </View>
           </View>
           <Image
             source={require("./assets/logo-flat.png")}
