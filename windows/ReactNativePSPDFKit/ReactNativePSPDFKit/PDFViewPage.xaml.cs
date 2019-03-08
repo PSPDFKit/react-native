@@ -9,7 +9,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using Windows.Data.Json;
 using PSPDFKit.UI;
 using Windows.Storage;
 using Windows.UI.Popups;
@@ -115,6 +117,39 @@ namespace ReactNativePSPDFKit
                 this.GetReactContext().GetNativeModule<UIManagerModule>().EventDispatcher.DispatchEvent(
                     new PdfViewDataReturnedEvent(this.GetTag(), requestId, annotations)
                 );
+            }
+            catch (Exception e)
+            {
+                this.GetReactContext().GetNativeModule<UIManagerModule>().EventDispatcher.DispatchEvent(
+                    new PdfViewDataReturnedEvent(this.GetTag(), requestId, e.Message)
+                );
+            }
+        }
+
+        internal void GetToolbarItems(int requestId)
+        {
+            try
+            {
+                var toolbarItems = Pdfview.Controller.GetToolbarItems();
+
+                this.GetReactContext().GetNativeModule<UIManagerModule>().EventDispatcher.DispatchEvent(
+                    new PdfViewDataReturnedEvent(this.GetTag(), requestId, toolbarItems)
+                );
+            }
+            catch (Exception e)
+            {
+                this.GetReactContext().GetNativeModule<UIManagerModule>().EventDispatcher.DispatchEvent(
+                    new PdfViewDataReturnedEvent(this.GetTag(), requestId, e.Message)
+                );
+            }
+        }
+
+        internal async Task SetToolbarItems(int requestId, string toolbarItemsJson)
+        {
+            try
+            {
+                var toolbarItems = PSPDFKit.UI.ToolbarComponents.Factory.FromJsonArray(JsonArray.Parse(toolbarItemsJson));
+                await Pdfview.Controller.SetToolbarItemsAsync(toolbarItems.ToList());
             }
             catch (Exception e)
             {

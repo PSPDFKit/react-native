@@ -20,14 +20,14 @@ import {
 import { StackNavigator } from "react-navigation";
 import PSPDFKitView from "react-native-pspdfkit";
 
-var PSPDFKit = NativeModules.ReactPSPDFKit;
-var PSPDFKitLibrary = NativeModules.ReactPSPDFKitLibrary;
-var RNFS = require("react-native-fs");
+const PSPDFKit = NativeModules.ReactPSPDFKit;
+const PSPDFKitLibrary = NativeModules.ReactPSPDFKitLibrary;
+const RNFS = require("react-native-fs");
 
 import { YellowBox } from "react-native";
+
 YellowBox.ignoreWarnings([
-  "Warning: isMounted(...) is deprecated", // React Native bug that hopefully will be fixed soon: https://github.com/facebook/react-native/issues/18868
-  "Warning: Invalid argument supplied to oneOf" // React native windows bug. 
+  "Warning: Invalid argument supplied to oneOf" // React native windows bug.
 ]);
 
 
@@ -48,7 +48,7 @@ const simpleSearch = {
   searchString: "the"
 };
 
-var examples = [
+const examples = [
   {
     key: "item1",
     name: "Open assets document",
@@ -65,7 +65,7 @@ var examples = [
       component.props.navigation.navigate("PdfView");
       // Present can only take files loaded in the Visual studio Project's Assets. Please use RNFS.
       // See https://docs.microsoft.com/en-us/windows/uwp/files/file-access-permissions
-      var path = RNFS.MainBundlePath + "\\Assets\\pdf\\Business Report.pdf";
+      const path = RNFS.MainBundlePath + "\\Assets\\pdf\\Business Report.pdf";
       PSPDFKit.Present(path)
         .then(() => { alert("File Opened successfully"); })
         .catch(error => { alert(error); });
@@ -92,7 +92,7 @@ var examples = [
     key: "item5",
     name: "Index Full Text Search From Picker",
     description: "A simple full text search over a folder of the users choice.",
-    action: async component => {
+    action: async () => {
       await PSPDFKitLibrary.OpenLibrary("MyLibrary");
       await PSPDFKitLibrary.EnqueueDocumentsInFolderPicker("MyLibrary");
       alert(
@@ -111,8 +111,8 @@ var examples = [
     key: "item6",
     name: "Index Full Text Search From Assets",
     description: "A simple full text search over the assets folder.",
-    action: async component => {
-      var path = RNFS.MainBundlePath + "\\Assets\\pdf";
+    action: async () => {
+      const path = RNFS.MainBundlePath + "\\Assets\\pdf";
 
       await PSPDFKitLibrary.OpenLibrary("AssetsLibrary");
       await PSPDFKitLibrary.EnqueueDocumentsInFolder("AssetsLibrary", path);
@@ -127,8 +127,77 @@ var examples = [
         })
         .finally(() => PSPDFKitLibrary.DeleteAllLibraries());
     }
+  },
+  {
+    key: "item7",
+    name: "Customize the toolbar",
+    description: "An example to show how to customize the toolbar UI.",
+    action: async component => {
+      component.props.navigation.navigate("PdfViewToolbarCustomization");
+    }
   }
 ];
+
+const styles = StyleSheet.create({
+  page: {
+    flex: 1,
+    alignItems: "stretch",
+    backgroundColor: "#eee"
+  },
+  pdfView: {
+    flex: 1
+  },
+  button: {
+    width: 100,
+    margin: 20
+  },
+  footer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center"
+  },
+  version: {
+    color: "#666666",
+    margin: 20
+  },
+  logo: {
+    height: 50,
+    width: 50,
+    margin: 10
+  },
+  separator: {
+    height: 0.5,
+    backgroundColor: "#ccc",
+    marginLeft: 10
+  },
+  header: {
+    alignItems: "center",
+    borderBottomWidth: 0.5,
+    borderColor: "#ccc"
+  },
+  listContainer: {
+    backgroundColor: "white"
+  },
+  list: {},
+  name: {
+    color: "#209cca",
+    fontWeight: "700",
+    fontSize: 14,
+    marginBottom: 4
+  },
+  description: {
+    color: "#666666",
+    fontSize: 12
+  },
+  rowContent: {
+    padding: 10
+  },
+  buttonRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center"
+  }
+});
 
 class CatalogScreen extends Component<{}> {
   // Initialize the hardcoded data
@@ -152,15 +221,14 @@ class CatalogScreen extends Component<{}> {
         <FlatList
           data={this.state.dataSource}
           renderItem={this._renderRow}
-          ItemSeparatorComponent={this._renderSeparator}
+          ItemSeparatorComponent={CatalogScreen._renderSeparator}
           contentContainerStyle={styles.listContainer}
-          style={styles.list}
-        />
+          style={styles.list} />
       </View>
     );
   }
 
-  _renderSeparator(sectionId, rowId) {
+  static _renderSeparator(sectionId, rowId) {
     return <View key={rowId} style={styles.separator} />;
   }
 
@@ -253,7 +321,7 @@ class PdfViewListenersScreen extends Component<{}> {
 }
 
 class PdfViewInstantJsonScreen extends Component<{}> {
-  static navigationOptions = ({ navigation }) => {
+  static navigationOptions = () => {
     return {
       title: "Programmatic Annotations"
     };
@@ -334,6 +402,42 @@ class PdfViewInstantJsonScreen extends Component<{}> {
   }
 }
 
+class PdfViewToolbarCustomizationScreen extends Component<{}> {
+  render() {
+    return (
+      <View style={styles.page}>
+        <PSPDFKitView
+          ref="pdfView"
+          style={styles.pdfView}
+          // The default file to open.
+          document="ms-appx:///Assets/pdf/annualReport.pdf"
+        />
+        <View style={styles.footer}>
+          <View style={styles.buttonRow}>
+            <View style={styles.button}>
+              <Button onPress={() =>
+                this.refs.pdfView.getToolbarItems().then(toolbarItems => {
+                  alert(JSON.stringify(toolbarItems));
+                })} title="Get Toolbar Items" />
+            </View>
+            <View style={styles.button}>
+              <Button onPress={() =>
+                this.refs.pdfView.setToolbarItems([{ type: "ink" }])} title="Set Toolbar Items" />
+            </View>
+          </View>
+          <Image
+            source={require("./assets/logo-flat.png")}
+            style={styles.logo}
+          />
+          <Text style={styles.version}>
+            SDK Version : {PSPDFKit.versionString}
+          </Text>
+        </View>
+      </View>
+    );
+  }
+}
+
 export default StackNavigator(
   {
     Catalog: {
@@ -347,65 +451,12 @@ export default StackNavigator(
     },
     PdfViewInstantJsonScreen: {
       screen: PdfViewInstantJsonScreen
+    },
+    PdfViewToolbarCustomization: {
+      screen: PdfViewToolbarCustomizationScreen
     }
   },
   {
     initialRouteName: "Catalog"
   }
 );
-
-var styles = StyleSheet.create({
-  page: {
-    flex: 1,
-    alignItems: "stretch",
-    backgroundColor: "#eee"
-  },
-  pdfView: {
-    flex: 1
-  },
-  button: {
-    width: 100,
-    margin: 20
-  },
-  footer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center"
-  },
-  version: {
-    color: "#666666",
-    margin: 20
-  },
-  logo: {
-    height: 50,
-    width: 50,
-    margin: 10
-  },
-  separator: {
-    height: 0.5,
-    backgroundColor: "#ccc",
-    marginLeft: 10
-  },
-  header: {
-    alignItems: "center",
-    borderBottomWidth: 0.5,
-    borderColor: "#ccc"
-  },
-  listContainer: {
-    backgroundColor: "white"
-  },
-  list: {},
-  name: {
-    color: "#209cca",
-    fontWeight: "700",
-    fontSize: 14,
-    marginBottom: 4
-  },
-  description: {
-    color: "#666666",
-    fontSize: 12
-  },
-  rowContent: {
-    padding: 10
-  }
-});
