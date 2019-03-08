@@ -68,7 +68,7 @@ namespace ReactNativePSPDFKit
 
                     promise.Resolve(null);
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
                     promise.Reject(e);
                 }
