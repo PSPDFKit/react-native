@@ -6,7 +6,7 @@
 //  This notice may not be removed from this file.
 //
 
-import React, { Component } from "react";
+import React, {Component} from "react";
 import {
   StyleSheet,
   Text,
@@ -17,14 +17,14 @@ import {
   NativeModules,
   Button
 } from "react-native";
-import { StackNavigator } from "react-navigation";
+import {StackNavigator} from "react-navigation";
 import PSPDFKitView from "react-native-pspdfkit";
 
 const PSPDFKit = NativeModules.ReactPSPDFKit;
 const PSPDFKitLibrary = NativeModules.ReactPSPDFKitLibrary;
 const RNFS = require("react-native-fs");
 
-import { YellowBox } from "react-native";
+import {YellowBox} from "react-native";
 
 YellowBox.ignoreWarnings([
   "Warning: Invalid argument supplied to oneOf" // React native windows bug.
@@ -41,7 +41,7 @@ const complexSearchConfiguration = {
   maximumPreviewResultsPerDocument: 0,
   maximumPreviewResultsTotal: 500,
   generateTextPreviews: true,
-  previewRange: { position: 20, length: 120 }
+  previewRange: {position: 20, length: 120}
 };
 
 const simpleSearch = {
@@ -67,8 +67,12 @@ const examples = [
       // See https://docs.microsoft.com/en-us/windows/uwp/files/file-access-permissions
       const path = RNFS.MainBundlePath + "\\Assets\\pdf\\Business Report.pdf";
       PSPDFKit.Present(path)
-        .then(() => { alert("File Opened successfully"); })
-        .catch(error => { alert(error); });
+        .then(() => {
+          alert("File Opened successfully");
+        })
+        .catch(error => {
+          alert(error);
+        });
     }
   },
   {
@@ -223,16 +227,16 @@ class CatalogScreen extends Component<{}> {
           renderItem={this._renderRow}
           ItemSeparatorComponent={CatalogScreen._renderSeparator}
           contentContainerStyle={styles.listContainer}
-          style={styles.list} />
+          style={styles.list}/>
       </View>
     );
   }
 
   static _renderSeparator(sectionId, rowId) {
-    return <View key={rowId} style={styles.separator} />;
+    return <View key={rowId} style={styles.separator}/>;
   }
 
-  _renderRow = ({ item, separators }) => {
+  _renderRow = ({item, separators}) => {
     return (
       <TouchableHighlight
         onPress={() => {
@@ -261,7 +265,7 @@ class PdfViewScreen extends Component<{}> {
         />
         <View style={styles.footer}>
           <View style={styles.button}>
-            <Button onPress={() => PSPDFKit.OpenFilePicker()} title="Open" />
+            <Button onPress={() => PSPDFKit.OpenFilePicker()} title="Open"/>
           </View>
           <Image
             source={require("./assets/logo-flat.png")}
@@ -277,13 +281,13 @@ class PdfViewScreen extends Component<{}> {
 }
 
 class PdfViewListenersScreen extends Component<{}> {
-  static navigationOptions = ({ navigation }) => {
+  static navigationOptions = ({navigation}) => {
     const params = navigation.state.params || {};
 
     return {
       title: "Event Listeners",
       headerRight: (
-        <Button onPress={() => params.handleSaveButtonPress()} title="Save" />
+        <Button onPress={() => params.handleSaveButtonPress()} title="Save"/>
       )
     };
   };
@@ -329,7 +333,7 @@ class PdfViewInstantJsonScreen extends Component<{}> {
 
   render() {
     return (
-      <View style={{ flex: 1 }}>
+      <View style={{flex: 1}}>
         <PSPDFKitView
           ref="pdfView"
           style={styles.pdfView}
@@ -355,7 +359,7 @@ class PdfViewInstantJsonScreen extends Component<{}> {
               title="Get annotations"
             />
           </View>
-          <View style={{ marginLeft: 10 }}>
+          <View style={{marginLeft: 10}}>
             <Button
               onPress={() => {
                 // This adds a new ink annotation to the first page.
@@ -418,11 +422,11 @@ class PdfViewToolbarCustomizationScreen extends Component<{}> {
               <Button onPress={() =>
                 this.refs.pdfView.getToolbarItems().then(toolbarItems => {
                   alert(JSON.stringify(toolbarItems));
-                })} title="Get Toolbar Items" />
+                })} title="Get Toolbar Items"/>
             </View>
             <View style={styles.button}>
               <Button onPress={() =>
-                this.refs.pdfView.setToolbarItems([{ type: "ink" }])} title="Set Toolbar Items" />
+                this.refs.pdfView.setToolbarItems([{type: "ink"}])} title="Set Toolbar Items"/>
             </View>
           </View>
           <Image
