@@ -111,7 +111,7 @@ namespace ReactNativePSPDFKit
                     PdfViewPage.GetToolbarItems(args[0].Value<int>());
                     break;
                 case COMMAND_SET_TOOLBAR_ITEMS:
-                    PdfViewPage.SetToolbarItems(args[0].Value<int>(), args[1].ToString());
+                    await PdfViewPage.SetToolbarItems(args[0].Value<int>(), args[1].ToString());
                     break;
             }
         }
