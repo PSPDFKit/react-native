@@ -50,7 +50,7 @@ class PSPDFKitView extends React.Component {
   };
 
   _onDataReturned = event => {
-    let { requestId, result, error } = event.nativeEvent;
+    let {requestId, result, error} = event.nativeEvent;
     let promise = this._requestMap[requestId];
     if (result) {
       promise.resolve(result);
@@ -63,35 +63,35 @@ class PSPDFKitView extends React.Component {
   /**
    * Enters the annotation creation mode, showing the annotation creation toolbar.
    */
-  enterAnnotationCreationMode = function () {
+  enterAnnotationCreationMode() {
     UIManager.dispatchViewManagerCommand(
       findNodeHandle(this.refs.pdfView),
       UIManager.RCTPSPDFKitView.Commands.enterAnnotationCreationMode,
       []
     );
-  };
+  }
 
   /**
    * Exits the currently active mode, hiding all active sub-toolbars.
    */
-  exitCurrentlyActiveMode = function () {
+  exitCurrentlyActiveMode() {
     UIManager.dispatchViewManagerCommand(
       findNodeHandle(this.refs.pdfView),
       UIManager.RCTPSPDFKitView.Commands.exitCurrentlyActiveMode,
       []
     );
-  };
+  }
 
   /**
    * Saves the currently opened document.
    */
-  saveCurrentDocument = function () {
+  saveCurrentDocument() {
     UIManager.dispatchViewManagerCommand(
       findNodeHandle(this.refs.pdfView),
       UIManager.RCTPSPDFKitView.Commands.saveCurrentDocument,
       []
     );
-  };
+  }
 
   /**
    * Gets all annotations from a specific page.
@@ -101,13 +101,13 @@ class PSPDFKitView extends React.Component {
    * @returns a promise resolving an array with the following structure:
    * {'annotations' : [instantJson]}
    */
-  getAnnotations = function (pageIndex) {
+  getAnnotations(pageIndex) {
     let requestId = this._nextRequestId++;
     let requestMap = this._requestMap;
 
     // We create a promise here that will be resolved once onDataReturned is called.
-    let promise = new Promise(function (resolve, reject) {
-      requestMap[requestId] = { resolve: resolve, reject: reject };
+    let promise = new Promise((resolve, reject) => {
+      requestMap[requestId] = {resolve: resolve, reject: reject};
     });
 
     UIManager.dispatchViewManagerCommand(
@@ -117,7 +117,7 @@ class PSPDFKitView extends React.Component {
     );
 
     return promise;
-  };
+  }
 
   /**
    * Adds a new annotation to the current document.
@@ -125,26 +125,26 @@ class PSPDFKitView extends React.Component {
    * @param annotation InstantJson of the annotation to add with the format of
    * https://pspdfkit.com/guides/windows/current/importing-exporting/instant-json/#instant-annotation-json-api
    */
-  addAnnotation = function (annotation) {
+  addAnnotation(annotation) {
     UIManager.dispatchViewManagerCommand(
       findNodeHandle(this.refs.pdfView),
       UIManager.RCTPSPDFKitView.Commands.addAnnotation,
       [annotation]
     );
-  };
+  }
 
   /**
    * Gets toolbar items currently shown.
    *
    * @return Receives an array of https://pspdfkit.com/api/web/PSPDFKit.ToolbarItem.html.
    */
-  getToolbarItems = function () {
+  getToolbarItems() {
     let requestId = this._nextRequestId++;
     let requestMap = this._requestMap;
 
     // We create a promise here that will be resolved once onDataReturned is called.
-    let promise = new Promise(function (resolve, reject) {
-      requestMap[requestId] = { resolve: resolve, reject: reject };
+    let promise = new Promise((resolve, reject) => {
+      requestMap[requestId] = {resolve: resolve, reject: reject};
     });
 
     UIManager.dispatchViewManagerCommand(
@@ -154,7 +154,7 @@ class PSPDFKitView extends React.Component {
     );
 
     return promise;
-  };
+  }
 
   /**
    * Set toolbar items currently shown.
@@ -165,13 +165,13 @@ class PSPDFKitView extends React.Component {
    * For more advance features please refer to
    * https://pspdfkit.com/guides/web/current/customizing-the-interface/customizing-the-toolbar/.
    */
-  setToolbarItems = function (toolbarItems) {
+  setToolbarItems(toolbarItems) {
     let requestId = this._nextRequestId++;
     let requestMap = this._requestMap;
 
     // We create a promise here that will be resolved once onDataReturned is called.
-    let promise = new Promise(function (resolve, reject) {
-      requestMap[requestId] = { resolve: resolve, reject: reject };
+    let promise = new Promise((resolve, reject) => {
+      requestMap[requestId] = {resolve: resolve, reject: reject};
     });
 
     UIManager.dispatchViewManagerCommand(
@@ -181,7 +181,7 @@ class PSPDFKitView extends React.Component {
     );
 
     return promise;
-  };
+  }
 }
 
 PSPDFKitView.propTypes = {
