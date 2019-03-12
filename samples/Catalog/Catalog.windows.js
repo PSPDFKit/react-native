@@ -44,6 +44,40 @@ const complexSearchConfiguration = {
   previewRange: {position: 20, length: 120}
 };
 
+const annotationToAdd = {
+  bbox: [
+    89.58633422851562,
+    98.5791015625,
+    143.12948608398438,
+    207.1583251953125
+  ],
+  blendMode: "normal",
+  createdAt: "2018-07-03T13:53:03Z",
+  isDrawnNaturally: false,
+  lineWidth: 5,
+  lines: {
+    intensities: [[0.5, 0.5, 0.5], [0.5, 0.5, 0.5]],
+    points: [
+      [
+        [92.08633422851562, 101.07916259765625],
+        [92.08633422851562, 202.15826416015625],
+        [138.12950134277344, 303.2374267578125]
+      ],
+      [
+        [184.17266845703125, 101.07916259765625],
+        [184.17266845703125, 202.15826416015625],
+        [230.2158203125, 303.2374267578125]
+      ]
+    ]
+  },
+  opacity: 1,
+  pageIndex: 0,
+  strokeColor: "#AA47BE",
+  type: "pspdfkit/ink",
+  updatedAt: "2018-07-03T13:53:03Z",
+  v: 1
+};
+
 const simpleSearch = {
   searchString: "the"
 };
@@ -361,41 +395,13 @@ class PdfViewInstantJsonScreen extends Component<{}> {
           </View>
           <View style={{marginLeft: 10}}>
             <Button
-              onPress={() => {
-                // This adds a new ink annotation to the first page.
-                this.refs.pdfView.addAnnotation({
-                  bbox: [
-                    89.58633422851562,
-                    98.5791015625,
-                    143.12948608398438,
-                    207.1583251953125
-                  ],
-                  blendMode: "normal",
-                  createdAt: "2018-07-03T13:53:03Z",
-                  isDrawnNaturally: false,
-                  lineWidth: 5,
-                  lines: {
-                    intensities: [[0.5, 0.5, 0.5], [0.5, 0.5, 0.5]],
-                    points: [
-                      [
-                        [92.08633422851562, 101.07916259765625],
-                        [92.08633422851562, 202.15826416015625],
-                        [138.12950134277344, 303.2374267578125]
-                      ],
-                      [
-                        [184.17266845703125, 101.07916259765625],
-                        [184.17266845703125, 202.15826416015625],
-                        [230.2158203125, 303.2374267578125]
-                      ]
-                    ]
-                  },
-                  opacity: 1,
-                  pageIndex: 0,
-                  strokeColor: "#AA47BE",
-                  type: "pspdfkit/ink",
-                  updatedAt: "2018-07-03T13:53:03Z",
-                  v: 1
-                });
+              onPress={() =>
+{
+  // This adds a new ink annotation to the first page.
+  this.refs.pdfView.addAnnotation(annotationToAdd).then(() => {
+    alert("Annotation Creation was successful.");
+  }).catch(error => { alert(error);
+});
               }}
               title="Add annotation"
             />
