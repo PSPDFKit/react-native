@@ -395,13 +395,13 @@ class PdfViewInstantJsonScreen extends Component<{}> {
           </View>
           <View style={{marginLeft: 10}}>
             <Button
-              onPress={() =>
-{
-  // This adds a new ink annotation to the first page.
-  this.refs.pdfView.addAnnotation(annotationToAdd).then(() => {
-    alert("Annotation Creation was successful.");
-  }).catch(error => { alert(error);
-});
+              onPress={() => {
+                // This adds a new ink annotation to the first page.
+                this.refs.pdfView.addAnnotation(annotationToAdd).then(() => {
+                  alert("Annotation Creation was successful.");
+                }).catch(error => {
+                  alert(error);
+                });
               }}
               title="Add annotation"
             />

@@ -62,7 +62,7 @@ class PSPDFKitView extends React.Component {
   };
 
   _onOperationResult = event => {
-    let { requestId, success, error } = event.nativeEvent;
+    let {requestId, success, error} = event.nativeEvent;
     let promise = this._requestMap[requestId];
     if (success) {
       promise.resolve(success);
@@ -148,9 +148,9 @@ class PSPDFKitView extends React.Component {
 
     // We create a promise here that will be resolved once onDataReturned is called.
     let promise = new Promise(function (resolve, reject) {
-      requestMap[requestId] = { resolve: resolve, reject: reject };
+      requestMap[requestId] = {resolve: resolve, reject: reject};
     });
-    
+
     UIManager.dispatchViewManagerCommand(
       findNodeHandle(this.refs.pdfView),
       UIManager.RCTPSPDFKitView.Commands.addAnnotation,
