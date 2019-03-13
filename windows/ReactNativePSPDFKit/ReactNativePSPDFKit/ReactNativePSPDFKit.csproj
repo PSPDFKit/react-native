@@ -110,6 +110,7 @@
     <Compile Include="Events\PdfViewDocumentSavedEvent.cs" />
     <Compile Include="Events\PdfViewDataReturnedEvent.cs" />
     <Compile Include="Events\PdfViewDocumentSaveFailedEvent.cs" />
+    <Compile Include="Events\PdfViewOperationResult.cs" />
     <Compile Include="JsonUtils.cs" />
     <Compile Include="LibraryModule.cs" />
     <Compile Include="PSPDFKitModule.cs" />

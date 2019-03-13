@@ -105,7 +105,7 @@ namespace ReactNativePSPDFKit
                     await PdfViewPage.GetAnnotations(args[0].Value<int>(), args[1].Value<int>());
                     break;
                 case COMMAND_ADD_ANNOTATION:
-                    await PdfViewPage.Pdfview.Document.CreateAnnotationAsync(Factory.FromJson(JsonObject.Parse(args[0].ToString())));
+                    await PdfViewPage.CreateAnnotation(args[0].Value<int>(), args[1].ToString());
                     break;
                 case COMMAND_GET_TOOLBAR_ITEMS:
                     PdfViewPage.GetToolbarItems(args[0].Value<int>());
@@ -145,6 +145,13 @@ namespace ReactNativePSPDFKit
                     new JObject
                     {
                         {"registrationName", "onDataReturned"},
+                    }
+                },
+                {
+                    PdfViewOperationResult.EVENT_NAME,
+                    new JObject
+                    {
+                        {"registrationName", "onOperationResult"},
                     }
                 }
             };

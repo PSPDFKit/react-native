@@ -27,6 +27,7 @@ class PSPDFKitView extends React.Component {
         onDocumentSaved={this._onDocumentSaved}
         onDocumentSaveFailed={this._onDocumentSaveFailed}
         onDataReturned={this._onDataReturned}
+        onOperationResult={this._onOperationResult}
       />
     );
   }
@@ -54,6 +55,17 @@ class PSPDFKitView extends React.Component {
     let promise = this._requestMap[requestId];
     if (result) {
       promise.resolve(result);
+    } else {
+      promise.reject(error);
+    }
+    this._requestMap.delete(requestId);
+  };
+
+  _onOperationResult = event => {
+    let {requestId, success, error} = event.nativeEvent;
+    let promise = this._requestMap[requestId];
+    if (success) {
+      promise.resolve(success);
     } else {
       promise.reject(error);
     }
@@ -124,14 +136,29 @@ class PSPDFKitView extends React.Component {
    *
    * @param annotation InstantJson of the annotation to add with the format of
    * https://pspdfkit.com/guides/windows/current/importing-exporting/instant-json/#instant-annotation-json-api
+   *
+   * @returns a promise resolving with a successful payload if annotation is created.
+   * {'success' : boolean}
+   * If success is false an error will also be held.
+   * {'error' : string}
    */
   addAnnotation(annotation) {
+    let requestId = this._nextRequestId++;
+    let requestMap = this._requestMap;
+
+    // We create a promise here that will be resolved once onDataReturned is called.
+    let promise = new Promise(function (resolve, reject) {
+      requestMap[requestId] = {resolve: resolve, reject: reject};
+    });
+
     UIManager.dispatchViewManagerCommand(
       findNodeHandle(this.refs.pdfView),
       UIManager.RCTPSPDFKitView.Commands.addAnnotation,
-      [annotation]
+      [requestId, annotation]
     );
-  }
+
+    return promise;
+  };
 
   /**
    * Gets toolbar items currently shown.

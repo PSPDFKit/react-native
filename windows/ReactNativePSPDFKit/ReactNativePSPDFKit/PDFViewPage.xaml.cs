@@ -159,6 +159,24 @@ namespace ReactNativePSPDFKit
             }
         }
 
+        public async Task CreateAnnotation(int requestId, string annotationJsonString)
+        {
+            try
+            {
+                await Pdfview.Document.CreateAnnotationAsync(Factory.FromJson(JsonObject.Parse(annotationJsonString)));
+
+                this.GetReactContext().GetNativeModule<UIManagerModule>().EventDispatcher.DispatchEvent(
+                    new PdfViewOperationResult(this.GetTag(), requestId)
+                );
+            }
+            catch (Exception e)
+            {
+                this.GetReactContext().GetNativeModule<UIManagerModule>().EventDispatcher.DispatchEvent(
+                    new PdfViewOperationResult(this.GetTag(), requestId, e.Message)
+                );
+            }
+        }
+
         internal async Task SetPageIndexAsync(int index)
         {
            await PDFView.Controller.SetCurrentPageIndexAsync(index);
