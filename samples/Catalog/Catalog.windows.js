@@ -328,7 +328,11 @@ class PdfViewListenersScreen extends Component<{}> {
 
   componentWillMount() {
     this.props.navigation.setParams({
-      handleSaveButtonPress: () => this.refs.pdfView.saveCurrentDocument()
+      handleSaveButtonPress: () => this.refs.pdfView.saveCurrentDocument().then(() => {
+        alert("Document was saved!");
+      }).catch(error => {
+        alert(error);
+      })
     });
   }
 
@@ -340,15 +344,6 @@ class PdfViewListenersScreen extends Component<{}> {
           style={styles.pdfView}
           // The default file to open.
           document="ms-appx:///Assets/pdf/annualReport.pdf"
-          onDocumentSaved={e => {
-            alert("Document was saved!");
-          }}
-          onDocumentSaveFailed={e => {
-            alert("Document couldn't be saved: " + e.error);
-          }}
-          onAnnotationTapped={e => {
-            alert("Annotation was tapped\n" + JSON.stringify(e));
-          }}
           onAnnotationsChanged={e => {
             alert("Annotations changed\n" + JSON.stringify(e));
           }}
