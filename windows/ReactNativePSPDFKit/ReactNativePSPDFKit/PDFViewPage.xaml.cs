@@ -27,7 +27,7 @@ namespace ReactNativePSPDFKit
         private StorageFile _fileToOpen;
         private bool _pdfViewInitialised = false;
         public readonly PdfView Pdfview;
-        
+
         public PDFViewPage()
         {
             InitializeComponent();
@@ -70,7 +70,7 @@ namespace ReactNativePSPDFKit
             _fileToOpen = file;
 
             // If the PdfView is already initialised we can show the new document.
-            if(_pdfViewInitialised)
+            if (_pdfViewInitialised)
             {
                 try
                 {
@@ -85,27 +85,19 @@ namespace ReactNativePSPDFKit
             }
         }
 
-        internal async Task ExportCurrentDocument()
+        internal async Task ExportCurrentDocument(int requestId)
         {
-            try
-            {
-                // Get the StorageFile
-                if (_fileToOpen != null)
+            await RunOperationAndFireEvent(requestId,
+                async () =>
                 {
-                    // Save it.
-                    await PDFView.Document.ExportAsync(_fileToOpen);
+                    // Get the StorageFile
+                    if (_fileToOpen != null)
+                    {
+                        // Save it.
+                        await PDFView.Document.ExportAsync(_fileToOpen);
+                    }
                 }
-
-                this.GetReactContext().GetNativeModule<UIManagerModule>().EventDispatcher.DispatchEvent(
-                    new PdfViewDocumentSavedEvent(this.GetTag())
-                );
-            }
-            catch (Exception e)
-            {
-                this.GetReactContext().GetNativeModule<UIManagerModule>().EventDispatcher.DispatchEvent(
-                    new PdfViewDocumentSaveFailedEvent(this.GetTag(), e.Message)
-                );
-            }
+            );
         }
 
         internal async Task GetAnnotations(int requestId, int pageIndex)
@@ -148,7 +140,8 @@ namespace ReactNativePSPDFKit
         {
             try
             {
-                var toolbarItems = PSPDFKit.UI.ToolbarComponents.Factory.FromJsonArray(JsonArray.Parse(toolbarItemsJson));
+                var toolbarItems =
+                    PSPDFKit.UI.ToolbarComponents.Factory.FromJsonArray(JsonArray.Parse(toolbarItemsJson));
                 await Pdfview.Controller.SetToolbarItemsAsync(toolbarItems.ToList());
             }
             catch (Exception e)
@@ -159,11 +152,29 @@ namespace ReactNativePSPDFKit
             }
         }
 
-        public async Task CreateAnnotation(int requestId, string annotationJsonString)
+        internal async Task CreateAnnotation(int requestId, string annotationJsonString)
+        {
+            await RunOperationAndFireEvent(requestId,
+                async () =>
+                {
+                    await Pdfview.Document.CreateAnnotationAsync(
+                        Factory.FromJson(JsonObject.Parse(annotationJsonString)));
+                }
+            );
+        }
+
+        internal async Task SetInteractionMode(int requestId, InteractionMode interactionMode)
+        {
+            await RunOperationAndFireEvent(requestId,
+                async () => { await Pdfview.Controller.SetInteractionModeAsync(interactionMode); }
+            );
+        }
+
+        private async Task RunOperationAndFireEvent(int requestId, Func<Task> operation)
         {
             try
             {
-                await Pdfview.Document.CreateAnnotationAsync(Factory.FromJson(JsonObject.Parse(annotationJsonString)));
+                await operation();
 
                 this.GetReactContext().GetNativeModule<UIManagerModule>().EventDispatcher.DispatchEvent(
                     new PdfViewOperationResult(this.GetTag(), requestId)
@@ -179,7 +190,7 @@ namespace ReactNativePSPDFKit
 
         internal async Task SetPageIndexAsync(int index)
         {
-           await PDFView.Controller.SetCurrentPageIndexAsync(index);
+            await PDFView.Controller.SetCurrentPageIndexAsync(index);
         }
 
         internal void SetShowToolbar(bool showToolbar)
@@ -194,6 +205,7 @@ namespace ReactNativePSPDFKit
             {
                 await PDFView.OpenStorageFileAsync(_fileToOpen);
             }
+
             _pdfViewInitialised = true;
         }
 
@@ -202,9 +214,9 @@ namespace ReactNativePSPDFKit
             foreach (var annotation in annotationList)
             {
                 this.GetReactContext().GetNativeModule<UIManagerModule>().EventDispatcher.DispatchEvent(
-                        new PdfViewAnnotationChangedEvent(this.GetTag(),
-                            PdfViewAnnotationChangedEvent.EVENT_TYPE_ADDED, annotation)
-                    );
+                    new PdfViewAnnotationChangedEvent(this.GetTag(),
+                        PdfViewAnnotationChangedEvent.EVENT_TYPE_ADDED, annotation)
+                );
             }
         }
 
@@ -213,9 +225,9 @@ namespace ReactNativePSPDFKit
             foreach (var annotation in annotationList)
             {
                 this.GetReactContext().GetNativeModule<UIManagerModule>().EventDispatcher.DispatchEvent(
-                        new PdfViewAnnotationChangedEvent(this.GetTag(),
-                            PdfViewAnnotationChangedEvent.EVENT_TYPE_CHANGED, annotation)
-                    );
+                    new PdfViewAnnotationChangedEvent(this.GetTag(),
+                        PdfViewAnnotationChangedEvent.EVENT_TYPE_CHANGED, annotation)
+                );
             }
         }
 
@@ -224,9 +236,9 @@ namespace ReactNativePSPDFKit
             foreach (var annotation in annotationList)
             {
                 this.GetReactContext().GetNativeModule<UIManagerModule>().EventDispatcher.DispatchEvent(
-                        new PdfViewAnnotationChangedEvent(this.GetTag(),
-                            PdfViewAnnotationChangedEvent.EVENT_TYPE_REMOVED, annotation)
-                    );
+                    new PdfViewAnnotationChangedEvent(this.GetTag(),
+                        PdfViewAnnotationChangedEvent.EVENT_TYPE_REMOVED, annotation)
+                );
             }
         }
     }
