@@ -69,7 +69,7 @@ class PSPDFKitView extends React.Component {
 
     // We create a promise here that will be resolved once onDataReturned is called.
     let promise = new Promise((resolve, reject) => {
-      requestMap[requestId] = { resolve: resolve, reject: reject };
+      requestMap[requestId] = {resolve: resolve, reject: reject};
     });
 
     UIManager.dispatchViewManagerCommand(
@@ -92,7 +92,7 @@ class PSPDFKitView extends React.Component {
 
     // We create a promise here that will be resolved once onDataReturned is called.
     let promise = new Promise((resolve, reject) => {
-      requestMap[requestId] = { resolve: resolve, reject: reject };
+      requestMap[requestId] = {resolve: resolve, reject: reject};
     });
 
     UIManager.dispatchViewManagerCommand(
@@ -115,7 +115,7 @@ class PSPDFKitView extends React.Component {
 
     // We create a promise here that will be resolved once onDataReturned is called.
     let promise = new Promise((resolve, reject) => {
-      requestMap[requestId] = { resolve: resolve, reject: reject };
+      requestMap[requestId] = {resolve: resolve, reject: reject};
     });
 
     UIManager.dispatchViewManagerCommand(
