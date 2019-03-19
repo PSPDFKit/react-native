@@ -639,14 +639,15 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
 10. Install all modules for Windows: `yarn install`. (Because of a [bug](https://github.com/yarnpkg/yarn/issues/2165) you may need to clean `yarn`'s cache with `yarn cache clean` before.)
 11. Initialize the windows project: `react-native windows`.
 12. Link module `react-native-pspdfkit`: `react-native link react-native-pspdfkit`.
-13. Open the Visual Studio solution in `react-native\YourApp\windows`.
-14. Accept and install any required extensions when prompted.
-15. If the settings window opens, click on `Developer` and select `yes`.
-16. Mark `PSPDFKit SDK` and `Visual C++ Runtime` as dependencies for `YourApp`:
+13. Link module `react-native-fs`: `react-native link react-native-fs`.
+14. Open the Visual Studio solution in `react-native\YourApp\windows`.
+15. Accept and install any required extensions when prompted.
+16. If the settings window opens, click on `Developer` and select `yes`.
+17. Mark `PSPDFKit SDK` and `Visual C++ Runtime` as dependencies for `YourApp`:
     Right click on `YourApp` -> Add -> Refererece... Click on Projects and tick `ReactNativePSPDFKit`. Click on Universal Windows -> Extensions and tick `PSPDFKit for UWP` and `Visual C++ 2015 Runtime for Universal Windows Platform Apps` then click ok.
     ![Add References Selection](screenshots/windowsAddReferences.PNG)
     ![Reference Checkboxes](screenshots/windowsSelectPSPDFKit+UWP.PNG)
-17. Add an application resource to your `Appl.xaml` to reference your License key.
+18. Add an application resource to your `Appl.xaml` to reference your License key.
 
 ```diff
 <rn:ReactApplication
@@ -667,7 +668,7 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
 </rn:ReactApplication>
 ```
 
-18. Create a new file resource called `License.xaml` with your PSPDFKit license key at the top level of the
+19. Create a new file resource called `License.xaml` with your PSPDFKit license key at the top level of the
     project. (Replace `ENTER LICENSE KEY HERE` with your key)
 
 ```xaml
@@ -680,11 +681,11 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
 </ResourceDictionary>
 ```
 
-19. Change the target SDK of YourApp to >= 10.0.16299 and Min Version to >= 10.0.15063 : Right Click on YourApp -> Properties. Go to
+20. Change the target SDK of YourApp to >= 10.0.16299 and Min Version to >= 10.0.15063 : Right Click on YourApp -> Properties. Go to
     Application and change Target Version to >= 10.0.16299 and change Min Version to >= 10.0.15063.
     ![Change SDK Version](screenshots/changeVersionSDK.png)
-20. Save Changes: File -> Save All
-21. Add the `PSPDFKitView` and `PSPDFKit` module into your `App.windows.js` file, and add a open button to allow the user
+21. Save Changes: File -> Save All
+22. Add the `PSPDFKitView` and `PSPDFKit` module into your `App.windows.js` file, and add a open button to allow the user
     to navigate the file system.
 
 ```javascript
@@ -748,9 +749,9 @@ var styles = StyleSheet.create({
 });
 ```
 
-22. Now run the application on the command line: `react-native run-windows`.
-23. Press Yes when PowerShell wants to run.
-24. Type 'y' when asking if you want to install the certificate.
+23. Now run the application on the command line: `react-native run-windows`.
+24. Press Yes when PowerShell wants to run.
+25. Type 'y' when asking if you want to install the certificate.
 
 #### Running Catalog Project
 
