@@ -65,12 +65,9 @@ public class ConfigurationAdapter {
 
     public ConfigurationAdapter(@NonNull Context context, ReadableMap configuration) {
         ReadableMapKeySetIterator iterator = configuration.keySetIterator();
-        boolean emptyConfiguration = iterator.hasNextKey() ? false : true;
-        if (emptyConfiguration) {
-            this.configuration = getDefaultConfiguration(context);
-        } else {
-            this.configuration = new PdfActivityConfiguration.Builder(context);
-
+        boolean hasConfiguration = iterator.hasNextKey();
+        this.configuration = new PdfActivityConfiguration.Builder(context);
+        if (hasConfiguration) {
             if (configuration.hasKey(PAGE_SCROLL_DIRECTION)) {
                 configurePageScrollDirection(configuration.getString(PAGE_SCROLL_DIRECTION));
             }
@@ -299,27 +296,5 @@ public class ConfigurationAdapter {
 
     public PdfActivityConfiguration build() {
         return configuration.build();
-    }
-
-    public static PdfActivityConfiguration.Builder getDefaultConfiguration(Context context) {
-
-        final PageScrollDirection pageScrollDirection = PageScrollDirection.HORIZONTAL;
-        final PageScrollMode pageScrollMode = PageScrollMode.PER_PAGE;
-        final PageFitMode pageFitMode = PageFitMode.FIT_TO_WIDTH;
-        final int searchType = PdfActivityConfiguration.SEARCH_INLINE;
-        final UserInterfaceViewMode userInterfaceViewMode = UserInterfaceViewMode.USER_INTERFACE_VIEW_MODE_AUTOMATIC;
-        final ThumbnailBarMode thumbnailBarMode = ThumbnailBarMode.THUMBNAIL_BAR_MODE_DEFAULT;
-        int startPage = 0;
-
-        PdfActivityConfiguration.Builder configuration = new PdfActivityConfiguration.Builder(context)
-                .scrollDirection(pageScrollDirection)
-                .scrollMode(pageScrollMode)
-                .fitMode(pageFitMode)
-                .setUserInterfaceViewMode(userInterfaceViewMode)
-                .setSearchType(searchType)
-                .setThumbnailBarMode(thumbnailBarMode)
-                .page(startPage);
-
-        return configuration;
     }
 }
