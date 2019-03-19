@@ -681,8 +681,8 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
 </ResourceDictionary>
 ```
 
-20. Change the target SDK of YourApp to >= 10.0.16299 and Min Version to >= 10.0.15063 : Right Click on YourApp -> Properties. Go to
-    Application and change Target Version to >= 10.0.16299 and change Min Version to >= 10.0.15063.
+20. Change the target SDK of YourApp to >= 10.0.17134 and Min Version to >= 10.0.15063 : Right Click on YourApp -> Properties. Go to
+    Application and change Target Version to >= 10.0.17134 and change Min Version to >= 10.0.15063.
     ![Change SDK Version](screenshots/changeVersionSDK.png)
 21. Save Changes: File -> Save All
 22. Add the `PSPDFKitView` and `PSPDFKit` module into your `App.windows.js` file, and add a open button to allow the user
