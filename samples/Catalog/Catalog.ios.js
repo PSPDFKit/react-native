@@ -17,10 +17,10 @@ import {
   FlatList,
   NativeModules,
   processColor,
-  NavigatorIOS,
   Modal,
   Dimensions
 } from "react-native";
+import { StackNavigator, NavigationEvents } from "react-navigation";
 const RNFS = require("react-native-fs");
 
 import PSPDFKitView from "react-native-pspdfkit";
@@ -86,21 +86,9 @@ const examples = [
   {
     key: "item4",
     name: "PDF View Component",
-    description:
-      "Show how to use the PSPDFKitView component with NavigatorIOS.",
+    description: "Show how to use the PSPDFKitView component with Navigator.",
     action: component => {
-      const nextRoute = {
-        component: PSPDFKitView,
-        passProps: {
-          document: "PDFs/Annual Report.pdf",
-          configuration: {
-            useParentNavigationBar: true,
-            showDocumentLabel: true,  
-          },
-          style: { flex: 1 }
-        }
-      };
-      component.props.navigator.push(nextRoute);
+      component.props.navigation.push("ConfiguredPDFViewComponent");
     }
   },
   {
@@ -109,10 +97,7 @@ const examples = [
     description:
       "Show how to use the listeners exposed by PSPDFKitView component.",
     action: component => {
-      const nextRoute = {
-        component: EventListeners
-      };
-      component.props.navigator.push(nextRoute);
+      component.props.navigation.push("EventListeners");
     }
   },
   {
@@ -120,10 +105,7 @@ const examples = [
     name: "Change Pages Buttons",
     description: "Adds a toolbar at the bottom with buttons to change pages.",
     action: component => {
-      const nextRoute = {
-        component: ChangePages
-      };
-      component.props.navigator.push(nextRoute);
+      component.props.navigation.push("ChangePages");
     }
   },
   {
@@ -132,10 +114,7 @@ const examples = [
     description:
       "Adds a toolbar at the bottom with a button to toggle the annotation toolbar.",
     action: component => {
-      const nextRoute = {
-        component: AnnotationCreationMode
-      };
-      component.props.navigator.push(nextRoute);
+      component.props.navigation.push("AnnotationCreationMode");
     }
   },
   {
@@ -144,10 +123,7 @@ const examples = [
     description:
       "Adds a toolbar at the bottom with a Save button and disables automatic saving.",
     action: component => {
-      const nextRoute = {
-        component: ManualSave
-      };
-      component.props.navigator.push(nextRoute);
+      component.props.navigation.push("ManualSave");
     }
   },
   {
@@ -155,7 +131,9 @@ const examples = [
     name: "Split PDF",
     description: "Show two PDFs side by side by using PSPDFKitView components.",
     action: component => {
-      component.openModal();
+      // TODO: Fix me
+      // component.props.navigation.navigate("SplitPDF");
+      //component.openModal();
     }
   },
   {
@@ -163,10 +141,7 @@ const examples = [
     name: "Programmatic Annotations",
     description: "Shows how to get and add new annotations using Instant JSON.",
     action: component => {
-      const nextRoute = {
-        component: ProgrammaticAnnotations
-      };
-      component.props.navigator.push(nextRoute);
+      component.props.navigation.push("ProgrammaticAnnotations");
     }
   },
   {
@@ -175,10 +150,7 @@ const examples = [
     description:
       "Shows how to get the value of a form element and how to programmatically fill forms.",
     action: component => {
-      const nextRoute = {
-        component: ProgrammaticFormFilling
-      };
-      component.props.navigator.push(nextRoute);
+      component.props.navigation.push("ProgrammaticFormFilling");
     }
   },
   {
@@ -194,8 +166,7 @@ const examples = [
   {
     key: "item13",
     name: "Custom Sharing Options",
-    description:
-      "Customize the sharing options for a document.",
+    description: "Customize the sharing options for a document.",
     action: () => {
       PSPDFKit.present("PDFs/Annual Report.pdf", {
         backgroundColor: processColor("white"),
@@ -203,10 +174,10 @@ const examples = [
         pageTransition: "scrollContinuous",
         pageScrollDirection: "vertical",
         sharingConfigurations: [
-        	{
-        		annotationOptions: ["flatten"],
-        		pageSelectionOptions: ["all", "annotated"]
-        	}
+          {
+            annotationOptions: ["flatten"],
+            pageSelectionOptions: ["all", "annotated"]
+          }
         ]
       });
     }
@@ -337,6 +308,25 @@ class SplitPDF extends Component {
     let { width, height } = event.nativeEvent.layout;
     this.setState({ dimensions: { width, height } });
   };
+}
+
+class ConfiguredPDFViewComponent extends Component {
+  render() {
+    return (
+      <View style={{ flex: 1 }}>
+        <PSPDFKitView
+          document={"PDFs/Annual Report.pdf"}
+          configuration={{
+            backgroundColor: processColor("lightgrey"),
+            showThumbnailBar: "scrubberBar",
+            useParentNavigationBar: true,
+            showDocumentLabel: true
+          }}
+          style={{ flex: 1, color: pspdfkitColor }}
+        />
+      </View>
+    );
+  }
 }
 
 class EventListeners extends Component {
@@ -486,7 +476,12 @@ class AnnotationCreationMode extends Component {
             showThumbnailBar: "scrollable",
             useParentNavigationBar: true
           }}
-          menuItemGrouping={['freetext', {key: 'markup', items: ['highlight', "underline"]}, 'ink', 'image']}
+          menuItemGrouping={[
+            "freetext",
+            { key: "markup", items: ["highlight", "underline"] },
+            "ink",
+            "image"
+          ]}
           pageIndex={this.state.currentPageIndex}
           style={{ flex: 1, color: pspdfkitColor }}
           onStateChanged={event => {
@@ -882,19 +877,93 @@ class ProgrammaticFormFilling extends Component {
   }
 }
 
-export default class Catalog extends Component {
+class Catalog extends Component<{}> {
+  static navigationOptions = {
+    title: "Catalog"
+  };
+
+  // Initialize the hardcoded data
+  constructor(props) {
+    super(props);
+    this.state = {
+      dataSource: examples
+    };
+  }
+
   render() {
     return (
-      <NavigatorIOS
-        initialRoute={{
-          component: ExampleList,
-          title: "PSPDFKit Catalog"
-        }}
-        style={{ flex: 1 }}
-      />
+      <View style={styles.page}>
+        <View style={styles.header}>
+          <Image
+            source={require("./assets/logo-flat.png")}
+            style={styles.logo}
+          />
+          <Text style={styles.version}>{PSPDFKit.versionString}</Text>
+        </View>
+        <FlatList
+          data={this.state.dataSource}
+          renderItem={this._renderRow}
+          ItemSeparatorComponent={this._renderSeparator}
+          contentContainerStyle={styles.listContainer}
+          style={styles.list}
+        />
+      </View>
     );
   }
+
+  _renderSeparator(sectionId, rowId) {
+    return <View key={rowId} style={styles.separator} />;
+  }
+
+  _renderRow = ({ item }) => {
+    return (
+      <TouchableHighlight
+        onPress={() => {
+          item.action(this);
+        }}
+        style={styles.row}
+        underlayColor={pspdfkitColor}
+      >
+        <View style={styles.rowContent}>
+          <Text style={styles.name}>{item.name}</Text>
+          <Text style={styles.description}>{item.description}</Text>
+        </View>
+      </TouchableHighlight>
+    );
+  };
 }
+
+export default StackNavigator(
+  {
+    Catalog: {
+      screen: Catalog
+    },
+    ConfiguredPDFViewComponent: {
+      screen: ConfiguredPDFViewComponent
+    },
+    EventListeners: {
+      screen: EventListeners
+    },
+    ChangePages: {
+      screen: ChangePages
+    },
+    AnnotationCreationMode: {
+      screen: AnnotationCreationMode
+    },
+    ManualSave: {
+      screen: ManualSave
+    },
+    ProgrammaticAnnotations: {
+      screen: ProgrammaticAnnotations
+    },
+    ProgrammaticFormFilling: {
+      screen: ProgrammaticFormFilling
+    }
+  },
+  {
+    initialRouteName: "Catalog"
+  }
+);
 
 var styles = StyleSheet.create({
   separator: {
