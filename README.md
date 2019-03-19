@@ -621,7 +621,7 @@ Shows the pdf `document` from the local device filesystem, or your app's assets.
 - PSPDFKit for Windows.vsix (installed)
 - PowerShell
 
-*NOTE* : `react-native-pspdfkit` for windows does not yet support react-native 0.59.*. Currently [`react-native-windows`][https://github.com/Microsoft/react-native-windows/releases] is not keeping up pace with `react-native`, where the last official release was 0.54.* and the last RC was 0.57.*. We have tested and require 0.57.0 to keep version aligned as much as possible.
+*NOTE* : `react-native-pspdfkit` for windows does not yet support react-native 0.59.\*. Currently [`react-native-windows`][https://github.com/Microsoft/react-native-windows/releases] is not keeping up pace with `react-native`, where the last official release was 0.54.\* and the last RC was 0.57.\*. We have tested and require 0.57.0 to keep version aligned as much as possible.
 
 #### Getting Started
 
