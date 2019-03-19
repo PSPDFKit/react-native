@@ -621,6 +621,8 @@ Shows the pdf `document` from the local device filesystem, or your app's assets.
 - PSPDFKit for Windows.vsix (installed)
 - PowerShell
 
+*NOTE* : `react-native-pspdfkit` for windows does not yet support react-native 0.59.*. Currently [`react-native-windows`][https://github.com/Microsoft/react-native-windows/releases] is not keeping up pace with `react-native`, where the last official release was 0.54.* and the last RC was 0.57.*. We have tested and require 0.57.0 to keep version aligned as much as possible.
+
 #### Getting Started
 
 Let's create a simple app that integrates PSPDFKit and uses the react-native-pspdfkit module.
@@ -629,7 +631,7 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
 2. Make sure `react-native-cli` is installed: `yarn global add react-native-cli`.
 3. Install Windows Tool for React Native: `yarn add global windows-build-tools`.
 4. Open `x64 Native Tools Command Prompt for VS 2017` program.
-5. Create the app with `react-native init --version=0.55.4 YourApp` in a location of your choice.
+5. Create the app with `react-native init --version=0.57.8 YourApp` in a location of your choice.
 6. Step into your newly created app folder: `cd YourApp`.
 7. Install the Windows helper plugin: `yarn add --dev rnpm-plugin-windows`.
 8. Install `react-native-pspdfkit` from GitHub: `yarn add github:PSPDFKit/react-native`.
