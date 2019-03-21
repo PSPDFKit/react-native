@@ -131,9 +131,7 @@ const examples = [
     name: "Split PDF",
     description: "Show two PDFs side by side by using PSPDFKitView components.",
     action: component => {
-      // TODO: Fix me
-      // component.props.navigation.navigate("SplitPDF");
-      //component.openModal();
+      component.props.navigation.navigate("SplitPDF");
     }
   },
   {
@@ -184,78 +182,6 @@ const examples = [
   }
 ];
 
-class ExampleList extends Component {
-  openModal = () => {
-    this.setState({ modalVisible: true });
-  };
-
-  closeModal = () => {
-    this.setState({ modalVisible: false });
-  };
-
-  // Initialize the hardcoded data
-  constructor(props) {
-    super(props);
-    this.state = {
-      dataSource: examples,
-      modalVisible: false
-    };
-  }
-
-  render() {
-    return (
-      <View style={{ flex: 1 }}>
-        <Modal
-          visible={this.state.modalVisible}
-          animationType={"slide"}
-          onRequestClose={this.closeModal}
-          supportedOrientations={["portrait", "landscape"]}
-        >
-          <SplitPDF onClose={this.closeModal} style={{ flex: 1 }} />
-        </Modal>
-        <FlatList
-          data={this.state.dataSource}
-          renderItem={this._renderRow}
-          ListHeaderComponent={this._renderHeader()}
-          ItemSeparatorComponent={this._renderSeparator}
-          contentContainerStyle={styles.listContainer}
-          style={styles.list}
-        />
-      </View>
-    );
-  }
-
-  _renderHeader() {
-    return (
-      <View style={styles.header}>
-        <Image source={require("./assets/logo-flat.png")} style={styles.logo} />
-        <Text style={styles.version}>{PSPDFKit.versionString}</Text>
-      </View>
-    );
-  }
-
-  _renderSeparator(sectionId, rowId) {
-    return <View key={rowId} style={styles.separator} />;
-  }
-
-  _renderRow = ({ item }) => {
-    return (
-      <TouchableHighlight
-        onPress={() => {
-          item.action(this);
-        }}
-        style={styles.row}
-        underlayColor={pspdfkitColorAlpha}
-      >
-        <View style={styles.rowContent}>
-          <Text style={styles.name}>{item.name}</Text>
-          <Text style={styles.description}>{item.description}</Text>
-        </View>
-      </TouchableHighlight>
-    );
-  };
-}
-
 class SplitPDF extends Component {
   constructor(props) {
     super(props);
@@ -280,8 +206,6 @@ class SplitPDF extends Component {
             showThumbnailBar: "scrollable"
           }}
           pageIndex={4}
-          showCloseButton={true}
-          onCloseButtonPressed={this.props.onClose}
           style={{ flex: 1, color: pspdfkitColor }}
         />
         <PSPDFKitView
@@ -319,7 +243,6 @@ class ConfiguredPDFViewComponent extends Component {
           configuration={{
             backgroundColor: processColor("lightgrey"),
             showThumbnailBar: "scrubberBar",
-            useParentNavigationBar: true,
             showDocumentLabel: true
           }}
           style={{ flex: 1, color: pspdfkitColor }}
@@ -337,8 +260,7 @@ class EventListeners extends Component {
           document={"PDFs/Annual Report.pdf"}
           configuration={{
             backgroundColor: processColor("lightgrey"),
-            showThumbnailBar: "scrollable",
-            useParentNavigationBar: true
+            showThumbnailBar: "scrollable"
           }}
           style={{ flex: 1, color: pspdfkitColor }}
           // Event Listeners
@@ -390,8 +312,7 @@ class ChangePages extends Component {
           document={"PDFs/Annual Report.pdf"}
           configuration={{
             backgroundColor: processColor("lightgrey"),
-            showThumbnailBar: "scrollable",
-            useParentNavigationBar: true
+            showThumbnailBar: "scrollable"
           }}
           pageIndex={this.state.currentPageIndex}
           style={{ flex: 1, color: pspdfkitColor }}
@@ -473,8 +394,7 @@ class AnnotationCreationMode extends Component {
           document={"PDFs/Annual Report.pdf"}
           configuration={{
             backgroundColor: processColor("lightgrey"),
-            showThumbnailBar: "scrollable",
-            useParentNavigationBar: true
+            showThumbnailBar: "scrollable"
           }}
           menuItemGrouping={[
             "freetext",
@@ -530,8 +450,7 @@ class ManualSave extends Component {
           disableAutomaticSaving={true}
           configuration={{
             backgroundColor: processColor("lightgrey"),
-            showThumbnailBar: "scrollable",
-            useParentNavigationBar: true
+            showThumbnailBar: "scrollable"
           }}
           style={{ flex: 1, color: pspdfkitColor }}
         />
@@ -574,8 +493,7 @@ class ProgrammaticAnnotations extends Component {
           disableAutomaticSaving={true}
           configuration={{
             backgroundColor: processColor("lightgrey"),
-            showThumbnailBar: "scrollable",
-            useParentNavigationBar: true
+            showThumbnailBar: "scrollable"
           }}
           style={{ flex: 1, color: pspdfkitColor }}
           onStateChanged={event => {
@@ -820,8 +738,7 @@ class ProgrammaticFormFilling extends Component {
           disableAutomaticSaving={true}
           configuration={{
             backgroundColor: processColor("lightgrey"),
-            showThumbnailBar: "scrollable",
-            useParentNavigationBar: true
+            showThumbnailBar: "scrollable"
           }}
           style={{ flex: 1, color: pspdfkitColor }}
         />
@@ -952,6 +869,9 @@ export default StackNavigator(
     },
     ManualSave: {
       screen: ManualSave
+    },
+    SplitPDF: {
+      screen: SplitPDF
     },
     ProgrammaticAnnotations: {
       screen: ProgrammaticAnnotations
