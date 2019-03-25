@@ -8,16 +8,14 @@
 //
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using Windows.Data.Json;
 using ReactNative.UIManager;
 using ReactNative.UIManager.Annotations;
 using Windows.Storage;
+using Windows.UI;
 using Newtonsoft.Json.Linq;
-using PSPDFKit.Pdf.Annotation;
 using PSPDFKit.UI;
 using ReactNativePSPDFKit.Events;
+using System.Text.RegularExpressions;
 
 namespace ReactNativePSPDFKit
 {
@@ -61,6 +59,51 @@ namespace ReactNativePSPDFKit
         public void SetHideNavigationBar(PDFViewPage view, bool hideNavigationBar)
         {
             view.SetShowToolbar(!hideNavigationBar);
+        }
+
+        [ReactProp("pdfStyle")]
+        public async void SetCustomCss(PDFViewPage view, JObject styleJObject)
+        {
+            var colorString = string.Empty;
+            if (styleJObject.ContainsKey("highlightColor"))
+            {
+                var highlightColor = ColorHelpers.Parse(styleJObject["highlightColor"].Value<uint>());
+                colorString += $"    --primary: {highlightColor.ToHexWithoutAlpha()};\r\n";
+            }
+
+            if (styleJObject.ContainsKey("primaryColor"))
+            {
+                var primaryColor = ColorHelpers.Parse(styleJObject["primaryColor"].Value<uint>());
+                colorString += $"    --primary-dark-1: {primaryColor.ToHexWithoutAlpha()};\r\n";
+            }
+
+            if (styleJObject.ContainsKey("primaryDarkColor"))
+            {
+                var primaryDarkColor = ColorHelpers.Parse(styleJObject["primaryDarkColor"].Value<uint>());
+                colorString += $"    --primary-dark-2: {primaryDarkColor.ToHexWithoutAlpha()};\r\n";
+            }
+
+            if (colorString.Length > 0)
+            {
+                var cssTemplate =
+                    await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appx:///ReactNativePSPDFKit/Assets/customTheme.css"));
+
+                var cssTemplateString = await FileIO.ReadTextAsync(cssTemplate);
+                cssTemplateString = cssTemplateString.Replace("${colors}", colorString);
+                
+                //create file in temp folder
+                var storageFolder = ApplicationData.Current.TemporaryFolder;
+                var sampleFile = await storageFolder.CreateFileAsync("windows.css", CreationCollisionOption.ReplaceExisting);
+                await FileIO.WriteTextAsync(sampleFile, cssTemplateString);
+
+                // Now we get the assets folder to copy the final css file into.
+                var appInstalledFolder = Windows.ApplicationModel.Package.Current.InstalledLocation;
+                var assetsFolder = await appInstalledFolder.GetFolderAsync("Assets");
+                await sampleFile.MoveAsync(assetsFolder, "windows.css", NameCollisionOption.ReplaceExisting);
+
+                // Pass the the css file to the pdf view in a web context.
+                PdfViewPage.Pdfview.Css = new Uri("ms-appx-web:///Assets/windows.css");
+            }
         }
 
         public override JObject ViewCommandsMap => new JObject

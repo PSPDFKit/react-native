@@ -86,7 +86,7 @@ const examples = [
   {
     key: "item1",
     name: "Open assets document",
-    description: "Open document from your project assets folder",
+    description: "Opens a document from your project assets folder",
     action: component => {
       component.props.navigation.navigate("PdfView");
     }
@@ -94,7 +94,7 @@ const examples = [
   {
     key: "item2",
     name: "Present a file from source",
-    description: "Open document from source",
+    description: "Opens a document from assets with Present",
     action: component => {
       component.props.navigation.navigate("PdfView");
       // Present can only take files loaded in the Visual studio Project's Assets. Please use RNFS.
@@ -172,6 +172,14 @@ const examples = [
     description: "An example to show how to customize the toolbar UI.",
     action: async component => {
       component.props.navigation.navigate("PdfViewToolbarCustomization");
+    }
+  },
+  {
+    key: "item8",
+      name: "Custom colors",
+      description: "Supplies different colors for Pdf View Toolbar.",
+      action: component => {
+      component.props.navigation.navigate("PdfViewStyle");
     }
   }
 ];
@@ -295,8 +303,7 @@ class PdfViewScreen extends Component<{}> {
           ref="pdfView"
           style={styles.pdfView}
           // The default file to open.
-          document="ms-appx:///Assets/pdf/annualReport.pdf"
-        />
+          document="ms-appx:///Assets/pdf/annualReport.pdf"/>
         <View style={styles.footer}>
           <View style={styles.button}>
             <Button onPress={() => PSPDFKit.OpenFilePicker()} title="Open"/>
@@ -443,6 +450,37 @@ class PdfViewToolbarCustomizationScreen extends Component<{}> {
   }
 }
 
+const pdfStyle = {
+  highlightColor: "#61D800", /* Hightlight or hover color. */
+  primaryColor: "red", /* Color for the main toolbar */
+  primaryDarkColor: "rgb(255, 0, 255)" /* Color for the second toolbar */
+};
+
+class PdfViewStyleScreen extends Component<{}> {
+  render() {
+    return (
+    <View style={styles.page}>
+      <PSPDFKitView
+    ref="pdfView"
+    style={styles.pdfView}
+          pdfStyle={pdfStyle}
+    // The default file to open.
+    document="ms-appx:///Assets/pdf/annualReport.pdf" />
+      <View style={styles.footer}>
+  <Image
+  source={require("./assets/logo-flat.png")}
+style={styles.logo}
+  />
+  <Text style={styles.version}>
+  SDK Version : {PSPDFKit.versionString}
+</Text>
+  </View>
+  </View>
+);
+}
+}
+
+
 export default StackNavigator(
   {
     Catalog: {
@@ -459,7 +497,10 @@ export default StackNavigator(
     },
     PdfViewToolbarCustomization: {
       screen: PdfViewToolbarCustomizationScreen
-    }
+    },
+    PdfViewStyle: {
+      screen: PdfViewStyleScreen
+    },
   },
   {
     initialRouteName: "Catalog"

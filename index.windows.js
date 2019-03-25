@@ -11,22 +11,41 @@ import {
   requireNativeComponent,
   ViewPropTypes,
   findNodeHandle,
-  UIManager
+  UIManager,
+  processColor
 } from "react-native";
 
 class PSPDFKitView extends React.Component {
   _nextRequestId = 1;
   _requestMap = new Map();
 
+  state = {
+    pdfStyle: {
+      highlightColor: null,
+      primaryColor: null,
+      primaryDarkColor: null
+    }
+  }
+
+  constructor(props) {
+    super(props);
+
+    this.state.pdfStyle = this._setPdfStyle(props.pdfStyle);
+  }
+
   render() {
     return (
       <RCTPSPDFKitView
         ref="pdfView"
-        {...this.props}
+        document={this.props.document}
+        pageIndex={this.props.pageIndex}
+        hideNavigationBar={this.props.hideNavigationBar}
+        onAnnotationsChanged={this.props.onAnnotationsChanged}
         onAnnotationsChanged={this._onAnnotationsChanged}
         onDataReturned={this._onDataReturned}
         onOperationResult={this._onOperationResult}
-      />
+        pdfStyle={this.state.pdfStyle}
+        style={this.props.style}/>
     );
   }
 
@@ -228,7 +247,31 @@ class PSPDFKitView extends React.Component {
 
     return promise;
   }
+
+  _setPdfStyle(colorObject)
+  {
+    var colorsToSend = {};
+    if (colorObject.highlightColor !== null) {
+      colorsToSend.highlightColor = processColor(colorObject.highlightColor);
+    }
+
+    if (colorObject.primaryColor !== null) {
+      colorsToSend.primaryColor = processColor(colorObject.primaryColor);
+    }
+
+    if (colorObject.primaryDarkColor !== null) {
+      colorsToSend.primaryDarkColor = processColor(colorObject.primaryDarkColor);
+    }
+
+    return colorsToSend;
+  }
 }
+
+const PDFStylePropTypes = PropTypes.shape({
+  highlightColor: PropTypes.string,
+  primaryColor: PropTypes.string,
+  primaryDarkColor: PropTypes.string
+});
 
 PSPDFKitView.propTypes = {
   /**
@@ -252,7 +295,18 @@ PSPDFKitView.propTypes = {
    * }
    */
   onAnnotationsChanged: PropTypes.func,
-  ...ViewPropTypes
+  /**
+   * Styles the pdf view in accordance to https://pspdfkit.com/guides/windows/current/customizing-the-interface/css-customization/
+   *
+   * Expects optional values of.
+   * {
+   *    highlightColor: PropTypes.string,
+   *    primaryColor: PropTypes.string,
+   *    primaryDarkColor: PropTypes.string
+   * }
+   */
+  pdfStyle: PDFStylePropTypes,
+  style: ViewPropTypes.style
 };
 
 const RCTPSPDFKitView = requireNativeComponent(
