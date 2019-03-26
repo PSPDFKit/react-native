@@ -26,7 +26,7 @@ class PSPDFKitView extends React.Component {
       primaryDarkColor: null
     },
     style: ViewPropTypes.style
-  }
+  };
 
   constructor(props) {
     super(props);
@@ -48,7 +48,6 @@ class PSPDFKitView extends React.Component {
         document={this.props.document}
         pageIndex={this.props.pageIndex}
         hideNavigationBar={this.props.hideNavigationBar}
-        onAnnotationsChanged={this.props.onAnnotationsChanged}
         onAnnotationsChanged={this._onAnnotationsChanged}
         onDataReturned={this._onDataReturned}
         onOperationResult={this._onOperationResult}
