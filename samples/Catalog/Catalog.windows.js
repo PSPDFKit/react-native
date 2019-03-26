@@ -176,9 +176,9 @@ const examples = [
   },
   {
     key: "item8",
-      name: "Custom colors",
-      description: "Supplies different colors for Pdf View Toolbar.",
-      action: component => {
+    name: "Custom colors",
+    description: "Supplies different colors for Pdf View Toolbar.",
+    action: component => {
       component.props.navigation.navigate("PdfViewStyle");
     }
   }
@@ -460,24 +460,24 @@ class PdfViewToolbarCustomizationScreen extends Component<{}> {
 class PdfViewStyleScreen extends Component<{}> {
   render() {
     return (
-    <View style={styles.page}>
-      <PSPDFKitView
-    ref="pdfView"
+      <View style={styles.page}>
+        <PSPDFKitView
+          ref="pdfView"
           style={pdfStyle}
-    // The default file to open.
-    document="ms-appx:///Assets/pdf/annualReport.pdf" />
-      <View style={styles.footer}>
-  <Image
-  source={require("./assets/logo-flat.png")}
-style={styles.logo}
-  />
-  <Text style={styles.version}>
-  SDK Version : {PSPDFKit.versionString}
-</Text>
-  </View>
-  </View>
-);
-}
+          // The default file to open.
+          document="ms-appx:///Assets/pdf/annualReport.pdf"/>
+        <View style={styles.footer}>
+          <Image
+            source={require("./assets/logo-flat.png")}
+            style={styles.logo}
+          />
+          <Text style={styles.version}>
+            SDK Version : {PSPDFKit.versionString}
+          </Text>
+        </View>
+      </View>
+    );
+  }
 }
 
 
