@@ -186,7 +186,7 @@ const examples = [
 
 const pdfStyle = {
   flex: 1,
-  highlightColor: "#61D800", /* Hightlight or hover color. */
+  highlightColor: "#61D800", /* Highlight or hover color. */
   primaryColor: "red", /* Color for the main toolbar */
   primaryDarkColor: "rgb(255, 0, 255)" /* Color for the second toolbar */
 };

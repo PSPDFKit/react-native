@@ -292,10 +292,10 @@ PSPDFKitView.propTypes = {
    *
    * Expects optional values of.
    * {
-   *    highlightColor: PropTypes.string,
-   *    primaryColor: PropTypes.string,
-   *    primaryDarkColor: PropTypes.string
-   *    ...ViewPropTypes.style
+   *    highlightColor: PropTypes.string,  | Highlight or hover color.
+   *    primaryColor: PropTypes.string,    | Color for the main toolbar
+   *    primaryDarkColor: PropTypes.string | Color for the second toolbar
+   *    ...ViewPropTypes.style             | Standard style props
    * }
    */
   style: PDFStylePropTypes
