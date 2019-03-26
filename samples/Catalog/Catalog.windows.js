@@ -184,6 +184,13 @@ const examples = [
   }
 ];
 
+const pdfStyle = {
+  flex: 1,
+  highlightColor: "#61D800", /* Hightlight or hover color. */
+  primaryColor: "red", /* Color for the main toolbar */
+  primaryDarkColor: "rgb(255, 0, 255)" /* Color for the second toolbar */
+};
+
 const styles = StyleSheet.create({
   page: {
     flex: 1,
@@ -450,20 +457,13 @@ class PdfViewToolbarCustomizationScreen extends Component<{}> {
   }
 }
 
-const pdfStyle = {
-  highlightColor: "#61D800", /* Hightlight or hover color. */
-  primaryColor: "red", /* Color for the main toolbar */
-  primaryDarkColor: "rgb(255, 0, 255)" /* Color for the second toolbar */
-};
-
 class PdfViewStyleScreen extends Component<{}> {
   render() {
     return (
     <View style={styles.page}>
       <PSPDFKitView
     ref="pdfView"
-    style={styles.pdfView}
-          pdfStyle={pdfStyle}
+          style={pdfStyle}
     // The default file to open.
     document="ms-appx:///Assets/pdf/annualReport.pdf" />
       <View style={styles.footer}>

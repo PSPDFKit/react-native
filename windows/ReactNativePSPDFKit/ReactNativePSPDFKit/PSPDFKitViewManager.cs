@@ -11,11 +11,9 @@ using System;
 using ReactNative.UIManager;
 using ReactNative.UIManager.Annotations;
 using Windows.Storage;
-using Windows.UI;
 using Newtonsoft.Json.Linq;
 using PSPDFKit.UI;
 using ReactNativePSPDFKit.Events;
-using System.Text.RegularExpressions;
 
 namespace ReactNativePSPDFKit
 {
@@ -91,12 +89,12 @@ namespace ReactNativePSPDFKit
                 var cssTemplateString = await FileIO.ReadTextAsync(cssTemplate);
                 cssTemplateString = cssTemplateString.Replace("${colors}", colorString);
                 
-                //create file in temp folder
+                // We have to write a file in the temp folder due to permission issues.
                 var storageFolder = ApplicationData.Current.TemporaryFolder;
                 var sampleFile = await storageFolder.CreateFileAsync("windows.css", CreationCollisionOption.ReplaceExisting);
                 await FileIO.WriteTextAsync(sampleFile, cssTemplateString);
 
-                // Now we get the assets folder to copy the final css file into.
+                // Now we get the assets folder to copy the final css file into and move the previous file.
                 var appInstalledFolder = Windows.ApplicationModel.Package.Current.InstalledLocation;
                 var assetsFolder = await appInstalledFolder.GetFolderAsync("Assets");
                 await sampleFile.MoveAsync(assetsFolder, "windows.css", NameCollisionOption.ReplaceExisting);

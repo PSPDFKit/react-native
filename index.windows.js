@@ -24,13 +24,21 @@ class PSPDFKitView extends React.Component {
       highlightColor: null,
       primaryColor: null,
       primaryDarkColor: null
-    }
+    },
+    style: ViewPropTypes.style
   }
 
   constructor(props) {
     super(props);
 
-    this.state.pdfStyle = this._setPdfStyle(props.pdfStyle);
+    this.state.pdfStyle.highlightColor = processColor(props.style.highlightColor);
+    delete props.style.highlightColor;
+    this.state.pdfStyle.primaryColor = processColor(props.style.primaryColor);
+    delete props.style.primaryColor;
+    this.state.pdfStyle.primaryDarkColor = processColor(props.style.primaryDarkColor);
+    delete props.style.primaryDarkColor;
+
+    this.state.style = props.style;
   }
 
   render() {
@@ -45,7 +53,7 @@ class PSPDFKitView extends React.Component {
         onDataReturned={this._onDataReturned}
         onOperationResult={this._onOperationResult}
         pdfStyle={this.state.pdfStyle}
-        style={this.props.style}/>
+        style={this.state.style}/>
     );
   }
 
@@ -247,30 +255,13 @@ class PSPDFKitView extends React.Component {
 
     return promise;
   }
-
-  _setPdfStyle(colorObject)
-  {
-    var colorsToSend = {};
-    if (colorObject.highlightColor !== null) {
-      colorsToSend.highlightColor = processColor(colorObject.highlightColor);
-    }
-
-    if (colorObject.primaryColor !== null) {
-      colorsToSend.primaryColor = processColor(colorObject.primaryColor);
-    }
-
-    if (colorObject.primaryDarkColor !== null) {
-      colorsToSend.primaryDarkColor = processColor(colorObject.primaryDarkColor);
-    }
-
-    return colorsToSend;
-  }
 }
 
 const PDFStylePropTypes = PropTypes.shape({
   highlightColor: PropTypes.string,
   primaryColor: PropTypes.string,
-  primaryDarkColor: PropTypes.string
+  primaryDarkColor: PropTypes.string,
+  ...ViewPropTypes.style
 });
 
 PSPDFKitView.propTypes = {
@@ -296,6 +287,7 @@ PSPDFKitView.propTypes = {
    */
   onAnnotationsChanged: PropTypes.func,
   /**
+   * Holds the standard style properties as expected plus extra pdf view style specific properties.
    * Styles the pdf view in accordance to https://pspdfkit.com/guides/windows/current/customizing-the-interface/css-customization/
    *
    * Expects optional values of.
@@ -303,10 +295,10 @@ PSPDFKitView.propTypes = {
    *    highlightColor: PropTypes.string,
    *    primaryColor: PropTypes.string,
    *    primaryDarkColor: PropTypes.string
+   *    ...ViewPropTypes.style
    * }
    */
-  pdfStyle: PDFStylePropTypes,
-  style: ViewPropTypes.style
+  style: PDFStylePropTypes
 };
 
 const RCTPSPDFKitView = requireNativeComponent(
