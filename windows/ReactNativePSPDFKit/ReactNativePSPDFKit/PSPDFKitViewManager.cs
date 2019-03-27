@@ -8,15 +8,10 @@
 //
 
 using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Windows.Data.Json;
 using ReactNative.UIManager;
 using ReactNative.UIManager.Annotations;
 using Windows.Storage;
 using Newtonsoft.Json.Linq;
-using PSPDFKit.Pdf;
-using PSPDFKit.Pdf.Annotation;
 using PSPDFKit.UI;
 using ReactNativePSPDFKit.Events;
 
@@ -30,6 +25,8 @@ namespace ReactNativePSPDFKit
         private const int COMMAND_SAVE_CURRENT_DOCUMENT = 3;
         private const int COMMAND_GET_ANNOTATIONS = 4;
         private const int COMMAND_ADD_ANNOTATION = 5;
+        private const int COMMAND_GET_TOOLBAR_ITEMS = 6;
+        private const int COMMAND_SET_TOOLBAR_ITEMS = 7;
 
         internal readonly PDFViewPage PdfViewPage = new PDFViewPage();
 
@@ -44,7 +41,7 @@ namespace ReactNativePSPDFKit
         public override string Name => "RCTPSPDFKitView";
 
         [ReactProp("document")]
-        public async void SetDocumentAsync(PDFViewPage view, String document)
+        public async void SetDocumentAsync(PDFViewPage view, string document)
         {
             var storagefile = await StorageFile.GetFileFromApplicationUriAsync(new Uri(document));
             await view.SetDefaultDocument(storagefile);
@@ -62,7 +59,52 @@ namespace ReactNativePSPDFKit
             view.SetShowToolbar(!hideNavigationBar);
         }
 
-        public override IReadOnlyDictionary<string, object> CommandsMap => new Dictionary<string, object>
+        [ReactProp("pdfStyle")]
+        public async void SetCustomCss(PDFViewPage view, JObject styleJObject)
+        {
+            var colorString = string.Empty;
+            if (styleJObject.ContainsKey("highlightColor"))
+            {
+                var highlightColor = ColorHelpers.Parse(styleJObject["highlightColor"].Value<uint>());
+                colorString += $"    --primary: {highlightColor.ToHexWithoutAlpha()};\r\n";
+            }
+
+            if (styleJObject.ContainsKey("primaryColor"))
+            {
+                var primaryColor = ColorHelpers.Parse(styleJObject["primaryColor"].Value<uint>());
+                colorString += $"    --primary-dark-1: {primaryColor.ToHexWithoutAlpha()};\r\n";
+            }
+
+            if (styleJObject.ContainsKey("primaryDarkColor"))
+            {
+                var primaryDarkColor = ColorHelpers.Parse(styleJObject["primaryDarkColor"].Value<uint>());
+                colorString += $"    --primary-dark-2: {primaryDarkColor.ToHexWithoutAlpha()};\r\n";
+            }
+
+            if (colorString.Length > 0)
+            {
+                var cssTemplate =
+                    await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appx:///ReactNativePSPDFKit/Assets/customTheme.css"));
+
+                var cssTemplateString = await FileIO.ReadTextAsync(cssTemplate);
+                cssTemplateString = cssTemplateString.Replace("${colors}", colorString);
+                
+                // We have to write a file in the temp folder due to permission issues.
+                var storageFolder = ApplicationData.Current.TemporaryFolder;
+                var sampleFile = await storageFolder.CreateFileAsync("windows.css", CreationCollisionOption.ReplaceExisting);
+                await FileIO.WriteTextAsync(sampleFile, cssTemplateString);
+
+                // Now we get the assets folder to copy the final css file into and move the previous file.
+                var appInstalledFolder = Windows.ApplicationModel.Package.Current.InstalledLocation;
+                var assetsFolder = await appInstalledFolder.GetFolderAsync("Assets");
+                await sampleFile.MoveAsync(assetsFolder, "windows.css", NameCollisionOption.ReplaceExisting);
+
+                // Pass the the css file to the pdf view in a web context.
+                PdfViewPage.Pdfview.Css = new Uri("ms-appx-web:///Assets/windows.css");
+            }
+        }
+
+        public override JObject ViewCommandsMap => new JObject
         {
             {
                 "enterAnnotationCreationMode", COMMAND_ENTER_ANNOTATION_CREATION_MODE
@@ -78,6 +120,12 @@ namespace ReactNativePSPDFKit
             },
             {
                 "addAnnotation", COMMAND_ADD_ANNOTATION
+            },
+            {
+                "getToolbarItems", COMMAND_GET_TOOLBAR_ITEMS
+            },
+            {
+                "setToolbarItems", COMMAND_SET_TOOLBAR_ITEMS
             }
         };
 
@@ -86,52 +134,65 @@ namespace ReactNativePSPDFKit
             switch (commandId)
             {
                 case COMMAND_ENTER_ANNOTATION_CREATION_MODE:
-                    await PdfViewPage.Pdfview.Controller.SetInteractionModeAsync(InteractionMode.Note);
+                    await PdfViewPage.SetInteractionMode(args[0].Value<int>(), InteractionMode.Note);
                     break;
                 case COMMAND_EXIT_CURRENTLY_ACTIVE_MODE:
-                    await PdfViewPage.Pdfview.Controller.SetInteractionModeAsync(InteractionMode.None);
+                    await PdfViewPage.SetInteractionMode(args[0].Value<int>(), InteractionMode.None);
                     break;
                 case COMMAND_SAVE_CURRENT_DOCUMENT:
-                    await PdfViewPage.ExportCurrentDocument();
+                    await PdfViewPage.ExportCurrentDocument(args[0].Value<int>());
                     break;
                 case COMMAND_GET_ANNOTATIONS:
                     await PdfViewPage.GetAnnotations(args[0].Value<int>(), args[1].Value<int>());
                     break;
                 case COMMAND_ADD_ANNOTATION:
-                    await PdfViewPage.Pdfview.Document.CreateAnnotationAsync(Factory.FromJson(JsonObject.Parse(args[0].ToString())));
+                    await PdfViewPage.CreateAnnotation(args[0].Value<int>(), args[1].ToString());
+                    break;
+                case COMMAND_GET_TOOLBAR_ITEMS:
+                    PdfViewPage.GetToolbarItems(args[0].Value<int>());
+                    break;
+                case COMMAND_SET_TOOLBAR_ITEMS:
+                    await PdfViewPage.SetToolbarItems(args[0].Value<int>(), args[1].ToString());
                     break;
             }
         }
 
-        public override IReadOnlyDictionary<string, object> ExportedCustomDirectEventTypeConstants =>
-            new Dictionary<string, object>
+        public override JObject CustomDirectEventTypeConstants =>
+            new JObject
             {
                 {
                     PdfViewAnnotationChangedEvent.EVENT_NAME,
-                    new Dictionary<string, object>
+                    new JObject
                     {
                         {"registrationName", "onAnnotationsChanged"},
                     }
                 },
                 {
                     PdfViewDocumentSavedEvent.EVENT_NAME,
-                    new Dictionary<string, object>
+                    new JObject
                     {
                         {"registrationName", "onDocumentSaved"},
                     }
                 },
                 {
                     PdfViewDocumentSaveFailedEvent.EVENT_NAME,
-                    new Dictionary<string, object>
+                    new JObject
                     {
                         {"registrationName", "onDocumentSaveFailed"},
                     }
                 },
                 {
                     PdfViewDataReturnedEvent.EVENT_NAME,
-                    new Dictionary<string, object>
+                    new JObject
                     {
                         {"registrationName", "onDataReturned"},
+                    }
+                },
+                {
+                    PdfViewOperationResult.EVENT_NAME,
+                    new JObject
+                    {
+                        {"registrationName", "onOperationResult"},
                     }
                 }
             };

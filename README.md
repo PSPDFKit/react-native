@@ -264,8 +264,9 @@ The PSPDFKit React Native iOS Wrapper allows you to specify a custom grouping fo
 - Android Build Tools 23.0.1 (React Native)
 - Android Build Tools 28.0.3 (PSPDFKit module)
 - Android Gradle plugin >= 3.2.1
-- PSPDFKit >= 5.2.0
-- react-native >= 0.57.8
+- PSPDFKit >= 5.3.0
+- react-native for example app >= 0.59.2
+- react-native for Catalog app >= 0.57.8
 
 #### Getting Started
 
@@ -300,25 +301,24 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
  }
 ```
 
-8. PSPDFKit targets modern platforms, so you'll have to set the `minSdkVersion` to 19. In `YourApp/android/build.gradle` (note **two** places to edit):
+8. PSPDFKit targets modern platforms, so you'll have to set the `minSdkVersion` to 19. In `YourApp/android/build.gradle`:
 ```diff
 ...
-  ext {
--     buildToolsVersion = "28.0.2"
-+     buildToolsVersion = "28.0.3"
--     minSdkVersion = 16
-+     minSdkVersion = 19
-      compileSdkVersion = 28
-      targetSdkVersion = 27
-      supportLibVersion = "28.0.0"
-  }
+ buildscript {
+     ext {
+         buildToolsVersion = "28.0.3"
+-        minSdkVersion = 16
++        minSdkVersion = 19
+         compileSdkVersion = 28
+         targetSdkVersion = 28
+         supportLibVersion = "28.0.0"
 ...
 ```
  
-9. We will also need to enable MultiDex and Java 8 support. In `YourApp/android/app/build.gradle` (note **two** places to edit):
+9. We will also need to enable MultiDex support. In `YourApp/android/app/build.gradle`:
 
 ```diff
-
+...
   defaultConfig {
       applicationId "com.yourapp"
       minSdkVersion rootProject.ext.minSdkVersion
@@ -327,12 +327,7 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
       versionName "1.0"
 +     multiDexEnabled true
   }
-
-+ compileOptions {
-+     sourceCompatibility JavaVersion.VERSION_1_8
-+     targetCompatibility JavaVersion.VERSION_1_8
-+ }
-   ...
+...
 ```
 
 10. PSPDFKit also uses AndroidX so you need to enable this as well in your `gradle.properties`:
@@ -679,6 +674,8 @@ Shows the pdf `document` from the local device filesystem, or your app's assets.
 - PSPDFKit for Windows.vsix (installed)
 - PowerShell
 
+*IMPORTANT* : `react-native-pspdfkit` for windows does not yet support react-native 0.59.\*. Currently [`react-native-windows`][https://github.com/Microsoft/react-native-windows/releases] is not keeping up pace with `react-native`, where the last official release was 0.54.\* and the last RC was 0.57.\*. We have tested and require 0.57.0 to keep version aligned as much as possible.
+
 #### Getting Started
 
 Let's create a simple app that integrates PSPDFKit and uses the react-native-pspdfkit module.
@@ -687,22 +684,23 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
 2. Make sure `react-native-cli` is installed: `yarn global add react-native-cli`.
 3. Install Windows Tool for React Native: `yarn add global windows-build-tools`.
 4. Open `x64 Native Tools Command Prompt for VS 2017` program.
-5. Create the app with `react-native init --version=0.55.4 YourApp` in a location of your choice.
+5. Create the app with `react-native init --version=0.57.8 YourApp` in a location of your choice.
 6. Step into your newly created app folder: `cd YourApp`.
 7. Install the Windows helper plugin: `yarn add --dev rnpm-plugin-windows`.
-8. Install `react-native-pspdfkit` from GitHub: `yarn add github:PSPDFKit/react-native`.
+8. Install `react-native-pspdfkit` from GitHub: `yarn add github:PSPDFKit/react-native#windows-1.11.0`.
 9. Install `react-native-fs` from GitHub: `yarn add react-native-fs`.
 10. Install all modules for Windows: `yarn install`. (Because of a [bug](https://github.com/yarnpkg/yarn/issues/2165) you may need to clean `yarn`'s cache with `yarn cache clean` before.)
 11. Initialize the windows project: `react-native windows`.
 12. Link module `react-native-pspdfkit`: `react-native link react-native-pspdfkit`.
-13. Open the Visual Studio solution in `react-native\YourApp\windows`.
-14. Accept and install any required extensions when prompted.
-15. If the settings window opens, click on `Developer` and select `yes`.
-16. Mark `PSPDFKit SDK` and `Visual C++ Runtime` as dependencies for `YourApp`:
+13. Link module `react-native-fs`: `react-native link react-native-fs`.
+14. Open the Visual Studio solution in `react-native\YourApp\windows`.
+15. Accept and install any required extensions when prompted.
+16. If the settings window opens, click on `Developer` and select `yes`.
+17. Mark `PSPDFKit SDK` and `Visual C++ Runtime` as dependencies for `YourApp`:
     Right click on `YourApp` -> Add -> Refererece... Click on Projects and tick `ReactNativePSPDFKit`. Click on Universal Windows -> Extensions and tick `PSPDFKit for UWP` and `Visual C++ 2015 Runtime for Universal Windows Platform Apps` then click ok.
     ![Add References Selection](screenshots/windowsAddReferences.PNG)
     ![Reference Checkboxes](screenshots/windowsSelectPSPDFKit+UWP.PNG)
-17. Add an application resource to your `Appl.xaml` to reference your License key.
+18. Add an application resource to your `Appl.xaml` to reference your License key.
 
 ```diff
 <rn:ReactApplication
@@ -723,7 +721,7 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
 </rn:ReactApplication>
 ```
 
-18. Create a new file resource called `License.xaml` with your PSPDFKit license key at the top level of the
+19. Create a new file resource called `License.xaml` with your PSPDFKit license key at the top level of the
     project. (Replace `ENTER LICENSE KEY HERE` with your key)
 
 ```xaml
@@ -736,11 +734,11 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
 </ResourceDictionary>
 ```
 
-19. Change the target SDK of YourApp to >= 10.0.16299 and Min Version to >= 10.0.15063 : Right Click on YourApp -> Properties. Go to
-    Application and change Target Version to >= 10.0.16299 and change Min Version to >= 10.0.15063.
+20. Change the target SDK of YourApp to >= 10.0.17134 and Min Version to >= 10.0.15063 : Right Click on YourApp -> Properties. Go to
+    Application and change Target Version to >= 10.0.17134 and change Min Version to >= 10.0.15063.
     ![Change SDK Version](screenshots/changeVersionSDK.png)
-20. Save Changes: File -> Save All
-21. Add the `PSPDFKitView` and `PSPDFKit` module into your `App.windows.js` file, and add a open button to allow the user
+21. Save Changes: File -> Save All
+22. Add the `PSPDFKitView` and `PSPDFKit` module into your `App.windows.js` file, and add a open button to allow the user
     to navigate the file system.
 
 ```javascript
@@ -804,9 +802,9 @@ var styles = StyleSheet.create({
 });
 ```
 
-22. Now run the application on the command line: `react-native run-windows`.
-23. Press Yes when PowerShell wants to run.
-24. Type 'y' when asking if you want to install the certificate.
+23. Now run the application on the command line: `react-native run-windows`.
+24. Press Yes when PowerShell wants to run.
+25. Type 'y' when asking if you want to install the certificate.
 
 #### Running Catalog Project
 

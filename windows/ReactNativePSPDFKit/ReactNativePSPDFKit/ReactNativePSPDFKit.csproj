@@ -106,10 +106,12 @@
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="ColorUtils.cs" />
     <Compile Include="Events\PdfViewAnnotationChangedEvent.cs" />
     <Compile Include="Events\PdfViewDocumentSavedEvent.cs" />
     <Compile Include="Events\PdfViewDataReturnedEvent.cs" />
     <Compile Include="Events\PdfViewDocumentSaveFailedEvent.cs" />
+    <Compile Include="Events\PdfViewOperationResult.cs" />
     <Compile Include="JsonUtils.cs" />
     <Compile Include="LibraryModule.cs" />
     <Compile Include="PSPDFKitModule.cs" />
@@ -137,7 +139,7 @@
     <SDKReference Include="Microsoft.VCLibs, Version=14.0">
       <Name>Visual C++ 2015 Runtime for Universal Windows Platform Apps</Name>
     </SDKReference>
-    <SDKReference Include="PSPDFKitSDK, Version=1.10.0">
+    <SDKReference Include="PSPDFKitSDK, Version=1.11.0">
       <Name>PSPDFKit for UWP</Name>
     </SDKReference>
   </ItemGroup>
@@ -156,6 +158,12 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Assets\customTheme.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

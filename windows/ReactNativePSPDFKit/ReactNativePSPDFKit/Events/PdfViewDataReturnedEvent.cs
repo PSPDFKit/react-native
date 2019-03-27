@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.Toolkit.Uwp.UI.Controls.TextToolbarButtons;
 using Newtonsoft.Json.Linq;
 using PSPDFKit.Pdf.Annotation;
 using ReactNative.UIManager.Events;
+using IToolbarItem = PSPDFKit.UI.ToolbarComponents.IToolbarItem;
 
 namespace ReactNativePSPDFKit.Events
 {
@@ -33,6 +35,22 @@ namespace ReactNativePSPDFKit.Events
                     { "annoations",annotationsSerialized}
                 };
                 _payload.Add("result", annotations);
+            }
+            catch (Exception e)
+            {
+                _payload.Add("error", e.Message);
+            }
+        }
+
+        public PdfViewDataReturnedEvent(int viewId, int requestId, IEnumerable<IToolbarItem> toolbarItems) :
+            base(viewId)
+        {
+            _payload.Add("requestId", requestId);
+            try
+            {
+                var toolbarItemsJson = PSPDFKit.UI.ToolbarComponents.Factory.ToJsonArray(toolbarItems);
+                
+                _payload.Add("result", JArray.Parse(toolbarItemsJson.ToString()));
             }
             catch (Exception e)
             {

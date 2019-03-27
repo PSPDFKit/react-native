@@ -338,6 +338,7 @@
 
 - (void)onStateChangedForPDFViewController:(PSPDFViewController *)pdfController pageView:(PSPDFPageView *)pageView pageAtIndex:(NSInteger)pageIndex {
   if (self.onStateChanged) {
+    BOOL isDocumentLoaded = [pdfController.document isValid];
     PSPDFPageCount pageCount = pdfController.document.pageCount;
     BOOL isAnnotationToolBarVisible = [pdfController.annotationToolbarController isToolbarVisible];
     BOOL hasSelectedAnnotations = pageView.selectedAnnotations.count > 0;
@@ -350,7 +351,8 @@
       }
     }
     
-    self.onStateChanged(@{@"currentPageIndex" : @(pageIndex),
+    self.onStateChanged(@{@"documentLoaded" : @(isDocumentLoaded),
+                          @"currentPageIndex" : @(pageIndex),
                           @"pageCount" : @(pageCount),
                           @"annotationCreationActive" : @(isAnnotationToolBarVisible),
                           @"annotationEditingActive" : @(hasSelectedAnnotations),

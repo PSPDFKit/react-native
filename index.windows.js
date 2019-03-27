@@ -11,23 +11,48 @@ import {
   requireNativeComponent,
   ViewPropTypes,
   findNodeHandle,
-  UIManager
+  UIManager,
+  processColor
 } from "react-native";
 
 class PSPDFKitView extends React.Component {
   _nextRequestId = 1;
   _requestMap = new Map();
 
+  state = {
+    pdfStyle: {
+      highlightColor: null,
+      primaryColor: null,
+      primaryDarkColor: null
+    },
+    style: ViewPropTypes.style
+  };
+
+  constructor(props) {
+    super(props);
+
+    this.state.pdfStyle.highlightColor = processColor(props.style.highlightColor);
+    delete props.style.highlightColor;
+    this.state.pdfStyle.primaryColor = processColor(props.style.primaryColor);
+    delete props.style.primaryColor;
+    this.state.pdfStyle.primaryDarkColor = processColor(props.style.primaryDarkColor);
+    delete props.style.primaryDarkColor;
+
+    this.state.style = props.style;
+  }
+
   render() {
     return (
       <RCTPSPDFKitView
         ref="pdfView"
-        {...this.props}
+        document={this.props.document}
+        pageIndex={this.props.pageIndex}
+        hideNavigationBar={this.props.hideNavigationBar}
         onAnnotationsChanged={this._onAnnotationsChanged}
-        onDocumentSaved={this._onDocumentSaved}
-        onDocumentSaveFailed={this._onDocumentSaveFailed}
         onDataReturned={this._onDataReturned}
-      />
+        onOperationResult={this._onOperationResult}
+        pdfStyle={this.state.pdfStyle}
+        style={this.state.style}/>
     );
   }
 
@@ -37,20 +62,8 @@ class PSPDFKitView extends React.Component {
     }
   };
 
-  _onDocumentSaved = event => {
-    if (this.props.onDocumentSaved) {
-      this.props.onDocumentSaved(event.nativeEvent);
-    }
-  };
-
-  _onDocumentSaveFailed = event => {
-    if (this.props.onDocumentSaveFailed) {
-      this.props.onDocumentSaveFailed(event.nativeEvent);
-    }
-  };
-
   _onDataReturned = event => {
-    let { requestId, result, error } = event.nativeEvent;
+    let {requestId, result, error} = event.nativeEvent;
     let promise = this._requestMap[requestId];
     if (result) {
       promise.resolve(result);
@@ -60,55 +73,101 @@ class PSPDFKitView extends React.Component {
     this._requestMap.delete(requestId);
   };
 
-  /**
-   * Enters the annotation creation mode, showing the annotation creation toolbar.
-   *
-   */
-  enterAnnotationCreationMode = function() {
-    UIManager.dispatchViewManagerCommand(
-      findNodeHandle(this.refs.pdfView),
-      UIManager.RCTPSPDFKitView.Commands.enterAnnotationCreationMode,
-      []
-    );
+  _onOperationResult = event => {
+    let {requestId, success, error} = event.nativeEvent;
+    let promise = this._requestMap[requestId];
+    if (success) {
+      promise.resolve(success);
+    } else {
+      promise.reject(error);
+    }
+    this._requestMap.delete(requestId);
   };
 
   /**
-   * Exits the currently active mode, hiding all toolbars.
+   * Enters the annotation creation mode, showing the annotation creation toolbar.
+   *
+   * @returns a promise resolving if successful or rejects if an error occurs with and error message
    */
-  exitCurrentlyActiveMode = function() {
+  enterAnnotationCreationMode() {
+    let requestId = this._nextRequestId++;
+    let requestMap = this._requestMap;
+
+    // We create a promise here that will be resolved once onDataReturned is called.
+    let promise = new Promise((resolve, reject) => {
+      requestMap[requestId] = {resolve: resolve, reject: reject};
+    });
+
+    UIManager.dispatchViewManagerCommand(
+      findNodeHandle(this.refs.pdfView),
+      UIManager.RCTPSPDFKitView.Commands.enterAnnotationCreationMode,
+      [requestId]
+    );
+
+    return promise;
+  }
+
+  /**
+   * Exits the currently active mode, hiding all active sub-toolbars.
+   *
+   * @returns a promise resolving if successful or rejects if an error occurs with and error message
+   */
+  exitCurrentlyActiveMode() {
+    let requestId = this._nextRequestId++;
+    let requestMap = this._requestMap;
+
+    // We create a promise here that will be resolved once onDataReturned is called.
+    let promise = new Promise((resolve, reject) => {
+      requestMap[requestId] = {resolve: resolve, reject: reject};
+    });
+
     UIManager.dispatchViewManagerCommand(
       findNodeHandle(this.refs.pdfView),
       UIManager.RCTPSPDFKitView.Commands.exitCurrentlyActiveMode,
       []
     );
-  };
+
+    return promise;
+  }
 
   /**
    * Saves the currently opened document.
-   */
-  saveCurrentDocument = function() {
-    UIManager.dispatchViewManagerCommand(
-      findNodeHandle(this.refs.pdfView),
-      UIManager.RCTPSPDFKitView.Commands.saveCurrentDocument,
-      []
-    );
-  };
-
-  /**
-   * Gets all annotations of the given type from the page.
    *
-   * @param pageIndex The page to get the annotations for.
-   *
-   * Returns a promise resolving an array with the following structure:
-   * {'annotations' : [instantJson]}
+   * @returns a promise resolving if successful or rejects if an error occurs with and error message
    */
-  getAnnotations = function(pageIndex) {
+  saveCurrentDocument() {
     let requestId = this._nextRequestId++;
     let requestMap = this._requestMap;
 
     // We create a promise here that will be resolved once onDataReturned is called.
-    let promise = new Promise(function(resolve, reject) {
-      requestMap[requestId] = { resolve: resolve, reject: reject };
+    let promise = new Promise((resolve, reject) => {
+      requestMap[requestId] = {resolve: resolve, reject: reject};
+    });
+
+    UIManager.dispatchViewManagerCommand(
+      findNodeHandle(this.refs.pdfView),
+      UIManager.RCTPSPDFKitView.Commands.saveCurrentDocument,
+      [requestId]
+    );
+
+    return promise;
+  }
+
+  /**
+   * Gets all annotations from a specific page.
+   *
+   * @param pageIndex The page to get the annotations for.
+   *
+   * @returns a promise resolving an array with the following structure:
+   * {'annotations' : [instantJson]}
+   */
+  getAnnotations(pageIndex) {
+    let requestId = this._nextRequestId++;
+    let requestMap = this._requestMap;
+
+    // We create a promise here that will be resolved once onDataReturned is called.
+    let promise = new Promise((resolve, reject) => {
+      requestMap[requestId] = {resolve: resolve, reject: reject};
     });
 
     UIManager.dispatchViewManagerCommand(
@@ -118,21 +177,91 @@ class PSPDFKitView extends React.Component {
     );
 
     return promise;
-  };
+  }
 
   /**
    * Adds a new annotation to the current document.
    *
-   * @param annotation InstantJson of the annotation to add.
+   * @param annotation InstantJson of the annotation to add with the format of
+   * https://pspdfkit.com/guides/windows/current/importing-exporting/instant-json/#instant-annotation-json-api
+   *
+   * @returns a promise resolving if successful or rejects if an error occurs with and error message
    */
-  addAnnotation = function(annotation) {
+  addAnnotation(annotation) {
+    let requestId = this._nextRequestId++;
+    let requestMap = this._requestMap;
+
+    // We create a promise here that will be resolved once onDataReturned is called.
+    let promise = new Promise((resolve, reject) => {
+      requestMap[requestId] = {resolve: resolve, reject: reject};
+    });
+
     UIManager.dispatchViewManagerCommand(
       findNodeHandle(this.refs.pdfView),
       UIManager.RCTPSPDFKitView.Commands.addAnnotation,
-      [annotation]
+      [requestId, annotation]
     );
+
+    return promise;
   };
+
+  /**
+   * Gets toolbar items currently shown.
+   *
+   * @return Receives an array of https://pspdfkit.com/api/web/PSPDFKit.ToolbarItem.html.
+   */
+  getToolbarItems() {
+    let requestId = this._nextRequestId++;
+    let requestMap = this._requestMap;
+
+    // We create a promise here that will be resolved once onDataReturned is called.
+    let promise = new Promise((resolve, reject) => {
+      requestMap[requestId] = {resolve: resolve, reject: reject};
+    });
+
+    UIManager.dispatchViewManagerCommand(
+      findNodeHandle(this.refs.pdfView),
+      UIManager.RCTPSPDFKitView.Commands.getToolbarItems,
+      [requestId]
+    );
+
+    return promise;
+  }
+
+  /**
+   * Set toolbar items currently shown.
+   *
+   * Receives an array of https://pspdfkit.com/api/web/PSPDFKit.ToolbarItem.html.
+   * Default toolbar items are provided for simple usage
+   * https://pspdfkit.com/api/web/PSPDFKit.html#.defaultToolbarItems.
+   * For more advance features please refer to
+   * https://pspdfkit.com/guides/web/current/customizing-the-interface/customizing-the-toolbar/.
+   */
+  setToolbarItems(toolbarItems) {
+    let requestId = this._nextRequestId++;
+    let requestMap = this._requestMap;
+
+    // We create a promise here that will be resolved once onDataReturned is called.
+    let promise = new Promise((resolve, reject) => {
+      requestMap[requestId] = {resolve: resolve, reject: reject};
+    });
+
+    UIManager.dispatchViewManagerCommand(
+      findNodeHandle(this.refs.pdfView),
+      UIManager.RCTPSPDFKitView.Commands.setToolbarItems,
+      [requestId, toolbarItems]
+    );
+
+    return promise;
+  }
 }
+
+const PDFStylePropTypes = PropTypes.shape({
+  highlightColor: PropTypes.string,
+  primaryColor: PropTypes.string,
+  primaryDarkColor: PropTypes.string,
+  ...ViewPropTypes.style
+});
 
 PSPDFKitView.propTypes = {
   /**
@@ -156,10 +285,22 @@ PSPDFKitView.propTypes = {
    * }
    */
   onAnnotationsChanged: PropTypes.func,
-  ...ViewPropTypes
+  /**
+   * Holds the standard style properties as expected plus extra pdf view style specific properties.
+   * Styles the pdf view in accordance to https://pspdfkit.com/guides/windows/current/customizing-the-interface/css-customization/
+   *
+   * Expects optional values of.
+   * {
+   *    highlightColor: PropTypes.string,  | Highlight or hover color.
+   *    primaryColor: PropTypes.string,    | Color for the main toolbar
+   *    primaryDarkColor: PropTypes.string | Color for the second toolbar
+   *    ...ViewPropTypes.style             | Standard style props
+   * }
+   */
+  style: PDFStylePropTypes
 };
 
-var RCTPSPDFKitView = requireNativeComponent(
+const RCTPSPDFKitView = requireNativeComponent(
   "RCTPSPDFKitView",
   PSPDFKitView,
   {}
