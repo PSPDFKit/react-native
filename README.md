@@ -265,7 +265,8 @@ The PSPDFKit React Native iOS Wrapper allows you to specify a custom grouping fo
 - Android Build Tools 28.0.3 (PSPDFKit module)
 - Android Gradle plugin >= 3.2.1
 - PSPDFKit >= 5.0.1
-- react-native >= 0.57.8
+- react-native for example app >= 0.59.2
+- react-native for Catalog app >= 0.57.8
 
 #### Getting Started
 
@@ -300,25 +301,24 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
  }
 ```
 
-8. PSPDFKit targets modern platforms, so you'll have to set the `minSdkVersion` to 19. In `YourApp/android/build.gradle` (note **two** places to edit):
+8. PSPDFKit targets modern platforms, so you'll have to set the `minSdkVersion` to 19. In `YourApp/android/build.gradle`:
 ```diff
 ...
-  ext {
--     buildToolsVersion = "28.0.2"
-+     buildToolsVersion = "28.0.3"
--     minSdkVersion = 16
-+     minSdkVersion = 19
-      compileSdkVersion = 28
-      targetSdkVersion = 27
-      supportLibVersion = "28.0.0"
-  }
+ buildscript {
+     ext {
+         buildToolsVersion = "28.0.3"
+-        minSdkVersion = 16
++        minSdkVersion = 19
+         compileSdkVersion = 28
+         targetSdkVersion = 28
+         supportLibVersion = "28.0.0"
 ...
 ```
  
-9. We will also need to enable MultiDex and Java 8 support. In `YourApp/android/app/build.gradle` (note **two** places to edit):
+9. We will also need to enable MultiDex support. In `YourApp/android/app/build.gradle`:
 
 ```diff
-
+...
   defaultConfig {
       applicationId "com.yourapp"
       minSdkVersion rootProject.ext.minSdkVersion
@@ -327,12 +327,7 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
       versionName "1.0"
 +     multiDexEnabled true
   }
-
-+ compileOptions {
-+     sourceCompatibility JavaVersion.VERSION_1_8
-+     targetCompatibility JavaVersion.VERSION_1_8
-+ }
-   ...
+...
 ```
 
 10. <a id="step-10"></a>Enter your PSPDFKit license key into `YourApp/android/app/src/main/AndroidManifest.xml` file:
