@@ -11,22 +11,48 @@ import {
   requireNativeComponent,
   ViewPropTypes,
   findNodeHandle,
-  UIManager
+  UIManager,
+  processColor
 } from "react-native";
 
 class PSPDFKitView extends React.Component {
   _nextRequestId = 1;
   _requestMap = new Map();
 
+  state = {
+    pdfStyle: {
+      highlightColor: null,
+      primaryColor: null,
+      primaryDarkColor: null
+    },
+    style: ViewPropTypes.style
+  };
+
+  constructor(props) {
+    super(props);
+
+    this.state.pdfStyle.highlightColor = processColor(props.style.highlightColor);
+    delete props.style.highlightColor;
+    this.state.pdfStyle.primaryColor = processColor(props.style.primaryColor);
+    delete props.style.primaryColor;
+    this.state.pdfStyle.primaryDarkColor = processColor(props.style.primaryDarkColor);
+    delete props.style.primaryDarkColor;
+
+    this.state.style = props.style;
+  }
+
   render() {
     return (
       <RCTPSPDFKitView
         ref="pdfView"
-        {...this.props}
+        document={this.props.document}
+        pageIndex={this.props.pageIndex}
+        hideNavigationBar={this.props.hideNavigationBar}
         onAnnotationsChanged={this._onAnnotationsChanged}
         onDataReturned={this._onDataReturned}
         onOperationResult={this._onOperationResult}
-      />
+        pdfStyle={this.state.pdfStyle}
+        style={this.state.style}/>
     );
   }
 
@@ -230,6 +256,13 @@ class PSPDFKitView extends React.Component {
   }
 }
 
+const PDFStylePropTypes = PropTypes.shape({
+  highlightColor: PropTypes.string,
+  primaryColor: PropTypes.string,
+  primaryDarkColor: PropTypes.string,
+  ...ViewPropTypes.style
+});
+
 PSPDFKitView.propTypes = {
   /**
    * Path to the PDF file that should be displayed.
@@ -252,7 +285,19 @@ PSPDFKitView.propTypes = {
    * }
    */
   onAnnotationsChanged: PropTypes.func,
-  ...ViewPropTypes
+  /**
+   * Holds the standard style properties as expected plus extra pdf view style specific properties.
+   * Styles the pdf view in accordance to https://pspdfkit.com/guides/windows/current/customizing-the-interface/css-customization/
+   *
+   * Expects optional values of.
+   * {
+   *    highlightColor: PropTypes.string,  | Highlight or hover color.
+   *    primaryColor: PropTypes.string,    | Color for the main toolbar
+   *    primaryDarkColor: PropTypes.string | Color for the second toolbar
+   *    ...ViewPropTypes.style             | Standard style props
+   * }
+   */
+  style: PDFStylePropTypes
 };
 
 const RCTPSPDFKitView = requireNativeComponent(
