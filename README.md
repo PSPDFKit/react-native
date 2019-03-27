@@ -265,7 +265,8 @@ The PSPDFKit React Native iOS Wrapper allows you to specify a custom grouping fo
 - Android Build Tools 28.0.3 (PSPDFKit module)
 - Android Gradle plugin >= 3.2.1
 - PSPDFKit >= 5.0.1
-- react-native >= 0.59.2
+- react-native for example app >= 0.59.2
+- react-native for Catalog app >= 0.57.8
 
 #### Getting Started
 
