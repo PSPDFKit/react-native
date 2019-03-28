@@ -1,4 +1,4 @@
-## React Native wrapper for PSPDFKit for iOS, Android & Windows. (PDF SDK for React Native)
+## React Native wrapper for PSPDFKit for iOS, Android (Experimental Android X Version) & Windows. (PDF SDK for React Native)
 
 ![PDF SDK for React Native](https://github.com/PSPDFKit/react-native/blob/master/article-header.png?raw=true)
 
@@ -275,7 +275,7 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
 1. Make sure `react-native-cli` is installed: `yarn global add react-native-cli`
 2. Create the app with `react-native init YourApp`.
 3. Step into your newly created app folder: `cd YourApp`.
-4. Add `react-native-pspdfkit` module from GitHub: `yarn add github:PSPDFKit/react-native`.
+4. Add `react-native-pspdfkit` module from GitHub: `yarn add github:PSPDFKit/react-native#reinhard/android-x-support`.
 5. Install all the dependencies for the project: `yarn install`. (Because of a [bug](https://github.com/yarnpkg/yarn/issues/2165) you may need to clean `yarn`'s cache with `yarn cache clean` before.)
 6. Link module `react-native-pspdfkit`: `react-native link react-native-pspdfkit`.
 7. <a id="step-7"></a>Add PSPDFKit repository to `YourApp/android/build.gradle` so PSPDFKit library can be downloaded:
