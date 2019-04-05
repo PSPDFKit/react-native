@@ -441,7 +441,7 @@ class PdfViewToolbarCustomizationScreen extends Component<{}> {
             </View>
             <View style={styles.button}>
               <Button onPress={() =>
-                this.refs.pdfView.setToolbarItems([{ type: "ink" }]).then(() => {
+                this.refs.pdfView.setToolbarItems([{type: "ink"}]).then(() => {
                   alert("Toolbar Items set.");
                 })} title="Set Toolbar Items"/>
             </View>
