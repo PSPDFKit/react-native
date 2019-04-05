@@ -138,18 +138,14 @@ namespace ReactNativePSPDFKit
 
         internal async Task SetToolbarItems(int requestId, string toolbarItemsJson)
         {
-            try
-            {
-                var toolbarItems =
-                    PSPDFKit.UI.ToolbarComponents.Factory.FromJsonArray(JsonArray.Parse(toolbarItemsJson));
-                await Pdfview.Controller.SetToolbarItemsAsync(toolbarItems.ToList());
-            }
-            catch (Exception e)
-            {
-                this.GetReactContext().GetNativeModule<UIManagerModule>().EventDispatcher.DispatchEvent(
-                    new PdfViewDataReturnedEvent(this.GetTag(), requestId, e.Message)
-                );
-            }
+            await RunOperationAndFireEvent(requestId,
+                async () =>
+                {
+                    var toolbarItems =
+                        PSPDFKit.UI.ToolbarComponents.Factory.FromJsonArray(JsonArray.Parse(toolbarItemsJson));
+                    await Pdfview.Controller.SetToolbarItemsAsync(toolbarItems.ToList());
+                }
+            );
         }
 
         internal async Task CreateAnnotation(int requestId, string annotationJsonString)
