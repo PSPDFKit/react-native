@@ -13,6 +13,8 @@
 @import PSPDFKit;
 @import PSPDFKitUI;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface RCTPSPDFKitView: UIView
 
 @property (nonatomic, readonly) PSPDFViewController *pdfController;
@@ -47,3 +49,5 @@
 - (void)setFormFieldValue:(NSString *)value fullyQualifiedName:(NSString *)fullyQualifiedName;
 
 @end
+
+NS_ASSUME_NONNULL_END
