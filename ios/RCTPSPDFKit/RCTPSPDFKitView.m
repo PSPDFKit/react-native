@@ -299,7 +299,7 @@
   }
 
   PSPDFDocument *document = self.pdfController.document;
-  if (![document isValid]) {
+  if (!document.isValid) {
     NSLog(@"Document is invalid.");
     return;
   }
