@@ -190,7 +190,7 @@
   }
   
   PSPDFDocument *document = self.pdfController.document;
-  if (![document isValid]) {
+  if (!document.isValid) {
     NSLog(@"Document is invalid.");
     return NO;
   }
@@ -211,7 +211,7 @@
 
 - (BOOL)removeAnnotationWithUUID:(NSString *)annotationUUID {
   PSPDFDocument *document = self.pdfController.document;
-  if (![document isValid]) {
+  if (!document.isValid) {
     NSLog(@"Document is invalid.");
     return NO;
   }
@@ -253,7 +253,7 @@
   
   PSPDFDataContainerProvider *dataContainerProvider = [[PSPDFDataContainerProvider alloc] initWithData:data];
   PSPDFDocument *document = self.pdfController.document;
-  if (![document isValid]) {
+  if (!document.isValid) {
     NSLog(@"Document is invalid.");
     return NO;
   }
@@ -277,7 +277,7 @@
   }
 
   PSPDFDocument *document = self.pdfController.document;
-  if (![document isValid]) {
+  if (!document.isValid) {
     NSLog(@"Document is invalid.");
     return nil;
   }
