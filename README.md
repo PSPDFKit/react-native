@@ -42,7 +42,7 @@ Let's create a simple app that integrates PSPDFKit and uses the `react-native-ps
 6. Link module `react-native-pspdfkit`: `react-native link react-native-pspdfkit`.
 7. Create the folder `ios/PSPDFKit` and copy `PSPDFKit.framework` and `PSPDFKitUI.framework` into it.
 8. Open `ios/YourApp.xcodeproj` in Xcode: `open ios/YourApp.xcodeproj`
-9. Make sure the deployment target is set to 10.0 or higher:
+9. Make sure the deployment target is set to 11.0 or higher:
    ![Deployment Target](screenshots/deployment-target.png)
 10. Change "View controller-based status bar appearance" to `YES` in `Info.plist`:
     ![View Controller-Based Status Bar Appearance](screenshots/view-controller-based-status-bar-appearance.png)
