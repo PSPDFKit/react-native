@@ -220,7 +220,7 @@
 
   NSArray<PSPDFAnnotation *> *allAnnotations = [[document allAnnotationsOfType:PSPDFAnnotationTypeAll].allValues valueForKeyPath:@"@unionOfArrays.self"];
   for (PSPDFAnnotation *annotation in allAnnotations) {
-    // Remove the annotation if the name matches.
+    // Remove the annotation if the uuids match.
     if ([annotation.uuid isEqualToString:annotationUUID]) {
       success = [document removeAnnotations:@[annotation] options:nil];
       break;
