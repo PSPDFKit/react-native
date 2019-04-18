@@ -173,7 +173,13 @@
 #pragma mark - Instant JSON
 
 - (NSDictionary<NSString *, NSArray<NSDictionary *> *> *)getAnnotations:(PSPDFPageIndex)pageIndex type:(PSPDFAnnotationType)type {
-  NSArray <PSPDFAnnotation *> *annotations = [self.pdfController.document annotationsForPageAtIndex:pageIndex type:type];
+  PSPDFDocument *document = self.pdfController.document;
+  if (!document.isValid) {
+    NSLog(@"Document is invalid.");
+    return nil;
+  }
+
+  NSArray <PSPDFAnnotation *> *annotations = [document annotationsForPageAtIndex:pageIndex type:type];
   NSArray <NSDictionary *> *annotationsJSON = [RCTConvert instantJSONFromAnnotations:annotations];
   return @{@"annotations" : annotationsJSON};
 }
@@ -234,8 +240,14 @@
 }
 
 - (NSDictionary<NSString *, NSArray<NSDictionary *> *> *)getAllUnsavedAnnotations {
-  PSPDFDocumentProvider *documentProvider = self.pdfController.document.documentProviders.firstObject;
-  NSData *data = [self.pdfController.document generateInstantJSONFromDocumentProvider:documentProvider error:NULL];
+  PSPDFDocument *document = self.pdfController.document;
+  if (!document.isValid) {
+    NSLog(@"Document is invalid.");
+    return nil;
+  }
+
+  PSPDFDocumentProvider *documentProvider = document.documentProviders.firstObject;
+  NSData *data = [document generateInstantJSONFromDocumentProvider:documentProvider error:NULL];
   NSDictionary *annotationsJSON = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:NULL];
   return annotationsJSON;
 }
