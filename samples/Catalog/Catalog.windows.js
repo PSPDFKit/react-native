@@ -6,10 +6,20 @@
 //  This notice may not be removed from this file.
 //
 
-import React, { Component } from "react";
-import { Button, FlatList, Image, NativeModules, StyleSheet, Text, TouchableHighlight, View, YellowBox } from "react-native";
+import React, {Component} from "react";
+import {
+  Button,
+  FlatList,
+  Image,
+  NativeModules,
+  StyleSheet,
+  Text,
+  TouchableHighlight,
+  View,
+  YellowBox
+} from "react-native";
 import PSPDFKitView from "react-native-pspdfkit";
-import { StackNavigator } from "react-navigation";
+import {StackNavigator} from "react-navigation";
 
 const PSPDFKit = NativeModules.ReactPSPDFKit;
 const PSPDFKitLibrary = NativeModules.ReactPSPDFKitLibrary;
@@ -314,8 +324,8 @@ class CatalogScreen extends Component<{}> {
 }
 
 const baseFolder = RNFS.DocumentDirectoryPath;
-const getPath = ({ item }) => {
-  const { id, versionId } = item;
+const getPath = ({item}) => {
+  const {id, versionId} = item;
   return `${baseFolder}${
     "\\"
     }${id}_${versionId}`;
@@ -332,11 +342,10 @@ class PdfViewScreen extends Component<{}> {
           style={styles.pdfView}/>
         <View style={styles.footer}>
           <View style={styles.button}>
-            <Button onPress={() =>
-    {
+            <Button onPress={() => {
               const fromUrl = "http://www.africau.edu/images/default/sample.pdf";
-              const item = { id: 0, versionId: 0 };
-              const path = getPath({ item });
+              const item = {id: 0, versionId: 0};
+              const path = getPath({item});
               let promise;
               if (pdfScreenLoads > 1) {
                 const result = RNFS.downloadFile({
@@ -369,9 +378,9 @@ class PdfViewScreen extends Component<{}> {
                 .catch(error => {
                   console.log("download error", error);
                 });
-      pdfScreenLoads++;
-    }
-    } title="Open"/>
+              pdfScreenLoads++;
+            }
+            } title="Open"/>
           </View>
           <Image
             source={require("./assets/logo-flat.png")}
