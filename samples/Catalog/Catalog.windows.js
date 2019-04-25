@@ -6,25 +6,15 @@
 //  This notice may not be removed from this file.
 //
 
-import React, {Component} from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  FlatList,
-  Image,
-  TouchableHighlight,
-  NativeModules,
-  Button
-} from "react-native";
-import {StackNavigator} from "react-navigation";
+import React, { Component } from "react";
+import { Button, FlatList, Image, NativeModules, StyleSheet, Text, TouchableHighlight, View, YellowBox } from "react-native";
 import PSPDFKitView from "react-native-pspdfkit";
+import { StackNavigator } from "react-navigation";
 
 const PSPDFKit = NativeModules.ReactPSPDFKit;
 const PSPDFKitLibrary = NativeModules.ReactPSPDFKitLibrary;
 const RNFS = require("react-native-fs");
 
-import {YellowBox} from "react-native";
 
 YellowBox.ignoreWarnings([
   "Warning: Invalid argument supplied to oneOf" // React native windows bug.
@@ -99,14 +89,35 @@ const examples = [
       component.props.navigation.navigate("PdfView");
       // Present can only take files loaded in the Visual studio Project's Assets. Please use RNFS.
       // See https://docs.microsoft.com/en-us/windows/uwp/files/file-access-permissions
-      const path = RNFS.MainBundlePath + "\\Assets\\pdf\\Business Report.pdf";
-      PSPDFKit.Present(path)
-        .then(() => {
-          alert("File Opened successfully");
+      const path = RNFS.TemporaryDirectoryPath + "\\test.pdf";
+      const fromUrl = "http://www.africau.edu/images/default/sample.pdf";
+
+      const result = RNFS.downloadFile({
+        fromUrl,
+        toFile: path
+      });
+      if (result.promise) {
+        promise = result.promise;
+      } else {
+        promise = new Promise((resolve, reject) => {
+          reject("could not download");
+        });
+      }
+
+      promise
+        .then(result => {
+          PSPDFKit.Present(path)
+            .then(() => {
+              alert("File Opened successfully");
+            })
+            .catch(error => {
+              alert(error);
+            });
         })
         .catch(error => {
-          alert(error);
+          console.log("download error", error);
         });
+
     }
   },
   {
@@ -302,18 +313,65 @@ class CatalogScreen extends Component<{}> {
   };
 }
 
+const baseFolder = RNFS.DocumentDirectoryPath;
+const getPath = ({ item }) => {
+  const { id, versionId } = item;
+  return `${baseFolder}${
+    "\\"
+    }${id}_${versionId}`;
+};
+
+var pdfScreenLoads = 0;
+
 class PdfViewScreen extends Component<{}> {
   render() {
     return (
       <View style={styles.page}>
         <PSPDFKitView
           ref="pdfView"
-          style={styles.pdfView}
-          // The default file to open.
-          document="ms-appx:///Assets/pdf/annualReport.pdf"/>
+          style={styles.pdfView}/>
         <View style={styles.footer}>
           <View style={styles.button}>
-            <Button onPress={() => PSPDFKit.OpenFilePicker()} title="Open"/>
+            <Button onPress={() =>
+    {
+              const fromUrl = "http://www.africau.edu/images/default/sample.pdf";
+              const item = { id: 0, versionId: 0 };
+              const path = getPath({ item });
+              let promise;
+              if (pdfScreenLoads > 1) {
+                const result = RNFS.downloadFile({
+                  fromUrl,
+                  toFile: path
+                });
+                if (result.promise) {
+                  promise = result.promise;
+                } else {
+                  promise = new Promise((resolve, reject) => {
+                    reject("could not download");
+                  });
+                }
+              } else {
+                promise = new Promise((resolve, reject) => {
+                  reject("skipping the first loads");
+                });
+              }
+
+              promise
+                .then(result => {
+                  PSPDFKit.Present(path)
+                    .then(() => {
+                      alert("File Opened successfully");
+                    })
+                    .catch(error => {
+                      alert(error);
+                    });
+                })
+                .catch(error => {
+                  console.log("download error", error);
+                });
+      pdfScreenLoads++;
+    }
+    } title="Open"/>
           </View>
           <Image
             source={require("./assets/logo-flat.png")}
