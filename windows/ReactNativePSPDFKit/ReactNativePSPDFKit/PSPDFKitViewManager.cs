@@ -63,22 +63,23 @@ namespace ReactNativePSPDFKit
         public async void SetCustomCss(PDFViewPage view, JObject styleJObject)
         {
             var colorString = string.Empty;
-            if (styleJObject.ContainsKey("highlightColor"))
+
+            var maybeHighlightColor = JsonUtils.ParserColor(styleJObject, "highlightColor");
+            if (maybeHighlightColor.HasValue)
             {
-                var highlightColor = ColorHelpers.Parse(styleJObject["highlightColor"].Value<uint>());
-                colorString += $"    --primary: {highlightColor.ToHexWithoutAlpha()};\r\n";
+                colorString += $"    --primary: {maybeHighlightColor.Value.ToHexWithoutAlpha()};\r\n";
             }
 
-            if (styleJObject.ContainsKey("primaryColor"))
+            var maybePrimaryColor = JsonUtils.ParserColor(styleJObject, "primaryColor");
+            if (maybePrimaryColor.HasValue)
             {
-                var primaryColor = ColorHelpers.Parse(styleJObject["primaryColor"].Value<uint>());
-                colorString += $"    --primary-dark-1: {primaryColor.ToHexWithoutAlpha()};\r\n";
+                colorString += $"    --primary-dark-1: {maybePrimaryColor.Value.ToHexWithoutAlpha()};\r\n";
             }
 
-            if (styleJObject.ContainsKey("primaryDarkColor"))
+            var maybePrimaryDarkColor = JsonUtils.ParserColor(styleJObject, "primaryDarkColor");
+            if (maybePrimaryDarkColor.HasValue)
             {
-                var primaryDarkColor = ColorHelpers.Parse(styleJObject["primaryDarkColor"].Value<uint>());
-                colorString += $"    --primary-dark-2: {primaryDarkColor.ToHexWithoutAlpha()};\r\n";
+                colorString += $"    --primary-dark-2: {maybePrimaryDarkColor.Value.ToHexWithoutAlpha()};\r\n";
             }
 
             if (colorString.Length > 0)
