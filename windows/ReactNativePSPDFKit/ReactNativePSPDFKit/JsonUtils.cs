@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
+using Windows.UI;
 using Newtonsoft.Json.Linq;
 using PSPDFKit.Search;
 using PSPDFKitFoundation;
 using PSPDFKitFoundation.Search;
 using PSPDFKitNative;
+using ReactNative.UIManager;
 
 namespace ReactNativePSPDFKit
 {
@@ -130,6 +132,21 @@ namespace ReactNativePSPDFKit
             }
 
             return pageNumbersJson;
+        }
+
+        internal static Color? ParserColor(JObject jObject, string propertyName)
+        {
+            if (TryGetNotNullValue(jObject, propertyName, out var jsonHighlightColor))
+            {
+                return ColorHelpers.Parse(jsonHighlightColor.Value<uint>());
+            }
+
+            return null;
+        }
+
+        internal static bool TryGetNotNullValue(JObject jObject, string propertyName, out JToken value)
+        {
+            return jObject.TryGetValue(propertyName, out value) && value.Type != JTokenType.Null;
         }
     }
 }
