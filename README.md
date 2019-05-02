@@ -794,6 +794,24 @@ Opens a document in the available `<PSPDFKitView>`. If the element is not displa
 PSPDFKit.Present("ms-appx:///Assets/pdf/Business Report.pdf");
 ```
 
+#### Theming support
+
+It is possible to theme/customize the PdfView with the use of a CSS file. To do this simple pass a `Uri` within the web context to the instantiated [`PSPDFKitPackage`](https://github.com/PSPDFKit/react-native/blob/master/windows/ReactNativePSPDFKit/ReactNativePSPDFKit/PSPDFKitPackage.cs#L32).
+
+To see this in action, make the following changes in [`samples/Catalog/windows/Catalog/MainReactNativeHost.cs`](https://github.com/PSPDFKit/react-native/blob/master/samples/Catalog/windows/Catalog/MainReactNativeHost.cs) and run the catalog the catalog.
+```diff
+protected override List<IReactPackage> Packages => new List<IReactPackage>
+{
+    new MainReactPackage(),
+-   new ReactNativePSPDFKit.PSPDFKitPackage(),
++   new ReactNativePSPDFKit.PSPDFKitPackage(new Uri("ms-appx-web:///Assets/css/greenTheme.css")),
+    new RNFSPackage()
+};
+```
+The code above will pass an asset held in the `Catalog` project's `Assets/css` to the web context of PSPDFKit for Windows. The file can then be used to theme the view.
+
+For more information on CSS Customization in PSPDFKit for Windows please refer to [CSS Customization](https://pspdfkit.com/guides/windows/current/customizing-the-interface/css-customization/)
+
 ## License
 
 This project can be used for evaluation or if you have a valid PSPDFKit license.  

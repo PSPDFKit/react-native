@@ -471,24 +471,14 @@ class PdfViewStyleScreen extends Component<{}> {
       <View style={styles.page}>
         <View style={styles.container}>
           <Text style={styles.stlyeExplanation}>
-            To see a working example of custom themes please navigate to
-            `samples/Catalog/windows/Catalog/MainReactNativeHost.cs`, remove the line `new
-            ReactNativePSPDFKit.PSPDFKitPackage(),` and uncomment the line `new ReactNativePSPDFKit.PSPDFKitPackage(new
-            Uri("ms-appx-web:///Assets/css/greenTheme.css")),` and then run the application as normal.
-          </Text>
-          <Text style={styles.stlyeExplanation}>
-            Observe the new package call supplies a URI to a file that is packaged with the application.
-            `samples/Catalog/windows/Catalog/Assets/css/greenTheme.css` where the colors can be changed.
-          </Text>
-          <Text style={styles.stlyeExplanation}>
-            For more information on UWP theming please click{" "}
+            Native changes are needed to customize the PdfView. Please follow the setups shown in the{" "}
             <Text
               style={{color: 'blue'}}
               onPress={() => {
-                Linking.openURL('https://pspdfkit.com/guides/windows/current/customizing-the-interface/css-customization/')
+                Linking.openURL('https://github.com/PSPDFKit/react-native/README.md#theming-support')
               }}
             >
-              here
+              README
             </Text>
           </Text>
         </View>

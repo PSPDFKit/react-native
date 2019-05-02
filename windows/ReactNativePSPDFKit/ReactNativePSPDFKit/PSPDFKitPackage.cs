@@ -25,10 +25,17 @@ namespace ReactNativePSPDFKit
     {
         private readonly PSPDFKitViewManger _pspdfkitViewManger = new PSPDFKitViewManger();
 
+        /// <summary>
+        /// Creates a PSPDFKit package with the default settings.
+        /// </summary>
         public PSPDFKitPackage()
         {
         }
 
+        /// <summary>
+        /// Creates a PSPDFKit package with a theming css.
+        /// <param name="cssResource">CSS theming file.</param>
+        /// </summary>
         public PSPDFKitPackage(Uri cssResource)
         {
             _pspdfkitViewManger.PdfViewPage.Pdfview.Css = cssResource;
