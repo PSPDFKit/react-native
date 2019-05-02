@@ -106,7 +106,6 @@
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="ColorUtils.cs" />
     <Compile Include="Events\PdfViewAnnotationChangedEvent.cs" />
     <Compile Include="Events\PdfViewDocumentSavedEvent.cs" />
     <Compile Include="Events\PdfViewDataReturnedEvent.cs" />
@@ -158,12 +157,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-  </ItemGroup>
-  <ItemGroup />
-  <ItemGroup>
-    <Content Include="Assets\customTheme.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
