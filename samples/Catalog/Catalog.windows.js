@@ -15,7 +15,8 @@ import {
   Image,
   TouchableHighlight,
   NativeModules,
-  Button
+  Button,
+  Linking 
 } from "react-native";
 import {StackNavigator} from "react-navigation";
 import PSPDFKitView from "react-native-pspdfkit";
@@ -475,7 +476,7 @@ class PdfViewStyleScreen extends Component<{}> {
             <Text
               style={{color: 'blue'}}
               onPress={() => {
-                Linking.openURL('https://github.com/PSPDFKit/react-native/README.md#theming-support')
+                Linking.openURL('https://github.com/PSPDFKit/react-native/blob/master/README.md#theming-support')
               }}
             >
               README
