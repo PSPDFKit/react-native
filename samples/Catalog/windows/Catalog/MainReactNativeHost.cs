@@ -1,3 +1,4 @@
+using System;
 using ReactNative;
 using ReactNative.Modules.Core;
 using ReactNative.Shell;
@@ -26,6 +27,8 @@ namespace Catalog
         {
             new MainReactPackage(),
             new ReactNativePSPDFKit.PSPDFKitPackage(),
+            // Comment out the package above and uncomment the line below if you require an external theme.
+//            new ReactNativePSPDFKit.PSPDFKitPackage(new Uri("ms-appx-web:///Assets/css/greenTheme.css")),
             new RNFSPackage()
         };
     }

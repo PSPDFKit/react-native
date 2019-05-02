@@ -25,6 +25,15 @@ namespace ReactNativePSPDFKit
     {
         private readonly PSPDFKitViewManger _pspdfkitViewManger = new PSPDFKitViewManger();
 
+        public PSPDFKitPackage()
+        {
+        }
+
+        public PSPDFKitPackage(Uri cssResource)
+        {
+            _pspdfkitViewManger.PdfViewPage.Pdfview.Css = cssResource;
+        }
+
         /// <summary>
         /// Creates the PSPDFKitModule native modules to register with the react
         /// instance.

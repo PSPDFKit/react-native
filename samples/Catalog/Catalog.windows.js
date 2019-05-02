@@ -173,6 +173,14 @@ const examples = [
     action: async component => {
       component.props.navigation.navigate("PdfViewToolbarCustomization");
     }
+  },
+  {
+    key: "item8",
+    name: "Custom colors",
+    description: "Explains how to theme your UWP react native application.",
+    action: component => {
+      component.props.navigation.navigate("PdfViewStyle");
+    }
   }
 ];
 
@@ -234,7 +242,19 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center"
-  }
+  },
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: "white",
+  },
+  stlyeExplanation: {
+    color: "#666666",
+    fontSize: 16,
+    textAlign: 'center',
+    margin: 50
+  },
 });
 
 class CatalogScreen extends Component<{}> {
@@ -445,6 +465,42 @@ class PdfViewToolbarCustomizationScreen extends Component<{}> {
   }
 }
 
+class PdfViewStyleScreen extends Component<{}> {
+    render() {
+      return (
+        <View style={styles.page}>
+          <View style={styles.container}>
+          <Text style={styles.stlyeExplanation}>
+        To see a working example of custom themes please navigate to `samples/Catalog/windows/Catalog/MainReactNativeHost.cs`, remove the line `new ReactNativePSPDFKit.PSPDFKitPackage(),` and uncomment the line `new ReactNativePSPDFKit.PSPDFKitPackage(new Uri("ms-appx-web:///Assets/css/greenTheme.css")),` and then run the application as normal. 
+      </Text>
+            <Text style={styles.stlyeExplanation}>
+        Observe the new package call supplies a URI to a file that is packaged with the application. `samples/Catalog/windows/Catalog/Assets/css/greenTheme.css` where the colors can be changed.
+        </Text>
+        <Text style={styles.stlyeExplanation}>
+              For more information on UWP theming please click{" "}
+      <Text
+    style={{ color: 'blue' }}
+                onPress={() => { Linking.openURL('https://pspdfkit.com/guides/windows/current/customizing-the-interface/css-customization/') }}
+>
+  here
+  </Text>
+        </Text>
+        </View>
+        <View style={styles.footer}>
+        
+  <Image
+source={require("./assets/logo-flat.png")}
+style={styles.logo}
+  />
+  <Text style={styles.version}>
+  SDK Version : {PSPDFKit.versionString}
+</Text>
+  </View>
+  </View>
+);
+}
+}
+
 export default StackNavigator(
   {
     Catalog: {
@@ -461,6 +517,9 @@ export default StackNavigator(
     },
     PdfViewToolbarCustomization: {
       screen: PdfViewToolbarCustomizationScreen
+    },
+    PdfViewStyle: {
+      screen: PdfViewStyleScreen
     }
   },
   {
