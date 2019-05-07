@@ -6,7 +6,7 @@
 //  This notice may not be removed from this file.
 //
 
-import React, { Component } from "react";
+import React, {Component} from "react";
 import {
   Button,
   FlatList,
@@ -19,7 +19,7 @@ import {
   YellowBox
 } from "react-native";
 import PSPDFKitView from "react-native-pspdfkit";
-import { StackNavigator } from "react-navigation";
+import {StackNavigator} from "react-navigation";
 
 const PSPDFKit = NativeModules.ReactPSPDFKit;
 const PSPDFKitLibrary = NativeModules.ReactPSPDFKitLibrary;
@@ -41,7 +41,7 @@ const complexSearchConfiguration = {
   maximumPreviewResultsPerDocument: 0,
   maximumPreviewResultsTotal: 500,
   generateTextPreviews: true,
-  previewRange: { position: 20, length: 120 }
+  previewRange: {position: 20, length: 120}
 };
 
 const annotationToAdd = {
@@ -276,16 +276,16 @@ class CatalogScreen extends Component<{}> {
           renderItem={this._renderRow}
           ItemSeparatorComponent={CatalogScreen._renderSeparator}
           contentContainerStyle={styles.listContainer}
-          style={styles.list} />
+          style={styles.list}/>
       </View>
     );
   }
 
   static _renderSeparator(sectionId, rowId) {
-    return <View key={rowId} style={styles.separator} />;
+    return <View key={rowId} style={styles.separator}/>;
   }
 
-  _renderRow = ({ item, separators }) => {
+  _renderRow = ({item, separators}) => {
     return (
       <TouchableHighlight
         onPress={() => {
@@ -303,8 +303,8 @@ class CatalogScreen extends Component<{}> {
 }
 
 const baseFolder = RNFS.DocumentDirectoryPath;
-const getPath = ({ item }) => {
-  const { id, versionId } = item;
+const getPath = ({item}) => {
+  const {id, versionId} = item;
   return `${baseFolder}${
     "\\"
     }${id}_${versionId}`;
@@ -318,7 +318,7 @@ class PdfViewScreen extends Component<{}> {
       <View style={styles.page}>
         <PSPDFKitView
           ref="pdfView"
-          style={styles.pdfView} />
+          style={styles.pdfView}/>
         <View style={styles.footer}>
           <View style={styles.button}>
             <Button onPress={() => {
@@ -337,17 +337,17 @@ class PdfViewScreen extends Component<{}> {
                       alert(error);
                     });
                 })
-                .catch(error => {
+                  .catch(error => {
                     alert(error);
-                });
-              } else {
-                  this.refs.pdfView.setToolbarItems([{ type: "ink" }]).then(() => {
-                    alert("Toolbar Items set.");
                   });
+              } else {
+                this.refs.pdfView.setToolbarItems([{type: "ink"}]).then(() => {
+                  alert("Toolbar Items set.");
+                });
               }
               global.pdfScreenLoads += 1;
             }
-            } title="Open" />
+            } title="Open"/>
           </View>
           <Image
             source={require("./assets/logo-flat.png")}
@@ -363,13 +363,13 @@ class PdfViewScreen extends Component<{}> {
 }
 
 class PdfViewListenersScreen extends Component<{}> {
-  static navigationOptions = ({ navigation }) => {
+  static navigationOptions = ({navigation}) => {
     const params = navigation.state.params || {};
 
     return {
       title: "Event Listeners",
       headerRight: (
-        <Button onPress={() => params.handleSaveButtonPress()} title="Save" />
+        <Button onPress={() => params.handleSaveButtonPress()} title="Save"/>
       )
     };
   };
@@ -410,7 +410,7 @@ class PdfViewInstantJsonScreen extends Component<{}> {
 
   render() {
     return (
-      <View style={{ flex: 1 }}>
+      <View style={{flex: 1}}>
         <PSPDFKitView
           ref="pdfView"
           style={styles.pdfView}
@@ -436,7 +436,7 @@ class PdfViewInstantJsonScreen extends Component<{}> {
               title="Get annotations"
             />
           </View>
-          <View style={{ marginLeft: 10 }}>
+          <View style={{marginLeft: 10}}>
             <Button
               onPress={() => {
                 // This adds a new ink annotation to the first page.
@@ -471,13 +471,13 @@ class PdfViewToolbarCustomizationScreen extends Component<{}> {
               <Button onPress={() =>
                 this.refs.pdfView.getToolbarItems().then(toolbarItems => {
                   alert(JSON.stringify(toolbarItems));
-                })} title="Get Toolbar Items" />
+                })} title="Get Toolbar Items"/>
             </View>
             <View style={styles.button}>
               <Button onPress={() =>
-                this.refs.pdfView.setToolbarItems([{ type: "ink" }]).then(() => {
+                this.refs.pdfView.setToolbarItems([{type: "ink"}]).then(() => {
                   alert("Toolbar Items set.");
-                })} title="Set Toolbar Items" />
+                })} title="Set Toolbar Items"/>
             </View>
           </View>
           <Image
@@ -501,7 +501,7 @@ class PdfViewStyleScreen extends Component<{}> {
           ref="pdfView"
           style={pdfStyle}
           // The default file to open.
-          document="ms-appx:///Assets/pdf/annualReport.pdf" />
+          document="ms-appx:///Assets/pdf/annualReport.pdf"/>
         <View style={styles.footer}>
           <Image
             source={require("./assets/logo-flat.png")}
