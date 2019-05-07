@@ -302,14 +302,6 @@ class CatalogScreen extends Component<{}> {
   };
 }
 
-const baseFolder = RNFS.DocumentDirectoryPath;
-const getPath = ({item}) => {
-  const {id, versionId} = item;
-  return `${baseFolder}${
-    "\\"
-    }${id}_${versionId}`;
-};
-
 global.pdfScreenLoads = 0;
 
 class PdfViewScreen extends Component<{}> {
