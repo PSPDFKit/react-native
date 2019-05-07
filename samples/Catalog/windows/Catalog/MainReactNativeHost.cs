@@ -1,3 +1,4 @@
+using System;
 using ReactNative;
 using ReactNative.Modules.Core;
 using ReactNative.Shell;

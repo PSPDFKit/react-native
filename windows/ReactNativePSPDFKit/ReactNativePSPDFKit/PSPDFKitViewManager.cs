@@ -8,10 +8,14 @@
 //
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using Windows.Data.Json;
 using ReactNative.UIManager;
 using ReactNative.UIManager.Annotations;
 using Windows.Storage;
 using Newtonsoft.Json.Linq;
+using PSPDFKit.Pdf.Annotation;
 using PSPDFKit.UI;
 using ReactNativePSPDFKit.Events;
 
@@ -57,52 +61,6 @@ namespace ReactNativePSPDFKit
         public void SetHideNavigationBar(PDFViewPage view, bool hideNavigationBar)
         {
             view.SetShowToolbar(!hideNavigationBar);
-        }
-
-        [ReactProp("pdfStyle")]
-        public async void SetCustomCss(PDFViewPage view, JObject styleJObject)
-        {
-            var colorString = string.Empty;
-
-            var maybeHighlightColor = JsonUtils.ParserColor(styleJObject, "highlightColor");
-            if (maybeHighlightColor.HasValue)
-            {
-                colorString += $"    --primary: {maybeHighlightColor.Value.ToHexWithoutAlpha()};\r\n";
-            }
-
-            var maybePrimaryColor = JsonUtils.ParserColor(styleJObject, "primaryColor");
-            if (maybePrimaryColor.HasValue)
-            {
-                colorString += $"    --primary-dark-1: {maybePrimaryColor.Value.ToHexWithoutAlpha()};\r\n";
-            }
-
-            var maybePrimaryDarkColor = JsonUtils.ParserColor(styleJObject, "primaryDarkColor");
-            if (maybePrimaryDarkColor.HasValue)
-            {
-                colorString += $"    --primary-dark-2: {maybePrimaryDarkColor.Value.ToHexWithoutAlpha()};\r\n";
-            }
-
-            if (colorString.Length > 0)
-            {
-                var cssTemplate =
-                    await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appx:///ReactNativePSPDFKit/Assets/customTheme.css"));
-
-                var cssTemplateString = await FileIO.ReadTextAsync(cssTemplate);
-                cssTemplateString = cssTemplateString.Replace("${colors}", colorString);
-                
-                // We have to write a file in the temp folder due to permission issues.
-                var storageFolder = ApplicationData.Current.TemporaryFolder;
-                var sampleFile = await storageFolder.CreateFileAsync("windows.css", CreationCollisionOption.ReplaceExisting);
-                await FileIO.WriteTextAsync(sampleFile, cssTemplateString);
-
-                // Now we get the assets folder to copy the final css file into and move the previous file.
-                var appInstalledFolder = Windows.ApplicationModel.Package.Current.InstalledLocation;
-                var assetsFolder = await appInstalledFolder.GetFolderAsync("Assets");
-                await sampleFile.MoveAsync(assetsFolder, "windows.css", NameCollisionOption.ReplaceExisting);
-
-                // Pass the the css file to the pdf view in a web context.
-                PdfViewPage.Pdfview.Css = new Uri("ms-appx-web:///Assets/windows.css");
-            }
         }
 
         public override JObject ViewCommandsMap => new JObject
