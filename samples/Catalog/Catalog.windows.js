@@ -16,7 +16,7 @@ import {
   TouchableHighlight,
   NativeModules,
   Button,
-  Linking 
+  Linking
 } from "react-native";
 import {StackNavigator} from "react-navigation";
 import PSPDFKitView from "react-native-pspdfkit";
@@ -402,8 +402,8 @@ class PdfViewInstantJsonScreen extends Component<{}> {
             <Button
               onPress={() => {
                 // This gets all annotations on the first page.
-                            this.refs.pdfView.getAnnotations(0).then(annotations => {
-                                alert(JSON.stringify(annotations));
+                this.refs.pdfView.getAnnotations(0).then(annotations => {
+                  alert(JSON.stringify(annotations));
                 });
               }}
               title="Get Annotations"
@@ -421,24 +421,24 @@ class PdfViewInstantJsonScreen extends Component<{}> {
               }}
               title="Add Annotation"
             />
-                </View>
-                <View style={{ marginLeft: 10 }}>
-                    <Button
-                        onPress={() => {
-                            this.refs.pdfView.getAnnotations(0).then(result => {
-                                if (result.annotations !== undefined && result.annotations.length > 0) {
-                                    // Removes the ink annotation if added with Add annotation button rejects if not present
-                                    this.refs.pdfView.removeAnnotation(result.annotations[0]).then(() => {
-                                        alert("Annotation removal was successful.");
-                                    }).catch(error => {
-                                        alert(error);
-                                    });
-                                }
-                            });
-                        }}
-                        title="Remove Annotation"
-                    />
-                </View>
+          </View>
+          <View style={{marginLeft: 10}}>
+            <Button
+              onPress={() => {
+                this.refs.pdfView.getAnnotations(0).then(result => {
+                  if (result.annotations !== undefined && result.annotations.length > 0) {
+                    // Removes the ink annotation if added with Add annotation button rejects if not present
+                    this.refs.pdfView.removeAnnotation(result.annotations[0]).then(() => {
+                      alert("Annotation removal was successful.");
+                    }).catch(error => {
+                      alert(error);
+                    });
+                  }
+                });
+              }}
+              title="Remove Annotation"
+            />
+          </View>
         </View>
       </View>
     );
