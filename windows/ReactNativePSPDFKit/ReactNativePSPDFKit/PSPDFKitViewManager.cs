@@ -31,6 +31,7 @@ namespace ReactNativePSPDFKit
         private const int COMMAND_ADD_ANNOTATION = 5;
         private const int COMMAND_GET_TOOLBAR_ITEMS = 6;
         private const int COMMAND_SET_TOOLBAR_ITEMS = 7;
+        private const int COMMAND_REMOVE_ANNOTATION = 8;
 
         internal readonly PDFViewPage PdfViewPage = new PDFViewPage();
 
@@ -81,6 +82,9 @@ namespace ReactNativePSPDFKit
                 "addAnnotation", COMMAND_ADD_ANNOTATION
             },
             {
+                "removeAnnotation", COMMAND_REMOVE_ANNOTATION
+            },
+            {
                 "getToolbarItems", COMMAND_GET_TOOLBAR_ITEMS
             },
             {
@@ -106,6 +110,9 @@ namespace ReactNativePSPDFKit
                     break;
                 case COMMAND_ADD_ANNOTATION:
                     await PdfViewPage.CreateAnnotation(args[0].Value<int>(), args[1].ToString());
+                    break;
+                case COMMAND_REMOVE_ANNOTATION:
+                    await PdfViewPage.RemoveAnnotation(args[0].Value<int>(), args[1].ToString());
                     break;
                 case COMMAND_GET_TOOLBAR_ITEMS:
                     PdfViewPage.GetToolbarItems(args[0].Value<int>());
