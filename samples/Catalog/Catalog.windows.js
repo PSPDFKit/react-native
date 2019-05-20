@@ -16,7 +16,7 @@ import {
   TouchableHighlight,
   NativeModules,
   Button,
-  Linking 
+  Linking
 } from "react-native";
 import {StackNavigator} from "react-navigation";
 import PSPDFKitView from "react-native-pspdfkit";
@@ -406,7 +406,7 @@ class PdfViewInstantJsonScreen extends Component<{}> {
                   alert(JSON.stringify(annotations));
                 });
               }}
-              title="Get annotations"
+              title="Get Annotations"
             />
           </View>
           <View style={{marginLeft: 10}}>
@@ -419,7 +419,24 @@ class PdfViewInstantJsonScreen extends Component<{}> {
                   alert(error);
                 });
               }}
-              title="Add annotation"
+              title="Add Annotation"
+            />
+          </View>
+          <View style={{marginLeft: 10}}>
+            <Button
+              onPress={() => {
+                this.refs.pdfView.getAnnotations(0).then(result => {
+                  if (result.annotations !== undefined && result.annotations.length > 0) {
+                    // Removes the ink annotation if added with Add annotation button rejects if not present
+                    this.refs.pdfView.removeAnnotation(result.annotations[0]).then(() => {
+                      alert("Annotation removal was successful.");
+                    }).catch(error => {
+                      alert(error);
+                    });
+                  }
+                });
+              }}
+              title="Remove Annotation"
             />
           </View>
         </View>

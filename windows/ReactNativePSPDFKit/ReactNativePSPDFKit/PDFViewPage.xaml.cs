@@ -159,6 +159,17 @@ namespace ReactNativePSPDFKit
             );
         }
 
+        internal async Task RemoveAnnotation(int requestId, string annotationJsonString)
+        {
+            await RunOperationAndFireEvent(requestId,
+                async () =>
+                {
+                    var annotation = Factory.FromJson(JsonObject.Parse(annotationJsonString));
+                    await Pdfview.Document.DeleteAnnotationAsync(annotation.Id);
+                }
+            );
+        }
+
         internal async Task SetInteractionMode(int requestId, InteractionMode interactionMode)
         {
             await RunOperationAndFireEvent(requestId,

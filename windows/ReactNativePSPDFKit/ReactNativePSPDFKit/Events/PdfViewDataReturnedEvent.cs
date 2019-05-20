@@ -32,7 +32,7 @@ namespace ReactNativePSPDFKit.Events
 
                 var annotations = new JObject
                 {
-                    { "annoations",annotationsSerialized}
+                    { "annotations",annotationsSerialized}
                 };
                 _payload.Add("result", annotations);
             }

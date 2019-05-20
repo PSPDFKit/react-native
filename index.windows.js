@@ -180,6 +180,32 @@ class PSPDFKitView extends React.Component {
   };
 
   /**
+   * Removes an annotation to the current document.
+   *
+   * @param annotation InstantJson of the annotation to remove with the format of
+   * https://pspdfkit.com/guides/windows/current/importing-exporting/instant-json/#instant-annotation-json-api
+   *
+   * @returns a promise resolving if successful or rejects if an error occurs with and error message
+   */
+  removeAnnotation(annotation) {
+    let requestId = this._nextRequestId++;
+    let requestMap = this._requestMap;
+
+    // We create a promise here that will be resolved once onDataReturned is called.
+    let promise = new Promise((resolve, reject) => {
+      requestMap[requestId] = {resolve: resolve, reject: reject};
+    });
+
+    UIManager.dispatchViewManagerCommand(
+      findNodeHandle(this.refs.pdfView),
+      UIManager.RCTPSPDFKitView.Commands.removeAnnotation,
+      [requestId, annotation]
+    );
+
+    return promise;
+  };
+
+  /**
    * Gets toolbar items currently shown.
    *
    * @return Receives an array of https://pspdfkit.com/api/web/PSPDFKit.ToolbarItem.html.
