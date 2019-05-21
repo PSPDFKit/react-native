@@ -134,11 +134,6 @@ const examples = [
     action: async () => {
       await PSPDFKitLibrary.OpenLibrary("MyLibrary");
       await PSPDFKitLibrary.EnqueueDocumentsInFolderPicker("MyLibrary");
-      alert(
-        'Searching Library for "' +
-        simpleSearch.searchString +
-        '". Please wait.'
-      );
       PSPDFKitLibrary.SearchLibrary("MyLibrary", simpleSearch)
         .then(result => {
           alert("Search : \n" + JSON.stringify(result));
@@ -155,11 +150,6 @@ const examples = [
 
       await PSPDFKitLibrary.OpenLibrary("AssetsLibrary");
       await PSPDFKitLibrary.EnqueueDocumentsInFolder("AssetsLibrary", path);
-      alert(
-        'Searching Library for "' +
-        complexSearchConfiguration.searchString +
-        '". Please wait.'
-      );
       PSPDFKitLibrary.SearchLibrary("AssetsLibrary", complexSearchConfiguration)
         .then(result => {
           alert("Search : \n" + JSON.stringify(result));
