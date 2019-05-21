@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using PSPDFKit.Pdf.Annotation;
 using ReactNative.UIManager.Events;
+using System.Collections.Generic;
 
 namespace ReactNativePSPDFKit.Events
 {
@@ -15,22 +16,28 @@ namespace ReactNativePSPDFKit.Events
         public const string EVENT_TYPE_REMOVED = "removed";
 
         private readonly string _eventType;
-        private readonly IAnnotation _annotation;
+        private readonly IList<IAnnotation> _annotations;
 
-        public PdfViewAnnotationChangedEvent(int viewId, string eventType, IAnnotation annotation) : base(viewId)
+        public PdfViewAnnotationChangedEvent(int viewId, string eventType, IList<IAnnotation> annotations) : base(viewId)
         {
-            this._eventType = eventType;
-            this._annotation = annotation;
+            _eventType = eventType;
+            _annotations = annotations;
         }
 
         public override string EventName => EVENT_NAME;
 
         public override void Dispatch(RCTEventEmitter rctEventEmitter)
         {
+            var annotationsJson = new JArray();
+            foreach (var annotation in _annotations)
+            {
+                annotationsJson.Add(JObject.Parse(annotation.ToJson().Stringify()));
+            }
+
             var eventData = new JObject
             {
                 { "change", _eventType },
-                { "annotations", JObject.Parse(_annotation.ToJson().Stringify()) }
+                { "annotations", annotationsJson }
             };
 
             rctEventEmitter.receiveEvent(ViewTag, EventName, eventData);

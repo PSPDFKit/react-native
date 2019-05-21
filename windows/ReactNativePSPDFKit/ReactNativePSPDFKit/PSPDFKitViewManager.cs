@@ -8,14 +8,10 @@
 //
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using Windows.Data.Json;
 using ReactNative.UIManager;
 using ReactNative.UIManager.Annotations;
 using Windows.Storage;
 using Newtonsoft.Json.Linq;
-using PSPDFKit.Pdf.Annotation;
 using PSPDFKit.UI;
 using ReactNativePSPDFKit.Events;
 
