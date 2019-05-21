@@ -108,7 +108,7 @@ namespace ReactNativePSPDFKit
             return queryResultsJson;
         }
 
-        private static JToken RangeToJson(IRange range)
+        private static JToken RangeToJson(Range range)
         {
             return new JObject
             {
@@ -117,9 +117,9 @@ namespace ReactNativePSPDFKit
             };
         }
 
-        private static IRange ToRange(JToken rangeJson)
+        private static Range ToRange(JToken rangeJson)
         {
-            return new Range(rangeJson.Value<int>("postion"), rangeJson.Value<int>("length"));
+            return new Range(rangeJson.Value<int>("position"), rangeJson.Value<int>("length"));
         }
 
         private static JArray LibraryQueryReultToJson(LibraryQueryResult libraryQueryResult)
