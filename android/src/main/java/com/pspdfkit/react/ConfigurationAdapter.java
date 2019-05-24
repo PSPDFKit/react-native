@@ -13,15 +13,15 @@
 
 package com.pspdfkit.react;
 
-import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableMapKeySetIterator;
-import com.pspdfkit.configuration.activity.UserInterfaceViewMode;
 import com.pspdfkit.configuration.activity.PdfActivityConfiguration;
 import com.pspdfkit.configuration.activity.ThumbnailBarMode;
+import com.pspdfkit.configuration.activity.UserInterfaceViewMode;
 import com.pspdfkit.configuration.page.PageFitMode;
 import com.pspdfkit.configuration.page.PageLayoutMode;
 import com.pspdfkit.configuration.page.PageScrollDirection;
@@ -305,9 +305,10 @@ public class ConfigurationAdapter {
         }
     }
 
-    private void configurePageMode(String pageMode) {
+    private void configurePageMode(@Nullable final String pageMode) {
         PageLayoutMode pageLayoutMode = PageLayoutMode.AUTO;
-        if (pageMode.equalsIgnoreCase(PAGE_MODE_AUTO)) {
+        if (pageMode == null ||
+            pageMode.equalsIgnoreCase(PAGE_MODE_AUTO)) {
             pageLayoutMode = PageLayoutMode.AUTO;
         } else if (pageMode.equalsIgnoreCase(PAGE_MODE_SINGLE)) {
             pageLayoutMode = PageLayoutMode.SINGLE;
@@ -317,7 +318,7 @@ public class ConfigurationAdapter {
         configuration.layoutMode(pageLayoutMode);
     }
 
-    private void configureFirstPageAlwaysSingle(boolean firstPageAlwaysSingle) {
+    private void configureFirstPageAlwaysSingle(final boolean firstPageAlwaysSingle) {
         configuration.firstPageAlwaysSingle(firstPageAlwaysSingle);
     }
 
