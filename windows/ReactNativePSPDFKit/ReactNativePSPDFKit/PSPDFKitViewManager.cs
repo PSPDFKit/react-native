@@ -29,10 +29,21 @@ namespace ReactNativePSPDFKit
         private const int COMMAND_SET_TOOLBAR_ITEMS = 7;
         private const int COMMAND_REMOVE_ANNOTATION = 8;
 
-        internal readonly PDFViewPage PdfViewPage = new PDFViewPage();
+        private readonly Uri _cssResource = null;
+        internal PDFViewPage PdfViewPage;
+
+        public PSPDFKitViewManger(Uri cssResource)
+        {
+            _cssResource = cssResource;
+        }
 
         protected override PDFViewPage CreateViewInstance(ThemedReactContext reactContext)
         {
+            PdfViewPage = new PDFViewPage();
+            if(_cssResource != null)
+            {
+                PdfViewPage.Pdfview.Css = _cssResource;
+            }
             return PdfViewPage;
         }
 
@@ -93,28 +104,28 @@ namespace ReactNativePSPDFKit
             switch (commandId)
             {
                 case COMMAND_ENTER_ANNOTATION_CREATION_MODE:
-                    await PdfViewPage.SetInteractionMode(args[0].Value<int>(), InteractionMode.Note);
+                    await view.SetInteractionMode(args[0].Value<int>(), InteractionMode.Note);
                     break;
                 case COMMAND_EXIT_CURRENTLY_ACTIVE_MODE:
-                    await PdfViewPage.SetInteractionMode(args[0].Value<int>(), InteractionMode.None);
+                    await view.SetInteractionMode(args[0].Value<int>(), InteractionMode.None);
                     break;
                 case COMMAND_SAVE_CURRENT_DOCUMENT:
-                    await PdfViewPage.ExportCurrentDocument(args[0].Value<int>());
+                    await view.ExportCurrentDocument(args[0].Value<int>());
                     break;
                 case COMMAND_GET_ANNOTATIONS:
-                    await PdfViewPage.GetAnnotations(args[0].Value<int>(), args[1].Value<int>());
+                    await view.GetAnnotations(args[0].Value<int>(), args[1].Value<int>());
                     break;
                 case COMMAND_ADD_ANNOTATION:
-                    await PdfViewPage.CreateAnnotation(args[0].Value<int>(), args[1].ToString());
+                    await view.CreateAnnotation(args[0].Value<int>(), args[1].ToString());
                     break;
                 case COMMAND_REMOVE_ANNOTATION:
-                    await PdfViewPage.RemoveAnnotation(args[0].Value<int>(), args[1].ToString());
+                    await view.RemoveAnnotation(args[0].Value<int>(), args[1].ToString());
                     break;
                 case COMMAND_GET_TOOLBAR_ITEMS:
-                    PdfViewPage.GetToolbarItems(args[0].Value<int>());
+                    view.GetToolbarItems(args[0].Value<int>());
                     break;
                 case COMMAND_SET_TOOLBAR_ITEMS:
-                    await PdfViewPage.SetToolbarItems(args[0].Value<int>(), args[1].ToString());
+                    await view.SetToolbarItems(args[0].Value<int>(), args[1].ToString());
                     break;
             }
         }
