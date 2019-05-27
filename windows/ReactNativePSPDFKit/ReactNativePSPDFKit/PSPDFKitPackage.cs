@@ -51,10 +51,20 @@ namespace ReactNativePSPDFKit
         /// <returns>The list of native modules.</returns>
         public IReadOnlyList<INativeModule> CreateNativeModules(ReactContext reactContext)
         {
+            object pspdfkitLicense;
+            try
+            {
+                pspdfkitLicense = Application.Current.Resources["PSPDFKitLicense"];
+            }
+            catch (Exception)
+            {
+                throw new Exception("Please ensure you define PSPDFKitLicense. See https://github.com/PSPDFKit/react-native#running-catalog-project-2");
+            }
+
             return new List<INativeModule>
             {
                 new PSPDFKitModule(reactContext, _pspdfkitViewManger),
-                new LibraryModule(reactContext, Application.Current.Resources["PSPDFKitLicense"] as string)
+                new LibraryModule(reactContext, pspdfkitLicense as string)
             };
         }
 
