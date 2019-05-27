@@ -39,6 +39,8 @@ namespace ReactNativePSPDFKit
                 // This is a work aronud to ensure that if the user navigates away from
                 // the Page and then back, a document will still be shown.
                 _fileToOpen = null;
+
+                args.Complete();
             };
 
             PDFView.OnDocumentOpened += (pdfView, document) =>
