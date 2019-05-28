@@ -91,7 +91,11 @@ public class ReactGroupingRule extends PresetMenuItemGroupingRule {
             case "signature":
                 return R.id.pspdf__annotation_creation_toolbar_item_signature;
             case "ink":
-                return R.id.pspdf__annotation_creation_toolbar_item_ink;
+                return R.id.pspdf__annotation_creation_toolbar_item_ink_pen;
+            case "pen":
+                return R.id.pspdf__annotation_creation_toolbar_item_ink_pen;
+            case "highlighter":
+                return R.id.pspdf__annotation_creation_toolbar_item_ink_highlighter;
             case "note":
                 return R.id.pspdf__annotation_creation_toolbar_item_note;
             case "drawing":
@@ -120,6 +124,8 @@ public class ReactGroupingRule extends PresetMenuItemGroupingRule {
                 return R.id.pspdf__annotation_creation_toolbar_item_redaction;
             case "picker":
                 return R.id.pspdf__annotation_creation_toolbar_item_picker;
+            case "sound":
+                return R.id.pspdf__annotation_creation_toolbar_item_sound;
         }
 
         Log.i(TAG, String.format("Received unknown menu item %s.", name));
