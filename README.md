@@ -174,7 +174,7 @@ Using this approach, you have more flexibility over how a document is presented 
 The layout is completely flexible, and can be adjust with flexbox.
 Note that you still need to set your license key with the Native Module.
 
-For all the `props` that you can pass to `PSPDFKitView`, have a look at the [source documentation](./js/index.js)
+For all the `props` that you can pass to `PSPDFKitView`, have a look at the [source documentation](./index.js).
 
 This is how you would show a PDF as a React component:
 
