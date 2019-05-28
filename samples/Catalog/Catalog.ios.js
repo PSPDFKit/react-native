@@ -95,7 +95,7 @@ const examples = [
           document: "PDFs/Annual Report.pdf",
           configuration: {
             useParentNavigationBar: true,
-            showDocumentLabel: true,  
+            showDocumentLabel: true
           },
           style: { flex: 1 }
         }
@@ -194,8 +194,7 @@ const examples = [
   {
     key: "item13",
     name: "Custom Sharing Options",
-    description:
-      "Customize the sharing options for a document.",
+    description: "Customize the sharing options for a document.",
     action: () => {
       PSPDFKit.present("PDFs/Annual Report.pdf", {
         backgroundColor: processColor("white"),
@@ -203,12 +202,23 @@ const examples = [
         pageTransition: "scrollContinuous",
         pageScrollDirection: "vertical",
         sharingConfigurations: [
-        	{
-        		annotationOptions: ["flatten"],
-        		pageSelectionOptions: ["all", "annotated"]
-        	}
+          {
+            annotationOptions: ["flatten"],
+            pageSelectionOptions: ["all", "annotated"]
+          }
         ]
       });
+    }
+  },
+  {
+    key: "item14",
+    name: "Customize the Toolbar",
+    description: "Shows how to customize the buttons in the toolbar.",
+    action: component => {
+      const nextRoute = {
+        component: ToolbarCustomization
+      };
+      component.props.navigator.push(nextRoute);
     }
   }
 ];
@@ -486,7 +496,12 @@ class AnnotationCreationMode extends Component {
             showThumbnailBar: "scrollable",
             useParentNavigationBar: true
           }}
-          menuItemGrouping={['freetext', {key: 'markup', items: ['highlight', "underline"]}, 'ink', 'image']}
+          menuItemGrouping={[
+            "freetext",
+            { key: "markup", items: ["highlight", "underline"] },
+            "ink",
+            "image"
+          ]}
           pageIndex={this.state.currentPageIndex}
           style={{ flex: 1, color: pspdfkitColor }}
           onStateChanged={event => {
@@ -877,6 +892,31 @@ class ProgrammaticFormFilling extends Component {
             />
           </View>
         </View>
+      </View>
+    );
+  }
+}
+
+class ToolbarCustomization extends Component {
+  render() {
+    return (
+      <View style={{ flex: 1 }}>
+        <PSPDFKitView
+          ref="pdfView"
+          document={"PDFs/Annual Report.pdf"}
+          configuration={{
+            backgroundColor: processColor("lightgrey"),
+            showThumbnailBar: "scrollable",
+            useParentNavigationBar: true
+          }}
+          leftBarButtonItems={["closeButtonItem"]}
+          rightBarButtonItems={[
+            "thumbnailsButtonItem",
+            "searchButtonItem",
+            "annotationButtonItem"
+          ]}
+          style={{ flex: 1, color: pspdfkitColor }}
+        />
       </View>
     );
   }

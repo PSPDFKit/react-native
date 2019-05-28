@@ -58,6 +58,34 @@ RCT_CUSTOM_VIEW_PROPERTY(menuItemGrouping, PSPDFAnnotationToolbarConfiguration, 
   }
 }
 
+RCT_CUSTOM_VIEW_PROPERTY(leftBarButtonItems, pdfController.navigationItem.leftBarButtonItems, RCTPSPDFKitView) {
+  NSArray *leftBarButtonItems = [RCTConvert NSArray:json];
+  NSMutableArray *items = [NSMutableArray array];
+  if (json && leftBarButtonItems) {
+    for (NSString *barButtonItemString in leftBarButtonItems) {
+      UIBarButtonItem *barButtonItem = [view.pdfController valueForKey:barButtonItemString];
+      if (barButtonItem && ![view.pdfController.navigationItem.rightBarButtonItems containsObject:barButtonItem]) {
+        [items addObject:barButtonItem];
+      }
+    }
+    view.pdfController.navigationItem.leftBarButtonItems = [items copy];
+  }
+}
+
+RCT_CUSTOM_VIEW_PROPERTY(rightBarButtonItems, pdfController.navigationItem.leftBarButtonItems, RCTPSPDFKitView) {
+  NSArray *rightBarButtonItems = [RCTConvert NSArray:json];
+  NSMutableArray *items = [NSMutableArray array];
+  if (json && rightBarButtonItems) {
+    for (NSString *barButtonItemString in rightBarButtonItems) {
+      UIBarButtonItem *barButtonItem = [view.pdfController valueForKey:barButtonItemString];
+      if (barButtonItem && ![view.pdfController.navigationItem.leftBarButtonItems containsObject:barButtonItem]) {
+        [items addObject:barButtonItem];
+      }
+    }
+    view.pdfController.navigationItem.rightBarButtonItems = [items copy];
+  }
+}
+
 RCT_EXPORT_VIEW_PROPERTY(hideNavigationBar, BOOL)
 
 RCT_EXPORT_VIEW_PROPERTY(disableDefaultActionForTappedAnnotations, BOOL)

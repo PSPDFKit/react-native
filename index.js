@@ -24,8 +24,8 @@ class PSPDFKitView extends React.Component {
     if (Platform.OS === "ios" || Platform.OS === "android") {
       const onCloseButtonPressedHandler = this.props.onCloseButtonPressed
         ? event => {
-          this.props.onCloseButtonPressed(event.nativeEvent);
-        }
+            this.props.onCloseButtonPressed(event.nativeEvent);
+          }
         : null;
       return (
         <RCTPSPDFKitView
@@ -89,7 +89,7 @@ class PSPDFKitView extends React.Component {
   /**
    * Enters the annotation creation mode, showing the annotation creation toolbar.
    */
-  enterAnnotationCreationMode = function () {
+  enterAnnotationCreationMode = function() {
     if (Platform.OS === "android") {
       UIManager.dispatchViewManagerCommand(
         findNodeHandle(this.refs.pdfView),
@@ -106,7 +106,7 @@ class PSPDFKitView extends React.Component {
   /**
    * Exits the currently active mode, hiding all toolbars.
    */
-  exitCurrentlyActiveMode = function () {
+  exitCurrentlyActiveMode = function() {
     if (Platform.OS === "android") {
       UIManager.dispatchViewManagerCommand(
         findNodeHandle(this.refs.pdfView),
@@ -123,7 +123,7 @@ class PSPDFKitView extends React.Component {
   /**
    * Saves the currently opened document.
    */
-  saveCurrentDocument = function () {
+  saveCurrentDocument = function() {
     if (Platform.OS === "android") {
       UIManager.dispatchViewManagerCommand(
         findNodeHandle(this.refs.pdfView),
@@ -146,13 +146,13 @@ class PSPDFKitView extends React.Component {
    * Returns a promise resolving an array with the following structure:
    * {'annotations' : [instantJson]}
    */
-  getAnnotations = function (pageIndex, type) {
+  getAnnotations = function(pageIndex, type) {
     if (Platform.OS === "android") {
       let requestId = this._nextRequestId++;
       let requestMap = this._requestMap;
 
       // We create a promise here that will be resolved once onDataReturned is called.
-      let promise = new Promise(function (resolve, reject) {
+      let promise = new Promise(function(resolve, reject) {
         requestMap[requestId] = { resolve: resolve, reject: reject };
       });
 
@@ -177,7 +177,7 @@ class PSPDFKitView extends React.Component {
    *
    * @param annotation InstantJson of the annotation to add.
    */
-  addAnnotation = function (annotation) {
+  addAnnotation = function(annotation) {
     if (Platform.OS === "android") {
       UIManager.dispatchViewManagerCommand(
         findNodeHandle(this.refs.pdfView),
@@ -197,7 +197,7 @@ class PSPDFKitView extends React.Component {
    *
    * @param annotation InstantJson of the annotation to remove.
    */
-  removeAnnotation = function (annotation) {
+  removeAnnotation = function(annotation) {
     if (Platform.OS === "android") {
       UIManager.dispatchViewManagerCommand(
         findNodeHandle(this.refs.pdfView),
@@ -217,13 +217,13 @@ class PSPDFKitView extends React.Component {
    *
    * Returns a promise resolving to document instant json (https://pspdfkit.com/guides/android/current/importing-exporting/instant-json/#instant-document-json-api-a56628).
    */
-  getAllUnsavedAnnotations = function () {
+  getAllUnsavedAnnotations = function() {
     if (Platform.OS === "android") {
       let requestId = this._nextRequestId++;
       let requestMap = this._requestMap;
 
       // We create a promise here that will be resolved once onDataReturned is called.
-      let promise = new Promise(function (resolve, reject) {
+      let promise = new Promise(function(resolve, reject) {
         requestMap[requestId] = { resolve: resolve, reject: reject };
       });
 
@@ -246,7 +246,7 @@ class PSPDFKitView extends React.Component {
    *
    * @param annotations The document instant json to apply.
    */
-  addAnnotations = function (annotations) {
+  addAnnotations = function(annotations) {
     if (Platform.OS === "android") {
       UIManager.dispatchViewManagerCommand(
         findNodeHandle(this.refs.pdfView),
@@ -269,13 +269,13 @@ class PSPDFKitView extends React.Component {
    * Returns a promise resolving a dictionary with the following structure:
    * {'formElement' : value} or {'error' : 'Failed to get the form field value.'}
    */
-  getFormFieldValue = function (fullyQualifiedName) {
+  getFormFieldValue = function(fullyQualifiedName) {
     if (Platform.OS === "android") {
       let requestId = this._nextRequestId++;
       let requestMap = this._requestMap;
 
       // We create a promise here that will be resolved once onDataReturned is called.
-      let promise = new Promise(function (resolve, reject) {
+      let promise = new Promise(function(resolve, reject) {
         requestMap[requestId] = { resolve: resolve, reject: reject };
       });
 
@@ -300,7 +300,7 @@ class PSPDFKitView extends React.Component {
    * @param fullyQualifiedName The fully qualified name of the form element.
    * @param value The string value form element. For button form elements pass 'selected' or 'deselected'. For choice form elements, pass the index of the choice to select, for example '1'.
    */
-  setFormFieldValue = function (fullyQualifiedName, value) {
+  setFormFieldValue = function(fullyQualifiedName, value) {
     if (Platform.OS === "android") {
       UIManager.dispatchViewManagerCommand(
         findNodeHandle(this.refs.pdfView),
@@ -425,7 +425,23 @@ PSPDFKitView.propTypes = {
   /**
    * menuItemGrouping: Can be used to specfiy a custom grouping for the menu items in the annotation creation toolbar.
    */
-  menuItemGrouping: PropTypes.array
+  menuItemGrouping: PropTypes.array,
+  /**
+   * leftBarButtonItems: Can be used to specfiy an array of the left button items.
+   * Note: The same button item cannot be added to both the left and right bar button items simultaneously.
+   * The full list of button items: https://pspdfkit.com/api/ios/Classes/PSPDFViewController.html#/Toolbar%20button%20items
+   *
+   * @platform ios
+   */
+  leftBarButtonItems: PropTypes.array,
+  /**
+   * leftBarButtonItems: Can be used to specfiy an array of the right button items.
+   * Note: The same button item cannot be added to both the left and right bar button items simultaneously.
+   * The full list of button items: https://pspdfkit.com/api/ios/Classes/PSPDFViewController.html#/Toolbar%20button%20items
+   *
+   * @platform ios
+   */
+  rightBarButtonItems: PropTypes.array
 };
 
 if (Platform.OS === "ios" || Platform.OS === "android") {
