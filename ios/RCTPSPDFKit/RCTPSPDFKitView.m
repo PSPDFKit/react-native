@@ -11,6 +11,8 @@
 #import <React/RCTUtils.h>
 #import "RCTConvert+PSPDFAnnotation.h"
 
+#define VALIDATE_DOCUMENT(document, ...) { if (!document.isValid) { NSLog(@"Document is invalid."); return __VA_ARGS__; }}
+
 @interface RCTPSPDFKitView ()<PSPDFDocumentDelegate, PSPDFViewControllerDelegate, PSPDFFlexibleToolbarContainerDelegate>
 
 @property (nonatomic, nullable) UIViewController *topController;
@@ -173,7 +175,10 @@
 #pragma mark - Instant JSON
 
 - (NSDictionary<NSString *, NSArray<NSDictionary *> *> *)getAnnotations:(PSPDFPageIndex)pageIndex type:(PSPDFAnnotationType)type {
-  NSArray <PSPDFAnnotation *> *annotations = [self.pdfController.document annotationsForPageAtIndex:pageIndex type:type];
+  PSPDFDocument *document = self.pdfController.document;
+  VALIDATE_DOCUMENT(document, nil);
+
+  NSArray <PSPDFAnnotation *> *annotations = [document annotationsForPageAtIndex:pageIndex type:type];
   NSArray <NSDictionary *> *annotationsJSON = [RCTConvert instantJSONFromAnnotations:annotations];
   return @{@"annotations" : annotationsJSON};
 }
@@ -190,6 +195,7 @@
   }
   
   PSPDFDocument *document = self.pdfController.document;
+  VALIDATE_DOCUMENT(document, NO)
   PSPDFDocumentProvider *documentProvider = document.documentProviders.firstObject;
 
   BOOL success = NO;
@@ -207,18 +213,18 @@
 
 - (BOOL)removeAnnotationWithUUID:(NSString *)annotationUUID {
   PSPDFDocument *document = self.pdfController.document;
-
+  VALIDATE_DOCUMENT(document, NO)
   BOOL success = NO;
 
   NSArray<PSPDFAnnotation *> *allAnnotations = [[document allAnnotationsOfType:PSPDFAnnotationTypeAll].allValues valueForKeyPath:@"@unionOfArrays.self"];
-    for (PSPDFAnnotation *annotation in allAnnotations) {
-      // Remove the annotation if the name matches.
-      if ([annotation.uuid isEqualToString:annotationUUID]) {
-        success = [document removeAnnotations:@[annotation] options:nil];
-        break;
-      }
+  for (PSPDFAnnotation *annotation in allAnnotations) {
+    // Remove the annotation if the uuids match.
+    if ([annotation.uuid isEqualToString:annotationUUID]) {
+      success = [document removeAnnotations:@[annotation] options:nil];
+      break;
     }
-
+  }
+  
   if (!success) {
     NSLog(@"Failed to remove annotation.");
   }
@@ -226,8 +232,11 @@
 }
 
 - (NSDictionary<NSString *, NSArray<NSDictionary *> *> *)getAllUnsavedAnnotations {
-  PSPDFDocumentProvider *documentProvider = self.pdfController.document.documentProviders.firstObject;
-  NSData *data = [self.pdfController.document generateInstantJSONFromDocumentProvider:documentProvider error:NULL];
+  PSPDFDocument *document = self.pdfController.document;
+  VALIDATE_DOCUMENT(document, nil)
+
+  PSPDFDocumentProvider *documentProvider = document.documentProviders.firstObject;
+  NSData *data = [document generateInstantJSONFromDocumentProvider:documentProvider error:NULL];
   NSDictionary *annotationsJSON = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:NULL];
   return annotationsJSON;
 }
@@ -245,12 +254,14 @@
   
   PSPDFDataContainerProvider *dataContainerProvider = [[PSPDFDataContainerProvider alloc] initWithData:data];
   PSPDFDocument *document = self.pdfController.document;
+  VALIDATE_DOCUMENT(document, NO)
   PSPDFDocumentProvider *documentProvider = document.documentProviders.firstObject;
-  BOOL success = [document applyInstantJSONFromDataProvider:dataContainerProvider toDocumentProvider:documentProvider error:NULL];
+  BOOL success = [document applyInstantJSONFromDataProvider:dataContainerProvider toDocumentProvider:documentProvider lenient:NO error:NULL];
   if (!success) {
     NSLog(@"Failed to add annotations.");
   }
 
+  [self.pdfController reloadPageAtIndex:self.pdfController.pageIndex animated:NO];
   return success;
 }
 
@@ -263,6 +274,8 @@
   }
 
   PSPDFDocument *document = self.pdfController.document;
+  VALIDATE_DOCUMENT(document, nil)
+  
   for (PSPDFFormElement *formElement in document.formParser.forms) {
     if ([formElement.fullyQualifiedFieldName isEqualToString:fullyQualifiedName]) {
       id formFieldValue = formElement.value;
@@ -280,6 +293,8 @@
   }
 
   PSPDFDocument *document = self.pdfController.document;
+  VALIDATE_DOCUMENT(document)
+  
   for (PSPDFFormElement *formElement in document.formParser.forms) {
     if ([formElement.fullyQualifiedFieldName isEqualToString:fullyQualifiedName]) {
       if ([formElement isKindOfClass:PSPDFButtonFormElement.class]) {

@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
+using Windows.UI;
 using Newtonsoft.Json.Linq;
 using PSPDFKit.Search;
 using PSPDFKitFoundation;
 using PSPDFKitFoundation.Search;
 using PSPDFKitNative;
+using ReactNative.UIManager;
 
 namespace ReactNativePSPDFKit
 {
@@ -106,7 +108,7 @@ namespace ReactNativePSPDFKit
             return queryResultsJson;
         }
 
-        private static JToken RangeToJson(IRange range)
+        private static JToken RangeToJson(Range range)
         {
             return new JObject
             {
@@ -115,9 +117,9 @@ namespace ReactNativePSPDFKit
             };
         }
 
-        private static IRange ToRange(JToken rangeJson)
+        private static Range ToRange(JToken rangeJson)
         {
-            return new Range(rangeJson.Value<int>("postion"), rangeJson.Value<int>("length"));
+            return new Range(rangeJson.Value<int>("position"), rangeJson.Value<int>("length"));
         }
 
         private static JArray LibraryQueryReultToJson(LibraryQueryResult libraryQueryResult)
@@ -130,6 +132,21 @@ namespace ReactNativePSPDFKit
             }
 
             return pageNumbersJson;
+        }
+
+        internal static Color? ParserColor(JObject jObject, string propertyName)
+        {
+            if (TryGetNotNullValue(jObject, propertyName, out var jsonHighlightColor))
+            {
+                return ColorHelpers.Parse(jsonHighlightColor.Value<uint>());
+            }
+
+            return null;
+        }
+
+        internal static bool TryGetNotNullValue(JObject jObject, string propertyName, out JToken value)
+        {
+            return jObject.TryGetValue(propertyName, out value) && value.Type != JTokenType.Null;
         }
     }
 }

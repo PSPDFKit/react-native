@@ -27,11 +27,23 @@ namespace ReactNativePSPDFKit
         private const int COMMAND_ADD_ANNOTATION = 5;
         private const int COMMAND_GET_TOOLBAR_ITEMS = 6;
         private const int COMMAND_SET_TOOLBAR_ITEMS = 7;
+        private const int COMMAND_REMOVE_ANNOTATION = 8;
 
-        internal readonly PDFViewPage PdfViewPage = new PDFViewPage();
+        private readonly Uri _cssResource = null;
+        internal PDFViewPage PdfViewPage;
+
+        public PSPDFKitViewManger(Uri cssResource)
+        {
+            _cssResource = cssResource;
+        }
 
         protected override PDFViewPage CreateViewInstance(ThemedReactContext reactContext)
         {
+            PdfViewPage = new PDFViewPage();
+            if(_cssResource != null)
+            {
+                PdfViewPage.Pdfview.Css = _cssResource;
+            }
             return PdfViewPage;
         }
 
@@ -59,51 +71,6 @@ namespace ReactNativePSPDFKit
             view.SetShowToolbar(!hideNavigationBar);
         }
 
-        [ReactProp("pdfStyle")]
-        public async void SetCustomCss(PDFViewPage view, JObject styleJObject)
-        {
-            var colorString = string.Empty;
-            if (styleJObject.ContainsKey("highlightColor"))
-            {
-                var highlightColor = ColorHelpers.Parse(styleJObject["highlightColor"].Value<uint>());
-                colorString += $"    --primary: {highlightColor.ToHexWithoutAlpha()};\r\n";
-            }
-
-            if (styleJObject.ContainsKey("primaryColor"))
-            {
-                var primaryColor = ColorHelpers.Parse(styleJObject["primaryColor"].Value<uint>());
-                colorString += $"    --primary-dark-1: {primaryColor.ToHexWithoutAlpha()};\r\n";
-            }
-
-            if (styleJObject.ContainsKey("primaryDarkColor"))
-            {
-                var primaryDarkColor = ColorHelpers.Parse(styleJObject["primaryDarkColor"].Value<uint>());
-                colorString += $"    --primary-dark-2: {primaryDarkColor.ToHexWithoutAlpha()};\r\n";
-            }
-
-            if (colorString.Length > 0)
-            {
-                var cssTemplate =
-                    await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appx:///ReactNativePSPDFKit/Assets/customTheme.css"));
-
-                var cssTemplateString = await FileIO.ReadTextAsync(cssTemplate);
-                cssTemplateString = cssTemplateString.Replace("${colors}", colorString);
-                
-                // We have to write a file in the temp folder due to permission issues.
-                var storageFolder = ApplicationData.Current.TemporaryFolder;
-                var sampleFile = await storageFolder.CreateFileAsync("windows.css", CreationCollisionOption.ReplaceExisting);
-                await FileIO.WriteTextAsync(sampleFile, cssTemplateString);
-
-                // Now we get the assets folder to copy the final css file into and move the previous file.
-                var appInstalledFolder = Windows.ApplicationModel.Package.Current.InstalledLocation;
-                var assetsFolder = await appInstalledFolder.GetFolderAsync("Assets");
-                await sampleFile.MoveAsync(assetsFolder, "windows.css", NameCollisionOption.ReplaceExisting);
-
-                // Pass the the css file to the pdf view in a web context.
-                PdfViewPage.Pdfview.Css = new Uri("ms-appx-web:///Assets/windows.css");
-            }
-        }
-
         public override JObject ViewCommandsMap => new JObject
         {
             {
@@ -122,6 +89,9 @@ namespace ReactNativePSPDFKit
                 "addAnnotation", COMMAND_ADD_ANNOTATION
             },
             {
+                "removeAnnotation", COMMAND_REMOVE_ANNOTATION
+            },
+            {
                 "getToolbarItems", COMMAND_GET_TOOLBAR_ITEMS
             },
             {
@@ -134,25 +104,28 @@ namespace ReactNativePSPDFKit
             switch (commandId)
             {
                 case COMMAND_ENTER_ANNOTATION_CREATION_MODE:
-                    await PdfViewPage.SetInteractionMode(args[0].Value<int>(), InteractionMode.Note);
+                    await view.SetInteractionMode(args[0].Value<int>(), InteractionMode.Note);
                     break;
                 case COMMAND_EXIT_CURRENTLY_ACTIVE_MODE:
-                    await PdfViewPage.SetInteractionMode(args[0].Value<int>(), InteractionMode.None);
+                    await view.SetInteractionMode(args[0].Value<int>(), InteractionMode.None);
                     break;
                 case COMMAND_SAVE_CURRENT_DOCUMENT:
-                    await PdfViewPage.ExportCurrentDocument(args[0].Value<int>());
+                    await view.ExportCurrentDocument(args[0].Value<int>());
                     break;
                 case COMMAND_GET_ANNOTATIONS:
-                    await PdfViewPage.GetAnnotations(args[0].Value<int>(), args[1].Value<int>());
+                    await view.GetAnnotations(args[0].Value<int>(), args[1].Value<int>());
                     break;
                 case COMMAND_ADD_ANNOTATION:
-                    await PdfViewPage.CreateAnnotation(args[0].Value<int>(), args[1].ToString());
+                    await view.CreateAnnotation(args[0].Value<int>(), args[1].ToString());
+                    break;
+                case COMMAND_REMOVE_ANNOTATION:
+                    await view.RemoveAnnotation(args[0].Value<int>(), args[1].ToString());
                     break;
                 case COMMAND_GET_TOOLBAR_ITEMS:
-                    PdfViewPage.GetToolbarItems(args[0].Value<int>());
+                    view.GetToolbarItems(args[0].Value<int>());
                     break;
                 case COMMAND_SET_TOOLBAR_ITEMS:
-                    await PdfViewPage.SetToolbarItems(args[0].Value<int>(), args[1].ToString());
+                    await view.SetToolbarItems(args[0].Value<int>(), args[1].ToString());
                     break;
             }
         }

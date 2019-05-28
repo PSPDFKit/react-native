@@ -12,6 +12,7 @@ using ReactNative.Modules.Core;
 using ReactNative.UIManager;
 using System;
 using System.Collections.Generic;
+using Windows.UI.Xaml;
 
 namespace ReactNativePSPDFKit
 {
@@ -23,7 +24,24 @@ namespace ReactNativePSPDFKit
     /// </summary>
     public class PSPDFKitPackage : IReactPackage
     {
-        private readonly PSPDFKitViewManger _pspdfkitViewManger = new PSPDFKitViewManger();
+        private readonly PSPDFKitViewManger _pspdfkitViewManger;
+
+        /// <summary>
+        /// Creates a PSPDFKit package with the default settings.
+        /// </summary>
+        public PSPDFKitPackage()
+        {
+            _pspdfkitViewManger = new PSPDFKitViewManger(null);
+        }
+
+        /// <summary>
+        /// Creates a PSPDFKit package with a theming css.
+        /// <param name="cssResource">CSS theming file.</param>
+        /// </summary>
+        public PSPDFKitPackage(Uri cssResource)
+        {
+            _pspdfkitViewManger = new PSPDFKitViewManger(cssResource);
+        }
 
         /// <summary>
         /// Creates the PSPDFKitModule native modules to register with the react
@@ -33,10 +51,20 @@ namespace ReactNativePSPDFKit
         /// <returns>The list of native modules.</returns>
         public IReadOnlyList<INativeModule> CreateNativeModules(ReactContext reactContext)
         {
+            object pspdfkitLicense;
+            try
+            {
+                pspdfkitLicense = Application.Current.Resources["PSPDFKitLicense"];
+            }
+            catch (Exception)
+            {
+                throw new Exception("Please ensure you define PSPDFKitLicense. See https://github.com/PSPDFKit/react-native#running-catalog-project-2");
+            }
+
             return new List<INativeModule>
             {
-                new PSPDFKitModule(reactContext, _pspdfkitViewManger.PdfViewPage),
-                new LibraryModule(reactContext, _pspdfkitViewManger.PdfViewPage.Pdfview.License)
+                new PSPDFKitModule(reactContext, _pspdfkitViewManger),
+                new LibraryModule(reactContext, pspdfkitLicense as string)
             };
         }
 

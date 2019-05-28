@@ -15,16 +15,18 @@ package com.pspdfkit.react;
 
 import android.content.Context;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableMapKeySetIterator;
 import com.pspdfkit.configuration.activity.PdfActivityConfiguration;
 import com.pspdfkit.configuration.activity.ThumbnailBarMode;
 import com.pspdfkit.configuration.activity.UserInterfaceViewMode;
 import com.pspdfkit.configuration.page.PageFitMode;
+import com.pspdfkit.configuration.page.PageLayoutMode;
 import com.pspdfkit.configuration.page.PageScrollDirection;
 import com.pspdfkit.configuration.page.PageScrollMode;
-
-import androidx.annotation.NonNull;
 
 public class ConfigurationAdapter {
     private static final String PAGE_SCROLL_DIRECTION = "pageScrollDirection";
@@ -58,7 +60,11 @@ public class ConfigurationAdapter {
     private static final String SHOW_PRINT_ACTION = "showPrintAction";
     private static final String SHOW_DOCUMENT_INFO_VIEW = "showDocumentInfoView";
     private static final String SHOW_DOCUMENT_TITLE_OVERLAY = "documentLabelEnabled";
-
+    private static final String PAGE_MODE = "pageMode";
+    private static final String PAGE_MODE_SINGLE = "single";
+    private static final String PAGE_MODE_DOUBLE = "double";
+    private static final String PAGE_MODE_AUTO = "automatic";
+    private static final String FIRST_PAGE_ALWAYS_SINGLE = "firstPageAlwaysSingle";
 
     private final PdfActivityConfiguration.Builder configuration;
 
@@ -133,6 +139,12 @@ public class ConfigurationAdapter {
             }
             if (configuration.hasKey(SHOW_DOCUMENT_TITLE_OVERLAY)) {
                 configureShowDocumentTitleOverlay(configuration.getBoolean(SHOW_DOCUMENT_TITLE_OVERLAY));
+            }
+            if (configuration.hasKey(PAGE_MODE)) {
+                configurePageMode(configuration.getString(PAGE_MODE));
+            }
+            if (configuration.hasKey(FIRST_PAGE_ALWAYS_SINGLE)) {
+                configureFirstPageAlwaysSingle(configuration.getBoolean(FIRST_PAGE_ALWAYS_SINGLE));
             }
         }
     }
@@ -292,6 +304,23 @@ public class ConfigurationAdapter {
         } else {
             configuration.hideDocumentTitleOverlay();
         }
+    }
+
+    private void configurePageMode(@Nullable final String pageMode) {
+        PageLayoutMode pageLayoutMode = PageLayoutMode.AUTO;
+        if (pageMode == null ||
+            pageMode.equalsIgnoreCase(PAGE_MODE_AUTO)) {
+            pageLayoutMode = PageLayoutMode.AUTO;
+        } else if (pageMode.equalsIgnoreCase(PAGE_MODE_SINGLE)) {
+            pageLayoutMode = PageLayoutMode.SINGLE;
+        } else if (pageMode.equalsIgnoreCase(PAGE_MODE_DOUBLE)) {
+            pageLayoutMode = PageLayoutMode.DOUBLE;
+        }
+        configuration.layoutMode(pageLayoutMode);
+    }
+
+    private void configureFirstPageAlwaysSingle(final boolean firstPageAlwaysSingle) {
+        configuration.firstPageAlwaysSingle(firstPageAlwaysSingle);
     }
 
     public PdfActivityConfiguration build() {

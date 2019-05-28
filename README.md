@@ -1,8 +1,10 @@
-## React Native wrapper for PSPDFKit for iOS, Android (Experimental Android X Version) & Windows. (PDF SDK for React Native)
+## React Native wrapper for PSPDFKit for iOS, Android (Experimental Android X Version) & Windows UWP. (PDF SDK for React Native)
 
 ![PDF SDK for React Native](https://github.com/PSPDFKit/react-native/blob/master/article-header.png?raw=true)
 
 This wrapper requires a valid license of PSPDFKit. Licenses are per platform. You can request [a trial license here](https://pspdfkit.com/try/).
+
+This wrapper exposes the most often used APIs from PSPDFKit. Many of our partners end up forking this wrapper and adding some custom code to achieve even greater integration with their products, using native code.
 
 #### Announcements
 
@@ -13,6 +15,7 @@ This wrapper requires a valid license of PSPDFKit. Licenses are per platform. Yo
   Native](https://pspdfkit.com/blog/2018/introducing-pspdfkit-windows/#react-native-for-windows-support) ([See Windows UWP](https://github.com/PSPDFKit/react-native#windows-uwp))
 - [How to Extend React Native APIs](https://pspdfkit.com/blog/2018/how-to-extend-react-native-api/)
 - [Advanced Techniques for React Native UI Components](https://pspdfkit.com/blog/2018/advanced-techniques-for-react-native-ui-components/)
+- [How to Extend React Native APIs for Windows](https://pspdfkit.com/blog/2019/how-to-extend-react-native-apis-for-windows/)
 
 #### PSPDFKit
 
@@ -24,8 +27,8 @@ The [PSPDFKit SDK](https://pspdfkit.com/) is a framework that allows you to view
 
 #### Requirements
 
-- Xcode 10.1
-- PSPDFKit 8.1.3 for iOS or later
+- Xcode 10.2
+- PSPDFKit 8.2.3 for iOS or later
 - react-native >= 0.57.8
 
 #### Getting Started
@@ -42,7 +45,7 @@ Let's create a simple app that integrates PSPDFKit and uses the `react-native-ps
 6. Link module `react-native-pspdfkit`: `react-native link react-native-pspdfkit`.
 7. Create the folder `ios/PSPDFKit` and copy `PSPDFKit.framework` and `PSPDFKitUI.framework` into it.
 8. Open `ios/YourApp.xcodeproj` in Xcode: `open ios/YourApp.xcodeproj`
-9. Make sure the deployment target is set to 10.0 or higher:
+9. Make sure the deployment target is set to 11.0 or higher:
    ![Deployment Target](screenshots/deployment-target.png)
 10. Change "View controller-based status bar appearance" to `YES` in `Info.plist`:
     ![View Controller-Based Status Bar Appearance](screenshots/view-controller-based-status-bar-appearance.png)
@@ -264,7 +267,7 @@ The PSPDFKit React Native iOS Wrapper allows you to specify a custom grouping fo
 - Android Build Tools 23.0.1 (React Native)
 - Android Build Tools 28.0.3 (PSPDFKit module)
 - Android Gradle plugin >= 3.2.1
-- PSPDFKit >= 5.3.0
+- PSPDFKit >= 5.4.0
 - react-native for example app >= 0.59.2
 - react-native for Catalog app >= 0.57.8
 
@@ -850,6 +853,24 @@ Opens a document in the available `<PSPDFKitView>`. If the element is not displa
 ```javascript
 PSPDFKit.Present("ms-appx:///Assets/pdf/Business Report.pdf");
 ```
+
+#### Theming support
+
+It is possible to theme/customize the PdfView with the use of a CSS file. To do this simple pass a `Uri` within the web context to the instantiated [`PSPDFKitPackage`](https://github.com/PSPDFKit/react-native/blob/master/windows/ReactNativePSPDFKit/ReactNativePSPDFKit/PSPDFKitPackage.cs#L32).
+
+To see this in action, make the following changes in [`samples/Catalog/windows/Catalog/MainReactNativeHost.cs`](https://github.com/PSPDFKit/react-native/blob/master/samples/Catalog/windows/Catalog/MainReactNativeHost.cs) and run the catalog the catalog.
+```diff
+protected override List<IReactPackage> Packages => new List<IReactPackage>
+{
+    new MainReactPackage(),
+-   new ReactNativePSPDFKit.PSPDFKitPackage(),
++   new ReactNativePSPDFKit.PSPDFKitPackage(new Uri("ms-appx-web:///Assets/css/greenTheme.css")),
+    new RNFSPackage()
+};
+```
+The code above will pass an asset held in the `Catalog` project's `Assets/css` to the web context of PSPDFKit for Windows. The file can then be used to theme the view.
+
+For more information on CSS Customization in PSPDFKit for Windows please refer to [CSS Customization](https://pspdfkit.com/guides/windows/current/customizing-the-interface/css-customization/)
 
 ## License
 

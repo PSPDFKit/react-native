@@ -15,7 +15,8 @@ import {
   Image,
   TouchableHighlight,
   NativeModules,
-  Button
+  Button,
+  Linking
 } from "react-native";
 import {StackNavigator} from "react-navigation";
 import PSPDFKitView from "react-native-pspdfkit";
@@ -86,7 +87,7 @@ const examples = [
   {
     key: "item1",
     name: "Open assets document",
-    description: "Opens a document from your project assets folder",
+    description: "Open document from your project assets folder",
     action: component => {
       component.props.navigation.navigate("PdfView");
     }
@@ -94,7 +95,7 @@ const examples = [
   {
     key: "item2",
     name: "Present a file from source",
-    description: "Opens a document from assets with Present",
+    description: "Open document from source",
     action: component => {
       component.props.navigation.navigate("PdfView");
       // Present can only take files loaded in the Visual studio Project's Assets. Please use RNFS.
@@ -133,11 +134,6 @@ const examples = [
     action: async () => {
       await PSPDFKitLibrary.OpenLibrary("MyLibrary");
       await PSPDFKitLibrary.EnqueueDocumentsInFolderPicker("MyLibrary");
-      alert(
-        'Searching Library for "' +
-        simpleSearch.searchString +
-        '". Please wait.'
-      );
       PSPDFKitLibrary.SearchLibrary("MyLibrary", simpleSearch)
         .then(result => {
           alert("Search : \n" + JSON.stringify(result));
@@ -154,11 +150,6 @@ const examples = [
 
       await PSPDFKitLibrary.OpenLibrary("AssetsLibrary");
       await PSPDFKitLibrary.EnqueueDocumentsInFolder("AssetsLibrary", path);
-      alert(
-        'Searching Library for "' +
-        complexSearchConfiguration.searchString +
-        '". Please wait.'
-      );
       PSPDFKitLibrary.SearchLibrary("AssetsLibrary", complexSearchConfiguration)
         .then(result => {
           alert("Search : \n" + JSON.stringify(result));
@@ -177,19 +168,12 @@ const examples = [
   {
     key: "item8",
     name: "Custom colors",
-    description: "Supplies different colors for Pdf View Toolbar.",
+    description: "Explains how to theme your UWP react native application.",
     action: component => {
       component.props.navigation.navigate("PdfViewStyle");
     }
   }
 ];
-
-const pdfStyle = {
-  flex: 1,
-  highlightColor: "#61D800", /* Highlight or hover color. */
-  primaryColor: "red", /* Color for the main toolbar */
-  primaryDarkColor: "rgb(255, 0, 255)" /* Color for the second toolbar */
-};
 
 const styles = StyleSheet.create({
   page: {
@@ -249,7 +233,19 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center"
-  }
+  },
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: "white",
+  },
+  stlyeExplanation: {
+    color: "#666666",
+    fontSize: 16,
+    textAlign: 'center',
+    margin: 50
+  },
 });
 
 class CatalogScreen extends Component<{}> {
@@ -310,7 +306,8 @@ class PdfViewScreen extends Component<{}> {
           ref="pdfView"
           style={styles.pdfView}
           // The default file to open.
-          document="ms-appx:///Assets/pdf/annualReport.pdf"/>
+          document="ms-appx:///Assets/pdf/annualReport.pdf"
+        />
         <View style={styles.footer}>
           <View style={styles.button}>
             <Button onPress={() => PSPDFKit.OpenFilePicker()} title="Open"/>
@@ -399,7 +396,7 @@ class PdfViewInstantJsonScreen extends Component<{}> {
                   alert(JSON.stringify(annotations));
                 });
               }}
-              title="Get annotations"
+              title="Get Annotations"
             />
           </View>
           <View style={{marginLeft: 10}}>
@@ -412,7 +409,24 @@ class PdfViewInstantJsonScreen extends Component<{}> {
                   alert(error);
                 });
               }}
-              title="Add annotation"
+              title="Add Annotation"
+            />
+          </View>
+          <View style={{marginLeft: 10}}>
+            <Button
+              onPress={() => {
+                this.refs.pdfView.getAnnotations(0).then(result => {
+                  if (result.annotations !== undefined && result.annotations.length > 0) {
+                    // Removes the ink annotation if added with Add annotation button rejects if not present
+                    this.refs.pdfView.removeAnnotation(result.annotations[0]).then(() => {
+                      alert("Annotation removal was successful.");
+                    }).catch(error => {
+                      alert(error);
+                    });
+                  }
+                });
+              }}
+              title="Remove Annotation"
             />
           </View>
         </View>
@@ -441,7 +455,9 @@ class PdfViewToolbarCustomizationScreen extends Component<{}> {
             </View>
             <View style={styles.button}>
               <Button onPress={() =>
-                this.refs.pdfView.setToolbarItems([{type: "ink"}])} title="Set Toolbar Items"/>
+                this.refs.pdfView.setToolbarItems([{type: "ink"}]).then(() => {
+                  alert("Toolbar Items set.");
+                })} title="Set Toolbar Items"/>
             </View>
           </View>
           <Image
@@ -461,12 +477,21 @@ class PdfViewStyleScreen extends Component<{}> {
   render() {
     return (
       <View style={styles.page}>
-        <PSPDFKitView
-          ref="pdfView"
-          style={pdfStyle}
-          // The default file to open.
-          document="ms-appx:///Assets/pdf/annualReport.pdf"/>
+        <View style={styles.container}>
+          <Text style={styles.stlyeExplanation}>
+            Native changes are needed to customize the PdfView. Please follow the setups shown in the{" "}
+            <Text
+              style={{color: 'blue'}}
+              onPress={() => {
+                Linking.openURL('https://github.com/PSPDFKit/react-native/blob/master/README.md#theming-support')
+              }}
+            >
+              README
+            </Text>
+          </Text>
+        </View>
         <View style={styles.footer}>
+
           <Image
             source={require("./assets/logo-flat.png")}
             style={styles.logo}
@@ -479,7 +504,6 @@ class PdfViewStyleScreen extends Component<{}> {
     );
   }
 }
-
 
 export default StackNavigator(
   {
@@ -500,7 +524,7 @@ export default StackNavigator(
     },
     PdfViewStyle: {
       screen: PdfViewStyleScreen
-    },
+    }
   },
   {
     initialRouteName: "Catalog"

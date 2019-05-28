@@ -11,48 +11,22 @@ import {
   requireNativeComponent,
   ViewPropTypes,
   findNodeHandle,
-  UIManager,
-  processColor
+  UIManager
 } from "react-native";
 
 class PSPDFKitView extends React.Component {
   _nextRequestId = 1;
   _requestMap = new Map();
 
-  state = {
-    pdfStyle: {
-      highlightColor: null,
-      primaryColor: null,
-      primaryDarkColor: null
-    },
-    style: ViewPropTypes.style
-  };
-
-  constructor(props) {
-    super(props);
-
-    this.state.pdfStyle.highlightColor = processColor(props.style.highlightColor);
-    delete props.style.highlightColor;
-    this.state.pdfStyle.primaryColor = processColor(props.style.primaryColor);
-    delete props.style.primaryColor;
-    this.state.pdfStyle.primaryDarkColor = processColor(props.style.primaryDarkColor);
-    delete props.style.primaryDarkColor;
-
-    this.state.style = props.style;
-  }
-
   render() {
     return (
       <RCTPSPDFKitView
         ref="pdfView"
-        document={this.props.document}
-        pageIndex={this.props.pageIndex}
-        hideNavigationBar={this.props.hideNavigationBar}
+        {...this.props}
         onAnnotationsChanged={this._onAnnotationsChanged}
         onDataReturned={this._onDataReturned}
         onOperationResult={this._onOperationResult}
-        pdfStyle={this.state.pdfStyle}
-        style={this.state.style}/>
+      />
     );
   }
 
@@ -206,6 +180,32 @@ class PSPDFKitView extends React.Component {
   };
 
   /**
+   * Removes an annotation to the current document.
+   *
+   * @param annotation InstantJson of the annotation to remove with the format of
+   * https://pspdfkit.com/guides/windows/current/importing-exporting/instant-json/#instant-annotation-json-api
+   *
+   * @returns a promise resolving if successful or rejects if an error occurs with and error message
+   */
+  removeAnnotation(annotation) {
+    let requestId = this._nextRequestId++;
+    let requestMap = this._requestMap;
+
+    // We create a promise here that will be resolved once onDataReturned is called.
+    let promise = new Promise((resolve, reject) => {
+      requestMap[requestId] = {resolve: resolve, reject: reject};
+    });
+
+    UIManager.dispatchViewManagerCommand(
+      findNodeHandle(this.refs.pdfView),
+      UIManager.RCTPSPDFKitView.Commands.removeAnnotation,
+      [requestId, annotation]
+    );
+
+    return promise;
+  };
+
+  /**
    * Gets toolbar items currently shown.
    *
    * @return Receives an array of https://pspdfkit.com/api/web/PSPDFKit.ToolbarItem.html.
@@ -256,13 +256,6 @@ class PSPDFKitView extends React.Component {
   }
 }
 
-const PDFStylePropTypes = PropTypes.shape({
-  highlightColor: PropTypes.string,
-  primaryColor: PropTypes.string,
-  primaryDarkColor: PropTypes.string,
-  ...ViewPropTypes.style
-});
-
 PSPDFKitView.propTypes = {
   /**
    * Path to the PDF file that should be displayed.
@@ -285,19 +278,7 @@ PSPDFKitView.propTypes = {
    * }
    */
   onAnnotationsChanged: PropTypes.func,
-  /**
-   * Holds the standard style properties as expected plus extra pdf view style specific properties.
-   * Styles the pdf view in accordance to https://pspdfkit.com/guides/windows/current/customizing-the-interface/css-customization/
-   *
-   * Expects optional values of.
-   * {
-   *    highlightColor: PropTypes.string,  | Highlight or hover color.
-   *    primaryColor: PropTypes.string,    | Color for the main toolbar
-   *    primaryDarkColor: PropTypes.string | Color for the second toolbar
-   *    ...ViewPropTypes.style             | Standard style props
-   * }
-   */
-  style: PDFStylePropTypes
+  ...ViewPropTypes
 };
 
 const RCTPSPDFKitView = requireNativeComponent(
