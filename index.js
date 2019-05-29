@@ -315,6 +315,76 @@ class PSPDFKitView extends React.Component {
       );
     }
   };
+ /**
+  * Set the left bar button items for the spcified view mode
+  * Note: The same button item cannot be added to both the left and right bar button items simultaneously.
+  *
+  * @param items The list of bar button items. See the full list of button items here: https://pspdfkit.com/api/ios/Classes/PSPDFViewController.html#/Toolbar%20button%20items
+  * @param viewMode The optional view mode. Can be 'document', 'thumbnails', 'documentEditor' or null.
+  * @param animated The animated flag.
+  *
+  * @platform ios
+  */
+  setLeftBarButtonItems = function(items, viewMode, animated) {
+    if (Platform.OS === "ios") {
+      NativeModules.PSPDFKitViewManager.setLeftBarButtonItems(
+        items,
+        viewMode,
+        animated,
+        findNodeHandle(this.refs.pdfView)
+      );
+    }
+  };
+ /**
+  * Get the left bar button items for the spcified view mode
+  *
+  * @param viewMode The optional view mode. Can be 'document', 'thumbnails', 'documentEditor' or null.
+  *
+  * @platform ios
+  */
+  getLeftBarButtonItemsForViewMode = function(viewMode) {
+    if (Platform.OS === "ios") {
+      return NativeModules.PSPDFKitViewManager.getLeftBarButtonItemsForViewMode(
+        viewMode,
+        findNodeHandle(this.refs.pdfView)
+      );
+    }
+  };
+ /**
+  * Set the right bar button items for the spcified view mode
+  * Note: The same button item cannot be added to both the left and right bar button items simultaneously.
+  *
+  * @param items The list of bar button items. See the full list of button items here: https://pspdfkit.com/api/ios/Classes/PSPDFViewController.html#/Toolbar%20button%20items
+  * @param viewMode The optional view mode. Can be 'document', 'thumbnails', 'documentEditor' or null.
+  * @param animated The animated flag.
+  *
+  * @platform ios
+  */
+  setRightBarButtonItems = function(items, viewMode, animated) {
+    if (Platform.OS === "ios") {
+      NativeModules.PSPDFKitViewManager.setRightBarButtonItems(
+        items,
+        viewMode,
+        animated,
+        findNodeHandle(this.refs.pdfView)
+      );
+    }
+  };
+ /**
+  * Get the right bar button items for the spcified view mode
+  *
+  * @param viewMode The optional view mode. Can be 'document', 'thumbnails', 'documentEditor' or null.
+  *
+  * @platform ios
+  */
+  getRightBarButtonItemsForViewMode = function(viewMode) {
+    if (Platform.OS === "ios") {
+      return NativeModules.PSPDFKitViewManager.getRightBarButtonItemsForViewMode(
+        viewMode,
+        findNodeHandle(this.refs.pdfView)
+      );
+    }
+  };
 }
 
 PSPDFKitView.propTypes = {

@@ -910,13 +910,47 @@ class ToolbarCustomization extends Component {
             useParentNavigationBar: true
           }}
           leftBarButtonItems={["closeButtonItem"]}
-          rightBarButtonItems={[
-            "thumbnailsButtonItem",
-            "searchButtonItem",
-            "annotationButtonItem"
-          ]}
           style={{ flex: 1, color: pspdfkitColor }}
         />
+        <View
+          style={{
+            flexDirection: "row",
+            height: 60,
+            alignItems: "center",
+            padding: 10
+          }}
+        >
+          <View>
+            <Button
+              onPress={async () => {
+                // Update the right bar buttons.
+                await this.refs.pdfView.setRightBarButtonItems(
+                  [
+                    "thumbnailsButtonItem",
+                    "searchButtonItem",
+                    "annotationButtonItem"
+                  ],
+                  "document",
+                  false
+                );
+              }}
+              title="Update right bar button items for document view mode"
+            />
+          </View>
+
+          <View>
+            <Button
+              onPress={async () => {
+                // Get the right bar buttons.
+                const rightBarButtonItems = await this.refs.pdfView.getRightBarButtonItemsForViewMode(
+                  "document"
+                );
+                alert(JSON.stringify(rightBarButtonItems));
+              }}
+              title="Get right bar button items for document view mode"
+            />
+          </View>
+        </View>
       </View>
     );
   }

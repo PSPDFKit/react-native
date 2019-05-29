@@ -10,6 +10,7 @@
 #import "RCTPSPDFKitView.h"
 #import <React/RCTUtils.h>
 #import "RCTConvert+PSPDFAnnotation.h"
+#import "RCTConvert+PSPDFViewMode.h"
 
 #define VALIDATE_DOCUMENT(document, ...) { if (!document.isValid) { NSLog(@"Document is invalid."); return __VA_ARGS__; }}
 
@@ -349,6 +350,62 @@
   }
 }
 
+#pragma mark - Customize the Toolbar
+
+- (void)setLeftBarButtonItems:(nullable NSArray <NSString *> *)items forViewMode:(nullable NSString *) viewMode animated:(BOOL)animated {
+  NSMutableArray *leftItems = [NSMutableArray array];
+  for (NSString *barButtonItemString in items) {
+    id barButtonItem = [self.pdfController valueForKey:barButtonItemString];
+    if (barButtonItem && [barButtonItem isKindOfClass:UIBarButtonItem.class] && ![self.pdfController.navigationItem.rightBarButtonItems containsObject:barButtonItem]) {
+      [leftItems addObject:barButtonItem];
+    }
+  }
+
+  if (viewMode.length) {
+    [self.pdfController.navigationItem setLeftBarButtonItems:[leftItems copy] forViewMode:[RCTConvert PSPDFViewMode:viewMode] animated:animated];
+  } else {
+    [self.pdfController.navigationItem setLeftBarButtonItems:[leftItems copy] animated:animated];
+  }
+}
+
+- (void)setRightBarButtonItems:(nullable NSArray <NSString *> *)items forViewMode:(nullable NSString *) viewMode animated:(BOOL)animated {
+  NSMutableArray *rightItems = [NSMutableArray array];
+  for (NSString *barButtonItemString in items) {
+    id barButtonItem = [self.pdfController valueForKey:barButtonItemString];
+    if (barButtonItem && [barButtonItem isKindOfClass:UIBarButtonItem.class] && ![self.pdfController.navigationItem.leftBarButtonItems containsObject:barButtonItem]) {
+      [rightItems addObject:barButtonItem];
+    }
+  }
+
+  if (viewMode.length) {
+    [self.pdfController.navigationItem setRightBarButtonItems:[rightItems copy] forViewMode:[RCTConvert PSPDFViewMode:viewMode] animated:animated];
+  } else {
+    [self.pdfController.navigationItem setRightBarButtonItems:[rightItems copy] animated:animated];
+  }
+}
+
+- (NSArray <NSString *> *)getLeftBarButtonItemsForViewMode:(NSString *)viewMode {
+  NSArray *items;
+  if (viewMode.length) {
+    items = [self.pdfController.navigationItem leftBarButtonItemsForViewMode:[RCTConvert PSPDFViewMode:viewMode]];
+  } else {
+    items = [self.pdfController.navigationItem leftBarButtonItems];
+  }
+
+  return [self buttonItemsStringFromUIBarButtonItems:items];
+}
+
+- (NSArray <NSString *> *)getRightBarButtonItemsForViewMode:(NSString *)viewMode {
+  NSArray *items;
+  if (viewMode.length) {
+    items = [self.pdfController.navigationItem rightBarButtonItemsForViewMode:[RCTConvert PSPDFViewMode:viewMode]];
+  } else {
+    items = [self.pdfController.navigationItem rightBarButtonItems];
+  }
+
+  return [self buttonItemsStringFromUIBarButtonItems:items];
+}
+
 #pragma mark - Helpers
 
 - (void)onStateChangedForPDFViewController:(PSPDFViewController *)pdfController pageView:(PSPDFPageView *)pageView pageAtIndex:(NSInteger)pageIndex {
@@ -375,6 +432,16 @@
                           @"formEditingActive" : @(isFormEditingActive)
                           });
   }
+}
+
+- (NSArray <NSString *> *)buttonItemsStringFromUIBarButtonItems:(NSArray <UIBarButtonItem *> *)barButtonItems {
+  NSMutableArray *barButtonItemsString = [NSMutableArray new];
+  [barButtonItems enumerateObjectsUsingBlock:^(UIBarButtonItem * _Nonnull barButtonItem, NSUInteger idx, BOOL * _Nonnull stop) {
+    NSString *actionString = NSStringFromSelector(barButtonItem.action);
+    NSString *buttonNameString = [actionString stringByReplacingOccurrencesOfString:@"ButtonPressed:" withString:@"BarButtonItem"];
+    [barButtonItemsString addObject:buttonNameString];
+  }];
+  return [barButtonItemsString copy];
 }
 
 @end

@@ -12,6 +12,7 @@
 #import "RCTConvert+PSPDFConfiguration.h"
 #import "RCTConvert+PSPDFDocument.h"
 #import "RCTConvert+PSPDFAnnotationToolbarConfiguration.h"
+#import "RCTConvert+PSPDFViewMode.h"
 #import "RCTPSPDFKitView.h"
 #import <React/RCTUIManager.h>
 
@@ -59,30 +60,16 @@ RCT_CUSTOM_VIEW_PROPERTY(menuItemGrouping, PSPDFAnnotationToolbarConfiguration, 
 }
 
 RCT_CUSTOM_VIEW_PROPERTY(leftBarButtonItems, pdfController.navigationItem.leftBarButtonItems, RCTPSPDFKitView) {
-  NSArray *leftBarButtonItems = [RCTConvert NSArray:json];
-  NSMutableArray *items = [NSMutableArray array];
-  if (json && leftBarButtonItems) {
-    for (NSString *barButtonItemString in leftBarButtonItems) {
-      UIBarButtonItem *barButtonItem = [view.pdfController valueForKey:barButtonItemString];
-      if (barButtonItem && ![view.pdfController.navigationItem.rightBarButtonItems containsObject:barButtonItem]) {
-        [items addObject:barButtonItem];
-      }
-    }
-    view.pdfController.navigationItem.leftBarButtonItems = [items copy];
+  if (json) {
+    NSArray *leftBarButtonItems = [RCTConvert NSArray:json];
+    [view setLeftBarButtonItems:leftBarButtonItems forViewMode:nil animated:NO];
   }
 }
 
 RCT_CUSTOM_VIEW_PROPERTY(rightBarButtonItems, pdfController.navigationItem.leftBarButtonItems, RCTPSPDFKitView) {
-  NSArray *rightBarButtonItems = [RCTConvert NSArray:json];
-  NSMutableArray *items = [NSMutableArray array];
-  if (json && rightBarButtonItems) {
-    for (NSString *barButtonItemString in rightBarButtonItems) {
-      UIBarButtonItem *barButtonItem = [view.pdfController valueForKey:barButtonItemString];
-      if (barButtonItem && ![view.pdfController.navigationItem.leftBarButtonItems containsObject:barButtonItem]) {
-        [items addObject:barButtonItem];
-      }
-    }
-    view.pdfController.navigationItem.rightBarButtonItems = [items copy];
+  if (json) {
+    NSArray *rightBarButtonItems = [RCTConvert NSArray:json];
+    [view setRightBarButtonItems:rightBarButtonItems forViewMode:nil animated:NO];
   }
 }
 
@@ -224,6 +211,44 @@ RCT_EXPORT_METHOD(setFormFieldValue:(nullable NSString *)value fullyQualifiedNam
   dispatch_async(dispatch_get_main_queue(), ^{
     RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
     [component setFormFieldValue:value fullyQualifiedName:fullyQualifiedName];
+  });
+}
+
+RCT_EXPORT_METHOD(setLeftBarButtonItems:(nullable NSArray *)items viewMode:(nullable NSString *)viewMode animated:(BOOL)animated reactTag:(nonnull NSNumber *)reactTag) {
+  dispatch_async(dispatch_get_main_queue(), ^{
+    RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
+    [component setLeftBarButtonItems:items forViewMode:viewMode animated:animated];
+  });
+}
+
+RCT_EXPORT_METHOD(setRightBarButtonItems:(nullable NSArray *)items viewMode:(nullable NSString *)viewMode animated:(BOOL)animated reactTag:(nonnull NSNumber *)reactTag) {
+  dispatch_async(dispatch_get_main_queue(), ^{
+    RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
+    [component setRightBarButtonItems:items forViewMode:viewMode animated:animated];
+  });
+}
+
+RCT_EXPORT_METHOD(getLeftBarButtonItemsForViewMode:(nullable NSString *)viewMode reactTag:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+  dispatch_async(dispatch_get_main_queue(), ^{
+    RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
+    NSArray *leftBarButtonItems = [component getLeftBarButtonItemsForViewMode:viewMode];
+    if (leftBarButtonItems) {
+      resolve(leftBarButtonItems);
+    } else {
+      reject(@"error", @"Failed to get the left bar button items.", nil);
+    }
+  });
+}
+
+RCT_EXPORT_METHOD(getRightBarButtonItemsForViewMode:(nullable NSString *)viewMode reactTag:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+  dispatch_async(dispatch_get_main_queue(), ^{
+    RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
+    NSArray *rightBarButtonItems = [component getRightBarButtonItemsForViewMode:viewMode];
+    if (rightBarButtonItems) {
+      resolve(rightBarButtonItems);
+    } else {
+      reject(@"error", @"Failed to get the right bar button items.", nil);
+    }
   });
 }
 
