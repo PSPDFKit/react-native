@@ -934,7 +934,7 @@ class ToolbarCustomization extends Component {
                   false
                 );
               }}
-              title="Update right bar button items for document view mode"
+              title="Set right bar button items"
             />
           </View>
 
@@ -947,7 +947,7 @@ class ToolbarCustomization extends Component {
                 );
                 alert(JSON.stringify(rightBarButtonItems));
               }}
-              title="Get right bar button items for document view mode"
+              title="Get right bar button items"
             />
           </View>
         </View>

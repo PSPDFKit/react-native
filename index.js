@@ -315,16 +315,16 @@ class PSPDFKitView extends React.Component {
       );
     }
   };
- /**
-  * Set the left bar button items for the spcified view mode
-  * Note: The same button item cannot be added to both the left and right bar button items simultaneously.
-  *
-  * @param items The list of bar button items. See the full list of button items here: https://pspdfkit.com/api/ios/Classes/PSPDFViewController.html#/Toolbar%20button%20items
-  * @param viewMode The optional view mode. Can be 'document', 'thumbnails', 'documentEditor' or null.
-  * @param animated The animated flag.
-  *
-  * @platform ios
-  */
+  /**
+   * Set the left bar button items for the spcified view mode.
+   * Note: The same button item cannot be added to both the left and right bar button items simultaneously.
+   *
+   * @param items The list of bar button items. See the full list of button items here: https://pspdfkit.com/api/ios/Classes/PSPDFViewController.html#/Toolbar%20button%20items
+   * @param viewMode The optional view mode. Can be 'document', 'thumbnails', 'documentEditor' or null. If `null` is passed, we set the bar button items for all view modes.
+   * @param animated The animated flag.
+   *
+   * @platform ios
+   */
   setLeftBarButtonItems = function(items, viewMode, animated) {
     if (Platform.OS === "ios") {
       NativeModules.PSPDFKitViewManager.setLeftBarButtonItems(
@@ -335,13 +335,15 @@ class PSPDFKitView extends React.Component {
       );
     }
   };
- /**
-  * Get the left bar button items for the spcified view mode
-  *
-  * @param viewMode The optional view mode. Can be 'document', 'thumbnails', 'documentEditor' or null.
-  *
-  * @platform ios
-  */
+  /**
+   * Get the left bar button items for the spcified view mode.
+   *
+   * @param viewMode The optional view mode. Can be 'document', 'thumbnails', 'documentEditor' or null. If `null` is passed, we default to the current view mode.
+   *
+   * Returns a promise resolving an array with the following structure:
+   * ['outlineButtonItem', 'searchButtonItem'] or a dictionary with the following error {'error' : 'Failed to get the left bar button items.'}
+   * @platform ios
+   */
   getLeftBarButtonItemsForViewMode = function(viewMode) {
     if (Platform.OS === "ios") {
       return NativeModules.PSPDFKitViewManager.getLeftBarButtonItemsForViewMode(
@@ -350,16 +352,16 @@ class PSPDFKitView extends React.Component {
       );
     }
   };
- /**
-  * Set the right bar button items for the spcified view mode
-  * Note: The same button item cannot be added to both the left and right bar button items simultaneously.
-  *
-  * @param items The list of bar button items. See the full list of button items here: https://pspdfkit.com/api/ios/Classes/PSPDFViewController.html#/Toolbar%20button%20items
-  * @param viewMode The optional view mode. Can be 'document', 'thumbnails', 'documentEditor' or null.
-  * @param animated The animated flag.
-  *
-  * @platform ios
-  */
+  /**
+   * Set the right bar button items for the spcified view mode.
+   * Note: The same button item cannot be added to both the left and right bar button items simultaneously.
+   *
+   * @param items The list of bar button items. See the full list of button items here: https://pspdfkit.com/api/ios/Classes/PSPDFViewController.html#/Toolbar%20button%20items
+   * @param viewMode The optional view mode. Can be 'document', 'thumbnails', 'documentEditor' or null. If `null` is passed, we set the bar button items for all view modes.
+   * @param animated The animated flag.
+   *
+   * @platform ios
+   */
   setRightBarButtonItems = function(items, viewMode, animated) {
     if (Platform.OS === "ios") {
       NativeModules.PSPDFKitViewManager.setRightBarButtonItems(
@@ -370,13 +372,15 @@ class PSPDFKitView extends React.Component {
       );
     }
   };
- /**
-  * Get the right bar button items for the spcified view mode
-  *
-  * @param viewMode The optional view mode. Can be 'document', 'thumbnails', 'documentEditor' or null.
-  *
-  * @platform ios
-  */
+  /**
+   * Get the right bar button items for the spcified view mode.
+   *
+   * @param viewMode The optional view mode. Can be 'document', 'thumbnails', 'documentEditor' or null. If `null` is passed, we default to the current view mode.
+   *
+   * Returns a promise resolving an array with the following structure:
+   * ['annotationButtonItem', 'documentEditorButtonItem'] or a dictionary with the following error {'error' : 'Failed to get the right bar button items.'}
+   * @platform ios
+   */
   getRightBarButtonItemsForViewMode = function(viewMode) {
     if (Platform.OS === "ios") {
       return NativeModules.PSPDFKitViewManager.getRightBarButtonItemsForViewMode(
@@ -505,7 +509,7 @@ PSPDFKitView.propTypes = {
    */
   leftBarButtonItems: PropTypes.array,
   /**
-   * leftBarButtonItems: Can be used to specfiy an array of the right button items.
+   * rightBarButtonItems: Can be used to specfiy an array of the right button items.
    * Note: The same button item cannot be added to both the left and right bar button items simultaneously.
    * The full list of button items: https://pspdfkit.com/api/ios/Classes/PSPDFViewController.html#/Toolbar%20button%20items
    *
