@@ -23,7 +23,7 @@
 
 RCT_EXPORT_MODULE()
 
-RCT_CUSTOM_VIEW_PROPERTY(document, pdfController.document, RCTPSPDFKitView) {
+RCT_CUSTOM_VIEW_PROPERTY(document, PSPDFDocument, RCTPSPDFKitView) {
   if (json) {
     view.pdfController.document = [RCTConvert PSPDFDocument:json];
     view.pdfController.document.delegate = (id<PSPDFDocumentDelegate>)view;
@@ -45,7 +45,7 @@ RCT_CUSTOM_VIEW_PROPERTY(configuration, PSPDFConfiguration, RCTPSPDFKitView) {
   }
 }
 
-RCT_CUSTOM_VIEW_PROPERTY(annotationAuthorName, pdfController.document.defaultAnnotationUsername, RCTPSPDFKitView) {
+RCT_CUSTOM_VIEW_PROPERTY(annotationAuthorName, NSString, RCTPSPDFKitView) {
   if (json) {
     view.pdfController.document.defaultAnnotationUsername = json;
     view.annotationAuthorName = json;
@@ -66,7 +66,7 @@ RCT_CUSTOM_VIEW_PROPERTY(leftBarButtonItems, NSArray<UIBarButtonItem *>, RCTPSPD
   }
 }
 
-RCT_CUSTOM_VIEW_PROPERTY(rightBarButtonItems, pdfController.navigationItem.leftBarButtonItems, RCTPSPDFKitView) {
+RCT_CUSTOM_VIEW_PROPERTY(rightBarButtonItems, NSArray<UIBarButtonItem *>, RCTPSPDFKitView) {
   if (json) {
     NSArray *rightBarButtonItems = [RCTConvert NSArray:json];
     [view setRightBarButtonItems:rightBarButtonItems forViewMode:nil animated:NO];
