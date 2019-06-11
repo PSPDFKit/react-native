@@ -11,6 +11,7 @@
 #import <React/RCTUtils.h>
 #import "RCTConvert+PSPDFAnnotation.h"
 #import "RCTConvert+PSPDFViewMode.h"
+#import "RCTConvert+UIBarButtonItem.h"
 
 #define VALIDATE_DOCUMENT(document, ...) { if (!document.isValid) { NSLog(@"Document is invalid."); return __VA_ARGS__; }}
 
@@ -355,8 +356,8 @@
 - (void)setLeftBarButtonItems:(nullable NSArray <NSString *> *)items forViewMode:(nullable NSString *) viewMode animated:(BOOL)animated {
   NSMutableArray *leftItems = [NSMutableArray array];
   for (NSString *barButtonItemString in items) {
-    id barButtonItem = [self.pdfController valueForKey:barButtonItemString];
-    if (barButtonItem && [barButtonItem isKindOfClass:UIBarButtonItem.class] && ![self.pdfController.navigationItem.rightBarButtonItems containsObject:barButtonItem]) {
+    UIBarButtonItem *barButtonItem = [RCTConvert uiBarButtonItemFrom:barButtonItemString forViewController:self.pdfController];
+    if (barButtonItem && ![self.pdfController.navigationItem.rightBarButtonItems containsObject:barButtonItem]) {
       [leftItems addObject:barButtonItem];
     }
   }
@@ -371,8 +372,8 @@
 - (void)setRightBarButtonItems:(nullable NSArray <NSString *> *)items forViewMode:(nullable NSString *) viewMode animated:(BOOL)animated {
   NSMutableArray *rightItems = [NSMutableArray array];
   for (NSString *barButtonItemString in items) {
-    id barButtonItem = [self.pdfController valueForKey:barButtonItemString];
-    if (barButtonItem && [barButtonItem isKindOfClass:UIBarButtonItem.class] && ![self.pdfController.navigationItem.leftBarButtonItems containsObject:barButtonItem]) {
+    UIBarButtonItem *barButtonItem = [RCTConvert uiBarButtonItemFrom:barButtonItemString forViewController:self.pdfController];
+    if (barButtonItem && ![self.pdfController.navigationItem.leftBarButtonItems containsObject:barButtonItem]) {
       [rightItems addObject:barButtonItem];
     }
   }
@@ -437,9 +438,10 @@
 - (NSArray <NSString *> *)buttonItemsStringFromUIBarButtonItems:(NSArray <UIBarButtonItem *> *)barButtonItems {
   NSMutableArray *barButtonItemsString = [NSMutableArray new];
   [barButtonItems enumerateObjectsUsingBlock:^(UIBarButtonItem * _Nonnull barButtonItem, NSUInteger idx, BOOL * _Nonnull stop) {
-    NSString *actionString = NSStringFromSelector(barButtonItem.action);
-    NSString *buttonNameString = [actionString stringByReplacingOccurrencesOfString:@"ButtonPressed:" withString:@"BarButtonItem"];
-    [barButtonItemsString addObject:buttonNameString];
+    NSString *buttonNameString = [RCTConvert stringBarButtonItemFrom:barButtonItem forViewController:self.pdfController];
+    if (buttonNameString) {
+      [barButtonItemsString addObject:buttonNameString];
+    }
   }];
   return [barButtonItemsString copy];
 }
