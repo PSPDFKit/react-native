@@ -320,7 +320,7 @@ class PSPDFKitView extends React.Component {
    * Note: The same button item cannot be added to both the left and right bar button items simultaneously.
    *
    * @param items The list of bar button items. See the full list of button items here: https://pspdfkit.com/api/ios/Classes/PSPDFViewController.html#/Toolbar%20button%20items
-   * @param viewMode The optional view mode. Can be 'document', 'thumbnails', 'documentEditor' or null. If `null` is passed, we set the bar button items for all view modes.
+   * @param viewMode The optional view mode. Can be 'document', 'thumbnails', 'documentEditor' or `null`. If `null` is passed, bar button items for all view modes are set.
    * @param animated The animated flag.
    *
    * @platform ios
