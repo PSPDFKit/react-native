@@ -59,7 +59,7 @@ RCT_CUSTOM_VIEW_PROPERTY(menuItemGrouping, PSPDFAnnotationToolbarConfiguration, 
   }
 }
 
-RCT_CUSTOM_VIEW_PROPERTY(leftBarButtonItems, pdfController.navigationItem.leftBarButtonItems, RCTPSPDFKitView) {
+RCT_CUSTOM_VIEW_PROPERTY(leftBarButtonItems, NSArray<UIBarButtonItem *>, RCTPSPDFKitView) {
   if (json) {
     NSArray *leftBarButtonItems = [RCTConvert NSArray:json];
     [view setLeftBarButtonItems:leftBarButtonItems forViewMode:nil animated:NO];
