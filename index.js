@@ -373,7 +373,7 @@ class PSPDFKitView extends React.Component {
     }
   };
   /**
-   * Get the right bar button items for the spcified view mode.
+   * Get the right bar button items for the specified view mode.
    *
    * @param viewMode The optional view mode. Can be 'document', 'thumbnails', 'documentEditor' or null. If `null` is passed, we default to the current view mode.
    *
