@@ -338,7 +338,7 @@ class PSPDFKitView extends React.Component {
   /**
    * Get the left bar button items for the specified view mode.
    *
-   * @param viewMode The optional view mode. Can be 'document', 'thumbnails', 'documentEditor' or null. If `null` is passed, we default to the current view mode.
+   * @param viewMode The optional view mode. Can be 'document', 'thumbnails', 'documentEditor' or `null`. If `null` is passed, bar button items for the current view mode are returned.
    *
    * Returns a promise resolving an array with the following structure:
    * ['outlineButtonItem', 'searchButtonItem'] or a dictionary with the following error {'error' : 'Failed to get the left bar button items.'}
