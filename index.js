@@ -353,7 +353,7 @@ class PSPDFKitView extends React.Component {
     }
   };
   /**
-   * Set the right bar button items for the spcified view mode.
+   * Set the right bar button items for the specified view mode.
    * Note: The same button item cannot be added to both the left and right bar button items simultaneously.
    *
    * @param items The list of bar button items. See the full list of button items here: https://pspdfkit.com/api/ios/Classes/PSPDFViewController.html#/Toolbar%20button%20items
