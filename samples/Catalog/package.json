@@ -1,6 +1,6 @@
 {
   "name": "Catalog",
-  "version": "1.23.16",
+  "version": "1.24.0",
   "private": true,
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start"
