@@ -88,18 +88,7 @@ const examples = [
     name: "PDF View Component",
     description: "Show how to use the PSPDFKitView component with Navigator.",
     action: component => {
-      const nextRoute = {
-        component: PSPDFKitView,
-        passProps: {
-          document: "PDFs/Annual Report.pdf",
-          configuration: {
-            useParentNavigationBar: true,
-            showDocumentLabel: true
-          },
-          style: { flex: 1 }
-        }
-      };
-      component.props.navigator.push(nextRoute);
+      component.props.navigation.push("ConfiguredPDFViewComponent");
     }
   },
   {
@@ -196,10 +185,7 @@ const examples = [
     name: "Customize the Toolbar",
     description: "Shows how to customize the buttons in the toolbar.",
     action: component => {
-      const nextRoute = {
-        component: ToolbarCustomization
-      };
-      component.props.navigator.push(nextRoute);
+      component.props.navigation.push("ToolbarCustomization");
     }
   }
 ];
@@ -826,9 +812,9 @@ class ToolbarCustomization extends Component {
           configuration={{
             backgroundColor: processColor("lightgrey"),
             showThumbnailBar: "scrollable",
-            useParentNavigationBar: true
+            useParentNavigationBar: false
           }}
-          leftBarButtonItems={["closeButtonItem"]}
+          leftBarButtonItems={["settingsButtonItem"]}
           style={{ flex: 1, color: pspdfkitColor }}
         />
         <View
@@ -875,7 +861,19 @@ class ToolbarCustomization extends Component {
   }
 }
 
-export default class Catalog extends Component {
+class Catalog extends Component<{}> {
+  static navigationOptions = {
+    title: "Catalog"
+  };
+
+  // Initialize the hardcoded data
+  constructor(props) {
+    super(props);
+    this.state = {
+      dataSource: examples
+    };
+  }
+
   render() {
     return (
       <View style={styles.page}>
@@ -947,6 +945,9 @@ export default StackNavigator(
     },
     ProgrammaticFormFilling: {
       screen: ProgrammaticFormFilling
+    },
+    ToolbarCustomization: {
+      screen: ToolbarCustomization
     }
   },
   {
