@@ -13,16 +13,17 @@
 
 package com.pspdfkit.react;
 
-import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableMapKeySetIterator;
-import com.pspdfkit.configuration.activity.UserInterfaceViewMode;
 import com.pspdfkit.configuration.activity.PdfActivityConfiguration;
 import com.pspdfkit.configuration.activity.ThumbnailBarMode;
+import com.pspdfkit.configuration.activity.UserInterfaceViewMode;
 import com.pspdfkit.configuration.page.PageFitMode;
+import com.pspdfkit.configuration.page.PageLayoutMode;
 import com.pspdfkit.configuration.page.PageScrollDirection;
 import com.pspdfkit.configuration.page.PageScrollMode;
 
@@ -58,19 +59,20 @@ public class ConfigurationAdapter {
     private static final String SHOW_PRINT_ACTION = "showPrintAction";
     private static final String SHOW_DOCUMENT_INFO_VIEW = "showDocumentInfoView";
     private static final String SHOW_DOCUMENT_TITLE_OVERLAY = "documentLabelEnabled";
-
+    private static final String PAGE_MODE = "pageMode";
+    private static final String PAGE_MODE_SINGLE = "single";
+    private static final String PAGE_MODE_DOUBLE = "double";
+    private static final String PAGE_MODE_AUTO = "automatic";
+    private static final String FIRST_PAGE_ALWAYS_SINGLE = "firstPageAlwaysSingle";
 
     private final PdfActivityConfiguration.Builder configuration;
 
 
     public ConfigurationAdapter(@NonNull Context context, ReadableMap configuration) {
         ReadableMapKeySetIterator iterator = configuration.keySetIterator();
-        boolean emptyConfiguration = iterator.hasNextKey() ? false : true;
-        if (emptyConfiguration) {
-            this.configuration = getDefaultConfiguration(context);
-        } else {
-            this.configuration = new PdfActivityConfiguration.Builder(context);
-
+        boolean hasConfiguration = iterator.hasNextKey();
+        this.configuration = new PdfActivityConfiguration.Builder(context);
+        if (hasConfiguration) {
             if (configuration.hasKey(PAGE_SCROLL_DIRECTION)) {
                 configurePageScrollDirection(configuration.getString(PAGE_SCROLL_DIRECTION));
             }
@@ -136,6 +138,12 @@ public class ConfigurationAdapter {
             }
             if (configuration.hasKey(SHOW_DOCUMENT_TITLE_OVERLAY)) {
                 configureShowDocumentTitleOverlay(configuration.getBoolean(SHOW_DOCUMENT_TITLE_OVERLAY));
+            }
+            if (configuration.hasKey(PAGE_MODE)) {
+                configurePageMode(configuration.getString(PAGE_MODE));
+            }
+            if (configuration.hasKey(FIRST_PAGE_ALWAYS_SINGLE)) {
+                configureFirstPageAlwaysSingle(configuration.getBoolean(FIRST_PAGE_ALWAYS_SINGLE));
             }
         }
     }
@@ -297,29 +305,24 @@ public class ConfigurationAdapter {
         }
     }
 
-    public PdfActivityConfiguration build() {
-        return configuration.build();
+    private void configurePageMode(@Nullable final String pageMode) {
+        PageLayoutMode pageLayoutMode = PageLayoutMode.AUTO;
+        if (pageMode == null ||
+            pageMode.equalsIgnoreCase(PAGE_MODE_AUTO)) {
+            pageLayoutMode = PageLayoutMode.AUTO;
+        } else if (pageMode.equalsIgnoreCase(PAGE_MODE_SINGLE)) {
+            pageLayoutMode = PageLayoutMode.SINGLE;
+        } else if (pageMode.equalsIgnoreCase(PAGE_MODE_DOUBLE)) {
+            pageLayoutMode = PageLayoutMode.DOUBLE;
+        }
+        configuration.layoutMode(pageLayoutMode);
     }
 
-    public static PdfActivityConfiguration.Builder getDefaultConfiguration(Context context) {
+    private void configureFirstPageAlwaysSingle(final boolean firstPageAlwaysSingle) {
+        configuration.firstPageAlwaysSingle(firstPageAlwaysSingle);
+    }
 
-        final PageScrollDirection pageScrollDirection = PageScrollDirection.HORIZONTAL;
-        final PageScrollMode pageScrollMode = PageScrollMode.PER_PAGE;
-        final PageFitMode pageFitMode = PageFitMode.FIT_TO_WIDTH;
-        final int searchType = PdfActivityConfiguration.SEARCH_INLINE;
-        final UserInterfaceViewMode userInterfaceViewMode = UserInterfaceViewMode.USER_INTERFACE_VIEW_MODE_AUTOMATIC;
-        final ThumbnailBarMode thumbnailBarMode = ThumbnailBarMode.THUMBNAIL_BAR_MODE_DEFAULT;
-        int startPage = 0;
-
-        PdfActivityConfiguration.Builder configuration = new PdfActivityConfiguration.Builder(context)
-                .scrollDirection(pageScrollDirection)
-                .scrollMode(pageScrollMode)
-                .fitMode(pageFitMode)
-                .setUserInterfaceViewMode(userInterfaceViewMode)
-                .setSearchType(searchType)
-                .setThumbnailBarMode(thumbnailBarMode)
-                .page(startPage);
-
-        return configuration;
+    public PdfActivityConfiguration build() {
+        return configuration.build();
     }
 }

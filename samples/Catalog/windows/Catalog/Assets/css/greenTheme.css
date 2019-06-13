@@ -1,0 +1,8 @@
+/* Main Toolbar */
+@import url("../pspdfkit/windows.css");
+
+:root {
+    --primary: #61D800; /* Hightlight or hover color. */
+    --primary-dark-1: #09AF00; /* Color for the main toolbar */
+    --primary-dark-2: #008B00; /* Color for the secondard toolbar */
+}

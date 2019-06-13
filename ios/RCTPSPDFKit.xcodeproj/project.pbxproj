@@ -11,6 +11,8 @@
 		6572780C1D86AE7300A5E1A8 /* RCTConvert+PSPDFConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 657278071D86AE7300A5E1A8 /* RCTConvert+PSPDFConfiguration.m */; };
 		657278111D86AEC600A5E1A8 /* RCTConvert+PSPDFDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 657278101D86AEC600A5E1A8 /* RCTConvert+PSPDFDocument.m */; };
 		84545BA4210A5CCF00FBB0A7 /* RCTConvert+PSPDFAnnotation.m in Sources */ = {isa = PBXBuildFile; fileRef = 84545BA2210A5CCF00FBB0A7 /* RCTConvert+PSPDFAnnotation.m */; };
+		84694AA822AFC7510077FD01 /* RCTConvert+UIBarButtonItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 84694AA722AFC7510077FD01 /* RCTConvert+UIBarButtonItem.m */; };
+		84BC2EAD229EE9FF00A386C6 /* RCTConvert+PSPDFViewMode.m in Sources */ = {isa = PBXBuildFile; fileRef = 84BC2EAC229EE9FF00A386C6 /* RCTConvert+PSPDFViewMode.m */; };
 		B783BA3421C3F55300FD981A /* RCTConvert+PSPDFAnnotationToolbarConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = B783BA3321C3F55300FD981A /* RCTConvert+PSPDFAnnotationToolbarConfiguration.m */; };
 		F84F8B192032D54F00153D9E /* RCTPSPDFKitView.m in Sources */ = {isa = PBXBuildFile; fileRef = F84F8B182032D54F00153D9E /* RCTPSPDFKitView.m */; };
 		F8C1A2E5202DCC9700E98192 /* RCTPSPDFKitViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F8C1A2E4202DCC9700E98192 /* RCTPSPDFKitViewManager.m */; };
@@ -38,6 +40,10 @@
 		657278101D86AEC600A5E1A8 /* RCTConvert+PSPDFDocument.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "RCTConvert+PSPDFDocument.m"; sourceTree = "<group>"; };
 		84545BA2210A5CCF00FBB0A7 /* RCTConvert+PSPDFAnnotation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "RCTConvert+PSPDFAnnotation.m"; sourceTree = "<group>"; };
 		84545BA3210A5CCF00FBB0A7 /* RCTConvert+PSPDFAnnotation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "RCTConvert+PSPDFAnnotation.h"; sourceTree = "<group>"; };
+		84694AA622AFC7510077FD01 /* RCTConvert+UIBarButtonItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RCTConvert+UIBarButtonItem.h"; sourceTree = "<group>"; };
+		84694AA722AFC7510077FD01 /* RCTConvert+UIBarButtonItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "RCTConvert+UIBarButtonItem.m"; sourceTree = "<group>"; };
+		84BC2EAB229EE9FF00A386C6 /* RCTConvert+PSPDFViewMode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RCTConvert+PSPDFViewMode.h"; sourceTree = "<group>"; };
+		84BC2EAC229EE9FF00A386C6 /* RCTConvert+PSPDFViewMode.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "RCTConvert+PSPDFViewMode.m"; sourceTree = "<group>"; };
 		B783BA3221C3F55300FD981A /* RCTConvert+PSPDFAnnotationToolbarConfiguration.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RCTConvert+PSPDFAnnotationToolbarConfiguration.h"; sourceTree = "<group>"; };
 		B783BA3321C3F55300FD981A /* RCTConvert+PSPDFAnnotationToolbarConfiguration.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "RCTConvert+PSPDFAnnotationToolbarConfiguration.m"; sourceTree = "<group>"; };
 		F84F8B182032D54F00153D9E /* RCTPSPDFKitView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RCTPSPDFKitView.m; sourceTree = "<group>"; };
@@ -82,6 +88,10 @@
 				657278101D86AEC600A5E1A8 /* RCTConvert+PSPDFDocument.m */,
 				B783BA3221C3F55300FD981A /* RCTConvert+PSPDFAnnotationToolbarConfiguration.h */,
 				B783BA3321C3F55300FD981A /* RCTConvert+PSPDFAnnotationToolbarConfiguration.m */,
+				84BC2EAB229EE9FF00A386C6 /* RCTConvert+PSPDFViewMode.h */,
+				84BC2EAC229EE9FF00A386C6 /* RCTConvert+PSPDFViewMode.m */,
+				84694AA622AFC7510077FD01 /* RCTConvert+UIBarButtonItem.h */,
+				84694AA722AFC7510077FD01 /* RCTConvert+UIBarButtonItem.m */,
 			);
 			path = Converters;
 			sourceTree = "<group>";
@@ -130,7 +140,7 @@
 		83CBB9F71A601CBA00E9B192 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0800;
+				LastUpgradeCheck = 1020;
 				ORGANIZATIONNAME = Facebook;
 				TargetAttributes = {
 					657277141D8312EA00A5E1A8 = {
@@ -144,6 +154,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);
@@ -166,9 +177,11 @@
 				F8C1A2E5202DCC9700E98192 /* RCTPSPDFKitViewManager.m in Sources */,
 				84545BA4210A5CCF00FBB0A7 /* RCTConvert+PSPDFAnnotation.m in Sources */,
 				6540D1841D89D22E00B8F94F /* RCTPSPDFKitManager.m in Sources */,
+				84694AA822AFC7510077FD01 /* RCTConvert+UIBarButtonItem.m in Sources */,
 				B783BA3421C3F55300FD981A /* RCTConvert+PSPDFAnnotationToolbarConfiguration.m in Sources */,
 				F84F8B192032D54F00153D9E /* RCTPSPDFKitView.m in Sources */,
 				6572780C1D86AE7300A5E1A8 /* RCTConvert+PSPDFConfiguration.m in Sources */,
+				84BC2EAD229EE9FF00A386C6 /* RCTConvert+PSPDFViewMode.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -210,14 +223,22 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -266,14 +287,22 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;

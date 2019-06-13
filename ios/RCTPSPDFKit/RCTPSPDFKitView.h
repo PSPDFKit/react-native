@@ -13,6 +13,8 @@
 @import PSPDFKit;
 @import PSPDFKitUI;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface RCTPSPDFKitView: UIView
 
 @property (nonatomic, readonly) PSPDFViewController *pdfController;
@@ -46,4 +48,12 @@
 - (NSDictionary<NSString *, NSString *> *)getFormFieldValue:(NSString *)fullyQualifiedName;
 - (void)setFormFieldValue:(NSString *)value fullyQualifiedName:(NSString *)fullyQualifiedName;
 
+// Toolbar buttons customizations
+- (void)setLeftBarButtonItems:(nullable NSArray <NSString *> *)items forViewMode:(nullable NSString *) viewMode animated:(BOOL)animated;
+- (void)setRightBarButtonItems:(nullable NSArray <NSString *> *)items forViewMode:(nullable NSString *) viewMode animated:(BOOL)animated;
+- (NSArray <NSString *> *)getLeftBarButtonItemsForViewMode:(NSString *)viewMode;
+- (NSArray <NSString *> *)getRightBarButtonItemsForViewMode:(NSString *)viewMode;
+
 @end
+
+NS_ASSUME_NONNULL_END

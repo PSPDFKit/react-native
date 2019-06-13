@@ -15,7 +15,8 @@ import {
   Image,
   TouchableHighlight,
   NativeModules,
-  Button
+  Button,
+  Linking
 } from "react-native";
 import {StackNavigator} from "react-navigation";
 import PSPDFKitView from "react-native-pspdfkit";
@@ -133,11 +134,6 @@ const examples = [
     action: async () => {
       await PSPDFKitLibrary.OpenLibrary("MyLibrary");
       await PSPDFKitLibrary.EnqueueDocumentsInFolderPicker("MyLibrary");
-      alert(
-        'Searching Library for "' +
-        simpleSearch.searchString +
-        '". Please wait.'
-      );
       PSPDFKitLibrary.SearchLibrary("MyLibrary", simpleSearch)
         .then(result => {
           alert("Search : \n" + JSON.stringify(result));
@@ -154,11 +150,6 @@ const examples = [
 
       await PSPDFKitLibrary.OpenLibrary("AssetsLibrary");
       await PSPDFKitLibrary.EnqueueDocumentsInFolder("AssetsLibrary", path);
-      alert(
-        'Searching Library for "' +
-        complexSearchConfiguration.searchString +
-        '". Please wait.'
-      );
       PSPDFKitLibrary.SearchLibrary("AssetsLibrary", complexSearchConfiguration)
         .then(result => {
           alert("Search : \n" + JSON.stringify(result));
@@ -172,6 +163,14 @@ const examples = [
     description: "An example to show how to customize the toolbar UI.",
     action: async component => {
       component.props.navigation.navigate("PdfViewToolbarCustomization");
+    }
+  },
+  {
+    key: "item8",
+    name: "Custom colors",
+    description: "Explains how to theme your UWP react native application.",
+    action: component => {
+      component.props.navigation.navigate("PdfViewStyle");
     }
   }
 ];
@@ -234,7 +233,19 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center"
-  }
+  },
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: "white",
+  },
+  stlyeExplanation: {
+    color: "#666666",
+    fontSize: 16,
+    textAlign: 'center',
+    margin: 50
+  },
 });
 
 class CatalogScreen extends Component<{}> {
@@ -328,7 +339,11 @@ class PdfViewListenersScreen extends Component<{}> {
 
   componentWillMount() {
     this.props.navigation.setParams({
-      handleSaveButtonPress: () => this.refs.pdfView.saveCurrentDocument()
+      handleSaveButtonPress: () => this.refs.pdfView.saveCurrentDocument().then(() => {
+        alert("Document was saved!");
+      }).catch(error => {
+        alert(error);
+      })
     });
   }
 
@@ -340,15 +355,6 @@ class PdfViewListenersScreen extends Component<{}> {
           style={styles.pdfView}
           // The default file to open.
           document="ms-appx:///Assets/pdf/annualReport.pdf"
-          onDocumentSaved={e => {
-            alert("Document was saved!");
-          }}
-          onDocumentSaveFailed={e => {
-            alert("Document couldn't be saved: " + e.error);
-          }}
-          onAnnotationTapped={e => {
-            alert("Annotation was tapped\n" + JSON.stringify(e));
-          }}
           onAnnotationsChanged={e => {
             alert("Annotations changed\n" + JSON.stringify(e));
           }}
@@ -390,7 +396,7 @@ class PdfViewInstantJsonScreen extends Component<{}> {
                   alert(JSON.stringify(annotations));
                 });
               }}
-              title="Get annotations"
+              title="Get Annotations"
             />
           </View>
           <View style={{marginLeft: 10}}>
@@ -403,7 +409,24 @@ class PdfViewInstantJsonScreen extends Component<{}> {
                   alert(error);
                 });
               }}
-              title="Add annotation"
+              title="Add Annotation"
+            />
+          </View>
+          <View style={{marginLeft: 10}}>
+            <Button
+              onPress={() => {
+                this.refs.pdfView.getAnnotations(0).then(result => {
+                  if (result.annotations !== undefined && result.annotations.length > 0) {
+                    // Removes the ink annotation if added with Add annotation button rejects if not present
+                    this.refs.pdfView.removeAnnotation(result.annotations[0]).then(() => {
+                      alert("Annotation removal was successful.");
+                    }).catch(error => {
+                      alert(error);
+                    });
+                  }
+                });
+              }}
+              title="Remove Annotation"
             />
           </View>
         </View>
@@ -432,9 +455,43 @@ class PdfViewToolbarCustomizationScreen extends Component<{}> {
             </View>
             <View style={styles.button}>
               <Button onPress={() =>
-                this.refs.pdfView.setToolbarItems([{type: "ink"}])} title="Set Toolbar Items"/>
+                this.refs.pdfView.setToolbarItems([{type: "ink"}]).then(() => {
+                  alert("Toolbar Items set.");
+                })} title="Set Toolbar Items"/>
             </View>
           </View>
+          <Image
+            source={require("./assets/logo-flat.png")}
+            style={styles.logo}
+          />
+          <Text style={styles.version}>
+            SDK Version : {PSPDFKit.versionString}
+          </Text>
+        </View>
+      </View>
+    );
+  }
+}
+
+class PdfViewStyleScreen extends Component<{}> {
+  render() {
+    return (
+      <View style={styles.page}>
+        <View style={styles.container}>
+          <Text style={styles.stlyeExplanation}>
+            Native changes are needed to customize the PdfView. Please follow the setups shown in the{" "}
+            <Text
+              style={{color: 'blue'}}
+              onPress={() => {
+                Linking.openURL('https://github.com/PSPDFKit/react-native/blob/master/README.md#theming-support')
+              }}
+            >
+              README
+            </Text>
+          </Text>
+        </View>
+        <View style={styles.footer}>
+
           <Image
             source={require("./assets/logo-flat.png")}
             style={styles.logo}
@@ -464,6 +521,9 @@ export default StackNavigator(
     },
     PdfViewToolbarCustomization: {
       screen: PdfViewToolbarCustomizationScreen
+    },
+    PdfViewStyle: {
+      screen: PdfViewStyleScreen
     }
   },
   {

@@ -12,6 +12,7 @@
 #import "RCTConvert+PSPDFConfiguration.h"
 #import "RCTConvert+PSPDFDocument.h"
 #import "RCTConvert+PSPDFAnnotationToolbarConfiguration.h"
+#import "RCTConvert+PSPDFViewMode.h"
 #import "RCTPSPDFKitView.h"
 #import <React/RCTUIManager.h>
 
@@ -22,7 +23,7 @@
 
 RCT_EXPORT_MODULE()
 
-RCT_CUSTOM_VIEW_PROPERTY(document, pdfController.document, RCTPSPDFKitView) {
+RCT_CUSTOM_VIEW_PROPERTY(document, PSPDFDocument, RCTPSPDFKitView) {
   if (json) {
     view.pdfController.document = [RCTConvert PSPDFDocument:json];
     view.pdfController.document.delegate = (id<PSPDFDocumentDelegate>)view;
@@ -44,7 +45,7 @@ RCT_CUSTOM_VIEW_PROPERTY(configuration, PSPDFConfiguration, RCTPSPDFKitView) {
   }
 }
 
-RCT_CUSTOM_VIEW_PROPERTY(annotationAuthorName, pdfController.document.defaultAnnotationUsername, RCTPSPDFKitView) {
+RCT_CUSTOM_VIEW_PROPERTY(annotationAuthorName, NSString, RCTPSPDFKitView) {
   if (json) {
     view.pdfController.document.defaultAnnotationUsername = json;
     view.annotationAuthorName = json;
@@ -55,6 +56,20 @@ RCT_CUSTOM_VIEW_PROPERTY(menuItemGrouping, PSPDFAnnotationToolbarConfiguration, 
   if (json) {
     PSPDFAnnotationToolbarConfiguration *configuration = [RCTConvert PSPDFAnnotationToolbarConfiguration:json];
     view.pdfController.annotationToolbarController.annotationToolbar.configurations = @[configuration];
+  }
+}
+
+RCT_CUSTOM_VIEW_PROPERTY(leftBarButtonItems, NSArray<UIBarButtonItem *>, RCTPSPDFKitView) {
+  if (json) {
+    NSArray *leftBarButtonItems = [RCTConvert NSArray:json];
+    [view setLeftBarButtonItems:leftBarButtonItems forViewMode:nil animated:NO];
+  }
+}
+
+RCT_CUSTOM_VIEW_PROPERTY(rightBarButtonItems, NSArray<UIBarButtonItem *>, RCTPSPDFKitView) {
+  if (json) {
+    NSArray *rightBarButtonItems = [RCTConvert NSArray:json];
+    [view setRightBarButtonItems:rightBarButtonItems forViewMode:nil animated:NO];
   }
 }
 
@@ -196,6 +211,44 @@ RCT_EXPORT_METHOD(setFormFieldValue:(nullable NSString *)value fullyQualifiedNam
   dispatch_async(dispatch_get_main_queue(), ^{
     RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
     [component setFormFieldValue:value fullyQualifiedName:fullyQualifiedName];
+  });
+}
+
+RCT_EXPORT_METHOD(setLeftBarButtonItems:(nullable NSArray *)items viewMode:(nullable NSString *)viewMode animated:(BOOL)animated reactTag:(nonnull NSNumber *)reactTag) {
+  dispatch_async(dispatch_get_main_queue(), ^{
+    RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
+    [component setLeftBarButtonItems:items forViewMode:viewMode animated:animated];
+  });
+}
+
+RCT_EXPORT_METHOD(setRightBarButtonItems:(nullable NSArray *)items viewMode:(nullable NSString *)viewMode animated:(BOOL)animated reactTag:(nonnull NSNumber *)reactTag) {
+  dispatch_async(dispatch_get_main_queue(), ^{
+    RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
+    [component setRightBarButtonItems:items forViewMode:viewMode animated:animated];
+  });
+}
+
+RCT_EXPORT_METHOD(getLeftBarButtonItemsForViewMode:(nullable NSString *)viewMode reactTag:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+  dispatch_async(dispatch_get_main_queue(), ^{
+    RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
+    NSArray *leftBarButtonItems = [component getLeftBarButtonItemsForViewMode:viewMode];
+    if (leftBarButtonItems) {
+      resolve(leftBarButtonItems);
+    } else {
+      reject(@"error", @"Failed to get the left bar button items.", nil);
+    }
+  });
+}
+
+RCT_EXPORT_METHOD(getRightBarButtonItemsForViewMode:(nullable NSString *)viewMode reactTag:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+  dispatch_async(dispatch_get_main_queue(), ^{
+    RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
+    NSArray *rightBarButtonItems = [component getRightBarButtonItemsForViewMode:viewMode];
+    if (rightBarButtonItems) {
+      resolve(rightBarButtonItems);
+    } else {
+      reject(@"error", @"Failed to get the right bar button items.", nil);
+    }
   });
 }
 

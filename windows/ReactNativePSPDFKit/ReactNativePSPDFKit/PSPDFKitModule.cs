@@ -22,12 +22,12 @@ namespace ReactNativePSPDFKit
     /// </summary>
     class PSPDFKitModule : ReactContextNativeModuleBase
     {
-        private readonly PDFViewPage _pdfViewPage;
+        private readonly PSPDFKitViewManger _viewManager;
         private string VERSION_KEY = "versionString";
 
-        public PSPDFKitModule(ReactContext reactContext, PDFViewPage pdfViewPage) : base(reactContext)
+        public PSPDFKitModule(ReactContext reactContext, PSPDFKitViewManger viewManager) : base(reactContext)
         {
-            _pdfViewPage = pdfViewPage;
+            _viewManager = viewManager;
         }
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace ReactNativePSPDFKit
 
                     promise.Resolve(null);
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
                     promise.Reject(e);
                 }
@@ -98,8 +98,14 @@ namespace ReactNativePSPDFKit
         private async Task LoadFileAsync(StorageFile file)
         {
             if (file == null) return;
-
-            await _pdfViewPage.OpenFileAsync(file);
+            if(_viewManager.PdfViewPage != null)
+            {
+                await _viewManager.PdfViewPage.OpenFileAsync(file);
+            }
+            else
+            {
+                throw new Exception("PdfViewPage: is not ready or unavailable.");
+            }
         }
 
         /// <summary>

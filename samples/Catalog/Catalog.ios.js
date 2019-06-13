@@ -88,7 +88,18 @@ const examples = [
     name: "PDF View Component",
     description: "Show how to use the PSPDFKitView component with Navigator.",
     action: component => {
-      component.props.navigation.push("ConfiguredPDFViewComponent");
+      const nextRoute = {
+        component: PSPDFKitView,
+        passProps: {
+          document: "PDFs/Annual Report.pdf",
+          configuration: {
+            useParentNavigationBar: true,
+            showDocumentLabel: true
+          },
+          style: { flex: 1 }
+        }
+      };
+      component.props.navigator.push(nextRoute);
     }
   },
   {
@@ -178,6 +189,17 @@ const examples = [
           }
         ]
       });
+    }
+  },
+  {
+    key: "item14",
+    name: "Customize the Toolbar",
+    description: "Shows how to customize the buttons in the toolbar.",
+    action: component => {
+      const nextRoute = {
+        component: ToolbarCustomization
+      };
+      component.props.navigator.push(nextRoute);
     }
   }
 ];
@@ -794,19 +816,66 @@ class ProgrammaticFormFilling extends Component {
   }
 }
 
-class Catalog extends Component<{}> {
-  static navigationOptions = {
-    title: "Catalog"
-  };
+class ToolbarCustomization extends Component {
+  render() {
+    return (
+      <View style={{ flex: 1 }}>
+        <PSPDFKitView
+          ref="pdfView"
+          document={"PDFs/Annual Report.pdf"}
+          configuration={{
+            backgroundColor: processColor("lightgrey"),
+            showThumbnailBar: "scrollable",
+            useParentNavigationBar: true
+          }}
+          leftBarButtonItems={["closeButtonItem"]}
+          style={{ flex: 1, color: pspdfkitColor }}
+        />
+        <View
+          style={{
+            flexDirection: "row",
+            height: 60,
+            alignItems: "center",
+            padding: 10
+          }}
+        >
+          <View>
+            <Button
+              onPress={async () => {
+                // Update the right bar buttons.
+                await this.refs.pdfView.setRightBarButtonItems(
+                  [
+                    "thumbnailsButtonItem",
+                    "searchButtonItem",
+                    "annotationButtonItem"
+                  ],
+                  "document",
+                  false
+                );
+              }}
+              title="Set right bar button items"
+            />
+          </View>
 
-  // Initialize the hardcoded data
-  constructor(props) {
-    super(props);
-    this.state = {
-      dataSource: examples
-    };
+          <View>
+            <Button
+              onPress={async () => {
+                // Get the right bar buttons.
+                const rightBarButtonItems = await this.refs.pdfView.getRightBarButtonItemsForViewMode(
+                  "document"
+                );
+                alert(JSON.stringify(rightBarButtonItems));
+              }}
+              title="Get right bar button items"
+            />
+          </View>
+        </View>
+      </View>
+    );
   }
+}
 
+export default class Catalog extends Component {
   render() {
     return (
       <View style={styles.page}>

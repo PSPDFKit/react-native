@@ -1,6 +1,6 @@
 {
   "name": "Catalog",
-  "version": "1.11.0",
+  "version": "1.24.0",
   "private": true,
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start"
@@ -14,7 +14,7 @@
     "react-native-qrcode-scanner": "^1.1.0",
     "react-native-windows": "0.57.0-rc.5",
     "react-navigation": "^1.0.3",
-    "prop-types": "15.6.0"
+    "prop-types": "15.7.2"
   },
   "devDependencies": {
     "rnpm-plugin-windows": "0.2.8"

@@ -24,8 +24,6 @@ class PSPDFKitView extends React.Component {
         ref="pdfView"
         {...this.props}
         onAnnotationsChanged={this._onAnnotationsChanged}
-        onDocumentSaved={this._onDocumentSaved}
-        onDocumentSaveFailed={this._onDocumentSaveFailed}
         onDataReturned={this._onDataReturned}
         onOperationResult={this._onOperationResult}
       />
@@ -35,18 +33,6 @@ class PSPDFKitView extends React.Component {
   _onAnnotationsChanged = event => {
     if (this.props.onAnnotationsChanged) {
       this.props.onAnnotationsChanged(event.nativeEvent);
-    }
-  };
-
-  _onDocumentSaved = event => {
-    if (this.props.onDocumentSaved) {
-      this.props.onDocumentSaved(event.nativeEvent);
-    }
-  };
-
-  _onDocumentSaveFailed = event => {
-    if (this.props.onDocumentSaveFailed) {
-      this.props.onDocumentSaveFailed(event.nativeEvent);
     }
   };
 
@@ -74,35 +60,71 @@ class PSPDFKitView extends React.Component {
 
   /**
    * Enters the annotation creation mode, showing the annotation creation toolbar.
+   *
+   * @returns a promise resolving if successful or rejects if an error occurs with and error message
    */
   enterAnnotationCreationMode() {
+    let requestId = this._nextRequestId++;
+    let requestMap = this._requestMap;
+
+    // We create a promise here that will be resolved once onDataReturned is called.
+    let promise = new Promise((resolve, reject) => {
+      requestMap[requestId] = {resolve: resolve, reject: reject};
+    });
+
     UIManager.dispatchViewManagerCommand(
       findNodeHandle(this.refs.pdfView),
       UIManager.RCTPSPDFKitView.Commands.enterAnnotationCreationMode,
-      []
+      [requestId]
     );
+
+    return promise;
   }
 
   /**
    * Exits the currently active mode, hiding all active sub-toolbars.
+   *
+   * @returns a promise resolving if successful or rejects if an error occurs with and error message
    */
   exitCurrentlyActiveMode() {
+    let requestId = this._nextRequestId++;
+    let requestMap = this._requestMap;
+
+    // We create a promise here that will be resolved once onDataReturned is called.
+    let promise = new Promise((resolve, reject) => {
+      requestMap[requestId] = {resolve: resolve, reject: reject};
+    });
+
     UIManager.dispatchViewManagerCommand(
       findNodeHandle(this.refs.pdfView),
       UIManager.RCTPSPDFKitView.Commands.exitCurrentlyActiveMode,
       []
     );
+
+    return promise;
   }
 
   /**
    * Saves the currently opened document.
+   *
+   * @returns a promise resolving if successful or rejects if an error occurs with and error message
    */
   saveCurrentDocument() {
+    let requestId = this._nextRequestId++;
+    let requestMap = this._requestMap;
+
+    // We create a promise here that will be resolved once onDataReturned is called.
+    let promise = new Promise((resolve, reject) => {
+      requestMap[requestId] = {resolve: resolve, reject: reject};
+    });
+
     UIManager.dispatchViewManagerCommand(
       findNodeHandle(this.refs.pdfView),
       UIManager.RCTPSPDFKitView.Commands.saveCurrentDocument,
-      []
+      [requestId]
     );
+
+    return promise;
   }
 
   /**
@@ -137,23 +159,46 @@ class PSPDFKitView extends React.Component {
    * @param annotation InstantJson of the annotation to add with the format of
    * https://pspdfkit.com/guides/windows/current/importing-exporting/instant-json/#instant-annotation-json-api
    *
-   * @returns a promise resolving with a successful payload if annotation is created.
-   * {'success' : boolean}
-   * If success is false an error will also be held.
-   * {'error' : string}
+   * @returns a promise resolving if successful or rejects if an error occurs with and error message
    */
   addAnnotation(annotation) {
     let requestId = this._nextRequestId++;
     let requestMap = this._requestMap;
 
     // We create a promise here that will be resolved once onDataReturned is called.
-    let promise = new Promise(function (resolve, reject) {
+    let promise = new Promise((resolve, reject) => {
       requestMap[requestId] = {resolve: resolve, reject: reject};
     });
 
     UIManager.dispatchViewManagerCommand(
       findNodeHandle(this.refs.pdfView),
       UIManager.RCTPSPDFKitView.Commands.addAnnotation,
+      [requestId, annotation]
+    );
+
+    return promise;
+  };
+
+  /**
+   * Removes an annotation to the current document.
+   *
+   * @param annotation InstantJson of the annotation to remove with the format of
+   * https://pspdfkit.com/guides/windows/current/importing-exporting/instant-json/#instant-annotation-json-api
+   *
+   * @returns a promise resolving if successful or rejects if an error occurs with and error message
+   */
+  removeAnnotation(annotation) {
+    let requestId = this._nextRequestId++;
+    let requestMap = this._requestMap;
+
+    // We create a promise here that will be resolved once onDataReturned is called.
+    let promise = new Promise((resolve, reject) => {
+      requestMap[requestId] = {resolve: resolve, reject: reject};
+    });
+
+    UIManager.dispatchViewManagerCommand(
+      findNodeHandle(this.refs.pdfView),
+      UIManager.RCTPSPDFKitView.Commands.removeAnnotation,
       [requestId, annotation]
     );
 
