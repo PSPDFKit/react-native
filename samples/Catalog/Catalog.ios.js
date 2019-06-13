@@ -876,7 +876,7 @@ class Catalog extends Component<{}> {
 
   render() {
     return (
-      <View style={styles.page}>
+      <View style={{ flex: 1 }}>
         <View style={styles.header}>
           <Image
             source={require("./assets/logo-flat.png")}
@@ -890,6 +890,7 @@ class Catalog extends Component<{}> {
           ItemSeparatorComponent={this._renderSeparator}
           contentContainerStyle={styles.listContainer}
           style={styles.list}
+          contentInset={{ bottom: 22 }}
         />
       </View>
     );
