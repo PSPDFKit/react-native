@@ -93,7 +93,7 @@ class PSPDFKitView extends React.Component {
     if (Platform.OS === "android") {
       UIManager.dispatchViewManagerCommand(
         findNodeHandle(this.refs.pdfView),
-        UIManager.RCTPSPDFKitView.Commands.enterAnnotationCreationMode,
+        UIManager.getViewManagerConfig('RCTPSPDFKitView').Commands.enterAnnotationCreationMode,
         []
       );
     } else if (Platform.OS === "ios") {
@@ -110,7 +110,7 @@ class PSPDFKitView extends React.Component {
     if (Platform.OS === "android") {
       UIManager.dispatchViewManagerCommand(
         findNodeHandle(this.refs.pdfView),
-        UIManager.RCTPSPDFKitView.Commands.exitCurrentlyActiveMode,
+        UIManager.getViewManagerConfig('RCTPSPDFKitView').Commands.exitCurrentlyActiveMode,
         []
       );
     } else if (Platform.OS === "ios") {
@@ -127,7 +127,7 @@ class PSPDFKitView extends React.Component {
     if (Platform.OS === "android") {
       UIManager.dispatchViewManagerCommand(
         findNodeHandle(this.refs.pdfView),
-        UIManager.RCTPSPDFKitView.Commands.saveCurrentDocument,
+        UIManager.getViewManagerConfig('RCTPSPDFKitView').Commands.saveCurrentDocument,
         []
       );
     } else if (Platform.OS === "ios") {
@@ -158,7 +158,7 @@ class PSPDFKitView extends React.Component {
 
       UIManager.dispatchViewManagerCommand(
         findNodeHandle(this.refs.pdfView),
-        UIManager.RCTPSPDFKitView.Commands.getAnnotations,
+        UIManager.getViewManagerConfig('RCTPSPDFKitView').Commands.getAnnotations,
         [requestId, pageIndex, type]
       );
 
@@ -181,7 +181,7 @@ class PSPDFKitView extends React.Component {
     if (Platform.OS === "android") {
       UIManager.dispatchViewManagerCommand(
         findNodeHandle(this.refs.pdfView),
-        UIManager.RCTPSPDFKitView.Commands.addAnnotation,
+        UIManager.getViewManagerConfig('RCTPSPDFKitView').Commands.addAnnotation,
         [annotation]
       );
     } else if (Platform.OS === "ios") {
@@ -201,7 +201,7 @@ class PSPDFKitView extends React.Component {
     if (Platform.OS === "android") {
       UIManager.dispatchViewManagerCommand(
         findNodeHandle(this.refs.pdfView),
-        UIManager.RCTPSPDFKitView.Commands.removeAnnotation,
+        UIManager.getViewManagerConfig('RCTPSPDFKitView').Commands.removeAnnotation,
         [annotation]
       );
     } else if (Platform.OS === "ios") {
@@ -229,7 +229,7 @@ class PSPDFKitView extends React.Component {
 
       UIManager.dispatchViewManagerCommand(
         findNodeHandle(this.refs.pdfView),
-        UIManager.RCTPSPDFKitView.Commands.getAllUnsavedAnnotations,
+        UIManager.getViewManagerConfig('RCTPSPDFKitView').Commands.getAllUnsavedAnnotations,
         [requestId]
       );
 
@@ -250,7 +250,7 @@ class PSPDFKitView extends React.Component {
     if (Platform.OS === "android") {
       UIManager.dispatchViewManagerCommand(
         findNodeHandle(this.refs.pdfView),
-        UIManager.RCTPSPDFKitView.Commands.addAnnotations,
+        UIManager.getViewManagerConfig('RCTPSPDFKitView').Commands.addAnnotations,
         [annotations]
       );
     } else if (Platform.OS === "ios") {
@@ -281,7 +281,7 @@ class PSPDFKitView extends React.Component {
 
       UIManager.dispatchViewManagerCommand(
         findNodeHandle(this.refs.pdfView),
-        UIManager.RCTPSPDFKitView.Commands.getFormFieldValue,
+        UIManager.getViewManagerConfig('RCTPSPDFKitView').Commands.getFormFieldValue,
         [requestId, fullyQualifiedName]
       );
 
@@ -304,7 +304,7 @@ class PSPDFKitView extends React.Component {
     if (Platform.OS === "android") {
       UIManager.dispatchViewManagerCommand(
         findNodeHandle(this.refs.pdfView),
-        UIManager.RCTPSPDFKitView.Commands.setFormFieldValue,
+        UIManager.getViewManagerConfig('RCTPSPDFKitView').Commands.setFormFieldValue,
         [fullyQualifiedName, value]
       );
     } else if (Platform.OS === "ios") {
