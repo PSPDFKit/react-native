@@ -15,16 +15,16 @@ Lets create a simple app that integrates PSPDFKit using CocoaPods.
 1. Make sure `react-native-cli` is installed: `yarn global add react-native-cli`
 2. Create the app with `react-native init YourApp`.
 3. Step into your newly created app folder: `cd YourApp`
-4. Install `react-native-pspdfkit` from GitHub: `yarn add github:PSPDFKit/react-native`
+4. Install `react-native-pspdfkit` from GitHub: `yarn add https://github.com/PSPDFKit/react-native.git#rad/fix-cocoapods-integration`
 5. Install all the dependencies for the project: `yarn install`. (Because of a [bug](https://github.com/yarnpkg/yarn/issues/2165) you may need to clean `yarn`'s cache with `yarn cache clean` before.)
 6. Link module `react-native-pspdfkit`: `react-native link react-native-pspdfkit`.
 7. Open ios/YourApp.xcodeproj in Xcode: open ios/YourApp.xcodeproj
 8. Make sure the deployment target is set to 11.0 or higher: 
 ![Deployment Target](../screenshots/deployment-target.png)
 9. Change "View controller-based status bar appearance" to `YES` in `Info.plist`:
-    ![View Controller-Based Status Bar Appearance](screenshots/view-controller-based-status-bar-appearance.png)
+    ![View Controller-Based Status Bar Appearance](../screenshots/view-controller-based-status-bar-appearance.png)
 10. Link with the `libRCTPSPDFKit.a` static library (if `libRCTPSPDFKit.a` is already there but greyed out, delete it and link it again):
-    ![Linking Static Library](screenshots/linking-static-library.png)
+    ![Linking Static Library](../screenshots/linking-static-library.png)
 11. Close the Xcode project
 12. Go back to the Terminal, `cd ios` then run `pod init`
 13. Replace the content of your newly created `Podfile` with this:
