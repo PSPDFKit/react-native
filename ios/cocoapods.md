@@ -3,7 +3,7 @@
 ### CocoaPods integration
 
 #### Requirements
-- Xcode 10.2
+- Xcode 10.2.1
 - PSPDFKit 8.4.0 for iOS or later
 - react-native >= 0.59.9
 - CocoaPods >= 1.7.2
