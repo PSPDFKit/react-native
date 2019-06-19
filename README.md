@@ -27,9 +27,9 @@ The [PSPDFKit SDK](https://pspdfkit.com/) is a framework that allows you to view
 
 #### Requirements
 
-- Xcode 10.2
-- PSPDFKit 8.2.3 for iOS or later
-- react-native >= 0.57.8
+- Xcode 10.2.1
+- PSPDFKit 8.4.0 for iOS or later
+- react-native >= 0.59.9
 
 #### Getting Started
 
@@ -79,10 +79,10 @@ import {
   View
 } from "react-native";
 
-var PSPDFKit = NativeModules.PSPDFKit;
+const PSPDFKit = NativeModules.PSPDFKit;
 PSPDFKit.setLicenseKey("YOUR_LICENSE_KEY_GOES_HERE");
 
-export default class App extends Component<{}> {
+export default class App extends Component<Props> {
   _onPressButton() {
     PSPDFKit.present("document.pdf", {
       pageTransition: "scrollContinuous",
