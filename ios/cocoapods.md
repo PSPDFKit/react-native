@@ -15,7 +15,7 @@ Lets create a simple app that integrates PSPDFKit using CocoaPods.
 1. Make sure `react-native-cli` is installed: `yarn global add react-native-cli`
 2. Create the app with `react-native init YourApp`.
 3. Step into your newly created app folder: `cd YourApp`
-4. Install `react-native-pspdfkit` from GitHub: `yarn add https://github.com/PSPDFKit/react-native.git#rad/fix-cocoapods-integration`
+4. Install `react-native-pspdfkit` from GitHub: `yarn add https://github.com/PSPDFKit/react-native`
 5. Install all the dependencies for the project: `yarn install`. (Because of a [bug](https://github.com/yarnpkg/yarn/issues/2165) you may need to clean `yarn`'s cache with `yarn cache clean` before.)
 6. Link module `react-native-pspdfkit`: `react-native link react-native-pspdfkit`.
 7. Open ios/YourApp.xcodeproj in Xcode: open ios/YourApp.xcodeproj
