@@ -138,7 +138,7 @@
     <SDKReference Include="Microsoft.VCLibs, Version=14.0">
       <Name>Visual C++ 2015 Runtime for Universal Windows Platform Apps</Name>
     </SDKReference>
-    <SDKReference Include="PSPDFKitSDK, Version=2.0.0">
+    <SDKReference Include="PSPDFKitSDK, Version=2.2.0">
       <Name>PSPDFKit for UWP</Name>
     </SDKReference>
   </ItemGroup>
