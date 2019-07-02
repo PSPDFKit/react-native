@@ -31,6 +31,7 @@ import com.pspdfkit.listeners.OnPreparePopupToolbarListener;
 import com.pspdfkit.listeners.SimpleDocumentListener;
 import com.pspdfkit.react.R;
 import com.pspdfkit.react.events.PdfViewDataReturnedEvent;
+import com.pspdfkit.react.events.PdfViewDocumentLoadFailedEvent;
 import com.pspdfkit.react.events.PdfViewDocumentSaveFailedEvent;
 import com.pspdfkit.react.events.PdfViewDocumentSavedEvent;
 import com.pspdfkit.react.events.PdfViewStateChangedEvent;
@@ -49,6 +50,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -172,7 +174,13 @@ public class PdfView extends FrameLayout {
 
     public void setDocument(String document) {
         if (Uri.parse(document).getScheme() == null) {
-            document = FILE_SCHEME + document;
+            // If there is no scheme it might be a raw path.
+            try {
+                File file = new File(document);
+                document = Uri.fromFile(file).toString();
+            } catch (Exception e) {
+                document = FILE_SCHEME + document;
+            }
         }
         if (documentOpeningDisposable != null) {
             documentOpeningDisposable.dispose();
@@ -187,6 +195,14 @@ public class PdfView extends FrameLayout {
                     public void accept(PdfDocument pdfDocument) throws Exception {
                         PdfView.this.document = pdfDocument;
                         setupFragment();
+                    }
+
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        PdfView.this.document = null;
+                        setupFragment();
+                        eventDispatcher.dispatchEvent(new PdfViewDocumentLoadFailedEvent(getId(), throwable.getMessage()));
                     }
                 });
     }

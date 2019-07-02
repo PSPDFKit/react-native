@@ -35,6 +35,7 @@ class PSPDFKitView extends React.Component {
           onStateChanged={this._onStateChanged}
           onDocumentSaved={this._onDocumentSaved}
           onDocumentSaveFailed={this._onDocumentSaveFailed}
+          onDocumentLoadFailed={this._onDocumentLoadFailed}
           onAnnotationTapped={this._onAnnotationTapped}
           onAnnotationsChanged={this._onAnnotationsChanged}
           onDataReturned={this._onDataReturned}
@@ -60,6 +61,12 @@ class PSPDFKitView extends React.Component {
   _onDocumentSaveFailed = event => {
     if (this.props.onDocumentSaveFailed) {
       this.props.onDocumentSaveFailed(event.nativeEvent);
+    }
+  };
+
+  _onDocumentLoadFailed = event => {
+    if (this.props.onDocumentLoadFailed) {
+      this.props.onDocumentLoadFailed(event.nativeEvent);
     }
   };
 
