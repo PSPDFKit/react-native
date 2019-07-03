@@ -76,7 +76,7 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
 
     @Override
     public void onDropViewInstance(PdfView view) {
-        view.removeFragment();
+        view.removeFragment(true);
     }
 
     @Nullable
