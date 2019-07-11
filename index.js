@@ -100,7 +100,7 @@ class PSPDFKitView extends React.Component {
     if (Platform.OS === "android") {
       UIManager.dispatchViewManagerCommand(
         findNodeHandle(this.refs.pdfView),
-        UIManager.getViewManagerConfig('RCTPSPDFKitView').Commands.enterAnnotationCreationMode,
+        this._getViewManagerConfig('RCTPSPDFKitView').Commands.enterAnnotationCreationMode,
         []
       );
     } else if (Platform.OS === "ios") {
@@ -117,7 +117,7 @@ class PSPDFKitView extends React.Component {
     if (Platform.OS === "android") {
       UIManager.dispatchViewManagerCommand(
         findNodeHandle(this.refs.pdfView),
-        UIManager.getViewManagerConfig('RCTPSPDFKitView').Commands.exitCurrentlyActiveMode,
+        this._getViewManagerConfig('RCTPSPDFKitView').Commands.exitCurrentlyActiveMode,
         []
       );
     } else if (Platform.OS === "ios") {
@@ -134,7 +134,7 @@ class PSPDFKitView extends React.Component {
     if (Platform.OS === "android") {
       UIManager.dispatchViewManagerCommand(
         findNodeHandle(this.refs.pdfView),
-        UIManager.getViewManagerConfig('RCTPSPDFKitView').Commands.saveCurrentDocument,
+        this._getViewManagerConfig('RCTPSPDFKitView').Commands.saveCurrentDocument,
         []
       );
     } else if (Platform.OS === "ios") {
@@ -165,7 +165,7 @@ class PSPDFKitView extends React.Component {
 
       UIManager.dispatchViewManagerCommand(
         findNodeHandle(this.refs.pdfView),
-        UIManager.getViewManagerConfig('RCTPSPDFKitView').Commands.getAnnotations,
+        this._getViewManagerConfig('RCTPSPDFKitView').Commands.getAnnotations,
         [requestId, pageIndex, type]
       );
 
@@ -188,7 +188,7 @@ class PSPDFKitView extends React.Component {
     if (Platform.OS === "android") {
       UIManager.dispatchViewManagerCommand(
         findNodeHandle(this.refs.pdfView),
-        UIManager.getViewManagerConfig('RCTPSPDFKitView').Commands.addAnnotation,
+        this._getViewManagerConfig('RCTPSPDFKitView').Commands.addAnnotation,
         [annotation]
       );
     } else if (Platform.OS === "ios") {
@@ -208,7 +208,7 @@ class PSPDFKitView extends React.Component {
     if (Platform.OS === "android") {
       UIManager.dispatchViewManagerCommand(
         findNodeHandle(this.refs.pdfView),
-        UIManager.getViewManagerConfig('RCTPSPDFKitView').Commands.removeAnnotation,
+        this._getViewManagerConfig('RCTPSPDFKitView').Commands.removeAnnotation,
         [annotation]
       );
     } else if (Platform.OS === "ios") {
@@ -236,7 +236,7 @@ class PSPDFKitView extends React.Component {
 
       UIManager.dispatchViewManagerCommand(
         findNodeHandle(this.refs.pdfView),
-        UIManager.getViewManagerConfig('RCTPSPDFKitView').Commands.getAllUnsavedAnnotations,
+        this._getViewManagerConfig('RCTPSPDFKitView').Commands.getAllUnsavedAnnotations,
         [requestId]
       );
 
@@ -257,7 +257,7 @@ class PSPDFKitView extends React.Component {
     if (Platform.OS === "android") {
       UIManager.dispatchViewManagerCommand(
         findNodeHandle(this.refs.pdfView),
-        UIManager.getViewManagerConfig('RCTPSPDFKitView').Commands.addAnnotations,
+        this._getViewManagerConfig('RCTPSPDFKitView').Commands.addAnnotations,
         [annotations]
       );
     } else if (Platform.OS === "ios") {
@@ -288,7 +288,7 @@ class PSPDFKitView extends React.Component {
 
       UIManager.dispatchViewManagerCommand(
         findNodeHandle(this.refs.pdfView),
-        UIManager.getViewManagerConfig('RCTPSPDFKitView').Commands.getFormFieldValue,
+        this._getViewManagerConfig('RCTPSPDFKitView').Commands.getFormFieldValue,
         [requestId, fullyQualifiedName]
       );
 
@@ -311,7 +311,7 @@ class PSPDFKitView extends React.Component {
     if (Platform.OS === "android") {
       UIManager.dispatchViewManagerCommand(
         findNodeHandle(this.refs.pdfView),
-        UIManager.getViewManagerConfig('RCTPSPDFKitView').Commands.setFormFieldValue,
+        this._getViewManagerConfig('RCTPSPDFKitView').Commands.setFormFieldValue,
         [fullyQualifiedName, value]
       );
     } else if (Platform.OS === "ios") {
@@ -394,6 +394,15 @@ class PSPDFKitView extends React.Component {
         viewMode,
         findNodeHandle(this.refs.pdfView)
       );
+    }
+  };
+
+  _getViewManagerConfig = viewManagerName => {
+    const version = NativeModules.PlatformConstants.reactNativeVersion.minor
+    if (version >= 58) {
+      return UIManager.getViewManagerConfig(viewManagerName);
+    } else {
+      return UIManager[viewManagerName];
     }
   };
 }
