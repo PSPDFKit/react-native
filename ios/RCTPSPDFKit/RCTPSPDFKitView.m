@@ -13,7 +13,7 @@
 #import "RCTConvert+PSPDFViewMode.h"
 #import "RCTConvert+UIBarButtonItem.h"
 
-#define VALIDATE_DOCUMENT(document, ...) { if (!document.isValid) { NSLog(@"Document is invalid."); return __VA_ARGS__; }}
+#define VALIDATE_DOCUMENT(document, ...) { if (!document.isValid) { NSLog(@"Document is invalid."); if (self.onDocumentLoadFailed) { self.onDocumentLoadFailed(@{@"error": @"Document is invalid."}); } return __VA_ARGS__; }}
 
 @interface RCTPSPDFKitView ()<PSPDFDocumentDelegate, PSPDFViewControllerDelegate, PSPDFFlexibleToolbarContainerDelegate>
 
@@ -158,6 +158,10 @@
 
 - (void)pdfViewController:(PSPDFViewController *)pdfController willBeginDisplayingPageView:(PSPDFPageView *)pageView forPageAtIndex:(NSInteger)pageIndex {
   [self onStateChangedForPDFViewController:pdfController pageView:pageView pageAtIndex:pageIndex];
+}
+
+- (void)pdfViewController:(PSPDFViewController *)pdfController didChangeDocument:(nullable PSPDFDocument *)document {
+    VALIDATE_DOCUMENT(document)
 }
 
 #pragma mark - PSPDFFlexibleToolbarContainerDelegate

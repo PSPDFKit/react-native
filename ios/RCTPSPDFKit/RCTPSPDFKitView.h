@@ -26,6 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) RCTBubblingEventBlock onCloseButtonPressed;
 @property (nonatomic, copy) RCTBubblingEventBlock onDocumentSaved;
 @property (nonatomic, copy) RCTBubblingEventBlock onDocumentSaveFailed;
+@property (nonatomic, copy) RCTBubblingEventBlock onDocumentLoadFailed;
 @property (nonatomic, copy) RCTBubblingEventBlock onAnnotationTapped;
 @property (nonatomic, copy) RCTBubblingEventBlock onAnnotationsChanged;
 @property (nonatomic, copy) RCTBubblingEventBlock onStateChanged;
