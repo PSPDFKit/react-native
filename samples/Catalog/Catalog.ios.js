@@ -251,8 +251,11 @@ class ConfiguredPDFViewComponent extends Component {
           configuration={{
             backgroundColor: processColor("lightgrey"),
             showThumbnailBar: "scrubberBar",
-            showDocumentLabel: true
+            showDocumentLabel: false,
+            useParentNavigationBar: false,
+            allowToolbarTitleChange: false
           }}
+          toolbarTitle={"Custom Title"}
           style={{ flex: 1, color: pspdfkitColor }}
         />
       </View>
