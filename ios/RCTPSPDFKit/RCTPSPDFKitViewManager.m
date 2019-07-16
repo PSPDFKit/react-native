@@ -73,6 +73,12 @@ RCT_CUSTOM_VIEW_PROPERTY(rightBarButtonItems, NSArray<UIBarButtonItem *>, RCTPSP
   }
 }
 
+RCT_CUSTOM_VIEW_PROPERTY(toolbarTitle, NSString, RCTPSPDFKitView) {
+  if (json) {
+    view.pdfController.title = json;
+  }
+}
+
 RCT_EXPORT_VIEW_PROPERTY(hideNavigationBar, BOOL)
 
 RCT_EXPORT_VIEW_PROPERTY(disableDefaultActionForTappedAnnotations, BOOL)
