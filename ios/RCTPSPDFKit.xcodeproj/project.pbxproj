@@ -259,6 +259,8 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(PROJECT_DIR)/../PSPDFKit",
 					"$(PROJECT_DIR)/../../../ios/PSPDFKit",
+					"$(PROJECT_DIR)/Pods/PSPDFKit",
+					"$(PROJECT_DIR)/PSPDFKit",
 				);
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -323,6 +325,8 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(PROJECT_DIR)/../PSPDFKit",
 					"$(PROJECT_DIR)/../../../ios/PSPDFKit",
+					"$(PROJECT_DIR)/Pods/PSPDFKit",
+					"$(PROJECT_DIR)/PSPDFKit",
 				);
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
