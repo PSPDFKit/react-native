@@ -251,13 +251,29 @@ editableAnnotationTypes: ["Ink", "Highlight"];
 
 The PSPDFKit React Native iOS Wrapper allows you to specify a custom grouping for the annotation creation toolbar. Please refer to [`RCTConvert+PSPDFAnnotationToolbarConfiguration.m`](./ios/RCTPSPDFKit/Converters/RCTConvert+PSPDFAnnotationToolbarConfiguration.m#L47) for the complete list of menu items. To set them just specify the `menuItemGrouping` prop on the `PSPDFKitView`. The format used is as follows:
 
-```
+```javascript
 [
   menuItem,
   { key: menuItem, items: [subItem, subItem]},
   ...
 ]
 ```
+
+#### Customize the Toolbar Buttons
+
+You can customize the toolbar buttons on the Native UI View component by specifying the toolbar buttons using `setLeftBarButtonItems` and `setRightBarButtonItems`, like so:
+
+```javascript
+pdfView.setRightBarButtonItems(
+  ["thumbnailsButtonItem", "searchButtonItem", "annotationButtonItem"],
+  "document",
+  false
+);
+```
+
+Please refer to [`RCTConvert+UIBarButtonItem.m`](./ios/RCTPSPDFKit/Converters/RCTConvert%2BUIBarButtonItem.m#L14) for the complete list of bar button items.
+
+Also, please take a look at the [ToolbarCustomization example from our Catalog app](./samples/Catalog/Catalog.ios.js#L805).
 
 ### Android
 
@@ -305,6 +321,7 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
 ```
 
 8. PSPDFKit targets modern platforms, so you'll have to set the `minSdkVersion` to 19. In `YourApp/android/build.gradle`:
+
 ```diff
 ...
  buildscript {
@@ -317,7 +334,7 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
          supportLibVersion = "28.0.0"
 ...
 ```
- 
+
 9. We will also need to enable MultiDex support. In `YourApp/android/app/build.gradle`:
 
 ```diff
@@ -619,7 +636,7 @@ Shows the pdf `document` from the local device filesystem, or your app's assets.
 - PSPDFKit for Windows.vsix (installed)
 - PowerShell
 
-*IMPORTANT* : `react-native-pspdfkit` for windows does not yet support react-native 0.59.\*. Currently [`react-native-windows`][https://github.com/Microsoft/react-native-windows/releases] is not keeping up pace with `react-native`, where the last official release was 0.54.\* and the last RC was 0.57.\*. We have tested and require 0.57.0 to keep version aligned as much as possible.
+_IMPORTANT_ : `react-native-pspdfkit` for windows does not yet support react-native 0.59.\*. Currently [`react-native-windows`][https://github.com/microsoft/react-native-windows/releases] is not keeping up pace with `react-native`, where the last official release was 0.54.\* and the last RC was 0.57.\*. We have tested and require 0.57.0 to keep version aligned as much as possible.
 
 #### Getting Started
 
@@ -757,6 +774,7 @@ var styles = StyleSheet.create({
 2. From the command promt `cd react-native\samples\Catalog`.
 3. Make sure `react-native-cli` is installed: `yarn global add react-native-cli`.
 4. Downgrade `react-native` package to 0.57.8. Edit `package.json`
+
 ```diff
   "dependencies": {
     "react-native-pspdfkit": "file:../../",
@@ -766,6 +784,7 @@ var styles = StyleSheet.create({
     "react-native-camera": "2.9.0",
     "react-native-fs": "2.13.3",
 ```
+
 5. run `yarn install`. (Because of a [bug](https://github.com/yarnpkg/yarn/issues/2165) you may need to clean `yarn`'s cache with `yarn cache clean` before.)
 6. Open the UWP catalog solution in `react-native\samples\Catalog\windows`.
 7. Accept and install any required extensions when prompted.
@@ -784,7 +803,7 @@ var styles = StyleSheet.create({
 
 9. From the command prompt run `react-native run-windows`.
 10. Enter `y` to accept the certificate when prompted and allow socket access for reactive when prompted.
-(Note: On windows yarn does not link correctly, therefore any changes made in the ReactNativePSPDFKit project will have to be manually copied to the `windows` folder at the base of the repo in order to commit changes.)
+    (Note: On windows yarn does not link correctly, therefore any changes made in the ReactNativePSPDFKit project will have to be manually copied to the `windows` folder at the base of the repo in order to commit changes.)
 
 #### API
 
@@ -811,6 +830,7 @@ PSPDFKit.Present("ms-appx:///Assets/pdf/Business Report.pdf");
 It is possible to theme/customize the PdfView with the use of a CSS file. To do this simple pass a `Uri` within the web context to the instantiated [`PSPDFKitPackage`](https://github.com/PSPDFKit/react-native/blob/master/windows/ReactNativePSPDFKit/ReactNativePSPDFKit/PSPDFKitPackage.cs#L32).
 
 To see this in action, make the following changes in [`samples/Catalog/windows/Catalog/MainReactNativeHost.cs`](https://github.com/PSPDFKit/react-native/blob/master/samples/Catalog/windows/Catalog/MainReactNativeHost.cs) and run the catalog the catalog.
+
 ```diff
 protected override List<IReactPackage> Packages => new List<IReactPackage>
 {
@@ -820,6 +840,7 @@ protected override List<IReactPackage> Packages => new List<IReactPackage>
     new RNFSPackage()
 };
 ```
+
 The code above will pass an asset held in the `Catalog` project's `Assets/css` to the web context of PSPDFKit for Windows. The file can then be used to theme the view.
 
 For more information on CSS Customization in PSPDFKit for Windows please refer to [CSS Customization](https://pspdfkit.com/guides/windows/current/customizing-the-interface/css-customization/)
