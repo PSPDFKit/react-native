@@ -28,12 +28,11 @@ The [PSPDFKit SDK](https://pspdfkit.com/) is a framework that allows you to view
 #### Requirements
 
 - Xcode 10.2.1
-- PSPDFKit 8.4.0 for iOS or later
-- react-native >= 0.59.9
+- PSPDFKit 8.4.2 for iOS or later
+- react-native >= 0.60.3
+- CocoaPods >= 1.7.2
 
 #### Getting Started
-
-**Note:** If you want to integrate PSPDFKit using CocoaPods, use [these instructions](ios/cocoapods.md) instead.
 
 Let's create a simple app that integrates PSPDFKit and uses the `react-native-pspdfkit` module.
 
@@ -43,33 +42,60 @@ Let's create a simple app that integrates PSPDFKit and uses the `react-native-ps
 4. Install `react-native-pspdfkit` from GitHub: `yarn add github:PSPDFKit/react-native`
 5. Install all the dependencies for the project: `yarn install`. (Because of a [bug](https://github.com/yarnpkg/yarn/issues/2165) you may need to clean `yarn`'s cache with `yarn cache clean` before.)
 6. Link module `react-native-pspdfkit`: `react-native link react-native-pspdfkit`.
-7. Create the folder `ios/PSPDFKit` and copy `PSPDFKit.framework` and `PSPDFKitUI.framework` into it.
-8. Open `ios/YourApp.xcodeproj` in Xcode: `open ios/YourApp.xcodeproj`
-9. Make sure the deployment target is set to 11.0 or higher:
-   ![Deployment Target](screenshots/deployment-target.png)
-10. Change "View controller-based status bar appearance" to `YES` in `Info.plist`:
-    ![View Controller-Based Status Bar Appearance](screenshots/view-controller-based-status-bar-appearance.png)
-11. Link with the `libRCTPSPDFKit.a` static library (if `libRCTPSPDFKit.a` is already there but greyed out, delete it and link it again):
-    ![Linking Static Library](screenshots/linking-static-library.png)
-12. Embed `PSPDFKit.framework` and `PSPDFKitUI.framework` by drag and dropping it into the "Embedded Binaries" section of the "YourApp" target (Select "Create groups"). This will also add it to the "Linked Framworks and Libraries" section:
-    ![Embedding PSPDFKit](screenshots/embedding-pspdfkit.png)
-13. Add a new `Run Script Phase` in your target’s `Build Phases`.
-    **IMPORTANT:** Make sure this `Run Script Phase` is below the `Embed Frameworks` build phase.  
-    You can drag and drop build phases to rearrange them.  
-    Paste the following line in the script text field of `Run Script Phase`:
+7. Open `ios/Podile` in a text editor: `open ios/Podfile`, update the platform to iOS 11, and add your CocoaPods URL.
 
-```sh
-bash "$BUILT_PRODUCTS_DIR/$FRAMEWORKS_FOLDER_PATH/PSPDFKit.framework/strip-framework.sh"
+```diff
+- platform :ios, '9.0'
++ platform :ios, '11.0'
+require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
+
+target 'YourApp' do
+  # Pods for YourApp
+  pod 'React', :path => '../node_modules/react-native/'
+  pod 'React-Core', :path => '../node_modules/react-native/React'
+  pod 'React-DevSupport', :path => '../node_modules/react-native/React'
+  pod 'React-fishhook', :path => '../node_modules/react-native/Libraries/fishhook'
+  pod 'React-RCTActionSheet', :path => '../node_modules/react-native/Libraries/ActionSheetIOS'
+  pod 'React-RCTAnimation', :path => '../node_modules/react-native/Libraries/NativeAnimation'
+  pod 'React-RCTBlob', :path => '../node_modules/react-native/Libraries/Blob'
+  pod 'React-RCTImage', :path => '../node_modules/react-native/Libraries/Image'
+  pod 'React-RCTLinking', :path => '../node_modules/react-native/Libraries/LinkingIOS'
+  pod 'React-RCTNetwork', :path => '../node_modules/react-native/Libraries/Network'
+  pod 'React-RCTSettings', :path => '../node_modules/react-native/Libraries/Settings'
+  pod 'React-RCTText', :path => '../node_modules/react-native/Libraries/Text'
+  pod 'React-RCTVibration', :path => '../node_modules/react-native/Libraries/Vibration'
+  pod 'React-RCTWebSocket', :path => '../node_modules/react-native/Libraries/WebSocket'
+
+  pod 'React-cxxreact', :path => '../node_modules/react-native/ReactCommon/cxxreact'
+  pod 'React-jsi', :path => '../node_modules/react-native/ReactCommon/jsi'
+  pod 'React-jsiexecutor', :path => '../node_modules/react-native/ReactCommon/jsiexecutor'
+  pod 'React-jsinspector', :path => '../node_modules/react-native/ReactCommon/jsinspector'
+  pod 'yoga', :path => '../node_modules/react-native/ReactCommon/yoga'
+
+  pod 'DoubleConversion', :podspec => '../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec'
+  pod 'glog', :podspec => '../node_modules/react-native/third-party-podspecs/glog.podspec'
+  pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec'
+
+  pod 'react-native-pspdfkit', :path => '../node_modules/react-native-pspdfkit'
++  pod 'PSPDFKit', podspec: 'https://customers.pspdfkit.com/cocoapods/YOUR_COCOAPODS_KEY_GOES_HERE/pspdfkit/latest.podspec'
+
+  use_native_modules!
+end
 ```
 
-![Run Script Phase](screenshots/run-script-phase.png)
+8. Go back to the Terminal, `cd ios` then run `pod install`
+9. Open `ios/YourApp.xcworkspace` in Xcode: `open ios/YourApp.xcworkspace`
+10. Make sure the deployment target is set to 11.0 or higher: 
+![Deployment Target](../screenshots/deployment-target.png)
+11. Change "View controller-based status bar appearance" to `YES` in `Info.plist`:
+    ![View Controller-Based Status Bar Appearance](../screenshots/view-controller-based-status-bar-appearance.png)
 
-14. Add a PDF by drag and dropping it into your Xcode project (Select "Create groups" and add to target "YourApp"). This will add the document to the "Copy Bundle Resources" build phase:
-    ![Adding PDF](screenshots/adding-pdf.png)
-15. Replace the default component from `App.js` with a simple touch area to present the bundled PDF. (Note that you can also use a [Native UI Component](#native-ui-component) to show a PDF.)
+12. Add a PDF by drag and dropping it into your Xcode project (Select "Create groups" and add to target "YourApp"). This will add the document to the "Copy Bundle Resources" build phase: 
+![Adding PDF](../screenshots/adding-pdf.png)
+13. Replace the default component from `index.ios.js` with a simple touch area to present the bundled PDF:
 
 ```javascript
-import React, { Component } from "react";
+import React, { Component } from 'react';
 import {
   AppRegistry,
   StyleSheet,
@@ -77,20 +103,18 @@ import {
   Text,
   TouchableHighlight,
   View
-} from "react-native";
+} from 'react-native';
 
 const PSPDFKit = NativeModules.PSPDFKit;
-PSPDFKit.setLicenseKey("YOUR_LICENSE_KEY_GOES_HERE");
 
-export default class App extends Component<Props> {
+PSPDFKit.setLicenseKey('INSERT_YOUR_LICENSE_KEY_HERE');
+
+// Change 'YourApp' to your app's name.
+export default class YourApp extends Component<Props> {
   _onPressButton() {
-    PSPDFKit.present("document.pdf", {
-      pageTransition: "scrollContinuous",
-      scrollDirection: "vertical",
-      documentLabelEnabled: true
-    });
+    PSPDFKit.present('document.pdf', {})
   }
-
+  
   render() {
     return (
       <View style={styles.container}>
@@ -105,21 +129,19 @@ export default class App extends Component<Props> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#F5FCFF"
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F5FCFF',
   },
-  welcome: {
+  text: {
     fontSize: 20,
-    textAlign: "center",
-    margin: 10
-  },
-  instructions: {
-    textAlign: "center",
-    color: "#333333",
-    marginBottom: 5
+    textAlign: 'center',
+    margin: 10,
   }
 });
+
+// Change both 'YourApp's to your app's name.
+AppRegistry.registerComponent('YourApp', () => YourApp);
 ```
 
 Your app is now ready to launch. Run the app in Xcode or type `react-native run-ios` in the terminal.
