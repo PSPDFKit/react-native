@@ -85,17 +85,17 @@ end
 
 8. Go back to the Terminal, `cd ios` then run `pod install`
 9. Open `ios/YourApp.xcworkspace` in Xcode: `open ios/YourApp.xcworkspace`
-10. Make sure the deployment target is set to 11.0 or higher: 
-![Deployment Target](screenshots/deployment-target.png)
+10. Make sure the deployment target is set to 11.0 or higher:
+    ![Deployment Target](screenshots/deployment-target.png)
 11. Change "View controller-based status bar appearance" to `YES` in `Info.plist`:
     ![View Controller-Based Status Bar Appearance](screenshots/view-controller-based-status-bar-appearance.png)
 
-12. Add a PDF by drag and dropping it into your Xcode project (Select "Create groups" and add to target "YourApp"). This will add the document to the "Copy Bundle Resources" build phase: 
-![Adding PDF](screenshots/adding-pdf.png)
+12. Add a PDF by drag and dropping it into your Xcode project (Select "Create groups" and add to target "YourApp"). This will add the document to the "Copy Bundle Resources" build phase:
+    ![Adding PDF](screenshots/adding-pdf.png)
 13. Replace the default component from `index.ios.js` with a simple touch area to present the bundled PDF:
 
 ```javascript
-import React, { Component } from 'react';
+import React, { Component } from "react";
 import {
   AppRegistry,
   StyleSheet,
@@ -103,18 +103,18 @@ import {
   Text,
   TouchableHighlight,
   View
-} from 'react-native';
+} from "react-native";
 
 const PSPDFKit = NativeModules.PSPDFKit;
 
-PSPDFKit.setLicenseKey('INSERT_YOUR_LICENSE_KEY_HERE');
+PSPDFKit.setLicenseKey("INSERT_YOUR_LICENSE_KEY_HERE");
 
 // Change 'YourApp' to your app's name.
 export default class YourApp extends Component<Props> {
   _onPressButton() {
-    PSPDFKit.present('document.pdf', {})
+    PSPDFKit.present("document.pdf", {});
   }
-  
+
   render() {
     return (
       <View style={styles.container}>
@@ -129,19 +129,19 @@ export default class YourApp extends Component<Props> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#F5FCFF"
   },
   text: {
     fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
+    textAlign: "center",
+    margin: 10
   }
 });
 
 // Change both 'YourApp's to your app's name.
-AppRegistry.registerComponent('YourApp', () => YourApp);
+AppRegistry.registerComponent("YourApp", () => YourApp);
 ```
 
 Your app is now ready to launch. Run the app in Xcode or type `react-native run-ios` in the terminal.
