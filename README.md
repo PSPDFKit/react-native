@@ -83,16 +83,15 @@ target 'YourApp' do
 end
 ```
 
-8. Go back to the Terminal, `cd ios` then run `pod install`
-9. Open `ios/YourApp.xcworkspace` in Xcode: `open ios/YourApp.xcworkspace`
+8. `cd ios` then run `pod install`.
+9. Open `YourApp.xcworkspace` in Xcode: `open YourApp.xcworkspace`.
 10. Make sure the deployment target is set to 11.0 or higher:
     ![Deployment Target](screenshots/deployment-target.png)
 11. Change "View controller-based status bar appearance" to `YES` in `Info.plist`:
     ![View Controller-Based Status Bar Appearance](screenshots/view-controller-based-status-bar-appearance.png)
-
 12. Add a PDF by drag and dropping it into your Xcode project (Select "Create groups" and add to target "YourApp"). This will add the document to the "Copy Bundle Resources" build phase:
     ![Adding PDF](screenshots/adding-pdf.png)
-13. Replace the default component from `index.ios.js` with a simple touch area to present the bundled PDF:
+13. Replace the default component from `App.js` with a simple touch area to present the bundled PDF. (Note that you can also use a [Native UI Component](#native-ui-component) to show a PDF.)
 
 ```javascript
 import React, { Component } from "react";
@@ -144,7 +143,7 @@ const styles = StyleSheet.create({
 AppRegistry.registerComponent("YourApp", () => YourApp);
 ```
 
-Your app is now ready to launch. Run the app in Xcode or type `react-native run-ios` in the terminal.
+Your app is now ready to launch. Run the app in Xcode or go back to the Terminal, then run `cd ..`, and `react-native run-ios`.
 
 ### Usage
 
