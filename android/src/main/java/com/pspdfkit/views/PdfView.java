@@ -494,14 +494,19 @@ public class PdfView extends FrameLayout {
         return EnumSet.noneOf(AnnotationType.class);
     }
 
-    public Disposable addAnnotation(ReadableMap annotation) {
+    public Disposable addAnnotation(final int requestId, ReadableMap annotation) {
         return fragmentGetter.take(1).map(PdfFragment::getDocument).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(pdfDocument -> {
-                    JSONObject json = new JSONObject(annotation.toHashMap());
-                    pdfDocument.getAnnotationProvider().createAnnotationFromInstantJson(json.toString());
-                });
-
+            .map(pdfDocument -> {
+                JSONObject json = new JSONObject(annotation.toHashMap());
+                return pdfDocument.getAnnotationProvider().createAnnotationFromInstantJson(json.toString());
+            })
+            .map(Annotation::toInstantJson)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe((instantJson) -> {
+                JSONObject result = new JSONObject();
+                result.put("annotation", new JSONObject(instantJson));
+                eventDispatcher.dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, result));
+            }, (throwable) -> eventDispatcher.dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, throwable)));
     }
 
     public Disposable removeAnnotation(ReadableMap annotation) {

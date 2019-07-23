@@ -632,7 +632,12 @@ class PdfViewInstantJsonScreen extends Component<{}> {
                   type: "pspdfkit/ink",
                   updatedAt: "2018-07-03T13:53:03Z",
                   v: 1
-                });
+                }).then(result => {
+                  alert(JSON.stringify(result))
+                })
+                .catch(ex => {
+                  alert(JSON.stringify(ex))
+                })
               }}
               title="Add annotation"
             />
