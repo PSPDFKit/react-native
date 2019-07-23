@@ -56,6 +56,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.Single;
@@ -536,14 +537,21 @@ public class PdfView extends FrameLayout {
                 });
     }
 
-    public Disposable addAnnotations(ReadableMap annotation) {
+    public Disposable addAnnotations(final int requestId, ReadableMap annotation) {
         return fragmentGetter.take(1).map(PdfFragment::getDocument).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(pdfDocument -> {
-                    JSONObject json = new JSONObject(annotation.toHashMap());
-                    final DataProvider dataProvider = new DocumentJsonDataProvider(json);
-                    DocumentJsonFormatter.importDocumentJson(pdfDocument, dataProvider);
-                });
+            .flatMapCompletable(currentDocument -> Completable.fromAction(() -> {
+                JSONObject json = new JSONObject(annotation.toHashMap());
+                final DataProvider dataProvider = new DocumentJsonDataProvider(json);
+                DocumentJsonFormatter.importDocumentJson(currentDocument, dataProvider);
+            }))
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(() -> {
+                JSONObject result = new JSONObject();
+                result.put("annotations", "created");
+                eventDispatcher.dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, result));
+            }, (throwable) -> {
+                eventDispatcher.dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, throwable));
+            });
     }
 
     public Disposable getFormFieldValue(final int requestId, @NonNull String formElementName) {

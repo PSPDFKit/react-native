@@ -256,14 +256,27 @@ class PSPDFKitView extends React.Component {
    * Applies the passed in document instant json.
    *
    * @param annotations The document instant json to apply.
+   * 
+   * Returns a promise resolving a dictionary with the following structure:
+   * {'annotations' : 'created'}.
    */
   addAnnotations = function(annotations) {
     if (Platform.OS === "android") {
+      let requestId = this._nextRequestId++;
+      let requestMap = this._requestMap;
+
+      // We create a promise here that will be resolved once onDataReturned is called.
+      let promise = new Promise(function(resolve, reject) {
+        requestMap[requestId] = { resolve: resolve, reject: reject };
+      });
+
       UIManager.dispatchViewManagerCommand(
         findNodeHandle(this.refs.pdfView),
         this._getViewManagerConfig("RCTPSPDFKitView").Commands.addAnnotations,
-        [annotations]
+        [requestId, annotations]
       );
+
+      return promise
     } else if (Platform.OS === "ios") {
       return NativeModules.PSPDFKitViewManager.addAnnotations(
         annotations,
