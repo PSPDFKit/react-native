@@ -171,47 +171,46 @@ public class PdfView extends FrameLayout {
     }
 
     public void setConfiguration(PdfActivityConfiguration configuration) {
+        if (configuration != null && !configuration.equals(this.configuration)) {
+            // The configuration changed, recreate the fragment.
+            // We set the current page index so the fragment is created at this location.
+            this.pageIndex = fragment != null ? fragment.getPageIndex() : this.pageIndex;
+            removeFragment(false);
+        }
         this.configuration = configuration;
         setupFragment();
     }
 
-    public void setDocument(@Nullable String document) {
-        if (document == null) {
+    public void setDocument(@Nullable String documentPath) {
+        if (documentPath == null) {
+            this.document = null;
             removeFragment(false);
             return;
         }
 
-        if (Uri.parse(document).getScheme() == null) {
+        if (Uri.parse(documentPath).getScheme() == null) {
             // If there is no scheme it might be a raw path.
             try {
-                File file = new File(document);
-                document = Uri.fromFile(file).toString();
+                File file = new File(documentPath);
+                documentPath = Uri.fromFile(file).toString();
             } catch (Exception e) {
-                document = FILE_SCHEME + document;
+                documentPath = FILE_SCHEME + document;
             }
         }
         if (documentOpeningDisposable != null) {
             documentOpeningDisposable.dispose();
         }
         updateState();
-        documentOpeningDisposable = PdfDocumentLoader.openDocumentAsync(getContext(), Uri.parse(document))
+        documentOpeningDisposable = PdfDocumentLoader.openDocumentAsync(getContext(), Uri.parse(documentPath))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<PdfDocument>() {
-
-                    @Override
-                    public void accept(PdfDocument pdfDocument) throws Exception {
-                        PdfView.this.document = pdfDocument;
-                        setupFragment();
-                    }
-
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        PdfView.this.document = null;
-                        setupFragment();
-                        eventDispatcher.dispatchEvent(new PdfViewDocumentLoadFailedEvent(getId(), throwable.getMessage()));
-                    }
+                .subscribe(pdfDocument -> {
+                    PdfView.this.document = pdfDocument;
+                    setupFragment();
+                }, throwable -> {
+                    PdfView.this.document = null;
+                    setupFragment();
+                    eventDispatcher.dispatchEvent(new PdfViewDocumentLoadFailedEvent(getId(), throwable.getMessage()));
                 });
     }
 
@@ -329,15 +328,17 @@ public class PdfView extends FrameLayout {
         PdfFragment pdfFragment = (PdfFragment) fragmentManager.findFragmentByTag(fragmentTag);
         if (pdfFragment != null) {
             fragmentManager.beginTransaction()
-                    .remove(pdfFragment)
-                    .commitAllowingStateLoss();
+                .remove(pdfFragment)
+                .commitNowAllowingStateLoss();
         }
         if (makeInactive) {
+            // Clear everything.
             isActive = false;
+            document = null;
         }
 
         fragment = null;
-        document = null;
+
         fragmentGetter.onComplete();
         fragmentGetter = BehaviorSubject.create();
         pendingFragmentActions.dispose();
