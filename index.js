@@ -153,7 +153,8 @@ class PSPDFKitView extends React.Component {
    * @param pageIndex The page to get the annotations for.
    * @param type The type of annotations to get (See here for types https://pspdfkit.com/guides/server/current/api/json-format/) or null to get all annotations.
    *
-   * Returns a promise resolving to true if the annotation was added.
+   * Returns a promise resolving an array with the following structure:
+   * {'annotations' : [instantJson]}
    */
   getAnnotations = function(pageIndex, type) {
     if (Platform.OS === "android") {
@@ -217,7 +218,7 @@ class PSPDFKitView extends React.Component {
    * Removes an existing annotation from the current document.
    *
    * @param annotation InstantJson of the annotation to remove.
-   * 
+   *
    * Returns a promise resolving to true if the annotation was removed and to false if the annotation couldn't be found.
    */
   removeAnnotation = function(annotation) {
@@ -280,8 +281,7 @@ class PSPDFKitView extends React.Component {
    *
    * @param annotations The document instant json to apply.
    *
-   * Returns a promise resolving a dictionary with the following structure:
-   * {'annotations' : 'created'}.
+   * Returns a promise resolving to true if the annotation was added.
    */
   addAnnotations = function(annotations) {
     if (Platform.OS === "android") {
