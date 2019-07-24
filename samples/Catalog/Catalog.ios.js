@@ -556,7 +556,18 @@ class ProgrammaticAnnotations extends Component {
                   type: "pspdfkit/ink",
                   v: 1
                 };
-                this.refs.pdfView.addAnnotation(annotationJSON);
+                this.refs.pdfView
+                  .addAnnotation(annotationJSON)
+                  .then(result => {
+                    if (result) {
+                      alert("Annotation was successfully added.");
+                    } else {
+                      alert("Failed to add annotation.");
+                    }
+                  })
+                  .catch(error => {
+                    alert(JSON.stringify(error));
+                  });
               }}
               title="addAnnotation"
             />
@@ -570,7 +581,18 @@ class ProgrammaticAnnotations extends Component {
                   "pspdfkit/ink"
                 );
                 const firstInkAnnotation = inkAnnotations["annotations"][0];
-                this.refs.pdfView.removeAnnotation(firstInkAnnotation);
+                this.refs.pdfView
+                  .removeAnnotation(firstInkAnnotation)
+                  .then(result => {
+                    if (result) {
+                      alert("Annotation was successfully removed.");
+                    } else {
+                      alert("Failed to remove annotation.");
+                    }
+                  })
+                  .catch(error => {
+                    alert(JSON.stringify(error));
+                  });
               }}
               title="removeAnnotation"
             />
@@ -705,7 +727,18 @@ class ProgrammaticAnnotations extends Component {
                   ],
                   format: "https://pspdfkit.com/instant-json/v1"
                 };
-                this.refs.pdfView.addAnnotations(annotationsJSON);
+                this.refs.pdfView
+                  .addAnnotations(annotationsJSON)
+                  .then(result => {
+                    if (result) {
+                      alert("Annotations were successfully added.");
+                    } else {
+                      alert("Failed to add annotations.");
+                    }
+                  })
+                  .catch(error => {
+                    alert(JSON.stringify(error));
+                  });
               }}
               title="addAnnotations"
             />
@@ -714,11 +747,18 @@ class ProgrammaticAnnotations extends Component {
             <Button
               onPress={async () => {
                 // Get ink annotations from the current page.
-                const annotations = await this.refs.pdfView.getAnnotations(
-                  this.state.currentPageIndex,
-                  "pspdfkit/ink"
-                );
-                alert(JSON.stringify(annotations));
+                await this.refs.pdfView
+                  .getAnnotations(this.state.currentPageIndex, "pspdfkit/ink")
+                  .then(result => {
+                    if (result) {
+                      alert(JSON.stringify(result));
+                    } else {
+                      alert("Failed to get annotations.");
+                    }
+                  })
+                  .catch(error => {
+                    alert(JSON.stringify(error));
+                  });
               }}
               title="getAnnotations"
             />
@@ -727,8 +767,18 @@ class ProgrammaticAnnotations extends Component {
             <Button
               onPress={async () => {
                 // Get all unsaved annotations from the document.
-                const unsavedAnnotations = await this.refs.pdfView.getAllUnsavedAnnotations();
-                alert(JSON.stringify(unsavedAnnotations));
+                await this.refs.pdfView
+                  .getAllUnsavedAnnotations()
+                  .then(result => {
+                    if (result) {
+                      alert(JSON.stringify(result));
+                    } else {
+                      alert("Failed to get unsaved annotations.");
+                    }
+                  })
+                  .catch(error => {
+                    alert(JSON.stringify(error));
+                  });
               }}
               title="getAllUnsavedAnnotations"
             />
