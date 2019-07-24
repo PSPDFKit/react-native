@@ -54,6 +54,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.concurrent.Callable;
 
 import io.reactivex.Completable;
@@ -502,14 +503,11 @@ public class PdfView extends FrameLayout {
             })
             .map(Annotation::toInstantJson)
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe((instantJson) -> {
-                JSONObject result = new JSONObject();
-                result.put("annotation", new JSONObject(instantJson));
-                eventDispatcher.dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, result));
-            }, (throwable) -> eventDispatcher.dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, throwable)));
+            .subscribe((instantJson) -> eventDispatcher.dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, true)),
+                (throwable) -> eventDispatcher.dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, throwable)));
     }
 
-    public Disposable removeAnnotation(ReadableMap annotation) {
+    public Disposable removeAnnotation(final int requestId, ReadableMap annotation) {
         return fragmentGetter.take(1).map(PdfFragment::getDocument).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .flatMap(pdfDocument -> {
@@ -522,10 +520,23 @@ public class PdfView extends FrameLayout {
                     if (pageIndex == -1 || type == null || name == null) {
                         return Observable.empty();
                     }
+
                     return pdfDocument.getAnnotationProvider().getAllAnnotationsOfType(getTypeFromString(type), pageIndex, 1)
                             .filter(annotationToFilter -> name.equals(annotationToFilter.getName()))
                             .map(filteredAnnotation -> new Pair<>(filteredAnnotation, pdfDocument));
-                }).subscribe(pair -> pair.second.getAnnotationProvider().removeAnnotationFromPage(pair.first));
+                })
+            .firstOrError()
+            .flatMapCompletable(pair -> Completable.fromAction(() -> {
+                pair.second.getAnnotationProvider().removeAnnotationFromPage(pair.first);
+            }))
+            .subscribe(() -> eventDispatcher.dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, true)), (throwable -> {
+                if (throwable instanceof NoSuchElementException) {
+                    // We didn't find an annotation so return false.
+                    eventDispatcher.dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, false));
+                } else {
+                    eventDispatcher.dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, throwable));
+                }
+            }));
     }
 
     public Single<JSONObject> getAllUnsavedAnnotations() {
@@ -550,13 +561,8 @@ public class PdfView extends FrameLayout {
                 DocumentJsonFormatter.importDocumentJson(currentDocument, dataProvider);
             }))
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(() -> {
-                JSONObject result = new JSONObject();
-                result.put("annotations", "created");
-                eventDispatcher.dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, result));
-            }, (throwable) -> {
-                eventDispatcher.dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, throwable));
-            });
+            .subscribe(() -> eventDispatcher.dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, true)),
+                (throwable) -> eventDispatcher.dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, throwable)));
     }
 
     public Disposable getFormFieldValue(final int requestId, @NonNull String formElementName) {

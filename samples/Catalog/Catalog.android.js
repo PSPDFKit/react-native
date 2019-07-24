@@ -22,7 +22,7 @@ import {
 } from "react-native";
 import { StackNavigator, NavigationEvents } from "react-navigation";
 
-import QRCodeScanner from 'react-native-qrcode-scanner';
+import QRCodeScanner from "react-native-qrcode-scanner";
 
 import PSPDFKitView from "react-native-pspdfkit";
 
@@ -69,8 +69,8 @@ const examples = [
     name: "Open local document",
     description: "Open document from external storage directory.",
     action: () => {
-      requestExternalStoragePermission(function () {
-        extractFromAssetsIfMissing("Annual Report.pdf", function () {
+      requestExternalStoragePermission(function() {
+        extractFromAssetsIfMissing("Annual Report.pdf", function() {
           PSPDFKit.present(DOCUMENT, {});
         });
       });
@@ -81,8 +81,8 @@ const examples = [
     name: "Open local image document",
     description: "Open image image document from external storage directory.",
     action: () => {
-      requestExternalStoragePermission(function () {
-        extractFromAssetsIfMissing("android.png", function () {
+      requestExternalStoragePermission(function() {
+        extractFromAssetsIfMissing("android.png", function() {
           PSPDFKit.presentImage(IMAGE_DOCUMENT, CONFIGURATION_IMAGE_DOCUMENT);
         });
       });
@@ -94,7 +94,7 @@ const examples = [
     description:
       "You can configure the builder with dictionary representation of the PSPDFConfiguration object.",
     action: () => {
-      requestExternalStoragePermission(function () {
+      requestExternalStoragePermission(function() {
         PSPDFKit.present(DOCUMENT, CONFIGURATION);
       });
     }
@@ -171,7 +171,7 @@ function extractFromAssetsIfMissing(assetFile, callback) {
       } else {
         console.log(
           assetFile +
-          " does not exist, extracting it from assets folder to the external storage directory."
+            " does not exist, extracting it from assets folder to the external storage directory."
         );
         RNFS.existsAssets(assetFile)
           .then(exist => {
@@ -190,7 +190,7 @@ function extractFromAssetsIfMissing(assetFile, callback) {
               // File does not exist, it should never happen.
               throw new Error(
                 assetFile +
-                " couldn't be extracted as it was not found in the project assets folder."
+                  " couldn't be extracted as it was not found in the project assets folder."
               );
             }
           })
@@ -337,7 +337,12 @@ class PdfViewScreen extends Component<{}> {
           }}
           pageIndex={this.state.currentPageIndex}
           fragmentTag="PDF1"
-          menuItemGrouping={['freetext', {key: 'markup', items: ['highlight', "underline"]}, 'ink', 'image']}
+          menuItemGrouping={[
+            "freetext",
+            { key: "markup", items: ["highlight", "underline"] },
+            "ink",
+            "image"
+          ]}
           onStateChanged={event => {
             this.setState({
               currentPageIndex: event.currentPageIndex,
@@ -600,44 +605,51 @@ class PdfViewInstantJsonScreen extends Component<{}> {
             <Button
               onPress={() => {
                 // This adds a new ink annotation to the first page.
-                this.refs.pdfView.addAnnotation({
-                  bbox: [
-                    89.58633422851562,
-                    98.5791015625,
-                    143.12948608398438,
-                    207.1583251953125
-                  ],
-                  blendMode: "normal",
-                  createdAt: "2018-07-03T13:53:03Z",
-                  isDrawnNaturally: false,
-                  lineWidth: 5,
-                  lines: {
-                    intensities: [[0.5, 0.5, 0.5], [0.5, 0.5, 0.5]],
-                    points: [
-                      [
-                        [92.08633422851562, 101.07916259765625],
-                        [92.08633422851562, 202.15826416015625],
-                        [138.12950134277344, 303.2374267578125]
-                      ],
-                      [
-                        [184.17266845703125, 101.07916259765625],
-                        [184.17266845703125, 202.15826416015625],
-                        [230.2158203125, 303.2374267578125]
+                this.refs.pdfView
+                  .addAnnotation({
+                    bbox: [
+                      89.58633422851562,
+                      98.5791015625,
+                      143.12948608398438,
+                      207.1583251953125
+                    ],
+                    blendMode: "normal",
+                    createdAt: "2018-07-03T13:53:03Z",
+                    isDrawnNaturally: false,
+                    lineWidth: 5,
+                    name: 'my annotation',
+                    lines: {
+                      intensities: [[0.5, 0.5, 0.5], [0.5, 0.5, 0.5]],
+                      points: [
+                        [
+                          [92.08633422851562, 101.07916259765625],
+                          [92.08633422851562, 202.15826416015625],
+                          [138.12950134277344, 303.2374267578125]
+                        ],
+                        [
+                          [184.17266845703125, 101.07916259765625],
+                          [184.17266845703125, 202.15826416015625],
+                          [230.2158203125, 303.2374267578125]
+                        ]
                       ]
-                    ]
-                  },
-                  opacity: 1,
-                  pageIndex: 0,
-                  strokeColor: "#AA47BE",
-                  type: "pspdfkit/ink",
-                  updatedAt: "2018-07-03T13:53:03Z",
-                  v: 1
-                }).then(result => {
-                  alert(JSON.stringify(result))
-                })
-                .catch(ex => {
-                  alert(JSON.stringify(ex))
-                })
+                    },
+                    opacity: 1,
+                    pageIndex: 0,
+                    strokeColor: "#AA47BE",
+                    type: "pspdfkit/ink",
+                    updatedAt: "2018-07-03T13:53:03Z",
+                    v: 1
+                  })
+                  .then(result => {
+                    if (result) {
+                      alert("Annotation was added.");
+                    } else {
+                      alert("Annotation was not added.");
+                    }
+                  })
+                  .catch(error => {
+                    alert(JSON.stringify(error));
+                  });
               }}
               title="Add annotation"
             />
@@ -647,10 +659,21 @@ class PdfViewInstantJsonScreen extends Component<{}> {
               onPress={() => {
                 // This removes the first annotation on the first page.
                 this.refs.pdfView.getAnnotations(0, null).then(results => {
-                  const annotations = results.annotations
+                  const annotations = results.annotations;
                   if (annotations.length >= 1) {
                     const annotation = annotations[0];
-                    this.refs.pdfView.removeAnnotation(annotation);
+                    this.refs.pdfView
+                      .removeAnnotation(annotation)
+                      .then(result => {
+                        if (result) {
+                          alert("Annotation was removed.");
+                        } else {
+                          alert("Annotation was not removed.");
+                        }
+                      })
+                      .catch(error => {
+                        alert(JSON.stringify(error));
+                      });
                   }
                 });
               }}
@@ -743,23 +766,24 @@ class InstantExampleScreen extends Component<{}> {
   };
 
   onSuccess = qrData => {
-    const documentInfoUrl = qrData.data
+    const documentInfoUrl = qrData.data;
     fetch(documentInfoUrl)
       .then(response => {
         if (response.ok) {
           return response.json();
         }
-        throw new Error('Error message.');
-      }).then(data => {
-        this.props.navigation.popToTop();
-        PSPDFKit.presentInstant(data.serverUrl, data.jwt, {})
-      }).catch(e => {
-        console.log("failed to load ", url, e.message);
+        throw new Error("Error message.");
       })
-  }
+      .then(data => {
+        this.props.navigation.popToTop();
+        PSPDFKit.presentInstant(data.serverUrl, data.jwt, {});
+      })
+      .catch(e => {
+        console.log("failed to load ", url, e.message);
+      });
+  };
 
   render() {
-
     return (
       <View style={{ flex: 1 }}>
         {this.props.navigation.isFocused && (
@@ -767,8 +791,10 @@ class InstantExampleScreen extends Component<{}> {
             onRead={this.onSuccess}
             topContent={
               <Text style={styles.centerText}>
-                Scan the QR code from <Text style={styles.textBold}>pspdfkit.com/instant/demo</Text> to connect to the document shown in your browser.
-            </Text>
+                Scan the QR code from{" "}
+                <Text style={styles.textBold}>pspdfkit.com/instant/demo</Text>{" "}
+                to connect to the document shown in your browser.
+              </Text>
             }
           />
         )}
@@ -851,10 +877,10 @@ var styles = StyleSheet.create({
     flex: 1,
     fontSize: 18,
     padding: 32,
-    color: '#777',
+    color: "#777"
   },
   textBold: {
-    fontWeight: '500',
-    color: '#000',
+    fontWeight: "500",
+    color: "#000"
   }
 });

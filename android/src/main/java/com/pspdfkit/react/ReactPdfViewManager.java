@@ -192,8 +192,9 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
                 }
                 break;
             case COMMAND_REMOVE_ANNOTATION:
-                if (args != null) {
-                    annotationDisposables.add(root.removeAnnotation(args.getMap(0)));
+                if (args != null && args.size() == 2) {
+                    final int requestId = args.getInt(0);
+                    annotationDisposables.add(root.removeAnnotation(requestId, args.getMap(1)));
                 }
                 break;
             case COMMAND_GET_ALL_UNSAVED_ANNOTATIONS:

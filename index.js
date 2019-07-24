@@ -153,8 +153,7 @@ class PSPDFKitView extends React.Component {
    * @param pageIndex The page to get the annotations for.
    * @param type The type of annotations to get (See here for types https://pspdfkit.com/guides/server/current/api/json-format/) or null to get all annotations.
    *
-   * Returns a promise resolving an array with the following structure:
-   * {'annotations' : [instantJson]}
+   * Returns a promise resolving to true if the annotation was added.
    */
   getAnnotations = function(pageIndex, type) {
     if (Platform.OS === "android") {
@@ -186,9 +185,8 @@ class PSPDFKitView extends React.Component {
    * Adds a new annotation to the current document.
    *
    * @param annotation InstantJson of the annotation to add.
-   * 
-   * Returns a promise resolving a dictionary with the following structure:
-   * {'annotation' : instantJson}.
+   *
+   * Returns a promise resolving to true if the annotation was added.
    */
   addAnnotation = function(annotation) {
     if (Platform.OS === "android") {
@@ -206,7 +204,7 @@ class PSPDFKitView extends React.Component {
         [requestId, annotation]
       );
 
-      return promise
+      return promise;
     } else if (Platform.OS === "ios") {
       return NativeModules.PSPDFKitViewManager.addAnnotation(
         annotation,
@@ -219,14 +217,26 @@ class PSPDFKitView extends React.Component {
    * Removes an existing annotation from the current document.
    *
    * @param annotation InstantJson of the annotation to remove.
+   * 
+   * Returns a promise resolving to true if the annotation was removed and to false if the annotation couldn't be found.
    */
   removeAnnotation = function(annotation) {
     if (Platform.OS === "android") {
+      let requestId = this._nextRequestId++;
+      let requestMap = this._requestMap;
+
+      // We create a promise here that will be resolved once onDataReturned is called.
+      let promise = new Promise(function(resolve, reject) {
+        requestMap[requestId] = { resolve: resolve, reject: reject };
+      });
+
       UIManager.dispatchViewManagerCommand(
         findNodeHandle(this.refs.pdfView),
         this._getViewManagerConfig("RCTPSPDFKitView").Commands.removeAnnotation,
-        [annotation]
+        [requestId, annotation]
       );
+
+      return promise;
     } else if (Platform.OS === "ios") {
       return NativeModules.PSPDFKitViewManager.removeAnnotation(
         annotation,
@@ -269,7 +279,7 @@ class PSPDFKitView extends React.Component {
    * Applies the passed in document instant json.
    *
    * @param annotations The document instant json to apply.
-   * 
+   *
    * Returns a promise resolving a dictionary with the following structure:
    * {'annotations' : 'created'}.
    */
@@ -289,7 +299,7 @@ class PSPDFKitView extends React.Component {
         [requestId, annotations]
       );
 
-      return promise
+      return promise;
     } else if (Platform.OS === "ios") {
       return NativeModules.PSPDFKitViewManager.addAnnotations(
         annotations,
