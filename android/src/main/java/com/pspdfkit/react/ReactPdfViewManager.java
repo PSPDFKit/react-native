@@ -186,13 +186,15 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
                 }
                 break;
             case COMMAND_ADD_ANNOTATION:
-                if (args != null) {
-                    annotationDisposables.add(root.addAnnotation(args.getMap(0)));
+                if (args != null && args.size() == 2) {
+                    final int requestId = args.getInt(0);
+                    annotationDisposables.add(root.addAnnotation(requestId, args.getMap(1)));
                 }
                 break;
             case COMMAND_REMOVE_ANNOTATION:
-                if (args != null) {
-                    annotationDisposables.add(root.removeAnnotation(args.getMap(0)));
+                if (args != null && args.size() == 2) {
+                    final int requestId = args.getInt(0);
+                    annotationDisposables.add(root.removeAnnotation(requestId, args.getMap(1)));
                 }
                 break;
             case COMMAND_GET_ALL_UNSAVED_ANNOTATIONS:
@@ -211,8 +213,9 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
                 }
                 break;
             case COMMAND_ADD_ANNOTATIONS:
-                if (args != null && args.size() == 1) {
-                    annotationDisposables.add(root.addAnnotations(args.getMap(0)));
+                if (args != null && args.size() == 2) {
+                    final int requestId = args.getInt(0);
+                    annotationDisposables.add(root.addAnnotations(requestId, args.getMap(1)));
                 }
                 break;
             case COMMAND_GET_FORM_FIELD_VALUE:

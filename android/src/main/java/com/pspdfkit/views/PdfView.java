@@ -54,8 +54,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.concurrent.Callable;
 
+import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.Single;
@@ -171,47 +173,46 @@ public class PdfView extends FrameLayout {
     }
 
     public void setConfiguration(PdfActivityConfiguration configuration) {
+        if (configuration != null && !configuration.equals(this.configuration)) {
+            // The configuration changed, recreate the fragment.
+            // We set the current page index so the fragment is created at this location.
+            this.pageIndex = fragment != null ? fragment.getPageIndex() : this.pageIndex;
+            removeFragment(false);
+        }
         this.configuration = configuration;
         setupFragment();
     }
 
-    public void setDocument(@Nullable String document) {
-        if (document == null) {
+    public void setDocument(@Nullable String documentPath) {
+        if (documentPath == null) {
+            this.document = null;
             removeFragment(false);
             return;
         }
 
-        if (Uri.parse(document).getScheme() == null) {
+        if (Uri.parse(documentPath).getScheme() == null) {
             // If there is no scheme it might be a raw path.
             try {
-                File file = new File(document);
-                document = Uri.fromFile(file).toString();
+                File file = new File(documentPath);
+                documentPath = Uri.fromFile(file).toString();
             } catch (Exception e) {
-                document = FILE_SCHEME + document;
+                documentPath = FILE_SCHEME + document;
             }
         }
         if (documentOpeningDisposable != null) {
             documentOpeningDisposable.dispose();
         }
         updateState();
-        documentOpeningDisposable = PdfDocumentLoader.openDocumentAsync(getContext(), Uri.parse(document))
+        documentOpeningDisposable = PdfDocumentLoader.openDocumentAsync(getContext(), Uri.parse(documentPath))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<PdfDocument>() {
-
-                    @Override
-                    public void accept(PdfDocument pdfDocument) throws Exception {
-                        PdfView.this.document = pdfDocument;
-                        setupFragment();
-                    }
-
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        PdfView.this.document = null;
-                        setupFragment();
-                        eventDispatcher.dispatchEvent(new PdfViewDocumentLoadFailedEvent(getId(), throwable.getMessage()));
-                    }
+                .subscribe(pdfDocument -> {
+                    PdfView.this.document = pdfDocument;
+                    setupFragment();
+                }, throwable -> {
+                    PdfView.this.document = null;
+                    setupFragment();
+                    eventDispatcher.dispatchEvent(new PdfViewDocumentLoadFailedEvent(getId(), throwable.getMessage()));
                 });
     }
 
@@ -329,15 +330,17 @@ public class PdfView extends FrameLayout {
         PdfFragment pdfFragment = (PdfFragment) fragmentManager.findFragmentByTag(fragmentTag);
         if (pdfFragment != null) {
             fragmentManager.beginTransaction()
-                    .remove(pdfFragment)
-                    .commitAllowingStateLoss();
+                .remove(pdfFragment)
+                .commitNowAllowingStateLoss();
         }
         if (makeInactive) {
+            // Clear everything.
             isActive = false;
+            document = null;
         }
 
         fragment = null;
-        document = null;
+
         fragmentGetter.onComplete();
         fragmentGetter = BehaviorSubject.create();
         pendingFragmentActions.dispose();
@@ -492,17 +495,19 @@ public class PdfView extends FrameLayout {
         return EnumSet.noneOf(AnnotationType.class);
     }
 
-    public Disposable addAnnotation(ReadableMap annotation) {
+    public Disposable addAnnotation(final int requestId, ReadableMap annotation) {
         return fragmentGetter.take(1).map(PdfFragment::getDocument).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(pdfDocument -> {
-                    JSONObject json = new JSONObject(annotation.toHashMap());
-                    pdfDocument.getAnnotationProvider().createAnnotationFromInstantJson(json.toString());
-                });
-
+            .map(pdfDocument -> {
+                JSONObject json = new JSONObject(annotation.toHashMap());
+                return pdfDocument.getAnnotationProvider().createAnnotationFromInstantJson(json.toString());
+            })
+            .map(Annotation::toInstantJson)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe((instantJson) -> eventDispatcher.dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, true)),
+                (throwable) -> eventDispatcher.dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, throwable)));
     }
 
-    public Disposable removeAnnotation(ReadableMap annotation) {
+    public Disposable removeAnnotation(final int requestId, ReadableMap annotation) {
         return fragmentGetter.take(1).map(PdfFragment::getDocument).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .flatMap(pdfDocument -> {
@@ -515,10 +520,23 @@ public class PdfView extends FrameLayout {
                     if (pageIndex == -1 || type == null || name == null) {
                         return Observable.empty();
                     }
+
                     return pdfDocument.getAnnotationProvider().getAllAnnotationsOfType(getTypeFromString(type), pageIndex, 1)
                             .filter(annotationToFilter -> name.equals(annotationToFilter.getName()))
                             .map(filteredAnnotation -> new Pair<>(filteredAnnotation, pdfDocument));
-                }).subscribe(pair -> pair.second.getAnnotationProvider().removeAnnotationFromPage(pair.first));
+                })
+            .firstOrError()
+            .flatMapCompletable(pair -> Completable.fromAction(() -> {
+                pair.second.getAnnotationProvider().removeAnnotationFromPage(pair.first);
+            }))
+            .subscribe(() -> eventDispatcher.dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, true)), (throwable -> {
+                if (throwable instanceof NoSuchElementException) {
+                    // We didn't find an annotation so return false.
+                    eventDispatcher.dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, false));
+                } else {
+                    eventDispatcher.dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, throwable));
+                }
+            }));
     }
 
     public Single<JSONObject> getAllUnsavedAnnotations() {
@@ -535,14 +553,16 @@ public class PdfView extends FrameLayout {
                 });
     }
 
-    public Disposable addAnnotations(ReadableMap annotation) {
+    public Disposable addAnnotations(final int requestId, ReadableMap annotation) {
         return fragmentGetter.take(1).map(PdfFragment::getDocument).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(pdfDocument -> {
-                    JSONObject json = new JSONObject(annotation.toHashMap());
-                    final DataProvider dataProvider = new DocumentJsonDataProvider(json);
-                    DocumentJsonFormatter.importDocumentJson(pdfDocument, dataProvider);
-                });
+            .flatMapCompletable(currentDocument -> Completable.fromAction(() -> {
+                JSONObject json = new JSONObject(annotation.toHashMap());
+                final DataProvider dataProvider = new DocumentJsonDataProvider(json);
+                DocumentJsonFormatter.importDocumentJson(currentDocument, dataProvider);
+            }))
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(() -> eventDispatcher.dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, true)),
+                (throwable) -> eventDispatcher.dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, throwable)));
     }
 
     public Disposable getFormFieldValue(final int requestId, @NonNull String formElementName) {
