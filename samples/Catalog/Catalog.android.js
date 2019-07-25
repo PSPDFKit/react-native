@@ -301,7 +301,7 @@ class PdfViewScreen extends Component<{}> {
     };
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.props.navigation.setParams({
       handleAnnotationButtonPress: () => {
         if (
@@ -474,7 +474,7 @@ class PdfViewListenersScreen extends Component<{}> {
     };
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.props.navigation.setParams({
       handleAnnotationButtonPress: () => {
         if (
@@ -546,7 +546,7 @@ class PdfViewInstantJsonScreen extends Component<{}> {
     };
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.props.navigation.setParams({
       handleAnnotationButtonPress: () => {
         if (
