@@ -187,7 +187,7 @@ class PSPDFKitView extends React.Component {
    *
    * @param annotation InstantJson of the annotation to add.
    *
-   * Returns a promise resolving to true if the annotation was added.
+   * Returns a promise resolving to true if the annotation was added. Otherwise, returns false if an error has occurred.
    */
   addAnnotation = function(annotation) {
     if (Platform.OS === "android") {
@@ -219,7 +219,7 @@ class PSPDFKitView extends React.Component {
    *
    * @param annotation InstantJson of the annotation to remove.
    *
-   * Returns a promise resolving to true if the annotation was removed and to false if the annotation couldn't be found.
+   * Returns a promise resolving to true if the annotation was removed. Otherwise, returns false if the annotation couldn't be found.
    */
   removeAnnotation = function(annotation) {
     if (Platform.OS === "android") {
