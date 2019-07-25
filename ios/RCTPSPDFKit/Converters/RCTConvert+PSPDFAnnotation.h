@@ -13,7 +13,7 @@
 
 @interface RCTConvert (PSPDFAnnotation)
 
-+ (NSArray <NSDictionary *> *)instantJSONFromAnnotations:(NSArray <PSPDFAnnotation *> *) annotations;
++ (NSArray <NSDictionary *> *)instantJSONFromAnnotations:(NSArray <PSPDFAnnotation *> *) annotations error:(NSError **)error;
 + (PSPDFAnnotationType)annotationTypeFromInstantJSONType:(NSString *)type;
 
 @end
