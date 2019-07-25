@@ -1,6 +1,6 @@
 package com.pspdfkit.views;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.pspdfkit.react.R;
 import com.pspdfkit.ui.forms.FormEditingBar;

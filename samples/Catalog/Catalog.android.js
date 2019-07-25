@@ -20,7 +20,7 @@ import {
   PermissionsAndroid,
   Dimensions
 } from "react-native";
-import { StackNavigator, NavigationEvents } from "react-navigation";
+import { StackNavigator, NavigationEvents, createStackNavigator, createAppContainer } from "react-navigation";
 
 import QRCodeScanner from 'react-native-qrcode-scanner';
 
@@ -772,7 +772,7 @@ class InstantExampleScreen extends Component<{}> {
   }
 }
 
-export default StackNavigator(
+export default createAppContainer(createStackNavigator(
   {
     Catalog: {
       screen: CatalogScreen
@@ -799,7 +799,7 @@ export default StackNavigator(
   {
     initialRouteName: "Catalog"
   }
-);
+));
 
 var styles = StyleSheet.create({
   separator: {

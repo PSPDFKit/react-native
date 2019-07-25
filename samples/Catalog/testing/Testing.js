@@ -13,7 +13,7 @@ import {
     PermissionsAndroid,
     Dimensions
 } from "react-native";
-import { StackNavigator } from "react-navigation";
+import { StackNavigator, NavigationEvents, createStackNavigator, createAppContainer } from "react-navigation";
 
 import styles from './styles'
 import AuthorNameScreen from './AuthorNameScreen'
@@ -92,7 +92,7 @@ class CatalogScreen extends Component<{}> {
     };
 }
 
-export default StackNavigator(
+export default createAppContainer(createStackNavigator(
     {
         Catalog: {
             screen: CatalogScreen
@@ -113,4 +113,4 @@ export default StackNavigator(
     {
         initialRouteName: "Catalog"
     }
-);
+));

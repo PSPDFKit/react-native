@@ -1,9 +1,9 @@
 package com.pspdfkit.react.menu;
 
 import android.content.Context;
-import android.support.annotation.IdRes;
-import android.support.annotation.IntRange;
-import android.support.annotation.NonNull;
+import androidx.annotation.IdRes;
+import androidx.annotation.IntRange;
+import androidx.annotation.NonNull;
 import android.util.Log;
 
 import com.facebook.react.bridge.Dynamic;
@@ -89,8 +89,10 @@ public class ReactGroupingRule extends PresetMenuItemGroupingRule {
                 return R.id.pspdf__annotation_creation_toolbar_item_freetext_callout;
             case "signature":
                 return R.id.pspdf__annotation_creation_toolbar_item_signature;
-            case "ink":
-                return R.id.pspdf__annotation_creation_toolbar_item_ink;
+            case "pen":
+                return R.id.pspdf__annotation_creation_toolbar_item_ink_pen;
+            case "highlighter":
+                return R.id.pspdf__annotation_creation_toolbar_item_ink_highlighter;
             case "note":
                 return R.id.pspdf__annotation_creation_toolbar_item_note;
             case "drawing":
