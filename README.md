@@ -6,6 +6,8 @@ This wrapper requires a valid license of PSPDFKit. Licenses are per platform. Yo
 
 This wrapper exposes the most often used APIs from PSPDFKit. Many of our partners end up forking this wrapper and adding some custom code to achieve even greater integration with their products, using native code.
 
+Windows is not currently supported, please use the previous version [1.24.9](https://github.com/PSPDFKit/react-native/releases/tag/1.24.9) instead.
+
 #### Announcements
 
 - [Announcement blog post](https://pspdfkit.com/blog/2016/react-native-module/)
@@ -651,6 +653,8 @@ Shows the pdf `document` from the local device filesystem, or your app's assets.
 `configuration` can be empty `{}`.
 
 ### Windows UWP
+
+Windows UWP is not currently supported, the following integration steps are for wrapper verision [1.24.9](https://github.com/PSPDFKit/react-native/releases/tag/1.24.9).
 
 #### Requirements
 
