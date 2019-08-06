@@ -286,7 +286,22 @@ class PSPDFKitView extends React.Component {
    */
   getAllAnnotations = function(type) {
     if (Platform.OS === "android") {
-      //TODO: Implement Android here.
+      let requestId = this._nextRequestId++;
+      let requestMap = this._requestMap;
+
+      // We create a promise here that will be resolved once onDataReturned is called.
+      let promise = new Promise(function(resolve, reject) {
+        requestMap[requestId] = { resolve: resolve, reject: reject };
+      });
+
+      UIManager.dispatchViewManagerCommand(
+        findNodeHandle(this.refs.pdfView),
+        this._getViewManagerConfig("RCTPSPDFKitView").Commands
+          .getAllAnnotations,
+        [requestId, type]
+      );
+
+      return promise;
     } else if (Platform.OS === "ios") {
       return NativeModules.PSPDFKitViewManager.getAllAnnotations(
         type,

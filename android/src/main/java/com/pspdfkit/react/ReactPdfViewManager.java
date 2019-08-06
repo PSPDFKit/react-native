@@ -1,6 +1,7 @@
 package com.pspdfkit.react;
 
 import android.app.Activity;
+
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 
@@ -51,6 +52,7 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
     public static final int COMMAND_GET_FORM_FIELD_VALUE = 8;
     public static final int COMMAND_SET_FORM_FIELD_VALUE = 9;
     public static final int COMMAND_REMOVE_ANNOTATION = 10;
+    public static final int COMMAND_GET_ALL_ANNOTATIONS = 11;
 
     private CompositeDisposable annotationDisposables = new CompositeDisposable();
 
@@ -100,6 +102,7 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
         commandMap.put("getFormFieldValue", COMMAND_GET_FORM_FIELD_VALUE);
         commandMap.put("setFormFieldValue", COMMAND_SET_FORM_FIELD_VALUE);
         commandMap.put("removeAnnotation", COMMAND_REMOVE_ANNOTATION);
+        commandMap.put("getAllAnnotations", COMMAND_GET_ALL_ANNOTATIONS);
         return commandMap;
     }
 
@@ -183,6 +186,19 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
                                 }
                             });
                     annotationDisposables.add(annotationDisposable);
+                }
+                break;
+            case COMMAND_GET_ALL_ANNOTATIONS:
+                if (args != null && args.size() == 2) {
+                    final int requestId = args.getInt(0);
+                    annotationDisposables.add(root.getAllAnnotations(args.getString(1))
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(annotations -> {
+                            root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, annotations));
+                        }, throwable -> {
+                            root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, throwable));
+                        }));
                 }
                 break;
             case COMMAND_ADD_ANNOTATION:
