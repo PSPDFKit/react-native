@@ -20,7 +20,7 @@ import {
   Modal,
   Dimensions
 } from "react-native";
-import { StackNavigator, NavigationEvents } from "react-navigation";
+import { createStackNavigator, createAppContainer } from "react-navigation";
 const RNFS = require("react-native-fs");
 
 import PSPDFKitView from "react-native-pspdfkit";
@@ -971,42 +971,44 @@ class Catalog extends Component<{}> {
   };
 }
 
-export default StackNavigator(
-  {
-    Catalog: {
-      screen: Catalog
+export default createAppContainer(
+  createStackNavigator(
+    {
+      Catalog: {
+        screen: Catalog
+      },
+      ConfiguredPDFViewComponent: {
+        screen: ConfiguredPDFViewComponent
+      },
+      EventListeners: {
+        screen: EventListeners
+      },
+      ChangePages: {
+        screen: ChangePages
+      },
+      AnnotationCreationMode: {
+        screen: AnnotationCreationMode
+      },
+      ManualSave: {
+        screen: ManualSave
+      },
+      SplitPDF: {
+        screen: SplitPDF
+      },
+      ProgrammaticAnnotations: {
+        screen: ProgrammaticAnnotations
+      },
+      ProgrammaticFormFilling: {
+        screen: ProgrammaticFormFilling
+      },
+      ToolbarCustomization: {
+        screen: ToolbarCustomization
+      }
     },
-    ConfiguredPDFViewComponent: {
-      screen: ConfiguredPDFViewComponent
-    },
-    EventListeners: {
-      screen: EventListeners
-    },
-    ChangePages: {
-      screen: ChangePages
-    },
-    AnnotationCreationMode: {
-      screen: AnnotationCreationMode
-    },
-    ManualSave: {
-      screen: ManualSave
-    },
-    SplitPDF: {
-      screen: SplitPDF
-    },
-    ProgrammaticAnnotations: {
-      screen: ProgrammaticAnnotations
-    },
-    ProgrammaticFormFilling: {
-      screen: ProgrammaticFormFilling
-    },
-    ToolbarCustomization: {
-      screen: ToolbarCustomization
+    {
+      initialRouteName: "Catalog"
     }
-  },
-  {
-    initialRouteName: "Catalog"
-  }
+  )
 );
 
 var styles = StyleSheet.create({

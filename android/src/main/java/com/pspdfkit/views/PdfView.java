@@ -2,9 +2,10 @@ package com.pspdfkit.views;
 
 import android.content.Context;
 import android.net.Uri;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentManager;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.FragmentManager;
+
 import android.util.AttributeSet;
 import android.util.Pair;
 import android.view.Choreographer;
@@ -364,7 +365,11 @@ public class PdfView extends FrameLayout {
     }
 
     private void applyThumbnailBarPadding() {
-        View fragmentView = findViewById(R.id.pspdf__fragment_layout);
+        if (fragment == null) {
+            return;
+        }
+
+        View fragmentView = fragment.getView();
         if (fragmentView != null && configuration.getThumbnailBarMode() != ThumbnailBarMode.THUMBNAIL_BAR_MODE_NONE) {
             fragmentView.setPadding(0, 0, 0, pdfThumbnailBar.getHeight());
         }

@@ -85,7 +85,7 @@ class PSPDFKitView extends React.Component {
   _onDataReturned = event => {
     let { requestId, result, error } = event.nativeEvent;
     let promise = this._requestMap[requestId];
-    if (result) {
+    if (result != undefined) {
       promise.resolve(result);
     } else {
       promise.reject(error);

@@ -6,6 +6,8 @@ This wrapper requires a valid license of PSPDFKit. Licenses are per platform. Yo
 
 This wrapper exposes the most often used APIs from PSPDFKit. Many of our partners end up forking this wrapper and adding some custom code to achieve even greater integration with their products, using native code.
 
+Windows is not currently supported, please use the previous version [1.24.9](https://github.com/PSPDFKit/react-native/releases/tag/1.24.9) instead.
+
 #### Announcements
 
 - [Announcement blog post](https://pspdfkit.com/blog/2016/react-native-module/)
@@ -305,10 +307,9 @@ For a more detailed description of toolbar customizations, refer to our Customiz
 - Android SDK
 - Android Build Tools 23.0.1 (React Native)
 - Android Build Tools 28.0.3 (PSPDFKit module)
-- Android Gradle plugin >= 3.2.1
-- PSPDFKit >= 5.0.1
-- react-native for example app >= 0.59.2
-- react-native for Catalog app >= 0.57.8
+- Android Gradle plugin >= 3.4.1
+- PSPDFKit >= 5.4.2
+- react-native >= 0.60.4
 
 #### Getting Started
 
@@ -319,15 +320,12 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
 3. Step into your newly created app folder: `cd YourApp`.
 4. Add `react-native-pspdfkit` module from GitHub: `yarn add github:PSPDFKit/react-native`.
 5. Install all the dependencies for the project: `yarn install`. (Because of a [bug](https://github.com/yarnpkg/yarn/issues/2165) you may need to clean `yarn`'s cache with `yarn cache clean` before.)
-6. Link module `react-native-pspdfkit`: `react-native link react-native-pspdfkit`.
-7. <a id="step-7"></a>Add PSPDFKit repository to `YourApp/android/build.gradle` so PSPDFKit library can be downloaded:
+6. <a id="step-7"></a>Add PSPDFKit repository to `YourApp/android/build.gradle` so PSPDFKit library can be downloaded:
 
 ```diff
  allprojects {
      repositories {
          mavenLocal()
-         google()
-         jcenter()
 +        maven {
 +            url 'https://customers.pspdfkit.com/maven/'
 +            credentials {
@@ -339,11 +337,18 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
              // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
              url "$rootDir/../node_modules/react-native/android"
          }
+         maven {
+            // Android JSC is installed from npm
+            url("$rootDir/../node_modules/jsc-android/dist")
+         }
+
+         google()
+         jcenter()
      }
  }
 ```
 
-8. PSPDFKit targets modern platforms, so you'll have to set the `minSdkVersion` to 19. In `YourApp/android/build.gradle`:
+7. PSPDFKit targets modern platforms, so you'll have to set the `minSdkVersion` to 19. In `YourApp/android/build.gradle`:
 
 ```diff
 ...
@@ -358,7 +363,7 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
 ...
 ```
 
-9. We will also need to enable MultiDex support. In `YourApp/android/app/build.gradle`:
+8. We will also need to enable MultiDex support. In `YourApp/android/app/build.gradle`:
 
 ```diff
 ...
@@ -373,7 +378,7 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
 ...
 ```
 
-10. <a id="step-10"></a>Enter your PSPDFKit license key into `YourApp/android/app/src/main/AndroidManifest.xml` file:
+9. <a id="step-10"></a>Enter your PSPDFKit license key into `YourApp/android/app/src/main/AndroidManifest.xml` file:
 
 ```diff
    <application>
@@ -386,7 +391,7 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
    </application>
 ```
 
-11. Set primary color. In `YourApp/android/app/src/main/res/values/styles.xml` replace
+10. Set primary color. In `YourApp/android/app/src/main/res/values/styles.xml` replace
 
 ```xml
 <!-- Customize your theme here. -->
@@ -398,16 +403,15 @@ with
 <item name="colorPrimary">#3C97C9</item>
 ```
 
-12. <a id="step-12"></a>Replace the default component from `YourApp/App.js` with a simple touch area to present a PDF document from the local device filesystem:
+11. <a id="step-12"></a>Replace the default component from `YourApp/App.js` with a simple touch area to present a PDF document from the local device filesystem:
 
 ```javascript
 import React, { Component } from "react";
 import {
-  AppRegistry,
   StyleSheet,
   NativeModules,
   Text,
-  TouchableHighlight,
+  TouchableOpacity,
   View,
   PermissionsAndroid
 } from "react-native";
@@ -431,9 +435,9 @@ export default class YourApp extends Component<{}> {
     return (
       <View style={styles.container}>
         <Text>{PSPDFKit.versionString}</Text>
-        <TouchableHighlight onPress={this._onPressButton}>
+        <TouchableOpacity onPress={this._onPressButton}>
           <Text style={styles.text}>Tap to Open Document</Text>
-        </TouchableHighlight>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -470,13 +474,13 @@ const styles = StyleSheet.create({
 });
 ```
 
-13. Before launching the app you need to copy a PDF document onto your development device or emulator.
+12. Before launching the app you need to copy a PDF document onto your development device or emulator.
 
     ```bash
     adb push /path/to/your/document.pdf /sdcard/document.pdf
     ```
 
-14. Your app is now ready to launch. From `YourApp` directory run `react-native run-android`.
+13. Your app is now ready to launch. From `YourApp` directory run `react-native run-android`.
 
     ```bash
     react-native run-android
@@ -649,6 +653,8 @@ Shows the pdf `document` from the local device filesystem, or your app's assets.
 `configuration` can be empty `{}`.
 
 ### Windows UWP
+
+Windows UWP is not currently supported, the following integration steps are for wrapper version [1.24.9](https://github.com/PSPDFKit/react-native/releases/tag/1.24.9).
 
 #### Requirements
 

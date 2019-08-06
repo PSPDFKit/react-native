@@ -20,16 +20,11 @@ import {
   PermissionsAndroid,
   Dimensions
 } from "react-native";
-import { StackNavigator, NavigationEvents } from "react-navigation";
+import { createStackNavigator, createAppContainer } from "react-navigation";
 
 import QRCodeScanner from "react-native-qrcode-scanner";
 
 import PSPDFKitView from "react-native-pspdfkit";
-
-// React Native bug that hopefully will be fixed soon:
-// https://github.com/facebook/react-native/issues/18868
-import { YellowBox } from "react-native";
-YellowBox.ignoreWarnings(["Warning: isMounted(...) is deprecated"]);
 
 const PSPDFKit = NativeModules.PSPDFKit;
 const RNFS = require("react-native-fs");
@@ -301,7 +296,7 @@ class PdfViewScreen extends Component<{}> {
     };
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.props.navigation.setParams({
       handleAnnotationButtonPress: () => {
         if (
@@ -479,7 +474,7 @@ class PdfViewListenersScreen extends Component<{}> {
     };
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.props.navigation.setParams({
       handleAnnotationButtonPress: () => {
         if (
@@ -551,7 +546,7 @@ class PdfViewInstantJsonScreen extends Component<{}> {
     };
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.props.navigation.setParams({
       handleAnnotationButtonPress: () => {
         if (
@@ -572,7 +567,7 @@ class PdfViewInstantJsonScreen extends Component<{}> {
         <PSPDFKitView
           ref="pdfView"
           document="file:///android_asset/Annual Report.pdf"
-          configuration={{}}
+          configuration={{ showThumbnailBar: "pinned" }}
           fragmentTag="PDF1"
           onStateChanged={event => {
             this.setState({
@@ -617,7 +612,7 @@ class PdfViewInstantJsonScreen extends Component<{}> {
                     createdAt: "2018-07-03T13:53:03Z",
                     isDrawnNaturally: false,
                     lineWidth: 5,
-                    name: 'my annotation',
+                    name: "my annotation",
                     lines: {
                       intensities: [[0.5, 0.5, 0.5], [0.5, 0.5, 0.5]],
                       points: [
@@ -803,33 +798,35 @@ class InstantExampleScreen extends Component<{}> {
   }
 }
 
-export default StackNavigator(
-  {
-    Catalog: {
-      screen: CatalogScreen
+export default createAppContainer(
+  createStackNavigator(
+    {
+      Catalog: {
+        screen: CatalogScreen
+      },
+      PdfView: {
+        screen: PdfViewScreen
+      },
+      PdfViewSplitScreen: {
+        screen: PdfViewSplitScreen
+      },
+      PdfViewListenersScreen: {
+        screen: PdfViewListenersScreen
+      },
+      PdfViewInstantJsonScreen: {
+        screen: PdfViewInstantJsonScreen
+      },
+      PdfViewFormFillingScreen: {
+        screen: PdfViewFormFillingScreen
+      },
+      InstantExampleScreen: {
+        screen: InstantExampleScreen
+      }
     },
-    PdfView: {
-      screen: PdfViewScreen
-    },
-    PdfViewSplitScreen: {
-      screen: PdfViewSplitScreen
-    },
-    PdfViewListenersScreen: {
-      screen: PdfViewListenersScreen
-    },
-    PdfViewInstantJsonScreen: {
-      screen: PdfViewInstantJsonScreen
-    },
-    PdfViewFormFillingScreen: {
-      screen: PdfViewFormFillingScreen
-    },
-    InstantExampleScreen: {
-      screen: InstantExampleScreen
+    {
+      initialRouteName: "Catalog"
     }
-  },
-  {
-    initialRouteName: "Catalog"
-  }
+  )
 );
 
 var styles = StyleSheet.create({
