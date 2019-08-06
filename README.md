@@ -654,7 +654,7 @@ Shows the pdf `document` from the local device filesystem, or your app's assets.
 
 ### Windows UWP
 
-Windows UWP is not currently supported, the following integration steps are for wrapper verision [1.24.9](https://github.com/PSPDFKit/react-native/releases/tag/1.24.9).
+Windows UWP is not currently supported, the following integration steps are for wrapper version [1.24.9](https://github.com/PSPDFKit/react-native/releases/tag/1.24.9).
 
 #### Requirements
 

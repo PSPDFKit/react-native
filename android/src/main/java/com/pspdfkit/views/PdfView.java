@@ -365,7 +365,11 @@ public class PdfView extends FrameLayout {
     }
 
     private void applyThumbnailBarPadding() {
-        View fragmentView = findViewById(R.id.pspdf__fragment_layout);
+        if (fragment == null) {
+            return;
+        }
+
+        View fragmentView = fragment.getView();
         if (fragmentView != null && configuration.getThumbnailBarMode() != ThumbnailBarMode.THUMBNAIL_BAR_MODE_NONE) {
             fragmentView.setPadding(0, 0, 0, pdfThumbnailBar.getHeight());
         }

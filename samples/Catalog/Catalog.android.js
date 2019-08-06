@@ -567,7 +567,7 @@ class PdfViewInstantJsonScreen extends Component<{}> {
         <PSPDFKitView
           ref="pdfView"
           document="file:///android_asset/Annual Report.pdf"
-          configuration={{}}
+          configuration={{ showThumbnailBar: "pinned" }}
           fragmentTag="PDF1"
           onStateChanged={event => {
             this.setState({

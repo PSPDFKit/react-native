@@ -14,6 +14,7 @@
 package com.pspdfkit.react;
 
 import android.content.Context;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -44,6 +45,8 @@ public class ConfigurationAdapter {
     private static final String SHOW_THUMBNAIL_BAR = "showThumbnailBar";
     private static final String SHOW_THUMBNAIL_BAR_DEFAULT = "default";
     private static final String SHOW_THUMBNAIL_BAR_SCROLLABLE = "scrollable";
+    private static final String SHOW_THUMBNAIL_BAR_FLOATING = "floating";
+    private static final String SHOW_THUMBNAIL_BAR_PINNED = "pinned";
     private static final String SHOW_THUMBNAIL_BAR_NONE = "none";
     private static final String SHOW_THUMBNAIL_GRID_ACTION = "showThumbnailGridAction";
     private static final String SHOW_OUTLINE_ACTION = "showOutlineAction";
@@ -217,6 +220,10 @@ public class ConfigurationAdapter {
             thumbnailBarMode = ThumbnailBarMode.THUMBNAIL_BAR_MODE_SCROLLABLE;
         } else if (showThumbnailBar.equals(SHOW_THUMBNAIL_BAR_NONE)) {
             thumbnailBarMode = ThumbnailBarMode.THUMBNAIL_BAR_MODE_NONE;
+        } else if (showThumbnailBar.equals(SHOW_THUMBNAIL_BAR_FLOATING)) {
+            thumbnailBarMode = ThumbnailBarMode.THUMBNAIL_BAR_MODE_FLOATING;
+        } else if (showThumbnailBar.equals(SHOW_THUMBNAIL_BAR_PINNED)) {
+            thumbnailBarMode = ThumbnailBarMode.THUMBNAIL_BAR_MODE_PINNED;
         }
         configuration.setThumbnailBarMode(thumbnailBarMode);
     }
