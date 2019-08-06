@@ -247,6 +247,15 @@
   return annotationsJSON;
 }
 
+- (NSDictionary<NSString *, NSArray<NSDictionary *> *> *)getAllAnnotations:(PSPDFAnnotationType)type error:(NSError *_Nullable *)error {
+  PSPDFDocument *document = self.pdfController.document;
+  VALIDATE_DOCUMENT(document, nil)
+
+  NSArray<PSPDFAnnotation *> *annotations = [[document allAnnotationsOfType:type].allValues valueForKeyPath:@"@unionOfArrays.self"];
+  NSArray <NSDictionary *> *annotationsJSON = [RCTConvert instantJSONFromAnnotations:annotations error:error];
+  return @{@"annotations" : annotationsJSON};
+}
+
 - (BOOL)addAnnotations:(id)jsonAnnotations error:(NSError *_Nullable *)error {
   NSData *data;
   if ([jsonAnnotations isKindOfClass:NSString.class]) {
