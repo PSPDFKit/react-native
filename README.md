@@ -29,10 +29,10 @@ The [PSPDFKit SDK](https://pspdfkit.com/) is a framework that allows you to view
 
 #### Requirements
 
-- Xcode 10.2.1
-- PSPDFKit 8.4.2 for iOS or later
-- react-native >= 0.60.3
-- CocoaPods >= 1.7.4
+- Xcode 10.3
+- PSPDFKit 8.5.1 for iOS or later
+- react-native >= 0.60.4
+- CocoaPods >= 1.7.5
 
 #### Getting Started
 
@@ -43,8 +43,7 @@ Let's create a simple app that integrates PSPDFKit and uses the `react-native-ps
 3. Step into your newly created app folder: `cd YourApp`
 4. Install `react-native-pspdfkit` from GitHub: `yarn add github:PSPDFKit/react-native`
 5. Install all the dependencies for the project: `yarn install`. (Because of a [bug](https://github.com/yarnpkg/yarn/issues/2165) you may need to clean `yarn`'s cache with `yarn cache clean` before.)
-6. Link module `react-native-pspdfkit`: `react-native link react-native-pspdfkit`.
-7. Open `ios/Podile` in a text editor: `open ios/Podfile`, update the platform to iOS 11, and add your CocoaPods URL.
+6. Open `ios/Podile` in a text editor: `open ios/Podfile`, update the platform to iOS 11, and add your CocoaPods URL.
 
 ```diff
 - platform :ios, '9.0'
@@ -85,15 +84,15 @@ target 'YourApp' do
 end
 ```
 
-8. `cd ios` then run `pod install`.
-9. Open `YourApp.xcworkspace` in Xcode: `open YourApp.xcworkspace`.
-10. Make sure the deployment target is set to 11.0 or higher:
+7. `cd ios` then run `pod install`.
+8. Open `YourApp.xcworkspace` in Xcode: `open YourApp.xcworkspace`.
+9. Make sure the deployment target is set to 11.0 or higher:
     ![Deployment Target](screenshots/deployment-target.png)
-11. Change "View controller-based status bar appearance" to `YES` in `Info.plist`:
+10. Change "View controller-based status bar appearance" to `YES` in `Info.plist`:
     ![View Controller-Based Status Bar Appearance](screenshots/view-controller-based-status-bar-appearance.png)
-12. Add a PDF by drag and dropping it into your Xcode project (Select "Create groups" and add to target "YourApp"). This will add the document to the "Copy Bundle Resources" build phase:
+11. Add a PDF by drag and dropping it into your Xcode project (Select "Create groups" and add to target "YourApp"). This will add the document to the "Copy Bundle Resources" build phase:
     ![Adding PDF](screenshots/adding-pdf.png)
-13. Replace the default component from `App.js` with a simple touch area to present the bundled PDF. (Note that you can also use a [Native UI Component](#native-ui-component) to show a PDF.)
+12. Replace the default component from `App.js` with a simple touch area to present the bundled PDF. (Note that you can also use a [Native UI Component](#native-ui-component) to show a PDF.)
 
 ```javascript
 import React, { Component } from "react";
