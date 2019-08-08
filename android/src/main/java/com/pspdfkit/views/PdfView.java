@@ -2,16 +2,16 @@ package com.pspdfkit.views;
 
 import android.content.Context;
 import android.net.Uri;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.FragmentManager;
-
 import android.util.AttributeSet;
 import android.util.Pair;
 import android.view.Choreographer;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.FrameLayout;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.FragmentManager;
 
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.uimanager.events.EventDispatcher;
@@ -30,7 +30,6 @@ import com.pspdfkit.forms.FormElement;
 import com.pspdfkit.forms.TextFormElement;
 import com.pspdfkit.listeners.OnPreparePopupToolbarListener;
 import com.pspdfkit.listeners.SimpleDocumentListener;
-import com.pspdfkit.react.R;
 import com.pspdfkit.react.events.PdfViewDataReturnedEvent;
 import com.pspdfkit.react.events.PdfViewDocumentLoadFailedEvent;
 import com.pspdfkit.react.events.PdfViewDocumentSaveFailedEvent;
@@ -449,9 +448,15 @@ public class PdfView extends FrameLayout {
         }).flatMap(new Function<PdfDocument, ObservableSource<Annotation>>() {
             @Override
             public ObservableSource<Annotation> apply(PdfDocument pdfDocument) {
-                return pdfDocument.getAnnotationProvider().getAllAnnotationsOfType(getTypeFromString(type), pageIndex, 1);
+                return pdfDocument.getAnnotationProvider().getAllAnnotationsOfTypeAsync(getTypeFromString(type), pageIndex, 1);
             }
         }).toList();
+    }
+
+    public Single<List<Annotation>> getAllAnnotations(@Nullable final String type) {
+        return fragmentGetter.take(1).map(PdfFragment::getDocument)
+            .flatMap(pdfDocument -> pdfDocument.getAnnotationProvider().getAllAnnotationsOfTypeAsync(getTypeFromString(type)))
+            .toList();
     }
 
     private EnumSet<AnnotationType> getTypeFromString(@Nullable String type) {

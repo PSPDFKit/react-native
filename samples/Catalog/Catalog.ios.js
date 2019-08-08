@@ -783,6 +783,26 @@ class ProgrammaticAnnotations extends Component {
               title="getAllUnsavedAnnotations"
             />
           </View>
+          <View>
+            <Button
+              onPress={async () => {
+                // Get all annotations annotations from the document.
+                await this.refs.pdfView
+                  .getAllAnnotations()
+                  .then(result => {
+                    if (result) {
+                      alert(JSON.stringify(result));
+                    } else {
+                      alert("Failed to get all annotations.");
+                    }
+                  })
+                  .catch(error => {
+                    alert(JSON.stringify(error));
+                  });
+              }}
+              title="getAllAnnotations"
+            />
+          </View>
         </View>
       </View>
     );
