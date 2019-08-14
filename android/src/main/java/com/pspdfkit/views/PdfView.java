@@ -248,7 +248,9 @@ public class PdfView extends FrameLayout {
     private void setupFragment() {
         if (fragmentTag != null && configuration != null && document != null) {
             PdfFragment pdfFragment = (PdfFragment) fragmentManager.findFragmentByTag(fragmentTag);
-            if (pdfFragment != null && pdfFragment.getArguments().getInt(ARG_ROOT_ID) != internalId) {
+            if (pdfFragment != null &&
+                (pdfFragment.getArguments() == null ||
+                pdfFragment.getArguments().getInt(ARG_ROOT_ID) != internalId)) {
                 // This is an orphaned fragment probably from a reload, get rid of it.
                 fragmentManager.beginTransaction()
                     .remove(pdfFragment)
