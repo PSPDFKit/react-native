@@ -77,6 +77,9 @@ public class PdfView extends FrameLayout {
 
     private static final String FILE_SCHEME = "file:///";
 
+    /** Key to use when setting the id argument of PdfFragments created by this PdfView. */
+    private static final String ARG_ROOT_ID = "root_id";
+
     private FragmentManager fragmentManager;
     private EventDispatcher eventDispatcher;
     private String fragmentTag;
@@ -101,6 +104,9 @@ public class PdfView extends FrameLayout {
     private BehaviorSubject<PdfFragment> fragmentGetter = BehaviorSubject.create();
     @Nullable
     private PdfTextSelectionPopupToolbar textSelectionPopupToolbar;
+
+    /** An internal id we generate so we can track if fragments found belong to this specific PdfView instance. */
+    private int internalId;
 
     public PdfView(@NonNull Context context) {
         super(context);
@@ -158,6 +164,9 @@ public class PdfView extends FrameLayout {
 
         // Set a default configuration.
         configuration = new PdfActivityConfiguration.Builder(getContext()).build();
+
+        // Generate an id to set on all fragments created by the PdfView.
+        internalId = View.generateViewId();
     }
 
     public void inject(FragmentManager fragmentManager, EventDispatcher eventDispatcher) {
@@ -239,8 +248,20 @@ public class PdfView extends FrameLayout {
     private void setupFragment() {
         if (fragmentTag != null && configuration != null && document != null) {
             PdfFragment pdfFragment = (PdfFragment) fragmentManager.findFragmentByTag(fragmentTag);
+            if (pdfFragment != null &&
+                (pdfFragment.getArguments() == null ||
+                pdfFragment.getArguments().getInt(ARG_ROOT_ID) != internalId)) {
+                // This is an orphaned fragment probably from a reload, get rid of it.
+                fragmentManager.beginTransaction()
+                    .remove(pdfFragment)
+                    .commitNow();
+                pdfFragment = null;
+            }
+
             if (pdfFragment == null) {
                 pdfFragment = PdfFragment.newInstance(document, this.configuration.getConfiguration());
+                // We put our internal id so we can track if this fragment belongs to us, used to handle orphaned fragments after hot reloads.
+                pdfFragment.getArguments().putInt(ARG_ROOT_ID, internalId);
                 prepareFragment(pdfFragment);
             } else {
                 View fragmentView = pdfFragment.getView();
