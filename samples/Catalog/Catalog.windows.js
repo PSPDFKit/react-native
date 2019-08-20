@@ -28,7 +28,7 @@ const RNFS = require("react-native-fs");
 import {YellowBox} from "react-native";
 
 YellowBox.ignoreWarnings([
-  "Warning: Invalid argument supplied to oneOf" // React native windows bug.
+  "Warning: Failed prop type: Invalid prop `accessibilityStates[0]`"
 ]);
 
 
