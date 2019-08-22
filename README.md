@@ -6,6 +6,8 @@ This wrapper requires a valid license of PSPDFKit. Licenses are per platform. Yo
 
 This wrapper exposes the most often used APIs from PSPDFKit. Many of our partners end up forking this wrapper and adding some custom code to achieve even greater integration with their products, using native code.
 
+_IMPORTANT_ : `react-native-pspdfkit` for windows does not yet support react-native 0.60.\*. Currently [`react-native-windows`][https://github.com/microsoft/react-native-windows/releases] is not keeping up pace with `react-native`, where the last official release was 0.60.\* and the last RC was 0.59.\*. We have tested and require 0.59.10 to keep version aligned as much as possible and will continue to support upon the `windows-support` branch.
+
 #### Announcements
 
 - [Announcement blog post](https://pspdfkit.com/blog/2016/react-native-module/)
@@ -658,8 +660,6 @@ Shows the pdf `document` from the local device filesystem, or your app's assets.
 - yarn
 - PSPDFKit for Windows.vsix (installed)
 - PowerShell
-
-_IMPORTANT_ : `react-native-pspdfkit` for windows does not yet support react-native 0.60.\*. Currently [`react-native-windows`][https://github.com/microsoft/react-native-windows/releases] is not keeping up pace with `react-native`, where the last official release was 0.60.\* and the last RC was 0.59.\*. We have tested and require 0.59.10 to keep version aligned as much as possible.
 
 #### Getting Started
 
