@@ -659,7 +659,7 @@ Shows the pdf `document` from the local device filesystem, or your app's assets.
 - PSPDFKit for Windows.vsix (installed)
 - PowerShell
 
-_IMPORTANT_ : `react-native-pspdfkit` for windows does not yet support react-native 0.59.\*. Currently [`react-native-windows`][https://github.com/microsoft/react-native-windows/releases] is not keeping up pace with `react-native`, where the last official release was 0.54.\* and the last RC was 0.57.\*. We have tested and require 0.57.0 to keep version aligned as much as possible.
+_IMPORTANT_ : `react-native-pspdfkit` for windows does not yet support react-native 0.60.\*. Currently [`react-native-windows`][https://github.com/microsoft/react-native-windows/releases] is not keeping up pace with `react-native`, where the last official release was 0.60.\* and the last RC was 0.59.\*. We have tested and require 0.59.10 to keep version aligned as much as possible.
 
 #### Getting Started
 
@@ -669,10 +669,10 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
 2. Make sure `react-native-cli` is installed: `yarn global add react-native-cli`.
 3. Install Windows Tool for React Native: `yarn add global windows-build-tools`.
 4. Open `x64 Native Tools Command Prompt for VS 2017` program.
-5. Create the app with `react-native init --version=0.57.8 YourApp` in a location of your choice.
+5. Create the app with `react-native init --version=0.59.10 YourApp` in a location of your choice.
 6. Step into your newly created app folder: `cd YourApp`.
 7. Install the Windows helper plugin: `yarn add --dev rnpm-plugin-windows`.
-8. Install `react-native-pspdfkit` from GitHub: `yarn add github:PSPDFKit/react-native#windows-1.11.0`.
+8. Install `react-native-pspdfkit` from GitHub: `yarn add github:PSPDFKit/react-native#windows-support`.
 9. Install `react-native-fs` from GitHub: `yarn add react-native-fs`.
 10. Install all modules for Windows: `yarn install`. (Because of a [bug](https://github.com/yarnpkg/yarn/issues/2165) you may need to clean `yarn`'s cache with `yarn cache clean` before.)
 11. Initialize the windows project: `react-native windows`.
@@ -796,23 +796,11 @@ var styles = StyleSheet.create({
 1. Clone the repository. `git clone https://github.com/PSPDFKit/react-native.git`.
 2. From the command promt `cd react-native\samples\Catalog`.
 3. Make sure `react-native-cli` is installed: `yarn global add react-native-cli`.
-4. Downgrade `react-native` package to 0.57.8. Edit `package.json`
-
-```diff
-  "dependencies": {
-    "react-native-pspdfkit": "file:../../",
-    "react": "16.8.3",
--   "react-native": "0.59.9",
-+   "react-native": "0.57.8",
-    "react-native-camera": "2.9.0",
-    "react-native-fs": "2.13.3",
-```
-
-5. run `yarn install`. (Because of a [bug](https://github.com/yarnpkg/yarn/issues/2165) you may need to clean `yarn`'s cache with `yarn cache clean` before.)
-6. Open the UWP catalog solution in `react-native\samples\Catalog\windows`.
-7. Accept and install any required extensions when prompted.
-8. If the settings windows opens, click on `Developer` and selected `yes`.
-9. Create a new file resouce called `License.xaml` with your PSPDFKit license key at the top level of the project. (Replace `ENTER LICENSE KEY HERE` with your key)
+4. run `yarn install`. (Because of a [bug](https://github.com/yarnpkg/yarn/issues/2165) you may need to clean `yarn`'s cache with `yarn cache clean` before.)
+5. Open the UWP catalog solution in `react-native\samples\Catalog\windows`.
+6. Accept and install any required extensions when prompted.
+7. If the settings windows opens, click on `Developer` and selected `yes`.
+8. Create a new file resouce called `License.xaml` with your PSPDFKit license key at the top level of the project. (Replace `ENTER LICENSE KEY HERE` with your key)
 
 ```xaml
 	<ResourceDictionary
