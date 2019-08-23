@@ -74,7 +74,7 @@ class PSPDFKitView extends React.Component {
 
     UIManager.dispatchViewManagerCommand(
       findNodeHandle(this.refs.pdfView),
-      UIManager.RCTPSPDFKitView.Commands.enterAnnotationCreationMode,
+      UIManager.getViewManagerConfig('RCTPSPDFKitView').Commands.enterAnnotationCreationMode,
       [requestId]
     );
 
@@ -97,7 +97,7 @@ class PSPDFKitView extends React.Component {
 
     UIManager.dispatchViewManagerCommand(
       findNodeHandle(this.refs.pdfView),
-      UIManager.RCTPSPDFKitView.Commands.exitCurrentlyActiveMode,
+      UIManager.getViewManagerConfig('RCTPSPDFKitView').Commands.exitCurrentlyActiveMode,
       []
     );
 
@@ -120,7 +120,7 @@ class PSPDFKitView extends React.Component {
 
     UIManager.dispatchViewManagerCommand(
       findNodeHandle(this.refs.pdfView),
-      UIManager.RCTPSPDFKitView.Commands.saveCurrentDocument,
+      UIManager.getViewManagerConfig('RCTPSPDFKitView').Commands.saveCurrentDocument,
       [requestId]
     );
 
@@ -146,7 +146,7 @@ class PSPDFKitView extends React.Component {
 
     UIManager.dispatchViewManagerCommand(
       findNodeHandle(this.refs.pdfView),
-      UIManager.RCTPSPDFKitView.Commands.getAnnotations,
+      UIManager.getViewManagerConfig('RCTPSPDFKitView').Commands.getAnnotations,
       [requestId, pageIndex]
     );
 
@@ -172,7 +172,7 @@ class PSPDFKitView extends React.Component {
 
     UIManager.dispatchViewManagerCommand(
       findNodeHandle(this.refs.pdfView),
-      UIManager.RCTPSPDFKitView.Commands.addAnnotation,
+      UIManager.getViewManagerConfig('RCTPSPDFKitView').Commands.addAnnotation,
       [requestId, annotation]
     );
 
@@ -198,7 +198,7 @@ class PSPDFKitView extends React.Component {
 
     UIManager.dispatchViewManagerCommand(
       findNodeHandle(this.refs.pdfView),
-      UIManager.RCTPSPDFKitView.Commands.removeAnnotation,
+      UIManager.getViewManagerConfig('RCTPSPDFKitView').Commands.removeAnnotation,
       [requestId, annotation]
     );
 
@@ -221,7 +221,7 @@ class PSPDFKitView extends React.Component {
 
     UIManager.dispatchViewManagerCommand(
       findNodeHandle(this.refs.pdfView),
-      UIManager.RCTPSPDFKitView.Commands.getToolbarItems,
+      UIManager.getViewManagerConfig('RCTPSPDFKitView').Commands.getToolbarItems,
       [requestId]
     );
 
@@ -248,7 +248,7 @@ class PSPDFKitView extends React.Component {
 
     UIManager.dispatchViewManagerCommand(
       findNodeHandle(this.refs.pdfView),
-      UIManager.RCTPSPDFKitView.Commands.setToolbarItems,
+      UIManager.getViewManagerConfig('RCTPSPDFKitView').Commands.setToolbarItems,
       [requestId, toolbarItems]
     );
 
