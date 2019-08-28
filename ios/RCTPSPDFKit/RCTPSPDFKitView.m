@@ -38,6 +38,11 @@
   return self;
 }
 
+- (void)removeFromSuperview {
+  [self.pdfController dismissViewControllerAnimated:NO completion:NULL];
+  [super removeFromSuperview];
+}
+
 - (void)dealloc {
   [self destroyViewControllerRelationship];
   [NSNotificationCenter.defaultCenter removeObserver:self];
