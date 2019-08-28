@@ -212,7 +212,9 @@
   BOOL success = NO;
   if (data) {
     PSPDFAnnotation *annotation = [PSPDFAnnotation annotationFromInstantJSON:data documentProvider:documentProvider error:error];
-    success = [document addAnnotations:@[annotation] options:nil];
+    if (annotation) {
+      success = [document addAnnotations:@[annotation] options:nil];
+    }
   }
   
   if (!success) {
