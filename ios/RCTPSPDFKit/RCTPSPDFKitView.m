@@ -39,6 +39,8 @@
 }
 
 - (void)removeFromSuperview {
+  // When the React Native `PSPDFKitView` in unmounted, we need to dismiss the `PSPDFViewController` to avoid orphan popovers.
+  // See https://github.com/PSPDFKit/react-native/issues/277
   [self.pdfController dismissViewControllerAnimated:NO completion:NULL];
   [super removeFromSuperview];
 }
