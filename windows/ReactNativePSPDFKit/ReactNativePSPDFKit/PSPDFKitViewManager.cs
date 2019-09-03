@@ -85,6 +85,12 @@ namespace ReactNativePSPDFKit
             view.SetShowToolbar(!hideNavigationBar);
         }
 
+        [ReactProp("annotationAuthorName")]
+        public void SetAnnotationAuthorName(PDFViewPage view, string annotationAuthorName)
+        {
+            view.SetAnnotationCreatorName(annotationAuthorName);
+        }
+
         /// <summary>
         /// Take the file and call the controller to open the document.
         /// </summary>

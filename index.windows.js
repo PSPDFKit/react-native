@@ -270,6 +270,10 @@ PSPDFKitView.propTypes = {
    */
   hideNavigationBar: PropTypes.bool,
   /**
+   * The name to appened to annotation creator name when annotations are created via the UI.
+   */
+  annotationAuthorName: PropTypes.string,
+  /**
    * Callback that is called when an annotation is added, changed, or removed.
    * Returns an object with the following structure:
    * {
