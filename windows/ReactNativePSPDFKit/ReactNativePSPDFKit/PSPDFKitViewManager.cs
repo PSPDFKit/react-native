@@ -8,6 +8,7 @@
 //
 
 using System;
+using System.Threading.Tasks;
 using ReactNative.UIManager;
 using ReactNative.UIManager.Annotations;
 using Windows.Storage;
@@ -31,6 +32,7 @@ namespace ReactNativePSPDFKit
 
         private readonly Uri _cssResource = null;
         internal PDFViewPage PdfViewPage;
+        private StorageFile _fileToOpen = null;
 
         public PSPDFKitViewManger(Uri cssResource)
         {
@@ -42,8 +44,18 @@ namespace ReactNativePSPDFKit
             PdfViewPage = new PDFViewPage();
             if(_cssResource != null)
             {
-                PdfViewPage.Pdfview.Css = _cssResource;
+                PdfViewPage.PdfView.Css = _cssResource;
             }
+
+            PdfViewPage.PdfView.InitializationCompletedHandler += async (pdfView, document) =>
+            {
+                // If we already have a file to open lets proceed with that here.
+                if (_fileToOpen != null)
+                {
+                    await pdfView.OpenStorageFileAsync(_fileToOpen);
+                }
+            };
+
             return PdfViewPage;
         }
 
@@ -55,8 +67,10 @@ namespace ReactNativePSPDFKit
         [ReactProp("document")]
         public async void SetDocumentAsync(PDFViewPage view, string document)
         {
-            var storagefile = await StorageFile.GetFileFromApplicationUriAsync(new Uri(document));
-            await view.SetDefaultDocument(storagefile);
+            if (_fileToOpen != null) return; // If present has been called we have a document staged to be opened. Just ignore the default document.
+
+            _fileToOpen = await StorageFile.GetFileFromApplicationUriAsync(new Uri(document));
+            await view.OpenFileAsync(_fileToOpen);
         }
 
         [ReactProp("pageIndex")]
@@ -69,6 +83,21 @@ namespace ReactNativePSPDFKit
         public void SetHideNavigationBar(PDFViewPage view, bool hideNavigationBar)
         {
             view.SetShowToolbar(!hideNavigationBar);
+        }
+
+        /// <summary>
+        /// Take the file and call the controller to open the document.
+        /// </summary>
+        /// <param name="file">File to open.</param>
+        internal async Task OpenFileAsync(StorageFile file)
+        {
+            _fileToOpen = file;
+
+            // If the PdfView is already initialized we can show the new document.
+            if (PdfViewPage != null)
+            {
+                await PdfViewPage.OpenFileAsync(file);
+            }
         }
 
         public override JObject ViewCommandsMap => new JObject
