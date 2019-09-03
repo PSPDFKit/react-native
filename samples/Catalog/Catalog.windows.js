@@ -398,18 +398,18 @@ class PdfViewInstantJsonScreen extends Component<{}> {
               }}
               title="Get Annotations Page 1"
             />
-                </View>
-    <View style={{ marginLeft: 10 }}>
-<Button
-onPress={() => {
-    // This gets all annotations on the document.¬
-    this.refs.pdfView.getAllAnnotations().then(annotations => {
-        alert(JSON.stringify(annotations));
-    });
-}}
-title="Get All Annotation"
-    />
-    </View>
+          </View>
+          <View style={{marginLeft: 10}}>
+            <Button
+              onPress={() => {
+                // This gets all annotations on the document.¬
+                this.refs.pdfView.getAllAnnotations().then(annotations => {
+                  alert(JSON.stringify(annotations));
+                });
+              }}
+              title="Get All Annotation"
+            />
+          </View>
           <View style={{marginLeft: 10}}>
             <Button
               onPress={() => {

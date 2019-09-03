@@ -151,31 +151,31 @@ class PSPDFKitView extends React.Component {
     );
 
     return promise;
-    }
+  }
 
-    /**
-     * Gets all annotations for the document.
-     *
-     * @returns a promise resolving an array with the following structure:
-     * {'annotations' : [instantJson]}
-     */
-    getAllAnnotations() {
-        let requestId = this._nextRequestId++;
-        let requestMap = this._requestMap;
+  /**
+   * Gets all annotations for the document.
+   *
+   * @returns a promise resolving an array with the following structure:
+   * {'annotations' : [instantJson]}
+   */
+  getAllAnnotations() {
+    let requestId = this._nextRequestId++;
+    let requestMap = this._requestMap;
 
-        // We create a promise here that will be resolved once onDataReturned is called.
-        let promise = new Promise((resolve, reject) => {
-            requestMap[requestId] = { resolve: resolve, reject: reject };
-        });
+    // We create a promise here that will be resolved once onDataReturned is called.
+    let promise = new Promise((resolve, reject) => {
+      requestMap[requestId] = {resolve: resolve, reject: reject};
+    });
 
-        UIManager.dispatchViewManagerCommand(
-            findNodeHandle(this.refs.pdfView),
-            UIManager.getViewManagerConfig('RCTPSPDFKitView').Commands.getAllAnnotations,
-            [requestId]
-        );
+    UIManager.dispatchViewManagerCommand(
+      findNodeHandle(this.refs.pdfView),
+      UIManager.getViewManagerConfig('RCTPSPDFKitView').Commands.getAllAnnotations,
+      [requestId]
+    );
 
-        return promise;
-    }
+    return promise;
+  }
 
   /**
    * Adds a new annotation to the current document.
