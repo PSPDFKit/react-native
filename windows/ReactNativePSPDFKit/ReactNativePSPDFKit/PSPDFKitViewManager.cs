@@ -29,6 +29,7 @@ namespace ReactNativePSPDFKit
         private const int COMMAND_GET_TOOLBAR_ITEMS = 6;
         private const int COMMAND_SET_TOOLBAR_ITEMS = 7;
         private const int COMMAND_REMOVE_ANNOTATION = 8;
+        private const int COMMAND_GET_ALL_ANNOTATIONS = 9;
 
         private readonly Uri _cssResource = null;
         internal PDFViewPage PdfViewPage;
@@ -85,6 +86,12 @@ namespace ReactNativePSPDFKit
             view.SetShowToolbar(!hideNavigationBar);
         }
 
+        [ReactProp("annotationAuthorName")]
+        public void SetAnnotationAuthorName(PDFViewPage view, string annotationAuthorName)
+        {
+            view.SetAnnotationCreatorName(annotationAuthorName);
+        }
+
         /// <summary>
         /// Take the file and call the controller to open the document.
         /// </summary>
@@ -115,6 +122,9 @@ namespace ReactNativePSPDFKit
                 "getAnnotations", COMMAND_GET_ANNOTATIONS
             },
             {
+                "getAllAnnotations", COMMAND_GET_ALL_ANNOTATIONS
+            },
+            {
                 "addAnnotation", COMMAND_ADD_ANNOTATION
             },
             {
@@ -143,6 +153,9 @@ namespace ReactNativePSPDFKit
                     break;
                 case COMMAND_GET_ANNOTATIONS:
                     await view.GetAnnotations(args[0].Value<int>(), args[1].Value<int>());
+                    break;
+                case COMMAND_GET_ALL_ANNOTATIONS:
+                    await view.GetAllAnnotations(args[0].Value<int>());
                     break;
                 case COMMAND_ADD_ANNOTATION:
                     await view.CreateAnnotation(args[0].Value<int>(), args[1].ToString());
