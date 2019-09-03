@@ -407,7 +407,7 @@ class PdfViewInstantJsonScreen extends Component<{}> {
                   alert(JSON.stringify(annotations));
                 });
               }}
-              title="Get All Annotation"
+              title="Get All Annotations"
             />
           </View>
           <View style={{marginLeft: 10}}>
