@@ -97,14 +97,14 @@ namespace ReactNativePSPDFKit
         /// <param name="file">File to open</param>
         private async Task LoadFileAsync(StorageFile file)
         {
-            if (file == null) return;
-            if(_viewManager.PdfViewPage != null)
+            if (file == null) throw new Exception("File cannot be null");
+            if(_viewManager != null)
             {
-                await _viewManager.PdfViewPage.OpenFileAsync(file);
+                await _viewManager.OpenFileAsync(file);
             }
             else
             {
-                throw new Exception("PdfViewPage: is not ready or unavailable.");
+                throw new Exception("PDFViewManager: is not ready or unavailable.");
             }
         }
 

@@ -10,7 +10,7 @@
     "react": "16.8.6",
     "react-native": "0.59.10",
     "react-native-camera": "2.9.0",
-    "react-native-fs": "2.13.3",
+    "react-native-fs": "2.14.1",
     "react-native-qrcode-scanner": "^1.1.0",
     "react-native-windows": "0.59.0-rc.3",
     "react-navigation": "^1.0.3",
