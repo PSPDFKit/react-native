@@ -270,7 +270,7 @@ PSPDFKitView.propTypes = {
    */
   hideNavigationBar: PropTypes.bool,
   /**
-   * The name to appened to annotation creator name when annotations are created via the UI.
+   * The  creator name to add when annotations are created via the UI.
    */
   annotationAuthorName: PropTypes.string,
   /**
