@@ -379,6 +379,7 @@ class PdfViewInstantJsonScreen extends Component<{}> {
           style={styles.pdfView}
           // The default file to open.
           document="ms-appx:///Assets/pdf/annualReport.pdf"
+          annotationAuthorName="Joe Smith"
         />
         <View
           style={{

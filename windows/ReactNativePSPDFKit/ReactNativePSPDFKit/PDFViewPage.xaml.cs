@@ -15,6 +15,7 @@ using Windows.Data.Json;
 using PSPDFKit.UI;
 using Windows.Storage;
 using Windows.UI.Xaml.Controls;
+using PSPDFKit.Pdf;
 using PSPDFKit.Pdf.Annotation;
 using ReactNative.UIManager;
 using ReactNativePSPDFKit.Events;
@@ -25,6 +26,7 @@ namespace ReactNativePSPDFKit
     {
         private bool _pdfViewInitialized = false;
         public readonly PdfView PdfView;
+        private string _annotationCreatorName = null;
 
         public PDFViewPage()
         {
@@ -199,13 +201,32 @@ namespace ReactNativePSPDFKit
             PDFView.ShowToolbar = showToolbar;
         }
 
-        private void PDFView_InitializationCompletedHandlerAsync(PdfView sender, PSPDFKit.Pdf.Document document)
+        public void SetAnnotationCreatorName(string annotationAuthorName)
+        {
+            _annotationCreatorName = annotationAuthorName;
+        }
+
+        private void PDFView_InitializationCompletedHandlerAsync(PdfView sender, Document document)
         {
             _pdfViewInitialized = true;
         }
 
-        private void DocumentOnAnnotationsCreated(object sender, IList<IAnnotation> annotations)
+        private async void DocumentOnAnnotationsCreated(Document document, IList<IAnnotation> annotations)
         {
+            // If we have an author name set, we want to add this.
+            if (_annotationCreatorName != null)
+            {
+                foreach (var annotation in annotations)
+                {
+                    // If the create name is populated then it probably was created else where. 
+                    if (annotation.CreatorName == null)
+                    {
+                        annotation.CreatorName = _annotationCreatorName;
+                        await document.UpdateAnnotationAsync(annotation);
+                    }
+                }
+            }
+
             this.GetReactContext().GetNativeModule<UIManagerModule>().EventDispatcher.DispatchEvent(
                 new PdfViewAnnotationChangedEvent(this.GetTag(),
                     PdfViewAnnotationChangedEvent.EVENT_TYPE_ADDED, annotations)
