@@ -94,6 +94,24 @@ namespace ReactNativePSPDFKit
             }
         }
 
+        internal async Task GetAllAnnotations(int requestId)
+        {
+            try
+            {
+                var annotations = await PdfView.Document.GetAnnotationsAsync();
+
+                this.GetReactContext().GetNativeModule<UIManagerModule>().EventDispatcher.DispatchEvent(
+                    new PdfViewDataReturnedEvent(this.GetTag(), requestId, annotations)
+                );
+            }
+            catch (Exception e)
+            {
+                this.GetReactContext().GetNativeModule<UIManagerModule>().EventDispatcher.DispatchEvent(
+                    new PdfViewDataReturnedEvent(this.GetTag(), requestId, e.Message)
+                );
+            }
+        }
+
         internal void GetToolbarItems(int requestId)
         {
             try
