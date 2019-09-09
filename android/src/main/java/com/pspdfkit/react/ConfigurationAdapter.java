@@ -67,6 +67,7 @@ public class ConfigurationAdapter {
     private static final String PAGE_MODE_DOUBLE = "double";
     private static final String PAGE_MODE_AUTO = "automatic";
     private static final String FIRST_PAGE_ALWAYS_SINGLE = "firstPageAlwaysSingle";
+    private static final String AUTOSAVE_DISABLED = "disableAutomaticSaving";
 
     private final PdfActivityConfiguration.Builder configuration;
 
@@ -147,6 +148,9 @@ public class ConfigurationAdapter {
             }
             if (configuration.hasKey(FIRST_PAGE_ALWAYS_SINGLE)) {
                 configureFirstPageAlwaysSingle(configuration.getBoolean(FIRST_PAGE_ALWAYS_SINGLE));
+            }
+            if (configuration.hasKey(AUTOSAVE_DISABLED)) {
+                configureAutosaveEnabled(!configuration.getBoolean(AUTOSAVE_DISABLED));
             }
         }
     }
@@ -327,6 +331,10 @@ public class ConfigurationAdapter {
 
     private void configureFirstPageAlwaysSingle(final boolean firstPageAlwaysSingle) {
         configuration.firstPageAlwaysSingle(firstPageAlwaysSingle);
+    }
+
+    private void configureAutosaveEnabled(final boolean autosaveEnabled) {
+        configuration.autosaveEnabled(autosaveEnabled);
     }
 
     public PdfActivityConfiguration build() {
