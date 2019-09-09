@@ -23,7 +23,7 @@
 RCT_EXPORT_MODULE(PSPDFKit)
 
 RCT_EXPORT_METHOD(setLicenseKey:(NSString *)licenseKey) {
-  [PSPDFKit setLicenseKey:licenseKey];
+  [PSPDFKitGlobal setLicenseKey:licenseKey];
 }
 
 RCT_EXPORT_METHOD(present:(PSPDFDocument *)document withConfiguration:(PSPDFConfiguration *)configuration) {
@@ -58,9 +58,9 @@ RCT_EXPORT_METHOD(setPageIndex:(NSUInteger)pageIndex animated:(BOOL)animated) {
 }
 
 - (NSDictionary *)constantsToExport {
-  return @{PROPERTY(versionString): PSPDFKit.versionString,
-           PROPERTY(versionNumber): PSPDFKit.versionNumber,
-           PROPERTY(buildNumber): @(PSPDFKit.buildNumber)};
+  return @{PROPERTY(versionString): PSPDFKitGlobal.versionString,
+           PROPERTY(versionNumber): PSPDFKitGlobal.versionNumber,
+           PROPERTY(buildNumber): @(PSPDFKitGlobal.buildNumber)};
 }
 
 + (BOOL)requiresMainQueueSetup {
