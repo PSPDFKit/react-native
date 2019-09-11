@@ -29,9 +29,9 @@ The [PSPDFKit SDK](https://pspdfkit.com/) is a framework that allows you to view
 
 #### Requirements
 
-- Xcode 10.3
-- PSPDFKit 8.5.1 for iOS or later
-- react-native >= 0.60.4
+- Xcode 11
+- PSPDFKit 9.0.0 for iOS or later
+- react-native >= 0.60.5
 - CocoaPods >= 1.7.5
 
 #### Getting Started
@@ -90,9 +90,11 @@ end
     ![Deployment Target](screenshots/deployment-target.png)
 10. Change "View controller-based status bar appearance" to `YES` in `Info.plist`:
     ![View Controller-Based Status Bar Appearance](screenshots/view-controller-based-status-bar-appearance.png)
-11. Add a PDF by drag and dropping it into your Xcode project (Select "Create groups" and add to target "YourApp"). This will add the document to the "Copy Bundle Resources" build phase:
+11. If your application is targeting iOS versions **prior to iOS 12.2** and your application **does not already contain any Swift code**, then you need to make sure Xcode bundles Swift standard libraries with your application distribution. To to so, open your target Build Settings and enable `Always Embed Swift Standard Libraries`:
+	![Always Embed Swift Standard Libraries](screenshots/always-embed-swift-standard-libraries.png)
+12. Add a PDF by drag and dropping it into your Xcode project (Select "Create groups" and add to target "YourApp"). This will add the document to the "Copy Bundle Resources" build phase:
     ![Adding PDF](screenshots/adding-pdf.png)
-12. Replace the default component from `App.js` with a simple touch area to present the bundled PDF. (Note that you can also use a [Native UI Component](#native-ui-component) to show a PDF.)
+13. Replace the default component from `App.js` with a simple touch area to present the bundled PDF. (Note that you can also use a [Native UI Component](#native-ui-component) to show a PDF.)
 
 ```javascript
 import React, { Component } from "react";
@@ -254,7 +256,7 @@ Example - Native UI Component:
 
 #### Running Catalog Project
 
-- Copy `PSPDFKit.framework` and `PSPDFKitUI.framework` into the `PSPDFKit` directory.
+- Copy `PSPDFKit.xcframework` and `PSPDFKitUI.xcframework` into the `PSPDFKit` directory.
 - Install dependencies: `yarn install` in `samples/Catalog` directory. (Because of a [bug](https://github.com/yarnpkg/yarn/issues/2165) you may need to clean `yarn`'s cache with `yarn cache clean` before.)
 - Run the app with `react-native-cli`: `react-native run-ios`
 - If you get an error about `config.h` not being found check out [this blog post](https://tuntunir.blogspot.com/2018/02/react-native-fatal-error-configh-file.html) for information on how to fix it.
