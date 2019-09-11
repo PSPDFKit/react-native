@@ -196,8 +196,7 @@
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				FRAMEWORK_SEARCH_PATHS = (
-					"$(PROJECT_DIR)/../PSPDFKit",
-					"$(PROJECT_DIR)/../../../ios/PSPDFKit",
+					"$(PROJECT_DIR)/../PSPDFKit/**",
 					"$(PROJECT_DIR)/../../../ios/Pods/PSPDFKit",
 				);
 				OTHER_LDFLAGS = "-ObjC";
@@ -215,8 +214,7 @@
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				FRAMEWORK_SEARCH_PATHS = (
-					"$(PROJECT_DIR)/../PSPDFKit",
-					"$(PROJECT_DIR)/../../../ios/PSPDFKit",
+					"$(PROJECT_DIR)/../PSPDFKit/**",
 					"$(PROJECT_DIR)/../../../ios/Pods/PSPDFKit",
 				);
 				OTHER_LDFLAGS = "-ObjC";
