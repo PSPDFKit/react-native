@@ -77,7 +77,7 @@ target 'YourApp' do
   pod 'glog', :podspec => '../node_modules/react-native/third-party-podspecs/glog.podspec'
   pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec'
 
-  pod 'react-native-pspdfkit', :path => '../node_modules/react-native-pspdfkit'
++ pod 'react-native-pspdfkit', :path => '../node_modules/react-native-pspdfkit'
 + pod 'PSPDFKit', podspec: 'https://customers.pspdfkit.com/cocoapods/YOUR_COCOAPODS_KEY_GOES_HERE/pspdfkit/latest.podspec'
 
   use_native_modules!
