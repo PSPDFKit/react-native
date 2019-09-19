@@ -44,6 +44,8 @@ android/app/libs
 
 PSPDFKit/PSPDFKit.framework
 PSPDFKit/PSPDFKitUI.framework
+PSPDFKit/PSPDFKit.xcframework
+PSPDFKit/PSPDFKitUI.xcframework
 
 # UWP license file
 samples/Catalog/windows/Catalog/License.xaml

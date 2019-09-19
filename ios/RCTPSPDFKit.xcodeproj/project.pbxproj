@@ -140,7 +140,7 @@
 		83CBB9F71A601CBA00E9B192 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1020;
+				LastUpgradeCheck = 1100;
 				ORGANIZATIONNAME = Facebook;
 				TargetAttributes = {
 					657277141D8312EA00A5E1A8 = {
@@ -196,8 +196,7 @@
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				FRAMEWORK_SEARCH_PATHS = (
-					"$(PROJECT_DIR)/../PSPDFKit",
-					"$(PROJECT_DIR)/../../../ios/PSPDFKit",
+					"$(PROJECT_DIR)/../PSPDFKit/**",
 					"$(PROJECT_DIR)/../../../ios/Pods/PSPDFKit",
 				);
 				OTHER_LDFLAGS = "-ObjC";
@@ -215,8 +214,7 @@
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				FRAMEWORK_SEARCH_PATHS = (
-					"$(PROJECT_DIR)/../PSPDFKit",
-					"$(PROJECT_DIR)/../../../ios/PSPDFKit",
+					"$(PROJECT_DIR)/../PSPDFKit/**",
 					"$(PROJECT_DIR)/../../../ios/Pods/PSPDFKit",
 				);
 				OTHER_LDFLAGS = "-ObjC";
@@ -229,6 +227,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
@@ -293,6 +292,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;

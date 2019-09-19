@@ -281,9 +281,8 @@ RCT_MULTI_ENUM_CONVERTER(PSPDFDocumentSharingPagesOptions,
 
   SET(doubleTapAction, PSPDFTapAction)
   SET(formElementZoomEnabled, BOOL)
-  SET(scrollOnTapPageEndEnabled, BOOL)
-  SET(scrollOnTapPageEndAnimationEnabled, BOOL)
-  SET(scrollOnTapPageEndMargin, CGFloat)
+  SET(scrollOnEdgeTapEnabled, BOOL)
+  SET(scrollOnEdgeTapMargin, CGFloat)
   SET_PROPERTY(enableTextSelection, textSelectionEnabled, BOOL)
   SET(textSelectionEnabled, BOOL)
   SET(imageSelectionEnabled, BOOL)
