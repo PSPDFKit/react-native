@@ -31,6 +31,7 @@ RCT_EXPORT_METHOD(present:(PSPDFDocument *)document withConfiguration:(PSPDFConf
 
   UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:pdfViewController];
 
+  navigationController.modalPresentationStyle = UIModalPresentationFullScreen;
   UIViewController *presentingViewController = RCTPresentedViewController();
   [presentingViewController presentViewController:navigationController animated:YES completion:nil];
 }
