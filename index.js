@@ -415,7 +415,7 @@ class PSPDFKitView extends React.Component {
 
       return promise;
     } else if (Platform.OS === "ios") {
-      NativeModules.PSPDFKitViewManager.setFormFieldValue(
+      return NativeModules.PSPDFKitViewManager.setFormFieldValue(
         value,
         fullyQualifiedName,
         findNodeHandle(this.refs.pdfView)
