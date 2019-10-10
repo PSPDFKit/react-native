@@ -131,15 +131,27 @@ class PSPDFKitView extends React.Component {
 
   /**
    * Saves the currently opened document.
+   *
+   * Returns a promise resolving to true if the document was saved, and false otherwise.
    */
   saveCurrentDocument = function() {
     if (Platform.OS === "android") {
+      let requestId = this._nextRequestId++;
+      let requestMap = this._requestMap;
+
+      // We create a promise here that will be resolved once onDataReturned is called.
+      let promise = new Promise(function(resolve, reject) {
+        requestMap[requestId] = { resolve: resolve, reject: reject };
+      });
+
       UIManager.dispatchViewManagerCommand(
         findNodeHandle(this.refs.pdfView),
         this._getViewManagerConfig("RCTPSPDFKitView").Commands
           .saveCurrentDocument,
-        []
+        [requestId]
       );
+
+      return promise;
     } else if (Platform.OS === "ios") {
       return NativeModules.PSPDFKitViewManager.saveCurrentDocument(
         findNodeHandle(this.refs.pdfView)
@@ -381,15 +393,27 @@ class PSPDFKitView extends React.Component {
    *
    * @param fullyQualifiedName The fully qualified name of the form element.
    * @param value The string value form element. For button form elements pass 'selected' or 'deselected'. For choice form elements, pass the index of the choice to select, for example '1'.
+   *
+   * Returns a promise resolving to true if the value was set, and false otherwise.
    */
   setFormFieldValue = function(fullyQualifiedName, value) {
     if (Platform.OS === "android") {
+      let requestId = this._nextRequestId++;
+      let requestMap = this._requestMap;
+
+      // We create a promise here that will be resolved once onDataReturned is called.
+      let promise = new Promise(function(resolve, reject) {
+        requestMap[requestId] = { resolve: resolve, reject: reject };
+      });
+
       UIManager.dispatchViewManagerCommand(
         findNodeHandle(this.refs.pdfView),
         this._getViewManagerConfig("RCTPSPDFKitView").Commands
           .setFormFieldValue,
-        [fullyQualifiedName, value]
+        [requestId, fullyQualifiedName, value]
       );
+
+      return promise;
     } else if (Platform.OS === "ios") {
       NativeModules.PSPDFKitViewManager.setFormFieldValue(
         value,
