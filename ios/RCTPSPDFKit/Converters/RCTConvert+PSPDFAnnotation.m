@@ -24,7 +24,7 @@
       }
     } else {
       // We only generate Instant JSON data for attached annotations. When an annotation is deleted, we only set the annotation uuid and name.
-      [annotationsJSON addObject:@{@"uuid" : annotation.uuid, @"name" : annotation.name ?: annotation.uuid}];
+      [annotationsJSON addObject:@{@"uuid" : annotation.uuid, @"name" : annotation.name ?: [NSNull new]}];
     }
   }
   
