@@ -46,7 +46,11 @@ const CONFIGURATION = {
   grayScale: true,
   showPageLabels: false,
   pageScrollDirection: "vertical",
-  showThumbnailBar: "scrollable"
+  showThumbnailBar: "scrollable",
+  // Settings this to false will disable all annotation editing
+  enableAnnotationEditing: true,
+  // Only stamps and square annotations will be editable, others can not be selected or otherwise modified.
+  editableAnnotationTypes: ['Stamp', 'Square']
 };
 
 const examples = [
