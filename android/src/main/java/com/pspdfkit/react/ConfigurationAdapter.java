@@ -384,7 +384,7 @@ public class ConfigurationAdapter {
             try {
                 parsedTypes.add(AnnotationType.valueOf(annotationType.toUpperCase(Locale.ENGLISH)));
             } catch (IllegalArgumentException ex) {
-                Log.w(LOG_TAG,
+                Log.e(LOG_TAG,
                     String.format("Illegal option %s provided for configuration option %s. Skipping this %s.", annotationType, EDITABLE_ANNOTATION_TYPES, annotationType),
                     ex);
             }
