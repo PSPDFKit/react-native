@@ -552,7 +552,7 @@ public class PdfView extends FrameLayout {
                         return Observable.empty();
                     }
 
-                    return pdfDocument.getAnnotationProvider().getAllAnnotationsOfType(getTypeFromString(type), pageIndex, 1)
+                    return pdfDocument.getAnnotationProvider().getAllAnnotationsOfTypeAsync(getTypeFromString(type), pageIndex, 1)
                             .filter(annotationToFilter -> name.equals(annotationToFilter.getName()))
                             .map(filteredAnnotation -> new Pair<>(filteredAnnotation, pdfDocument));
                 })

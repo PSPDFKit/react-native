@@ -18,6 +18,8 @@ import com.pspdfkit.react.events.PdfViewDocumentSavedEvent;
 import com.pspdfkit.ui.special_mode.controller.AnnotationSelectionController;
 import com.pspdfkit.ui.special_mode.manager.AnnotationManager;
 
+import java.util.List;
+
 class PdfViewDocumentListener implements DocumentListener, AnnotationManager.OnAnnotationSelectedListener, AnnotationProvider.OnAnnotationUpdatedListener {
 
     @NonNull
@@ -121,5 +123,10 @@ class PdfViewDocumentListener implements DocumentListener, AnnotationManager.OnA
     @Override
     public void onAnnotationRemoved(@NonNull Annotation annotation) {
         eventDispatcher.dispatchEvent(new PdfViewAnnotationChangedEvent(parent.getId(), PdfViewAnnotationChangedEvent.EVENT_TYPE_REMOVED, annotation));
+    }
+
+    @Override
+    public void onAnnotationZOrderChanged(int i, @NonNull List<Annotation> list, @NonNull List<Annotation> list1) {
+        // Not required.
     }
 }

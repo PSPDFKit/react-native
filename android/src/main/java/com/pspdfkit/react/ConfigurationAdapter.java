@@ -27,6 +27,9 @@ import com.pspdfkit.configuration.page.PageFitMode;
 import com.pspdfkit.configuration.page.PageLayoutMode;
 import com.pspdfkit.configuration.page.PageScrollDirection;
 import com.pspdfkit.configuration.page.PageScrollMode;
+import com.pspdfkit.configuration.sharing.ShareFeatures;
+
+import java.util.EnumSet;
 
 public class ConfigurationAdapter {
     private static final String PAGE_SCROLL_DIRECTION = "pageScrollDirection";
@@ -217,9 +220,9 @@ public class ConfigurationAdapter {
     }
 
     private void configureShowThumbnailBar(String showThumbnailBar) {
-        ThumbnailBarMode thumbnailBarMode = ThumbnailBarMode.THUMBNAIL_BAR_MODE_DEFAULT;
+        ThumbnailBarMode thumbnailBarMode = ThumbnailBarMode.THUMBNAIL_BAR_MODE_FLOATING;
         if (showThumbnailBar.equals(SHOW_THUMBNAIL_BAR_DEFAULT)) {
-            thumbnailBarMode = ThumbnailBarMode.THUMBNAIL_BAR_MODE_DEFAULT;
+            thumbnailBarMode = ThumbnailBarMode.THUMBNAIL_BAR_MODE_FLOATING;
         } else if (showThumbnailBar.equals(SHOW_THUMBNAIL_BAR_SCROLLABLE)) {
             thumbnailBarMode = ThumbnailBarMode.THUMBNAIL_BAR_MODE_SCROLLABLE;
         } else if (showThumbnailBar.equals(SHOW_THUMBNAIL_BAR_NONE)) {
@@ -282,9 +285,9 @@ public class ConfigurationAdapter {
 
     private void configureShowShareAction(boolean showShareAction) {
         if (showShareAction) {
-            configuration.enableShare();
+            configuration.setEnabledShareFeatures(ShareFeatures.all());
         } else {
-            configuration.disableShare();
+            configuration.setEnabledShareFeatures(ShareFeatures.none());
         }
     }
 
