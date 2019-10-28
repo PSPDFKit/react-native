@@ -58,6 +58,7 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.Callable;
 
 import io.reactivex.Completable;
+import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.Single;
@@ -446,17 +447,21 @@ public class PdfView extends FrameLayout {
                 }));
     }
 
-    public void saveCurrentDocument() {
+    public boolean saveCurrentDocument() throws Exception {
         if (fragment != null) {
             try {
                 if (document.saveIfModified()) {
                     // Since the document listeners won't be called when manually saving we also dispatch this event here.
                     eventDispatcher.dispatchEvent(new PdfViewDocumentSavedEvent(getId()));
+                    return true;
                 }
+                return false;
             } catch (Exception e) {
                 eventDispatcher.dispatchEvent(new PdfViewDocumentSaveFailedEvent(getId(), e.getMessage()));
+                throw e;
             }
         }
+        return false;
     }
 
     public Single<List<Annotation>> getAnnotations(final int pageIndex, @Nullable final String type) {
@@ -658,49 +663,49 @@ public class PdfView extends FrameLayout {
 
     }
 
-    public Disposable setFormFieldValue(@NonNull String formElementName, @NonNull final String value) {
+    public Maybe<Boolean> setFormFieldValue(@NonNull String formElementName, @NonNull final String value) {
         return document.getFormProvider().getFormElementWithNameAsync(formElementName)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<FormElement>() {
-
-                    @Override
-                    public void accept(FormElement formElement) {
-                        if (formElement instanceof TextFormElement) {
-                            TextFormElement textFormElement = (TextFormElement) formElement;
-                            textFormElement.setText(value);
-                        } else if (formElement instanceof EditableButtonFormElement) {
-                            EditableButtonFormElement editableButtonFormElement = (EditableButtonFormElement) formElement;
-                            if (value.equalsIgnoreCase("selected")) {
-                                editableButtonFormElement.select();
-                            } else if (value.equalsIgnoreCase("deselected")) {
-                                editableButtonFormElement.deselect();
-                            }
-                        } else if (formElement instanceof ChoiceFormElement) {
-                            ChoiceFormElement choiceFormElement = (ChoiceFormElement) formElement;
+                .map(formElement -> {
+                    if (formElement instanceof TextFormElement) {
+                        TextFormElement textFormElement = (TextFormElement) formElement;
+                        textFormElement.setText(value);
+                        return true;
+                    } else if (formElement instanceof EditableButtonFormElement) {
+                        EditableButtonFormElement editableButtonFormElement = (EditableButtonFormElement) formElement;
+                        if (value.equalsIgnoreCase("selected")) {
+                            editableButtonFormElement.select();
+                        } else if (value.equalsIgnoreCase("deselected")) {
+                            editableButtonFormElement.deselect();
+                        }
+                        return true;
+                    } else if (formElement instanceof ChoiceFormElement) {
+                        ChoiceFormElement choiceFormElement = (ChoiceFormElement) formElement;
+                        try {
+                            int selectedIndex = Integer.parseInt(value);
+                            List<Integer> selectedIndices = new ArrayList<>();
+                            selectedIndices.add(selectedIndex);
+                            choiceFormElement.setSelectedIndexes(selectedIndices);
+                            return true;
+                        } catch (NumberFormatException e) {
                             try {
-                                int selectedIndex = Integer.parseInt(value);
+                                // Maybe it's multiple indices.
+                                JSONArray indices = new JSONArray(value);
                                 List<Integer> selectedIndices = new ArrayList<>();
-                                selectedIndices.add(selectedIndex);
+                                for (int i = 0; i < indices.length(); i++) {
+                                    selectedIndices.add(indices.getInt(i));
+                                }
                                 choiceFormElement.setSelectedIndexes(selectedIndices);
-                            } catch (NumberFormatException e) {
-                                try {
-                                    // Maybe it's multiple indices.
-                                    JSONArray indices = new JSONArray(value);
-                                    List<Integer> selectedIndices = new ArrayList<>();
-                                    for (int i = 0; i < indices.length(); i++) {
-                                        selectedIndices.add(indices.getInt(i));
-                                    }
-                                    choiceFormElement.setSelectedIndexes(selectedIndices);
-                                } catch (JSONException ex) {
-                                    // This isn't an index maybe we can set a custom value on a combobox.
-                                    if (formElement instanceof ComboBoxFormElement) {
-                                        ((ComboBoxFormElement) formElement).setCustomText(value);
-                                    }
+                                return true;
+                            } catch (JSONException ex) {
+                                // This isn't an index maybe we can set a custom value on a combobox.
+                                if (formElement instanceof ComboBoxFormElement) {
+                                    ((ComboBoxFormElement) formElement).setCustomText(value);
+                                    return true;
                                 }
                             }
                         }
                     }
+                    return false;
                 });
     }
 }

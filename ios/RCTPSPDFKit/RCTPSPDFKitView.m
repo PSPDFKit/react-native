@@ -310,35 +310,43 @@
   return @{@"error": @"Failed to get the form field value."};
 }
 
-- (void)setFormFieldValue:(NSString *)value fullyQualifiedName:(NSString *)fullyQualifiedName {
+- (BOOL)setFormFieldValue:(NSString *)value fullyQualifiedName:(NSString *)fullyQualifiedName {
   if (fullyQualifiedName.length == 0) {
     NSLog(@"Invalid fully qualified name.");
-    return;
+    return NO;
   }
   
   PSPDFDocument *document = self.pdfController.document;
-  VALIDATE_DOCUMENT(document)
-  
+  VALIDATE_DOCUMENT(document, NO)
+
+  BOOL success = NO;
   for (PSPDFFormElement *formElement in document.formParser.forms) {
     if ([formElement.fullyQualifiedFieldName isEqualToString:fullyQualifiedName]) {
       if ([formElement isKindOfClass:PSPDFButtonFormElement.class]) {
         if ([value isEqualToString:@"selected"]) {
           [(PSPDFButtonFormElement *)formElement select];
+          success = YES;
         } else if ([value isEqualToString:@"deselected"]) {
           [(PSPDFButtonFormElement *)formElement deselect];
+          success = YES;
         }
       } else if ([formElement isKindOfClass:PSPDFChoiceFormElement.class]) {
         ((PSPDFChoiceFormElement *)formElement).selectedIndices = [NSIndexSet indexSetWithIndex:value.integerValue];
+        success = YES;
       } else if ([formElement isKindOfClass:PSPDFTextFieldFormElement.class]) {
         formElement.contents = value;
+        success = YES;
       } else if ([formElement isKindOfClass:PSPDFSignatureFormElement.class]) {
         NSLog(@"Signature form elements are not supported.");
+        success = NO;
       } else {
         NSLog(@"Unsupported form element.");
+        success = NO;
       }
       break;
     }
   }
+  return success;
 }
 
 #pragma mark - Notifications

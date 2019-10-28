@@ -233,10 +233,15 @@ RCT_EXPORT_METHOD(getFormFieldValue:(NSString *)fullyQualifiedName reactTag:(non
   });
 }
 
-RCT_EXPORT_METHOD(setFormFieldValue:(nullable NSString *)value fullyQualifiedName:(NSString *)fullyQualifiedName reactTag:(nonnull NSNumber *)reactTag) {
+RCT_EXPORT_METHOD(setFormFieldValue:(nullable NSString *)value fullyQualifiedName:(NSString *)fullyQualifiedName reactTag:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   dispatch_async(dispatch_get_main_queue(), ^{
     RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
-    [component setFormFieldValue:value fullyQualifiedName:fullyQualifiedName];
+    BOOL success = [component setFormFieldValue:value fullyQualifiedName:fullyQualifiedName];
+     if (success) {
+       resolve(@(success));
+     } else {
+       reject(@"error", @"Failed to set form field value.", nil);
+     }
   });
 }
 

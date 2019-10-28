@@ -477,7 +477,18 @@ class ManualSave extends Component {
             <Button
               onPress={() => {
                 // Manual Save
-                this.refs.pdfView.saveCurrentDocument();
+                this.refs.pdfView
+                  .saveCurrentDocument()
+                  .then(result => {
+                    if (result) {
+                      alert("Successfully saved current document.");
+                    } else {
+                      alert("Failed to save current document.");
+                    }
+                  })
+                  .catch(error => {
+                    alert(JSON.stringify(error));
+                  });
               }}
               title="Save"
             />
@@ -835,24 +846,128 @@ class ProgrammaticFormFilling extends Component {
             <Button
               onPress={() => {
                 // Fill Text Form Fields.
-                this.refs.pdfView.setFormFieldValue("Name_Last", "Appleseed");
-                this.refs.pdfView.setFormFieldValue("Name_First", "John");
-                this.refs.pdfView.setFormFieldValue(
-                  "Address_1",
-                  "1 Infinite Loop"
-                );
-                this.refs.pdfView.setFormFieldValue("City", "Cupertino");
-                this.refs.pdfView.setFormFieldValue("STATE", "CA");
-                this.refs.pdfView.setFormFieldValue("SSN", "123456789");
-                this.refs.pdfView.setFormFieldValue(
-                  "Telephone_Home",
-                  "(123) 456-7890"
-                );
-                this.refs.pdfView.setFormFieldValue("Birthdate", "1/1/1983");
+                this.refs.pdfView
+                  .setFormFieldValue("Name_Last", "Appleseed")
+                  .then(result => {
+                    if (result) {
+                      console.log("Successfully set the form field value.");
+                    } else {
+                      alert("Failed to set form field value.");
+                    }
+                  })
+                  .catch(error => {
+                    alert(JSON.stringify(error));
+                  });
+                this.refs.pdfView
+                  .setFormFieldValue("Name_First", "John")
+                  .then(result => {
+                    if (result) {
+                      console.log("Successfully set the form field value.");
+                    } else {
+                      alert("Failed to set form field value.");
+                    }
+                  })
+                  .catch(error => {
+                    alert(JSON.stringify(error));
+                  });
+                this.refs.pdfView
+                  .setFormFieldValue("Address_1", "1 Infinite Loop")
+                  .then(result => {
+                    if (result) {
+                      console.log("Successfully set the form field value.");
+                    } else {
+                      alert("Failed to set form field value.");
+                    }
+                  })
+                  .catch(error => {
+                    alert(JSON.stringify(error));
+                  });
+                this.refs.pdfView
+                  .setFormFieldValue("City", "Cupertino")
+                  .then(result => {
+                    if (result) {
+                      console.log("Successfully set the form field value.");
+                    } else {
+                      alert("Failed to set form field value.");
+                    }
+                  })
+                  .catch(error => {
+                    alert(JSON.stringify(error));
+                  });
+                this.refs.pdfView
+                  .setFormFieldValue("STATE", "CA")
+                  .then(result => {
+                    if (result) {
+                      console.log("Successfully set the form field value.");
+                    } else {
+                      alert("Failed to set form field value.");
+                    }
+                  })
+                  .catch(error => {
+                    alert(JSON.stringify(error));
+                  });
+                this.refs.pdfView
+                  .setFormFieldValue("SSN", "123456789")
+                  .then(result => {
+                    if (result) {
+                      console.log("Successfully set the form field value.");
+                    } else {
+                      alert("Failed to set form field value.");
+                    }
+                  })
+                  .catch(error => {
+                    alert(JSON.stringify(error));
+                  });
+                this.refs.pdfView
+                  .setFormFieldValue("Telephone_Home", "(123) 456-7890")
+                  .then(result => {
+                    if (result) {
+                      console.log("Successfully set the form field value.");
+                    } else {
+                      alert("Failed to set form field value.");
+                    }
+                  })
+                  .catch(error => {
+                    alert(JSON.stringify(error));
+                  });
+                this.refs.pdfView
+                  .setFormFieldValue("Birthdate", "1/1/1983")
+                  .then(result => {
+                    if (result) {
+                      console.log("Successfully set the form field value.");
+                    } else {
+                      alert("Failed to set form field value.");
+                    }
+                  })
+                  .catch(error => {
+                    alert(JSON.stringify(error));
+                  });
 
                 // Select a button form elements.
-                this.refs.pdfView.setFormFieldValue("Sex.0", "selected");
-                this.refs.pdfView.setFormFieldValue("PHD", "selected");
+                this.refs.pdfView
+                  .setFormFieldValue("Sex.0", "selected")
+                  .then(result => {
+                    if (result) {
+                      console.log("Successfully set the form field value.");
+                    } else {
+                      alert("Failed to set form field value.");
+                    }
+                  })
+                  .catch(error => {
+                    alert(JSON.stringify(error));
+                  });
+                this.refs.pdfView
+                  .setFormFieldValue("PHD", "selected")
+                  .then(result => {
+                    if (result) {
+                      console.log("Successfully set the form field value.");
+                    } else {
+                      alert("Failed to set form field value.");
+                    }
+                  })
+                  .catch(error => {
+                    alert(JSON.stringify(error));
+                  });
               }}
               title="Fill Forms"
             />
