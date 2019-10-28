@@ -14,12 +14,15 @@
 package com.pspdfkit.react;
 
 import android.content.Context;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableMapKeySetIterator;
+import com.pspdfkit.annotations.AnnotationType;
 import com.pspdfkit.configuration.activity.PdfActivityConfiguration;
 import com.pspdfkit.configuration.activity.ThumbnailBarMode;
 import com.pspdfkit.configuration.activity.UserInterfaceViewMode;
@@ -31,7 +34,15 @@ import com.pspdfkit.configuration.sharing.ShareFeatures;
 
 import java.util.EnumSet;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+
 public class ConfigurationAdapter {
+
+    private static final String LOG_TAG = "ConfigurationAdapter";
+
     private static final String PAGE_SCROLL_DIRECTION = "pageScrollDirection";
     private static final String PAGE_SCROLL_DIRECTION_HORIZONTAL = "horizontal";
     private static final String PAGE_SCROLL_DIRECTION_VERTICAL = "vertical";
@@ -71,6 +82,8 @@ public class ConfigurationAdapter {
     private static final String PAGE_MODE_AUTO = "automatic";
     private static final String FIRST_PAGE_ALWAYS_SINGLE = "firstPageAlwaysSingle";
     private static final String AUTOSAVE_DISABLED = "disableAutomaticSaving";
+    private static final String ANNOTATION_EDITING_ENABLED = "enableAnnotationEditing";
+    private static final String EDITABLE_ANNOTATION_TYPES = "editableAnnotationTypes";
 
     private final PdfActivityConfiguration.Builder configuration;
 
@@ -154,6 +167,12 @@ public class ConfigurationAdapter {
             }
             if (configuration.hasKey(AUTOSAVE_DISABLED)) {
                 configureAutosaveEnabled(!configuration.getBoolean(AUTOSAVE_DISABLED));
+            }
+            if (configuration.hasKey(ANNOTATION_EDITING_ENABLED)) {
+                configureAnnotationEditingEnabled(configuration.getBoolean(ANNOTATION_EDITING_ENABLED));
+            }
+            if (configuration.hasKey(EDITABLE_ANNOTATION_TYPES)) {
+                configureEditableAnnotationTypes(configuration.getArray(EDITABLE_ANNOTATION_TYPES));
             }
         }
     }
@@ -338,6 +357,43 @@ public class ConfigurationAdapter {
 
     private void configureAutosaveEnabled(final boolean autosaveEnabled) {
         configuration.autosaveEnabled(autosaveEnabled);
+    }
+
+    private void configureAnnotationEditingEnabled(final boolean annotationEditingEnabled) {
+        if (annotationEditingEnabled) {
+            configuration.enableAnnotationEditing();
+        } else {
+            configuration.disableAnnotationEditing();
+        }
+    }
+
+    private void configureEditableAnnotationTypes(@Nullable final ReadableArray editableAnnotationTypes) {
+        if (editableAnnotationTypes == null) {
+            // If explicit null is passed we disable annotation editing.
+            configuration.editableAnnotationTypes(Collections.singletonList(AnnotationType.NONE));
+            return;
+        }
+        List<Object> annotationTypes = editableAnnotationTypes.toArrayList();
+        if (annotationTypes.contains("all")) {
+            // Passing in null enables all annotation types.
+            configuration.editableAnnotationTypes(null);
+            return;
+        }
+
+        // Finally create the actual list of enabled annotation types.
+        List<AnnotationType> parsedTypes = new ArrayList<>();
+        for (Object item : annotationTypes) {
+            String annotationType = item.toString();
+            try {
+                parsedTypes.add(AnnotationType.valueOf(annotationType.toUpperCase(Locale.ENGLISH)));
+            } catch (IllegalArgumentException ex) {
+                Log.e(LOG_TAG,
+                    String.format("Illegal option %s provided for configuration option %s. Skipping this %s.", annotationType, EDITABLE_ANNOTATION_TYPES, annotationType),
+                    ex);
+            }
+        }
+
+        configuration.editableAnnotationTypes(parsedTypes);
     }
 
     public PdfActivityConfiguration build() {

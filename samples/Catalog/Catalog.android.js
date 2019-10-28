@@ -46,7 +46,11 @@ const CONFIGURATION = {
   grayScale: true,
   showPageLabels: false,
   pageScrollDirection: "vertical",
-  showThumbnailBar: "scrollable"
+  showThumbnailBar: "scrollable",
+  // Settings this to false will disable all annotation editing
+  enableAnnotationEditing: true,
+  // Only stamps and square annotations will be editable, others can not be selected or otherwise modified.
+  editableAnnotationTypes: ['Stamp', 'Square']
 };
 
 const examples = [
@@ -712,24 +716,30 @@ class PdfViewFormFillingScreen extends Component<{}> {
             <Button
               onPress={() => {
                 // Fill Text Form Fields.
-                this.refs.pdfView.setFormFieldValue("Name_Last", "Appleseed");
-                this.refs.pdfView.setFormFieldValue("Name_First", "John");
-                this.refs.pdfView.setFormFieldValue(
-                  "Address_1",
-                  "1 Infinite Loop"
-                );
-                this.refs.pdfView.setFormFieldValue("City", "Cupertino");
-                this.refs.pdfView.setFormFieldValue("STATE", "CA");
-                this.refs.pdfView.setFormFieldValue("SSN", "123456789");
-                this.refs.pdfView.setFormFieldValue(
-                  "Telephone_Home",
-                  "(123) 456-7890"
-                );
-                this.refs.pdfView.setFormFieldValue("Birthdate", "1/1/1983");
+                Promise.all(
+                  this.refs.pdfView.setFormFieldValue("Name_Last", "Appleseed"),
+                  this.refs.pdfView.setFormFieldValue("Name_First", "John"),
+                  this.refs.pdfView.setFormFieldValue(
+                    "Address_1",
+                    "1 Infinite Loop"
+                  ),
+                  this.refs.pdfView.setFormFieldValue("City", "Cupertino"),
+                  this.refs.pdfView.setFormFieldValue("STATE", "CA"),
+                  this.refs.pdfView.setFormFieldValue("SSN", "123456789"),
+                  this.refs.pdfView.setFormFieldValue(
+                    "Telephone_Home",
+                    "(123) 456-7890"
+                  ),
+                  this.refs.pdfView.setFormFieldValue("Birthdate", "1/1/1983"),
 
-                // Select a button form elements.
-                this.refs.pdfView.setFormFieldValue("Sex.0", "selected");
-                this.refs.pdfView.setFormFieldValue("PHD", "selected");
+                  // Select a button form elements.
+                  this.refs.pdfView.setFormFieldValue("Sex.0", "selected"),
+                  this.refs.pdfView.setFormFieldValue("PHD", "selected")
+                ).then(result => {
+                  // Called when all form field values were set.
+                  // If you want to fill forms then save the document this is the place to do it.
+                  alert("All forms filled!");
+                });
               }}
               title="Fill Forms"
             />
