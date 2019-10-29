@@ -90,7 +90,52 @@ class ManualSigningScreen extends Component<{}> {
   }
 }
 
-class WatermarkScreen extends Component<{}> {}
+class WatermarkScreen extends Component<{}> {
+  constructor(props) {
+    super(props);
+    this.state = {
+      documentPath: FORM_DOCUMENT,
+    };
+  }
+
+  render() {
+    return (
+      <View style={{flex: 1}}>
+        <CustomPdfView
+          ref="pdfView"
+          document={this.state.documentPath}
+          style={{flex: 1}}
+          onDocumentWatermarked={event => {
+            this.setState({
+              documentPath: event.nativeEvent.watermarkedDocumentPath,
+            });
+          }}
+        />
+        <View
+          style={{
+            flexDirection: 'row',
+            height: 40,
+            alignItems: 'center',
+            padding: 10,
+          }}>
+          <View>
+            <Button
+              onPress={() => {
+                // This will open the native signature dialog.
+                UIManager.dispatchViewManagerCommand(
+                  findNodeHandle(this.refs.pdfView),
+                  'createWatermark',
+                  [],
+                );
+              }}
+              title="Create Watermark"
+            />
+          </View>
+        </View>
+      </View>
+    );
+  }
+}
 
 export default createAppContainer(
   createStackNavigator(

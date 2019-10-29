@@ -2,7 +2,10 @@ package com.pspdfkit.nativecatalog;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.net.Uri;
+import android.text.TextPaint;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -23,9 +26,13 @@ import com.pspdfkit.configuration.forms.SignaturePickerOrientation;
 import com.pspdfkit.configuration.signatures.SignatureCertificateSelectionMode;
 import com.pspdfkit.configuration.signatures.SignatureSavingStrategy;
 import com.pspdfkit.document.PdfDocument;
+import com.pspdfkit.document.processor.PageCanvas;
+import com.pspdfkit.document.processor.PdfProcessor;
+import com.pspdfkit.document.processor.PdfProcessorTask;
 import com.pspdfkit.forms.SignatureFormElement;
 import com.pspdfkit.listeners.DocumentSigningListener;
 import com.pspdfkit.nativecatalog.events.DocumentDigitallySignedEvent;
+import com.pspdfkit.nativecatalog.events.DocumentWatermarkedEvent;
 import com.pspdfkit.react.events.PdfViewAnnotationChangedEvent;
 import com.pspdfkit.react.events.PdfViewAnnotationTappedEvent;
 import com.pspdfkit.react.events.PdfViewDataReturnedEvent;
@@ -42,8 +49,10 @@ import com.pspdfkit.ui.PdfFragment;
 import com.pspdfkit.ui.signatures.SignatureOptions;
 import com.pspdfkit.ui.signatures.SignaturePickerFragment;
 import com.pspdfkit.ui.signatures.SignatureSignerDialog;
+import com.pspdfkit.utils.Size;
 import com.pspdfkit.views.PdfView;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.GeneralSecurityException;
@@ -148,6 +157,8 @@ public class CustomPdfViewManager extends SimpleViewManager<PdfView> {
         );
         // This is the event that is sent after digitally signing.
         map.put(DocumentDigitallySignedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onDocumentDigitallySigned"));
+        // This is the event that is sent after watermarking.
+        map.put(DocumentWatermarkedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onDocumentWatermarked"));
         return map;
     }
 
@@ -158,6 +169,10 @@ public class CustomPdfViewManager extends SimpleViewManager<PdfView> {
             case "startSigning":
                 // The user clicked the signing button in react-native, start the native signing flow.
                 performInkSigning(root);
+                break;
+            case "createWatermark":
+                // The user clicked the create watermark button, start our watermarking process.
+                performWatermarking(root);
                 break;
         }
     }
@@ -244,6 +259,45 @@ public class CustomPdfViewManager extends SimpleViewManager<PdfView> {
                 }
             );
         }
+    }
+
+    private void performWatermarking(@NonNull PdfView pdfView) {
+        pdfView.getFragment()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(pdfFragment -> {
+                PdfDocument document = pdfFragment.getDocument();
+                // Create our task we'll use for watermarking.
+                PdfProcessorTask task = PdfProcessorTask.fromDocument(document);
+
+                // Now we'll add a text on each page.
+                TextPaint textPaint = new TextPaint();
+                textPaint.setColor(Color.argb(128, 255, 0, 255));
+                textPaint.setTextSize(72);
+                textPaint.setTextAlign(Paint.Align.CENTER);
+                for (int i = 0; i < document.getPageCount(); i++) {
+                    Size pageSize = document.getPageSize(i);
+                    PageCanvas pageCanvas = new PageCanvas(pageSize, canvas -> {
+                        // Move the text to the center.
+                        canvas.translate(pageSize.width / 2, pageSize.height / 2);
+                        // Then rotate the text 45°.
+                        canvas.rotate(45);
+
+                        // Now draw it at 0/0 since we already applied the correct translation.
+                        canvas.drawText("My Watermark", 0f, 0f, textPaint);
+                    });
+                    task.addCanvasDrawingToPage(pageCanvas, i);
+                }
+
+                // Perform the watermarking.
+                File watermarkedFile = new File(pdfView.getContext().getCacheDir(), "watermarked.pdf");
+                PdfProcessor.processDocument(task, watermarkedFile);
+
+                // We successfully watermarked the document, report the new URI to react-native.
+                reactApplicationContext
+                    .getNativeModule(UIManagerModule.class)
+                    .getEventDispatcher()
+                    .dispatchEvent(new DocumentWatermarkedEvent(pdfView.getId(), watermarkedFile.getCanonicalPath()));
+            });
     }
 
     @Override
