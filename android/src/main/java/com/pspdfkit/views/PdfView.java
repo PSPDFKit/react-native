@@ -11,6 +11,7 @@ import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.facebook.react.bridge.ReadableMap;
@@ -70,6 +71,7 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
+import io.reactivex.subjects.Subject;
 
 /**
  * This view displays a {@link com.pspdfkit.ui.PdfFragment} and all associated toolbars.
@@ -707,5 +709,10 @@ public class PdfView extends FrameLayout {
                     }
                     return false;
                 });
+    }
+
+    /** Returns the current fragment if it is set. */
+    public Maybe<PdfFragment> getFragment() {
+        return fragmentGetter.firstElement();
     }
 }
