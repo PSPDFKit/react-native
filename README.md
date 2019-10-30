@@ -519,6 +519,10 @@ const styles = StyleSheet.create({
 
 5. Catalog app is now ready to launch. From `samples/Catalog` directory run `react-native run-android`.
 
+#### Running Native Catalog
+
+See [here](https://github.com/PSPDFKit/react-native/tree/master/samples/NativeCatalog)
+
 #### Configuration
 
 ##### Upload PDF to device

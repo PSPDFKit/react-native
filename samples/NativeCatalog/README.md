@@ -2,6 +2,23 @@
 
 This second, Android only, Catalog example serves to show you how you can leverage the `PdfView` in your own view manager to provide more advanced integrations with PSPDFKit while still using react-native where possible.
 
+### Running this Sample
+
+1. Clone the repository. `git clone https://github.com/PSPDFKit/react-native.git`.
+2. Install dependencies: run `yarn install` from `samples/NativeCatalog` directory.
+3. Add your customer portal password to `samples/NativeCatalog/android/build.gradle`:
+
+```groovy
+      maven {
+          url 'https://customers.pspdfkit.com/maven/'
+
+          credentials {
+              username 'pspdfkit'
+              password 'YOUR_MAVEN_PASSWORD_GOES_HERE'
+          }
+      }
+```
+
 ### Examples
 
 #### Manual Signing
