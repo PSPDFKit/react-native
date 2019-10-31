@@ -2,135 +2,44 @@ package com.pspdfkit.views;
 
 import androidx.annotation.NonNull;
 
-import com.pspdfkit.react.R;
 import com.pspdfkit.ui.forms.FormEditingBar;
-import com.pspdfkit.ui.inspector.PropertyInspectorCoordinatorLayout;
-import com.pspdfkit.ui.inspector.annotation.DefaultAnnotationCreationInspectorController;
-import com.pspdfkit.ui.inspector.annotation.DefaultAnnotationEditingInspectorController;
-import com.pspdfkit.ui.inspector.forms.FormEditingInspectorController;
-import com.pspdfkit.ui.special_mode.controller.AnnotationCreationController;
-import com.pspdfkit.ui.special_mode.controller.AnnotationEditingController;
-import com.pspdfkit.ui.special_mode.controller.FormEditingController;
 import com.pspdfkit.ui.special_mode.controller.TextSelectionController;
-import com.pspdfkit.ui.special_mode.manager.AnnotationManager;
-import com.pspdfkit.ui.special_mode.manager.FormManager;
 import com.pspdfkit.ui.special_mode.manager.TextSelectionManager;
 import com.pspdfkit.ui.toolbar.AnnotationCreationToolbar;
 import com.pspdfkit.ui.toolbar.AnnotationEditingToolbar;
+import com.pspdfkit.ui.toolbar.ContextualToolbar;
 import com.pspdfkit.ui.toolbar.ToolbarCoordinatorLayout;
 import com.pspdfkit.ui.toolbar.grouping.MenuItemGroupingRule;
+import com.pspdfkit.ui.toolbar.grouping.presets.AnnotationCreationToolbarGroupingRule;
 
 import javax.annotation.Nullable;
 
 /**
  * Keeps track of the currently active mode and handles updating the toolbar states.
  */
-class PdfViewModeController implements AnnotationManager.OnAnnotationCreationModeChangeListener,
-        AnnotationManager.OnAnnotationEditingModeChangeListener,
-        FormManager.OnFormElementEditingModeChangeListener,
-        TextSelectionManager.OnTextSelectionModeChangeListener {
+class PdfViewModeController implements
+    TextSelectionManager.OnTextSelectionModeChangeListener,
+    ToolbarCoordinatorLayout.OnContextualToolbarLifecycleListener, FormEditingBar.OnFormEditingBarLifecycleListener {
 
     private final PdfView parent;
-    private final ToolbarCoordinatorLayout toolbarCoordinatorLayout;
-    private final AnnotationCreationToolbar annotationCreationToolbar;
-    private final AnnotationEditingToolbar annotationEditingToolbar;
-    private final FormEditingBar formEditingBar;
 
     private boolean annotationCreationActive = false;
     private boolean annotationEditingActive = false;
     private boolean textSelectionActive = false;
     private boolean formEditingActive = false;
 
-    private final DefaultAnnotationCreationInspectorController annotationCreationInspectorController;
-    private final DefaultAnnotationEditingInspectorController annotationEditingInspectorController;
-    private final FormEditingInspectorController formEditingInspectorController;
+    @Nullable
+    private MenuItemGroupingRule itemGroupingRule;
 
-    PdfViewModeController(PdfView parent,
-                          PropertyInspectorCoordinatorLayout inspectorCoordinatorLayout,
-                          ToolbarCoordinatorLayout toolbarCoordinatorLayout,
-                          FormEditingBar formEditingBar) {
+    PdfViewModeController(@NonNull PdfView parent) {
         this.parent = parent;
-        this.toolbarCoordinatorLayout = toolbarCoordinatorLayout;
-        this.annotationCreationToolbar = new AnnotationCreationToolbar(parent.getContext());
-        this.annotationEditingToolbar = new AnnotationEditingToolbar(parent.getContext());
-        this.formEditingBar = formEditingBar;
-
-        this.annotationCreationInspectorController = new DefaultAnnotationCreationInspectorController(parent.getContext(), inspectorCoordinatorLayout);
-        this.annotationEditingInspectorController = new DefaultAnnotationEditingInspectorController(parent.getContext(), inspectorCoordinatorLayout);
-        this.formEditingInspectorController = new FormEditingInspectorController(parent.getContext(), inspectorCoordinatorLayout);
     }
 
     /**
      * Sets the menu item grouping rule that will be used for the annotation creation toolbar.
      */
     public void setMenuItemGroupingRule(@Nullable MenuItemGroupingRule groupingRule) {
-        this.annotationCreationToolbar.setMenuItemGroupingRule(groupingRule);
-    }
-
-    @Override
-    public void onEnterAnnotationCreationMode(@NonNull AnnotationCreationController controller) {
-        annotationCreationActive = true;
-
-        // When entering the annotation creation mode we bind the creation inspector to the provided controller.
-        // Controller handles request for toggling annotation inspector.
-        annotationCreationInspectorController.bindAnnotationCreationController(controller);
-
-        // When entering the annotation creation mode we bind the toolbar to the provided controller, and
-        // issue the coordinator layout to animate the toolbar in place.
-        // Whenever the user presses an action, the toolbar forwards this command to the controller.
-        annotationCreationToolbar.bindController(controller);
-        toolbarCoordinatorLayout.displayContextualToolbar(annotationCreationToolbar, true);
-        parent.manuallyLayoutChildren();
-        parent.updateState();
-    }
-
-    @Override
-    public void onChangeAnnotationCreationMode(@NonNull AnnotationCreationController controller) {
-        // Nothing to be done here, if toolbar is bound to the controller it will pick up the changes.
-    }
-
-    @Override
-    public void onExitAnnotationCreationMode(@NonNull AnnotationCreationController controller) {
-        annotationCreationActive = false;
-
-        // Once we're done with editing, unbind the controller from the toolbar, and remove it from the
-        // toolbar coordinator layout (with animation in this case).
-        toolbarCoordinatorLayout.removeContextualToolbar(true);
-        annotationCreationToolbar.unbindController();
-
-        // Also unbind the annotation creation controller from the inspector controller.
-        annotationCreationInspectorController.unbindAnnotationCreationController();
-        parent.manuallyLayoutChildren();
-        parent.updateState();
-    }
-
-    @Override
-    public void onEnterAnnotationEditingMode(@NonNull AnnotationEditingController controller) {
-        annotationEditingActive = true;
-
-        annotationEditingInspectorController.bindAnnotationEditingController(controller);
-
-        annotationEditingToolbar.bindController(controller);
-        toolbarCoordinatorLayout.displayContextualToolbar(annotationEditingToolbar, true);
-        parent.manuallyLayoutChildren();
-        parent.updateState();
-    }
-
-    @Override
-    public void onChangeAnnotationEditingMode(@NonNull AnnotationEditingController controller) {
-        // Nothing to be done here, if toolbar is bound to the controller it will pick up the changes.
-    }
-
-    @Override
-    public void onExitAnnotationEditingMode(@NonNull AnnotationEditingController controller) {
-        annotationEditingActive = false;
-
-        toolbarCoordinatorLayout.removeContextualToolbar(true);
-        annotationEditingToolbar.unbindController();
-
-        annotationEditingInspectorController.unbindAnnotationEditingController();
-        parent.manuallyLayoutChildren();
-        parent.updateState();
+        this.itemGroupingRule = groupingRule;
     }
 
     @Override
@@ -141,42 +50,6 @@ class PdfViewModeController implements AnnotationManager.OnAnnotationCreationMod
     @Override
     public void onExitTextSelectionMode(@NonNull TextSelectionController controller) {
         textSelectionActive = false;
-    }
-
-    @Override
-    public void onEnterFormElementEditingMode(@NonNull FormEditingController controller) {
-        formEditingActive = true;
-
-        formEditingInspectorController.bindFormEditingController(controller);
-        formEditingBar.bindController(controller);
-        parent.manuallyLayoutChildren();
-        parent.updateState();
-    }
-
-    @Override
-    public void onChangeFormElementEditingMode(@NonNull FormEditingController controller) {
-
-    }
-
-    @Override
-    public void onExitFormElementEditingMode(@NonNull FormEditingController controller) {
-        formEditingActive = false;
-
-        formEditingInspectorController.unbindFormEditingController();
-        formEditingBar.unbindController();
-        parent.manuallyLayoutChildren();
-        parent.updateState();
-    }
-
-    void resetToolbars() {
-        toolbarCoordinatorLayout.removeContextualToolbar(false);
-        annotationCreationToolbar.unbindController();
-        annotationCreationActive = false;
-        annotationCreationInspectorController.unbindAnnotationCreationController();
-        annotationEditingToolbar.unbindController();
-        annotationEditingInspectorController.unbindAnnotationEditingController();
-        formEditingInspectorController.unbindFormEditingController();
-        formEditingBar.unbindController();
     }
 
     boolean isAnnotationCreationActive() {
@@ -193,5 +66,59 @@ class PdfViewModeController implements AnnotationManager.OnAnnotationCreationMod
 
     boolean isFormEditingActive() {
         return formEditingActive;
+    }
+
+    @Override
+    public void onPrepareContextualToolbar(@NonNull ContextualToolbar contextualToolbar) {
+        if (contextualToolbar instanceof AnnotationCreationToolbar) {
+            if (itemGroupingRule != null) {
+                contextualToolbar.setMenuItemGroupingRule(itemGroupingRule);
+            } else {
+                contextualToolbar.setMenuItemGroupingRule(new AnnotationCreationToolbarGroupingRule(parent.getContext()));
+            }
+        }
+    }
+
+    @Override
+    public void onDisplayContextualToolbar(@NonNull ContextualToolbar contextualToolbar) {
+        if (contextualToolbar instanceof AnnotationCreationToolbar) {
+            annotationCreationActive = true;
+        }
+        if (contextualToolbar instanceof AnnotationEditingToolbar) {
+            annotationEditingActive = true;
+        }
+
+        parent.updateState();
+    }
+
+    @Override
+    public void onRemoveContextualToolbar(@NonNull ContextualToolbar contextualToolbar) {
+        if (contextualToolbar instanceof AnnotationCreationToolbar) {
+            annotationCreationActive = false;
+        }
+        if (contextualToolbar instanceof AnnotationEditingToolbar) {
+            annotationEditingActive = false;
+        }
+
+        parent.updateState();
+    }
+
+    @Override
+    public void onPrepareFormEditingBar(@NonNull FormEditingBar formEditingBar) {
+        // Not required.
+    }
+
+    @Override
+    public void onDisplayFormEditingBar(@NonNull FormEditingBar formEditingBar) {
+        formEditingActive = true;
+
+        parent.updateState();
+    }
+
+    @Override
+    public void onRemoveFormEditingBar(@NonNull FormEditingBar formEditingBar) {
+        formEditingActive = false;
+
+        parent.updateState();
     }
 }
