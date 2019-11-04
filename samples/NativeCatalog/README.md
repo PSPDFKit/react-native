@@ -9,15 +9,17 @@ This second, Android only, Catalog example serves to show you how you can levera
 3. Add your customer portal password to `samples/NativeCatalog/android/build.gradle`:
 
 ```groovy
-      maven {
-          url 'https://customers.pspdfkit.com/maven/'
+maven {
+    url 'https://customers.pspdfkit.com/maven/'
 
-          credentials {
-              username 'pspdfkit'
-              password 'YOUR_MAVEN_PASSWORD_GOES_HERE'
-          }
-      }
+    credentials {
+        username 'pspdfkit'
+        password 'YOUR_MAVEN_PASSWORD_GOES_HERE'
+    }
+}
 ```
+
+4. Native Catalog app is now ready to launch. From `samples/NativeCatalog` directory run `react-native run-android`.
 
 ### Examples
 

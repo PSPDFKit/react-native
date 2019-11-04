@@ -85,8 +85,9 @@ public class CustomPdfViewManager extends SimpleViewManager<PdfView> {
     }
 
     private void addJohnAppleseedCertificateToTrustedCertificates(@NonNull Context context) {
+        InputStream keystoreFile = null;
         try {
-            final InputStream keystoreFile = context.getAssets().open("JohnAppleseed.p12");
+            keystoreFile = context.getAssets().open("JohnAppleseed.p12");
             // Inside a p12 we have both the certificate and private key used for signing. We just need the certificate here.
             // Proper signatures should have a root CA approved certificate making this step unnecessary.
             KeyStore.PrivateKeyEntry key = SignatureManager.loadPrivateKeyPairFromStream(keystoreFile, "test", null, null);
@@ -95,6 +96,14 @@ public class CustomPdfViewManager extends SimpleViewManager<PdfView> {
             }
         } catch (IOException | GeneralSecurityException e) {
             Log.e("PSPDFKit", "Couldn't load and add John Appleseed certificate to trusted certificate list!");
+        } finally {
+            if (keystoreFile != null) {
+                try {
+                    keystoreFile.close();
+                } catch (IOException e) {
+                    Log.e("PSPDFKit", "Couldn't load and add John Appleseed certificate to trusted certificate list!");
+                }
+            }
         }
     }
 
@@ -145,16 +154,8 @@ public class CustomPdfViewManager extends SimpleViewManager<PdfView> {
     @Nullable
     @Override
     public Map getExportedCustomDirectEventTypeConstants() {
-        // These are required for the PdfView to work.
-        // You can see them in ReactPdfViewManager.java
-        Map map = MapBuilder.of(PdfViewStateChangedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onStateChanged"),
-            PdfViewDocumentSavedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onDocumentSaved"),
-            PdfViewAnnotationTappedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onAnnotationTapped"),
-            PdfViewAnnotationChangedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onAnnotationsChanged"),
-            PdfViewDataReturnedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onDataReturned"),
-            PdfViewDocumentSaveFailedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onDocumentSaveFailed"),
-            PdfViewDocumentLoadFailedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onDocumentLoadFailed")
-        );
+        // Get the default events exposed by the PdfView.
+        Map map = PdfView.createDefaultEventRegistrationMap();
         // This is the event that is sent after digitally signing.
         map.put(DocumentDigitallySignedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onDocumentDigitallySigned"));
         // This is the event that is sent after watermarking.
