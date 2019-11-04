@@ -92,8 +92,6 @@ public class PdfView extends FrameLayout {
     @Nullable
     private PdfUiFragment fragment;
     private BehaviorSubject<PdfUiFragment> pdfUiFragmentGetter = BehaviorSubject.create();
-    @Nullable
-    private PdfTextSelectionPopupToolbar textSelectionPopupToolbar;
 
     /** An internal id we generate so we can track if fragments found belong to this specific PdfView instance. */
     private int internalId;
@@ -293,6 +291,8 @@ public class PdfView extends FrameLayout {
                 updateState();
             }
         });
+
+        // To prevent listeners from being attached multiple times we clean them before attaching them.
         pdfFragment.removeOnTextSelectionModeChangeListener(pdfViewModeController);
         pdfFragment.addOnTextSelectionModeChangeListener(pdfViewModeController);
         pdfFragment.removeDocumentListener(pdfViewDocumentListener);
@@ -322,10 +322,6 @@ public class PdfView extends FrameLayout {
         pdfUiFragmentGetter = BehaviorSubject.create();
         pendingFragmentActions.dispose();
         pendingFragmentActions = new CompositeDisposable();
-        if (textSelectionPopupToolbar != null) {
-            textSelectionPopupToolbar.dismiss();
-            textSelectionPopupToolbar = null;
-        }
     }
 
     void manuallyLayoutChildren() {
