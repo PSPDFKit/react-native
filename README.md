@@ -521,7 +521,7 @@ const styles = StyleSheet.create({
 
 #### Running Native Catalog
 
-See [here](https://github.com/PSPDFKit/react-native/tree/master/samples/NativeCatalog)
+Take a look at the [instructions to get started here](https://github.com/PSPDFKit/react-native/tree/master/samples/NativeCatalog/README.md)
 
 #### Configuration
 

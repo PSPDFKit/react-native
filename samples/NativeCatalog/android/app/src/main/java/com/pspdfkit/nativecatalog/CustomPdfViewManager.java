@@ -111,7 +111,7 @@ public class CustomPdfViewManager extends SimpleViewManager<PdfView> {
         if (currentActivity instanceof FragmentActivity) {
             FragmentActivity fragmentActivity = (FragmentActivity) currentActivity;
 
-            // You can create a PdfView in your own view manager and use all the work our wrapper already does.
+            // You can create a PdfView in your own view manager to reuse all the work our wrapper already does.
             PdfView pdfView = new PdfView(reactContext);
 
             // Make sure to inject all the classes the view needs to function.
@@ -183,7 +183,7 @@ public class CustomPdfViewManager extends SimpleViewManager<PdfView> {
             .subscribe(pdfFragment -> {
                 // We got our fragment.
                 PdfDocument document = pdfFragment.getDocument();
-                // We have a element with the name EMPLOYEE SIGNATURE in the document, grab a reference here.
+                // We have an element with the name EMPLOYEE SIGNATURE in the document. Grab a reference here.
                 SignatureFormElement signatureFormElement = (SignatureFormElement) document.getFormProvider().getFormElementWithName("EMPLOYEE SIGNATURE");
                 // Now we can display the signature picker.
                 SignaturePickerFragment.show(pdfFragment.getFragmentManager(), new SignaturePickerFragment.OnSignaturePickedListener() {
