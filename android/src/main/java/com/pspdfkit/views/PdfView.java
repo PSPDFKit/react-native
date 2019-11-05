@@ -11,9 +11,11 @@ import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.events.EventDispatcher;
 import com.pspdfkit.annotations.Annotation;
 import com.pspdfkit.annotations.AnnotationType;
@@ -30,6 +32,8 @@ import com.pspdfkit.forms.FormElement;
 import com.pspdfkit.forms.TextFormElement;
 import com.pspdfkit.listeners.OnPreparePopupToolbarListener;
 import com.pspdfkit.listeners.SimpleDocumentListener;
+import com.pspdfkit.react.events.PdfViewAnnotationChangedEvent;
+import com.pspdfkit.react.events.PdfViewAnnotationTappedEvent;
 import com.pspdfkit.react.events.PdfViewDataReturnedEvent;
 import com.pspdfkit.react.events.PdfViewDocumentLoadFailedEvent;
 import com.pspdfkit.react.events.PdfViewDocumentSaveFailedEvent;
@@ -54,6 +58,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.Callable;
 
@@ -70,6 +75,7 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
+import io.reactivex.subjects.Subject;
 
 /**
  * This view displays a {@link com.pspdfkit.ui.PdfFragment} and all associated toolbars.
@@ -707,5 +713,22 @@ public class PdfView extends FrameLayout {
                     }
                     return false;
                 });
+    }
+
+    /** Returns the current fragment if it is set. */
+    public Maybe<PdfFragment> getFragment() {
+        return fragmentGetter.firstElement();
+    }
+
+    /** Returns the event registration map for the default events emitted by the {@link PdfView}. */
+    public static  Map<String, Map<String, String>> createDefaultEventRegistrationMap() {
+       return MapBuilder.of(PdfViewStateChangedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onStateChanged"),
+            PdfViewDocumentSavedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onDocumentSaved"),
+            PdfViewAnnotationTappedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onAnnotationTapped"),
+            PdfViewAnnotationChangedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onAnnotationsChanged"),
+            PdfViewDataReturnedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onDataReturned"),
+            PdfViewDocumentSaveFailedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onDocumentSaveFailed"),
+            PdfViewDocumentLoadFailedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onDocumentLoadFailed")
+        );
     }
 }
