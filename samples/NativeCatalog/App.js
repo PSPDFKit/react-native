@@ -45,6 +45,18 @@ const examples = [
       });
     },
   },
+  {
+    name: 'Watermark on Startup',
+    description:
+      'Shows how to watermark a PDF as soon as it is loaded in our CustomPdfView',
+    action: component => {
+      requestExternalStoragePermission(function() {
+        extractFromAssetsIfMissing('Form_example.pdf', function() {
+          component.props.navigation.navigate('WatermarkStartup');
+        });
+      });
+    },
+  },
 ];
 
 class ManualSigningScreen extends Component<{}> {
@@ -141,6 +153,33 @@ class WatermarkScreen extends Component<{}> {
   }
 }
 
+class WatermarkStartupScreen extends Component<{}> {
+  constructor(props) {
+    super(props);
+    this.state = {
+      // This tag tells our CustomPdfView to apply the watermark to the document before loading it.
+      documentPath: FORM_DOCUMENT+"|ADD_WATERMARK",
+    };
+  }
+
+  render() {
+    return (
+      <View style={{flex: 1}}>
+        <CustomPdfView
+          ref="pdfView"
+          document={this.state.documentPath}
+          style={{flex: 1}}
+          onDocumentWatermarked={event => {
+            this.setState({
+              documentPath: event.nativeEvent.watermarkedDocumentPath,
+            });
+          }}
+        />
+      </View>
+    );
+  }
+}
+
 export default createAppContainer(
   createStackNavigator(
     {
@@ -152,6 +191,9 @@ export default createAppContainer(
       },
       Watermark: {
         screen: WatermarkScreen,
+      },
+      WatermarkStartup: {
+        screen: WatermarkStartupScreen,
       },
     },
     {
