@@ -1,4 +1,4 @@
-platform :ios, '9.0'
+platform :ios, '11.0'
 require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
 
 target 'NativeCatalog' do
@@ -33,6 +33,9 @@ target 'NativeCatalog' do
   pod 'DoubleConversion', :podspec => '../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec'
   pod 'glog', :podspec => '../node_modules/react-native/third-party-podspecs/glog.podspec'
   pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec'
+  
+  pod 'react-native-pspdfkit', :path => '../node_modules/react-native-pspdfkit'  
+  pod 'PSPDFKit', podspec:'https://customers.pspdfkit.com/cocoapods/YOUR_COCOAPODS_KEY_GOES_HERE/pspdfkit/latest.podspec'
 
   target 'NativeCatalogTests' do
     inherit! :search_paths
@@ -40,14 +43,4 @@ target 'NativeCatalog' do
   end
 
   use_native_modules!
-end
-
-target 'NativeCatalog-tvOS' do
-  # Pods for NativeCatalog-tvOS
-
-  target 'NativeCatalog-tvOSTests' do
-    inherit! :search_paths
-    # Pods for testing
-  end
-
 end

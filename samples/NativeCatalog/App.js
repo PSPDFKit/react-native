@@ -18,7 +18,10 @@ import {
 const CustomPdfView = requireNativeComponent('CustomPdfView');
 const PSPDFKit = NativeModules.PSPDFKit;
 
-const FORM_DOCUMENT = 'file:///sdcard/Form_example.pdf';
+const FORM_DOCUMENT =
+  Platform.OS === 'android'
+    ? 'file:///sdcard/Form_example.pdf'
+    : 'PDFs/Form_example.pdf';
 
 const examples = [
   {
@@ -26,11 +29,15 @@ const examples = [
     description:
       'Shows how to start the signing flow using a react-native button linked to our CustomPdfView.',
     action: component => {
-      requestExternalStoragePermission(function() {
-        extractFromAssetsIfMissing('Form_example.pdf', function() {
-          component.props.navigation.navigate('ManualSigning');
+      if (Platform.OS === 'android') {
+        requestExternalStoragePermission(function() {
+          extractFromAssetsIfMissing('Form_example.pdf', function() {
+            component.props.navigation.navigate('ManualSigning');
+          });
         });
-      });
+      } else {
+        component.props.navigation.navigate('ManualSigning');
+      }
     },
   },
   {
@@ -38,11 +45,15 @@ const examples = [
     description:
       'Shows how to watermark a PDF that is loaded in our CustomPdfView',
     action: component => {
-      requestExternalStoragePermission(function() {
-        extractFromAssetsIfMissing('Form_example.pdf', function() {
-          component.props.navigation.navigate('Watermark');
+      if (Platform.OS === 'android') {
+        requestExternalStoragePermission(function() {
+          extractFromAssetsIfMissing('Form_example.pdf', function() {
+            component.props.navigation.navigate('Watermark');
+          });
         });
-      });
+      } else {
+        component.props.navigation.navigate('Watermark');
+      }
     },
   },
   {
@@ -85,17 +96,23 @@ class ManualSigningScreen extends Component<{}> {
             flexDirection: 'row',
             height: 40,
             alignItems: 'center',
-            padding: 10,
+            padding: -10,
           }}>
           <View>
             <Button
               onPress={() => {
                 // This will open the native signature dialog.
-                UIManager.dispatchViewManagerCommand(
-                  findNodeHandle(this.refs.pdfView),
-                  'startSigning',
-                  [],
-                );
+                if (Platform.OS === 'android') {
+                  UIManager.dispatchViewManagerCommand(
+                    findNodeHandle(this.refs.pdfView),
+                    'startSigning',
+                    [],
+                  );
+                } else {
+                  NativeModules.CustomPdfViewManager.startSigning(
+                    findNodeHandle(this.refs.pdfView),
+                  );
+                }
               }}
               title="Start Signing"
             />
@@ -132,17 +149,23 @@ class WatermarkScreen extends Component<{}> {
             flexDirection: 'row',
             height: 40,
             alignItems: 'center',
-            padding: 10,
+            padding: -10,
           }}>
           <View>
             <Button
               onPress={() => {
                 // This will open the native signature dialog.
-                UIManager.dispatchViewManagerCommand(
-                  findNodeHandle(this.refs.pdfView),
-                  'createWatermark',
-                  [],
-                );
+                if (Platform.OS === 'android') {
+                  UIManager.dispatchViewManagerCommand(
+                    findNodeHandle(this.refs.pdfView),
+                    'createWatermark',
+                    [],
+                  );
+                } else {
+                  NativeModules.CustomPdfViewManager.createWatermark(
+                    findNodeHandle(this.refs.pdfView),
+                  );
+                }
               }}
               title="Create Watermark"
             />
