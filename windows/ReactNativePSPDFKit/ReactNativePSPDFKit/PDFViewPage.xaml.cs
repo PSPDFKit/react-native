@@ -206,6 +206,11 @@ namespace ReactNativePSPDFKit
             _annotationCreatorName = annotationAuthorName;
         }
 
+        public void SetReadOnly(bool readOnly)
+        {
+            PdfView.ReadOnly = readOnly;
+        }
+
         private void PDFView_InitializationCompletedHandlerAsync(PdfView sender, Document document)
         {
             _pdfViewInitialized = true;
