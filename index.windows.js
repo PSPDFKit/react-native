@@ -290,6 +290,11 @@ PSPDFKitView.propTypes = {
    */
   pageIndex: PropTypes.number,
   /**
+   * Configuration object, to customize the appearance and behavior of PSPDFKit.
+   * Currently only takes `{{enableAnnotationEditing: false/true}}`
+   */
+  configuration: PropTypes.object,
+  /**
    * Controls whether a navigation bar is created and shown or not. Defaults to showing a navigation bar (false).
    */
   hideNavigationBar: PropTypes.bool,

@@ -20,7 +20,7 @@ namespace ReactNativePSPDFKit
 {
     public class PSPDFKitViewManger : SimpleViewManager<PDFViewPage>
     {
-
+        /// Command to enumeration mapping.
         private const int COMMAND_ENTER_ANNOTATION_CREATION_MODE = 1;
         private const int COMMAND_EXIT_CURRENTLY_ACTIVE_MODE = 2;
         private const int COMMAND_SAVE_CURRENT_DOCUMENT = 3;
@@ -30,6 +30,9 @@ namespace ReactNativePSPDFKit
         private const int COMMAND_SET_TOOLBAR_ITEMS = 7;
         private const int COMMAND_REMOVE_ANNOTATION = 8;
         private const int COMMAND_GET_ALL_ANNOTATIONS = 9;
+
+        /// View configuration string constants
+        private const string CONFIGURATION_ENABLE_ANNOTATION_EDITING = "enableAnnotationEditing";
 
         private readonly Uri _cssResource = null;
         internal PDFViewPage PdfViewPage;
@@ -90,6 +93,14 @@ namespace ReactNativePSPDFKit
         public void SetAnnotationAuthorName(PDFViewPage view, string annotationAuthorName)
         {
             view.SetAnnotationCreatorName(annotationAuthorName);
+        }
+
+        [ReactProp("configuration")]
+        public void SetConfiguration(PDFViewPage view, JObject configuration)
+        {
+            configuration.TryGetValue(CONFIGURATION_ENABLE_ANNOTATION_EDITING, out var enableAnnotationEditingJson);
+            var enableAnnotationEditing = enableAnnotationEditingJson.Value<bool>();
+            view.SetReadOnly(!enableAnnotationEditing);
         }
 
         /// <summary>
