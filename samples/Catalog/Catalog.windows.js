@@ -166,7 +166,7 @@ const examples = [
     name: "Customize the toolbar",
     description: "An example to show how to customize the toolbar UI.",
     action: async component => {
-      component.props.navigation.navigate("PdfViewDisableAnnotationEditing");
+      component.props.navigation.navigate("PdfViewToolbarCustomization");
     }
   },
   {
