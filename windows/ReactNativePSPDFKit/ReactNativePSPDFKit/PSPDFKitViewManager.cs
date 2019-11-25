@@ -98,9 +98,11 @@ namespace ReactNativePSPDFKit
         [ReactProp("configuration")]
         public void SetConfiguration(PDFViewPage view, JObject configuration)
         {
-            configuration.TryGetValue(CONFIGURATION_ENABLE_ANNOTATION_EDITING, out var enableAnnotationEditingJson);
-            var enableAnnotationEditing = enableAnnotationEditingJson.Value<bool>();
-            view.SetReadOnly(!enableAnnotationEditing);
+            if (configuration.TryGetValue(CONFIGURATION_ENABLE_ANNOTATION_EDITING, out var enableAnnotationEditingJson))
+            {
+                var enableAnnotationEditing = enableAnnotationEditingJson.Value<bool>();
+                view.SetReadOnly(!enableAnnotationEditing);
+            }
         }
 
         /// <summary>
