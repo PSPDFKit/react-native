@@ -38,6 +38,7 @@ import com.pspdfkit.react.events.PdfViewStateChangedEvent;
 import com.pspdfkit.react.helper.DocumentJsonDataProvider;
 import com.pspdfkit.ui.DocumentDescriptor;
 import com.pspdfkit.ui.PdfFragment;
+import com.pspdfkit.ui.PdfUi;
 import com.pspdfkit.ui.PdfUiFragment;
 import com.pspdfkit.ui.PdfUiFragmentBuilder;
 import com.pspdfkit.ui.toolbar.grouping.MenuItemGroupingRule;
@@ -653,7 +654,7 @@ public class PdfView extends FrameLayout {
 
     /** Returns the current fragment if it is set. */
     public Maybe<PdfFragment> getFragment() {
-        return fragmentGetter.firstElement();
+        return pdfUiFragmentGetter.firstElement().map(PdfUi::getPdfFragment);
     }
 
     /** Returns the event registration map for the default events emitted by the {@link PdfView}. */
