@@ -26,8 +26,10 @@
 		8439DE9F2100F991008F1674 /* libRNFS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6540D1951D8A9F9100B8F94F /* libRNFS.a */; };
 		8439DEA02100FAA8008F1674 /* libRCTPSPDFKit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 657278841D86C28800A5E1A8 /* libRCTPSPDFKit.a */; };
 		8439DEA42100FCB8008F1674 /* PDFs in Resources */ = {isa = PBXBuildFile; fileRef = 8439DEA32100FCB8008F1674 /* PDFs */; };
-		84AFE0F92326B447000BD717 /* PSPDFKitUI.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84AFE0F72326B446000BD717 /* PSPDFKitUI.xcframework */; };
-		84AFE0FA2326B447000BD717 /* PSPDFKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84AFE0F82326B446000BD717 /* PSPDFKit.xcframework */; };
+		84C69C9C236F22AE001A992C /* PSPDFKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84AFE0F82326B446000BD717 /* PSPDFKit.xcframework */; };
+		84C69C9D236F22AE001A992C /* PSPDFKit.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 84AFE0F82326B446000BD717 /* PSPDFKit.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		84C69CC5236F22B0001A992C /* PSPDFKitUI.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84AFE0F72326B446000BD717 /* PSPDFKitUI.xcframework */; };
+		84C69CC6236F22B0001A992C /* PSPDFKitUI.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 84AFE0F72326B446000BD717 /* PSPDFKitUI.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		84D29148224151C100F55337 /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84D29119224151C100F55337 /* JavaScriptCore.framework */; };
 		84FB136022EB4F83004FF166 /* libRNGestureHandler.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 84FB135D22EB4F3E004FF166 /* libRNGestureHandler.a */; };
 /* End PBXBuildFile section */
@@ -322,6 +324,8 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				84C69CC6236F22B0001A992C /* PSPDFKitUI.xcframework in Embed Frameworks */,
+				84C69C9D236F22AE001A992C /* PSPDFKit.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -372,8 +376,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				84AFE0FA2326B447000BD717 /* PSPDFKit.xcframework in Frameworks */,
-				84AFE0F92326B447000BD717 /* PSPDFKitUI.xcframework in Frameworks */,
+				84C69CC5236F22B0001A992C /* PSPDFKitUI.xcframework in Frameworks */,
+				84C69C9C236F22AE001A992C /* PSPDFKit.xcframework in Frameworks */,
 				84D29148224151C100F55337 /* JavaScriptCore.framework in Frameworks */,
 				841A136C210762A4006CD78D /* libRCTAnimation.a in Frameworks */,
 				8439DEA02100FAA8008F1674 /* libRCTPSPDFKit.a in Frameworks */,
