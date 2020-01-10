@@ -61,15 +61,15 @@ const examples = [
     description:
       'Shows how to watermark a PDF as soon as it is loaded in our CustomPdfView',
     action: component => {
-		if (Platform.OS === 'android') {
-		  requestExternalStoragePermission(function() {
+      if (Platform.OS === 'android') {
+        requestExternalStoragePermission(function() {
           extractFromAssetsIfMissing('Form_example.pdf', function() {
             component.props.navigation.navigate('WatermarkStartup');
           });
         });
       } else {
-	    component.props.navigation.navigate('WatermarkStartup');
-	  }
+        component.props.navigation.navigate('WatermarkStartup');
+      }
     },
   },
 ];
@@ -185,7 +185,7 @@ class WatermarkStartupScreen extends Component<{}> {
     super(props);
     this.state = {
       // This tag tells our CustomPdfView to apply the watermark to the document before loading it.
-      documentPath: FORM_DOCUMENT+"|ADD_WATERMARK",
+      documentPath: FORM_DOCUMENT + '|ADD_WATERMARK',
     };
   }
 
