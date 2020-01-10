@@ -19,7 +19,7 @@ maven {
 }
 ```
 
-4. Native Catalog app is now ready to launch. From `samples/NativeCatalog` directory run `react-native run-android`.
+4. The Native Catalog app is now ready to launch. From `samples/NativeCatalog` directory run `react-native run-android`.
 
 ### Running this Sample on iOS
 
@@ -67,6 +67,7 @@ end
 ```
 
 4. `cd ios` then run `pod install`.
+5. The Native Catalog app is now ready to launch. From `samples/NativeCatalog` directory run `react-native run-ios`.
 
 ### Examples
 
