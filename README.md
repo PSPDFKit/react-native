@@ -722,11 +722,12 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
 </ResourceDictionary>
 ```
 
-21. Change the target SDK of YourApp to >= 10.0.17134 and Min Version to >= 10.0.16299 : Right Click on YourApp -> Properties. Go to
+21. Change the Package Name of the application to match the bundle ID you registered with PSPDFKit. More details on this can be found in https://pspdfkit.com/guides/windows/current/faq/what-is-a-bundle-id/.
+22. Change the target SDK of YourApp to >= 10.0.17134 and Min Version to >= 10.0.16299 : Right Click on YourApp -> Properties. Go to
     Application and change Target Version to >= 10.0.17134 and change Min Version to >= 10.0.16299.
     ![Change SDK Version](screenshots/changeVersionSDK.png)
-22. Save Changes: File -> Save All
-23. Add the `PSPDFKitView` and `PSPDFKit` module into your `App.windows.js` file, located at the base of `YourApp` folder, and add a open button to allow the user to navigate the file system.
+23. Save Changes: File -> Save All
+24. Add the `PSPDFKitView` and `PSPDFKit` module into your `App.windows.js` file, located at the base of `YourApp` folder, and add a open button to allow the user to navigate the file system.
 
 ```javascript
 import React, { Component } from "react";
@@ -795,10 +796,10 @@ var styles = StyleSheet.create({
 });
 ```
 
-24. Now start the server on the command line: `react-native start`.
-25. Press Yes when PowerShell wants to run.
-26. Type 'y' when asking if you want to install the certificate.
-27. Run the catalog project from Visual Studio by clicking `Local Machine` towards the top of the window. (Ensure x64 or x86 is selected)
+25. Now start the server on the command line: `react-native start`.
+26. Press Yes when PowerShell wants to run.
+27. Type 'y' when asking if you want to install the certificate.
+28. Run the catalog project from Visual Studio by clicking `Local Machine` towards the top of the window. (Ensure x64 or x86 is selected)
 
 #### Running Catalog Project
 
