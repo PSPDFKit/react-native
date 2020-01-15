@@ -1,7 +1,4 @@
 //
-//  CustomPdfView.m
-//  NativeCatalog
-//
 //  Copyright © 2020 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
