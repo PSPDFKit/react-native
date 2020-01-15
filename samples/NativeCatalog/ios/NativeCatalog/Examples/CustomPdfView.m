@@ -173,7 +173,7 @@
     [signatureController dismissViewControllerAnimated:YES completion:NULL];
 }
 
-- (BOOL)createWatermark {
+- (BOOL)createWatermarkAndReloadData:(BOOL)reloadData {
   PSPDFDocument *document = _pdfController.document;
   const PSPDFRenderDrawBlock drawBlock = ^(CGContextRef context, NSUInteger page, CGRect cropBox, PSPDFRenderOptions *options) {
     NSString *text = @"My Watermark";
@@ -189,7 +189,9 @@
     options.drawBlock = drawBlock;
   }];
 
-  [_pdfController reloadData];
+  if (reloadData) {
+    [_pdfController reloadData];
+  }
   return YES;
 }
 

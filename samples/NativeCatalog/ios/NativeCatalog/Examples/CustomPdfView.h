@@ -24,7 +24,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) RCTBubblingEventBlock onDocumentDigitallySigned;
 
 - (BOOL)startSigning;
-- (BOOL)createWatermark;
+- (BOOL)createWatermarkAndReloadData:(BOOL)reloadData;
+
 @end
 
 NS_ASSUME_NONNULL_END

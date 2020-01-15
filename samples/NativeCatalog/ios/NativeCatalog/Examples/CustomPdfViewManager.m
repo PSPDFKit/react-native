@@ -27,7 +27,7 @@ RCT_CUSTOM_VIEW_PROPERTY(document, PSPDFDocument, CustomPdfView) {
       if ([path hasSuffix:@"|ADD_WATERMARK"]) {
         path = [path stringByReplacingOccurrencesOfString:@"|ADD_WATERMARK" withString:@""];
         view.pdfController.document = [RCTConvert PSPDFDocument:path];
-        [view createWatermark];
+        [view createWatermarkAndReloadData:NO];
         return;
       }
     }
@@ -54,7 +54,7 @@ RCT_EXPORT_METHOD(createWatermark:(nonnull NSNumber *)reactTag resolver:(RCTProm
   dispatch_async(dispatch_get_main_queue(), ^{
     CustomPdfView *component = (CustomPdfView *)[self.bridge.uiManager viewForReactTag:reactTag];
     NSError *error;
-    BOOL success = [component createWatermark];
+    BOOL success = [component createWatermarkAndReloadData:YES];
     if (success) {
       resolve(@(success));
     } else {
