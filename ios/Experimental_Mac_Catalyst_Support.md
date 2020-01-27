@@ -1,12 +1,13 @@
 ## Experimental Mac Catalyst Support
 
-## Considerations:
+## Why is Mac Catalyst Not Fully Supported Yet?
 
 - Since React Native 0.60, [new React Native projects use CocoaPods by default](https://facebook.github.io/react-native/blog/2019/07/03/version-60#cocoapods-by-default).
 - React Native does not officially support Mac Catalyst. See https://github.com/react-native-community/discussions-and-proposals/issues/131
 - At the moment, the latest stable version of CocoaPods (1.8.4) does not support XCFrameworks, which are required for Mac Catalyst. Partial support for XCFrameworks has been added to CocoaPods version 1.9.0.beta.2. See https://github.com/CocoaPods/CocoaPods/issues/9148 for more details.
-- In our CocoaPods artifacts, we do not offer XCFrameworks. We plan on offering them as soon as they are fully supported by the latest stable version of CocoaPods. Below, we walk you trough how to create your own local CocoaPods Artifacts that are compatible with XCFrameworks and Mac Catalyst.
-- In this tutorial, we discuss how to integrate PSPDFKit in a newly created React Native project. Since the instructions, involve modifying React Native code to make the project compile on Mac Catalyst, the project will on run on macOS and not on iOS.
+- In our CocoaPods artifacts, we do not offer XCFrameworks yet, but we plan on offering them as soon as they are fully supported by the latest stable version of CocoaPods. 
+
+Below, we walk you trough how to create your own local CocoaPods Artifacts that are compatible with XCFrameworks and Mac Catalyst. In this tutorial, we discuss how to integrate PSPDFKit in a newly created React Native project. Since the instructions, involve modifying React Native code to make the project compile on Mac Catalyst, the project will on run on macOS and not on iOS.
 
 ### Requirements
 
