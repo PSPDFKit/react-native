@@ -18,20 +18,19 @@ Below, we walk you trough how to create your own local CocoaPods Artifacts that 
 
 ### Getting Started
 
-#### Creating the CocoaPods Artifacts.
+#### Creating the CocoaPods Artifacts
 
 1. If you’re an existing customer, download PSPDFKit for iOS from the [customer portal](https://customers.pspdfkit.com/). Otherwise, if you don’t already have PSPDFKit, [sign up for our 60-day trial](https://pspdfkit.com/try/) and you will receive an email with the download instructions.
-2. Copy `PSPDFKit.xcframework` and `PSPDFKitUI.xcframework` in a writable location - say the `~/Downloads` folder.
-3. Remove `strip-bitcode.sh` and `strip-framework.sh` from `PSPDFKit.xcframework/ios-x86_64-maccatalyst/PSPDFKit.framework`:
+2. Copy `PSPDFKit.xcframework` and `PSPDFKitUI.xcframework` in a writable location. We'll use the `~/Downloads` folder.
+3. Remove `strip-bitcode.sh` and `strip-framework.sh` from `PSPDFKit.xcframework/*/PSPDFKit.framework`:
 
 ```sh
-rm PSPDFKit.xcframework/ios-x86_64-maccatalyst/PSPDFKit.framework/strip-bitcode.sh
-rm PSPDFKit.xcframework/ios-x86_64-maccatalyst/PSPDFKit.framework/strip-framework.sh
+rm PSPDFKit.xcframework/*/PSPDFKit.framework/strip-*.sh
 ```
 
-3. Select `PSPDFKit.xcframework` and `PSPDFKitUI.xcframework`, right-click on them, then create an archive buy compressing them into a `.zip` file.
+4. Create an archive (`.zip` file) by compressing `PSPDFKit.xcframework` and `PSPDFKitUI.xcframework` into `PSPDFKit.zip`: 
 	![compress-xcframeworks](../screenshots/compress-xcframeworks.png)
-4. Rename the resulting `Archive.zip` to `PSPDFKit.zip`
+5. Rename the resulting `Archive.zip` to `PSPDFKit.zip`.
 
 #### Integrating PSPDFKit in a New React Native Project
 
@@ -42,7 +41,7 @@ Let's create a simple app that integrates PSPDFKit and uses the `react-native-ps
 3. Step into your newly created app folder: `cd YourApp`
 4. Install `react-native-pspdfkit` from GitHub: `yarn add github:PSPDFKit/react-native`
 5. Install all the dependencies for the project: `yarn install`. (Because of a [bug](https://github.com/yarnpkg/yarn/issues/2165) you may need to clean `yarn`'s cache with `yarn cache clean` before.)
-6. Open `ios/Podile` in a text editor: `open ios/Podfile`, update the platform to iOS 11, and add the CocoaPods URLs.
+6. Open `ios/Podile` in a text editor: `open ios/Podfile`, update the platform to iOS 11, and add the CocoaPods URLs:
 
 ```diff
 - platform :ios, '9.0'
@@ -83,7 +82,7 @@ target 'YourApp' do
 end
 ```
 
-7. In the `ios` folder, copy the CocoaPods artifatcs that you created earlier: `cp PSPDFKit.zip YourApp/ios/`
+7. In the `ios` folder, copy the CocoaPods artifatcs that you created earlier: `cp PSPDFKit.zip YourApp/ios/`.
 8. In the `ios` folder, create a new `PSPDFKit.podspec` file with the following content:
 
 ```podspec
