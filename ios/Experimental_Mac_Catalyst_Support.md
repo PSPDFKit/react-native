@@ -21,6 +21,13 @@
 
 1. If you’re an existing customer, download PSPDFKit for iOS from the [customer portal](https://customers.pspdfkit.com/). Otherwise, if you don’t already have PSPDFKit, [sign up for our 60-day trial](https://pspdfkit.com/try/) and you will receive an email with the download instructions.
 2. Copy `PSPDFKit.xcframework` and `PSPDFKitUI.xcframework` in a writable location - say the `~/Downloads` folder.
+3. Remove `strip-bitcode.sh` and `strip-framework.sh` from `PSPDFKit.xcframework/ios-x86_64-maccatalyst/PSPDFKit.framework`:
+
+```sh
+rm PSPDFKit.xcframework/ios-x86_64-maccatalyst/PSPDFKit.framework/strip-bitcode.sh
+rm PSPDFKit.xcframework/ios-x86_64-maccatalyst/PSPDFKit.framework/strip-framework.sh
+```
+
 3. Select `PSPDFKit.xcframework` and `PSPDFKitUI.xcframework`, right-click on them, then create an archive buy compressing them into a `.zip` file.
 	![compress-xcframeworks](../screenshots/compress-xcframeworks.png)
 4. Rename the resulting `Archive.zip` to `PSPDFKit.zip`
