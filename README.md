@@ -29,10 +29,10 @@ The [PSPDFKit SDK](https://pspdfkit.com/) is a framework that allows you to view
 
 #### Requirements
 
-- Xcode 11
-- PSPDFKit 9.0.0 for iOS or later
-- react-native >= 0.60.5
-- CocoaPods >= 1.7.5
+- Xcode 11.3.1
+- PSPDFKit 9.2.0 for iOS or later
+- react-native >= 0.61.5
+- CocoaPods >= 1.8.4
 
 #### Getting Started
 
@@ -261,6 +261,14 @@ Example - Native UI Component:
 - Run the app with `react-native-cli`: `react-native run-ios`
 - If you get an error about `config.h` not being found check out [this blog post](https://tuntunir.blogspot.com/2018/02/react-native-fatal-error-configh-file.html) for information on how to fix it.
 
+#### Running on Mac Catalyst
+
+Using PSPDFKit React Native Wrapper on Mac Catalyst is not fully supported yet. We plan on adding full support for Mac Catalyst as soon as React Native and CocoaPods will full support Mac Catalyst. 
+
+For more details, see [why we don't fully support Mac Catalyst yet here](ios/Experimental_Mac_Catalyst_Support.md#why-is-mac-catalyst-not-fully-supported-yet).
+
+If you wish to try the experimental Support for Mac Catalyst, please follow [the instructions here.](ios/Experimental_Mac_Catalyst_Support.md)
+ 
 #### Configuration Mapping
 
 The PSPDFKit React Native iOS Wrapper maps most configuration options available in `PSPDFConfiguration` from JSON. Please refer to [`RCTConvert+PSPDFConfiguration.m`](./ios/RCTPSPDFKit/Converters/RCTConvert+PSPDFConfiguration.m#L267) for the complete list and for the exact naming of enum values.
