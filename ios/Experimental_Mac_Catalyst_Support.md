@@ -9,7 +9,7 @@
 
 Below, we walk you trough how to create your own local CocoaPods Artifacts that are compatible with XCFrameworks and Mac Catalyst. In this tutorial, we also discuss how to integrate PSPDFKit in a newly created React Native project and how to run it on a Mac. 
 
-**Note:** Since the instructions, involve modifying React Native code to make the project compile on Mac Catalyst, the project will on run on macOS and not on iOS.
+**Note:** Since the instructions involve modifying React Native code to make the project compile on Mac Catalyst, the project will on run only on macOS and not on iOS.
 
 ### Requirements
 
@@ -23,7 +23,7 @@ Below, we walk you trough how to create your own local CocoaPods Artifacts that 
 #### Creating the CocoaPods Artifacts
 
 1. If you’re an existing customer, download PSPDFKit for iOS from the [customer portal](https://customers.pspdfkit.com/). Otherwise, if you don’t already have PSPDFKit, [sign up for our 60-day trial](https://pspdfkit.com/try/) and you will receive an email with the download instructions.
-2. Copy `PSPDFKit.xcframework` and `PSPDFKitUI.xcframework` in a writable location. We'll use the `~/Downloads` folder.
+2. Copy `PSPDFKit.xcframework` and `PSPDFKitUI.xcframework` in a writable location.
 3. Remove `strip-bitcode.sh` and `strip-framework.sh` from `PSPDFKit.xcframework/*/PSPDFKit.framework`:
 
 ```sh
