@@ -272,13 +272,8 @@ class PdfViewScreen extends Component<{}> {
     const params = navigation.state.params || {};
 
     return {
-      title: "PDF",
-      headerRight: (
-        <Button
-          onPress={() => params.handleAnnotationButtonPress()}
-          title="Annotations"
-        />
-      )
+      // Since the PSPDFKitView provides it's own toolbar and back button we don't need a header.
+      header: null,
     };
   };
 
@@ -328,6 +323,10 @@ class PdfViewScreen extends Component<{}> {
           }}
           pageIndex={this.state.currentPageIndex}
           fragmentTag="PDF1"
+          showBackButtonInToolbar={true}
+          onNavigationButtonClicked={event => {
+            this.props.navigation.goBack()
+          }}
           menuItemGrouping={[
             "freetext",
             { key: "markup", items: ["highlight", "underline"] },

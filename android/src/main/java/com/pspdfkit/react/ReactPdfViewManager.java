@@ -148,6 +148,11 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
         view.setMenuItemGroupingRule(groupingRule);
     }
 
+    @ReactProp(name = "showBackButtonInToolbar")
+    public void setShowBackButtonInToolbar(@NonNull final PdfView view, final boolean showBackButtonInToolbar) {
+        view.setShowBackButtonInToolbar(showBackButtonInToolbar);
+    }
+
     @Nullable
     @Override
     public Map getExportedCustomDirectEventTypeConstants() {

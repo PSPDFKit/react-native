@@ -38,6 +38,7 @@ class PSPDFKitView extends React.Component {
           onDocumentLoadFailed={this._onDocumentLoadFailed}
           onAnnotationTapped={this._onAnnotationTapped}
           onAnnotationsChanged={this._onAnnotationsChanged}
+          onNavigationButtonClicked={this._onNavigationButtonClicked}
           onDataReturned={this._onDataReturned}
         />
       );
@@ -79,6 +80,12 @@ class PSPDFKitView extends React.Component {
   _onAnnotationsChanged = event => {
     if (this.props.onAnnotationsChanged) {
       this.props.onAnnotationsChanged(event.nativeEvent);
+    }
+  };
+
+  _onNavigationButtonClicked = event => {
+    if (this.props.onNavigationButtonClicked) {
+      this.props.onNavigationButtonClicked(event.nativeEvent);
     }
   };
 
@@ -639,7 +646,19 @@ PSPDFKitView.propTypes = {
    *
    * @platform ios
    */
-  toolbarTitle: PropTypes.string
+  toolbarTitle: PropTypes.string,
+  /**
+   * showBackButtonInToolbar: When set to true the toolbar integrated into the PSPDFKitView will display a back button in the top left corner.
+   *
+   * @platform android
+   */
+  showBackButtonInToolbar: PropTypes.bool,
+  /**
+   * onNavigationButtonClicked: When showBackButtonInToolbar is set to true this will notify you when the back button is clicked.
+   *
+   * @platform android
+   */
+  onNavigationButtonClicked: PropTypes.func
 };
 
 if (Platform.OS === "ios" || Platform.OS === "android") {

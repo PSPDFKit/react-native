@@ -34,11 +34,11 @@ import com.pspdfkit.react.events.PdfViewDataReturnedEvent;
 import com.pspdfkit.react.events.PdfViewDocumentLoadFailedEvent;
 import com.pspdfkit.react.events.PdfViewDocumentSaveFailedEvent;
 import com.pspdfkit.react.events.PdfViewDocumentSavedEvent;
+import com.pspdfkit.react.events.PdfViewNavigationButtonClickedEvent;
 import com.pspdfkit.react.events.PdfViewStateChangedEvent;
 import com.pspdfkit.react.helper.DocumentJsonDataProvider;
 import com.pspdfkit.ui.DocumentDescriptor;
 import com.pspdfkit.ui.PdfFragment;
-import com.pspdfkit.ui.PdfUi;
 import com.pspdfkit.ui.PdfUiFragment;
 import com.pspdfkit.ui.PdfUiFragmentBuilder;
 import com.pspdfkit.ui.toolbar.grouping.MenuItemGroupingRule;
@@ -50,6 +50,7 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
@@ -97,7 +98,9 @@ public class PdfView extends FrameLayout {
 
     @Nullable
     private PdfUiFragment fragment;
-    private BehaviorSubject<PdfUiFragment> pdfUiFragmentGetter = BehaviorSubject.create();
+
+    /** We wrap the fragment in a list so we can have a state that encapsulates no element being set. */
+    private BehaviorSubject<List<PdfUiFragment>> pdfUiFragmentGetter = BehaviorSubject.createDefault(Collections.emptyList());
 
     /** An internal id we generate so we can track if fragments found belong to this specific PdfView instance. */
     private int internalId;
@@ -219,6 +222,14 @@ public class PdfView extends FrameLayout {
         pdfViewModeController.setMenuItemGroupingRule(groupingRule);
     }
 
+    public void setShowBackButtonInToolbar(final boolean showBackButtonInToolbar) {
+        pendingFragmentActions.add(getCurrentPdfUiFragment()
+            .observeOn(Schedulers.io())
+            .subscribe(pdfUiFragment -> {
+                ((ReactPdfUiFragment) pdfUiFragment).setShowBackButtonInToolbar(showBackButtonInToolbar);
+            }));
+    }
+
     private void setupFragment() {
         if (fragmentTag != null && configuration != null && document != null) {
             PdfUiFragment pdfFragment = (PdfUiFragment) fragmentManager.findFragmentByTag(fragmentTag);
@@ -235,7 +246,7 @@ public class PdfView extends FrameLayout {
             if (pdfFragment == null) {
                 pdfFragment = PdfUiFragmentBuilder.fromDocumentDescriptor(getContext(), DocumentDescriptor.fromDocument(document))
                     .configuration(configuration)
-                    .fragmentClass(ConfigurationChangeReportingPdfUiFragment.class)
+                    .fragmentClass(ReactPdfUiFragment.class)
                     .build();
                 // We put our internal id so we can track if this fragment belongs to us, used to handle orphaned fragments after hot reloads.
                 pdfFragment.getArguments().putInt(ARG_ROOT_ID, internalId);
@@ -249,7 +260,7 @@ public class PdfView extends FrameLayout {
                     // The document changed create a new PdfFragment.
                     pdfFragment = PdfUiFragmentBuilder.fromDocumentDescriptor(getContext(), DocumentDescriptor.fromDocument(document))
                         .configuration(configuration)
-                        .fragmentClass(ConfigurationChangeReportingPdfUiFragment.class)
+                        .fragmentClass(ReactPdfUiFragment.class)
                         .build();
                     prepareFragment(pdfFragment);
                 } else if (fragmentView != null && fragmentView.getParent() != this) {
@@ -266,7 +277,7 @@ public class PdfView extends FrameLayout {
             }
 
             fragment = pdfFragment;
-            pdfUiFragmentGetter.onNext(fragment);
+            pdfUiFragmentGetter.onNext(Collections.singletonList(pdfFragment));
         }
     }
 
@@ -279,9 +290,17 @@ public class PdfView extends FrameLayout {
 
         pdfUiFragment.setOnContextualToolbarLifecycleListener(pdfViewModeController);
         pdfUiFragment.getPSPDFKitViews().getFormEditingBarView().addOnFormEditingBarLifecycleListener(pdfViewModeController);
-        ((ConfigurationChangeReportingPdfUiFragment) pdfUiFragment).setOnConfigurationChangedListener(() -> {
-            // If the configuration was changed from the UI a new fragment will be created, reattach our listeners.
-            preparePdfFragment(pdfUiFragment.getPdfFragment());
+        ((ReactPdfUiFragment) pdfUiFragment).setReactPdfUiFragmentListener(new ReactPdfUiFragment.ReactPdfUiFragmentListener() {
+            @Override
+            public void onConfigurationChanged(@NonNull PdfUiFragment pdfUiFragment) {
+                // If the configuration was changed from the UI a new fragment will be created, reattach our listeners.
+                preparePdfFragment(pdfUiFragment.getPdfFragment());
+            }
+
+            @Override
+            public void onNavigationButtonClicked(@NonNull PdfUiFragment pdfUiFragment) {
+                eventDispatcher.dispatchEvent(new PdfViewNavigationButtonClickedEvent(getId()));
+            }
         });
 
         // After attaching the PdfUiFragment we can access the PdfFragment.
@@ -315,14 +334,14 @@ public class PdfView extends FrameLayout {
             // Clear everything.
             isActive = false;
             document = null;
+
+            pendingFragmentActions.dispose();
+            pendingFragmentActions = new CompositeDisposable();
         }
 
         fragment = null;
 
-        pdfUiFragmentGetter.onComplete();
-        pdfUiFragmentGetter = BehaviorSubject.create();
-        pendingFragmentActions.dispose();
-        pendingFragmentActions = new CompositeDisposable();
+        pdfUiFragmentGetter.onNext(Collections.emptyList());
     }
 
     void manuallyLayoutChildren() {
@@ -622,9 +641,15 @@ public class PdfView extends FrameLayout {
 
     /** Returns the {@link PdfFragment} hosted in the current {@link PdfUiFragment}. */
     private Observable<PdfFragment> getCurrentPdfFragment() {
+        return getPdfFragment()
+            .take(1);
+    }
+
+    /** Returns the {@link PdfUiFragment}. */
+    private Observable<PdfUiFragment> getCurrentPdfUiFragment() {
         return pdfUiFragmentGetter
-            .filter(pdfUiFragment -> pdfUiFragment.getPdfFragment() != null)
-            .map(PdfUiFragment::getPdfFragment)
+            .filter(pdfUiFragments -> !pdfUiFragments.isEmpty())
+            .map(pdfUiFragments -> pdfUiFragments.get(0))
             .take(1);
     }
 
@@ -642,18 +667,15 @@ public class PdfView extends FrameLayout {
      */
     public Observable<PdfFragment> getPdfFragment() {
         return pdfUiFragmentGetter
+            .filter(pdfUiFragments -> !pdfUiFragments.isEmpty())
+            .map(pdfUiFragments -> pdfUiFragments.get(0))
             .filter(pdfUiFragment -> pdfUiFragment.getPdfFragment() != null)
             .map(PdfUiFragment::getPdfFragment);
     }
 
-    /** Returns the current fragment if it is set. */
-    public Maybe<PdfFragment> getFragment() {
-        return pdfUiFragmentGetter.firstElement().map(PdfUi::getPdfFragment);
-    }
-
     /** Returns the event registration map for the default events emitted by the {@link PdfView}. */
     public static  Map<String, Map<String, String>> createDefaultEventRegistrationMap() {
-       return MapBuilder.of(PdfViewStateChangedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onStateChanged"),
+       Map<String , Map<String, String>> map = MapBuilder.of(PdfViewStateChangedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onStateChanged"),
             PdfViewDocumentSavedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onDocumentSaved"),
             PdfViewAnnotationTappedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onAnnotationTapped"),
             PdfViewAnnotationChangedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onAnnotationsChanged"),
@@ -661,5 +683,9 @@ public class PdfView extends FrameLayout {
             PdfViewDocumentSaveFailedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onDocumentSaveFailed"),
             PdfViewDocumentLoadFailedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onDocumentLoadFailed")
         );
+
+       map.put(PdfViewNavigationButtonClickedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onNavigationButtonClicked"));
+
+       return map;
     }
 }
