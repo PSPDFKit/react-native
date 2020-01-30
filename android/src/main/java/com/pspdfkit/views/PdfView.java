@@ -1,5 +1,6 @@
 package com.pspdfkit.views;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.Uri;
 import android.util.AttributeSet;
@@ -10,7 +11,6 @@ import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.facebook.react.bridge.ReadableMap;
@@ -42,7 +42,6 @@ import com.pspdfkit.ui.PdfUi;
 import com.pspdfkit.ui.PdfUiFragment;
 import com.pspdfkit.ui.PdfUiFragmentBuilder;
 import com.pspdfkit.ui.toolbar.grouping.MenuItemGroupingRule;
-import com.pspdfkit.ui.toolbar.popup.PdfTextSelectionPopupToolbar;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -68,11 +67,11 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
-import io.reactivex.subjects.Subject;
 
 /**
  * This view displays a {@link com.pspdfkit.ui.PdfFragment} and all associated toolbars.
  */
+@SuppressLint("pspdfkit-experimental")
 public class PdfView extends FrameLayout {
 
     private static final String FILE_SCHEME = "file:///";
@@ -299,14 +298,9 @@ public class PdfView extends FrameLayout {
             }
         });
 
-        // To prevent listeners from being attached multiple times we clean them before attaching them.
-        pdfFragment.removeOnTextSelectionModeChangeListener(pdfViewModeController);
         pdfFragment.addOnTextSelectionModeChangeListener(pdfViewModeController);
-        pdfFragment.removeDocumentListener(pdfViewDocumentListener);
         pdfFragment.addDocumentListener(pdfViewDocumentListener);
-        pdfFragment.removeOnAnnotationSelectedListener(pdfViewDocumentListener);
         pdfFragment.addOnAnnotationSelectedListener(pdfViewDocumentListener);
-        pdfFragment.removeOnAnnotationUpdatedListener(pdfViewDocumentListener);
         pdfFragment.addOnAnnotationUpdatedListener(pdfViewDocumentListener);
     }
 
