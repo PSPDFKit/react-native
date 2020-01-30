@@ -323,7 +323,7 @@ class PdfViewScreen extends Component<{}> {
           }}
           pageIndex={this.state.currentPageIndex}
           fragmentTag="PDF1"
-          showBackButtonInToolbar={true}
+          showNavigationButtonInToolbar={true}
           onNavigationButtonClicked={event => {
             this.props.navigation.goBack()
           }}

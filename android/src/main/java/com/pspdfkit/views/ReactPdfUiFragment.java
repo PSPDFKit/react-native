@@ -28,12 +28,12 @@ public class ReactPdfUiFragment extends PdfUiFragment {
 
 
     /** When set to true will add a navigation arrow to the toolbar. */
-    void setShowBackButtonInToolbar(final boolean showBackButtonInToolbar) {
+    void setShowNavigationButtonInToolbar(final boolean showNavigationButtonInToolbar) {
         if (getView() == null) {
             return;
         }
         Toolbar toolbar = getView().findViewById(R.id.pspdf__toolbar_main);
-        if (showBackButtonInToolbar) {
+        if (showNavigationButtonInToolbar) {
             toolbar.setNavigationIcon(R.drawable.pspdf__ic_navigation_arrow);
             toolbar.setNavigationOnClickListener(v -> {
                 if (reactPdfUiFragmentListener != null) {

@@ -648,13 +648,13 @@ PSPDFKitView.propTypes = {
    */
   toolbarTitle: PropTypes.string,
   /**
-   * showBackButtonInToolbar: When set to true the toolbar integrated into the PSPDFKitView will display a back button in the top left corner.
+   * showNavigationButtonInToolbar: When set to true the toolbar integrated into the PSPDFKitView will display a back button in the top left corner.
    *
    * @platform android
    */
-  showBackButtonInToolbar: PropTypes.bool,
+  showNavigationButtonInToolbar: PropTypes.bool,
   /**
-   * onNavigationButtonClicked: When showBackButtonInToolbar is set to true this will notify you when the back button is clicked.
+   * onNavigationButtonClicked: When showNavigationButtonInToolbar is set to true this will notify you when the back button is clicked.
    *
    * @platform android
    */

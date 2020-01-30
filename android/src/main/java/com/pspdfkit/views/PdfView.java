@@ -222,11 +222,11 @@ public class PdfView extends FrameLayout {
         pdfViewModeController.setMenuItemGroupingRule(groupingRule);
     }
 
-    public void setShowBackButtonInToolbar(final boolean showBackButtonInToolbar) {
+    public void setShowNavigationButtonInToolbar(final boolean showNavigationButtonInToolbar) {
         pendingFragmentActions.add(getCurrentPdfUiFragment()
             .observeOn(Schedulers.io())
             .subscribe(pdfUiFragment -> {
-                ((ReactPdfUiFragment) pdfUiFragment).setShowBackButtonInToolbar(showBackButtonInToolbar);
+                ((ReactPdfUiFragment) pdfUiFragment).setShowNavigationButtonInToolbar(showNavigationButtonInToolbar);
             }));
     }
 
