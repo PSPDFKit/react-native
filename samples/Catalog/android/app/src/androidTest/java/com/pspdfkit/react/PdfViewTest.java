@@ -12,6 +12,7 @@ import com.pspdfkit.preferences.PSPDFKitPreferences;
 import com.pspdfkit.react.helper.JsonUtilities;
 import com.pspdfkit.react.test.TestActivity;
 import com.pspdfkit.ui.PdfFragment;
+import com.pspdfkit.ui.PdfUiFragment;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -89,7 +90,7 @@ public class PdfViewTest {
 
         openExample("GetAnnotations");
 
-        PdfFragment fragment = (PdfFragment) activityRule.getActivity().getSupportFragmentManager().findFragmentByTag("PDF1");
+        PdfUiFragment fragment = (PdfUiFragment) activityRule.getActivity().getSupportFragmentManager().findFragmentByTag("PDF1");
         FreeTextAnnotation annotation = new FreeTextAnnotation(0, new RectF(0, 0, 100, 100), "Test");
         fragment.getDocument().getAnnotationProvider().addAnnotationToPage(annotation);
 
@@ -120,7 +121,7 @@ public class PdfViewTest {
         openExample("Forms");
 
         // Check with the form provider that the fields are empty.
-        PdfFragment fragment = (PdfFragment) activityRule.getActivity().getSupportFragmentManager().findFragmentByTag("PDF1");
+        PdfUiFragment fragment = (PdfUiFragment) activityRule.getActivity().getSupportFragmentManager().findFragmentByTag("PDF1");
         TextFormField lastname = (TextFormField) fragment.getDocument().getFormProvider().getFormFieldWithFullyQualifiedName("Name_Last");
         TextFormField firstname = (TextFormField)fragment.getDocument().getFormProvider().getFormFieldWithFullyQualifiedName("Name_First");
         assertNull(lastname.getFormElement().getText());
@@ -140,7 +141,7 @@ public class PdfViewTest {
         openExample("Forms");
 
         // Check with the form provider that the fields are empty.
-        PdfFragment fragment = (PdfFragment) activityRule.getActivity().getSupportFragmentManager().findFragmentByTag("PDF1");
+        PdfUiFragment fragment = (PdfUiFragment) activityRule.getActivity().getSupportFragmentManager().findFragmentByTag("PDF1");
         TextFormField lastname = (TextFormField) fragment.getDocument().getFormProvider().getFormFieldWithFullyQualifiedName("Name_Last");
         TextFormField firstname = (TextFormField)fragment.getDocument().getFormProvider().getFormFieldWithFullyQualifiedName("Name_First");
         assertNull(lastname.getFormElement().getText());

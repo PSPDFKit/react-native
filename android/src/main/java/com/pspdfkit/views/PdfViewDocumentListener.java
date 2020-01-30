@@ -1,9 +1,10 @@
 package com.pspdfkit.views;
 
 import android.graphics.PointF;
+import android.view.MotionEvent;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import android.view.MotionEvent;
 
 import com.facebook.react.uimanager.events.EventDispatcher;
 import com.pspdfkit.annotations.Annotation;
@@ -86,8 +87,8 @@ class PdfViewDocumentListener implements DocumentListener, AnnotationManager.OnA
     }
 
     @Override
-    public void onPageChanged(@NonNull PdfDocument pdfDocument, int i) {
-
+    public void onPageChanged(@NonNull PdfDocument pdfDocument, int pageIndex) {
+        parent.updateState(pageIndex);
     }
 
     @Override
