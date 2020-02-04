@@ -32,8 +32,6 @@ import com.pspdfkit.configuration.page.PageScrollDirection;
 import com.pspdfkit.configuration.page.PageScrollMode;
 import com.pspdfkit.configuration.sharing.ShareFeatures;
 
-import java.util.EnumSet;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -84,6 +82,8 @@ public class ConfigurationAdapter {
     private static final String AUTOSAVE_DISABLED = "disableAutomaticSaving";
     private static final String ANNOTATION_EDITING_ENABLED = "enableAnnotationEditing";
     private static final String EDITABLE_ANNOTATION_TYPES = "editableAnnotationTypes";
+    private static final String SHOW_SETTINGS_MENU = "showSettingsMenu";
+    private static final String TOOLBAR_TITLE = "toolbarTitle";
 
     private final PdfActivityConfiguration.Builder configuration;
 
@@ -173,6 +173,12 @@ public class ConfigurationAdapter {
             }
             if (configuration.hasKey(EDITABLE_ANNOTATION_TYPES)) {
                 configureEditableAnnotationTypes(configuration.getArray(EDITABLE_ANNOTATION_TYPES));
+            }
+            if (configuration.hasKey(SHOW_SETTINGS_MENU)) {
+                configureSettingsMenuShown(configuration.getBoolean(SHOW_SETTINGS_MENU));
+            }
+            if (configuration.hasKey(TOOLBAR_TITLE)) {
+                configureToolbarTitle(configuration.getString(TOOLBAR_TITLE));
             }
         }
     }
@@ -394,6 +400,18 @@ public class ConfigurationAdapter {
         }
 
         configuration.editableAnnotationTypes(parsedTypes);
+    }
+
+    private void configureSettingsMenuShown(final boolean settingsMenuShown) {
+        if (settingsMenuShown) {
+            configuration.showSettingsMenu();
+        } else {
+            configuration.hideSettingsMenu();
+        }
+    }
+
+    private void configureToolbarTitle(@Nullable final String customTitle) {
+        configuration.title(customTitle);
     }
 
     public PdfActivityConfiguration build() {
