@@ -318,6 +318,7 @@ class PdfViewScreen extends Component<{}> {
           ref="pdfView"
           document="file:///android_asset/Annual Report.pdf"
           configuration={{
+            toolbarTitle: "My Awesome Report",
             backgroundColor: processColor("lightgrey"),
             showThumbnailBar: "scrollable"
           }}

@@ -83,7 +83,7 @@ public class ConfigurationAdapter {
     private static final String ANNOTATION_EDITING_ENABLED = "enableAnnotationEditing";
     private static final String EDITABLE_ANNOTATION_TYPES = "editableAnnotationTypes";
     private static final String SHOW_SETTINGS_MENU = "showSettingsMenu";
-    private static final String CUSTOM_TITLE = "customTitle";
+    private static final String TOOLBAR_TITLE = "toolbarTitle";
 
     private final PdfActivityConfiguration.Builder configuration;
 
@@ -177,8 +177,8 @@ public class ConfigurationAdapter {
             if (configuration.hasKey(SHOW_SETTINGS_MENU)) {
                 configureSettingsMenuShown(configuration.getBoolean(SHOW_SETTINGS_MENU));
             }
-            if (configuration.hasKey(CUSTOM_TITLE)) {
-                configureCustomTitle(configuration.getString(CUSTOM_TITLE));
+            if (configuration.hasKey(TOOLBAR_TITLE)) {
+                configureToolbarTitle(configuration.getString(TOOLBAR_TITLE));
             }
         }
     }
@@ -410,7 +410,7 @@ public class ConfigurationAdapter {
         }
     }
 
-    private void configureCustomTitle(@Nullable final String customTitle) {
+    private void configureToolbarTitle(@Nullable final String customTitle) {
         configuration.title(customTitle);
     }
 
