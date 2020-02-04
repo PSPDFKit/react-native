@@ -18,6 +18,7 @@ Windows is not currently supported, please use the previous version [1.24.9](htt
 - [How to Extend React Native APIs](https://pspdfkit.com/blog/2018/how-to-extend-react-native-api/)
 - [Advanced Techniques for React Native UI Components](https://pspdfkit.com/blog/2018/advanced-techniques-for-react-native-ui-components/)
 - [How to Extend React Native APIs for Windows](https://pspdfkit.com/blog/2019/how-to-extend-react-native-apis-for-windows/)
+- [How to Bridge Native iOS Code to React Native](https://pspdfkit.com/blog/2020/how-to-bridge-native-ios-code-to-react-native/)
 
 #### PSPDFKit
 
