@@ -8,7 +8,14 @@ import com.pspdfkit.configuration.activity.PdfActivityConfiguration;
 import com.pspdfkit.react.R;
 import com.pspdfkit.ui.PdfUiFragment;
 
-/** This {@link PdfUiFragment} reports when the {@link PdfActivityConfiguration} was changed and allows a navigation icon to be shown and hidden. */
+/**
+ * This {@link PdfUiFragment} provides additional callbacks to improve integration into react native.
+ * <p/>
+ * <ul>
+ * <li>A callback when the configuration was changed.</li>
+ * <li>A method to show and hide the navigation button in the toolbar, as well as a callback for when it is clicked.</li>
+ * </ul>
+ */
 public class ReactPdfUiFragment extends PdfUiFragment {
 
     @Nullable private ReactPdfUiFragmentListener reactPdfUiFragmentListener;

@@ -100,7 +100,8 @@ public class PdfView extends FrameLayout {
     private PdfUiFragment fragment;
 
     /** We wrap the fragment in a list so we can have a state that encapsulates no element being set. */
-    private BehaviorSubject<List<PdfUiFragment>> pdfUiFragmentGetter = BehaviorSubject.createDefault(Collections.emptyList());
+    @NonNull
+    private final BehaviorSubject<List<PdfUiFragment>> pdfUiFragmentGetter = BehaviorSubject.createDefault(Collections.emptyList());
 
     /** An internal id we generate so we can track if fragments found belong to this specific PdfView instance. */
     private int internalId;
