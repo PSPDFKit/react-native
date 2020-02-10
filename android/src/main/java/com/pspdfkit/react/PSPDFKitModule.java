@@ -20,12 +20,14 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
 import com.facebook.react.bridge.ActivityEventListener;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
@@ -61,6 +63,12 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
     @NonNull
     private Handler activityResultHandler = new Handler(Looper.getMainLooper());
 
+    /**
+     * The last promise we received when calling present. Used to notify once the document is loaded.
+     */
+    @Nullable
+    private Promise lastPresentPromise;
+
     public PSPDFKitModule(ReactApplicationContext reactContext) {
         super(reactContext);
     }
@@ -83,7 +91,7 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
     }
 
     @ReactMethod
-    public void present(@NonNull String document, @NonNull ReadableMap configuration) {
+    public void present(@NonNull String document, @NonNull ReadableMap configuration, @Nullable Promise promise) {
         if (getCurrentActivity() != null) {
             if (resumedActivity == null) {
                 // We register an activity lifecycle callback so we can get notified of the current activity.
@@ -95,12 +103,13 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
                 document = FILE_SCHEME + document;
             }
 
+            lastPresentPromise = promise;
             PdfActivity.showDocument(getCurrentActivity(), Uri.parse(document), configurationAdapter.build());
         }
     }
 
     @ReactMethod
-    public void presentImage(@NonNull String imageDocument, @NonNull ReadableMap configuration) {
+    public void presentImage(@NonNull String imageDocument, @NonNull ReadableMap configuration, @Nullable Promise promise) {
         if (getCurrentActivity() != null) {
             if (resumedActivity == null) {
                 // We register an activity lifecycle callback so we can get notified of the current activity.
@@ -112,18 +121,21 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
                 imageDocument = FILE_SCHEME + imageDocument;
             }
 
+            lastPresentPromise = promise;
             PdfActivity.showImage(getCurrentActivity(), Uri.parse(imageDocument), configurationAdapter.build());
         }
     }
 
     @ReactMethod
-    public void presentInstant(@NonNull String serverUrl, @NonNull String jwt, @NonNull ReadableMap configuration) {
+    public void presentInstant(@NonNull String serverUrl, @NonNull String jwt, @NonNull ReadableMap configuration, @Nullable Promise promise) {
         if (getCurrentActivity() != null) {
             if (resumedActivity == null) {
                 // We register an activity lifecycle callback so we can get notified of the current activity.
                 getCurrentActivity().getApplication().registerActivityLifecycleCallbacks(this);
             }
             ConfigurationAdapter configurationAdapter = new ConfigurationAdapter(getCurrentActivity(), configuration);
+
+            lastPresentPromise = promise;
             InstantPdfActivity.showInstantDocument(getCurrentActivity(), serverUrl, jwt, configurationAdapter.build());
         }
     }
@@ -189,6 +201,26 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
             // Run our queued up task when a PdfActivity is displayed.
             onPdfActivityOpenedTask.run();
             onPdfActivityOpenedTask = null;
+            
+            // We notify the called as soon as the document is loaded or loading failed.
+            if (lastPresentPromise != null) {
+                PdfActivity pdfActivity = (PdfActivity) resumedActivity;
+                pdfActivity.getPdfFragment().addDocumentListener(new SimpleDocumentListener() {
+                    @Override
+                    public void onDocumentLoaded(@NonNull PdfDocument document) {
+                        super.onDocumentLoaded(document);
+                        lastPresentPromise.resolve(Boolean.TRUE);
+                        lastPresentPromise = null;
+                    }
+
+                    @Override
+                    public void onDocumentLoadFailed(@NonNull Throwable exception) {
+                        super.onDocumentLoadFailed(exception);
+                        lastPresentPromise.reject(exception);
+                        lastPresentPromise = null;
+                    }
+                });
+            }
         }
     }
 

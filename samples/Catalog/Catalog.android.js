@@ -59,7 +59,12 @@ const examples = [
     name: "Open assets document",
     description: "Open document from your project assets folder",
     action: () => {
-      PSPDFKit.present("file:///android_asset/Annual Report.pdf", {});
+      PSPDFKit.present("file:///android_asset/Annual Report.pdf", {})
+        .then(loaded => {
+          console.log("Document was loaded successfully.")
+        }).catch(error => {
+          console.log(error);
+        });
       PSPDFKit.setPageIndex(3, false);
     }
   },
