@@ -22,36 +22,57 @@
 
 RCT_EXPORT_MODULE(PSPDFKit)
 
-RCT_EXPORT_METHOD(setLicenseKey:(NSString *)licenseKey) {
-  [PSPDFKitGlobal setLicenseKey:licenseKey];
+RCT_REMAP_METHOD(setLicenseKey, setLicenseKey:(NSString *)licenseKey resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+  if (licenseKey.length > 0) {
+    [PSPDFKitGlobal setLicenseKey:licenseKey];
+    resolve(@(YES));
+  } else {
+    reject(@"error", @"Invalid License Key.", nil);
+  }
 }
 
-RCT_EXPORT_METHOD(present:(PSPDFDocument *)document withConfiguration:(PSPDFConfiguration *)configuration) {
+RCT_REMAP_METHOD(present, present:(PSPDFDocument *)document withConfiguration:(PSPDFConfiguration *)configuration resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   PSPDFViewController *pdfViewController = [[PSPDFViewController alloc] initWithDocument:document configuration:configuration];
-
   UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:pdfViewController];
-
   navigationController.modalPresentationStyle = UIModalPresentationFullScreen;
   UIViewController *presentingViewController = RCTPresentedViewController();
-  [presentingViewController presentViewController:navigationController animated:YES completion:nil];
+
+  if (presentingViewController) {
+    [presentingViewController presentViewController:navigationController animated:YES completion:nil];
+    resolve(@(YES));
+  } else {
+    reject(@"error", @"Failed to present document.", nil);
+  }
 }
 
-RCT_EXPORT_METHOD(dismiss) {
+RCT_REMAP_METHOD(dismiss, resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   UIViewController *presentedViewController = RCTPresentedViewController();
   NSAssert([presentedViewController isKindOfClass:UINavigationController.class], @"Presented view controller needs to be a UINavigationController");
   UINavigationController *navigationController = (UINavigationController *)presentedViewController;
   NSAssert(navigationController.viewControllers.count == 1 && [navigationController.viewControllers.firstObject isKindOfClass:PSPDFViewController.class], @"Presented view controller needs to contain a PSPDFViewController");
-  [navigationController dismissViewControllerAnimated:true completion:nil];
+
+  if (navigationController) {
+    [navigationController dismissViewControllerAnimated:true completion:nil];
+    resolve(@(YES));
+  } else {
+    reject(@"error", @"Failed to dismiss", nil);
+  }
 }
 
-RCT_EXPORT_METHOD(setPageIndex:(NSUInteger)pageIndex animated:(BOOL)animated) {
+RCT_REMAP_METHOD(setPageIndex, setPageIndex:(NSUInteger)pageIndex animated:(BOOL)animated resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   UIViewController *presentedViewController = RCTPresentedViewController();
   NSAssert([presentedViewController isKindOfClass:UINavigationController.class], @"Presented view controller needs to be a UINavigationController");
   UINavigationController *navigationController = (UINavigationController *)presentedViewController;
   NSAssert(navigationController.viewControllers.count == 1 && [navigationController.viewControllers.firstObject isKindOfClass:PSPDFViewController.class], @"Presented view controller needs to contain a PSPDFViewController");
+
   PSPDFViewController *pdfViewController = (PSPDFViewController *)navigationController.viewControllers.firstObject;
-
-  [pdfViewController setPageIndex:pageIndex animated:animated];
+  // Validate the the page index is not out of bounds.
+  if (pageIndex < pdfViewController.document.pageCount) {
+    [pdfViewController setPageIndex:pageIndex animated:animated];
+    resolve(@(YES));
+  } else {
+    reject(@"error", @"Page Index out of bounds", nil);
+  }
 }
 
 - (dispatch_queue_t)methodQueue {
