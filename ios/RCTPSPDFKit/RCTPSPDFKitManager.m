@@ -53,7 +53,7 @@ RCT_REMAP_METHOD(dismiss, resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCT
   NSAssert(navigationController.viewControllers.count == 1 && [navigationController.viewControllers.firstObject isKindOfClass:PSPDFViewController.class], @"Presented view controller needs to contain a PSPDFViewController");
 
   if (navigationController) {
-    [navigationController dismissViewControllerAnimated:true completion:^{
+    [navigationController dismissViewControllerAnimated:YES completion:^{
       resolve(@(YES));
     }];
   } else {
