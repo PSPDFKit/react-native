@@ -38,8 +38,9 @@ RCT_REMAP_METHOD(present, present:(PSPDFDocument *)document withConfiguration:(P
   UIViewController *presentingViewController = RCTPresentedViewController();
 
   if (presentingViewController) {
-    [presentingViewController presentViewController:navigationController animated:YES completion:nil];
-    resolve(@(YES));
+    [presentingViewController presentViewController:navigationController animated:YES completion:^{
+      resolve(@(YES));
+    }];
   } else {
     reject(@"error", @"Failed to present document.", nil);
   }
@@ -52,8 +53,9 @@ RCT_REMAP_METHOD(dismiss, resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCT
   NSAssert(navigationController.viewControllers.count == 1 && [navigationController.viewControllers.firstObject isKindOfClass:PSPDFViewController.class], @"Presented view controller needs to contain a PSPDFViewController");
 
   if (navigationController) {
-    [navigationController dismissViewControllerAnimated:true completion:nil];
-    resolve(@(YES));
+    [navigationController dismissViewControllerAnimated:true completion:^{
+      resolve(@(YES));
+    }];
   } else {
     reject(@"error", @"Failed to dismiss", nil);
   }
@@ -71,7 +73,7 @@ RCT_REMAP_METHOD(setPageIndex, setPageIndex:(NSUInteger)pageIndex animated:(BOOL
     [pdfViewController setPageIndex:pageIndex animated:animated];
     resolve(@(YES));
   } else {
-    reject(@"error", @"Page Index out of bounds", nil);
+    reject(@"error", @"Failed to set page index: The page index is out of bounds", nil);
   }
 }
 
