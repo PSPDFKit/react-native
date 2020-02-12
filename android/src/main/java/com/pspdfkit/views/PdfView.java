@@ -27,6 +27,7 @@ import com.pspdfkit.forms.ChoiceFormElement;
 import com.pspdfkit.forms.ComboBoxFormElement;
 import com.pspdfkit.forms.EditableButtonFormElement;
 import com.pspdfkit.forms.TextFormElement;
+import com.pspdfkit.listeners.OnVisibilityChangedListener;
 import com.pspdfkit.listeners.SimpleDocumentListener;
 import com.pspdfkit.react.events.PdfViewAnnotationChangedEvent;
 import com.pspdfkit.react.events.PdfViewAnnotationTappedEvent;
@@ -41,6 +42,8 @@ import com.pspdfkit.ui.DocumentDescriptor;
 import com.pspdfkit.ui.PdfFragment;
 import com.pspdfkit.ui.PdfUiFragment;
 import com.pspdfkit.ui.PdfUiFragmentBuilder;
+import com.pspdfkit.ui.search.PdfSearchView;
+import com.pspdfkit.ui.search.PdfSearchViewInline;
 import com.pspdfkit.ui.toolbar.grouping.MenuItemGroupingRule;
 
 import org.json.JSONArray;
@@ -105,6 +108,11 @@ public class PdfView extends FrameLayout {
 
     /** An internal id we generate so we can track if fragments found belong to this specific PdfView instance. */
     private int internalId;
+
+    /** We keep track if the navigation button should be shown so we can show it when the inline search view is closed. */
+    private boolean isNavigationButtonShown = false;
+    /** We keep track if the inline search view is shown since we don't want to add a second navigation button while it is shown. */
+    private boolean isSearchViewShown = false;
 
     public PdfView(@NonNull Context context) {
         super(context);
@@ -224,10 +232,13 @@ public class PdfView extends FrameLayout {
     }
 
     public void setShowNavigationButtonInToolbar(final boolean showNavigationButtonInToolbar) {
+        isNavigationButtonShown = showNavigationButtonInToolbar;
         pendingFragmentActions.add(getCurrentPdfUiFragment()
             .observeOn(Schedulers.io())
             .subscribe(pdfUiFragment -> {
-                ((ReactPdfUiFragment) pdfUiFragment).setShowNavigationButtonInToolbar(showNavigationButtonInToolbar);
+                if (!isSearchViewShown) {
+                    ((ReactPdfUiFragment) pdfUiFragment).setShowNavigationButtonInToolbar(showNavigationButtonInToolbar);
+                }
             }));
     }
 
@@ -303,6 +314,22 @@ public class PdfView extends FrameLayout {
                 eventDispatcher.dispatchEvent(new PdfViewNavigationButtonClickedEvent(getId()));
             }
         });
+
+        PdfSearchView searchView = pdfUiFragment.getPSPDFKitViews().getSearchView();
+        if (searchView instanceof PdfSearchViewInline) {
+            // The inline search view provides its own back button hide ours if it becomes visible.
+            searchView.addOnVisibilityChangedListener(new OnVisibilityChangedListener() {
+                @Override
+                public void onShow(@NonNull View view) {
+                    ((ReactPdfUiFragment) pdfUiFragment).setShowNavigationButtonInToolbar(false);
+                }
+
+                @Override
+                public void onHide(@NonNull View view) {
+                    ((ReactPdfUiFragment) pdfUiFragment).setShowNavigationButtonInToolbar(isNavigationButtonShown);
+                }
+            });
+        }
 
         // After attaching the PdfUiFragment we can access the PdfFragment.
         preparePdfFragment(pdfUiFragment.getPdfFragment());

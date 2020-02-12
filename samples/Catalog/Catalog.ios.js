@@ -26,7 +26,13 @@ const RNFS = require("react-native-fs");
 import PSPDFKitView from "react-native-pspdfkit";
 const PSPDFKit = NativeModules.PSPDFKit;
 
-PSPDFKit.setLicenseKey("YOUR_LICENSE_KEY_GOES_HERE");
+PSPDFKit.setLicenseKey("YOUR_LICENSE_KEY_GOES_HERE").then(result => {
+  if (result) {
+    console.log("Successfully set the license key.");
+  } else {
+    console.log(error);
+  }
+});
 
 const pspdfkitColor = "#267AD4";
 const pspdfkitColorAlpha = "#267AD450";
@@ -37,7 +43,13 @@ const examples = [
     name: "Open document using resource path",
     description: "Open document from your resource bundle with relative path.",
     action: () => {
-      PSPDFKit.present("PDFs/Annual Report.pdf", {});
+      PSPDFKit.present("PDFs/Annual Report.pdf", {}).then(result => {
+        if (result) {
+          console.log("Successfully presented document.");
+        } else {
+          console.log(error);
+        }
+      });
     }
   },
   {
@@ -58,8 +70,20 @@ const examples = [
           }
         })
         .then(() => {
-          PSPDFKit.present(path, {});
-          PSPDFKit.setPageIndex(3, false);
+          PSPDFKit.present(path, {}).then(result => {
+            if (result) {
+              console.log("Successfully presented document.");
+            } else {
+              console.log(error);
+            }
+          });
+          PSPDFKit.setPageIndex(3, false).then(result => {
+            if (result) {
+              console.log("Successfully set the page index.");
+            } else {
+              console.log(error);
+            }
+          });
         })
         .catch(err => {
           console.log(err.message, err.code);
@@ -80,6 +104,12 @@ const examples = [
         showPageLabels: false,
         showDocumentLabel: true,
         inlineSearch: true
+      }).then(result => {
+        if (result) {
+          console.log("Successfully presented document.");
+        } else {
+          console.log(error);
+        }
       });
     }
   },
