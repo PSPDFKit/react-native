@@ -79,7 +79,7 @@ RCT_REMAP_METHOD(setPageIndex, setPageIndex:(NSUInteger)pageIndex animated:(BOOL
   }
 }
 
-#pragma mark - Annotations Processing
+#pragma mark - Annotation Processing
 
 RCT_REMAP_METHOD(processAnnotations, processAnnotations:(PSPDFAnnotationChange)annotationChange annotationType:(PSPDFAnnotationType)annotationType sourceDocument:(PSPDFDocument *)sourceDocument processedDocumentPath:(nonnull NSString *)processedDocumentPath resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   NSError *error;
