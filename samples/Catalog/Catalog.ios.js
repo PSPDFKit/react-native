@@ -1031,11 +1031,12 @@ class ProgrammaticFormFilling extends Component {
 
 class AnnotationProcessing extends Component {
   render() {
+    const sourceDocumentPath = "PDFs/Annual Report.pdf";
     return (
       <View style={{ flex: 1 }}>
         <PSPDFKitView
           ref="pdfView"
-          document={"PDFs/Annual Report.pdf"}
+          document={sourceDocumentPath}
           disableAutomaticSaving={true}
           configuration={{
             backgroundColor: processColor("lightgrey"),
@@ -1056,18 +1057,31 @@ class AnnotationProcessing extends Component {
               onPress={async () => {
                 const processedDocumentPath =
                   RNFS.DocumentDirectoryPath + "/embedded.pdf";
-                await this.refs.pdfView
-                  .processAnnotations("embed", null, processedDocumentPath)
-                  .then(success => {
-                    if (success) {
-                      PSPDFKit.present(processedDocumentPath, {});
-                    } else {
-                      alert("Failed to embed annotations.");
-                    }
-                  })
-                  .catch(error => {
-                    alert(JSON.stringify(error));
-                  });
+                // First, save all annotations in the current document.
+                await this.refs.pdfView.saveCurrentDocument().then(success => {
+                  if (success) {
+                    // Then, embed all the annotations
+                    PSPDFKit.processAnnotations(
+                      "embed",
+                      null,
+                      sourceDocumentPath,
+                      processedDocumentPath
+                    )
+                      .then(success => {
+                        if (success) {
+                          // And finally, present the newly processed document with embedded annotations.
+                          PSPDFKit.present(processedDocumentPath, {});
+                        } else {
+                          alert("Failed to embed annotations.");
+                        }
+                      })
+                      .catch(error => {
+                        alert(JSON.stringify(error));
+                      });
+                  } else {
+                    alert("Failed to save current document.");
+                  }
+                });
               }}
               title="Embed All Annotations"
             />
@@ -1077,18 +1091,31 @@ class AnnotationProcessing extends Component {
               onPress={async () => {
                 const processedDocumentPath =
                   RNFS.DocumentDirectoryPath + "/flattened.pdf";
-                await this.refs.pdfView
-                  .processAnnotations("flatten", null, processedDocumentPath)
-                  .then(success => {
-                    if (success) {
-                      PSPDFKit.present(processedDocumentPath, {});
-                    } else {
-                      alert("Failed to flatten annotations.");
-                    }
-                  })
-                  .catch(error => {
-                    alert(JSON.stringify(error));
-                  });
+                // First, save all annotations in the current document.
+                await this.refs.pdfView.saveCurrentDocument().then(success => {
+                  if (success) {
+                    // Then, flatten all the annotations
+                    PSPDFKit.processAnnotations(
+                      "flatten",
+                      null,
+                      sourceDocumentPath,
+                      processedDocumentPath
+                    )
+                      .then(success => {
+                        if (success) {
+                          // And finally, present the newly processed document with flattened annotations.
+                          PSPDFKit.present(processedDocumentPath, {});
+                        } else {
+                          alert("Failed to embed annotations.");
+                        }
+                      })
+                      .catch(error => {
+                        alert(JSON.stringify(error));
+                      });
+                  } else {
+                    alert("Failed to save current document.");
+                  }
+                });
               }}
               title="Flatten All Annotations"
             />
@@ -1098,18 +1125,31 @@ class AnnotationProcessing extends Component {
               onPress={async () => {
                 const processedDocumentPath =
                   RNFS.DocumentDirectoryPath + "/removed.pdf";
-                await this.refs.pdfView
-                  .processAnnotations("remove", null, processedDocumentPath)
-                  .then(success => {
-                    if (success) {
-                      PSPDFKit.present(processedDocumentPath, {});
-                    } else {
-                      alert("Failed to remove annotations.");
-                    }
-                  })
-                  .catch(error => {
-                    alert(JSON.stringify(error));
-                  });
+                // First, save all annotations in the current document.
+                await this.refs.pdfView.saveCurrentDocument().then(success => {
+                  if (success) {
+                    // Then, remove all the annotations
+                    PSPDFKit.processAnnotations(
+                      "remove",
+                      null,
+                      sourceDocumentPath,
+                      processedDocumentPath
+                    )
+                      .then(success => {
+                        if (success) {
+                          // And finally, present the newly processed document with removed annotations.
+                          PSPDFKit.present(processedDocumentPath, {});
+                        } else {
+                          alert("Failed to remove annotations.");
+                        }
+                      })
+                      .catch(error => {
+                        alert(JSON.stringify(error));
+                      });
+                  } else {
+                    alert("Failed to save current document.");
+                  }
+                });
               }}
               title="Remove All Annotations"
             />
@@ -1118,19 +1158,32 @@ class AnnotationProcessing extends Component {
             <Button
               onPress={async () => {
                 const processedDocumentPath =
-                  RNFS.DocumentDirectoryPath + "/print.pdf";
-                await this.refs.pdfView
-                  .processAnnotations("print", null, processedDocumentPath)
-                  .then(success => {
-                    if (success) {
-                      PSPDFKit.present(processedDocumentPath, {});
-                    } else {
-                      alert("Failed to print annotations.");
-                    }
-                  })
-                  .catch(error => {
-                    alert(JSON.stringify(error));
-                  });
+                  RNFS.DocumentDirectoryPath + "/printed.pdf";
+                // First, save all annotations in the current document.
+                await this.refs.pdfView.saveCurrentDocument().then(success => {
+                  if (success) {
+                    // Then, print all the annotations
+                    PSPDFKit.processAnnotations(
+                      "print",
+                      null,
+                      sourceDocumentPath,
+                      processedDocumentPath
+                    )
+                      .then(success => {
+                        if (success) {
+                          // And finally, present the newly processed document with printed annotations.
+                          PSPDFKit.present(processedDocumentPath, {});
+                        } else {
+                          alert("Failed to print annotations.");
+                        }
+                      })
+                      .catch(error => {
+                        alert(JSON.stringify(error));
+                      });
+                  } else {
+                    alert("Failed to save current document.");
+                  }
+                });
               }}
               title="Print All Annotations"
             />

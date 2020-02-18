@@ -12,6 +12,8 @@
 #import <React/RCTLog.h>
 #import <React/RCTUtils.h>
 #import <React/RCTConvert.h>
+#import "RCTConvert+PSPDFAnnotation.h"
+#import "RCTConvert+PSPDFAnnotationChange.h"
 
 #define PROPERTY(property) NSStringFromSelector(@selector(property))
 
@@ -74,6 +76,30 @@ RCT_REMAP_METHOD(setPageIndex, setPageIndex:(NSUInteger)pageIndex animated:(BOOL
     resolve(@(YES));
   } else {
     reject(@"error", @"Failed to set page index: The page index is out of bounds", nil);
+  }
+}
+
+#pragma mark - Annotations Processing
+
+RCT_REMAP_METHOD(processAnnotations, processAnnotations:(nullable NSString *)change annotationType:(nullable NSString *)type sourceDocument:(PSPDFDocument *)sourceDocument processedDocumentPath:(nonnull NSString *)processedDocumentPath resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+  NSError *error;
+  PSPDFAnnotationChange annotationChange = [RCTConvert PSPDFAnnotationChange:change];
+  PSPDFAnnotationType annotationType = [RCTConvert annotationTypeFromInstantJSONType:type];
+  NSURL *processedDocumentURL = [NSURL fileURLWithPath:processedDocumentPath];
+
+  // Create a processor configuration with the current document.
+  PSPDFProcessorConfiguration *configuration = [[PSPDFProcessorConfiguration alloc] initWithDocument:sourceDocument];
+
+  // Modify annotations.
+  [configuration modifyAnnotationsOfTypes:annotationType change:annotationChange];
+
+  // Create the PDF processor and write the processed file.
+  PSPDFProcessor *processor = [[PSPDFProcessor alloc] initWithConfiguration:configuration securityOptions:nil];
+  BOOL success = [processor writeToFileURL:processedDocumentURL error:&error];
+  if (success) {
+    resolve(@(success));
+  } else {
+    reject(@"error", @"Failed to process annotations.", error);
   }
 }
 

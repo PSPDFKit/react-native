@@ -349,25 +349,6 @@
   return success;
 }
 
-#pragma mark - Annotations Processing
-
-- (BOOL)processAnnotations:(PSPDFAnnotationChange)annotationChange annotationType:(PSPDFAnnotationType)annotationType processedDocumentPath:(nonnull NSString *)processedDocumentPath error:(NSError *_Nullable *)error {
-  PSPDFDocument *document = self.pdfController.document;
-  VALIDATE_DOCUMENT(document, NO)
-
-  NSURL *processedDocumentURL = [NSURL fileURLWithPath:processedDocumentPath];
-
-  // Create a processor configuration with the current document.
-  PSPDFProcessorConfiguration *configuration = [[PSPDFProcessorConfiguration alloc] initWithDocument:document];
-
-  // Modify annotations.
-  [configuration modifyAnnotationsOfTypes:annotationType change:annotationChange];
-
-  // Create the PDF processor and write the processed file.
-  PSPDFProcessor *processor = [[PSPDFProcessor alloc] initWithConfiguration:configuration securityOptions:nil];
-  return [processor writeToFileURL:processedDocumentURL error:error];
-}
-
 #pragma mark - Notifications
 
 - (void)annotationChangedNotification:(NSNotification *)notification {
