@@ -1063,7 +1063,7 @@ class AnnotationProcessing extends Component {
                     // Then, embed all the annotations
                     PSPDFKit.processAnnotations(
                       "embed",
-                      null,
+                      "all",
                       sourceDocumentPath,
                       processedDocumentPath
                     )
@@ -1097,7 +1097,7 @@ class AnnotationProcessing extends Component {
                     // Then, flatten all the annotations
                     PSPDFKit.processAnnotations(
                       "flatten",
-                      null,
+                      "all",
                       sourceDocumentPath,
                       processedDocumentPath
                     )
@@ -1131,7 +1131,7 @@ class AnnotationProcessing extends Component {
                     // Then, remove all the annotations
                     PSPDFKit.processAnnotations(
                       "remove",
-                      null,
+                      "all",
                       sourceDocumentPath,
                       processedDocumentPath
                     )
@@ -1165,7 +1165,7 @@ class AnnotationProcessing extends Component {
                     // Then, print all the annotations
                     PSPDFKit.processAnnotations(
                       "print",
-                      null,
+                      "all",
                       sourceDocumentPath,
                       processedDocumentPath
                     )

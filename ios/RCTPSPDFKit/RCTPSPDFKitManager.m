@@ -81,10 +81,8 @@ RCT_REMAP_METHOD(setPageIndex, setPageIndex:(NSUInteger)pageIndex animated:(BOOL
 
 #pragma mark - Annotations Processing
 
-RCT_REMAP_METHOD(processAnnotations, processAnnotations:(nullable NSString *)change annotationType:(nullable NSString *)type sourceDocument:(PSPDFDocument *)sourceDocument processedDocumentPath:(nonnull NSString *)processedDocumentPath resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+RCT_REMAP_METHOD(processAnnotations, processAnnotations:(PSPDFAnnotationChange)annotationChange annotationType:(PSPDFAnnotationType)annotationType sourceDocument:(PSPDFDocument *)sourceDocument processedDocumentPath:(nonnull NSString *)processedDocumentPath resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   NSError *error;
-  PSPDFAnnotationChange annotationChange = [RCTConvert PSPDFAnnotationChange:change];
-  PSPDFAnnotationType annotationType = [RCTConvert annotationTypeFromInstantJSONType:type];
   NSURL *processedDocumentURL = [NSURL fileURLWithPath:processedDocumentPath];
 
   // Create a processor configuration with the current document.
