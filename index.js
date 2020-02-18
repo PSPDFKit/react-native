@@ -503,6 +503,25 @@ class PSPDFKitView extends React.Component {
       );
     }
   };
+  /**
+   * Process (embed, flatten, remove, print) annotations in a new document.
+   *
+   * @param change The annotation change. Can be 'embed', 'flatten', 'remove' or `print`. If `null` is passed, `embed` will be used.
+   * @param type The type of annotations to get (See here for types https://pspdfkit.com/guides/server/current/api/json-format/) or null to get all annotations.
+   * @param processedDocumentPath The path of processed document. Needs to be in a writable location.
+   *
+   * @platform ios
+   */
+  processAnnotations = function(change, type, processedDocumentPath) {
+    if (Platform.OS === "ios") {
+      return NativeModules.PSPDFKitViewManager.processAnnotations(
+        change,
+        type,
+        processedDocumentPath,
+        findNodeHandle(this.refs.pdfView)
+      );
+    }
+  };
 
   _getViewManagerConfig = viewManagerName => {
     const version = NativeModules.PlatformConstants.reactNativeVersion.minor;

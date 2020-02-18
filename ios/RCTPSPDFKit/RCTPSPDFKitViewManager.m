@@ -13,6 +13,7 @@
 #import "RCTConvert+PSPDFDocument.h"
 #import "RCTConvert+PSPDFAnnotationToolbarConfiguration.h"
 #import "RCTConvert+PSPDFViewMode.h"
+#import "RCTConvert+PSPDFAnnotationChange.h"
 #import "RCTPSPDFKitView.h"
 #import <React/RCTUIManager.h>
 
@@ -237,11 +238,11 @@ RCT_EXPORT_METHOD(setFormFieldValue:(nullable NSString *)value fullyQualifiedNam
   dispatch_async(dispatch_get_main_queue(), ^{
     RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
     BOOL success = [component setFormFieldValue:value fullyQualifiedName:fullyQualifiedName];
-     if (success) {
-       resolve(@(success));
-     } else {
-       reject(@"error", @"Failed to set form field value.", nil);
-     }
+    if (success) {
+      resolve(@(success));
+    } else {
+      reject(@"error", @"Failed to set form field value.", nil);
+    }
   });
 }
 
@@ -279,6 +280,21 @@ RCT_EXPORT_METHOD(getRightBarButtonItemsForViewMode:(nullable NSString *)viewMod
       resolve(rightBarButtonItems);
     } else {
       reject(@"error", @"Failed to get the right bar button items.", nil);
+    }
+  });
+}
+
+RCT_EXPORT_METHOD(processAnnotations:(nullable NSString *)change annotationType:(nullable NSString *)type processedDocumentPath:(nonnull NSString *)processedDocumentPath reactTag:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+  dispatch_async(dispatch_get_main_queue(), ^{
+    RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
+    NSError *error;
+    PSPDFAnnotationChange annotationChange = [RCTConvert PSPDFAnnotationChange:change];
+    PSPDFAnnotationType annotationType = [RCTConvert annotationTypeFromInstantJSONType:type];
+    BOOL success = [component processAnnotations:annotationChange annotationType:annotationType processedDocumentPath:processedDocumentPath error:&error];
+    if (success) {
+      resolve(@(success));
+    } else {
+      reject(@"error", @"Failed to process annotations.", error);
     }
   });
 }

@@ -56,6 +56,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSArray <NSString *> *)getLeftBarButtonItemsForViewMode:(NSString *)viewMode;
 - (NSArray <NSString *> *)getRightBarButtonItemsForViewMode:(NSString *)viewMode;
 
+// Annotation Processing
+- (BOOL)processAnnotations:(PSPDFAnnotationChange)annotationChange annotationType:(PSPDFAnnotationType)annotationType processedDocumentPath:(nonnull NSString *)processedDocumentPath error:(NSError *_Nullable *)error;
 @end
 
 NS_ASSUME_NONNULL_END
