@@ -312,7 +312,7 @@ For a more detailed description of toolbar customizations, refer to our Customiz
 
 #### Process Annotations
 
-The PSPDFKit React Native iOS Wrapper allows you to create a new document with processed (embedded, flattenned, removed, or printed) annotations. In the snippet below, we add a button which flattens all the annotations of the document from the currently displayed `PSPDFKitView` in a newly processed PDF file:
+The PSPDFKit React Native Wrapper allows you to create a new document with processed (embedded, flattenned, removed, or printed) annotations on Android and iOS. In the snippet below, we add a button which flattens all the annotations of the document from the currently displayed `PSPDFKitView` in a newly processed PDF file:
 
 ```javascript
 <View>
