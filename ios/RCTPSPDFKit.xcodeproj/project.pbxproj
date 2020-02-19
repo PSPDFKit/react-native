@@ -12,6 +12,7 @@
 		657278111D86AEC600A5E1A8 /* RCTConvert+PSPDFDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 657278101D86AEC600A5E1A8 /* RCTConvert+PSPDFDocument.m */; };
 		84545BA4210A5CCF00FBB0A7 /* RCTConvert+PSPDFAnnotation.m in Sources */ = {isa = PBXBuildFile; fileRef = 84545BA2210A5CCF00FBB0A7 /* RCTConvert+PSPDFAnnotation.m */; };
 		84694AA822AFC7510077FD01 /* RCTConvert+UIBarButtonItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 84694AA722AFC7510077FD01 /* RCTConvert+UIBarButtonItem.m */; };
+		84B9870023FC208600C6711A /* RCTConvert+PSPDFAnnotationChange.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B986FF23FC208600C6711A /* RCTConvert+PSPDFAnnotationChange.m */; };
 		84BC2EAD229EE9FF00A386C6 /* RCTConvert+PSPDFViewMode.m in Sources */ = {isa = PBXBuildFile; fileRef = 84BC2EAC229EE9FF00A386C6 /* RCTConvert+PSPDFViewMode.m */; };
 		B783BA3421C3F55300FD981A /* RCTConvert+PSPDFAnnotationToolbarConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = B783BA3321C3F55300FD981A /* RCTConvert+PSPDFAnnotationToolbarConfiguration.m */; };
 		F84F8B192032D54F00153D9E /* RCTPSPDFKitView.m in Sources */ = {isa = PBXBuildFile; fileRef = F84F8B182032D54F00153D9E /* RCTPSPDFKitView.m */; };
@@ -42,6 +43,8 @@
 		84545BA3210A5CCF00FBB0A7 /* RCTConvert+PSPDFAnnotation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "RCTConvert+PSPDFAnnotation.h"; sourceTree = "<group>"; };
 		84694AA622AFC7510077FD01 /* RCTConvert+UIBarButtonItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RCTConvert+UIBarButtonItem.h"; sourceTree = "<group>"; };
 		84694AA722AFC7510077FD01 /* RCTConvert+UIBarButtonItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "RCTConvert+UIBarButtonItem.m"; sourceTree = "<group>"; };
+		84B986FE23FC208600C6711A /* RCTConvert+PSPDFAnnotationChange.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RCTConvert+PSPDFAnnotationChange.h"; sourceTree = "<group>"; };
+		84B986FF23FC208600C6711A /* RCTConvert+PSPDFAnnotationChange.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "RCTConvert+PSPDFAnnotationChange.m"; sourceTree = "<group>"; };
 		84BC2EAB229EE9FF00A386C6 /* RCTConvert+PSPDFViewMode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RCTConvert+PSPDFViewMode.h"; sourceTree = "<group>"; };
 		84BC2EAC229EE9FF00A386C6 /* RCTConvert+PSPDFViewMode.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "RCTConvert+PSPDFViewMode.m"; sourceTree = "<group>"; };
 		B783BA3221C3F55300FD981A /* RCTConvert+PSPDFAnnotationToolbarConfiguration.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RCTConvert+PSPDFAnnotationToolbarConfiguration.h"; sourceTree = "<group>"; };
@@ -92,6 +95,8 @@
 				84BC2EAC229EE9FF00A386C6 /* RCTConvert+PSPDFViewMode.m */,
 				84694AA622AFC7510077FD01 /* RCTConvert+UIBarButtonItem.h */,
 				84694AA722AFC7510077FD01 /* RCTConvert+UIBarButtonItem.m */,
+				84B986FE23FC208600C6711A /* RCTConvert+PSPDFAnnotationChange.h */,
+				84B986FF23FC208600C6711A /* RCTConvert+PSPDFAnnotationChange.m */,
 			);
 			path = Converters;
 			sourceTree = "<group>";
@@ -178,6 +183,7 @@
 				84545BA4210A5CCF00FBB0A7 /* RCTConvert+PSPDFAnnotation.m in Sources */,
 				6540D1841D89D22E00B8F94F /* RCTPSPDFKitManager.m in Sources */,
 				84694AA822AFC7510077FD01 /* RCTConvert+UIBarButtonItem.m in Sources */,
+				84B9870023FC208600C6711A /* RCTConvert+PSPDFAnnotationChange.m in Sources */,
 				B783BA3421C3F55300FD981A /* RCTConvert+PSPDFAnnotationToolbarConfiguration.m in Sources */,
 				F84F8B192032D54F00153D9E /* RCTPSPDFKitView.m in Sources */,
 				6572780C1D86AE7300A5E1A8 /* RCTConvert+PSPDFConfiguration.m in Sources */,

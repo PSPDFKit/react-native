@@ -237,11 +237,11 @@ RCT_EXPORT_METHOD(setFormFieldValue:(nullable NSString *)value fullyQualifiedNam
   dispatch_async(dispatch_get_main_queue(), ^{
     RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
     BOOL success = [component setFormFieldValue:value fullyQualifiedName:fullyQualifiedName];
-     if (success) {
-       resolve(@(success));
-     } else {
-       reject(@"error", @"Failed to set form field value.", nil);
-     }
+    if (success) {
+      resolve(@(success));
+    } else {
+      reject(@"error", @"Failed to set form field value.", nil);
+    }
   });
 }
 
