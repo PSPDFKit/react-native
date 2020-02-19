@@ -88,11 +88,11 @@ end
 7. `cd ios` then run `pod install`.
 8. Open `YourApp.xcworkspace` in Xcode: `open YourApp.xcworkspace`.
 9. Make sure the deployment target is set to 11.0 or higher:
-    ![Deployment Target](screenshots/deployment-target.png)
+   ![Deployment Target](screenshots/deployment-target.png)
 10. Change "View controller-based status bar appearance" to `YES` in `Info.plist`:
     ![View Controller-Based Status Bar Appearance](screenshots/view-controller-based-status-bar-appearance.png)
 11. If your application is targeting iOS versions **prior to iOS 12.2** and your application **does not already contain any Swift code**, then you need to make sure Xcode bundles Swift standard libraries with your application distribution. To to so, open your target Build Settings and enable `Always Embed Swift Standard Libraries`:
-	![Always Embed Swift Standard Libraries](screenshots/always-embed-swift-standard-libraries.png)
+    ![Always Embed Swift Standard Libraries](screenshots/always-embed-swift-standard-libraries.png)
 12. Add a PDF by drag and dropping it into your Xcode project (Select "Create groups" and add to target "YourApp"). This will add the document to the "Copy Bundle Resources" build phase:
     ![Adding PDF](screenshots/adding-pdf.png)
 13. Replace the default component from `App.js` with a simple touch area to present the bundled PDF. (Note that you can also use a [Native UI Component](#native-ui-component) to show a PDF.)
@@ -264,12 +264,12 @@ Example - Native UI Component:
 
 #### Running on Mac Catalyst
 
-Using PSPDFKit React Native Wrapper on Mac Catalyst is not fully supported yet. We plan on adding full support for Mac Catalyst as soon as React Native and CocoaPods will full support Mac Catalyst. 
+Using PSPDFKit React Native Wrapper on Mac Catalyst is not fully supported yet. We plan on adding full support for Mac Catalyst as soon as React Native and CocoaPods will full support Mac Catalyst.
 
 For more details, see [why we don't fully support Mac Catalyst yet here](ios/Experimental_Mac_Catalyst_Support.md#why-is-mac-catalyst-not-fully-supported-yet).
 
 If you wish to try the experimental Support for Mac Catalyst, please follow [the instructions here.](ios/Experimental_Mac_Catalyst_Support.md)
- 
+
 #### Configuration Mapping
 
 The PSPDFKit React Native iOS Wrapper maps most configuration options available in `PSPDFConfiguration` from JSON. Please refer to [`RCTConvert+PSPDFConfiguration.m`](./ios/RCTPSPDFKit/Converters/RCTConvert+PSPDFConfiguration.m#L267) for the complete list and for the exact naming of enum values.
@@ -312,7 +312,7 @@ For a more detailed description of toolbar customizations, refer to our Customiz
 
 #### Process Annotations
 
-The PSPDFKit React Native Wrapper allows you to create a new document with processed (embedded, flattenned, removed, or printed) annotations on Android and iOS. In the snippet below, we add a button which flattens all the annotations of the document from the currently displayed `PSPDFKitView` in a newly processed PDF file:
+The PSPDFKit React Native Wrapper allows you to create a new document with processed (embedded, flattenned, removed, or printed) annotations on Android and iOS using the `PSPDFKit.processAnnotations(annotationChange, annotationType, sourceDocumentPath, processedDocumentPath)` function. In the snippet below, we add a button which flattens all the annotations of the document from the currently displayed `PSPDFKitView` in a newly processed PDF file:
 
 ```javascript
 <View>
@@ -357,7 +357,7 @@ The PSPDFKit React Native Wrapper allows you to create a new document with proce
     }}
     title="Flatten All Annotations"
   />
-</View>;
+</View>
 ```
 
 For a runnable example, please take a look at the [AnnotationProcessing example from our Catalog app](./samples/Catalog/Catalog.ios.js#L1032).
