@@ -310,6 +310,58 @@ Also, please take a look at the [ToolbarCustomization example from our Catalog a
 
 For a more detailed description of toolbar customizations, refer to our Customizing the Toolbar guide for [iOS](https://pspdfkit.com/guides/ios/current/customizing-the-interface/customizing-the-toolbar/) and [Android](https://pspdfkit.com/guides/android/current/customizing-the-interface/customizing-the-toolbar/).
 
+#### Process Annotations
+
+The PSPDFKit React Native iOS Wrapper allows you to create a new document with processed (embedded, flattenned, removed, or printed) annotations. In the snippet below, we add a button which flattens all the annotations of the document from the currently displayed `PSPDFKitView` in a newly processed PDF file:
+
+```javascript
+<View>
+  <Button
+    onPress={async () => {
+      const processedDocumentPath =
+        RNFS.DocumentDirectoryPath + "/flattened.pdf";
+      // Delete the processed document if it already exists.
+      RNFS.exists(processedDocumentPath)
+        .then(exists => {
+          if (exists) {
+            RNFS.unlink(processedDocumentPath);
+          }
+        })
+        .then(() => {
+          // First, save all annotations in the current document.
+          this.refs.pdfView.saveCurrentDocument().then(success => {
+            if (success) {
+              // Then, flatten all the annotations
+              PSPDFKit.processAnnotations(
+                "flatten",
+                "all",
+                sourceDocumentPath,
+                processedDocumentPath
+              )
+                .then(success => {
+                  if (success) {
+                    // And finally, present the newly processed document with flattened annotations.
+                    PSPDFKit.present(processedDocumentPath, {});
+                  } else {
+                    alert("Failed to embed annotations.");
+                  }
+                })
+                .catch(error => {
+                  alert(JSON.stringify(error));
+                });
+            } else {
+              alert("Failed to save current document.");
+            }
+          });
+        });
+    }}
+    title="Flatten All Annotations"
+  />
+</View>;
+```
+
+For a runnable example, please take a look at the [AnnotationProcessing example from our Catalog app](./samples/Catalog/Catalog.ios.js#L1032).
+
 ### Android
 
 #### Requirements
