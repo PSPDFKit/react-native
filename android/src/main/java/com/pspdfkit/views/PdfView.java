@@ -17,7 +17,6 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.events.EventDispatcher;
 import com.pspdfkit.annotations.Annotation;
-import com.pspdfkit.annotations.AnnotationType;
 import com.pspdfkit.configuration.activity.PdfActivityConfiguration;
 import com.pspdfkit.document.PdfDocument;
 import com.pspdfkit.document.PdfDocumentLoader;
@@ -54,7 +53,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -71,6 +69,8 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
+
+import static com.pspdfkit.react.helper.ConversionHelpers.getAnnotationTypeFromString;
 
 /**
  * This view displays a {@link com.pspdfkit.ui.PdfFragment} and all associated toolbars.
@@ -443,60 +443,16 @@ public class PdfView extends FrameLayout {
         return getCurrentPdfFragment()
             .map(pdfFragment -> pdfFragment.getDocument())
             .flatMap((Function<PdfDocument, ObservableSource<Annotation>>) pdfDocument ->
-                pdfDocument.getAnnotationProvider().getAllAnnotationsOfTypeAsync(getTypeFromString(type), pageIndex, 1)).toList();
+                pdfDocument.getAnnotationProvider().getAllAnnotationsOfTypeAsync(getAnnotationTypeFromString(type), pageIndex, 1)).toList();
     }
 
     public Single<List<Annotation>> getAllAnnotations(@Nullable final String type) {
         return getCurrentPdfFragment().map(PdfFragment::getDocument)
-            .flatMap(pdfDocument -> pdfDocument.getAnnotationProvider().getAllAnnotationsOfTypeAsync(getTypeFromString(type)))
+            .flatMap(pdfDocument -> pdfDocument.getAnnotationProvider().getAllAnnotationsOfTypeAsync(getAnnotationTypeFromString(type)))
             .toList();
     }
 
-    private EnumSet<AnnotationType> getTypeFromString(@Nullable String type) {
-        if (type == null) {
-            return EnumSet.allOf(AnnotationType.class);
-        }
-        if ("pspdfkit/ink".equalsIgnoreCase(type)) {
-            return EnumSet.of(AnnotationType.INK);
-        }
-        if ("pspdfkit/link".equalsIgnoreCase(type)) {
-            return EnumSet.of(AnnotationType.LINK);
-        }
-        if ("pspdfkit/markup/highlight".equalsIgnoreCase(type)) {
-            return EnumSet.of(AnnotationType.HIGHLIGHT);
-        }
-        if ("pspdfkit/markup/squiggly".equalsIgnoreCase(type)) {
-            return EnumSet.of(AnnotationType.SQUIGGLY);
-        }
-        if ("pspdfkit/markup/strikeout".equalsIgnoreCase(type)) {
-            return EnumSet.of(AnnotationType.STRIKEOUT);
-        }
-        if ("pspdfkit/markup/underline".equalsIgnoreCase(type)) {
-            return EnumSet.of(AnnotationType.UNDERLINE);
-        }
-        if ("pspdfkit/note".equalsIgnoreCase(type)) {
-            return EnumSet.of(AnnotationType.NOTE);
-        }
-        if ("pspdfkit/shape/ellipse".equalsIgnoreCase(type)) {
-            return EnumSet.of(AnnotationType.CIRCLE);
-        }
-        if ("pspdfkit/shape/line".equalsIgnoreCase(type)) {
-            return EnumSet.of(AnnotationType.LINE);
-        }
-        if ("pspdfkit/shape/polygon".equalsIgnoreCase(type)) {
-            return EnumSet.of(AnnotationType.POLYGON);
-        }
-        if ("pspdfkit/shape/polyline".equalsIgnoreCase(type)) {
-            return EnumSet.of(AnnotationType.POLYLINE);
-        }
-        if ("pspdfkit/shape/rectangle".equalsIgnoreCase(type)) {
-            return EnumSet.of(AnnotationType.SQUARE);
-        }
-        if ("pspdfkit/text".equalsIgnoreCase(type)) {
-            return EnumSet.of(AnnotationType.FREETEXT);
-        }
-        return EnumSet.noneOf(AnnotationType.class);
-    }
+
 
     public Disposable addAnnotation(final int requestId, ReadableMap annotation) {
         return getCurrentPdfFragment().map(PdfFragment::getDocument).subscribeOn(Schedulers.io())
@@ -524,7 +480,7 @@ public class PdfView extends FrameLayout {
                     return Observable.empty();
                 }
 
-                return pdfDocument.getAnnotationProvider().getAllAnnotationsOfTypeAsync(getTypeFromString(type), pageIndex, 1)
+                return pdfDocument.getAnnotationProvider().getAllAnnotationsOfTypeAsync(getAnnotationTypeFromString(type), pageIndex, 1)
                     .filter(annotationToFilter -> name.equals(annotationToFilter.getName()))
                     .map(filteredAnnotation -> new Pair<>(filteredAnnotation, pdfDocument));
             })
