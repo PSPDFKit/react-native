@@ -280,7 +280,7 @@ public class ConfigurationAdapter {
         }
     }
 
-    private void configureShowBookmarksAction(boolean showBookmarksAction) {
+    private void configureShowBookmarksAction(final boolean showBookmarksAction) {
         if (showBookmarksAction) {
             configuration.enableBookmarkList();
         } else {
