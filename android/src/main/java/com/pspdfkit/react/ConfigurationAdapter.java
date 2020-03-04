@@ -3,7 +3,7 @@
  *
  *   PSPDFKit
  *
- *   Copyright © 2017-2019 PSPDFKit GmbH. All rights reserved.
+ *   Copyright © 2017-2020 PSPDFKit GmbH. All rights reserved.
  *
  *   THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
  *   AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -62,6 +62,7 @@ public class ConfigurationAdapter {
     private static final String SHOW_THUMBNAIL_BAR_NONE = "none";
     private static final String SHOW_THUMBNAIL_GRID_ACTION = "showThumbnailGridAction";
     private static final String SHOW_OUTLINE_ACTION = "showOutlineAction";
+    private static final String SHOW_BOOKMARKS_ACTION = "showBookmarksAction";
     private static final String SHOW_ANNOTATION_LIST_ACTION = "showAnnotationListAction";
     private static final String SHOW_PAGE_NUMBER_OVERLAY = "showPageNumberOverlay";
     private static final String SHOW_PAGE_LABELS = "showPageLabels";
@@ -122,6 +123,9 @@ public class ConfigurationAdapter {
             }
             if (configuration.hasKey(SHOW_OUTLINE_ACTION)) {
                 configureShowOutlineAction(configuration.getBoolean(SHOW_OUTLINE_ACTION));
+            }
+            if (configuration.hasKey(SHOW_BOOKMARKS_ACTION)) {
+                configureShowBookmarksAction(configuration.getBoolean(SHOW_BOOKMARKS_ACTION));
             }
             if (configuration.hasKey(SHOW_ANNOTATION_LIST_ACTION)) {
                 configureShowAnnotationListAction(configuration.getBoolean(SHOW_ANNOTATION_LIST_ACTION));
@@ -273,6 +277,14 @@ public class ConfigurationAdapter {
             configuration.enableOutline();
         } else {
             configuration.disableOutline();
+        }
+    }
+
+    private void configureShowBookmarksAction(boolean showBookmarksAction) {
+        if (showBookmarksAction) {
+            configuration.enableBookmarkList();
+        } else {
+            configuration.disableBookmarkList();
         }
     }
 
