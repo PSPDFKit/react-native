@@ -109,8 +109,6 @@
       signer.reason = @"Contract agreement";
       PSPDFSignatureManager *signatureManager = PSPDFKitGlobal.sharedInstance.signatureManager;
       [signatureManager clearRegisteredSigners];
-      [signatureManager registerSigner:signer];
-
       [signatureManager clearTrustedCertificates];
 
       // Add certs to trust store for the signature validation process
