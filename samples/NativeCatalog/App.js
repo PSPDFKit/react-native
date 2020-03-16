@@ -95,12 +95,10 @@ class ManualSigningScreen extends Component<{}> {
             });
           }}
         />
-        <View
+        <SafeAreaView
           style={{
             flexDirection: 'row',
-            height: 40,
             alignItems: 'center',
-            padding: -10,
           }}>
           <View>
             <Button
@@ -121,7 +119,7 @@ class ManualSigningScreen extends Component<{}> {
               title="Start Signing"
             />
           </View>
-        </View>
+        </SafeAreaView>
       </View>
     );
   }
@@ -148,12 +146,10 @@ class WatermarkScreen extends Component<{}> {
             });
           }}
         />
-        <View
+        <SafeAreaView
           style={{
             flexDirection: 'row',
-            height: 40,
             alignItems: 'center',
-            padding: -10,
           }}>
           <View>
             <Button
@@ -174,7 +170,7 @@ class WatermarkScreen extends Component<{}> {
               title="Create Watermark"
             />
           </View>
-        </View>
+        </SafeAreaView>
       </View>
     );
   }
