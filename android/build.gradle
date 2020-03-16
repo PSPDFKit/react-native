@@ -69,7 +69,7 @@ if (demoVersion) {
 }
 
 dependencies {
-    implementation("com.pspdfkit:pspdfkit:${PSPDFKIT_VERSION}") {
+    api("com.pspdfkit:pspdfkit:${PSPDFKIT_VERSION}") {
         exclude group: 'com.google.auto.value', module: 'auto-value'
     }
     implementation "com.facebook.react:react-native:+"

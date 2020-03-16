@@ -1,6 +1,6 @@
 {
   "name": "NativeCatalog",
-  "version": "1.27.5",
+  "version": "1.28.1",
   "private": true,
   "scripts": {
     "android": "react-native run-android",
