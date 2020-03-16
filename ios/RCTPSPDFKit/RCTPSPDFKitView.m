@@ -285,7 +285,7 @@
     NSLog(@"Failed to add annotations.");
   }
   
-  [self.pdfController reloadPageAtIndex:self.pdfController.pageIndex animated:NO];
+  [self.pdfController reloadData];
   return success;
 }
 
