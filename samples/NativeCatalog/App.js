@@ -158,7 +158,7 @@ class WatermarkScreen extends Component<{}> {
           <View>
             <Button
               onPress={() => {
-                // This will open the native signature dialog.
+                 // This will create a watermark in native code.
                 if (Platform.OS === 'android') {
                   UIManager.dispatchViewManagerCommand(
                     findNodeHandle(this.refs.pdfView),

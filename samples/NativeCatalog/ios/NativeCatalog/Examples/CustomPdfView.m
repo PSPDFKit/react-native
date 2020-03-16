@@ -28,7 +28,7 @@
 }
 
 - (void)removeFromSuperview {
-  // When the React Native `PSPDFKitView` in unmounted, we need to dismiss the `PSPDFViewController` to avoid orphan popovers.
+  // When the React Native PDF view in unmounted, we need to dismiss the `PSPDFViewController` to avoid orphan popovers.
   // See https://github.com/PSPDFKit/react-native/issues/277
   [self.pdfController dismissViewControllerAnimated:NO completion:NULL];
   [super removeFromSuperview];
@@ -97,7 +97,6 @@
 
 #pragma mark - PSPDFSignatureViewControllerDelegate
 
-// Sign all pages example
 - (void)signatureViewControllerDidFinish:(PSPDFSignatureViewController *)signatureController withSigner:(nullable PSPDFSigner *)signer shouldSaveSignature:(BOOL)shouldSaveSignature {
     [signatureController dismissViewControllerAnimated:YES completion:^{
       NSURL *samplesURL = [NSBundle.mainBundle.resourceURL URLByAppendingPathComponent:@"PDFs"];
