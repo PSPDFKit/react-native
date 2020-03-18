@@ -262,6 +262,10 @@ Example - Native UI Component:
 - Run the app with `react-native-cli`: `react-native run-ios`
 - If you get an error about `config.h` not being found check out [this blog post](https://tuntunir.blogspot.com/2018/02/react-native-fatal-error-configh-file.html) for information on how to fix it.
 
+#### Running the Native Catalog
+
+Take a look at the [instructions to get started here](/samples/NativeCatalog/README.md#running-this-sample-on-ios).
+
 #### Running on Mac Catalyst
 
 Using PSPDFKit React Native Wrapper on Mac Catalyst is not fully supported yet. We plan on adding full support for Mac Catalyst as soon as React Native and CocoaPods will full support Mac Catalyst.
@@ -582,7 +586,7 @@ const styles = StyleSheet.create({
 
 #### Running the Native Catalog
 
-Take a look at the [instructions to get started here](https://github.com/PSPDFKit/react-native/tree/master/samples/NativeCatalog/README.md).
+Take a look at the [instructions to get started here](/samples/NativeCatalog/README.md#running-this-sample-on-android).
 
 #### Configuration
 
