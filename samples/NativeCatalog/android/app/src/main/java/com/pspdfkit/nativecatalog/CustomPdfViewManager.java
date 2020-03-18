@@ -185,7 +185,7 @@ public class CustomPdfViewManager extends SimpleViewManager<PdfView> {
     }
 
     private void performInkSigning(@NonNull PdfView pdfView) {
-        pdfView.getFragment()
+        pdfView.getActivePdfFragment()
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(pdfFragment -> {
                 // We got our fragment.
@@ -269,7 +269,7 @@ public class CustomPdfViewManager extends SimpleViewManager<PdfView> {
     }
 
     private void performWatermarking(@NonNull PdfView pdfView) {
-        pdfView.getFragment()
+        pdfView.getActivePdfFragment()
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(pdfFragment -> {
                 PdfDocument document = pdfFragment.getDocument();
