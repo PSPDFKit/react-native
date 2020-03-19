@@ -33,7 +33,6 @@ public class ReactPdfUiFragment extends PdfUiFragment {
         }
     }
 
-
     /** When set to true will add a navigation arrow to the toolbar. */
     void setShowNavigationButtonInToolbar(final boolean showNavigationButtonInToolbar) {
         if (getView() == null) {
