@@ -1,5 +1,6 @@
 package com.pspdfkit.nativecatalog;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
@@ -19,8 +20,10 @@ import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.UIManagerModule;
 import com.facebook.react.uimanager.annotations.ReactProp;
+import com.pspdfkit.annotations.AnnotationType;
 import com.pspdfkit.annotations.InkAnnotation;
 import com.pspdfkit.annotations.WidgetAnnotation;
+import com.pspdfkit.annotations.configuration.InkAnnotationConfiguration;
 import com.pspdfkit.configuration.activity.PdfActivityConfiguration;
 import com.pspdfkit.configuration.forms.SignaturePickerOrientation;
 import com.pspdfkit.configuration.signatures.SignatureCertificateSelectionMode;
@@ -34,6 +37,7 @@ import com.pspdfkit.forms.SignatureFormElement;
 import com.pspdfkit.listeners.DocumentSigningListener;
 import com.pspdfkit.nativecatalog.events.DocumentDigitallySignedEvent;
 import com.pspdfkit.nativecatalog.events.DocumentWatermarkedEvent;
+import com.pspdfkit.react.menu.ReactGroupingRule;
 import com.pspdfkit.signatures.Signature;
 import com.pspdfkit.signatures.SignatureManager;
 import com.pspdfkit.signatures.signers.InteractiveSigner;
@@ -155,6 +159,43 @@ public class CustomPdfViewManager extends SimpleViewManager<PdfView> {
         } else {
             view.setDocument(document);
         }
+
+        // When the document is loaded we configure a custom annotation configuration for ink annotations.
+        // While this is applied in all examples, the DefaultAnnotationSettingsScreen example is
+        // the reason this was added.
+        applyCustomAnnotationConfiguration(view);
+    }
+
+    @SuppressLint("CheckResult")
+    private void applyCustomAnnotationConfiguration(@NonNull final PdfView view) {
+        // You first need to grab the current PdfFragment.
+        view.getPdfFragment()
+            .take(1)
+            .firstOrError()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe((pdfFragment, throwable) -> {
+                // Then you can apply your AnnotationConfiguration.
+                if (pdfFragment != null) {
+                    // See https://pspdfkit.com/guides/android/current/annotations/annotation-configuration/#customizing-annotation-configuration
+                    // for more information about this.
+                    pdfFragment.getAnnotationConfiguration().put(AnnotationType.INK,
+                        InkAnnotationConfiguration.builder(view.getContext())
+                            // We always want red ink, with a thick stroke.
+                            .setDefaultColor(Color.RED)
+                            .setDefaultThickness(15)
+                            // If this is set, even when the user changes the options
+                            // the next time they use the tool the defaults configured here will be applied again.
+                            .setForceDefaults(true)
+                            .build());
+                }
+            });
+    }
+
+    @SuppressLint("CheckResult")
+    @ReactProp(name = "menuItemGrouping")
+    public void setMenuItemGrouping(PdfView view, @NonNull ReadableArray menuItemGrouping) {
+        ReactGroupingRule groupingRule = new ReactGroupingRule(view.getContext(), menuItemGrouping);
+        view.setMenuItemGroupingRule(groupingRule);
     }
 
     @Nullable

@@ -6,6 +6,7 @@ import {
   View,
   NativeModules,
   Button,
+  Text,
   requireNativeComponent,
 } from 'react-native';
 import {createStackNavigator, createAppContainer} from 'react-navigation';
@@ -69,6 +70,22 @@ const examples = [
         });
       } else {
         component.props.navigation.navigate('WatermarkStartup');
+      }
+    },
+  },
+  {
+    name: 'Default Annotation Settings',
+    description:
+      'Shows how to configure default annotations settings. (Android Only)',
+    action: component => {
+      if (Platform.OS === 'android') {
+        requestExternalStoragePermission(function() {
+          extractFromAssetsIfMissing('Form_example.pdf', function() {
+            component.props.navigation.navigate('DefaultAnnotationSettings');
+          });
+        });
+      } else {
+        component.props.navigation.navigate('DefaultAnnotationSettings');
       }
     },
   },
@@ -154,7 +171,7 @@ class WatermarkScreen extends Component<{}> {
           <View>
             <Button
               onPress={() => {
-                 // This will create a watermark in native code.
+                // This will create a watermark in native code.
                 if (Platform.OS === 'android') {
                   UIManager.dispatchViewManagerCommand(
                     findNodeHandle(this.refs.pdfView),
@@ -203,6 +220,30 @@ class WatermarkStartupScreen extends Component<{}> {
   }
 }
 
+class DefaultAnnotationSettingsScreen extends Component<{}> {
+  render() {
+    return (
+      <View style={{flex: 1}}>
+        {Platform.OS === 'android' && (
+          <CustomPdfView
+            ref="pdfView"
+            document={FORM_DOCUMENT}
+            style={{flex: 1}}
+            // This way only the ink tool and the button to open the inspector is show.
+            // If you don't need the inspector you can remove the "picker" option completely
+            // and only configure the tool using the AnnotationConfiguration.
+            // See CustomPdfViewManager#setDocument() for how to apply the custom configuration.
+            menuItemGrouping={['pen', 'picker']}
+          />
+        )}
+        {Platform.OS === 'ios' && (
+          <Text>This example isn't supported on iOS!</Text>
+        )}
+      </View>
+    );
+  }
+}
+
 export default createAppContainer(
   createStackNavigator(
     {
@@ -217,6 +258,9 @@ export default createAppContainer(
       },
       WatermarkStartup: {
         screen: WatermarkStartupScreen,
+      },
+      DefaultAnnotationSettings: {
+        screen: DefaultAnnotationSettingsScreen,
       },
     },
     {
