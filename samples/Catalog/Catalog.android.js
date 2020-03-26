@@ -50,7 +50,7 @@ const CONFIGURATION = {
   // Settings this to false will disable all annotation editing
   enableAnnotationEditing: true,
   // Only stamps and square annotations will be editable, others can not be selected or otherwise modified.
-  editableAnnotationTypes: ['Stamp', 'Square']
+  editableAnnotationTypes: ["Stamp", "Square"]
 };
 
 const examples = [
@@ -61,8 +61,9 @@ const examples = [
     action: () => {
       PSPDFKit.present("file:///android_asset/Annual Report.pdf", {})
         .then(loaded => {
-          console.log("Document was loaded successfully.")
-        }).catch(error => {
+          console.log("Document was loaded successfully.");
+        })
+        .catch(error => {
           console.log(error);
         });
       PSPDFKit.setPageIndex(3, false);
@@ -164,6 +165,17 @@ const examples = [
     action: component => {
       extractFromAssetsIfMissing("Annual Report.pdf", function() {
         component.props.navigation.push("AnnotationProcessing");
+      });
+    }
+  },
+  {
+    key: "item13",
+    name: "Hiding Toolbar",
+    description:
+      "Shows how to hide the main toolbar while keeping the thumbnail bar visible.",
+    action: component => {
+      extractFromAssetsIfMissing("Annual Report.pdf", function() {
+        component.props.navigation.push("HidingToolbar");
       });
     }
   }
@@ -289,7 +301,7 @@ class PdfViewScreen extends Component<{}> {
 
     return {
       // Since the PSPDFKitView provides it's own toolbar and back button we don't need a header.
-      header: null,
+      header: null
     };
   };
 
@@ -342,7 +354,7 @@ class PdfViewScreen extends Component<{}> {
           fragmentTag="PDF1"
           showNavigationButtonInToolbar={true}
           onNavigationButtonClicked={event => {
-            this.props.navigation.goBack()
+            this.props.navigation.goBack();
           }}
           menuItemGrouping={[
             "freetext",
@@ -569,7 +581,10 @@ class PdfViewInstantJsonScreen extends Component<{}> {
                     lineWidth: 5,
                     name: "my annotation",
                     lines: {
-                      intensities: [[0.5, 0.5, 0.5], [0.5, 0.5, 0.5]],
+                      intensities: [
+                        [0.5, 0.5, 0.5],
+                        [0.5, 0.5, 0.5]
+                      ],
                       points: [
                         [
                           [92.08633422851562, 101.07916259765625],
@@ -960,6 +975,74 @@ class AnnotationProcessing extends Component {
   }
 }
 
+class HidingToolbar extends Component {
+  static navigationOptions = ({ navigation }) => {
+    const params = navigation.state.params || {};
+    return {
+      title: "Hidden Toolbar",
+      headerRight: (
+        <Button
+          onPress={() => params.handleAnnotationButtonPress()}
+          title="Annotations"
+        />
+      )
+    };
+  };
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      annotationCreationActive: false,
+      annotationEditingActive: false
+    };
+  }
+
+  componentDidMount() {
+    this.props.navigation.setParams({
+      handleAnnotationButtonPress: () => {
+        if (
+          this.state.annotationCreationActive ||
+          this.state.annotationEditingActive
+        ) {
+          this.refs.pdfView.exitCurrentlyActiveMode();
+        } else {
+          this.refs.pdfView.enterAnnotationCreationMode();
+        }
+      }
+    });
+  }
+
+  render() {
+    return (
+      <View style={{ flex: 1 }}>
+        <PSPDFKitView
+          ref="pdfView"
+          document={DOCUMENT}
+          configuration={{
+            backgroundColor: processColor("lightgrey"),
+            showThumbnailBar: "scrollable",
+            // If you want to hide the toolbar it's essential to also hide the document label overlay.
+            documentLabelEnabled: false,
+            // We want to keep the thumbnail bar always visible, but the automatic mode is also supported with hideDefaultToolbar.
+            userInterfaceViewMode: "alwaysVisible"
+          }}
+          // This will just hide the toolbar, keeping the thumbnail bar visible.
+          hideDefaultToolbar={true}
+          disableAutomaticSaving={true}
+          fragmentTag="PDF1"
+          onStateChanged={event => {
+            this.setState({
+              annotationCreationActive: event.annotationCreationActive,
+              annotationEditingActive: event.annotationEditingActive
+            });
+          }}
+          style={{ flex: 1, color: pspdfkitColor }}
+        />
+      </View>
+    );
+  }
+}
+
 export default createAppContainer(
   createStackNavigator(
     {
@@ -983,6 +1066,9 @@ export default createAppContainer(
       },
       AnnotationProcessing: {
         screen: AnnotationProcessing
+      },
+      HidingToolbar: {
+        screen: HidingToolbar
       }
     },
     {

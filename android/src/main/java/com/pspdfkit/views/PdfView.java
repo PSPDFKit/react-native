@@ -28,6 +28,7 @@ import com.pspdfkit.forms.EditableButtonFormElement;
 import com.pspdfkit.forms.TextFormElement;
 import com.pspdfkit.listeners.OnVisibilityChangedListener;
 import com.pspdfkit.listeners.SimpleDocumentListener;
+import com.pspdfkit.react.R;
 import com.pspdfkit.react.events.PdfViewAnnotationChangedEvent;
 import com.pspdfkit.react.events.PdfViewAnnotationTappedEvent;
 import com.pspdfkit.react.events.PdfViewDataReturnedEvent;
@@ -43,6 +44,7 @@ import com.pspdfkit.ui.PdfUiFragment;
 import com.pspdfkit.ui.PdfUiFragmentBuilder;
 import com.pspdfkit.ui.search.PdfSearchView;
 import com.pspdfkit.ui.search.PdfSearchViewInline;
+import com.pspdfkit.ui.toolbar.MainToolbar;
 import com.pspdfkit.ui.toolbar.grouping.MenuItemGroupingRule;
 
 import org.json.JSONArray;
@@ -234,10 +236,32 @@ public class PdfView extends FrameLayout {
     public void setShowNavigationButtonInToolbar(final boolean showNavigationButtonInToolbar) {
         isNavigationButtonShown = showNavigationButtonInToolbar;
         pendingFragmentActions.add(getCurrentPdfUiFragment()
-            .observeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
             .subscribe(pdfUiFragment -> {
                 if (!isSearchViewShown) {
                     ((ReactPdfUiFragment) pdfUiFragment).setShowNavigationButtonInToolbar(showNavigationButtonInToolbar);
+                }
+            }));
+    }
+
+    public void setHideDefaultToolbar(boolean hideDefaultToolbar) {
+        pendingFragmentActions.add(getCurrentPdfUiFragment()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(pdfUiFragment -> {
+                final View views = pdfUiFragment.getView();
+                if (views != null) {
+                    final ReactMainToolbar mainToolbar = views.findViewById(R.id.pspdf__toolbar_main);
+                    if (hideDefaultToolbar) {
+                        // If hiding the toolbar is requested we force the visibility to gone, this way it will never be shown.
+                        mainToolbar.setForcedVisibility(GONE);
+                    } else {
+                        // To reset we undo our forcing, and if the UI is supposed to be shown right
+                        // now we manually set the visibility to visible so it's immediately shown.
+                        mainToolbar.setForcedVisibility(null);
+                        if (pdfUiFragment.isUserInterfaceVisible()) {
+                            mainToolbar.setVisibility(VISIBLE);
+                        }
+                    }
                 }
             }));
     }
@@ -647,7 +671,7 @@ public class PdfView extends FrameLayout {
     }
 
     /**
-     * This returns {@link PdfFragment} as they become available. If the user changes the view configuration of the fragment is replaced for other reasons a new {@link PdfFragment} is emitted.
+     * This returns {@link PdfFragment} as they become available. If the user changes the view configuration or the fragment is replaced for other reasons a new {@link PdfFragment} is emitted.
      */
     public Observable<PdfFragment> getPdfFragment() {
         return pdfUiFragmentGetter
