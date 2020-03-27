@@ -61,6 +61,8 @@ target 'YourApp' do
   pod 'react-native-pspdfkit', :path => '../node_modules/react-native-pspdfkit'
 - pod 'PSPDFKit', podspec: 'https://customers.pspdfkit.com/cocoapods/YOUR_COCOAPODS_KEY_GOES_HERE/pspdfkit/latest.podspec'
 + pod 'PSPDFKit', podspec: 'https://customers.pspdfkit.com/cocoapods/USE_YOUR_OWN_COCOAPODS_KEY/pspdfkit/latest.podspec'
+- pod 'Instant', podspec:'https://customers.pspdfkit.com/cocoapods/YOUR_COCOAPODS_KEY_GOES_HERE/instant/latest.podspec'
++ pod 'Instant', podspec:'https://customers.pspdfkit.com/cocoapods/USE_YOUR_OWN_COCOAPODS_KEY/instant/latest.podspec'
 
   use_native_modules!
 end

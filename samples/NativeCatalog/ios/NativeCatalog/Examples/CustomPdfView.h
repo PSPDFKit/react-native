@@ -22,6 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (BOOL)startSigning;
 - (BOOL)createWatermarkAndReloadData:(BOOL)reloadData;
+- (BOOL)presentInstantExample;
 
 @end
 

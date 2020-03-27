@@ -9,6 +9,7 @@
 
 #import "CustomPdfView.h"
 #import <React/RCTUtils.h>
+#import "NativeCatalog-Swift.h"
 
 @interface CustomPdfView()<PSPDFSignatureViewControllerDelegate>
 @property (nonatomic, nullable) UIViewController *topController;
@@ -47,9 +48,8 @@
 
   if (self.pdfController.configuration.useParentNavigationBar) {
     self.topController = self.pdfController;
-
   } else {
-    self.topController = [[PSPDFNavigationController alloc] initWithRootViewController:self.pdfController];;
+    self.topController = [[PSPDFNavigationController alloc] initWithRootViewController:self.pdfController];
   }
 
   UIView *topControllerView = self.topController.view;
@@ -187,6 +187,20 @@
     [_pdfController reloadData];
   }
   return YES;
+}
+
+- (BOOL)presentInstantExample {
+  UIViewController *presentingViewController = RCTPresentedViewController();
+  InstantExampleViewController *instantExampleViewController = [[InstantExampleViewController alloc] init];
+  self.topController = [[PSPDFNavigationController alloc] initWithRootViewController:instantExampleViewController];
+  self.topController.modalPresentationStyle = UIModalPresentationFullScreen;
+  instantExampleViewController.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[PSPDFKitGlobal imageNamed:@"x"] style:UIBarButtonItemStylePlain target:self action:@selector(closeInstantExampleButtonPressed:)];
+  [presentingViewController presentViewController:self.topController animated:YES completion:NULL];
+  return YES;
+}
+
+- (void)closeInstantExampleButtonPressed:(nullable id)sender {
+  [self.topController dismissViewControllerAnimated:YES completion:NULL];
 }
 
 @end

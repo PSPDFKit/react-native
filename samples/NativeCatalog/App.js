@@ -29,10 +29,10 @@ const examples = [
     name: 'Manual Signing',
     description:
       'Shows how to start the signing flow using a react-native button linked to our CustomPdfView.',
-    action: component => {
+    action: (component) => {
       if (Platform.OS === 'android') {
-        requestExternalStoragePermission(function() {
-          extractFromAssetsIfMissing('Form_example.pdf', function() {
+        requestExternalStoragePermission(function () {
+          extractFromAssetsIfMissing('Form_example.pdf', function () {
             component.props.navigation.navigate('ManualSigning');
           });
         });
@@ -45,10 +45,10 @@ const examples = [
     name: 'Watermark',
     description:
       'Shows how to watermark a PDF that is loaded in our CustomPdfView',
-    action: component => {
+    action: (component) => {
       if (Platform.OS === 'android') {
-        requestExternalStoragePermission(function() {
-          extractFromAssetsIfMissing('Form_example.pdf', function() {
+        requestExternalStoragePermission(function () {
+          extractFromAssetsIfMissing('Form_example.pdf', function () {
             component.props.navigation.navigate('Watermark');
           });
         });
@@ -61,10 +61,10 @@ const examples = [
     name: 'Watermark on Startup',
     description:
       'Shows how to watermark a PDF as soon as it is loaded in our CustomPdfView',
-    action: component => {
+    action: (component) => {
       if (Platform.OS === 'android') {
-        requestExternalStoragePermission(function() {
-          extractFromAssetsIfMissing('Form_example.pdf', function() {
+        requestExternalStoragePermission(function () {
+          extractFromAssetsIfMissing('Form_example.pdf', function () {
             component.props.navigation.navigate('WatermarkStartup');
           });
         });
@@ -77,15 +77,24 @@ const examples = [
     name: 'Default Annotation Settings',
     description:
       'Shows how to configure default annotations settings. (Android Only)',
-    action: component => {
+    action: (component) => {
       if (Platform.OS === 'android') {
-        requestExternalStoragePermission(function() {
-          extractFromAssetsIfMissing('Form_example.pdf', function() {
+        requestExternalStoragePermission(function () {
+          extractFromAssetsIfMissing('Form_example.pdf', function () {
             component.props.navigation.navigate('DefaultAnnotationSettings');
           });
         });
       } else {
         component.props.navigation.navigate('DefaultAnnotationSettings');
+      }
+    },
+  },
+  {
+    name: 'Instant Example',
+    description: 'Shows the Native Swift Instant Example. (iOS only)',
+    action: (component) => {
+      if (Platform.OS === 'ios') {
+        component.props.navigation.push('InstantExample');
       }
     },
   },
@@ -106,7 +115,7 @@ class ManualSigningScreen extends Component<{}> {
           ref="pdfView"
           document={this.state.documentPath}
           style={{flex: 1}}
-          onDocumentDigitallySigned={event => {
+          onDocumentDigitallySigned={(event) => {
             this.setState({
               documentPath: event.nativeEvent.signedDocumentPath,
             });
@@ -157,7 +166,7 @@ class WatermarkScreen extends Component<{}> {
           ref="pdfView"
           document={this.state.documentPath}
           style={{flex: 1}}
-          onDocumentWatermarked={event => {
+          onDocumentWatermarked={(event) => {
             this.setState({
               documentPath: event.nativeEvent.watermarkedDocumentPath,
             });
@@ -209,12 +218,35 @@ class WatermarkStartupScreen extends Component<{}> {
           ref="pdfView"
           document={this.state.documentPath}
           style={{flex: 1}}
-          onDocumentWatermarked={event => {
+          onDocumentWatermarked={(event) => {
             this.setState({
               documentPath: event.nativeEvent.watermarkedDocumentPath,
             });
           }}
         />
+      </View>
+    );
+  }
+}
+
+class InstantExampleScreen extends Component<{}> {
+  render() {
+    return (
+      <View style={{flex: 1}}>
+        {Platform.OS === 'ios' && <CustomPdfView ref="pdfView" />}
+        {Platform.OS === 'ios' && (
+          <Button
+            onPress={() => {
+              NativeModules.CustomPdfViewManager.presentInstantExample(
+                findNodeHandle(this.refs.pdfView),
+              );
+            }}
+            title="Present Instant Example"
+          />
+        )}
+        {Platform.OS === 'android' && (
+          <Text>This example isn't supported on Android!</Text>
+        )}
       </View>
     );
   }
@@ -258,6 +290,9 @@ export default createAppContainer(
       },
       WatermarkStartup: {
         screen: WatermarkStartupScreen,
+      },
+      InstantExample: {
+        screen: InstantExampleScreen,
       },
       DefaultAnnotationSettings: {
         screen: DefaultAnnotationSettingsScreen,

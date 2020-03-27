@@ -36,6 +36,7 @@ target 'NativeCatalog' do
   
   pod 'react-native-pspdfkit', :path => '../node_modules/react-native-pspdfkit'  
   pod 'PSPDFKit', podspec:'https://customers.pspdfkit.com/cocoapods/YOUR_COCOAPODS_KEY_GOES_HERE/pspdfkit/latest.podspec'
+  pod 'Instant', podspec:'https://customers.pspdfkit.com/cocoapods/YOUR_COCOAPODS_KEY_GOES_HERE/instant/latest.podspec'
 
   target 'NativeCatalogTests' do
     inherit! :search_paths
