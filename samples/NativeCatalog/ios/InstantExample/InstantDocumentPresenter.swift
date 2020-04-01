@@ -13,23 +13,23 @@ import PSPDFKitUI
  Connects to our public PSPDFKit for Web examples server to present documents managed by PSPDFKit Instant.
  This is decoupled from any view controller in order to support loading documents by opening URLs.
  */
-class InstantDocumentPresenter {
+public class InstantDocumentPresenter {
     /**
      Interfaces with our Web examples server to create and access documents.
      In your own app you would connect to your own server backend to get Instant document identifiers and authentication tokens.
      */
-    private lazy var apiClient = WebPreviewAPIClient(presentingViewController: presentingViewController)
+    private lazy var apiClient = WebExamplesAPIClient(presentingViewController: presentingViewController)
 
     /// View controller that can present other view controllers.
     private weak var presentingViewController: UIViewController?
 
     /// Initialize a document presenter with a view controller that can present other view controllers.
-    init(presentingViewController: UIViewController) {
+    public init(presentingViewController: UIViewController) {
         self.presentingViewController = presentingViewController
     }
 
     /// Tries to create a new Instant session.
-    func createNewSession() {
+    public func createNewSession() {
         loadSession(loadingMessage: "Creating") { completion in
             self.apiClient.createNewSession(completion: completion)
         }
@@ -40,7 +40,7 @@ class InstantDocumentPresenter {
 
      - Parameter urlString: An Instant document URL scanned from a barcode or entered by the user.
      */
-    func joinExistingSession(withURL urlString: String) {
+    public func joinExistingSession(withURL urlString: String) {
         guard let url = URL(string: urlString) else {
             showAlert(withTitle: "Couldn’t Join Group", message: "This is not a link. Please enter an Instant document link.")
             return
@@ -55,8 +55,8 @@ class InstantDocumentPresenter {
      Loads an Instant session using the specified API call. The passed in closure should run an
      asynchronous API call. That closure will be passed another closure to run on completion.
      */
-    private func loadSession(loadingMessage: String, APICall: @escaping (@escaping WebPreviewAPIClient.CompletionHandler) -> Void) {
-        let progressHUDItem = PSPDFStatusHUDItem.indeterminateProgress(withText: loadingMessage)
+    private func loadSession(loadingMessage: String, APICall: @escaping (@escaping WebExamplesAPIClient.CompletionHandler) -> Void) {
+        let progressHUDItem = StatusHUDItem.indeterminateProgress(withText: loadingMessage)
         progressHUDItem.setHUDStyle(.black)
 
         progressHUDItem.push(animated: true, on: presentingViewController?.view.window) {
@@ -72,7 +72,7 @@ class InstantDocumentPresenter {
                             self.showAlert(withTitle: "Couldn’t Set Up Instant", message: error.localizedDescription)
                         }
 
-                    case .failure(WebPreviewAPIClient.Failure.cancelled):
+                    case .failure(WebExamplesAPIClient.Failure.cancelled):
                         break // Do not show the alert if user cancelled the request themselves.
 
                     case let .failure(otherError):
@@ -94,7 +94,7 @@ class InstantDocumentPresenter {
 
     private func showAlert(withTitle title: String, message: String) {
         let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        alertController.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+        alertController.addAction(UIAlertAction(title: "OK", style: .cancel))
 
         presentOnFrontmostViewController(alertController)
     }

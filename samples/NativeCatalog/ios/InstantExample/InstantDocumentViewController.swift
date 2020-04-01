@@ -6,15 +6,16 @@
 //
 
 import Instant
+import PSPDFKit
 
 /**
  Downloads and shows a document managed by Instant, and shows a
  button to share the document URL so you can see Instant syncing.
  */
-class InstantDocumentViewController: PSPDFInstantViewController {
+class InstantDocumentViewController: InstantViewController {
     private let documentInfo: InstantDocumentInfo
-    private let client: PSPDFInstantClient
-    private let documentDescriptor: PSPDFInstantDocumentDescriptor
+    private let client: InstantClient
+    private let documentDescriptor: InstantDocumentDescriptor
 
     init(documentInfo: InstantDocumentInfo) throws {
         /*
@@ -24,7 +25,7 @@ class InstantDocumentViewController: PSPDFInstantViewController {
          so we need to keep references to the client and document descriptor otherwise with no
          strong references they would deallocate and syncing would stop.
          */
-        client = try PSPDFInstantClient(serverURL: documentInfo.serverURL)
+        client = try InstantClient(serverURL: documentInfo.serverURL)
 
         documentDescriptor = try client.documentDescriptor(forJWT: documentInfo.jwt)
 
@@ -34,7 +35,7 @@ class InstantDocumentViewController: PSPDFInstantViewController {
         // Tell Instant to download the document from Web examples server’s PSPDFKit Server instance.
         do {
             try documentDescriptor.download(usingJWT: documentInfo.jwt)
-        } catch PSPDFInstantError.alreadyDownloaded {
+        } catch InstantError.alreadyDownloaded {
             // This is fine, we only have to reauthenticate. Any other errors are passed up.
             documentDescriptor.reauthenticate(withJWT: documentInfo.jwt)
         }
@@ -42,13 +43,11 @@ class InstantDocumentViewController: PSPDFInstantViewController {
         // Get the `PSPDFDocument` from Instant.
         let pdfDocument = documentDescriptor.editableDocument
 
-        let configuration = PSPDFConfiguration { builder in
-            builder.pageTransition = .scrollContinuous
-            builder.scrollDirection = .vertical
-        }
-
         // Set the document on the `PSPDFInstantViewController` (the superclass) so it can show the download progress, and then show the document.
-        super.init(document: pdfDocument, configuration: configuration)
+        super.init(document: pdfDocument, configuration: PDFConfiguration {
+            $0.pageTransition = .scrollContinuous
+            $0.scrollDirection = .vertical
+        })
 
         let collaborateItem = UIBarButtonItem(title: "Collaborate", style: .plain, target: self, action: #selector(showCollaborationOptions(_:)))
         let barButtonItems = [collaborateItem, annotationButtonItem]
@@ -111,7 +110,7 @@ class InstantDocumentViewController: PSPDFInstantViewController {
             let error = notification.userInfo?[PSPDFInstantErrorKey] as? NSError
 
             let alertController = UIAlertController(title: title, message: error?.localizedDescription, preferredStyle: .alert)
-            alertController.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+            alertController.addAction(UIAlertAction(title: "OK", style: .cancel))
             self.psc_frontmost.present(alertController, animated: true, completion: nil)
         }
     }
@@ -129,7 +128,7 @@ class InstantDocumentViewController: PSPDFInstantViewController {
 
             self.present(activityViewController, animated: true)
         }))
-        alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel))
 
         present(alertController, animated: true)
     }

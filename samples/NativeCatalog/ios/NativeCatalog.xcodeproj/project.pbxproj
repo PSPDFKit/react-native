@@ -12,18 +12,18 @@
 		13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB11A68108700A75B9A /* LaunchScreen.xib */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		35C3D672073CC7D4C99F4A95 /* libPods-NativeCatalog.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B068A47725170C7A2100EE53 /* libPods-NativeCatalog.a */; };
-		4C20D1CACDACD8BD8B8DDD6A /* libPods-NativeCatalogTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 67D4656F82A81B754BB705C8 /* libPods-NativeCatalogTests.a */; };
+		2AD52A55D07643AD7BFAA381 /* libPods-NativeCatalog.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E6B9903E5A6F6239013AC3FB /* libPods-NativeCatalog.a */; };
+		5791F4E044E07A89757F0251 /* libPods-NativeCatalogTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D3645470FDC1D2846E8C6A15 /* libPods-NativeCatalogTests.a */; };
 		844D64C02375A9FE004E70D2 /* CustomPdfView.m in Sources */ = {isa = PBXBuildFile; fileRef = 844D64BF2375A9FE004E70D2 /* CustomPdfView.m */; };
 		844D64C32375AA44004E70D2 /* CustomPdfViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 844D64C22375AA44004E70D2 /* CustomPdfViewManager.m */; };
 		844D64E62375B5FC004E70D2 /* PDFs in Resources */ = {isa = PBXBuildFile; fileRef = 844D64E52375B5FC004E70D2 /* PDFs */; };
 		84E53901242E2972002F99F2 /* ScannerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84E538FB242E2972002F99F2 /* ScannerViewController.swift */; };
-		84E53902242E2972002F99F2 /* WebPreviewAPIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84E538FC242E2972002F99F2 /* WebPreviewAPIClient.swift */; };
 		84E53903242E2972002F99F2 /* InstantExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84E538FD242E2972002F99F2 /* InstantExample.swift */; };
 		84E53904242E2972002F99F2 /* InstantDocumentPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84E538FE242E2972002F99F2 /* InstantDocumentPresenter.swift */; };
 		84E53905242E2972002F99F2 /* InstantDocumentInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84E538FF242E2972002F99F2 /* InstantDocumentInfo.swift */; };
 		84E53906242E2972002F99F2 /* InstantDocumentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84E53900242E2972002F99F2 /* InstantDocumentViewController.swift */; };
 		84E5391F242E2A5C002F99F2 /* UIViewController+PSCFrontmost.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84E5391E242E2A5C002F99F2 /* UIViewController+PSCFrontmost.swift */; };
+		84F455972434D68A00DFFCCC /* WebExamplesAPIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84F455962434D68A00DFFCCC /* WebExamplesAPIClient.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -41,7 +41,7 @@
 		00E356EE1AD99517003FC87E /* NativeCatalogTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NativeCatalogTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* NativeCatalogTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NativeCatalogTests.m; sourceTree = "<group>"; };
-		0ADA4E810EE2E6FAD4A3FD88 /* Pods-NativeCatalogTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NativeCatalogTests.release.xcconfig"; path = "Target Support Files/Pods-NativeCatalogTests/Pods-NativeCatalogTests.release.xcconfig"; sourceTree = "<group>"; };
+		1105704D4849AC5DB8933C8B /* Pods-NativeCatalogTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NativeCatalogTests.release.xcconfig"; path = "Target Support Files/Pods-NativeCatalogTests/Pods-NativeCatalogTests.release.xcconfig"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* NativeCatalog.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NativeCatalog.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = NativeCatalog/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = NativeCatalog/AppDelegate.m; sourceTree = "<group>"; };
@@ -49,8 +49,7 @@
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = NativeCatalog/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = NativeCatalog/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = NativeCatalog/main.m; sourceTree = "<group>"; };
-		67D4656F82A81B754BB705C8 /* libPods-NativeCatalogTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-NativeCatalogTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		73BCAB27B09D1F33F42A31F4 /* Pods-NativeCatalog.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NativeCatalog.release.xcconfig"; path = "Target Support Files/Pods-NativeCatalog/Pods-NativeCatalog.release.xcconfig"; sourceTree = "<group>"; };
+		396A8C1511F4924BA0A1E490 /* Pods-NativeCatalogTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NativeCatalogTests.debug.xcconfig"; path = "Target Support Files/Pods-NativeCatalogTests/Pods-NativeCatalogTests.debug.xcconfig"; sourceTree = "<group>"; };
 		844D64BE2375A9FE004E70D2 /* CustomPdfView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomPdfView.h; sourceTree = "<group>"; };
 		844D64BF2375A9FE004E70D2 /* CustomPdfView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomPdfView.m; sourceTree = "<group>"; };
 		844D64C12375AA44004E70D2 /* CustomPdfViewManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CustomPdfViewManager.h; sourceTree = "<group>"; };
@@ -58,17 +57,18 @@
 		844D64E52375B5FC004E70D2 /* PDFs */ = {isa = PBXFileReference; lastKnownFileType = folder; name = PDFs; path = ../../PDFs; sourceTree = "<group>"; };
 		84E538FA242E2971002F99F2 /* NativeCatalog-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NativeCatalog-Bridging-Header.h"; sourceTree = "<group>"; };
 		84E538FB242E2972002F99F2 /* ScannerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ScannerViewController.swift; path = InstantExample/ScannerViewController.swift; sourceTree = SOURCE_ROOT; };
-		84E538FC242E2972002F99F2 /* WebPreviewAPIClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = WebPreviewAPIClient.swift; path = InstantExample/WebPreviewAPIClient.swift; sourceTree = SOURCE_ROOT; };
 		84E538FD242E2972002F99F2 /* InstantExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = InstantExample.swift; path = InstantExample/InstantExample.swift; sourceTree = SOURCE_ROOT; };
 		84E538FE242E2972002F99F2 /* InstantDocumentPresenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = InstantDocumentPresenter.swift; path = InstantExample/InstantDocumentPresenter.swift; sourceTree = SOURCE_ROOT; };
 		84E538FF242E2972002F99F2 /* InstantDocumentInfo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = InstantDocumentInfo.swift; path = InstantExample/InstantDocumentInfo.swift; sourceTree = SOURCE_ROOT; };
 		84E53900242E2972002F99F2 /* InstantDocumentViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = InstantDocumentViewController.swift; path = InstantExample/InstantDocumentViewController.swift; sourceTree = SOURCE_ROOT; };
 		84E5391E242E2A5C002F99F2 /* UIViewController+PSCFrontmost.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "UIViewController+PSCFrontmost.swift"; path = "NativeCatalog/InstantExample/UIViewController+PSCFrontmost.swift"; sourceTree = SOURCE_ROOT; };
-		90AB00B79228B7BE8CFBB444 /* Pods-NativeCatalogTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NativeCatalogTests.debug.xcconfig"; path = "Target Support Files/Pods-NativeCatalogTests/Pods-NativeCatalogTests.debug.xcconfig"; sourceTree = "<group>"; };
-		B068A47725170C7A2100EE53 /* libPods-NativeCatalog.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-NativeCatalog.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		E9DEF420A1F14ED4D79D10B7 /* Pods-NativeCatalog.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NativeCatalog.debug.xcconfig"; path = "Target Support Files/Pods-NativeCatalog/Pods-NativeCatalog.debug.xcconfig"; sourceTree = "<group>"; };
+		84F455962434D68A00DFFCCC /* WebExamplesAPIClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = WebExamplesAPIClient.swift; path = InstantExample/WebExamplesAPIClient.swift; sourceTree = SOURCE_ROOT; };
+		D3645470FDC1D2846E8C6A15 /* libPods-NativeCatalogTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-NativeCatalogTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		E6B9903E5A6F6239013AC3FB /* libPods-NativeCatalog.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-NativeCatalog.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		EB96BC1AD898FD7F63559F12 /* Pods-NativeCatalog.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NativeCatalog.debug.xcconfig"; path = "Target Support Files/Pods-NativeCatalog/Pods-NativeCatalog.debug.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		ED2971642150620600B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS12.0.sdk/System/Library/Frameworks/JavaScriptCore.framework; sourceTree = DEVELOPER_DIR; };
+		F44E216A406398F13D80D322 /* Pods-NativeCatalog.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NativeCatalog.release.xcconfig"; path = "Target Support Files/Pods-NativeCatalog/Pods-NativeCatalog.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -76,7 +76,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4C20D1CACDACD8BD8B8DDD6A /* libPods-NativeCatalogTests.a in Frameworks */,
+				5791F4E044E07A89757F0251 /* libPods-NativeCatalogTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -84,7 +84,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				35C3D672073CC7D4C99F4A95 /* libPods-NativeCatalog.a in Frameworks */,
+				2AD52A55D07643AD7BFAA381 /* libPods-NativeCatalog.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -128,8 +128,8 @@
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				ED2971642150620600B7C4FE /* JavaScriptCore.framework */,
-				B068A47725170C7A2100EE53 /* libPods-NativeCatalog.a */,
-				67D4656F82A81B754BB705C8 /* libPods-NativeCatalogTests.a */,
+				E6B9903E5A6F6239013AC3FB /* libPods-NativeCatalog.a */,
+				D3645470FDC1D2846E8C6A15 /* libPods-NativeCatalogTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -188,8 +188,8 @@
 				84E53900242E2972002F99F2 /* InstantDocumentViewController.swift */,
 				84E538FD242E2972002F99F2 /* InstantExample.swift */,
 				84E538FB242E2972002F99F2 /* ScannerViewController.swift */,
+				84F455962434D68A00DFFCCC /* WebExamplesAPIClient.swift */,
 				84E5391E242E2A5C002F99F2 /* UIViewController+PSCFrontmost.swift */,
-				84E538FC242E2972002F99F2 /* WebPreviewAPIClient.swift */,
 			);
 			path = InstantExample;
 			sourceTree = "<group>";
@@ -197,10 +197,10 @@
 		E20636F4482E38B1DB5E29B7 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				E9DEF420A1F14ED4D79D10B7 /* Pods-NativeCatalog.debug.xcconfig */,
-				73BCAB27B09D1F33F42A31F4 /* Pods-NativeCatalog.release.xcconfig */,
-				90AB00B79228B7BE8CFBB444 /* Pods-NativeCatalogTests.debug.xcconfig */,
-				0ADA4E810EE2E6FAD4A3FD88 /* Pods-NativeCatalogTests.release.xcconfig */,
+				EB96BC1AD898FD7F63559F12 /* Pods-NativeCatalog.debug.xcconfig */,
+				F44E216A406398F13D80D322 /* Pods-NativeCatalog.release.xcconfig */,
+				396A8C1511F4924BA0A1E490 /* Pods-NativeCatalogTests.debug.xcconfig */,
+				1105704D4849AC5DB8933C8B /* Pods-NativeCatalogTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -212,7 +212,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "NativeCatalogTests" */;
 			buildPhases = (
-				24CECAA39128546E013EBAE9 /* [CP] Check Pods Manifest.lock */,
+				D212507043B3A93AC75A1A74 /* [CP] Check Pods Manifest.lock */,
 				00E356EA1AD99517003FC87E /* Sources */,
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
@@ -231,13 +231,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "NativeCatalog" */;
 			buildPhases = (
-				BF195BA114F5DCB7F9302535 /* [CP] Check Pods Manifest.lock */,
+				34456C36ED5A4F745E28E799 /* [CP] Check Pods Manifest.lock */,
 				FD10A7F022414F080027D42C /* Start Packager */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				122E04F745F185A0FAFA3630 /* [CP] Embed Pods Frameworks */,
+				A55FE3DA6D56DB9652C17360 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -320,7 +320,29 @@
 			shellPath = /bin/sh;
 			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh";
 		};
-		122E04F745F185A0FAFA3630 /* [CP] Embed Pods Frameworks */ = {
+		34456C36ED5A4F745E28E799 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-NativeCatalog-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		A55FE3DA6D56DB9652C17360 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -348,7 +370,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-NativeCatalog/Pods-NativeCatalog-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		24CECAA39128546E013EBAE9 /* [CP] Check Pods Manifest.lock */ = {
+		D212507043B3A93AC75A1A74 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -364,28 +386,6 @@
 			);
 			outputPaths = (
 				"$(DERIVED_FILE_DIR)/Pods-NativeCatalogTests-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		BF195BA114F5DCB7F9302535 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-NativeCatalog-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -429,10 +429,10 @@
 				84E53903242E2972002F99F2 /* InstantExample.swift in Sources */,
 				84E53904242E2972002F99F2 /* InstantDocumentPresenter.swift in Sources */,
 				844D64C32375AA44004E70D2 /* CustomPdfViewManager.m in Sources */,
+				84F455972434D68A00DFFCCC /* WebExamplesAPIClient.swift in Sources */,
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 				84E53906242E2972002F99F2 /* InstantDocumentViewController.swift in Sources */,
-				84E53902242E2972002F99F2 /* WebPreviewAPIClient.swift in Sources */,
 				84E53905242E2972002F99F2 /* InstantDocumentInfo.swift in Sources */,
 				84E5391F242E2A5C002F99F2 /* UIViewController+PSCFrontmost.swift in Sources */,
 				84E53901242E2972002F99F2 /* ScannerViewController.swift in Sources */,
@@ -465,7 +465,7 @@
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 90AB00B79228B7BE8CFBB444 /* Pods-NativeCatalogTests.debug.xcconfig */;
+			baseConfigurationReference = 396A8C1511F4924BA0A1E490 /* Pods-NativeCatalogTests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -489,7 +489,7 @@
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 0ADA4E810EE2E6FAD4A3FD88 /* Pods-NativeCatalogTests.release.xcconfig */;
+			baseConfigurationReference = 1105704D4849AC5DB8933C8B /* Pods-NativeCatalogTests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -510,13 +510,14 @@
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = E9DEF420A1F14ED4D79D10B7 /* Pods-NativeCatalog.debug.xcconfig */;
+			baseConfigurationReference = EB96BC1AD898FD7F63559F12 /* Pods-NativeCatalog.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = NO;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = NativeCatalog/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = (
@@ -536,12 +537,13 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 73BCAB27B09D1F33F42A31F4 /* Pods-NativeCatalog.release.xcconfig */;
+			baseConfigurationReference = F44E216A406398F13D80D322 /* Pods-NativeCatalog.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = NativeCatalog/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = (

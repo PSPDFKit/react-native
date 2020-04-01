@@ -13,7 +13,7 @@ import Foundation
  This is just networking and JSON parsing. It’s very specific our backend so not very useful as sample code.
  In your own app you would connect to your own server backend to get Instant document identifiers and authentication tokens.
  */
-class WebPreviewAPIClient: NSObject, URLSessionTaskDelegate {
+class WebExamplesAPIClient: NSObject, URLSessionTaskDelegate {
 
     enum Failure: Error {
         case cancelled
@@ -72,7 +72,7 @@ class WebPreviewAPIClient: NSObject, URLSessionTaskDelegate {
 
     private func promptForHTTPBasicAuthenticationCredential(challenge: URLAuthenticationChallenge, completion: @escaping (URLCredential?) -> Void) {
         let hudWindow = presentingViewController?.view.window
-        let hudItems = PSPDFStatusHUD.itemsForHUD(on: hudWindow)
+        let hudItems = StatusHUD.itemsForHUD(on: hudWindow)
         let alert = UIAlertController(title: "Log in to \(challenge.protectionSpace.host)", message: "Your login information will be sent securely.", preferredStyle: .alert)
 
         alert.addTextField { textField in
@@ -86,14 +86,14 @@ class WebPreviewAPIClient: NSObject, URLSessionTaskDelegate {
         }
 
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { _ in
-            PSPDFStatusHUD.pushItems(hudItems, on: hudWindow, animated: true) {
+            StatusHUD.pushItems(hudItems, on: hudWindow, animated: true) {
                 completion(nil)
             }
         }
 
         let logInAction = UIAlertAction(title: "Log In", style: .default) { [unowned alert] _ in
             guard let textFields = alert.textFields, textFields.count == 2 else {
-                PSPDFStatusHUD.pushItems(hudItems, on: hudWindow, animated: true) {
+                StatusHUD.pushItems(hudItems, on: hudWindow, animated: true) {
                     completion(nil)
                 }
                 return
@@ -103,7 +103,7 @@ class WebPreviewAPIClient: NSObject, URLSessionTaskDelegate {
                 password: textFields[1].text ?? "",
                 persistence: .permanent
             )
-            PSPDFStatusHUD.pushItems(hudItems, on: hudWindow, animated: true) {
+            StatusHUD.pushItems(hudItems, on: hudWindow, animated: true) {
                 completion(credential)
             }
         }
@@ -111,7 +111,7 @@ class WebPreviewAPIClient: NSObject, URLSessionTaskDelegate {
         alert.addAction(cancelAction)
         alert.addAction(logInAction)
 
-        PSPDFStatusHUD.popItems(hudItems, animated: true) {
+        StatusHUD.popItems(hudItems, animated: true) {
             self.presentingViewController?.present(alert, animated: true)
         }
     }
@@ -146,7 +146,7 @@ class WebPreviewAPIClient: NSObject, URLSessionTaskDelegate {
     }
 }
 
-extension WebPreviewAPIClient.Failure: LocalizedError {
+extension WebExamplesAPIClient.Failure: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .cancelled:
@@ -161,9 +161,9 @@ extension WebPreviewAPIClient.Failure: LocalizedError {
     }
 }
 
-extension PSPDFStatusHUD {
+extension StatusHUD {
 
-    fileprivate static func popItems(_ items: [PSPDFStatusHUDItem]?, animated: Bool, completion: @escaping () -> Void) {
+    fileprivate static func popItems(_ items: [StatusHUDItem]?, animated: Bool, completion: @escaping () -> Void) {
         guard let items = items, !items.isEmpty else {
             completion()
             return
@@ -172,7 +172,7 @@ extension PSPDFStatusHUD {
         items.last!.pop(animated: animated, completion: completion)
     }
 
-    fileprivate static func pushItems(_ items: [PSPDFStatusHUDItem]?, on window: UIWindow?, animated: Bool, completion: @escaping () -> Void) {
+    fileprivate static func pushItems(_ items: [StatusHUDItem]?, on window: UIWindow?, animated: Bool, completion: @escaping () -> Void) {
         guard let items = items, !items.isEmpty else {
             completion()
             return

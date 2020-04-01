@@ -33,7 +33,7 @@ import Instant
 /// Shows UI to either start a new collaboration session or join an existing session.
 @objc class InstantExampleViewController: UITableViewController {
 
-    private lazy var apiClient = WebPreviewAPIClient(presentingViewController: self)
+    private lazy var apiClient = WebExamplesAPIClient(presentingViewController: self)
     private lazy var instantDocumentPresenter = InstantDocumentPresenter(presentingViewController: self)
 
     /// A reference to the text field in the cell so it can be disabled when starting a new group to avoid duplicate network requests.
@@ -46,7 +46,7 @@ import Instant
         // Since this demo is ephemeral, we want to ensure we start with a clean slate each time.
         // The InstantDocumentViewController tries to clean up when it deallocates but that can’t catch every case.
         do {
-            try FileManager.default.removeItem(at: PSPDFInstantClient.dataDirectory)
+            try FileManager.default.removeItem(at: InstantClient.dataDirectory)
         } catch {
             switch error {
             case CocoaError.fileNoSuchFile,
@@ -180,7 +180,7 @@ import Instant
 
     private func showError(withTitle title: String, message: String) {
         let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        alertController.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+        alertController.addAction(UIAlertAction(title: "OK", style: .cancel))
 
         present(alertController, animated: true, completion: nil)
     }

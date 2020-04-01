@@ -86,7 +86,7 @@ class ScannerViewController: UIViewController {
         self.previewLayer = previewLayer
         navigationController?.navigationBar.prefersLargeTitles = true
 
-        navigationItem.leftBarButtonItem = UIBarButtonItem(image: PSPDFKitGlobal.imageNamed("x"), style: .done, target: self, action: #selector(closePressed))
+        navigationItem.leftBarButtonItem = UIBarButtonItem(image: SDK.imageNamed("x"), style: .done, target: self, action: #selector(closePressed))
     }
 
     override func viewWillDisappear(_ animated: Bool) {
