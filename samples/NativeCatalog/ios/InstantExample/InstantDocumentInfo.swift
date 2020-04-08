@@ -29,28 +29,13 @@ extension InstantDocumentInfo {
     }
 
     init?(json: Any) {
-        guard let dictionary = json as? [String: Any] else {
-            return nil
-        }
-
-        guard let serverUrlString = dictionary[JSONKeys.serverUrl.rawValue] as? String else {
-            return nil
-        }
-
-        guard let serverURL = URL(string: serverUrlString) else {
-            return nil
-        }
-
-        guard let urlString = dictionary[JSONKeys.url.rawValue] as? String else {
-            return nil
-        }
-
-        guard let url = URL(string: urlString) else {
-            return nil
-        }
-
-        guard let jwt = dictionary[JSONKeys.jwt.rawValue] as? String else {
-            return nil
+        guard let dictionary = json as? [String: Any],
+            let serverUrlString = dictionary[JSONKeys.serverUrl.rawValue] as? String,
+            let serverURL = URL(string: serverUrlString),
+            let urlString = dictionary[JSONKeys.url.rawValue] as? String,
+            let url = URL(string: urlString),
+            let jwt = dictionary[JSONKeys.jwt.rawValue] as? String else {
+                return nil
         }
 
         self.init(serverURL: serverURL, url: url, jwt: jwt)
