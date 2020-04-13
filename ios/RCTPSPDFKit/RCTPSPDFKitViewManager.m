@@ -19,6 +19,20 @@
 @import PSPDFKit;
 @import PSPDFKitUI;
 
+// Static variables to allow communication between the React Native View Props and the custom font picker view controller.
+static NSString *staticSelectedFontName;
+static NSArray<NSString *>*staticAvailableFontNames;
+
+/** Defaults to YES.
+
+ @see https://pspdfkit.com/api/ios/Classes/PSPDFFontPickerViewController.html#/c:objc(cs)PSPDFFontPickerViewController(py)showDownloadableFonts
+ */
+static BOOL staticShowDownloadableFonts = YES;
+
+// Custom font picker subclass to allow customizations.
+@interface CustomFontPickerViewController : PSPDFFontPickerViewController
+@end
+
 @implementation RCTPSPDFKitViewManager
 
 RCT_EXPORT_MODULE()
@@ -106,6 +120,42 @@ RCT_EXPORT_VIEW_PROPERTY(onAnnotationTapped, RCTBubblingEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onAnnotationsChanged, RCTBubblingEventBlock)
 
 RCT_EXPORT_VIEW_PROPERTY(onStateChanged, RCTBubblingEventBlock)
+
+RCT_CUSTOM_VIEW_PROPERTY(availableFontNames, NSArray, RCTPSPDFKitView) {
+  if (json && [RCTConvert NSArray:json]) {
+    view.availableFontNames = [RCTConvert NSArray:json];
+    staticAvailableFontNames = view.availableFontNames;
+
+    // We use a subclassed font picker view controller to customize it.
+    [view.pdfController updateConfigurationWithoutReloadingWithBuilder:^(PSPDFConfigurationBuilder * _Nonnull builder) {
+      [builder overrideClass:PSPDFFontPickerViewController.class withClass:CustomFontPickerViewController.class];
+    }];
+  }
+}
+
+RCT_CUSTOM_VIEW_PROPERTY(selectedFontName, NSString, RCTPSPDFKitView) {
+  if (json && [RCTConvert NSString:json]) {
+    view.selectedFontName = [RCTConvert NSString:json];
+    staticSelectedFontName = view.selectedFontName;
+
+    // We use a subclassed font picker view controller to customize it.
+    [view.pdfController updateConfigurationWithoutReloadingWithBuilder:^(PSPDFConfigurationBuilder * _Nonnull builder) {
+      [builder overrideClass:PSPDFFontPickerViewController.class withClass:CustomFontPickerViewController.class];
+    }];
+  }
+}
+
+RCT_CUSTOM_VIEW_PROPERTY(showDownloadableFonts, BOOL, RCTPSPDFKitView) {
+  if (json) {
+    view.showDownloadableFonts = [RCTConvert BOOL:json];
+    staticShowDownloadableFonts = view.showDownloadableFonts;
+
+    // We use a subclassed font picker view controller to customize it.
+    [view.pdfController updateConfigurationWithoutReloadingWithBuilder:^(PSPDFConfigurationBuilder * _Nonnull builder) {
+      [builder overrideClass:PSPDFFontPickerViewController.class withClass:CustomFontPickerViewController.class];
+    }];
+  }
+}
 
 RCT_EXPORT_METHOD(enterAnnotationCreationMode:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   dispatch_async(dispatch_get_main_queue(), ^{
@@ -287,4 +337,39 @@ RCT_EXPORT_METHOD(getRightBarButtonItemsForViewMode:(nullable NSString *)viewMod
   return [[RCTPSPDFKitView alloc] init];
 }
 
+@end
+
+@implementation CustomFontPickerViewController
+
+- (NSArray *)customFontFamilyDescriptors {
+  NSMutableArray *fontFamilyDescription = [NSMutableArray array];
+  for (NSString *fontName in staticAvailableFontNames) {
+    [fontFamilyDescription addObject:[[UIFontDescriptor alloc] initWithFontAttributes:@{UIFontDescriptorNameAttribute: fontName}]];
+  }
+
+  return fontFamilyDescription;
+}
+
+- (UIFont *)customSelectedFont {
+  // We bailout early if the passed selected font name is nil.
+  if (!staticSelectedFontName) {
+    return nil;
+  }
+  UIFontDescriptor *fontDescriptor = [[UIFontDescriptor alloc] initWithFontAttributes:@{UIFontDescriptorNameAttribute: staticSelectedFontName}];
+  return [UIFont fontWithDescriptor:fontDescriptor size:12.0];
+}
+
+- (instancetype)initWithFontFamilyDescriptors:(NSArray *)fontFamilyDescriptors {
+  // Override the default font family descriptors.
+  fontFamilyDescriptors = [self customFontFamilyDescriptors];
+  return [super initWithFontFamilyDescriptors:fontFamilyDescriptors];
+}
+
+-(void)viewWillAppear:(BOOL)animated {
+  [super viewWillAppear:animated];
+
+  // Customize the font picker before it appears.
+  self.showDownloadableFonts = staticShowDownloadableFonts;
+  self.selectedFont = [self customSelectedFont];
+}
 @end
