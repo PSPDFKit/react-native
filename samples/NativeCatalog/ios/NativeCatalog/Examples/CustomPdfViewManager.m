@@ -59,6 +59,19 @@ RCT_EXPORT_METHOD(createWatermark:(nonnull NSNumber *)reactTag resolver:(RCTProm
   });
 }
 
+RCT_EXPORT_METHOD(presentInstantExample:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+  dispatch_async(dispatch_get_main_queue(), ^{
+    CustomPdfView *component = (CustomPdfView *)[self.bridge.uiManager viewForReactTag:reactTag];
+    NSError *error;
+    BOOL success = [component presentInstantExample];
+    if (success) {
+      resolve(@(success));
+    } else {
+      reject(@"error", @"Failed to present Instant Example.", error);
+    }
+  });
+}
+
 - (UIView *)view {
   return [[CustomPdfView alloc] init];
 }
