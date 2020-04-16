@@ -661,18 +661,19 @@ PSPDFKitView.propTypes = {
   onNavigationButtonClicked: PropTypes.func,
   /**
    * availableFontNames: Can be used to specfiy the available font names in the font picker.
-   * Note: You need to set the desired font family names as `UIFontDescriptor`. See https://developer.apple.com/documentation/uikit/uifontdescriptor?language=objc
+   *
+   * Note on iOS: You need to set the desired font family names as `UIFontDescriptor`. See https://developer.apple.com/documentation/uikit/uifontdescriptor?language=objc
    * See `CustomFontPicker` in https://github.com/PSPDFKit/react-native/blob/master/samples/Catalog/Catalog.ios.js
    *
-   * @platform ios
    */
   availableFontNames: PropTypes.array,
   /**
    * selectedFontName: Can be used to specfiy the current selected font in the font picker.
-   * Note: You need to set the desired font family name as `UIFontDescriptor`. See https://developer.apple.com/documentation/uikit/uifontdescriptor?language=objc
+   *
+   * Note on iOS: You need to set the desired font family name as `UIFontDescriptor`. See https://developer.apple.com/documentation/uikit/uifontdescriptor?language=objc
    * See `CustomFontPicker` in https://github.com/PSPDFKit/react-native/blob/master/samples/Catalog/Catalog.ios.js
    *
-   * @platform ios
+   * Note on Android: This is the default font that is selected, if the users changes the font that will become the new default.
    */
   selectedFontName: PropTypes.string,
   /**

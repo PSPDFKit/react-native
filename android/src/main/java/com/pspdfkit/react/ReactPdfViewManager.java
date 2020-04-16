@@ -14,13 +14,7 @@ import com.facebook.react.uimanager.ViewGroupManager;
 import com.facebook.react.uimanager.annotations.ReactProp;
 import com.pspdfkit.annotations.Annotation;
 import com.pspdfkit.preferences.PSPDFKitPreferences;
-import com.pspdfkit.react.events.PdfViewAnnotationChangedEvent;
-import com.pspdfkit.react.events.PdfViewAnnotationTappedEvent;
 import com.pspdfkit.react.events.PdfViewDataReturnedEvent;
-import com.pspdfkit.react.events.PdfViewDocumentLoadFailedEvent;
-import com.pspdfkit.react.events.PdfViewDocumentSaveFailedEvent;
-import com.pspdfkit.react.events.PdfViewDocumentSavedEvent;
-import com.pspdfkit.react.events.PdfViewStateChangedEvent;
 import com.pspdfkit.react.menu.ReactGroupingRule;
 import com.pspdfkit.views.PdfView;
 
@@ -154,8 +148,18 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
     }
 
     @ReactProp(name= "hideDefaultToolbar")
-    public void setHideDefaultToolbar(@NonNull final PdfView view,final boolean hideDefaultToolbar) {
+    public void setHideDefaultToolbar(@NonNull final PdfView view, final boolean hideDefaultToolbar) {
         view.setHideDefaultToolbar(hideDefaultToolbar);
+    }
+
+    @ReactProp(name = "availableFontNames")
+    public void setAvailableFontNames(@NonNull final PdfView view, @Nullable final ReadableArray availableFontNames) {
+        view.setAvailableFontNames(availableFontNames);
+    }
+
+    @ReactProp(name = "selectedFontName")
+    public void setSelectedFontName(@NonNull final PdfView view, @Nullable final String selectedFontName) {
+        view.setSelectedFontName(selectedFontName);
     }
 
     @Nullable

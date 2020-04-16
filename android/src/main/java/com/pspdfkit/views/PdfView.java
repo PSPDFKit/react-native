@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.Uri;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.Pair;
 import android.view.Choreographer;
 import android.view.View;
@@ -13,10 +14,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentManager;
 
+import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.events.EventDispatcher;
+import com.pspdfkit.PSPDFKit;
 import com.pspdfkit.annotations.Annotation;
+import com.pspdfkit.annotations.AnnotationType;
+import com.pspdfkit.annotations.configuration.FreeTextAnnotationConfiguration;
 import com.pspdfkit.configuration.activity.PdfActivityConfiguration;
 import com.pspdfkit.document.PdfDocument;
 import com.pspdfkit.document.PdfDocumentLoader;
@@ -42,9 +47,11 @@ import com.pspdfkit.ui.DocumentDescriptor;
 import com.pspdfkit.ui.PdfFragment;
 import com.pspdfkit.ui.PdfUiFragment;
 import com.pspdfkit.ui.PdfUiFragmentBuilder;
+import com.pspdfkit.ui.fonts.Font;
+import com.pspdfkit.ui.fonts.FontManager;
 import com.pspdfkit.ui.search.PdfSearchView;
 import com.pspdfkit.ui.search.PdfSearchViewInline;
-import com.pspdfkit.ui.toolbar.MainToolbar;
+import com.pspdfkit.ui.special_mode.controller.AnnotationTool;
 import com.pspdfkit.ui.toolbar.grouping.MenuItemGroupingRule;
 
 import org.json.JSONArray;
@@ -84,6 +91,7 @@ public class PdfView extends FrameLayout {
 
     /** Key to use when setting the id argument of PdfFragments created by this PdfView. */
     private static final String ARG_ROOT_ID = "root_id";
+    private static final String TAG = "PdfView";
 
     private FragmentManager fragmentManager;
     private EventDispatcher eventDispatcher;
@@ -115,6 +123,18 @@ public class PdfView extends FrameLayout {
     private boolean isNavigationButtonShown = false;
     /** We keep track if the inline search view is shown since we don't want to add a second navigation button while it is shown. */
     private boolean isSearchViewShown = false;
+
+    /** Disposable keeping track of our subscription to update the annotation configuration on each emitted PdfFragment. */
+    @Nullable
+    private Disposable updateAnnotationConfigurationDisposable;
+
+    /** The currently configured array of available font names for free text annotations. */
+    @Nullable
+    private ReadableArray availableFontNames;
+
+    /** The currently configured default font name for free text annotations. */
+    @Nullable
+    private String selectedFontName;
 
     public PdfView(@NonNull Context context) {
         super(context);
@@ -231,6 +251,63 @@ public class PdfView extends FrameLayout {
      */
     public void setMenuItemGroupingRule(@NonNull MenuItemGroupingRule groupingRule) {
         pdfViewModeController.setMenuItemGroupingRule(groupingRule);
+    }
+
+    public void setAvailableFontNames(@Nullable final ReadableArray availableFontNames) {
+        this.availableFontNames = availableFontNames;
+        updateAnnotationConfiguration();
+    }
+
+    public void setSelectedFontName(@Nullable final String selectedFontName) {
+        this.selectedFontName = selectedFontName;
+        updateAnnotationConfiguration();
+    }
+
+    private void updateAnnotationConfiguration() {
+        if (updateAnnotationConfigurationDisposable != null) {
+            updateAnnotationConfigurationDisposable.dispose();
+        }
+
+        // First we create the new FreeTextAnnotationConfiguration.
+        FreeTextAnnotationConfiguration.Builder builder = FreeTextAnnotationConfiguration.builder(getContext());
+        FontManager systemFontManager = PSPDFKit.getSystemFontManager();
+        if (availableFontNames != null) {
+            // Custom list of available fonts is set.
+            final ArrayList<Font> availableFonts  = new ArrayList<>();
+            for (int i = 0; i < availableFontNames.size(); i++) {
+                final String fontName = availableFontNames.getString(i);
+                final Font font = systemFontManager.getFontByName(fontName);
+                if (font != null) {
+                    availableFonts.add(font);
+                } else {
+                    Log.w(TAG, String.format("Failed to add font %s to list of available fonts since it wasn't found in the list of system fonts.", fontName));
+                }
+            }
+            builder.setAvailableFonts(availableFonts);
+        }
+
+        if (selectedFontName != null) {
+            final Font defaultFont = systemFontManager.getFontByName(selectedFontName);
+            if (defaultFont != null) {
+                builder.setDefaultFont(defaultFont);
+            } else {
+                Log.w(TAG, String.format("Failed to set default font to %s since it wasn't found in the list of system fonts.", selectedFontName));
+            }
+        }
+
+        final FreeTextAnnotationConfiguration configuration = builder.build();
+        // We want to set this on the current PdfFragment and all future ones.
+        // We use the observable emitting PdfFragments for this purpose.
+        updateAnnotationConfigurationDisposable = getPdfFragment()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(pdfFragment -> {
+                pdfFragment.getAnnotationConfiguration().put(
+                    AnnotationTool.FREETEXT,configuration);
+                pdfFragment.getAnnotationConfiguration().put(
+                    AnnotationType.FREETEXT,configuration);
+                pdfFragment.getAnnotationConfiguration().put(
+                    AnnotationTool.FREETEXT_CALLOUT,configuration);
+            });
     }
 
     public void setShowNavigationButtonInToolbar(final boolean showNavigationButtonInToolbar) {
