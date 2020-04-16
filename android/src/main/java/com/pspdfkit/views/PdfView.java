@@ -286,7 +286,7 @@ public class PdfView extends FrameLayout {
                     .build();
                 // We put our internal id so we can track if this fragment belongs to us, used to handle orphaned fragments after hot reloads.
                 pdfFragment.getArguments().putInt(ARG_ROOT_ID, internalId);
-                prepareFragment(pdfFragment);
+                prepareFragment(pdfFragment, true);
             } else {
                 View fragmentView = pdfFragment.getView();
                 if (pdfFragment.getDocument() != null && !pdfFragment.getDocument().getUid().equals(document.getUid())) {
@@ -298,13 +298,13 @@ public class PdfView extends FrameLayout {
                         .configuration(configuration)
                         .fragmentClass(ReactPdfUiFragment.class)
                         .build();
-                    prepareFragment(pdfFragment);
+                    prepareFragment(pdfFragment, true);
                 } else if (fragmentView != null && fragmentView.getParent() != this) {
                     // We only need to detach the fragment if the parent view changed.
                     fragmentManager.beginTransaction()
                         .remove(pdfFragment)
                         .commitNow();
-                    prepareFragment(pdfFragment);
+                    prepareFragment(pdfFragment, true);
                 }
             }
 
@@ -317,12 +317,14 @@ public class PdfView extends FrameLayout {
         }
     }
 
-    private void prepareFragment(final PdfUiFragment pdfUiFragment) {
-        fragmentManager.beginTransaction()
-            .add(pdfUiFragment, fragmentTag)
-            .commitNow();
-        View fragmentView = pdfUiFragment.getView();
-        addView(fragmentView, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+    private void prepareFragment(final PdfUiFragment pdfUiFragment, final boolean attachFragment) {
+        if (attachFragment) {
+            fragmentManager.beginTransaction()
+                .add(pdfUiFragment, fragmentTag)
+                .commitNow();
+            View fragmentView = pdfUiFragment.getView();
+            addView(fragmentView, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+        }
 
         pdfUiFragment.setOnContextualToolbarLifecycleListener(pdfViewModeController);
         pdfUiFragment.getPSPDFKitViews().getFormEditingBarView().addOnFormEditingBarLifecycleListener(pdfViewModeController);
@@ -330,7 +332,9 @@ public class PdfView extends FrameLayout {
             @Override
             public void onConfigurationChanged(@NonNull PdfUiFragment pdfUiFragment) {
                 // If the configuration was changed from the UI a new fragment will be created, reattach our listeners.
-                preparePdfFragment(pdfUiFragment.getPdfFragment());
+                prepareFragment(pdfUiFragment, false);
+                // Also notify other places that might want to reattach their listeners.
+                pdfUiFragmentGetter.onNext(Collections.singletonList(pdfUiFragment));
             }
 
             @Override
