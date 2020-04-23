@@ -33,7 +33,7 @@ RCT_CUSTOM_VIEW_PROPERTY(document, PSPDFDocument, RCTPSPDFKitView) {
       view.pdfController.document.defaultAnnotationUsername = view.annotationAuthorName;
     }
 
-    // The `disableFormEditing` property may be set before the document exists. We set it again here when the document exists.
+    // Disable form editing when the document exists.
     if (view.disableFormEditing) {
         view.pdfController.document.formsEnabled = !view.disableFormEditing;
     }
@@ -49,6 +49,7 @@ RCT_CUSTOM_VIEW_PROPERTY(configuration, PSPDFConfiguration, RCTPSPDFKitView) {
     }];
 
     // The `disableFormEditing` property can be used as both a view prop and a configuration option.
+    // Here we set the view property with the value of the configuration option.
     NSDictionary *dictionary = [RCTConvert NSDictionary:json];
     if (dictionary[@"disableFormEditing"]) {
       view.disableFormEditing = [RCTConvert BOOL:dictionary[@"disableFormEditing"]];
