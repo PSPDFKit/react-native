@@ -22,6 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) UIBarButtonItem *closeButton;
 @property (nonatomic) BOOL disableDefaultActionForTappedAnnotations;
 @property (nonatomic) BOOL disableAutomaticSaving;
+@property (nonatomic) BOOL disableFormEditing;
 @property (nonatomic, copy, nullable) NSString *annotationAuthorName;
 @property (nonatomic, copy) RCTBubblingEventBlock onCloseButtonPressed;
 @property (nonatomic, copy) RCTBubblingEventBlock onDocumentSaved;

@@ -554,6 +554,10 @@ PSPDFKitView.propTypes = {
    */
   disableAutomaticSaving: PropTypes.bool,
   /**
+   * Controls whether or not the document's forms are editable. Defaults to forms being editable (false).
+   */
+  disableFormEditing: PropTypes.bool,
+  /**
    * Controls the author name that is set for new annotations.
    * If not set and the user hasn't specified it before the user will be asked and the result will be saved.
    * The value set here will be persisted and the user will not be asked even if this is not set the next time.

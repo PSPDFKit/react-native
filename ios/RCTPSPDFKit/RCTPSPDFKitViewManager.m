@@ -32,6 +32,11 @@ RCT_CUSTOM_VIEW_PROPERTY(document, PSPDFDocument, RCTPSPDFKitView) {
     if (view.annotationAuthorName) {
       view.pdfController.document.defaultAnnotationUsername = view.annotationAuthorName;
     }
+
+    // The `disableFormEditing` property may be set before the document exists. We set it again here when the document exists.
+    if (view.disableFormEditing) {
+        view.pdfController.document.formsEnabled = !view.disableFormEditing;
+    }
   }
 }
 
@@ -42,6 +47,12 @@ RCT_CUSTOM_VIEW_PROPERTY(configuration, PSPDFConfiguration, RCTPSPDFKitView) {
     [view.pdfController updateConfigurationWithBuilder:^(PSPDFConfigurationBuilder *builder) {
       [builder setupFromJSON:json];
     }];
+
+    // The `disableFormEditing` property can be used as both a view prop and a configuration option.
+    NSDictionary *dictionary = [RCTConvert NSDictionary:json];
+    if (dictionary[@"disableFormEditing"]) {
+      view.disableFormEditing = [RCTConvert BOOL:dictionary[@"disableFormEditing"]];
+    }
   }
 }
 
@@ -84,6 +95,13 @@ RCT_EXPORT_VIEW_PROPERTY(hideNavigationBar, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(disableDefaultActionForTappedAnnotations, BOOL)
 
 RCT_EXPORT_VIEW_PROPERTY(disableAutomaticSaving, BOOL)
+
+
+RCT_CUSTOM_VIEW_PROPERTY(disableFormEditing, BOOL, RCTPSPDFKitView) {
+  if (json && [RCTConvert BOOL:json]) {
+    view.disableFormEditing = [RCTConvert BOOL:json];
+  }
+}
 
 RCT_REMAP_VIEW_PROPERTY(color, tintColor, UIColor)
 
