@@ -33,10 +33,8 @@ RCT_CUSTOM_VIEW_PROPERTY(document, PSPDFDocument, RCTPSPDFKitView) {
       view.pdfController.document.defaultAnnotationUsername = view.annotationAuthorName;
     }
 
-    // Disable form editing when the document exists.
-    if (view.disableFormEditing) {
-        view.pdfController.document.formsEnabled = !view.disableFormEditing;
-    }
+    // Enable or disable form editing when the document exists.
+    view.pdfController.document.formsEnabled = view.enableFormEditing;
   }
 }
 
@@ -48,11 +46,11 @@ RCT_CUSTOM_VIEW_PROPERTY(configuration, PSPDFConfiguration, RCTPSPDFKitView) {
       [builder setupFromJSON:json];
     }];
 
-    // The `disableFormEditing` property can be used as both a view prop and a configuration option.
+    // The `enableFormEditing` property can be used as both a view prop and a configuration option.
     // Here we set the view property with the value of the configuration option.
     NSDictionary *dictionary = [RCTConvert NSDictionary:json];
-    if (dictionary[@"disableFormEditing"]) {
-      view.disableFormEditing = [RCTConvert BOOL:dictionary[@"disableFormEditing"]];
+    if (dictionary[@"enableFormEditing"]) {
+      view.enableFormEditing = [RCTConvert BOOL:dictionary[@"enableFormEditing"]];
     }
   }
 }
@@ -97,10 +95,9 @@ RCT_EXPORT_VIEW_PROPERTY(disableDefaultActionForTappedAnnotations, BOOL)
 
 RCT_EXPORT_VIEW_PROPERTY(disableAutomaticSaving, BOOL)
 
-
-RCT_CUSTOM_VIEW_PROPERTY(disableFormEditing, BOOL, RCTPSPDFKitView) {
-  if (json && [RCTConvert BOOL:json]) {
-    view.disableFormEditing = [RCTConvert BOOL:json];
+RCT_CUSTOM_VIEW_PROPERTY(enableFormEditing, BOOL, RCTPSPDFKitView) {
+  if (json) {
+    view.enableFormEditing = [RCTConvert BOOL:json];
   }
 }
 
