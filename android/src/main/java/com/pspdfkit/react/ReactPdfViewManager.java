@@ -13,9 +13,14 @@ import com.facebook.react.uimanager.UIManagerModule;
 import com.facebook.react.uimanager.ViewGroupManager;
 import com.facebook.react.uimanager.annotations.ReactProp;
 import com.pspdfkit.annotations.Annotation;
-import com.pspdfkit.configuration.activity.PdfActivityConfiguration;
 import com.pspdfkit.preferences.PSPDFKitPreferences;
+import com.pspdfkit.react.events.PdfViewAnnotationChangedEvent;
+import com.pspdfkit.react.events.PdfViewAnnotationTappedEvent;
 import com.pspdfkit.react.events.PdfViewDataReturnedEvent;
+import com.pspdfkit.react.events.PdfViewDocumentLoadFailedEvent;
+import com.pspdfkit.react.events.PdfViewDocumentSaveFailedEvent;
+import com.pspdfkit.react.events.PdfViewDocumentSavedEvent;
+import com.pspdfkit.react.events.PdfViewStateChangedEvent;
 import com.pspdfkit.react.menu.ReactGroupingRule;
 import com.pspdfkit.views.PdfView;
 
@@ -50,11 +55,6 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
     public static final int COMMAND_GET_ALL_ANNOTATIONS = 11;
 
     private CompositeDisposable annotationDisposables = new CompositeDisposable();
-
-    /**
-     * Value of the form editing enabled property so we can make sure configuration does not override it.
-     */
-    private boolean isFormEditingEnabled = true;
 
     @Override
     public String getName() {
@@ -112,36 +112,9 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
     }
 
     @ReactProp(name = "configuration")
-    public void setConfiguration(@NonNull PdfView view, @NonNull ReadableMap configuration) {
+    public void setConfiguration(PdfView view, @NonNull ReadableMap configuration) {
         ConfigurationAdapter configurationAdapter = new ConfigurationAdapter(view.getContext(), configuration);
-        view.setConfiguration(updateReactPropsInConfiguration(configurationAdapter.build()));
-    }
-
-    @ReactProp(name = "enableFormEditing")
-    public void setEnableFormEditing(@NonNull PdfView view, boolean enableFormEditing) {
-        this.isFormEditingEnabled = enableFormEditing;
-
-        final PdfActivityConfiguration configuration = view.getConfiguration();
-        final PdfActivityConfiguration updatedConfiguration = updateReactPropsInConfiguration(configuration);
-        if (!updatedConfiguration.equals(configuration)) {
-            view.setConfiguration(updatedConfiguration);
-        }
-    }
-
-    @NonNull
-    private PdfActivityConfiguration updateReactPropsInConfiguration(@NonNull PdfActivityConfiguration configuration) {
-        // Check if the configuration needs update according to current react properties.
-        if (configuration.getConfiguration().isFormEditingEnabled() == isFormEditingEnabled) {
-            return configuration;
-        }
-
-        PdfActivityConfiguration.Builder updatedConfigurationBuilder = new PdfActivityConfiguration.Builder(configuration);
-        if (isFormEditingEnabled) {
-            updatedConfigurationBuilder.enableFormEditing();
-        } else {
-            updatedConfigurationBuilder.disableFormEditing();
-        }
-        return updatedConfigurationBuilder.build();
+        view.setConfiguration(configurationAdapter.build());
     }
 
     @ReactProp(name = "document")

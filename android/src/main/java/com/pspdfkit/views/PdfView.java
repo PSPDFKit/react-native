@@ -180,11 +180,6 @@ public class PdfView extends FrameLayout {
         setupFragment();
     }
 
-    @NonNull
-    public PdfActivityConfiguration getConfiguration() {
-        return this.configuration;
-    }
-
     public void setDocument(@Nullable String documentPath) {
         if (documentPath == null) {
             this.document = null;
