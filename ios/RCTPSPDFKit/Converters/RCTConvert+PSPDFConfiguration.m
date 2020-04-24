@@ -365,6 +365,12 @@ RCT_MULTI_ENUM_CONVERTER(PSPDFDocumentSharingPagesOptions,
     self.editableAnnotationTypes = nil;
   }
 
+  if (dictionary[@"enableFormEditing"] && ![RCTConvert BOOL:dictionary[@"enableFormEditing"]]) {
+    NSMutableSet *editableTypes = [self.editableAnnotationTypes mutableCopy];
+    [editableTypes removeObject:PSPDFAnnotationStringWidget];
+    self.editableAnnotationTypes = [editableTypes copy];
+  }
+  
   if (dictionary[@"sharingConfigurations"]) {
     [self setRCTSharingConfigurations:[RCTConvert NSArray:dictionary[@"sharingConfigurations"]]];
   }
