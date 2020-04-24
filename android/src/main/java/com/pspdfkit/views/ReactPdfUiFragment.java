@@ -1,11 +1,15 @@
 package com.pspdfkit.views;
 
+import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
-import com.pspdfkit.configuration.activity.PdfActivityConfiguration;
 import com.pspdfkit.react.R;
+import com.pspdfkit.ui.PdfFragment;
 import com.pspdfkit.ui.PdfUiFragment;
 
 /**
@@ -20,17 +24,21 @@ public class ReactPdfUiFragment extends PdfUiFragment {
 
     @Nullable private ReactPdfUiFragmentListener reactPdfUiFragmentListener;
 
+    private final FragmentManager.FragmentLifecycleCallbacks fragmentLifecycleCallbacks = new FragmentManager.FragmentLifecycleCallbacks() {
+        @Override
+        public void onFragmentCreated(@NonNull FragmentManager fm, @NonNull Fragment f, @Nullable Bundle savedInstanceState) {
+            super.onFragmentCreated(fm, f, savedInstanceState);
+            // Whenever a new PdfFragment is created that means the configuration has changed.
+            if (f instanceof PdfFragment) {
+                if (reactPdfUiFragmentListener != null) {
+                    reactPdfUiFragmentListener.onConfigurationChanged(ReactPdfUiFragment.this);
+                }
+            }
+        }
+    };
+
     void setReactPdfUiFragmentListener(@Nullable ReactPdfUiFragmentListener listener) {
         this.reactPdfUiFragmentListener = listener;
-    }
-
-    @Override
-    public void performApplyConfiguration(@NonNull PdfActivityConfiguration configuration) {
-        super.performApplyConfiguration(configuration);
-
-        if (this.reactPdfUiFragmentListener != null) {
-            reactPdfUiFragmentListener.onConfigurationChanged(this);
-        }
     }
 
     /** When set to true will add a navigation arrow to the toolbar. */
@@ -52,12 +60,25 @@ public class ReactPdfUiFragment extends PdfUiFragment {
         }
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        // We want to get notified when a child PdfFragment is created so we can reattach our listeners.
+        getChildFragmentManager().registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, false);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        getChildFragmentManager().unregisterFragmentLifecycleCallbacks(fragmentLifecycleCallbacks);
+    }
+
     /**
      * Listener that notifies of actions taken directly in the PdfUiFragment.
      */
     public interface ReactPdfUiFragmentListener {
 
-        /** Called when the configuration changed, reset your {@link com.pspdfkit.ui.PdfFragment} listeners in here. */
+        /** Called when the configuration changed, reset your {@link com.pspdfkit.ui.PdfFragment} and {@link PdfUiFragment} listeners in here. */
         void onConfigurationChanged(@NonNull PdfUiFragment pdfUiFragment);
 
         /** Called when the back navigation button was clicked. */
