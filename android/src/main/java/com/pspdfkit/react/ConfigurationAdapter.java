@@ -71,6 +71,7 @@ public class ConfigurationAdapter {
     private static final String START_PAGE = "startPage";
     private static final String ENABLE_ANNOTATION_EDITING = "enableAnnotationEditing";
     private static final String ENABLE_TEXT_SELECTION = "enableTextSelection";
+    private static final String ENABLE_FORM_EDITING = "enableFormEditing";
     private static final String SHOW_SHARE_ACTION = "showShareAction";
     private static final String SHOW_PRINT_ACTION = "showPrintAction";
     private static final String SHOW_DOCUMENT_INFO_VIEW = "showDocumentInfoView";
@@ -144,6 +145,9 @@ public class ConfigurationAdapter {
             }
             if (configuration.hasKey(ENABLE_ANNOTATION_EDITING)) {
                 configureEnableAnnotationEditing(configuration.getBoolean(ENABLE_ANNOTATION_EDITING));
+            }
+            if (configuration.hasKey(ENABLE_FORM_EDITING)) {
+                configureEnableFormEditing(configuration.getBoolean(ENABLE_FORM_EDITING));
             }
             if (configuration.hasKey(SHOW_SHARE_ACTION)) {
                 configureShowShareAction(configuration.getBoolean(SHOW_SHARE_ACTION));
@@ -317,6 +321,14 @@ public class ConfigurationAdapter {
             configuration.enableAnnotationEditing();
         } else {
             configuration.disableAnnotationEditing();
+        }
+    }
+
+    private void configureEnableFormEditing(boolean enableFormEditing) {
+        if (enableFormEditing) {
+            configuration.enableFormEditing();
+        } else {
+            configuration.disableFormEditing();
         }
     }
 
