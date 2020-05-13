@@ -54,6 +54,7 @@ RCT_REMAP_VIEW_PROPERTY(pageIndex, pdfController.pageIndex, NSUInteger)
 RCT_CUSTOM_VIEW_PROPERTY(configuration, PSPDFConfiguration, RCTPSPDFKitView) {
   if (json) {
     [view.pdfController updateConfigurationWithBuilder:^(PSPDFConfigurationBuilder *builder) {
+      [builder overrideClass:PSPDFFontPickerViewController.class withClass:CustomFontPickerViewController.class];
       [builder setupFromJSON:json];
     }];
   }
@@ -125,11 +126,6 @@ RCT_CUSTOM_VIEW_PROPERTY(availableFontNames, NSArray, RCTPSPDFKitView) {
   if (json && [RCTConvert NSArray:json]) {
     view.availableFontNames = [RCTConvert NSArray:json];
     staticAvailableFontNames = view.availableFontNames;
-
-    // We use a subclassed font picker view controller to customize it.
-    [view.pdfController updateConfigurationWithoutReloadingWithBuilder:^(PSPDFConfigurationBuilder * _Nonnull builder) {
-      [builder overrideClass:PSPDFFontPickerViewController.class withClass:CustomFontPickerViewController.class];
-    }];
   }
 }
 
@@ -137,11 +133,6 @@ RCT_CUSTOM_VIEW_PROPERTY(selectedFontName, NSString, RCTPSPDFKitView) {
   if (json && [RCTConvert NSString:json]) {
     view.selectedFontName = [RCTConvert NSString:json];
     staticSelectedFontName = view.selectedFontName;
-
-    // We use a subclassed font picker view controller to customize it.
-    [view.pdfController updateConfigurationWithoutReloadingWithBuilder:^(PSPDFConfigurationBuilder * _Nonnull builder) {
-      [builder overrideClass:PSPDFFontPickerViewController.class withClass:CustomFontPickerViewController.class];
-    }];
   }
 }
 
@@ -149,11 +140,6 @@ RCT_CUSTOM_VIEW_PROPERTY(showDownloadableFonts, BOOL, RCTPSPDFKitView) {
   if (json) {
     view.showDownloadableFonts = [RCTConvert BOOL:json];
     staticShowDownloadableFonts = view.showDownloadableFonts;
-
-    // We use a subclassed font picker view controller to customize it.
-    [view.pdfController updateConfigurationWithoutReloadingWithBuilder:^(PSPDFConfigurationBuilder * _Nonnull builder) {
-      [builder overrideClass:PSPDFFontPickerViewController.class withClass:CustomFontPickerViewController.class];
-    }];
   }
 }
 
@@ -360,9 +346,19 @@ RCT_EXPORT_METHOD(getRightBarButtonItemsForViewMode:(nullable NSString *)viewMod
 }
 
 - (instancetype)initWithFontFamilyDescriptors:(NSArray *)fontFamilyDescriptors {
-  // Override the default font family descriptors.
-  fontFamilyDescriptors = [self customFontFamilyDescriptors];
+  // Override the default font family descriptors if custom font descriptors are specified.
+  NSArray *customFontFamilyDescriptors = [self customFontFamilyDescriptors];
+  if (customFontFamilyDescriptors.count) {
+      fontFamilyDescriptors = customFontFamilyDescriptors;
+  }
   return [super initWithFontFamilyDescriptors:fontFamilyDescriptors];
+}
+
+- (void)dealloc {
+  // Reset the static variables.
+  staticSelectedFontName = nil;
+  staticAvailableFontNames = nil;
+  staticShowDownloadableFonts = YES;
 }
 
 -(void)viewWillAppear:(BOOL)animated {
@@ -372,4 +368,5 @@ RCT_EXPORT_METHOD(getRightBarButtonItemsForViewMode:(nullable NSString *)viewMod
   self.showDownloadableFonts = staticShowDownloadableFonts;
   self.selectedFont = [self customSelectedFont];
 }
+
 @end
