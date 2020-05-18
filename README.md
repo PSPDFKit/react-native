@@ -26,6 +26,13 @@ The [PSPDFKit SDK](https://pspdfkit.com/) is a framework that allows you to view
 
 [PSPDFKit Instant](https://pspdfkit.com/instant) adds real-time collaboration features to seamlessly share, edit, and annotate PDF documents.
 
+## Support, Issues and License Questions
+
+PSPDFKit offers support for customers with an active SDK license via https://pspdfkit.com/support/request/
+
+Are you evaluating our SDK? That's great, we're happy to help out!
+To make sure this is fast, please us a work email and have someone from your company fill out our sales form: https://pspdfkit.com/sales/
+
 ### iOS
 
 #### Requirements
