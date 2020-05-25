@@ -30,6 +30,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) RCTBubblingEventBlock onAnnotationTapped;
 @property (nonatomic, copy) RCTBubblingEventBlock onAnnotationsChanged;
 @property (nonatomic, copy) RCTBubblingEventBlock onStateChanged;
+@property (nonatomic, copy, nullable) NSArray<NSString *> *availableFontNames;
+@property (nonatomic, copy, nullable) NSString *selectedFontName;
+@property (nonatomic) BOOL showDownloadableFonts;
 
 /// Annotation Toolbar
 - (BOOL)enterAnnotationCreationMode;
