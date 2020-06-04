@@ -1,4 +1,4 @@
-platform :ios, '11.0'
+platform :ios, '12.0'
 require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
 
 target 'NativeCatalog' do
@@ -35,8 +35,8 @@ target 'NativeCatalog' do
   pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec'
   
   pod 'react-native-pspdfkit', :path => '../node_modules/react-native-pspdfkit'  
-  pod 'PSPDFKit', podspec:'https://customers.pspdfkit.com/cocoapods/YOUR_COCOAPODS_KEY_GOES_HERE/pspdfkit/latest.podspec'
-  pod 'Instant', podspec:'https://customers.pspdfkit.com/cocoapods/YOUR_COCOAPODS_KEY_GOES_HERE/instant/latest.podspec'
+  pod 'PSPDFKit', podspec:'https://customers.pspdfkit.com/pspdfkit-ios/latest.podspec'
+  pod 'Instant', podspec:'https://customers.pspdfkit.com/instant/latest.podspec'
 
   target 'NativeCatalogTests' do
     inherit! :search_paths
