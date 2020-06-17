@@ -37,25 +37,25 @@ To make sure this is fast, please use a work email and have someone from your co
 
 #### Requirements
 
-- Xcode 11.3.1
-- PSPDFKit 9.2.0 for iOS or later
-- react-native >= 0.61.5
-- CocoaPods >= 1.8.4
+- Xcode 11.5
+- PSPDFKit 9.4.0 for iOS or later
+- react-native >= 0.62.2
+- CocoaPods >= 1.9.3
 
 #### Getting Started
 
 Let's create a simple app that integrates PSPDFKit and uses the `react-native-pspdfkit` module.
 
 1. Make sure `react-native-cli` is installed: `yarn global add react-native-cli`
-2. Create the app with `react-native init YourApp`.
+2. Create the app with `react-native init YourApp`
 3. Step into your newly created app folder: `cd YourApp`
 4. Install `react-native-pspdfkit` from GitHub: `yarn add github:PSPDFKit/react-native`
 5. Install all the dependencies for the project: `yarn install`. (Because of a [bug](https://github.com/yarnpkg/yarn/issues/2165) you may need to clean `yarn`'s cache with `yarn cache clean` before.)
-6. Open `ios/Podile` in a text editor: `open ios/Podfile`, update the platform to iOS 11, and add your CocoaPods URL.
+6. Open `ios/Podile` in a text editor: `open ios/Podfile`, update the platform to iOS 12, and add the PSPDFKit podspecs:
 
 ```diff
 - platform :ios, '9.0'
-+ platform :ios, '11.0'
++ platform :ios, '12.0'
 require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
 
 target 'YourApp' do
@@ -85,8 +85,8 @@ target 'YourApp' do
   pod 'glog', :podspec => '../node_modules/react-native/third-party-podspecs/glog.podspec'
   pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec'
 
-+ pod 'react-native-pspdfkit', :path => '../node_modules/react-native-pspdfkit'
-+ pod 'PSPDFKit', podspec: 'https://customers.pspdfkit.com/cocoapods/YOUR_COCOAPODS_KEY_GOES_HERE/pspdfkit/latest.podspec'
++ pod 'react-native-pspdfkit', :path => '../node_modules/react-native-pspdfkit/react-native-pspdfkit.podspec'
++ pod 'PSPDFKit', podspec: 'https://customers.pspdfkit.com/pspdfkit-ios/latest.podspec'
 
   use_native_modules!
 end
@@ -94,7 +94,7 @@ end
 
 7. `cd ios` then run `pod install`.
 8. Open `YourApp.xcworkspace` in Xcode: `open YourApp.xcworkspace`.
-9. Make sure the deployment target is set to 11.0 or higher:
+9. Make sure the deployment target is set to 12.0 or higher:
    ![Deployment Target](screenshots/deployment-target.png)
 10. Change "View controller-based status bar appearance" to `YES` in `Info.plist`:
     ![View Controller-Based Status Bar Appearance](screenshots/view-controller-based-status-bar-appearance.png)
@@ -275,11 +275,9 @@ Take a look at the [instructions to get started here](/samples/NativeCatalog/REA
 
 #### Running on Mac Catalyst
 
-Using PSPDFKit React Native Wrapper on Mac Catalyst is not fully supported yet. We plan on adding full support for Mac Catalyst as soon as React Native and CocoaPods will full support Mac Catalyst.
+Using PSPDFKit React Native Wrapper on Mac Catalyst does not currently work due to a [Flipper and FlipperKit issue](https://github.com/facebook/react-native/issues/28810).
 
-For more details, see [why we don't fully support Mac Catalyst yet here](ios/Experimental_Mac_Catalyst_Support.md#why-is-mac-catalyst-not-fully-supported-yet).
-
-If you wish to try the experimental Support for Mac Catalyst, please follow [the instructions here.](ios/Experimental_Mac_Catalyst_Support.md)
+If you wish to run your project on Mac Catalyst, please try the [following workaround which removes everything related to Flipper and FlipperKit](https://github.com/facebook/react-native/issues/28810#issuecomment-623357732).
 
 #### Configuration Mapping
 
