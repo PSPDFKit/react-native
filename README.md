@@ -38,7 +38,7 @@ To make sure this is fast, please use a work email and have someone from your co
 #### Requirements
 
 - Xcode 11.5
-- PSPDFKit 9.4.0 for iOS or later
+- PSPDFKit 9.5.0 for iOS or later
 - react-native >= 0.62.2
 - CocoaPods >= 1.9.3
 
