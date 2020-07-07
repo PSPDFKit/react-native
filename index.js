@@ -30,6 +30,7 @@ class PSPDFKitView extends React.Component {
       return (
         <RCTPSPDFKitView
           ref="pdfView"
+          fragmentTag="PSPDFKitView.FragmentTag"
           {...this.props}
           onCloseButtonPressed={onCloseButtonPressedHandler}
           onStateChanged={this._onStateChanged}
