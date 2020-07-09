@@ -2,7 +2,7 @@
 *   Contains gradle configuration constants
 */
 ext {
-    PSPDFKIT_VERSION = '6.4.0'
+    PSPDFKIT_VERSION = '6.5.0'
 }
 
 buildscript {
@@ -10,6 +10,9 @@ buildscript {
         jcenter()
         maven {
             url 'https://maven.google.com'
+        }
+        maven {
+            url 'https://customers.pspdfkit.com/maven'
         }
     }
 
@@ -39,33 +42,6 @@ android {
     lintOptions {
         abortOnError false
     }
-}
-
-def demoVersion = false;
-project.repositories.each {
-    if (it instanceof MavenArtifactRepository) {
-        if ("$it.url".contains("customers.pspdfkit.com/maven")) {
-            // Bug: https://github.com/gradle/gradle/issues/1230
-            def username = it.credentials.username
-            def password = it.credentials.password
-
-            if (username == "pspdfkit") {
-                if (password != null && password.startsWith("TRIAL")) {
-                    demoVersion = true;
-                } else if (password != null && password == "YOUR_MAVEN_PASSWORD_GOES_HERE") {
-                    println "#######################################################################################################"
-                    println "### Credentials error: edit 'YourApp/android/build.gradle' file and modify PSPDFKit maven password. ###"
-                    println "#######################################################################################################"
-                }
-            }
-        }
-    }
-}
-
-if (demoVersion) {
-    println "##############################"
-    println "### PSPDFKit Demo Version. ###"
-    println "##############################"
 }
 
 dependencies {
