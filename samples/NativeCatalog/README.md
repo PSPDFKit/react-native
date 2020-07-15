@@ -6,20 +6,7 @@ This second, Android only, Catalog example serves to show you how you can levera
 
 1. Clone the repository. `git clone https://github.com/PSPDFKit/react-native.git`.
 2. Install dependencies: run `yarn install` from `samples/NativeCatalog` directory.
-3. Add your customer portal password to `samples/NativeCatalog/android/build.gradle`:
-
-```groovy
-maven {
-    url 'https://customers.pspdfkit.com/maven/'
-
-    credentials {
-        username 'pspdfkit'
-        password 'YOUR_MAVEN_PASSWORD_GOES_HERE'
-    }
-}
-```
-
-4. The Native Catalog app is now ready to launch. From `samples/NativeCatalog` directory run `react-native run-android`.
+3. The Native Catalog app is now ready to launch. From `samples/NativeCatalog` directory run `react-native run-android`.
 
 ### Running this Sample on iOS
 

@@ -35,11 +35,6 @@ allprojects {
         jcenter()
         maven {
             url 'https://customers.pspdfkit.com/maven/'
-
-            credentials {
-                username 'pspdfkit'
-                password 'YOUR_MAVEN_KEY_GOES_HERE'
-            }
         }
         maven { url 'https://jitpack.io' }
     }

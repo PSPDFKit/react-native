@@ -391,35 +391,7 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
 3. Step into your newly created app folder: `cd YourApp`.
 4. Add `react-native-pspdfkit` module from GitHub: `yarn add github:PSPDFKit/react-native`.
 5. Install all the dependencies for the project: `yarn install`. (Because of a [bug](https://github.com/yarnpkg/yarn/issues/2165) you may need to clean `yarn`'s cache with `yarn cache clean` before.)
-6. <a id="step-7"></a>Add PSPDFKit repository to `YourApp/android/build.gradle` so PSPDFKit library can be downloaded:
-
-```diff
- allprojects {
-     repositories {
-         mavenLocal()
-+        maven {
-+            url 'https://customers.pspdfkit.com/maven/'
-+            credentials {
-+                username 'pspdfkit'
-+                password 'YOUR_MAVEN_KEY_GOES_HERE'
-+            }
-+        }
-         maven {
-             // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
-             url "$rootDir/../node_modules/react-native/android"
-         }
-         maven {
-            // Android JSC is installed from npm
-            url("$rootDir/../node_modules/jsc-android/dist")
-         }
-
-         google()
-         jcenter()
-     }
- }
-```
-
-7. PSPDFKit targets modern platforms, so you'll have to set the `minSdkVersion` to 19. In `YourApp/android/build.gradle`:
+6. PSPDFKit targets modern platforms, so you'll have to set the `minSdkVersion` to 19. In `YourApp/android/build.gradle`:
 
 ```diff
 ...
@@ -434,7 +406,7 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
 ...
 ```
 
-8. We will also need to enable MultiDex support. In `YourApp/android/app/build.gradle`:
+7. We will also need to enable MultiDex support. In `YourApp/android/app/build.gradle`:
 
 ```diff
 ...
@@ -449,7 +421,7 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
 ...
 ```
 
-9. <a id="step-10"></a>Enter your PSPDFKit license key into `YourApp/android/app/src/main/AndroidManifest.xml` file:
+8. <a id="step-10"></a>Enter your PSPDFKit license key into `YourApp/android/app/src/main/AndroidManifest.xml` file:
 
 ```diff
    <application>
@@ -462,7 +434,7 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
    </application>
 ```
 
-10. Set primary color. In `YourApp/android/app/src/main/res/values/styles.xml` replace
+9. Set primary color. In `YourApp/android/app/src/main/res/values/styles.xml` replace
 
 ```xml
 <!-- Customize your theme here. -->
@@ -474,7 +446,7 @@ with
 <item name="colorPrimary">#3C97C9</item>
 ```
 
-11. <a id="step-12"></a>Replace the default component from `YourApp/App.js` with a simple touch area to present a PDF document from the local device filesystem:
+10. <a id="step-12"></a>Replace the default component from `YourApp/App.js` with a simple touch area to present a PDF document from the local device filesystem:
 
 ```javascript
 import React, { Component } from "react";
@@ -545,13 +517,13 @@ const styles = StyleSheet.create({
 });
 ```
 
-12. Before launching the app you need to copy a PDF document onto your development device or emulator.
+11. Before launching the app you need to copy a PDF document onto your development device or emulator.
 
     ```bash
     adb push /path/to/your/document.pdf /sdcard/document.pdf
     ```
 
-13. Your app is now ready to launch. From `YourApp` directory run `react-native run-android`.
+12. Your app is now ready to launch. From `YourApp` directory run `react-native run-android`.
 
     ```bash
     react-native run-android
@@ -561,20 +533,7 @@ const styles = StyleSheet.create({
 
 1. Clone the repository. `git clone https://github.com/PSPDFKit/react-native.git`.
 2. Install dependencies: run `yarn install` from `samples/Catalog` directory. (Because of a [bug](https://github.com/yarnpkg/yarn/issues/2165) you may need to clean `yarn`'s cache with `yarn cache clean` before.)
-3. Add your customer portal password to `samples/Catalog/android/build.gradle`:
-
-```groovy
-      maven {
-          url 'https://customers.pspdfkit.com/maven/'
-
-          credentials {
-              username 'pspdfkit'
-              password 'YOUR_MAVEN_PASSWORD_GOES_HERE'
-          }
-      }
-```
-
-4. Update license key in `samples/Catalog/android/app/src/main/AndroidManifest.xml`:
+3. Update license key in `samples/Catalog/android/app/src/main/AndroidManifest.xml`:
 
 ```xml
    <application>
@@ -587,7 +546,7 @@ const styles = StyleSheet.create({
    </application>
 ```
 
-5. Catalog app is now ready to launch. From `samples/Catalog` directory run `react-native run-android`.
+4. Catalog app is now ready to launch. From `samples/Catalog` directory run `react-native run-android`.
 
 #### Running the Native Catalog
 
