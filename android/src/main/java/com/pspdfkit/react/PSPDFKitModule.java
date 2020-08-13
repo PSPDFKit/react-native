@@ -300,24 +300,33 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
             // Forward the result to all our fragments.
             FragmentActivity fragmentActivity = (FragmentActivity) activity;
             for (final Fragment fragment : fragmentActivity.getSupportFragmentManager().getFragments()) {
-                if (fragment instanceof PdfFragment ||
-                        fragment instanceof GalleryImagePickerFragment ||
-                        fragment instanceof CameraImagePickerFragment) {
-                    // When starting an intent from a fragment its request code is shifted to make it unique,
-                    // we undo it here manually since react by default eats all activity results.
-                    int requestIndex = requestCode >> REQUEST_CODE_TO_INDEX;
-                    if (requestIndex != 0) {
-                        // We need to wait until the next frame with delivering the result to the fragment,
-                        // otherwise the app will crash since the fragment won't be ready.
-                        activityResultHandler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                fragment.onActivityResult(requestCode & MASKED_REQUEST_CODE_TO_REAL_CODE, resultCode, data);
-                            }
-                        });
-                    }
-                }
+                handleFragment(fragment, requestCode, resultCode, data);
             }
+        }
+    }
+
+    private void handleFragment(@NonNull final Fragment fragment, final int requestCode, final int resultCode, @NonNull final Intent data) {
+        if (fragment instanceof PdfFragment ||
+            fragment instanceof GalleryImagePickerFragment ||
+            fragment instanceof CameraImagePickerFragment) {
+            // When starting an intent from a fragment its request code is shifted to make it unique,
+            // we undo it here manually since react by default eats all activity results.
+            int requestIndex = requestCode >> REQUEST_CODE_TO_INDEX;
+            if (requestIndex != 0) {
+                // We need to wait until the next frame with delivering the result to the fragment,
+                // otherwise the app will crash since the fragment won't be ready.
+                activityResultHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        fragment.onActivityResult(requestCode & MASKED_REQUEST_CODE_TO_REAL_CODE, resultCode, data);
+                    }
+                });
+            }
+        }
+
+        // Also send this to all child fragments so we ensure the result is handled.
+        for (final Fragment childFragment : fragment.getChildFragmentManager().getFragments()) {
+            handleFragment(childFragment, requestCode, resultCode, data);
         }
     }
 
