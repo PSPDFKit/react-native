@@ -37,9 +37,9 @@ To make sure this is fast, please use a work email and have someone from your co
 
 #### Requirements
 
-- Xcode 11.5
-- PSPDFKit 9.5.0 for iOS or later
-- react-native >= 0.62.2
+- Xcode 11.7
+- PSPDFKit 9.5.2 for iOS or later
+- react-native >= 0.63.2
 - CocoaPods >= 1.9.3
 
 #### Getting Started
@@ -54,41 +54,32 @@ Let's create a simple app that integrates PSPDFKit and uses the `react-native-ps
 6. Open `ios/Podile` in a text editor: `open ios/Podfile`, update the platform to iOS 12, and add the PSPDFKit podspecs:
 
 ```diff
-- platform :ios, '9.0'
-+ platform :ios, '12.0'
+require_relative '../node_modules/react-native/scripts/react_native_pods'
 require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
 
+- platform :ios, '10.0'
++ platform :ios, '12.0'
+
 target 'YourApp' do
-  # Pods for YourApp
-  pod 'React', :path => '../node_modules/react-native/'
-  pod 'React-Core', :path => '../node_modules/react-native/React'
-  pod 'React-DevSupport', :path => '../node_modules/react-native/React'
-  pod 'React-fishhook', :path => '../node_modules/react-native/Libraries/fishhook'
-  pod 'React-RCTActionSheet', :path => '../node_modules/react-native/Libraries/ActionSheetIOS'
-  pod 'React-RCTAnimation', :path => '../node_modules/react-native/Libraries/NativeAnimation'
-  pod 'React-RCTBlob', :path => '../node_modules/react-native/Libraries/Blob'
-  pod 'React-RCTImage', :path => '../node_modules/react-native/Libraries/Image'
-  pod 'React-RCTLinking', :path => '../node_modules/react-native/Libraries/LinkingIOS'
-  pod 'React-RCTNetwork', :path => '../node_modules/react-native/Libraries/Network'
-  pod 'React-RCTSettings', :path => '../node_modules/react-native/Libraries/Settings'
-  pod 'React-RCTText', :path => '../node_modules/react-native/Libraries/Text'
-  pod 'React-RCTVibration', :path => '../node_modules/react-native/Libraries/Vibration'
-  pod 'React-RCTWebSocket', :path => '../node_modules/react-native/Libraries/WebSocket'
+  config = use_native_modules!
 
-  pod 'React-cxxreact', :path => '../node_modules/react-native/ReactCommon/cxxreact'
-  pod 'React-jsi', :path => '../node_modules/react-native/ReactCommon/jsi'
-  pod 'React-jsiexecutor', :path => '../node_modules/react-native/ReactCommon/jsiexecutor'
-  pod 'React-jsinspector', :path => '../node_modules/react-native/ReactCommon/jsinspector'
-  pod 'yoga', :path => '../node_modules/react-native/ReactCommon/yoga'
+  use_react_native!(:path => config["reactNativePath"])
 
-  pod 'DoubleConversion', :podspec => '../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec'
-  pod 'glog', :podspec => '../node_modules/react-native/third-party-podspecs/glog.podspec'
-  pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec'
-
-+ pod 'react-native-pspdfkit', :path => '../node_modules/react-native-pspdfkit/react-native-pspdfkit.podspec'
-+ pod 'PSPDFKit', podspec: 'https://customers.pspdfkit.com/pspdfkit-ios/latest.podspec'
-
-  use_native_modules!
+  target 'YourAppTests' do
+    inherit! :complete
+    # Pods for testing
+  end
++ pod 'react-native-pspdfkit', :path => '../node_modules/react-native-pspdfkit'
++ pod 'PSPDFKit', podspec: 'https://customers.pspdfkit.com/pspdfkit-ios/latest-framework.podspec'
+  
+  # Enables Flipper.
+  #
+  # Note that if you have use_frameworks! enabled, Flipper will not work and
+  # you should disable these next few lines.
+  use_flipper!
+  post_install do |installer|
+    flipper_post_install(installer)
+  end
 end
 ```
 
@@ -277,7 +268,12 @@ Take a look at the [instructions to get started here](/samples/NativeCatalog/REA
 
 Using PSPDFKit React Native Wrapper on Mac Catalyst does not currently work due to a [Flipper and FlipperKit issue](https://github.com/facebook/react-native/issues/28810).
 
-If you wish to run your project on Mac Catalyst, please try the [following workaround which removes everything related to Flipper and FlipperKit](https://github.com/facebook/react-native/issues/28810#issuecomment-623357732).
+If you wish to run your project on Mac Catalyst, please try the [following workaround which removes everything related to Flipper and FlipperKit](https://github.com/facebook/react-native/issues/28810#issuecomment-623357732), and update the podspec URL for PSPDFKit in your Podfile like so:
+
+```diff
+- pod 'PSPDFKit', podspec: 'https://customers.pspdfkit.com/pspdfkit-ios/latest-framework.podspec'
++ pod 'PSPDFKit', podspec: 'https://customers.pspdfkit.com/pspdfkit-ios/latest.podspec'
+```
 
 #### Configuration Mapping
 
