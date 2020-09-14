@@ -15,6 +15,9 @@
 
 #define VALIDATE_DOCUMENT(document, ...) { if (!document.isValid) { NSLog(@"Document is invalid."); if (self.onDocumentLoadFailed) { self.onDocumentLoadFailed(@{@"error": @"Document is invalid."}); } return __VA_ARGS__; }}
 
+@interface RCTPSPDFKitViewController : PSPDFViewController
+@end
+
 @interface RCTPSPDFKitView ()<PSPDFDocumentDelegate, PSPDFViewControllerDelegate, PSPDFFlexibleToolbarContainerDelegate>
 
 @property (nonatomic, nullable) UIViewController *topController;
@@ -25,7 +28,7 @@
 
 - (instancetype)initWithFrame:(CGRect)frame {
   if ((self = [super initWithFrame:frame])) {
-    _pdfController = [[PSPDFViewController alloc] init];
+    _pdfController = [[RCTPSPDFKitViewController alloc] init];
     _pdfController.delegate = self;
     _pdfController.annotationToolbarController.delegate = self;
     _closeButton = [[UIBarButtonItem alloc] initWithImage:[PSPDFKitGlobal imageNamed:@"x"] style:UIBarButtonItemStylePlain target:self action:@selector(closeButtonPressed:)];
@@ -58,9 +61,8 @@
   
   if (self.pdfController.configuration.useParentNavigationBar || self.hideNavigationBar) {
     self.topController = self.pdfController;
-    
   } else {
-    self.topController = [[PSPDFNavigationController alloc] initWithRootViewController:self.pdfController];;
+    self.topController = [[PSPDFNavigationController alloc] initWithRootViewController:self.pdfController];
   }
   
   UIView *topControllerView = self.topController.view;
@@ -474,6 +476,28 @@
     }
   }];
   return [barButtonItemsString copy];
+}
+
+@end
+
+@implementation RCTPSPDFKitViewController
+
+- (void)viewWillTransitionToSize:(CGSize)newSize withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
+  [super viewWillTransitionToSize:newSize withTransitionCoordinator:coordinator];
+  
+  /* Workaround for internal issue 25653:
+   We re-apply the current view state to workaround an issue where the last page view would be layed out incorrectly
+   in single page mode and scroll per spread page trasition after device rotation.
+
+   We do this because the `PSPDFViewController` is not embedded as recommended in
+   https://pspdfkit.com/guides/ios/current/customizing-the-interface/embedding-the-pdfviewcontroller-inside-a-custom-container-view-controller
+   and because React Native itself handles the React Native view.
+
+   TL;DR: We are adding the `PSPDFViewController` to `RCTPSPDFKitView` and not to the container controller's view.
+   */
+  [coordinator animateAlongsideTransition:NULL completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+    [self applyViewState:self.viewState animateIfPossible:NO];
+  }];
 }
 
 @end
