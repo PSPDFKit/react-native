@@ -40,7 +40,7 @@ To make sure this is fast, please use a work email and have someone from your co
 - Xcode 12
 - PSPDFKit 10.0.0 for iOS or later
 - react-native >= 0.63.2
-- CocoaPods >= 1.9.3
+- CocoaPods >= 1.10.0.rc.1
 
 #### Getting Started
 
@@ -70,7 +70,7 @@ target 'YourApp' do
     # Pods for testing
   end
 + pod 'react-native-pspdfkit', :path => '../node_modules/react-native-pspdfkit'
-+ pod 'PSPDFKit', podspec: 'https://customers.pspdfkit.com/pspdfkit-ios/latest-framework.podspec'
++ pod 'PSPDFKit', podspec: 'https://customers.pspdfkit.com/pspdfkit-ios/latest.podspec'
   
   # Enables Flipper.
   #
@@ -268,12 +268,7 @@ Take a look at the [instructions to get started here](/samples/NativeCatalog/REA
 
 Using PSPDFKit React Native Wrapper on Mac Catalyst does not currently work due to a [Flipper and FlipperKit issue](https://github.com/facebook/react-native/issues/28810).
 
-If you wish to run your project on Mac Catalyst, please try the [following workaround which removes everything related to Flipper and FlipperKit](https://github.com/facebook/react-native/issues/28810#issuecomment-623357732), and update the podspec URL for PSPDFKit in your Podfile like so:
-
-```diff
-- pod 'PSPDFKit', podspec: 'https://customers.pspdfkit.com/pspdfkit-ios/latest-framework.podspec'
-+ pod 'PSPDFKit', podspec: 'https://customers.pspdfkit.com/pspdfkit-ios/latest.podspec'
-```
+If you wish to run your project on Mac Catalyst, please try the [following workaround which removes everything related to Flipper and FlipperKit](https://github.com/facebook/react-native/issues/28810#issuecomment-623357732).
 
 #### Configuration Mapping
 
