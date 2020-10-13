@@ -9,7 +9,6 @@
   ],
   "homepage": "https://github.com/PSPDFKit/react-native",
   "bugs": {
-    "url": "https://github.com/PSPDFKit/react-native/issues",
     "email": "support@pspdfkit.com"
   },
   "license": "SEE LICENSE IN LICENSE",
@@ -24,7 +23,7 @@
   "peerDependencies": {
     "prop-types": ">= 15.6.2 < 16",
     "react": ">= 16.8.6 < 17",
-    "react-native": ">= 0.60.4 < 1"
+    "react-native": ">= 0.63.2 < 1"
   },
   "dependencies": {},
   "devDependencies": {
