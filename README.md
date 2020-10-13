@@ -38,7 +38,7 @@ To make sure this is fast, please use a work email and have someone from your co
 #### Requirements
 
 - Xcode 12
-- PSPDFKit 10.0.0 for iOS or later
+- PSPDFKit 10.0.1 for iOS or later
 - react-native >= 0.63.2
 - CocoaPods >= 1.10.0.rc.1
 
@@ -370,8 +370,8 @@ For a runnable example, please take a look at the [AnnotationProcessing example 
 - Android Build Tools 23.0.1 (React Native)
 - Android Build Tools 28.0.3 (PSPDFKit module)
 - Android Gradle plugin >= 3.4.1
-- PSPDFKit >= 5.4.2
-- react-native >= 0.60.4
+- PSPDFKit >= 6.5.2
+- react-native >= 0.63.2
 
 #### Getting Started
 
