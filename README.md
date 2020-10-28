@@ -370,7 +370,7 @@ For a runnable example, please take a look at the [AnnotationProcessing example 
 - Android Build Tools 23.0.1 (React Native)
 - Android Build Tools 28.0.3 (PSPDFKit module)
 - Android Gradle plugin >= 3.4.1
-- PSPDFKit >= 6.5.2
+- PSPDFKit >= 6.5.3
 - react-native >= 0.63.2
 
 #### Getting Started
