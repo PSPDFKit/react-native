@@ -382,7 +382,20 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
 3. Step into your newly created app folder: `cd YourApp`.
 4. Add `react-native-pspdfkit` module from GitHub: `yarn add github:PSPDFKit/react-native`.
 5. Install all the dependencies for the project: `yarn install`. (Because of a [bug](https://github.com/yarnpkg/yarn/issues/2165) you may need to clean `yarn`'s cache with `yarn cache clean` before.)
-6. PSPDFKit targets modern platforms, so you'll have to set the `minSdkVersion` to 19. In `YourApp/android/build.gradle`:
+6. Add PSPDFKit repository to `YourApp/android/build.gradle` so PSPDFKit library can be downloaded:
+
+```diff
+...
+ allprojects {
+     repositories {
+         mavenLocal()
++        maven {
++            url 'https://customers.pspdfkit.com/maven/'
++        }
+...
+```
+
+7. PSPDFKit targets modern platforms, so you'll have to set the `minSdkVersion` to 19. In `YourApp/android/build.gradle`:
 
 ```diff
 ...
@@ -397,7 +410,7 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
 ...
 ```
 
-7. We will also need to enable MultiDex support. In `YourApp/android/app/build.gradle`:
+8. We will also need to enable MultiDex support. In `YourApp/android/app/build.gradle`:
 
 ```diff
 ...
@@ -412,7 +425,7 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
 ...
 ```
 
-8. <a id="step-10"></a>Enter your PSPDFKit license key into `YourApp/android/app/src/main/AndroidManifest.xml` file:
+9. <a id="step-9"></a>Enter your PSPDFKit license key into `YourApp/android/app/src/main/AndroidManifest.xml` file:
 
 ```diff
    <application>
@@ -425,7 +438,7 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
    </application>
 ```
 
-9. Set primary color. In `YourApp/android/app/src/main/res/values/styles.xml` replace
+10. Set primary color. In `YourApp/android/app/src/main/res/values/styles.xml` replace
 
 ```xml
 <!-- Customize your theme here. -->
@@ -437,7 +450,7 @@ with
 <item name="colorPrimary">#3C97C9</item>
 ```
 
-10. <a id="step-12"></a>Replace the default component from `YourApp/App.js` with a simple touch area to present a PDF document from the local device filesystem:
+11. <a id="step-11"></a>Replace the default component from `YourApp/App.js` with a simple touch area to present a PDF document from the local device filesystem:
 
 ```javascript
 import React, { Component } from "react";
@@ -508,13 +521,13 @@ const styles = StyleSheet.create({
 });
 ```
 
-11. Before launching the app you need to copy a PDF document onto your development device or emulator.
+12. Before launching the app you need to copy a PDF document onto your development device or emulator.
 
     ```bash
     adb push /path/to/your/document.pdf /sdcard/document.pdf
     ```
 
-12. Your app is now ready to launch. From `YourApp` directory run `react-native run-android`.
+13. Your app is now ready to launch. From `YourApp` directory run `react-native run-android`.
 
     ```bash
     react-native run-android
