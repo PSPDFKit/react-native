@@ -37,10 +37,10 @@ To make sure this is fast, please use a work email and have someone from your co
 
 #### Requirements
 
-- Xcode 12
-- PSPDFKit 10.0.1 for iOS or later
-- react-native >= 0.63.2
-- CocoaPods >= 1.10.0.rc.1
+- The latest [Xcode](https://developer.apple.com/xcode/).
+- PSPDFKit 10.1.0 for iOS or later
+- react-native >= 0.63.3
+- CocoaPods >= 1.10.0
 
 #### Getting Started
 
@@ -89,11 +89,9 @@ end
    ![Deployment Target](screenshots/deployment-target.png)
 10. Change "View controller-based status bar appearance" to `YES` in `Info.plist`:
     ![View Controller-Based Status Bar Appearance](screenshots/view-controller-based-status-bar-appearance.png)
-11. If your application is targeting iOS versions **prior to iOS 12.2** and your application **does not already contain any Swift code**, then you need to make sure Xcode bundles Swift standard libraries with your application distribution. To to so, open your target Build Settings and enable `Always Embed Swift Standard Libraries`:
-    ![Always Embed Swift Standard Libraries](screenshots/always-embed-swift-standard-libraries.png)
-12. Add a PDF by drag and dropping it into your Xcode project (Select "Create groups" and add to target "YourApp"). This will add the document to the "Copy Bundle Resources" build phase:
+11. Add a PDF by drag and dropping it into your Xcode project (Select "Create groups" and add to target "YourApp"). This will add the document to the "Copy Bundle Resources" build phase:
     ![Adding PDF](screenshots/adding-pdf.png)
-13. Replace the default component from `App.js` with a simple touch area to present the bundled PDF. (Note that you can also use a [Native UI Component](#native-ui-component) to show a PDF.)
+12. Replace the default component from `App.js` with a simple touch area to present the bundled PDF. (Note that you can also use a [Native UI Component](#native-ui-component) to show a PDF.)
 
 ```javascript
 import React, { Component } from "react";
