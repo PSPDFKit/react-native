@@ -51,6 +51,9 @@ public class ConversionHelpers {
         if ("pspdfkit/text".equalsIgnoreCase(type)) {
             return EnumSet.of(AnnotationType.FREETEXT);
         }
+        if ("pspdfkit/stamp".equalsIgnoreCase(type)) {
+            return EnumSet.of(AnnotationType.STAMP);
+        }
         return EnumSet.noneOf(AnnotationType.class);
     }
 }
