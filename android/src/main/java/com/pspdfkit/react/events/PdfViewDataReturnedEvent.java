@@ -1,5 +1,5 @@
 /*
- * PdfViewAnnotationReturnedEvent.java
+ * PdfViewDataReturnedEvent.java
  *
  *   PSPDFKit
  *
