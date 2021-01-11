@@ -253,6 +253,7 @@ Example - Native UI Component:
 
 #### Running Catalog Project
 
+- [Download the latest version of PSPDFKit for iOS](https://customers.pspdfkit.com/download/binary/ios/latest).
 - Copy `PSPDFKit.xcframework` and `PSPDFKitUI.xcframework` into the `PSPDFKit` directory.
 - Install dependencies: `yarn install` in `samples/Catalog` directory. (Because of a [bug](https://github.com/yarnpkg/yarn/issues/2165) you may need to clean `yarn`'s cache with `yarn cache clean` before.)
 - Run the app with `react-native-cli`: `react-native run-ios`
