@@ -90,7 +90,10 @@ class PdfViewDocumentListener implements DocumentListener, AnnotationManager.OnA
     }
 
     @Override
-    public boolean onPageClick(@NonNull PdfDocument pdfDocument, int i, @Nullable MotionEvent motionEvent, @Nullable PointF pointF, @Nullable Annotation annotation) {
+    public boolean onPageClick(@NonNull PdfDocument pdfDocument, int pageIndex, @Nullable MotionEvent motionEvent, @Nullable PointF pointF, @Nullable Annotation annotation) {
+        if (annotation != null) {
+            eventDispatcher.dispatchEvent(new PdfViewAnnotationTappedEvent(parent.getId(), annotation));
+        }
         return false;
     }
 
@@ -116,7 +119,6 @@ class PdfViewDocumentListener implements DocumentListener, AnnotationManager.OnA
 
     @Override
     public boolean onPrepareAnnotationSelection(@NonNull AnnotationSelectionController annotationSelectionController, @NonNull Annotation annotation, boolean annotationCreated) {
-        eventDispatcher.dispatchEvent(new PdfViewAnnotationTappedEvent(parent.getId(), annotation));
         return !disableDefaultActionForTappedAnnotations;
     }
 
