@@ -54,10 +54,14 @@
     return PSPDFAnnotationTypeLine;
   } else if ([type isEqualToString:@"pspdfkit/shape/polygon"]) {
     return PSPDFAnnotationTypePolygon;
+  } else if ([type isEqualToString:@"pspdfkit/shape/polyline"]) {
+    return PSPDFAnnotationTypePolyLine;
   } else if ([type isEqualToString:@"pspdfkit/shape/rectangle"]) {
     return PSPDFAnnotationTypeSquare;
   } else if ([type isEqualToString:@"pspdfkit/text"]) {
     return PSPDFAnnotationTypeFreeText;
+  } else if ([type isEqualToString:@"pspdfkit/stamp"]) {
+    return PSPDFAnnotationTypeStamp;
   } else {
     return PSPDFAnnotationTypeUndefined;
   }
