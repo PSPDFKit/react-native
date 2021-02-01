@@ -1,6 +1,6 @@
 ## Native Catalog
 
-This second, Android only, Catalog example serves to show you how you can leverage the `PdfView` in your own view manager to provide more advanced integrations with PSPDFKit while still using react-native where possible.
+This second Catalog example serves to show you how you can leverage `PdfView` (Android) and `PSPDFViewController` (iOS) in your own view manager to provide more advanced integrations with PSPDFKit while still using React Native where possible.
 
 ### Running this Sample on Android
 
