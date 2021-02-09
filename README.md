@@ -71,7 +71,7 @@ target 'YourApp' do
   end
 + pod 'react-native-pspdfkit', :path => '../node_modules/react-native-pspdfkit'
 + pod 'PSPDFKit', podspec: 'https://customers.pspdfkit.com/pspdfkit-ios/latest.podspec'
-  
+
   # Enables Flipper.
   #
   # Note that if you have use_frameworks! enabled, Flipper will not work and
@@ -371,7 +371,7 @@ For a runnable example, please take a look at the [AnnotationProcessing example 
 - Android Build Tools 23.0.1 (React Native)
 - Android Build Tools 28.0.3 (PSPDFKit module)
 - Android Gradle plugin >= 3.4.1
-- PSPDFKit >= 6.5.3
+- PSPDFKit >= 6.6.0
 - react-native >= 0.63.2
 
 #### Getting Started
@@ -608,12 +608,12 @@ The PSPDFKit React Native Android Wrapper allows you to specify a custom groupin
 
 #### Update
 
-Upgrading yarn's lock file is required in order to update react-native-pspdfkit module in a project that has been already setup following the steps in [Getting Started](#getting-started-1) section.  
+Upgrading yarn's lock file is required in order to update react-native-pspdfkit module in a project that has been already setup following the steps in [Getting Started](#getting-started-1) section.
 From root project folder (e.g.`YourApp` for upgrading example project) launch `yarn upgrade`.
 
 ##### Migrate from PSPDFKit version 2.9.x to 3.0.0
 
-After launching `yarn upgrade`, apply [step 7](#step-7), [step 10](#step-10) and [step 12](#step-12) from [Getting Started](#getting-started-1) section.  
+After launching `yarn upgrade`, apply [step 7](#step-7), [step 10](#step-10) and [step 12](#step-12) from [Getting Started](#getting-started-1) section.
 Enable MultiDex in `YourApp/android/app/build.gradle` (note **one** place to edit):
 
 ```diff
@@ -636,7 +636,7 @@ defaultConfig {
 ...
 ```
 
-Remove `pspdfkit-lib` folder in `YourApp/android/`.  
+Remove `pspdfkit-lib` folder in `YourApp/android/`.
  In `YourApp/android/settings.gradle` remove the old reference to `pspdfkit-lib` (note **one** place to edit):
 
 ```diff
@@ -647,7 +647,7 @@ Remove `pspdfkit-lib` folder in `YourApp/android/`.
 
 ##### Migrate from PSPDFKit version 3.3.3 to 4.0.x
 
-After launching `yarn upgrade`, apply [step 6](#step-6), [step 8](#step-8) and [step 10](#step-10) from [Getting Started](#getting-started-1) section.  
+After launching `yarn upgrade`, apply [step 6](#step-6), [step 8](#step-8) and [step 10](#step-10) from [Getting Started](#getting-started-1) section.
 Enable MultiDex in `YourApp/android/app/build.gradle` (note **four** place to edit):
 
 ```diff
@@ -697,7 +697,7 @@ Windows UWP is not currently supported on `master`, please follow the integratio
 
 ## License
 
-This project can be used for evaluation or if you have a valid PSPDFKit license.  
+This project can be used for evaluation or if you have a valid PSPDFKit license.
 All items and source code Copyright © 2010-2021 PSPDFKit GmbH.
 
 See LICENSE for details.
