@@ -98,7 +98,15 @@ RCT_EXPORT_VIEW_PROPERTY(hideNavigationBar, BOOL)
 
 RCT_EXPORT_VIEW_PROPERTY(disableDefaultActionForTappedAnnotations, BOOL)
 
-RCT_EXPORT_VIEW_PROPERTY(disableAutomaticSaving, BOOL)
+RCT_CUSTOM_VIEW_PROPERTY(disableAutomaticSaving, BOOL, RCTPSPDFKitView) {
+  if (json) {
+    view.disableAutomaticSaving = [RCTConvert BOOL:json];
+    [view.pdfController updateConfigurationWithBuilder:^(PSPDFConfigurationBuilder *builder) {
+      // Disable autosave in the configuration.
+      builder.autosaveEnabled = !view.disableAutomaticSaving;
+    }];
+  }
+}
 
 RCT_REMAP_VIEW_PROPERTY(color, tintColor, UIColor)
 
