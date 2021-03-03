@@ -38,7 +38,7 @@ To make sure this is fast, please use a work email and have someone from your co
 #### Requirements
 
 - The latest [Xcode](https://developer.apple.com/xcode/).
-- PSPDFKit 10.2.0 for iOS or later
+- PSPDFKit 10.2.1 for iOS or later
 - react-native >= 0.63.4
 - CocoaPods >= 1.10.1
 
@@ -76,10 +76,10 @@ target 'YourApp' do
   #
   # Note that if you have use_frameworks! enabled, Flipper will not work and
   # you should disable these next few lines.
-  use_flipper!
-  post_install do |installer|
-    flipper_post_install(installer)
-  end
+- use_flipper!
+- post_install do |installer|
+-   flipper_post_install(installer)
+- end
 end
 ```
 
@@ -368,6 +368,7 @@ For a runnable example, please take a look at the [AnnotationProcessing example 
 #### Requirements
 
 - Android SDK
+- Android NDK
 - Android Build Tools 23.0.1 (React Native)
 - Android Build Tools 28.0.3 (PSPDFKit module)
 - Android Gradle plugin >= 3.4.1
