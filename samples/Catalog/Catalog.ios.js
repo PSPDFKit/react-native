@@ -1286,6 +1286,7 @@ class ToolbarCustomization extends Component {
                     "thumbnailsButtonItem",
                     "searchButtonItem",
                     "annotationButtonItem",
+                    "readerViewButtonItem",
                   ],
                   "document",
                   false
