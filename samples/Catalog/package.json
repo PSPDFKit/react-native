@@ -1,6 +1,6 @@
 {
   "name": "Catalog",
-  "version": "1.30.9",
+  "version": "1.30.10",
   "private": true,
   "scripts": {
     "start": "react-native start",
