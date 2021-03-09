@@ -40,6 +40,8 @@
     return @"activityButtonItem";
   } else if (barButtonItem == pdfController.settingsButtonItem) {
     return @"settingsButtonItem";
+  } else if (barButtonItem == pdfController.readerViewButtonItem) {
+    return @"readerViewButtonItem";
   } else {
     return nil;
   }
@@ -74,6 +76,8 @@
     return pdfController.activityButtonItem;
   } else if ([barButtonItem isEqualToString:@"settingsButtonItem"]) {
     return pdfController.settingsButtonItem;
+  } else if ([barButtonItem isEqualToString:@"readerViewButtonItem"]) {
+      return pdfController.readerViewButtonItem;
   } else {
     return nil;
   }
