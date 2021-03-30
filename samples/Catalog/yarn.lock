@@ -5425,7 +5425,7 @@ react-native-permissions@^1.1.1:
   integrity sha512-t0Ujm177bagjUOSzhpmkSz+LqFW04HnY9TeZFavDCmV521fQvFz82aD+POXqWsAdsJVOK3umJYBNNqCjC3g0hQ==
 
 "react-native-pspdfkit@file:../..":
-  version "1.30.10"
+  version "1.30.11"
 
 react-native-qrcode-scanner@^1.2.1:
   version "1.2.1"
