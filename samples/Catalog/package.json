@@ -1,6 +1,6 @@
 {
   "name": "Catalog",
-  "version": "1.30.10",
+  "version": "1.30.11",
   "private": true,
   "scripts": {
     "start": "react-native start",
@@ -27,5 +27,8 @@
     "metro-react-native-babel-preset": "^0.54.1",
     "react-test-renderer": "16.8.6",
     "rnpm-plugin-windows": "0.2.8"
+  },
+  "resolutions": {
+    "graceful-fs": "4.2.4"
   }
 }
