@@ -312,6 +312,7 @@ class ConfiguredPDFViewComponent extends Component {
             useParentNavigationBar: false,
             allowToolbarTitleChange: false,
           }}
+          leftBarButtonItems={["settingsButtonItem"]}
           toolbarTitle={"Custom Title"}
           style={{ flex: 1, color: pspdfkitColor }}
         />
