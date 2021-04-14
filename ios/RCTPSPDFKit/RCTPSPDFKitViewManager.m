@@ -41,15 +41,24 @@ RCT_CUSTOM_VIEW_PROPERTY(document, PSPDFDocument, RCTPSPDFKitView) {
   if (json) {
     view.pdfController.document = [RCTConvert PSPDFDocument:json];
     view.pdfController.document.delegate = (id<PSPDFDocumentDelegate>)view;
-    
-    // The author name may be set before the document exists. We set it again here when the document exists.
+
+    // The following properties need to be set after the document is set.
+    // We set them again here when we're certain the document exists.
     if (view.annotationAuthorName) {
       view.pdfController.document.defaultAnnotationUsername = view.annotationAuthorName;
     }
+
+    view.pdfController.pageIndex = view.pageIndex;
   }
 }
 
-RCT_REMAP_VIEW_PROPERTY(pageIndex, pdfController.pageIndex, NSUInteger)
+RCT_CUSTOM_VIEW_PROPERTY(pageIndex, PSPDFPageIndex, RCTPSPDFKitView) {
+  if (json) {
+    PSPDFPageIndex idx = [RCTConvert NSUInteger:json];
+    view.pageIndex = idx;
+    view.pdfController.pageIndex = idx;
+  }
+}
 
 RCT_CUSTOM_VIEW_PROPERTY(configuration, PSPDFConfiguration, RCTPSPDFKitView) {
   if (json) {
@@ -357,7 +366,7 @@ RCT_EXPORT_METHOD(getRightBarButtonItemsForViewMode:(nullable NSString *)viewMod
   // Override the default font family descriptors if custom font descriptors are specified.
   NSArray *customFontFamilyDescriptors = [self customFontFamilyDescriptors];
   if (customFontFamilyDescriptors.count) {
-      fontFamilyDescriptors = customFontFamilyDescriptors;
+    fontFamilyDescriptors = customFontFamilyDescriptors;
   }
   return [super initWithFontFamilyDescriptors:fontFamilyDescriptors];
 }
