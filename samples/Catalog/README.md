@@ -1,6 +1,6 @@
 ## Catalog
 
-The project contains a large set of code examples, which illustrate how to set up and customize PSPDFKit for various use cases. You can run the Catalog app on Android and iOS.
+The project contains a large set of sample code, which illustrates how to set up and customize PSPDFKit for various use cases. You can run the Catalog app on Android and iOS.
 
 ### Running the Catalog on Android
 
@@ -10,9 +10,9 @@ The project contains a large set of code examples, which illustrate how to set u
 - Android NDK
 - Android Build Tools 23.0.1 (React Native)
 - Android Build Tools 28.0.3 (PSPDFKit module)
-- Android Gradle plugin >= 3.4.1
-- PSPDFKit >= 6.6.0
-- react-native >= 0.63.2
+- Android Gradle plugin 3.4.1 or later.
+- PSPDFKit for Android 6.6.0 or later.
+- React Native 0.60.4.
 
 #### Getting Started
 
@@ -38,9 +38,8 @@ The project contains a large set of code examples, which illustrate how to set u
 #### Requirements
 
 - The latest [Xcode](https://developer.apple.com/xcode/).
-- PSPDFKit 10.2.1 for iOS or later
-- react-native >= 0.63.4
-- CocoaPods >= 1.10.1
+- the latest version of PSPDFKit for iOS.
+- React Native 0.60.4.
 
 #### Getting Started
 
