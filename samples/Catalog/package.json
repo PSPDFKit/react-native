@@ -1,6 +1,6 @@
 {
   "name": "Catalog",
-  "version": "1.30.11",
+  "version": "1.30.12",
   "private": true,
   "scripts": {
     "start": "react-native start",
@@ -30,5 +30,8 @@
   },
   "resolutions": {
     "graceful-fs": "4.2.4"
+  },
+  "scripts": {
+    "postinstall": "./../scripts/workaround-rn-28405.rb"
   }
 }

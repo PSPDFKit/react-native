@@ -30,5 +30,8 @@
   },
   "jest": {
     "preset": "react-native"
+  },
+  "scripts": {
+    "postinstall": "./../scripts/workaround-rn-28405.rb"
   }
 }
