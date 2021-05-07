@@ -12,7 +12,8 @@
 		13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB11A68108700A75B9A /* LaunchScreen.xib */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		16B3FFFDE782D83809DB1648 /* libPods-NativeCatalog.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EF5D8D9C0035DC82798947E4 /* libPods-NativeCatalog.a */; };
+		1A6227466265E89C2583935B /* libPods-NativeCatalogTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C09FDB4616A8895C64620FB /* libPods-NativeCatalogTests.a */; };
+		7898DB0318F1824594487D35 /* libPods-NativeCatalog.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8014BAEE207029DD3DC62A9F /* libPods-NativeCatalog.a */; };
 		844D64C02375A9FE004E70D2 /* CustomPdfView.m in Sources */ = {isa = PBXBuildFile; fileRef = 844D64BF2375A9FE004E70D2 /* CustomPdfView.m */; };
 		844D64C32375AA44004E70D2 /* CustomPdfViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 844D64C22375AA44004E70D2 /* CustomPdfViewManager.m */; };
 		844D64E62375B5FC004E70D2 /* PDFs in Resources */ = {isa = PBXBuildFile; fileRef = 844D64E52375B5FC004E70D2 /* PDFs */; };
@@ -23,7 +24,6 @@
 		84E53906242E2972002F99F2 /* InstantDocumentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84E53900242E2972002F99F2 /* InstantDocumentViewController.swift */; };
 		84E5391F242E2A5C002F99F2 /* UIViewController+PSCFrontmost.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84E5391E242E2A5C002F99F2 /* UIViewController+PSCFrontmost.swift */; };
 		84F455972434D68A00DFFCCC /* WebExamplesAPIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84F455962434D68A00DFFCCC /* WebExamplesAPIClient.swift */; };
-		ADB20344946DD08171C0B960 /* libPods-NativeCatalogTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2E6B4E8D759A588F85622EED /* libPods-NativeCatalogTests.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -48,8 +48,10 @@
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = NativeCatalog/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = NativeCatalog/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = NativeCatalog/main.m; sourceTree = "<group>"; };
-		2E6B4E8D759A588F85622EED /* libPods-NativeCatalogTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-NativeCatalogTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		3061E0AC6C543ACC225B8E07 /* Pods-NativeCatalog.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NativeCatalog.debug.xcconfig"; path = "Target Support Files/Pods-NativeCatalog/Pods-NativeCatalog.debug.xcconfig"; sourceTree = "<group>"; };
+		2EF9D530DB50B0AEC21C1DDD /* Pods-NativeCatalogTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NativeCatalogTests.debug.xcconfig"; path = "Target Support Files/Pods-NativeCatalogTests/Pods-NativeCatalogTests.debug.xcconfig"; sourceTree = "<group>"; };
+		7C09FDB4616A8895C64620FB /* libPods-NativeCatalogTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-NativeCatalogTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7C41BD164E8DB8F2F4E5286F /* Pods-NativeCatalogTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NativeCatalogTests.release.xcconfig"; path = "Target Support Files/Pods-NativeCatalogTests/Pods-NativeCatalogTests.release.xcconfig"; sourceTree = "<group>"; };
+		8014BAEE207029DD3DC62A9F /* libPods-NativeCatalog.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-NativeCatalog.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		844D64BE2375A9FE004E70D2 /* CustomPdfView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomPdfView.h; sourceTree = "<group>"; };
 		844D64BF2375A9FE004E70D2 /* CustomPdfView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomPdfView.m; sourceTree = "<group>"; };
 		844D64C12375AA44004E70D2 /* CustomPdfViewManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CustomPdfViewManager.h; sourceTree = "<group>"; };
@@ -63,12 +65,10 @@
 		84E53900242E2972002F99F2 /* InstantDocumentViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = InstantDocumentViewController.swift; path = InstantExample/InstantDocumentViewController.swift; sourceTree = SOURCE_ROOT; };
 		84E5391E242E2A5C002F99F2 /* UIViewController+PSCFrontmost.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "UIViewController+PSCFrontmost.swift"; path = "NativeCatalog/InstantExample/UIViewController+PSCFrontmost.swift"; sourceTree = SOURCE_ROOT; };
 		84F455962434D68A00DFFCCC /* WebExamplesAPIClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = WebExamplesAPIClient.swift; path = InstantExample/WebExamplesAPIClient.swift; sourceTree = SOURCE_ROOT; };
-		975DA22AD505EBDB677BC388 /* Pods-NativeCatalogTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NativeCatalogTests.debug.xcconfig"; path = "Target Support Files/Pods-NativeCatalogTests/Pods-NativeCatalogTests.debug.xcconfig"; sourceTree = "<group>"; };
-		BFA3F4A2B2AA6767F63FE048 /* Pods-NativeCatalog.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NativeCatalog.release.xcconfig"; path = "Target Support Files/Pods-NativeCatalog/Pods-NativeCatalog.release.xcconfig"; sourceTree = "<group>"; };
+		B82DD1C5CB4BD113946B6AE4 /* Pods-NativeCatalog.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NativeCatalog.debug.xcconfig"; path = "Target Support Files/Pods-NativeCatalog/Pods-NativeCatalog.debug.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		ED2971642150620600B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS12.0.sdk/System/Library/Frameworks/JavaScriptCore.framework; sourceTree = DEVELOPER_DIR; };
-		EF5D8D9C0035DC82798947E4 /* libPods-NativeCatalog.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-NativeCatalog.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		F0169F20D00D69D0F631C59E /* Pods-NativeCatalogTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NativeCatalogTests.release.xcconfig"; path = "Target Support Files/Pods-NativeCatalogTests/Pods-NativeCatalogTests.release.xcconfig"; sourceTree = "<group>"; };
+		FF493BF914DA143AD4B79B89 /* Pods-NativeCatalog.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NativeCatalog.release.xcconfig"; path = "Target Support Files/Pods-NativeCatalog/Pods-NativeCatalog.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -76,7 +76,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				ADB20344946DD08171C0B960 /* libPods-NativeCatalogTests.a in Frameworks */,
+				1A6227466265E89C2583935B /* libPods-NativeCatalogTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -84,7 +84,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				16B3FFFDE782D83809DB1648 /* libPods-NativeCatalog.a in Frameworks */,
+				7898DB0318F1824594487D35 /* libPods-NativeCatalog.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -128,8 +128,8 @@
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				ED2971642150620600B7C4FE /* JavaScriptCore.framework */,
-				EF5D8D9C0035DC82798947E4 /* libPods-NativeCatalog.a */,
-				2E6B4E8D759A588F85622EED /* libPods-NativeCatalogTests.a */,
+				8014BAEE207029DD3DC62A9F /* libPods-NativeCatalog.a */,
+				7C09FDB4616A8895C64620FB /* libPods-NativeCatalogTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -197,10 +197,10 @@
 		E20636F4482E38B1DB5E29B7 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				3061E0AC6C543ACC225B8E07 /* Pods-NativeCatalog.debug.xcconfig */,
-				BFA3F4A2B2AA6767F63FE048 /* Pods-NativeCatalog.release.xcconfig */,
-				975DA22AD505EBDB677BC388 /* Pods-NativeCatalogTests.debug.xcconfig */,
-				F0169F20D00D69D0F631C59E /* Pods-NativeCatalogTests.release.xcconfig */,
+				B82DD1C5CB4BD113946B6AE4 /* Pods-NativeCatalog.debug.xcconfig */,
+				FF493BF914DA143AD4B79B89 /* Pods-NativeCatalog.release.xcconfig */,
+				2EF9D530DB50B0AEC21C1DDD /* Pods-NativeCatalogTests.debug.xcconfig */,
+				7C41BD164E8DB8F2F4E5286F /* Pods-NativeCatalogTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -212,7 +212,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "NativeCatalogTests" */;
 			buildPhases = (
-				E538A32CF9B51B8BA4389949 /* [CP] Check Pods Manifest.lock */,
+				E07F9EE4285FE5EDE33E67CD /* [CP] Check Pods Manifest.lock */,
 				00E356EA1AD99517003FC87E /* Sources */,
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
@@ -231,13 +231,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "NativeCatalog" */;
 			buildPhases = (
-				90458A652A2B547552F7A00D /* [CP] Check Pods Manifest.lock */,
+				AF322CFD66717BFF3FD59824 /* [CP] Check Pods Manifest.lock */,
 				FD10A7F022414F080027D42C /* Start Packager */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				8178A35C635F06315B510D0E /* [CP] Embed Pods Frameworks */,
+				AA93E8DE1522C17E2D1CC0E3 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -320,7 +320,7 @@
 			shellPath = /bin/sh;
 			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh";
 		};
-		8178A35C635F06315B510D0E /* [CP] Embed Pods Frameworks */ = {
+		AA93E8DE1522C17E2D1CC0E3 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -342,7 +342,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-NativeCatalog/Pods-NativeCatalog-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		90458A652A2B547552F7A00D /* [CP] Check Pods Manifest.lock */ = {
+		AF322CFD66717BFF3FD59824 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -364,7 +364,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		E538A32CF9B51B8BA4389949 /* [CP] Check Pods Manifest.lock */ = {
+		E07F9EE4285FE5EDE33E67CD /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -459,7 +459,7 @@
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 975DA22AD505EBDB677BC388 /* Pods-NativeCatalogTests.debug.xcconfig */;
+			baseConfigurationReference = 2EF9D530DB50B0AEC21C1DDD /* Pods-NativeCatalogTests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -483,7 +483,7 @@
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = F0169F20D00D69D0F631C59E /* Pods-NativeCatalogTests.release.xcconfig */;
+			baseConfigurationReference = 7C41BD164E8DB8F2F4E5286F /* Pods-NativeCatalogTests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -504,7 +504,7 @@
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3061E0AC6C543ACC225B8E07 /* Pods-NativeCatalog.debug.xcconfig */;
+			baseConfigurationReference = B82DD1C5CB4BD113946B6AE4 /* Pods-NativeCatalog.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -531,7 +531,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = BFA3F4A2B2AA6767F63FE048 /* Pods-NativeCatalog.release.xcconfig */;
+			baseConfigurationReference = FF493BF914DA143AD4B79B89 /* Pods-NativeCatalog.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
