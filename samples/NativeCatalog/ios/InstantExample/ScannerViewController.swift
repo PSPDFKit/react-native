@@ -16,7 +16,7 @@ enum BarcodeScanResult {
     case failure(error: String)
 }
 
-protocol ScannerViewControllerDelegate: class {
+protocol ScannerViewControllerDelegate: AnyObject {
     /// Notifies the delegate when a scanning result is obtained. This will be called on the main thread.
     func scannerViewController(_ scannerViewController: ScannerViewController, didFinishScanningWith result: BarcodeScanResult)
 }
