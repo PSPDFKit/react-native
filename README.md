@@ -1,10 +1,10 @@
-## React Native wrapper for PSPDFKit for iOS, Android & Windows UWP. (PDF SDK for React Native)
+## React Native Library for PSPDFKit for iOS, Android & Windows UWP. (PDF SDK for React Native)
 
 ![PDF SDK for React Native](https://github.com/PSPDFKit/react-native/blob/master/article-header.png?raw=true)
 
-This wrapper requires a valid license of PSPDFKit. Licenses are per platform. You can request [a trial license here](https://pspdfkit.com/try/).
+This library requires a valid license of PSPDFKit. Licenses are per platform.
 
-This wrapper exposes the most often used APIs from PSPDFKit. Many of our partners end up forking this wrapper and adding some custom code to achieve even greater integration with their products, using native code.
+PSPDFKit for React Native exposes the most often used APIs from PSPDFKit. Many of our partners end up forking this repository and adding some custom code to achieve even greater integration with their products, using native code.
 
 Windows is not currently supported, please use the previous version [1.24.9](https://github.com/PSPDFKit/react-native/releases/tag/1.24.9) instead.
 
@@ -37,117 +37,168 @@ To make sure this is fast, please use a work email and have someone from your co
 
 #### Requirements
 
-- The latest [Xcode](https://developer.apple.com/xcode/).
-- PSPDFKit 10.2.1 for iOS or later
-- react-native >= 0.63.4
-- CocoaPods >= 1.10.1
+- A [development environment](https://reactnative.dev/docs/environment-setup) for running React Native projects using the React Native CLI (not the Expo CLI)
+- The [latest stable version of Xcode](https://developer.apple.com/xcode/)
+- The [latest version of PSPDFKit for iOS](https://pspdfkit.com/changelog/ios/)
+- The [latest stable version of CocoaPods](https://github.com/CocoaPods/CocoaPods/releases). If you don’t already have CocoaPods installed, follow the [CocoaPods installation guide](https://guides.cocoapods.org/using/getting-started.html#installation) to install CocoaPods on your Mac.
 
 #### Getting Started
 
 Let's create a simple app that integrates PSPDFKit and uses the `react-native-pspdfkit` module.
 
-1. Make sure `react-native-cli` is installed: `yarn global add react-native-cli`
-2. Create the app with `react-native init YourApp`
-3. Step into your newly created app folder: `cd YourApp`
-4. Install `react-native-pspdfkit` from GitHub: `yarn add github:PSPDFKit/react-native`
-5. Install all the dependencies for the project: `yarn install`. (Because of a [bug](https://github.com/yarnpkg/yarn/issues/2165) you may need to clean `yarn`'s cache with `yarn cache clean` before.)
-6. Open `ios/Podile` in a text editor: `open ios/Podfile`, update the platform to iOS 12, and add the PSPDFKit podspecs:
+1. In the terminal app, change the current working directory to the location you wish to save your project. In this example, we’ll use the `~/Documents/` directory:
+
+```bash
+cd ~/Documents
+```
+
+2. Create the React Native project by running the following command:
+
+```bash
+react-native init PSPDFKitDemo
+```
+
+3. In the terminal app, change the location of the current working directory inside the newly created project:
+
+```bash
+cd PSPDFKitDemo
+```
+
+4. Add the PSPDFKit plugin: 
+
+```bash
+yarn add github:PSPDFKit/react-native
+```
+
+5. Install all the dependencies for the project: 
+
+```bash
+yarn install
+```
+
+6. Open your project’s Podfile in a text editor to update the platform to iOS 12, and add the PSPDFKit Podspec: 
+
+```bash
+open ios/Podfile
+```
+
+Your Podfile should look like this:
 
 ```diff
+require_relative '../node_modules/react-native/scripts/react_native_pods'
 require_relative '../node_modules/react-native/scripts/react_native_pods'
 require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
 
 - platform :ios, '10.0'
 + platform :ios, '12.0'
 
-target 'YourApp' do
+target 'PSPDFKitDemo' do
   config = use_native_modules!
 
-  use_react_native!(:path => config["reactNativePath"])
+  use_react_native!(
+    :path => config[:reactNativePath],
+    # to enable hermes on iOS, change `false` to `true` and then install pods
+    :hermes_enabled => false
+  )
 
-  target 'YourAppTests' do
+  target 'PSPDFKitDemoTests' do
     inherit! :complete
     # Pods for testing
   end
 + pod 'react-native-pspdfkit', :path => '../node_modules/react-native-pspdfkit'
 + pod 'PSPDFKit', podspec: 'https://customers.pspdfkit.com/pspdfkit-ios/latest.podspec'
-
   # Enables Flipper.
   #
   # Note that if you have use_frameworks! enabled, Flipper will not work and
-  # you should disable these next few lines.
-- use_flipper!
-- post_install do |installer|
--   flipper_post_install(installer)
-- end
+  # you should disable the next line.
+  use_flipper!()
+
+  post_install do |installer|
+    react_native_post_install(installer)
+  end
 end
 ```
 
-7. `cd ios` then run `pod install`.
-8. Open `YourApp.xcworkspace` in Xcode: `open YourApp.xcworkspace`.
-9. Make sure the deployment target is set to 12.0 or higher:
-   ![Deployment Target](screenshots/deployment-target.png)
-10. Change "View controller-based status bar appearance" to `YES` in `Info.plist`:
-    ![View Controller-Based Status Bar Appearance](screenshots/view-controller-based-status-bar-appearance.png)
-11. Add a PDF by drag and dropping it into your Xcode project (Select "Create groups" and add to target "YourApp"). This will add the document to the "Copy Bundle Resources" build phase:
-    ![Adding PDF](screenshots/adding-pdf.png)
-12. Replace the default component from `App.js` with a simple touch area to present the bundled PDF. (Note that you can also use a [Native UI Component](#native-ui-component) to show a PDF.)
+7. Change the location of the current working directory to the `ios` folder:
 
-```javascript
-import React, { Component } from "react";
-import {
-  AppRegistry,
-  StyleSheet,
-  NativeModules,
-  Text,
-  TouchableHighlight,
-  View
-} from "react-native";
+```bash
+cd ios
+```
 
-const PSPDFKit = NativeModules.PSPDFKit;
+8. Install the CocoaPods dependencies:
 
-PSPDFKit.setLicenseKey("INSERT_YOUR_LICENSE_KEY_HERE");
+```bash
+pod install
+```
 
-// Change 'YourApp' to your app's name.
-export default class YourApp extends Component<Props> {
-  _onPressButton() {
-    PSPDFKit.present("document.pdf", {});
-  }
+9. Open your project’s Workspace in Xcode: 
 
+```bash
+open PSPDFKitDemo.xcworkspace
+```
+
+7. Make sure the deployment target is set to 12.0 or higher: 
+
+![deployment-target](/screenshots/deployment-target.png)
+
+8. Change View controller-based status bar appearance to `YES` in your project’s `Info.plist`:
+
+![view-controller-based-status-bar-appearance](/screenshots/view-controller-based-status-bar-appearance.png)
+
+
+9. Add the PDF document you want to display to your application by dragging it into your project. On the dialog that’s displayed, select Finish to accept the default integration options. You can use <a href="https://pspdfkit.com/downloads/pspdfkit-ios-quickstart-guide.pdf" download="Document.pdf">this QuickStart Guide PDF</a> as an example.
+
+![drag-and-drop-document](/screenshots/drag-and-drop-document.png)
+
+10. Change the location of the current working directory back to the root project folder:
+
+```bash
+cd ..
+```
+
+11. Open your `App.js` file:
+
+```bash
+open App.js
+```
+
+12. Replace the entire contents of `App.js` with the following code snippet:
+
+```js
+import React, {Component} from 'react';
+import {Platform} from 'react-native';
+import PSPDFKitView from 'react-native-pspdfkit';
+
+const DOCUMENT =
+  Platform.OS === 'ios' ? 'Document.pdf' : 'file:///android_asset/Document.pdf';
+export default class PSPDFKitDemo extends Component<{}> {
   render() {
     return (
-      <View style={styles.container}>
-        <TouchableHighlight onPress={this._onPressButton}>
-          <Text style={styles.text}>Tap to Open Document</Text>
-        </TouchableHighlight>
-      </View>
+      <PSPDFKitView
+        document={DOCUMENT}
+        configuration={{
+          thumbnailBarMode: 'scrollable',
+          pageTransition: 'scrollContinuous',
+          scrollDirection: 'vertical',
+        }}
+        ref="pdfView"
+        fragmentTag="PDF1"
+        style={{flex: 1}}
+      />
     );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#F5FCFF"
-  },
-  text: {
-    fontSize: 20,
-    textAlign: "center",
-    margin: 10
-  }
-});
-
-// Change both 'YourApp's to your app's name.
-AppRegistry.registerComponent("YourApp", () => YourApp);
 ```
 
-Your app is now ready to launch. Run the app in Xcode or go back to the Terminal, then run `cd ..`, and `react-native run-ios`.
+13. The app is now ready to launch! Go back to the terminal app and run:
+
+```bash
+react-native run-ios
+```
 
 ### Usage
 
-There are 2 different ways on how to use the PSPDFKit React Native wrapper on iOS.
+There are 2 different ways on how to use the PSPDFKit for React Native on iOS.
 
 - Present a document via a Native Module modally.
 - Show a PSPDFKit view via a Native UI component.
@@ -193,7 +244,6 @@ With `PSPDFKitView` you can use PSPDFKit like any other React component in your 
 Using this approach, you have more flexibility over how a document is presented and displayed.
 
 The layout is completely flexible, and can be adjust with flexbox.
-Note that you still need to set your license key with the Native Module.
 
 For all the `props` that you can pass to `PSPDFKitView`, have a look at the [source documentation](./index.js).
 
@@ -251,15 +301,9 @@ Example - Native UI Component:
 />
 ```
 
-#### Running Catalog Project
+#### Running the Catalog Project
 
-- Clone the repository: `git clone https://github.com/PSPDFKit/react-native.git`.
-- Step into your newly cloned folder: `cd react-native` and create a new `PSPDFKit` directory: `mkdir PSPDFKit`.
-- [Download the latest version of PSPDFKit for iOS](https://customers.pspdfkit.com/download/binary/ios/latest) and mount the DMG file.
-- Copy `PSPDFKit.xcframework` and `PSPDFKitUI.xcframework` into the `PSPDFKit` directory.
-- Install dependencies: `yarn install` in `samples/Catalog` directory. (Because of a [bug](https://github.com/yarnpkg/yarn/issues/2165) you may need to clean `yarn`'s cache with `yarn cache clean` before.)
-- Run the app with `react-native-cli`: `react-native run-ios`
-- If you get an error about `config.h` not being found check out [this blog post](https://tuntunir.blogspot.com/2018/02/react-native-fatal-error-configh-file.html) for information on how to fix it.
+Take a look at the [instructions to get started here](/samples/Catalog/README.md#running-the-catalog-on-ios).
 
 #### Running the Native Catalog
 
@@ -267,13 +311,13 @@ Take a look at the [instructions to get started here](/samples/NativeCatalog/REA
 
 #### Running on Mac Catalyst
 
-Using PSPDFKit React Native Wrapper on Mac Catalyst does not currently work due to a [Flipper and FlipperKit issue](https://github.com/facebook/react-native/issues/28810).
+Using PSPDFKit for React Native on Mac Catalyst does not currently work due to a [Flipper and FlipperKit issue](https://github.com/facebook/react-native/issues/28810).
 
 If you wish to run your project on Mac Catalyst, please try the [following workaround which removes everything related to Flipper and FlipperKit](https://github.com/facebook/react-native/issues/28810#issuecomment-623357732).
 
 #### Configuration Mapping
 
-The PSPDFKit React Native iOS Wrapper maps most configuration options available in `PSPDFConfiguration` from JSON. Please refer to [`RCTConvert+PSPDFConfiguration.m`](./ios/RCTPSPDFKit/Converters/RCTConvert+PSPDFConfiguration.m#L267) for the complete list and for the exact naming of enum values.
+On iOS, PSPDFKit for React Native iOS maps most configuration options available in `PSPDFConfiguration` from JSON. Please refer to [`RCTConvert+PSPDFConfiguration.m`](./ios/RCTPSPDFKit/Converters/RCTConvert+PSPDFConfiguration.m#L267) for the complete list and for the exact naming of enum values.
 
 Annotations are mapped based on their type name. This is case sensitive. For example, to limit annotation types to ink and highlight, use this:
 
@@ -283,7 +327,7 @@ editableAnnotationTypes: ["Ink", "Highlight"];
 
 #### Menu Item Mapping
 
-The PSPDFKit React Native iOS Wrapper allows you to specify a custom grouping for the annotation creation toolbar. Please refer to [`RCTConvert+PSPDFAnnotationToolbarConfiguration.m`](./ios/RCTPSPDFKit/Converters/RCTConvert+PSPDFAnnotationToolbarConfiguration.m#L47) for the complete list of menu items. To set them just specify the `menuItemGrouping` prop on the `PSPDFKitView`. The format used is as follows:
+On iOS, PSPDFKit for React Native allows you to specify a custom grouping for the annotation creation toolbar. Please refer to [`RCTConvert+PSPDFAnnotationToolbarConfiguration.m`](./ios/RCTPSPDFKit/Converters/RCTConvert+PSPDFAnnotationToolbarConfiguration.m#L47) for the complete list of menu items. To set them just specify the `menuItemGrouping` prop on the `PSPDFKitView`. The format used is as follows:
 
 ```javascript
 [
@@ -313,7 +357,7 @@ For a more detailed description of toolbar customizations, refer to our Customiz
 
 #### Process Annotations
 
-The PSPDFKit React Native Wrapper allows you to create a new document with processed (embedded, flattenned, removed, or printed) annotations on Android and iOS using the `PSPDFKit.processAnnotations(annotationChange, annotationType, sourceDocumentPath, processedDocumentPath)` function. In the snippet below, we add a button which flattens all the annotations of the document from the currently displayed `PSPDFKitView` in a newly processed PDF file:
+PSPDFKit for React Native allows you to create a new document with processed (embedded, flattenned, removed, or printed) annotations on Android and iOS using the `PSPDFKit.processAnnotations(annotationChange, annotationType, sourceDocumentPath, processedDocumentPath)` function. In the snippet below, we add a button which flattens all the annotations of the document from the currently displayed `PSPDFKitView` in a newly processed PDF file:
 
 ```javascript
 <View>
@@ -367,24 +411,52 @@ For a runnable example, please take a look at the [AnnotationProcessing example 
 
 #### Requirements
 
-- Android SDK
-- Android NDK
-- Android Build Tools 23.0.1 (React Native)
-- Android Build Tools 28.0.3 (PSPDFKit module)
-- Android Gradle plugin >= 3.4.1
-- PSPDFKit >= 6.6.0
-- react-native >= 0.63.2
+- A [development environment](https://reactnative.dev/docs/environment-setup) for running React Native projects using the React Native CLI (not the Expo CLI)
+- The [latest stable version of Android Studio](https://developer.android.com/studio)
+- The [Android NDK](https://developer.android.com/studio/projects/install-ndk)
+- An [Android Virtual Device](https://developer.android.com/studio/run/managing-avds.html) or a hardware device
 
 #### Getting Started
 
-Let's create a simple app that integrates PSPDFKit and uses the react-native-pspdfkit module.
+Let's create a simple app that integrates PSPDFKit and uses the `react-native-pspdfkit` module.
 
-1. Make sure `react-native-cli` is installed: `yarn global add react-native-cli`
-2. Create the app with `react-native init YourApp`.
-3. Step into your newly created app folder: `cd YourApp`.
-4. Add `react-native-pspdfkit` module from GitHub: `yarn add github:PSPDFKit/react-native`.
-5. Install all the dependencies for the project: `yarn install`. (Because of a [bug](https://github.com/yarnpkg/yarn/issues/2165) you may need to clean `yarn`'s cache with `yarn cache clean` before.)
-6. Add PSPDFKit repository to `YourApp/android/build.gradle` so PSPDFKit library can be downloaded:
+1. In the terminal app, change the current working directory to the location you wish to save your project. In this example, we’ll use the `~/Documents/` directory:
+
+```bash
+cd ~/Documents
+```
+
+2. Create the React Native project by running the following command:
+
+```bash
+react-native init PSPDFKitDemo
+```
+
+3. In the terminal app, change the location of the current working directory inside the newly created project:
+
+```bash
+cd PSPDFKitDemo
+```
+
+4. Add the PSPDFKit plugin: 
+
+```bash
+yarn add github:PSPDFKit/react-native
+```
+
+5. Install all the dependencies for the project: 
+
+```bash
+yarn install
+```
+
+6. Open your project’s `build.gradle` file:
+
+```bash
+open android/build.gradle
+```
+
+7. Add the PSPDFKit repository to download the PSPDFKit library:
 
 ```diff
 ...
@@ -397,27 +469,18 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
 ...
 ```
 
-7. PSPDFKit targets modern platforms, so you'll have to set the `minSdkVersion` to 19. In `YourApp/android/build.gradle`:
+8. Open the app’s `build.gradle` file: 
 
-```diff
-...
- buildscript {
-     ext {
-         buildToolsVersion = "28.0.3"
--        minSdkVersion = 16
-+        minSdkVersion = 19
-         compileSdkVersion = 28
-         targetSdkVersion = 28
-         supportLibVersion = "28.0.0"
-...
+```bash
+open android/app/build.gradle
 ```
 
-8. We will also need to enable MultiDex support. In `YourApp/android/app/build.gradle`:
+9. Enable `multidex` support:
 
 ```diff
 ...
   defaultConfig {
-      applicationId "com.yourapp"
+      applicationId "com.pspdfkitdemo"
       minSdkVersion rootProject.ext.minSdkVersion
       targetSdkVersion rootProject.ext.targetSdkVersion
       versionCode 1
@@ -427,132 +490,64 @@ Let's create a simple app that integrates PSPDFKit and uses the react-native-psp
 ...
 ```
 
-9. <a id="step-9"></a>Enter your PSPDFKit license key into `YourApp/android/app/src/main/AndroidManifest.xml` file:
+10. Add the PDF document you want to display to your application. You can download <a href="https://pspdfkit.com/downloads/pspdfkit-android-quickstart-guide.pdf" download="Document.pdf">this QuickStart Guide PDF</a> as an example.
 
-```diff
-   <application>
-      ...
+11. Create the `assets` directory:
 
-+      <meta-data
-+          android:name="pspdfkit_license_key"
-+          android:value="YOUR_LICENSE_KEY_GOES_HERE"/>
-
-   </application>
+```bash
+mkdir android/app/src/main/assets
 ```
 
-10. Set primary color. In `YourApp/android/app/src/main/res/values/styles.xml` replace
+12. Copy a PDF document into your `assets` directory:
 
-```xml
-<!-- Customize your theme here. -->
+```bash
+cp ~/Downloads/Document.pdf android/app/src/main/assets/Document.pdf
 ```
 
-with
+13. Open your `App.js` file:
 
-```xml
-<item name="colorPrimary">#3C97C9</item>
+```bash
+open App.js
 ```
 
-11. <a id="step-11"></a>Replace the default component from `YourApp/App.js` with a simple touch area to present a PDF document from the local device filesystem:
+14. Replace the entire contents of `App.js` with the following code snippet:
 
-```javascript
-import React, { Component } from "react";
-import {
-  StyleSheet,
-  NativeModules,
-  Text,
-  TouchableOpacity,
-  View,
-  PermissionsAndroid
-} from "react-native";
+```js
+import React, {Component} from 'react';
+import {Platform} from 'react-native';
+import PSPDFKitView from 'react-native-pspdfkit';
 
-var PSPDFKit = NativeModules.PSPDFKit;
-
-const DOCUMENT = "file:///sdcard/document.pdf";
-const CONFIGURATION = {
-  scrollContinuously: false,
-  showPageNumberOverlay: true,
-  pageScrollDirection: "vertical"
-};
-
-// Change 'YourApp' to your app's name.
-export default class YourApp extends Component<{}> {
-  _onPressButton() {
-    requestExternalStoragePermission();
-  }
-
+const DOCUMENT =
+  Platform.OS === 'ios' ? 'Document.pdf' : 'file:///android_asset/Document.pdf';
+export default class PSPDFKitDemo extends Component<{}> {
   render() {
     return (
-      <View style={styles.container}>
-        <Text>{PSPDFKit.versionString}</Text>
-        <TouchableOpacity onPress={this._onPressButton}>
-          <Text style={styles.text}>Tap to Open Document</Text>
-        </TouchableOpacity>
-      </View>
+      <PSPDFKitView
+        document={DOCUMENT}
+        configuration={{
+          thumbnailBarMode: 'scrollable',
+          pageTransition: 'scrollContinuous',
+          scrollDirection: 'vertical',
+        }}
+        ref="pdfView"
+        fragmentTag="PDF1"
+        style={{flex: 1}}
+      />
     );
   }
 }
-
-async function requestExternalStoragePermission() {
-  try {
-    const granted = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
-    );
-    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-      console.log("Write external storage permission granted");
-      PSPDFKit.present(DOCUMENT, CONFIGURATION);
-    } else {
-      console.log("Write external storage permission denied");
-    }
-  } catch (err) {
-    console.warn(err);
-  }
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#F5FCFF"
-  },
-  text: {
-    fontSize: 20,
-    textAlign: "center",
-    margin: 10
-  }
-});
 ```
 
-12. Before launching the app you need to copy a PDF document onto your development device or emulator.
+15. The app is now ready to launch! Go back to the terminal app and run:
 
-    ```bash
-    adb push /path/to/your/document.pdf /sdcard/document.pdf
-    ```
-
-13. Your app is now ready to launch. From `YourApp` directory run `react-native run-android`.
-
-    ```bash
-    react-native run-android
-    ```
-
-#### Running Catalog Project
-
-1. Clone the repository. `git clone https://github.com/PSPDFKit/react-native.git`.
-2. Install dependencies: run `yarn install` from `samples/Catalog` directory. (Because of a [bug](https://github.com/yarnpkg/yarn/issues/2165) you may need to clean `yarn`'s cache with `yarn cache clean` before.)
-3. Update license key in `samples/Catalog/android/app/src/main/AndroidManifest.xml`:
-
-```xml
-   <application>
-      ...
-
-      <meta-data
-          android:name="pspdfkit_license_key"
-          android:value="YOUR_LICENSE_KEY_GOES_HERE"/>
-
-   </application>
+```bash
+react-native run-android
 ```
 
-4. Catalog app is now ready to launch. From `samples/Catalog` directory run `react-native run-android`.
+#### Running the Catalog Project
+
+Take a look at the [instructions to get started here](/samples/Catalog/README.md#running-the-catalog-on-android).
+
 
 #### Running the Native Catalog
 
@@ -597,7 +592,7 @@ Just like on iOS we also support integrating PSPDFKit directly into the react-na
 
 ##### Menu Item Mapping
 
-The PSPDFKit React Native Android Wrapper allows you to specify a custom grouping for the annotation creation toolbar. Please refer to [`ReactGroupingRule.java`](https://github.com/PSPDFKit/react-native/blob/master/android/src/main/java/com/pspdfkit/react/menu/ReactGroupingRule.java) for the complete list of menu items. To set them just specify the `menuItemGrouping` prop on the `PSPDFKitView`. The format used is as follows:
+On Android, PSPDFKit for React Native allows you to specify a custom grouping for the annotation creation toolbar. Please refer to [`ReactGroupingRule.java`](https://github.com/PSPDFKit/react-native/blob/master/android/src/main/java/com/pspdfkit/react/menu/ReactGroupingRule.java) for the complete list of menu items. To set them just specify the `menuItemGrouping` prop on the `PSPDFKitView`. The format used is as follows:
 
 ```
 [
@@ -701,7 +696,7 @@ Windows UWP is not currently supported on `master`, please follow the integratio
 This project can be used for evaluation or if you have a valid PSPDFKit license.
 All items and source code Copyright © 2010-2021 PSPDFKit GmbH.
 
-See LICENSE for details.
+See [LICENSE](./LICENSE) for details.
 
 ## Contributing
 
