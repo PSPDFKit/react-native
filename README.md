@@ -197,7 +197,7 @@ react-native run-ios
 
 ### Usage
 
-There are 2 different ways on how to use the PSPDFKit for React Native on iOS.
+There are 2 different ways on how to use PSPDFKit for React Native on iOS.
 
 - Present a document via a Native Module modally.
 - Show a PSPDFKit view via a Native UI component.
