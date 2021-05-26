@@ -24,13 +24,9 @@
 
 RCT_EXPORT_MODULE(PSPDFKit)
 
-RCT_REMAP_METHOD(setLicenseKey, setLicenseKey:(NSString *)licenseKey resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-  if (licenseKey.length > 0) {
-    [PSPDFKitGlobal setLicenseKey:licenseKey];
-    resolve(@(YES));
-  } else {
-    reject(@"error", @"Invalid License Key.", nil);
-  }
+RCT_REMAP_METHOD(setLicenseKey, setLicenseKey:(nullable NSString *)licenseKey resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+  [PSPDFKitGlobal setLicenseKey:licenseKey];
+  resolve(@(YES));
 }
 
 RCT_REMAP_METHOD(present, present:(PSPDFDocument *)document withConfiguration:(PSPDFConfiguration *)configuration resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {

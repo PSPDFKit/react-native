@@ -182,7 +182,7 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
     }
 
     @ReactMethod
-    public void setLicenseKey(@NonNull String licenseKey) {
+    public void setLicenseKey(@Nullable String licenseKey) {
         PSPDFKit.initialize(getReactApplicationContext().getApplicationContext(), licenseKey);
     }
 
