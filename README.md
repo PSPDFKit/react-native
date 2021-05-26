@@ -86,7 +86,6 @@ Your Podfile should look like this:
 
 ```diff
 require_relative '../node_modules/react-native/scripts/react_native_pods'
-require_relative '../node_modules/react-native/scripts/react_native_pods'
 require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
 
 - platform :ios, '10.0'
