@@ -92,8 +92,7 @@
       builder.availableModes = @[@(PSPDFSignatureCreationModeDraw)];
     }];
     signatureController.delegate = self;
-    PSPDFNavigationController *signatureContainer = [[PSPDFNavigationController alloc] initWithRootViewController:signatureController];
-    [_pdfController presentViewController:signatureContainer animated:YES completion:NULL];
+    [_pdfController presentViewController:signatureController animated:YES completion:NULL];
   } else {
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"This example is not available on iOS 12" message:@"This example requires iOS 13 and later." preferredStyle:UIAlertControllerStyleAlert];
     [alert addAction:[UIAlertAction actionWithTitle:@"Dismiss" style:UIAlertActionStyleDefault handler:NULL]];
