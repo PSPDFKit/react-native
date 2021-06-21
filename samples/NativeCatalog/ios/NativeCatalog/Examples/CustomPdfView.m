@@ -11,7 +11,7 @@
 #import <React/RCTUtils.h>
 #import "NativeCatalog-Swift.h"
 
-@interface CustomPdfView()<PSPDFSignatureViewControllerDelegate>
+@interface CustomPdfView()<PSPDFSignatureCreationViewControllerDelegate>
 @property (nonatomic, nullable) UIViewController *topController;
 @end
 
@@ -85,19 +85,27 @@
 }
 
 - (BOOL)startSigning {
-  // Programmatically show the signature view controller
-  PSPDFSignatureViewController *signatureController = [[PSPDFSignatureViewController alloc] init];
-  signatureController.naturalDrawingEnabled = YES;
-  signatureController.delegate = self;
-  PSPDFNavigationController *signatureContainer = [[PSPDFNavigationController alloc] initWithRootViewController:signatureController];
-  [_pdfController presentViewController:signatureContainer animated:YES completion:NULL];
+  // Programmatically show the signature creation view controller
+  if (@available(iOS 13.0, *)) {
+    PSPDFSignatureCreationViewController *signatureController = [[PSPDFSignatureCreationViewController alloc] init];
+    signatureController.configuration = [PSPDFSignatureCreationConfiguration configurationWithBuilder:^(PSPDFSignatureCreationConfigurationBuilder * _Nonnull builder) {
+      builder.availableModes = @[@(PSPDFSignatureCreationModeDraw)];
+    }];
+    signatureController.delegate = self;
+    PSPDFNavigationController *signatureContainer = [[PSPDFNavigationController alloc] initWithRootViewController:signatureController];
+    [_pdfController presentViewController:signatureContainer animated:YES completion:NULL];
+  } else {
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"This example is not available on iOS 12" message:@"This example requires iOS 13 and later." preferredStyle:UIAlertControllerStyleAlert];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Dismiss" style:UIAlertActionStyleDefault handler:NULL]];
+    [_pdfController presentViewController:alert animated:YES completion:NULL];
+  }
 
   return YES;
 }
 
 #pragma mark - PSPDFSignatureViewControllerDelegate
 
-- (void)signatureViewControllerDidFinish:(PSPDFSignatureViewController *)signatureController withSigner:(nullable PSPDFSigner *)signer shouldSaveSignature:(BOOL)shouldSaveSignature {
+- (void)signatureCreationViewControllerDidFinish:(PSPDFSignatureCreationViewController * _Nonnull)signatureController  API_AVAILABLE(ios(13.0)){
     [signatureController dismissViewControllerAnimated:YES completion:^{
       NSURL *samplesURL = [NSBundle.mainBundle.resourceURL URLByAppendingPathComponent:@"PDFs"];
       NSURL *p12URL = [samplesURL URLByAppendingPathComponent:@"JohnAppleseed.p12"];
@@ -143,7 +151,7 @@
       // Set the bounding box to fit in the signature form element.
       annotation.boundingBox = CGRectMake(signatureFormElement.boundingBox.origin.x + 70, signatureFormElement.boundingBox.origin.y - 25, 50, 50);
       annotation.color = signatureController.drawView.strokeColor;
-      annotation.naturalDrawingEnabled = signatureController.naturalDrawingEnabled;
+      annotation.naturalDrawingEnabled = signatureController.drawView.naturalDrawingEnabled;
       annotation.pageIndex = 0;
 
       // Add the ink annotation.
@@ -163,7 +171,7 @@
     }];
 }
 
-- (void)signatureViewControllerDidCancel:(PSPDFSignatureViewController *)signatureController {
+- (void)signatureCreationViewControllerDidCancel:(PSPDFSignatureCreationViewController * _Nonnull)signatureController  API_AVAILABLE(ios(13.0)){
     [signatureController dismissViewControllerAnimated:YES completion:NULL];
 }
 
