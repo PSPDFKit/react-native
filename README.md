@@ -19,6 +19,7 @@ Windows is not currently supported, please use the previous version [1.24.9](htt
 - [Advanced Techniques for React Native UI Components](https://pspdfkit.com/blog/2018/advanced-techniques-for-react-native-ui-components/)
 - [How to Extend React Native APIs for Windows](https://pspdfkit.com/blog/2019/how-to-extend-react-native-apis-for-windows/)
 - [How to Bridge Native iOS Code to React Native](https://pspdfkit.com/blog/2020/how-to-bridge-native-ios-code-to-react-native/)
+- [How to Open a PDF in React Native Using the Document Picker](https://pspdfkit.com/blog/2021/how-to-open-a-pdf-in-react-native-using-the-document-browser/)
 
 #### PSPDFKit
 
