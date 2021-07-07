@@ -77,7 +77,7 @@ yarn add github:PSPDFKit/react-native
 yarn install
 ```
 
-6. Open your project’s Podfile in a text editor to update the platform to iOS 12, and add the PSPDFKit Podspec: 
+6. Open your project’s Podfile in a text editor to update the platform to iOS 13, and add the PSPDFKit Podspec: 
 
 ```bash
 open ios/Podfile
@@ -90,7 +90,7 @@ require_relative '../node_modules/react-native/scripts/react_native_pods'
 require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
 
 - platform :ios, '10.0'
-+ platform :ios, '12.0'
++ platform :ios, '13.0'
 
 target 'PSPDFKitDemo' do
   config = use_native_modules!
@@ -137,7 +137,7 @@ pod install
 open PSPDFKitDemo.xcworkspace
 ```
 
-7. Make sure the deployment target is set to 12.0 or higher: 
+7. Make sure the deployment target is set to 13.0 or higher: 
 
 ![deployment-target](/screenshots/deployment-target.png)
 

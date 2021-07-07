@@ -338,7 +338,6 @@ RCT_MULTI_ENUM_CONVERTER(PSPDFDocumentSharingPagesOptions,
   SET(createAnnotationMenuEnabled, BOOL)
   SET(naturalDrawingAnnotationEnabled, BOOL)
   SET(drawCreateMode, PSPDFDrawCreateMode)
-  SET(showAnnotationMenuAfterCreation, BOOL)
   SET(shouldAskForAnnotationUsername, BOOL)
   SET(annotationEntersEditModeAfterSecondTapEnabled, BOOL)
   SET(autosaveEnabled, BOOL)

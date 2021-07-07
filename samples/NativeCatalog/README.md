@@ -4,16 +4,34 @@ This second Catalog example serves to show you how you can leverage `PdfView` (A
 
 ### Running this Sample on Android
 
-1. Clone the repository. `git clone https://github.com/PSPDFKit/react-native.git`.
-2. Install dependencies: run `yarn install` from `samples/NativeCatalog` directory.
-3. The Native Catalog app is now ready to launch. From `samples/NativeCatalog` directory run `react-native run-android`.
+#### Requirements
+
+- A [development environment](https://reactnative.dev/docs/environment-setup) for running React Native projects using the React Native CLI (not the Expo CLI).
+- The [latest stable version of Android Studio](https://developer.android.com/studio).
+- The [Android NDK](https://developer.android.com/studio/projects/install-ndk).
+- An [Android Virtual Device](Android Virtual Device) or a hardware device.
+
+#### Getting Started
+
+1. Clone the repository: `git clone https://github.com/PSPDFKit/react-native.git`.
+2. Step into the NativeCatalog project's directory: `cd react-native/samples/NativeCatalog`.
+3. Install dependencies: run `yarn install`.
+4. The Native Catalog app is now ready to launch: `react-native run-android`.
 
 ### Running this Sample on iOS
 
-1. Clone the repository. `git clone https://github.com/PSPDFKit/react-native.git`.
-2. Install dependencies: run `yarn install` from the `samples/NativeCatalog` directory.
-3. `cd ios` then run `pod install`.
-4. The Native Catalog app is now ready to launch. From `samples/NativeCatalog` directory run `react-native run-ios`.
+- A [development environment](https://reactnative.dev/docs/environment-setup) for running React Native projects using the React Native CLI (not the Expo CLI).
+- The [latest stable version of Xcode](https://apps.apple.com/us/app/xcode/id497799835?mt=12).
+- The [latest stable version of CocoaPods](https://github.com/CocoaPods/CocoaPods/releases). If you don’t already have CocoaPods installed, follow the [CocoaPods installation guide](https://guides.cocoapods.org/using/getting-started.html#installation) to install CocoaPods on your Mac.
+
+#### Getting Started
+
+1. Clone the repository: `git clone https://github.com/PSPDFKit/react-native.git`.
+2. Step into the `NativeCatalog` project's directory: `cd react-native/samples/NativeCatalog`.
+3. Install dependencies: run `yarn install`.
+4. `cd ios` then run `pod install`.
+5. Step back into the `NativeCatalog` project's directory: `cd ..`.
+6. The Native Catalog app is now ready to launch: `react-native run-ios`.
 
 ### Examples
 
