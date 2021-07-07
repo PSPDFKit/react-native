@@ -8,7 +8,7 @@ The project contains a large set of sample code, which illustrates how to set up
 
 - The [latest stable version of Android Studio](https://developer.android.com/studio).
 - The [Android NDK](https://developer.android.com/studio/projects/install-ndk).
-- An [Android Virtual Device](Android Virtual Device) or a hardware device.
+- An [Android Virtual Device](https://developer.android.com/studio/run/managing-avds.html) or a hardware device.
 - React Native 0.60.4.
 
 #### Getting Started

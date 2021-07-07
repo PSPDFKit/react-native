@@ -9,7 +9,7 @@ This second Catalog example serves to show you how you can leverage `PdfView` (A
 - A [development environment](https://reactnative.dev/docs/environment-setup) for running React Native projects using the React Native CLI (not the Expo CLI).
 - The [latest stable version of Android Studio](https://developer.android.com/studio).
 - The [Android NDK](https://developer.android.com/studio/projects/install-ndk).
-- An [Android Virtual Device](Android Virtual Device) or a hardware device.
+- An [Android Virtual Device](https://developer.android.com/studio/run/managing-avds.html) or a hardware device.
 
 #### Getting Started
 
