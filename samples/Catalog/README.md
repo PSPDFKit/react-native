@@ -38,7 +38,7 @@ The project contains a large set of sample code, which illustrates how to set up
 6. Step into the Catalog project's directory: `cd /samples/Catalog`
 7. Install dependencies: `yarn install` in `samples/Catalog` directory. (Because of a [bug](https://github.com/yarnpkg/yarn/issues/2165) you may need to clean `yarn`'s cache with `yarn cache clean` before.)
 8. Start the Metro bundler by running `react-native start`
-9. Run the app with `react-native-cli`: `react-native run-ios`
+9. Run the app with `react-native-cli`: `react-native run-ios --simulator="iPad Pro (12.9-inch) (5th generation)"`
 
 ### Troubleshooting
 
