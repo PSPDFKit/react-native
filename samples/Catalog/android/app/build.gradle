@@ -117,7 +117,7 @@ android {
     defaultConfig {
         applicationId "com.pspdfkit.react.catalog"
         multiDexEnabled true
-        minSdkVersion 19
+        minSdkVersion 21
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
