@@ -1,10 +1,14 @@
 ## Newest Release
 
+### 1.32.2 - 30 Aug 2021
+
+- Migrate from `ReactFragmentActivity` to `ReactActivity` for compatibility with React Native `0.65.1`. (#30771)
+
+## Previous Releases
+
 ### 1.32.1 - 06 Aug 2021
 
 - Adds missing `PSPDFSettingsOption` cases to the configuration for the iOS platform. (#30458)
-
-## Previous Releases
 
 ### 1.32.0 - 23 Jul 2021
 

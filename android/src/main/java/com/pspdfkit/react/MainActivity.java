@@ -13,9 +13,9 @@
 
 package com.pspdfkit.react;
 
-import com.facebook.react.ReactFragmentActivity;
+import com.facebook.react.ReactActivity;
 
-public class MainActivity extends ReactFragmentActivity {
+public class MainActivity extends ReactActivity {
 
     /**
      * Returns the name of the main component registered from JavaScript.
