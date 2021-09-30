@@ -187,6 +187,13 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
     }
 
     @ReactMethod
+    public void setLicenseKeys(@Nullable String androidLicenseKey, @Nullable String iOSLicenseKey) {
+        // Here, we ignore the `iOSLicenseKey` parameter and only care about `androidLicenseKey`.
+        // `iOSLicenseKey` will be used to activate the license on iOS.
+        PSPDFKit.initialize(getReactApplicationContext().getApplicationContext(), androidLicenseKey);
+    }
+
+    @ReactMethod
     public void processAnnotations(@NonNull final String processingMode,
                                    @Nullable final String annotationType,
                                    @NonNull final String sourceDocumentPath,

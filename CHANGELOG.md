@@ -1,10 +1,20 @@
 ## Newest Release
 
+### 2.0.0 - 28 Sep 2021
+
+- Adds the ability to open TIFF images as Image Documents. (#30103)
+- Adds a `setLicenseKeys` method which accepts both Android and iOS license keys. (#30943)
+- Adds support for iOS 15. (#31008)
+- PSPDFKit now requires React Native 0.65.1 or later. (#30947)
+- PSPDFKit now requires Xcode 13 or later. (#31008)
+- Updates `peerDependencies` and `devDependencies` in `package.json`. (#30947)
+- Overhauls the Catalog and NativeCatalog example projects to use the newest version of React Native. (#29342)
+
+## Previous Releases
+
 ### 1.32.2 - 30 Aug 2021
 
 - Migrate from `ReactFragmentActivity` to `ReactActivity` for compatibility with React Native `0.65.1`. (#30771)
-
-## Previous Releases
 
 ### 1.32.1 - 06 Aug 2021
 

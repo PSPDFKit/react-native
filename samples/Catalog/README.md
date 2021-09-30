@@ -6,39 +6,35 @@ The project contains a large set of sample code, which illustrates how to set up
 
 #### Requirements
 
+- A [development environment](https://reactnative.dev/docs/environment-setup) for running React Native projects using the React Native CLI (not the Expo CLI).
 - The [latest stable version of Android Studio](https://developer.android.com/studio).
 - The [Android NDK](https://developer.android.com/studio/projects/install-ndk).
 - An [Android Virtual Device](https://developer.android.com/studio/run/managing-avds.html) or a hardware device.
-- React Native 0.60.4.
 
 #### Getting Started
 
-1. Clone the repository: `git clone https://github.com/PSPDFKit/react-native.git`.
+1. Clone the repository: `git clone https://github.com/PSPDFKit/react-native.git`
 2. Step into the Catalog project's directory: `cd react-native/samples/Catalog`
-3. Install dependencies: run `yarn install`.
-4. [Start your emulator](https://developer.android.com/studio/run/emulator#runningemulator).
-5. Start the Metro bundler by running `react-native start`.
-6. Catalog app is now ready to launch. From `samples/Catalog` directory run `react-native run-android`.
+3. Install dependencies: `yarn install`
+4. The Catalog app is now ready to launch: `react-native run-android`
 
 ### Running the Catalog on iOS
 
 #### Requirements
 
-- The latest [Xcode](https://developer.apple.com/xcode/).
-- the latest version of PSPDFKit for iOS.
-- React Native 0.60.4.
+- A [development environment](https://reactnative.dev/docs/environment-setup) for running React Native projects using the React Native CLI (not the Expo CLI).
+- The latest [stable version of Xcode](https://apps.apple.com/us/app/xcode/id497799835?mt=12).
+- The [latest stable version of CocoaPods](https://github.com/CocoaPods/CocoaPods/releases). If you don’t already have CocoaPods installed, follow the [CocoaPods installation guide](https://guides.cocoapods.org/using/getting-started.html#installation) to install CocoaPods on your Mac.
 
 #### Getting Started
 
-1. Clone the repository: `git clone https://github.com/PSPDFKit/react-native.git`.
-2. Step into your newly cloned folder: `cd react-native`  
-3. Create a new `PSPDFKit` directory: `mkdir PSPDFKit`.
-4. [Download the latest version of PSPDFKit for iOS](https://customers.pspdfkit.com/download/binary/ios/latest) and mount the DMG file.
-5. Copy `PSPDFKit.xcframework` and `PSPDFKitUI.xcframework` into the `PSPDFKit` directory.
-6. Step into the Catalog project's directory: `cd /samples/Catalog`
-7. Install dependencies: `yarn install` in `samples/Catalog` directory. (Because of a [bug](https://github.com/yarnpkg/yarn/issues/2165) you may need to clean `yarn`'s cache with `yarn cache clean` before.)
-8. Start the Metro bundler by running `react-native start`
-9. Run the app with `react-native-cli`: `react-native run-ios --simulator="iPad Pro (12.9-inch) (5th generation)"`
+1. Clone the repository: `git clone https://github.com/PSPDFKit/react-native.git`
+2. Step into the Catalog project's directory: `cd react-native/samples/Catalog`
+3. Install dependencies: `yarn install`
+4. Go to the iOS folder: `cd iOS`
+5. Install the iOS pods: `pod install`
+6. Go back to the Catalog directory: `cd ..`
+7. The Catalog app is now ready to launch: `react-native run-ios`
 
 ### Troubleshooting
 

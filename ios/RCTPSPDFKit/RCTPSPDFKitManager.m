@@ -29,6 +29,13 @@ RCT_REMAP_METHOD(setLicenseKey, setLicenseKey:(nullable NSString *)licenseKey re
   resolve(@(YES));
 }
 
+RCT_REMAP_METHOD(setLicenseKeys, setLicenseKeys:(nullable NSString *)androidLicenseKey iOSLicenseKey:(nullable NSString *)iOSLicenseKey resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+  // Here, we ignore the `androidLicenseKey` parameter and only care about `iOSLicenseKey`.
+  // `androidLicenseKey` will be used to activate the license on Android.
+  [PSPDFKitGlobal setLicenseKey:iOSLicenseKey];
+  resolve(@(YES));
+}
+
 RCT_REMAP_METHOD(present, present:(PSPDFDocument *)document withConfiguration:(PSPDFConfiguration *)configuration resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   PSPDFViewController *pdfViewController = [[PSPDFViewController alloc] initWithDocument:document configuration:configuration];
   UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:pdfViewController];

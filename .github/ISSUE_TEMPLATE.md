@@ -1,5 +1,3 @@
 # Details
 
-
 # Acceptance Criteria
-

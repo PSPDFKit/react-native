@@ -1,7 +1,7 @@
 {
   "name": "react-native-pspdfkit",
-  "version": "1.32.2",
-  "description": "A React Native module for the PSPDFKit library.",
+  "version": "2.0.0",
+  "description": "React Native PDF Library by PSPDFKit",
   "keywords": [
     "react native",
     "pspdfkit",
@@ -21,12 +21,12 @@
     "format": "prettier \"{samples/**/*.{md,js},*.{md,js}}\" --write"
   },
   "peerDependencies": {
-    "prop-types": ">= 15.6.2 < 16",
-    "react": ">= 16.8.6 < 17",
-    "react-native": ">= 0.63.2 < 1"
+    "prop-types": "^15.7.2",
+    "react": "^17.0.2",
+    "react-native": "^0.65.1"
   },
   "dependencies": {},
   "devDependencies": {
-    "prettier": "^1.14.3"
+    "prettier": "^2.4.1"
   }
 }

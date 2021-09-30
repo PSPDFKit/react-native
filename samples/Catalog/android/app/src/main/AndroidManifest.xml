@@ -1,53 +1,24 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
-  ~ AndroidManifest.xml
-  ~
-  ~   PSPDFKit
-  ~
-  ~   Copyright © 2017-2021 PSPDFKit GmbH. All rights reserved.
-  ~
-  ~   THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
-  ~   AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
-  ~   UNAUTHORIZED REPRODUCTION OR DISTRIBUTION IS SUBJECT TO CIVIL AND CRIMINAL PENALTIES.
-  ~   This notice may not be removed from this file.
-  -->
-
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.pspdfkit.react.catalog"
-    android:versionCode="1"
-    android:versionName="1.0">
+  package="com.catalog">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-    <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.VIBRATE"/>
 
     <application
-        android:name=".MainApplication"
-        android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name">
-        <activity
-            android:name=".MainActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
-            android:label="@string/app_name"
-            android:theme="@style/PSPDFCatalog.Theme.Light">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name="com.pspdfkit.react.test.TestActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
-            android:label="@string/app_name"
-            android:theme="@style/PSPDFCatalog.Theme.Light">
-        </activity>
-        <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
-
-        <meta-data
-            android:name="pspdfkit_license_key"
-            android:value="YOUR_LICENSE_KEY_GOES_HERE"/>
+      android:name=".MainApplication"
+      android:label="@string/app_name"
+      android:icon="@mipmap/ic_launcher"
+      android:allowBackup="false"
+      android:theme="@style/AppTheme">
+      <activity
+        android:name=".MainActivity"
+        android:label="@string/app_name"
+        android:configChanges="keyboard|keyboardHidden|orientation|screenSize|uiMode"
+        android:launchMode="singleTask"
+        android:windowSoftInputMode="adjustResize">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+      </activity>
     </application>
-
 </manifest>

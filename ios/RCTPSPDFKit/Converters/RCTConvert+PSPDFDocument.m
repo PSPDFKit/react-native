@@ -21,7 +21,7 @@
   }
 
   NSString *fileExtension = url.pathExtension.lowercaseString;
-  BOOL isImageFile = [fileExtension isEqualToString:@"png"] || [fileExtension isEqualToString:@"jpeg"] || [fileExtension isEqualToString:@"jpg"];
+  BOOL isImageFile = [fileExtension isEqualToString:@"png"] || [fileExtension isEqualToString:@"jpeg"] || [fileExtension isEqualToString:@"jpg"] || [fileExtension isEqualToString:@"tiff"] || [fileExtension isEqualToString:@"tif"];
   if (isImageFile) {
     return [[PSPDFImageDocument alloc] initWithImageURL:url];
   } else {
