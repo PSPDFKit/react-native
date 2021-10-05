@@ -1,5 +1,11 @@
 ## Newest Release
 
+### 2.0.1 - 05 Oct 2021
+
+- Re-add Java 8 language features. (#31288)
+
+## Previous Releases
+
 ### 2.0.0 - 28 Sep 2021
 
 - Adds the ability to open TIFF images as Image Documents. (#30103)
@@ -9,8 +15,6 @@
 - PSPDFKit now requires Xcode 13 or later. (#31008)
 - Updates `peerDependencies` and `devDependencies` in `package.json`. (#30947)
 - Overhauls the Catalog and NativeCatalog example projects to use the newest version of React Native. (#29342)
-
-## Previous Releases
 
 ### 1.32.2 - 30 Aug 2021
 
