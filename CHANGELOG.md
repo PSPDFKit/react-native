@@ -1,10 +1,15 @@
 ## Newest Release
 
+### 2.0.2 - 07 Oct 2021
+
+- Update to PSPDFKit for Android 8.
+- PSPDFKit now requires React Native 0.66.0 or later. (#31348)
+
+## Previous Releases
+
 ### 2.0.1 - 05 Oct 2021
 
 - Re-add Java 8 language features. (#31288)
-
-## Previous Releases
 
 ### 2.0.0 - 28 Sep 2021
 

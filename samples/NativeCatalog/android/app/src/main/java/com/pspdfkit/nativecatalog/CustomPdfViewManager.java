@@ -40,6 +40,7 @@ import com.pspdfkit.nativecatalog.events.DocumentWatermarkedEvent;
 import com.pspdfkit.react.menu.ReactGroupingRule;
 import com.pspdfkit.signatures.Signature;
 import com.pspdfkit.signatures.SignatureManager;
+import com.pspdfkit.signatures.listeners.OnSignaturePickedListener;
 import com.pspdfkit.signatures.signers.InteractiveSigner;
 import com.pspdfkit.signatures.signers.Pkcs12Signer;
 import com.pspdfkit.signatures.signers.Signer;
@@ -234,7 +235,7 @@ public class CustomPdfViewManager extends SimpleViewManager<PdfView> {
                 // We have an element with the name EMPLOYEE SIGNATURE in the document. Grab a reference here.
                 SignatureFormElement signatureFormElement = (SignatureFormElement) document.getFormProvider().getFormElementWithName("EMPLOYEE SIGNATURE");
                 // Now we can display the signature picker.
-                SignaturePickerFragment.show(pdfFragment.getFragmentManager(), new SignaturePickerFragment.OnSignaturePickedListener() {
+                SignaturePickerFragment.show(pdfFragment.getParentFragmentManager(), new OnSignaturePickedListener() {
                         @Override
                         public void onSignaturePicked(@NonNull Signature signature) {
                             // We want to place the ink annotation on top of the signature field. We retrieve the widget annotation to access its position.
@@ -279,7 +280,7 @@ public class CustomPdfViewManager extends SimpleViewManager<PdfView> {
 
             // Show the signer dialog that handles the signing process.
             SignatureSignerDialog.show(
-                pdfFragment.getFragmentManager(),
+                pdfFragment.getParentFragmentManager(),
                 new SignatureSignerDialog.Options.Builder(
                     pdfFragment.getDocument(),
                     signatureFormElement.getFormField(),
