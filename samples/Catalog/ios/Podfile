@@ -16,7 +16,7 @@ target 'Catalog' do
     inherit! :complete
     # Pods for testing
   end
-  pod 'PSPDFKit', podspec: 'https://customers.pspdfkit.com/pspdfkit-ios/latest.podspec'
+  pod 'PSPDFKit', '~> 11.1.0'
   # Enables Flipper.
   #
   # Note that if you have use_frameworks! enabled, Flipper will not work and

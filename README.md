@@ -1,4 +1,4 @@
-## React Native Library for PSPDFKit for iOS, Android & Windows UWP. (PDF SDK for React Native)
+# React Native Library for PSPDFKit for iOS, Android & Windows UWP. (PDF SDK for React Native)
 
 ![PDF SDK for React Native](https://github.com/PSPDFKit/react-native/blob/master/article-header.png?raw=true)
 
@@ -8,7 +8,7 @@ PSPDFKit for React Native exposes the most often used APIs from PSPDFKit. Many o
 
 Windows is not currently supported, please use the previous version [1.24.9](https://github.com/PSPDFKit/react-native/releases/tag/1.24.9) instead.
 
-#### Announcements
+### Announcements
 
 - [Announcement blog post](https://pspdfkit.com/blog/2016/react-native-module/)
 - [React Native UI Component for iOS](https://pspdfkit.com/blog/2018/react-native-ui-component-for-ios/) ([See iOS](https://github.com/PSPDFKit/react-native#ios))
@@ -22,13 +22,13 @@ Windows is not currently supported, please use the previous version [1.24.9](htt
 - [How to Bridge Native iOS Code to React Native](https://pspdfkit.com/blog/2020/how-to-bridge-native-ios-code-to-react-native/)
 - [How to Open a PDF in React Native Using the Document Picker](https://pspdfkit.com/blog/2021/how-to-open-a-pdf-in-react-native-using-the-document-browser/)
 
-#### PSPDFKit
+### PSPDFKit
 
 The [PSPDFKit SDK](https://pspdfkit.com/) is a framework that allows you to view, annotate, sign, and fill PDF forms on iOS, Android, Windows, macOS, and Web.
 
 [PSPDFKit Instant](https://pspdfkit.com/instant) adds real-time collaboration features to seamlessly share, edit, and annotate PDF documents.
 
-## Support, Issues and License Questions
+# Support, Issues and License Questions
 
 PSPDFKit offers support for customers with an active SDK license via https://pspdfkit.com/support/request/
 
@@ -49,15 +49,15 @@ To set the license key for the currently running platform, use:
 PSPDFKit.setLicenseKey("YOUR_REACT_NATIVE_LICENSE_KEY_GOES_HERE");
 ```
 
-### iOS
+## iOS
 
-#### Requirements
+### Requirements
 
 - A [development environment](https://reactnative.dev/docs/environment-setup) for running React Native projects using the React Native CLI (not the Expo CLI)
 - The [latest stable version of Xcode](https://apps.apple.com/us/app/xcode/id497799835?mt=12)
 - The [latest stable version of CocoaPods](https://github.com/CocoaPods/CocoaPods/releases). If you don’t already have CocoaPods installed, follow the [CocoaPods installation guide](https://guides.cocoapods.org/using/getting-started.html#installation) to install CocoaPods on your Mac.
 
-#### Getting Started
+### Getting Started
 
 Let's create a simple app that integrates PSPDFKit and uses the `react-native-pspdfkit` module.
 
@@ -211,7 +211,7 @@ Let's create a simple app that integrates PSPDFKit and uses the `react-native-ps
    react-native run-ios
    ```
 
-### Usage
+## Usage
 
 There are 2 different ways on how to use PSPDFKit for React Native on iOS.
 
@@ -220,7 +220,7 @@ There are 2 different ways on how to use PSPDFKit for React Native on iOS.
 
 Depending on your needs you might want to use one or the other.
 
-### Native Module
+## Native Module
 
 Using the Native Module `PSPDFKit.present()`, you can present a document with PSPDFKit modally in fullscreen.
 You can specify the path to the document you want to present, and [configuration options](#configuration).
@@ -250,7 +250,7 @@ export default class App extends Component<{}> {
 }
 ```
 
-### Native UI Component
+## Native UI Component
 
 With `PSPDFKitView` you can use PSPDFKit like any other React component in your app.
 Using this approach, you have more flexibility over how a document is presented and displayed.
@@ -283,7 +283,7 @@ export default class App extends Component<{}> {
 }
 ```
 
-#### Configuration
+### Configuration
 
 You can configure the presentation with a configuration dictionary which is a mirror of the [`PSPDFConfiguration`](https://pspdfkit.com/api/ios/Classes/PSPDFConfiguration.html) class.
 
@@ -310,21 +310,21 @@ Example - Native UI Component:
 />
 ```
 
-#### Running the Catalog Project
+### Running the Catalog Project
 
 Take a look at the [instructions to get started here](/samples/Catalog/README.md#running-the-catalog-on-ios).
 
-#### Running the Native Catalog
+### Running the Native Catalog
 
 Take a look at the [instructions to get started here](/samples/NativeCatalog/README.md#running-this-sample-on-ios).
 
-#### Running on Mac Catalyst
+### Running on Mac Catalyst
 
 Using PSPDFKit for React Native on Mac Catalyst does not currently work due to a [Flipper and FlipperKit issue](https://github.com/facebook/react-native/issues/28810).
 
 If you wish to run your project on Mac Catalyst, please try the [following workaround which removes everything related to Flipper and FlipperKit](https://github.com/facebook/react-native/issues/28810#issuecomment-623357732).
 
-#### Configuration Mapping
+### Configuration Mapping
 
 On iOS, PSPDFKit for React Native iOS maps most configuration options available in `PSPDFConfiguration` from JSON. Please refer to [`RCTConvert+PSPDFConfiguration.m`](./ios/RCTPSPDFKit/Converters/RCTConvert+PSPDFConfiguration.m#L267) for the complete list and for the exact naming of enum values.
 
@@ -334,7 +334,7 @@ Annotations are mapped based on their type name. This is case sensitive. For exa
 editableAnnotationTypes: ["Ink", "Highlight"];
 ```
 
-#### Menu Item Mapping
+### Menu Item Mapping
 
 On iOS, PSPDFKit for React Native allows you to specify a custom grouping for the annotation creation toolbar. Please refer to [`RCTConvert+PSPDFAnnotationToolbarConfiguration.m`](./ios/RCTPSPDFKit/Converters/RCTConvert+PSPDFAnnotationToolbarConfiguration.m#L47) for the complete list of menu items. To set them just specify the `menuItemGrouping` prop on the `PSPDFKitView`. The format used is as follows:
 
@@ -346,7 +346,7 @@ On iOS, PSPDFKit for React Native allows you to specify a custom grouping for th
 ]
 ```
 
-#### Customize the Toolbar Buttons
+### Customize the Toolbar Buttons
 
 You can customize the toolbar buttons on the Native UI View component by specifying the toolbar buttons using `setLeftBarButtonItems` and `setRightBarButtonItems`, like so:
 
@@ -364,7 +364,7 @@ Also, please take a look at the [ToolbarCustomization example from our Catalog a
 
 For a more detailed description of toolbar customizations, refer to our Customizing the Toolbar guide for [iOS](https://pspdfkit.com/guides/ios/current/customizing-the-interface/customizing-the-toolbar/) and [Android](https://pspdfkit.com/guides/android/current/customizing-the-interface/customizing-the-toolbar/).
 
-#### Process Annotations
+### Process Annotations
 
 PSPDFKit for React Native allows you to create a new document with processed (embedded, flattenned, removed, or printed) annotations on Android and iOS using the `PSPDFKit.processAnnotations(annotationChange, annotationType, sourceDocumentPath, processedDocumentPath)` function. In the snippet below, we add a button which flattens all the annotations of the document from the currently displayed `PSPDFKitView` in a newly processed PDF file:
 
@@ -416,16 +416,16 @@ PSPDFKit for React Native allows you to create a new document with processed (em
 
 For a runnable example, please take a look at the [AnnotationProcessing example from our Catalog app](./samples/Catalog/Catalog.ios.js#L1032).
 
-### Android
+## Android
 
-#### Requirements
+### Requirements
 
 - A [development environment](https://reactnative.dev/docs/environment-setup) for running React Native projects using the React Native CLI (not the Expo CLI)
 - The [latest stable version of Android Studio](https://developer.android.com/studio)
 - The [Android NDK](https://developer.android.com/studio/projects/install-ndk)
 - An [Android Virtual Device](https://developer.android.com/studio/run/managing-avds.html) or a hardware device
 
-#### Getting Started
+### Getting Started
 
 Let's create a simple app that integrates PSPDFKit and uses the `react-native-pspdfkit` module.
 
@@ -555,17 +555,17 @@ Let's create a simple app that integrates PSPDFKit and uses the `react-native-ps
    react-native run-android
    ```
 
-#### Running the Catalog Project
+### Running the Catalog Project
 
 Take a look at the [instructions to get started here](/samples/Catalog/README.md#running-the-catalog-on-android).
 
-#### Running the Native Catalog
+### Running the Native Catalog
 
 Take a look at the [instructions to get started here](/samples/NativeCatalog/README.md#running-this-sample-on-android).
 
-#### Configuration
+### Configuration
 
-##### Upload PDF to device
+#### Upload PDF to device
 
 To copy a pdf document to your local device storage:
 
@@ -573,11 +573,11 @@ To copy a pdf document to your local device storage:
 adb push "document.pdf" "/sdcard/document.pdf"
 ```
 
-##### Bundle PDF inside the APK's assets
+#### Bundle PDF inside the APK's assets
 
 To bundle a pdf document in the Android app, simply copy it the Android `assets` folder, for the Catalog app is `samples/PDFs`.
 
-##### Viewer options
+#### Viewer options
 
 You can configure the builder with a dictionary representation of the PSPDFConfiguration object. Check [`ConfigurationAdapter.java`](https://github.com/PSPDFKit/react-native/blob/master/android/src/main/java/com/pspdfkit/react/ConfigurationAdapter.java) for all the parameters available.
 
@@ -592,7 +592,7 @@ const CONFIGURATION = {
 };
 ```
 
-#### Native UI Component
+### Native UI Component
 
 Just like on iOS we also support integrating PSPDFKit directly into the react-native view hierarchy. There are a few thing you need to consider when using this approach:
 
@@ -600,7 +600,7 @@ Just like on iOS we also support integrating PSPDFKit directly into the react-na
 - Because of [issues](https://github.com/facebook/react-native/issues/17968) in react-native our `PdfView` needs to call `layout` and `dispatchOnGlobalLayout` on every frame, this might negatively affect your apps performance or even cause it to misbehave.
 - `PSPDFKitView` doesn't yet support all the features (outline, bookmarks, thubmnail grid, view settings) using `PSPDFKit.present` provides.
 
-##### Menu Item Mapping
+#### Menu Item Mapping
 
 On Android, PSPDFKit for React Native allows you to specify a custom grouping for the annotation creation toolbar. Please refer to [`ReactGroupingRule.java`](https://github.com/PSPDFKit/react-native/blob/master/android/src/main/java/com/pspdfkit/react/menu/ReactGroupingRule.java) for the complete list of menu items. To set them just specify the `menuItemGrouping` prop on the `PSPDFKitView`. The format used is as follows:
 
@@ -612,12 +612,12 @@ On Android, PSPDFKit for React Native allows you to specify a custom grouping fo
 ]
 ```
 
-#### Update
+### Update
 
 Upgrading yarn's lock file is required in order to update react-native-pspdfkit module in a project that has been already setup following the steps in [Getting Started](#getting-started-1) section.
 From root project folder (e.g.`YourApp` for upgrading example project) launch `yarn upgrade`.
 
-##### Migrate from PSPDFKit version 2.9.x to 3.0.0
+#### Migrate from PSPDFKit version 2.9.x to 3.0.0
 
 After launching `yarn upgrade`, apply [step 7](#step-7), [step 10](#step-10) and [step 12](#step-12) from [Getting Started](#getting-started-1) section.
 Enable MultiDex in `YourApp/android/app/build.gradle` (note **one** place to edit):
@@ -651,7 +651,7 @@ In `YourApp/android/settings.gradle` remove the old reference to `pspdfkit-lib` 
 -include ':pspdfkit-lib'
 ```
 
-##### Migrate from PSPDFKit version 3.3.3 to 4.0.x
+#### Migrate from PSPDFKit version 3.3.3 to 4.0.x
 
 After launching `yarn upgrade`, apply [step 6](#step-6), [step 8](#step-8) and [step 10](#step-10) from [Getting Started](#getting-started-1) section.
 Enable MultiDex in `YourApp/android/app/build.gradle` (note **four** place to edit):
@@ -680,26 +680,13 @@ defaultConfig {
 ...
 ```
 
-#### API
-
-##### Constants
-
-The following constants are available on the PSPDFKit export:
-
-- `versionString` (`String`) PSPDFKit version number.
-
-##### `present(document : string, configuration : readable map) : void`
-
-Shows the pdf `document` from the local device filesystem, or your app's assets.
-
-- `file:///sdcard/document.pdf` will open the document from local device filesystem.
-- `file:///android_asset/document.pdf` will open the document from your app's assets.
-
-`configuration` can be empty `{}`.
-
-### Windows UWP
+## Windows UWP
 
 Windows UWP is not currently supported on `master`, please follow the integration steps on the [`windows-support`](https://github.com/PSPDFKit/react-native/tree/windows-support#windows-uwp) branch.
+
+# Troubleshooting
+
+For Troubleshooting common issues you might encounter when setting up PSPDFKit for React Native, please refer to the [Troubleshooting](https://pspdfkit.com/guides/react-native/troubleshoot/) section.
 
 ## License
 

@@ -1,11 +1,18 @@
 ## Newest Release
 
-### 2.0.2 - 22 Oct 2021
+### 2.0.3 - 02 Nov 2021
+
+- PSPDFKit now requires React Native 0.66.1 or later. (#31744)
+- Updates for PSPDFKit 8.0.1 for Android. (#31744)
+- Updates for PSPDFKit 11.1 for iOS. (#31654)
+- Improves the repository's README. (#31633)
+
+## Previous Releases
+
+### 2.0.2 - 07 Oct 2021
 
 - Update to PSPDFKit for Android 8.
 - PSPDFKit now requires React Native 0.66.0 or later. (#31348)
-
-## Previous Releases
 
 ### 2.0.1 - 05 Oct 2021
 

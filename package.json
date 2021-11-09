@@ -1,6 +1,6 @@
 {
   "name": "react-native-pspdfkit",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "React Native PDF Library by PSPDFKit",
   "keywords": [
     "react native",
@@ -23,7 +23,7 @@
   "peerDependencies": {
     "prop-types": "^15.7.2",
     "react": "^17.0.2",
-    "react-native": "^0.66.0"
+    "react-native": "^0.66.1"
   },
   "dependencies": {},
   "devDependencies": {
