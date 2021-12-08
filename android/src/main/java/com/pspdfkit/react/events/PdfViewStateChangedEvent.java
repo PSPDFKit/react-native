@@ -75,6 +75,7 @@ public class PdfViewStateChangedEvent extends Event<PdfViewStateChangedEvent> {
         eventData.putInt("currentPageIndex", currentPageIndex);
         eventData.putInt("pageCount", pageCount);
         eventData.putBoolean("annotationCreationActive", annotationCreationActive);
+        eventData.putInt("affectedPageIndex", currentPageIndex);
         eventData.putBoolean("annotationEditingActive", annotationEditingActive);
         eventData.putBoolean("textSelectionActive", textSelectionActive);
         eventData.putBoolean("formEditingActive", formEditingActive);

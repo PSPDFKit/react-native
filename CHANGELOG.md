@@ -1,13 +1,20 @@
 ## Newest Release
 
+### 2.0.4 - 07 Dec 2021
+
+- Updates the Xcode build settings of the Catalog and Native Catalog example projects to work on iOS simulators on Apple Silicon Macs. (#32129)
+- Sets `currentPageIndex` in `onStateChanged` callbacks always to the currently visible page index. Also adds `affectedPageIndex` to get the page that is corresponding to the other states in the callback. (#31926)
+- PSPDFKit now requires React Native 0.66.3 or later.  (#32119)
+- Updates for PSPDFKit 8.0.2 for Android. (#32119)
+
+## Previous Releases
+
 ### 2.0.3 - 02 Nov 2021
 
 - PSPDFKit now requires React Native 0.66.1 or later. (#31744)
 - Updates for PSPDFKit 8.0.1 for Android. (#31744)
 - Updates for PSPDFKit 11.1 for iOS. (#31654)
 - Improves the repository's README. (#31633)
-
-## Previous Releases
 
 ### 2.0.2 - 07 Oct 2021
 

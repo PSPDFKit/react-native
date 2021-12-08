@@ -36,6 +36,8 @@
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(annotationChangedNotification:) name:PSPDFAnnotationChangedNotification object:nil];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(annotationChangedNotification:) name:PSPDFAnnotationsAddedNotification object:nil];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(annotationChangedNotification:) name:PSPDFAnnotationsRemovedNotification object:nil];
+
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(spreadIndexDidChange:) name:PSPDFDocumentViewControllerSpreadIndexDidChangeNotification object:nil];
   }
   
   return self;
@@ -385,7 +387,15 @@
   }
 }
 
-#pragma mark - Customize the Toolbar
+- (void)spreadIndexDidChange:(NSNotification *)notification {
+    PSPDFDocumentViewController *documentViewController = self.pdfController.documentViewController;
+    if (notification.object != documentViewController) { return; }
+    PSPDFPageIndex pageIndex = [documentViewController.layout pageRangeForSpreadAtIndex:documentViewController.spreadIndex].location;
+    PSPDFPageView *pageView = [self.pdfController pageViewForPageAtIndex:pageIndex];
+    [self onStateChangedForPDFViewController:self.pdfController pageView:pageView pageAtIndex:pageIndex];
+}
+
+// MARK: - Customize the Toolbar
 
 - (void)setLeftBarButtonItems:(nullable NSArray <NSString *> *)items forViewMode:(nullable NSString *) viewMode animated:(BOOL)animated {
   NSMutableArray *leftItems = [NSMutableArray array];
@@ -459,9 +469,10 @@
     }
     
     self.onStateChanged(@{@"documentLoaded" : @(isDocumentLoaded),
-                          @"currentPageIndex" : @(pageIndex),
+                          @"currentPageIndex" : @(pdfController.pageIndex),
                           @"pageCount" : @(pageCount),
                           @"annotationCreationActive" : @(isAnnotationToolBarVisible),
+                          @"affectedPageIndex": @(pageIndex),
                           @"annotationEditingActive" : @(hasSelectedAnnotations),
                           @"textSelectionActive" : @(hasSelectedText),
                           @"formEditingActive" : @(isFormEditingActive)
