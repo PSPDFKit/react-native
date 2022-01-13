@@ -1,5 +1,5 @@
 //
-//  Copyright © 2018-2021 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2018-2022 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -136,7 +136,7 @@
   return [self.pdfController.document saveWithOptions:nil error:error];
 }
 
-#pragma mark - PSPDFDocumentDelegate
+// MARK: - PSPDFDocumentDelegate
 
 - (void)pdfDocumentDidSave:(nonnull PSPDFDocument *)document {
   if (self.onDocumentSaved) {
@@ -150,7 +150,7 @@
   }
 }
 
-#pragma mark - PSPDFViewControllerDelegate
+// MARK: - PSPDFViewControllerDelegate
 
 - (BOOL)pdfViewController:(PSPDFViewController *)pdfController didTapOnAnnotation:(PSPDFAnnotation *)annotation annotationPoint:(CGPoint)annotationPoint annotationView:(UIView<PSPDFAnnotationPresenting> *)annotationView pageView:(PSPDFPageView *)pageView viewPoint:(CGPoint)viewPoint {
   if (self.onAnnotationTapped) {
@@ -177,7 +177,7 @@
   VALIDATE_DOCUMENT(document)
 }
 
-#pragma mark - PSPDFFlexibleToolbarContainerDelegate
+// MARK: - PSPDFFlexibleToolbarContainerDelegate
 
 - (void)flexibleToolbarContainerDidShow:(PSPDFFlexibleToolbarContainer *)container {
   PSPDFPageIndex pageIndex = self.pdfController.pageIndex;
@@ -191,7 +191,7 @@
   [self onStateChangedForPDFViewController:self.pdfController pageView:pageView pageAtIndex:pageIndex];
 }
 
-#pragma mark - Instant JSON
+// MARK: - Instant JSON
 
 - (NSDictionary<NSString *, NSArray<NSDictionary *> *> *)getAnnotations:(PSPDFPageIndex)pageIndex type:(PSPDFAnnotationType)type error:(NSError *_Nullable *)error {
   PSPDFDocument *document = self.pdfController.document;
@@ -295,7 +295,7 @@
   return success;
 }
 
-#pragma mark - Forms
+// MARK: - Forms
 
 - (NSDictionary<NSString *, id> *)getFormFieldValue:(NSString *)fullyQualifiedName {
   if (fullyQualifiedName.length == 0) {
@@ -355,7 +355,7 @@
   return success;
 }
 
-#pragma mark - Notifications
+// MARK: - Notifications
 
 - (void)annotationChangedNotification:(NSNotification *)notification {
   id object = notification.object;
@@ -451,7 +451,7 @@
   return [self buttonItemsStringFromUIBarButtonItems:items];
 }
 
-#pragma mark - Helpers
+// MARK: - Helpers
 
 - (void)onStateChangedForPDFViewController:(PSPDFViewController *)pdfController pageView:(PSPDFPageView *)pageView pageAtIndex:(NSInteger)pageIndex {
   if (self.onStateChanged) {

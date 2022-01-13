@@ -1,4 +1,4 @@
-//  Copyright © 2018-2021 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2018-2022 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -642,8 +642,8 @@ PSPDFKitView.propTypes = {
   rightBarButtonItems: PropTypes.array,
   /**
    * toolbarTitle: Can be used to specfiy a custom toolbar title on iOS by setting the `title` property of the `PSPDFViewController`.
-   * Note: You need to set `showDocumentLabel`, `useParentNavigationBar`, and `allowToolbarTitleChange` to false in your Configuration before setting the custom title.
-   * See `ConfiguredPDFViewComponent` in https://github.com/PSPDFKit/react-native/blob/master/samples/Catalog/Catalog.ios.js
+   * Note: You need to set `documentLabelEnabled`, `useParentNavigationBar`, and `allowToolbarTitleChange` to false in your Configuration before setting the custom title.
+   * See `ConfiguredPDFViewComponent` in https://github.com/PSPDFKit/react-native/blob/master/samples/Catalog/Catalog.js
    *
    * @platform ios
    */
@@ -664,7 +664,7 @@ PSPDFKitView.propTypes = {
    * availableFontNames: Can be used to specfiy the available font names in the font picker.
    *
    * Note on iOS: You need to set the desired font family names as `UIFontDescriptor`. See https://developer.apple.com/documentation/uikit/uifontdescriptor?language=objc
-   * See `CustomFontPicker` in https://github.com/PSPDFKit/react-native/blob/master/samples/Catalog/Catalog.ios.js
+   * See `CustomFontPicker` in https://github.com/PSPDFKit/react-native/blob/master/samples/Catalog/Catalog.js
    *
    */
   availableFontNames: PropTypes.array,
@@ -672,14 +672,14 @@ PSPDFKitView.propTypes = {
    * selectedFontName: Can be used to specfiy the current selected font in the font picker.
    *
    * Note on iOS: You need to set the desired font family name as `UIFontDescriptor`. See https://developer.apple.com/documentation/uikit/uifontdescriptor?language=objc
-   * See `CustomFontPicker` in https://github.com/PSPDFKit/react-native/blob/master/samples/Catalog/Catalog.ios.js
+   * See `CustomFontPicker` in https://github.com/PSPDFKit/react-native/blob/master/samples/Catalog/Catalog.js
    *
    * Note on Android: This is the default font that is selected, if the users changes the font that will become the new default.
    */
   selectedFontName: PropTypes.string,
   /**
    * showDownloadableFonts: Can be used to show or hide the downloadable fonts section in the font picker. Defaults to showing a the downloadable fonts (true).
-   * See `CustomFontPicker` in https://github.com/PSPDFKit/react-native/blob/master/samples/Catalog/Catalog.ios.js
+   * See `CustomFontPicker` in https://github.com/PSPDFKit/react-native/blob/master/samples/Catalog/Catalog.js
    *
    * @platform ios
    */

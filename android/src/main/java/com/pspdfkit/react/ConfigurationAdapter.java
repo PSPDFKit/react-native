@@ -3,7 +3,7 @@
  *
  *   PSPDFKit
  *
- *   Copyright © 2017-2021 PSPDFKit GmbH. All rights reserved.
+ *   Copyright © 2017-2022 PSPDFKit GmbH. All rights reserved.
  *
  *   THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
  *   AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -31,6 +31,7 @@ import com.pspdfkit.configuration.page.PageLayoutMode;
 import com.pspdfkit.configuration.page.PageScrollDirection;
 import com.pspdfkit.configuration.page.PageScrollMode;
 import com.pspdfkit.configuration.sharing.ShareFeatures;
+import com.pspdfkit.configuration.signatures.SignatureSavingStrategy;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -41,157 +42,271 @@ public class ConfigurationAdapter {
 
     private static final String LOG_TAG = "ConfigurationAdapter";
 
-    private static final String PAGE_SCROLL_DIRECTION = "pageScrollDirection";
+    // Document Interaction Options
+    private static final String SCROLL_DIRECTION = "scrollDirection";
     private static final String PAGE_SCROLL_DIRECTION_HORIZONTAL = "horizontal";
     private static final String PAGE_SCROLL_DIRECTION_VERTICAL = "vertical";
-    private static final String PAGE_SCROLL_CONTINUOUS = "scrollContinuously";
-    private static final String FIT_PAGE_TO_WIDTH = "fitPageToWidth";
-    private static final String IMMERSIVE_MODE = "immersiveMode";
-    private static final String USER_INTERFACE_VIEW_MODE = "userInterfaceViewMode";
-    private static final String USER_INTERFACE_VIEW_MODE_AUTOMATIC = "automatic";
-    private static final String USER_INTERFACE_VIEW_MODE_AUTOMATIC_BORDER_PAGES = "automaticBorderPages";
-    private static final String USER_INTERFACE_VIEW_MODE_ALWAYS_VISIBLE = "alwaysVisible";
-    private static final String USER_INTERFACE_VIEW_MODE_ALWAYS_HIDDEN = "alwaysHidden";
-    private static final String SHOW_SEARCH_ACTION = "showSearchAction";
-    private static final String INLINE_SEARCH = "inlineSearch";
-    private static final String SHOW_THUMBNAIL_BAR = "showThumbnailBar";
-    private static final String SHOW_THUMBNAIL_BAR_DEFAULT = "default";
-    private static final String SHOW_THUMBNAIL_BAR_SCROLLABLE = "scrollable";
-    private static final String SHOW_THUMBNAIL_BAR_FLOATING = "floating";
-    private static final String SHOW_THUMBNAIL_BAR_PINNED = "pinned";
-    private static final String SHOW_THUMBNAIL_BAR_NONE = "none";
-    private static final String SHOW_THUMBNAIL_GRID_ACTION = "showThumbnailGridAction";
-    private static final String SHOW_OUTLINE_ACTION = "showOutlineAction";
-    private static final String SHOW_BOOKMARKS_ACTION = "showBookmarksAction";
-    private static final String SHOW_ANNOTATION_LIST_ACTION = "showAnnotationListAction";
-    private static final String SHOW_PAGE_NUMBER_OVERLAY = "showPageNumberOverlay";
-    private static final String SHOW_PAGE_LABELS = "showPageLabels";
-    private static final String INVERT_COLORS = "invertColors";
-    private static final String GRAY_SCALE = "grayScale";
-    private static final String START_PAGE = "startPage";
-    private static final String ENABLE_ANNOTATION_EDITING = "enableAnnotationEditing";
+    private static final String PAGE_TRANSITION = "pageTransition";
+    private static final String PAGE_TRANSITION_PER_SPREAD = "scrollPerSpread";
+    private static final String PAGE_TRANSITION_CONTINUOUS = "scrollContinuous";
     private static final String ENABLE_TEXT_SELECTION = "enableTextSelection";
-    private static final String ENABLE_FORM_EDITING = "enableFormEditing";
-    private static final String SHOW_SHARE_ACTION = "showShareAction";
-    private static final String SHOW_PRINT_ACTION = "showPrintAction";
-    private static final String SHOW_DOCUMENT_INFO_VIEW = "showDocumentInfoView";
+    private static final String AUTOSAVE_ENABLED = "autosaveEnabled";
+    private static final String AUTOSAVE_DISABLED = "disableAutomaticSaving";
+    private static final String SIGNATURE_SAVING_STRATEGY = "signatureSavingStrategy";
+    private static final String SIGNATURE_SAVING_STRATEGY_ALWAYS = "alwaysSave";
+    private static final String SIGNATURE_SAVING_STRATEGY_NEVER = "neverSave";
+    private static final String SIGNATURE_SAVING_STRATEGY_IF_SELECTED = "saveIfSelected";
+
+    // Document Presentation Options
+    private static final String SHOW_PAGE_LABELS = "showPageLabels";
     private static final String SHOW_DOCUMENT_TITLE_OVERLAY = "documentLabelEnabled";
     private static final String PAGE_MODE = "pageMode";
     private static final String PAGE_MODE_SINGLE = "single";
     private static final String PAGE_MODE_DOUBLE = "double";
     private static final String PAGE_MODE_AUTO = "automatic";
     private static final String FIRST_PAGE_ALWAYS_SINGLE = "firstPageAlwaysSingle";
-    private static final String AUTOSAVE_DISABLED = "disableAutomaticSaving";
-    private static final String ANNOTATION_EDITING_ENABLED = "enableAnnotationEditing";
-    private static final String EDITABLE_ANNOTATION_TYPES = "editableAnnotationTypes";
-    private static final String SHOW_SETTINGS_MENU = "showSettingsMenu";
+    private static final String SPREAD_FITTING = "spreadFitting";
+    private static final String SPREAD_FITTING_FIT = "fit";
+    private static final String SPREAD_FITTING_FILL = "fill";
+    private static final String INVERT_COLORS = "invertColors";
+    private static final String GRAY_SCALE = "grayScale";
+
+    // User Interface Options
+    private static final String USER_INTERFACE_VIEW_MODE = "userInterfaceViewMode";
+    private static final String USER_INTERFACE_VIEW_MODE_AUTOMATIC = "automatic";
+    private static final String USER_INTERFACE_VIEW_MODE_AUTOMATIC_BORDER_PAGES = "automaticBorderPages";
+    private static final String USER_INTERFACE_VIEW_MODE_AUTOMATIC_NO_FIRST_LAST_PAGE = "automaticNoFirstLastPage";
+    private static final String USER_INTERFACE_VIEW_MODE_ALWAYS = "always";
+    private static final String USER_INTERFACE_VIEW_MODE_ALWAYS_VISIBLE = "alwaysVisible";
+    private static final String USER_INTERFACE_VIEW_MODE_ALWAYS_HIDDEN = "alwaysHidden";
+    private static final String USER_INTERFACE_VIEW_MODE_NEVER = "never";
     private static final String TOOLBAR_TITLE = "toolbarTitle";
+    private static final String IMMERSIVE_MODE = "immersiveMode";
+    private static final String SHOW_SEARCH_ACTION = "showSearchAction";
+    private static final String INLINE_SEARCH = "inlineSearch";
+    private static final String SHOW_OUTLINE_ACTION = "showOutlineAction";
+    private static final String SHOW_BOOKMARKS_ACTION = "showBookmarksAction";
+    private static final String SHOW_SHARE_ACTION = "showShareAction";
+    private static final String SHOW_PRINT_ACTION = "showPrintAction";
+    private static final String SHOW_DOCUMENT_INFO_VIEW = "showDocumentInfoView";
+    private static final String SHOW_SETTINGS_MENU = "showSettingsMenu";
+
+    // Thumbnail Options
+    private static final String SHOW_THUMBNAIL_BAR = "showThumbnailBar";
+    private static final String SHOW_THUMBNAIL_BAR_NONE = "none";
+    private static final String SHOW_THUMBNAIL_BAR_DEFAULT = "default";
+    private static final String SHOW_THUMBNAIL_BAR_FLOATING = "floating";
+    private static final String SHOW_THUMBNAIL_BAR_SCRUBBERBAR = "scrubberBar";
+    private static final String SHOW_THUMBNAIL_BAR_PINNED = "pinned";
+    private static final String SHOW_THUMBNAIL_BAR_SCROLLABLE = "scrollable";
+    private static final String SHOW_THUMBNAIL_GRID_ACTION = "showThumbnailGridAction";
+
+    // Annotation, Forms and Bookmark Options
+    private static final String EDITABLE_ANNOTATION_TYPES = "editableAnnotationTypes";
+    private static final String ENABLE_ANNOTATION_EDITING = "enableAnnotationEditing";
+    private static final String ENABLE_FORM_EDITING = "enableFormEditing";
+    private static final String SHOW_ANNOTATION_LIST_ACTION = "showAnnotationListAction";
+    private static final String ANNOTATION_EDITING_ENABLED = "enableAnnotationEditing";
+
+    // Deprecated Options
+    /**
+     * @deprecated This key word was deprecated with PSPDFKit for React Native 2.1.
+     * Use {@code SCROLL_DIRECTION} instead, which replaces it.
+     */
+    @Deprecated
+    private static final String PAGE_SCROLL_DIRECTION = "pageScrollDirection";
+    /**
+     * @deprecated This key word was deprecated with PSPDFKit for React Native 2.1.
+     * Use {@code PAGE_TRANSITION} instead, which replaces it.
+     */
+    @Deprecated
+    private static final String PAGE_SCROLL_CONTINUOUS = "scrollContinuously";
+    /**
+     * @deprecated This key word was deprecated with PSPDFKit for React Native 2.1.
+     * Use {@code SHOW_PAGE_LABELS} instead, which replaces it.
+     */
+    @Deprecated
+    private static final String SHOW_PAGE_NUMBER_OVERLAY = "showPageNumberOverlay";
+    /**
+     * @deprecated This key word was deprecated with PSPDFKit for React Native 2.1.
+     * Use {@code SHOW_PAGE_LABELS} instead, which replaces it.
+     */
+    @Deprecated
+    private static final String PAGE_LABEL_ENABLED = "pageLabelEnabled";
+    /**
+     * @deprecated This key word was deprecated with PSPDFKit for React Native 2.1.
+     * Use {@code SPREAD_FITTING} instead, which replaces it.
+     */
+    @Deprecated
+    private static final String FIT_PAGE_TO_WIDTH = "fitPageToWidth";
+    /**
+     * @deprecated This key word was deprecated with PSPDFKit for React Native 2.1.
+     * Use {@code pageIndex} property on {@code PSPDFKitView} instead.
+     */
+    @Deprecated
+    private static final String START_PAGE = "startPage";
 
     private final PdfActivityConfiguration.Builder configuration;
 
-
-    public ConfigurationAdapter(@NonNull Context context, ReadableMap configuration) {
+    public ConfigurationAdapter(@NonNull final Context context, ReadableMap configuration) {
         ReadableMapKeySetIterator iterator = configuration.keySetIterator();
         boolean hasConfiguration = iterator.hasNextKey();
         this.configuration = new PdfActivityConfiguration.Builder(context);
         if (hasConfiguration) {
-            if (configuration.hasKey(PAGE_SCROLL_DIRECTION)) {
-                configurePageScrollDirection(configuration.getString(PAGE_SCROLL_DIRECTION));
+            String key;
+
+            key = getKeyOrNull(configuration, PAGE_SCROLL_DIRECTION);
+            if (key != null) {
+                configurePageScrollDirection(configuration.getString(key));
             }
-            if (configuration.hasKey(PAGE_SCROLL_CONTINUOUS)) {
-                configurePageScrollContinuous(configuration.getBoolean(PAGE_SCROLL_CONTINUOUS));
+            key = getKeyOrNull(configuration, SCROLL_DIRECTION);
+            if (key != null) {
+                configurePageScrollDirection(configuration.getString(key));
             }
-            if (configuration.hasKey(FIT_PAGE_TO_WIDTH)) {
-                configureFitPageToWidth(configuration.getBoolean(FIT_PAGE_TO_WIDTH));
+            key = getKeyOrNull(configuration, USER_INTERFACE_VIEW_MODE);
+            if (key != null) {
+                configureUserInterfaceViewMode(configuration.getString(key));
             }
-            if (configuration.hasKey(INLINE_SEARCH)) {
-                configureInlineSearch(configuration.getBoolean(INLINE_SEARCH));
+            key = getKeyOrNull(configuration, SHOW_THUMBNAIL_BAR);
+            if (key != null) {
+                configureShowThumbnailBar(configuration.getString(key));
             }
-            if (configuration.hasKey(USER_INTERFACE_VIEW_MODE)) {
-                configureUserInterfaceViewMode(configuration.getString(USER_INTERFACE_VIEW_MODE));
+            key = getKeyOrNull(configuration, SHOW_THUMBNAIL_GRID_ACTION);
+            if (key != null) {
+                configureShowThumbnailGridAction(configuration.getBoolean(key));
             }
-            if (configuration.hasKey(START_PAGE)) {
-                configureStartPage(configuration.getInt(START_PAGE));
+            key = getKeyOrNull(configuration, PAGE_SCROLL_CONTINUOUS);
+            if (key != null) {
+                configurePageScrollContinuous(configuration.getBoolean(key));
             }
-            if (configuration.hasKey(SHOW_SEARCH_ACTION)) {
-                configureShowSearchAction(configuration.getBoolean(SHOW_SEARCH_ACTION));
+            key = getKeyOrNull(configuration, PAGE_TRANSITION);
+            if (key != null) {
+                configurePageTransition(configuration.getString(key));
             }
-            if (configuration.hasKey(IMMERSIVE_MODE)) {
-                configureImmersiveMode(configuration.getBoolean(IMMERSIVE_MODE));
+            key = getKeyOrNull(configuration, SPREAD_FITTING);
+            if (key != null) {
+                configureSpreadFitting(configuration.getString(key));
             }
-            if (configuration.hasKey(SHOW_THUMBNAIL_GRID_ACTION)) {
-                configureShowThumbnailGridAction(configuration.getBoolean(SHOW_THUMBNAIL_GRID_ACTION));
+            key = getKeyOrNull(configuration, FIT_PAGE_TO_WIDTH);
+            if (key != null) {
+                configureFitPageToWidth(configuration.getBoolean(key));
             }
-            if (configuration.hasKey(SHOW_OUTLINE_ACTION)) {
-                configureShowOutlineAction(configuration.getBoolean(SHOW_OUTLINE_ACTION));
+            key = getKeyOrNull(configuration, INLINE_SEARCH);
+            if (key != null) {
+                configureInlineSearch(configuration.getBoolean(key));
             }
-            if (configuration.hasKey(SHOW_BOOKMARKS_ACTION)) {
-                configureShowBookmarksAction(configuration.getBoolean(SHOW_BOOKMARKS_ACTION));
+            key = getKeyOrNull(configuration, START_PAGE);
+            if (key != null) {
+                configureStartPage(configuration.getInt(key));
             }
-            if (configuration.hasKey(SHOW_ANNOTATION_LIST_ACTION)) {
-                configureShowAnnotationListAction(configuration.getBoolean(SHOW_ANNOTATION_LIST_ACTION));
+            key = getKeyOrNull(configuration, SIGNATURE_SAVING_STRATEGY);
+            if (key != null) {
+                configureSignatureSavingStrategy(configuration.getString(key));
             }
-            if (configuration.hasKey(SHOW_PAGE_NUMBER_OVERLAY)) {
-                configureShowPageNumberOverlay(configuration.getBoolean(SHOW_PAGE_NUMBER_OVERLAY));
+            key = getKeyOrNull(configuration, SHOW_SEARCH_ACTION);
+            if (key != null) {
+                configureShowSearchAction(configuration.getBoolean(key));
             }
-            if (configuration.hasKey(SHOW_PAGE_LABELS)) {
-                configureShowPageLabels(configuration.getBoolean(SHOW_PAGE_LABELS));
+            key = getKeyOrNull(configuration, IMMERSIVE_MODE);
+            if (key != null) {
+                configureImmersiveMode(configuration.getBoolean(key));
             }
-            if (configuration.hasKey(GRAY_SCALE)) {
-                configureGrayScale(configuration.getBoolean(GRAY_SCALE));
+            key = getKeyOrNull(configuration, SHOW_OUTLINE_ACTION);
+            if (key != null) {
+                configureShowOutlineAction(configuration.getBoolean(key));
             }
-            if (configuration.hasKey(INVERT_COLORS)) {
-                configureInvertColors(configuration.getBoolean(INVERT_COLORS));
+            key = getKeyOrNull(configuration, SHOW_BOOKMARKS_ACTION);
+            if (key != null) {
+                configureShowBookmarksAction(configuration.getBoolean(key));
             }
-            if (configuration.hasKey(ENABLE_ANNOTATION_EDITING)) {
-                configureEnableAnnotationEditing(configuration.getBoolean(ENABLE_ANNOTATION_EDITING));
+            key = getKeyOrNull(configuration, SHOW_ANNOTATION_LIST_ACTION);
+            if (key != null) {
+                configureShowAnnotationListAction(configuration.getBoolean(key));
             }
-            if (configuration.hasKey(ENABLE_FORM_EDITING)) {
-                configureEnableFormEditing(configuration.getBoolean(ENABLE_FORM_EDITING));
+            key = getKeyOrNull(configuration, SHOW_PAGE_NUMBER_OVERLAY);
+            if (key != null) {
+                configureShowPageNumberOverlay(configuration.getBoolean(key));
             }
-            if (configuration.hasKey(SHOW_SHARE_ACTION)) {
-                configureShowShareAction(configuration.getBoolean(SHOW_SHARE_ACTION));
+            key = getKeyOrNull(configuration, SHOW_PAGE_LABELS);
+            if (key != null) {
+                configureShowPageLabels(configuration.getBoolean(key));
             }
-            if (configuration.hasKey(SHOW_PRINT_ACTION)) {
-                configureShowPrintAction(configuration.getBoolean(SHOW_PRINT_ACTION));
+            key = getKeyOrNull(configuration, PAGE_LABEL_ENABLED);
+            if (key != null) {
+                configureShowPageLabels(configuration.getBoolean(key));
             }
-            if (configuration.hasKey(ENABLE_TEXT_SELECTION)) {
-                configureEnableTextSelection(configuration.getBoolean(ENABLE_TEXT_SELECTION));
+            key = getKeyOrNull(configuration, GRAY_SCALE);
+            if (key != null) {
+                configureGrayScale(configuration.getBoolean(key));
             }
-            if (configuration.hasKey(SHOW_THUMBNAIL_BAR)) {
-                configureShowThumbnailBar(configuration.getString(SHOW_THUMBNAIL_BAR));
+            key = getKeyOrNull(configuration, INVERT_COLORS);
+            if (key != null) {
+                configureInvertColors(configuration.getBoolean(key));
             }
-            if (configuration.hasKey(SHOW_DOCUMENT_INFO_VIEW)) {
-                configureDocumentInfoView(configuration.getBoolean(SHOW_DOCUMENT_INFO_VIEW));
+            key = getKeyOrNull(configuration, ENABLE_ANNOTATION_EDITING);
+            if (key != null) {
+                configureEnableAnnotationEditing(configuration.getBoolean(key));
             }
-            if (configuration.hasKey(SHOW_DOCUMENT_TITLE_OVERLAY)) {
-                configureShowDocumentTitleOverlay(configuration.getBoolean(SHOW_DOCUMENT_TITLE_OVERLAY));
+            key = getKeyOrNull(configuration, ENABLE_FORM_EDITING);
+            if (key != null) {
+                configureEnableFormEditing(configuration.getBoolean(key));
             }
-            if (configuration.hasKey(PAGE_MODE)) {
-                configurePageMode(configuration.getString(PAGE_MODE));
+            key = getKeyOrNull(configuration, SHOW_SHARE_ACTION);
+            if (key != null) {
+                configureShowShareAction(configuration.getBoolean(key));
             }
-            if (configuration.hasKey(FIRST_PAGE_ALWAYS_SINGLE)) {
-                configureFirstPageAlwaysSingle(configuration.getBoolean(FIRST_PAGE_ALWAYS_SINGLE));
+            key = getKeyOrNull(configuration, SHOW_PRINT_ACTION);
+            if (key != null) {
+                configureShowPrintAction(configuration.getBoolean(key));
             }
-            if (configuration.hasKey(AUTOSAVE_DISABLED)) {
-                configureAutosaveEnabled(!configuration.getBoolean(AUTOSAVE_DISABLED));
+            key = getKeyOrNull(configuration, ENABLE_TEXT_SELECTION);
+            if (key != null) {
+                configureEnableTextSelection(configuration.getBoolean(key));
             }
-            if (configuration.hasKey(ANNOTATION_EDITING_ENABLED)) {
-                configureAnnotationEditingEnabled(configuration.getBoolean(ANNOTATION_EDITING_ENABLED));
+            key = getKeyOrNull(configuration, SHOW_DOCUMENT_INFO_VIEW);
+            if (key != null) {
+                configureDocumentInfoView(configuration.getBoolean(key));
             }
-            if (configuration.hasKey(EDITABLE_ANNOTATION_TYPES)) {
-                configureEditableAnnotationTypes(configuration.getArray(EDITABLE_ANNOTATION_TYPES));
+            key = getKeyOrNull(configuration, SHOW_DOCUMENT_TITLE_OVERLAY);
+            if (key != null) {
+                configureShowDocumentTitleOverlay(configuration.getBoolean(key));
             }
-            if (configuration.hasKey(SHOW_SETTINGS_MENU)) {
-                configureSettingsMenuShown(configuration.getBoolean(SHOW_SETTINGS_MENU));
+            key = getKeyOrNull(configuration, PAGE_MODE);
+            if (key != null) {
+                configurePageMode(configuration.getString(key));
             }
-            if (configuration.hasKey(TOOLBAR_TITLE)) {
-                configureToolbarTitle(configuration.getString(TOOLBAR_TITLE));
+            key = getKeyOrNull(configuration, FIRST_PAGE_ALWAYS_SINGLE);
+            if (key != null) {
+                configureFirstPageAlwaysSingle(configuration.getBoolean(key));
+            }
+            key = getKeyOrNull(configuration, AUTOSAVE_ENABLED);
+            if (key != null) {
+                configureAutosaveEnabled(configuration.getBoolean(key));
+            }
+            key = getKeyOrNull(configuration, AUTOSAVE_DISABLED);
+            if (key != null) {
+                configureAutosaveEnabled(!configuration.getBoolean(key));
+            }
+            key = getKeyOrNull(configuration, ANNOTATION_EDITING_ENABLED);
+            if (key != null) {
+                configureAnnotationEditingEnabled(configuration.getBoolean(key));
+            }
+            key = getKeyOrNull(configuration, EDITABLE_ANNOTATION_TYPES);
+            if (key != null) {
+                configureEditableAnnotationTypes(configuration.getArray(key));
+            }
+            key = getKeyOrNull(configuration, SHOW_SETTINGS_MENU);
+            if (key != null) {
+                configureSettingsMenuShown(configuration.getBoolean(key));
+            }
+            key = getKeyOrNull(configuration, TOOLBAR_TITLE);
+            if (key != null) {
+                configureToolbarTitle(configuration.getString(key));
             }
         }
     }
 
-    private void configureShowPageNumberOverlay(boolean showPageNumberOverlay) {
+    private void configureShowPageNumberOverlay(final boolean showPageNumberOverlay) {
         if (showPageNumberOverlay) {
             configuration.showPageNumberOverlay();
         } else {
@@ -199,7 +314,11 @@ public class ConfigurationAdapter {
         }
     }
 
-    private void configurePageScrollDirection(final String pageScrollDirection) {
+    private void configurePageScrollDirection(@Nullable final String pageScrollDirection) {
+        if (pageScrollDirection == null) {
+            Log.e(LOG_TAG, "Illegal configuration option for page scroll direction.");
+            return;
+        }
         if (pageScrollDirection.equals(PAGE_SCROLL_DIRECTION_HORIZONTAL)) {
             configuration.scrollDirection(PageScrollDirection.HORIZONTAL);
         } else if (pageScrollDirection.equals(PAGE_SCROLL_DIRECTION_VERTICAL)) {
@@ -212,35 +331,71 @@ public class ConfigurationAdapter {
         configuration.scrollMode(pageScrollMode);
     }
 
-    private void configureFitPageToWidth(boolean fitPageToWidth) {
+    private void configurePageTransition(@Nullable final String pageTransition) {
+        if (pageTransition == null) {
+            Log.e(LOG_TAG, "Illegal configuration option for page transition.");
+            return;
+        }
+
+        if (pageTransition.equals(PAGE_TRANSITION_PER_SPREAD)) {
+            configuration.scrollMode(PageScrollMode.PER_PAGE);
+        } else if (pageTransition.equals(PAGE_TRANSITION_CONTINUOUS)) {
+            configuration.scrollMode(PageScrollMode.CONTINUOUS);
+        }
+    }
+
+    private void configureSpreadFitting(@Nullable final String mode) {
+        if (mode == null) {
+            Log.e(LOG_TAG, "Illegal configuration option for mode.");
+            return;
+        }
+        if (mode.equals(SPREAD_FITTING_FIT)) {
+            configuration.fitMode(PageFitMode.FIT_TO_WIDTH);
+        }
+        else if (mode.equals(SPREAD_FITTING_FILL)) {
+            configuration.fitMode(PageFitMode.FIT_TO_SCREEN);
+        }
+    }
+
+    private void configureFitPageToWidth(final boolean fitPageToWidth) {
         final PageFitMode pageFitMode = fitPageToWidth ? PageFitMode.FIT_TO_WIDTH : PageFitMode.FIT_TO_SCREEN;
         configuration.fitMode(pageFitMode);
     }
 
-    private void configureInlineSearch(boolean inlineSearch) {
+    private void configureInlineSearch(final boolean inlineSearch) {
         final int searchType = inlineSearch ? PdfActivityConfiguration.SEARCH_INLINE : PdfActivityConfiguration.SEARCH_MODULAR;
         configuration.setSearchType(searchType);
     }
 
-    private void configureStartPage(int startPage) {
+    private void configureStartPage(final int startPage) {
         configuration.page(startPage);
     }
 
-    private void configureUserInterfaceViewMode(String userInterfaceViewMode) {
-        UserInterfaceViewMode result = UserInterfaceViewMode.USER_INTERFACE_VIEW_MODE_AUTOMATIC;
-        if (userInterfaceViewMode.equals(USER_INTERFACE_VIEW_MODE_AUTOMATIC)) {
-            result = UserInterfaceViewMode.USER_INTERFACE_VIEW_MODE_AUTOMATIC;
-        } else if (userInterfaceViewMode.equals(USER_INTERFACE_VIEW_MODE_AUTOMATIC_BORDER_PAGES)) {
-            result = UserInterfaceViewMode.USER_INTERFACE_VIEW_MODE_AUTOMATIC_BORDER_PAGES;
-        } else if (userInterfaceViewMode.equals(USER_INTERFACE_VIEW_MODE_ALWAYS_VISIBLE)) {
-            result = UserInterfaceViewMode.USER_INTERFACE_VIEW_MODE_VISIBLE;
-        } else if (userInterfaceViewMode.equals(USER_INTERFACE_VIEW_MODE_ALWAYS_HIDDEN)) {
-            result = UserInterfaceViewMode.USER_INTERFACE_VIEW_MODE_HIDDEN;
+    private void configureUserInterfaceViewMode(@Nullable final String userInterfaceViewMode) {
+        if (userInterfaceViewMode == null) {
+            Log.e(LOG_TAG, "Illegal configuration option for user interface view mode.");
+            return;
         }
-        configuration.setUserInterfaceViewMode(result);
+        switch (userInterfaceViewMode) {
+            case USER_INTERFACE_VIEW_MODE_AUTOMATIC:
+                configuration.setUserInterfaceViewMode(UserInterfaceViewMode.USER_INTERFACE_VIEW_MODE_AUTOMATIC);
+                break;
+            case USER_INTERFACE_VIEW_MODE_AUTOMATIC_BORDER_PAGES:
+            case USER_INTERFACE_VIEW_MODE_AUTOMATIC_NO_FIRST_LAST_PAGE:
+                configuration.setUserInterfaceViewMode(UserInterfaceViewMode.USER_INTERFACE_VIEW_MODE_AUTOMATIC_BORDER_PAGES);
+                break;
+            case USER_INTERFACE_VIEW_MODE_ALWAYS:
+            case USER_INTERFACE_VIEW_MODE_ALWAYS_VISIBLE:
+                configuration.setUserInterfaceViewMode(UserInterfaceViewMode.USER_INTERFACE_VIEW_MODE_VISIBLE);
+                break;
+            case USER_INTERFACE_VIEW_MODE_ALWAYS_HIDDEN:
+            case USER_INTERFACE_VIEW_MODE_NEVER:
+                configuration.setUserInterfaceViewMode(UserInterfaceViewMode.USER_INTERFACE_VIEW_MODE_HIDDEN);
+                break;
+        }
     }
 
-    private void configureShowSearchAction(boolean showSearchAction) {
+    private void configureShowSearchAction(final boolean showSearchAction) {
         if (showSearchAction) {
             configuration.enableSearch();
         } else {
@@ -248,27 +403,46 @@ public class ConfigurationAdapter {
         }
     }
 
-    private void configureImmersiveMode(boolean immersiveMode) {
+    private void configureSignatureSavingStrategy(@Nullable final String signatureSavingStrategy) {
+        if (signatureSavingStrategy == null) {
+            Log.e(LOG_TAG, "Illegal configuration option for signature saving strategy.");
+            return;
+        }
+        if (signatureSavingStrategy.equals(SIGNATURE_SAVING_STRATEGY_ALWAYS)) {
+            configuration.signatureSavingStrategy(SignatureSavingStrategy.ALWAYS_SAVE);
+        } else if (signatureSavingStrategy.equals(SIGNATURE_SAVING_STRATEGY_NEVER)) {
+            configuration.signatureSavingStrategy(SignatureSavingStrategy.NEVER_SAVE);
+        } else if (signatureSavingStrategy.equals(SIGNATURE_SAVING_STRATEGY_IF_SELECTED)) {
+            configuration.signatureSavingStrategy(SignatureSavingStrategy.SAVE_IF_SELECTED);
+        }
+    }
+
+    private void configureImmersiveMode(final boolean immersiveMode) {
         configuration.useImmersiveMode(immersiveMode);
     }
 
-    private void configureShowThumbnailBar(String showThumbnailBar) {
-        ThumbnailBarMode thumbnailBarMode = ThumbnailBarMode.THUMBNAIL_BAR_MODE_FLOATING;
-        if (showThumbnailBar.equals(SHOW_THUMBNAIL_BAR_DEFAULT)) {
-            thumbnailBarMode = ThumbnailBarMode.THUMBNAIL_BAR_MODE_FLOATING;
-        } else if (showThumbnailBar.equals(SHOW_THUMBNAIL_BAR_SCROLLABLE)) {
-            thumbnailBarMode = ThumbnailBarMode.THUMBNAIL_BAR_MODE_SCROLLABLE;
-        } else if (showThumbnailBar.equals(SHOW_THUMBNAIL_BAR_NONE)) {
-            thumbnailBarMode = ThumbnailBarMode.THUMBNAIL_BAR_MODE_NONE;
-        } else if (showThumbnailBar.equals(SHOW_THUMBNAIL_BAR_FLOATING)) {
-            thumbnailBarMode = ThumbnailBarMode.THUMBNAIL_BAR_MODE_FLOATING;
-        } else if (showThumbnailBar.equals(SHOW_THUMBNAIL_BAR_PINNED)) {
-            thumbnailBarMode = ThumbnailBarMode.THUMBNAIL_BAR_MODE_PINNED;
+    private void configureShowThumbnailBar(@Nullable final String showThumbnailBar) {
+        if (showThumbnailBar == null) {
+            Log.e(LOG_TAG, "Illegal configuration option for showing thumbnail bar.");
+            return;
         }
-        configuration.setThumbnailBarMode(thumbnailBarMode);
+
+        if (showThumbnailBar.equals(SHOW_THUMBNAIL_BAR_NONE)) {
+            configuration.setThumbnailBarMode(ThumbnailBarMode.THUMBNAIL_BAR_MODE_NONE);
+        } else if (showThumbnailBar.equals(SHOW_THUMBNAIL_BAR_DEFAULT)) {
+            configuration.setThumbnailBarMode(ThumbnailBarMode.THUMBNAIL_BAR_MODE_FLOATING);
+        } else if (showThumbnailBar.equals(SHOW_THUMBNAIL_BAR_FLOATING)) {
+            configuration.setThumbnailBarMode(ThumbnailBarMode.THUMBNAIL_BAR_MODE_FLOATING);
+        } else if (showThumbnailBar.equals(SHOW_THUMBNAIL_BAR_SCRUBBERBAR)) {
+            configuration.setThumbnailBarMode(ThumbnailBarMode.THUMBNAIL_BAR_MODE_PINNED);
+        } else if (showThumbnailBar.equals(SHOW_THUMBNAIL_BAR_PINNED)) {
+            configuration.setThumbnailBarMode(ThumbnailBarMode.THUMBNAIL_BAR_MODE_PINNED);
+        } else if (showThumbnailBar.equals(SHOW_THUMBNAIL_BAR_SCROLLABLE)) {
+            configuration.setThumbnailBarMode(ThumbnailBarMode.THUMBNAIL_BAR_MODE_SCROLLABLE);
+        }
     }
 
-    private void configureShowThumbnailGridAction(boolean showThumbnailGridAction) {
+    private void configureShowThumbnailGridAction(final boolean showThumbnailGridAction) {
         if (showThumbnailGridAction) {
             configuration.showThumbnailGrid();
         } else {
@@ -276,7 +450,7 @@ public class ConfigurationAdapter {
         }
     }
 
-    private void configureShowOutlineAction(boolean showOutlineAction) {
+    private void configureShowOutlineAction(final boolean showOutlineAction) {
         if (showOutlineAction) {
             configuration.enableOutline();
         } else {
@@ -292,7 +466,7 @@ public class ConfigurationAdapter {
         }
     }
 
-    private void configureShowAnnotationListAction(boolean showAnnotationListAction) {
+    private void configureShowAnnotationListAction(final boolean showAnnotationListAction) {
         if (showAnnotationListAction) {
             configuration.enableAnnotationList();
         } else {
@@ -300,7 +474,7 @@ public class ConfigurationAdapter {
         }
     }
 
-    private void configureShowPageLabels(boolean showPageLabels) {
+    private void configureShowPageLabels(final boolean showPageLabels) {
         if (showPageLabels) {
             configuration.showPageLabels();
         } else {
@@ -308,15 +482,15 @@ public class ConfigurationAdapter {
         }
     }
 
-    private void configureGrayScale(boolean grayScale) {
+    private void configureGrayScale(final boolean grayScale) {
         configuration.toGrayscale(grayScale);
     }
 
-    private void configureInvertColors(boolean invertColors) {
+    private void configureInvertColors(final boolean invertColors) {
         configuration.invertColors(invertColors);
     }
 
-    private void configureEnableAnnotationEditing(boolean enableAnnotationEditing) {
+    private void configureEnableAnnotationEditing(final boolean enableAnnotationEditing) {
         if (enableAnnotationEditing) {
             configuration.enableAnnotationEditing();
         } else {
@@ -324,7 +498,7 @@ public class ConfigurationAdapter {
         }
     }
 
-    private void configureEnableFormEditing(boolean enableFormEditing) {
+    private void configureEnableFormEditing(final boolean enableFormEditing) {
         if (enableFormEditing) {
             configuration.enableFormEditing();
         } else {
@@ -332,7 +506,7 @@ public class ConfigurationAdapter {
         }
     }
 
-    private void configureShowShareAction(boolean showShareAction) {
+    private void configureShowShareAction(final boolean showShareAction) {
         if (showShareAction) {
             configuration.setEnabledShareFeatures(ShareFeatures.all());
         } else {
@@ -340,7 +514,7 @@ public class ConfigurationAdapter {
         }
     }
 
-    private void configureShowPrintAction(boolean showPrintAction) {
+    private void configureShowPrintAction(final boolean showPrintAction) {
         if (showPrintAction) {
             configuration.enablePrinting();
         } else {
@@ -348,11 +522,11 @@ public class ConfigurationAdapter {
         }
     }
 
-    private void configureEnableTextSelection(boolean enableTextSelection) {
+    private void configureEnableTextSelection(final boolean enableTextSelection) {
         configuration.textSelectionEnabled(enableTextSelection);
     }
 
-    private void configureDocumentInfoView(boolean enableDocumentInfoView) {
+    private void configureDocumentInfoView(final boolean enableDocumentInfoView) {
         if (enableDocumentInfoView) {
             configuration.enableDocumentInfoView();
         } else {
@@ -360,7 +534,7 @@ public class ConfigurationAdapter {
         }
     }
 
-    private void configureShowDocumentTitleOverlay(boolean showDocumentTitleOverlay) {
+    private void configureShowDocumentTitleOverlay(final boolean showDocumentTitleOverlay) {
         if (showDocumentTitleOverlay) {
             configuration.showDocumentTitleOverlay();
         } else {
@@ -369,16 +543,18 @@ public class ConfigurationAdapter {
     }
 
     private void configurePageMode(@Nullable final String pageMode) {
-        PageLayoutMode pageLayoutMode = PageLayoutMode.AUTO;
-        if (pageMode == null ||
-            pageMode.equalsIgnoreCase(PAGE_MODE_AUTO)) {
-            pageLayoutMode = PageLayoutMode.AUTO;
-        } else if (pageMode.equalsIgnoreCase(PAGE_MODE_SINGLE)) {
-            pageLayoutMode = PageLayoutMode.SINGLE;
-        } else if (pageMode.equalsIgnoreCase(PAGE_MODE_DOUBLE)) {
-            pageLayoutMode = PageLayoutMode.DOUBLE;
+        if (pageMode == null) {
+            Log.e(LOG_TAG, "Illegal configuration option for page mode.");
+            return;
         }
-        configuration.layoutMode(pageLayoutMode);
+
+        if (pageMode.equalsIgnoreCase(PAGE_MODE_AUTO)) {
+            configuration.layoutMode(PageLayoutMode.AUTO);
+        } else if (pageMode.equalsIgnoreCase(PAGE_MODE_SINGLE)) {
+            configuration.layoutMode(PageLayoutMode.SINGLE);
+        } else if (pageMode.equalsIgnoreCase(PAGE_MODE_DOUBLE)) {
+            configuration.layoutMode(PageLayoutMode.DOUBLE);
+        }
     }
 
     private void configureFirstPageAlwaysSingle(final boolean firstPageAlwaysSingle) {
@@ -418,11 +594,10 @@ public class ConfigurationAdapter {
                 parsedTypes.add(AnnotationType.valueOf(annotationType.toUpperCase(Locale.ENGLISH)));
             } catch (IllegalArgumentException ex) {
                 Log.e(LOG_TAG,
-                    String.format("Illegal option %s provided for configuration option %s. Skipping this %s.", annotationType, EDITABLE_ANNOTATION_TYPES, annotationType),
-                    ex);
+                        String.format("Illegal option %s provided for configuration option %s. Skipping this %s.", annotationType, EDITABLE_ANNOTATION_TYPES, annotationType),
+                        ex);
             }
         }
-
         configuration.editableAnnotationTypes(parsedTypes);
     }
 
@@ -440,5 +615,34 @@ public class ConfigurationAdapter {
 
     public PdfActivityConfiguration build() {
         return configuration.build();
+    }
+
+    /**
+     * When reading configuration options, we check not only for the given configuration string,
+     * but also for a string with the `android` prefix. For instance if the user enters
+     * `androidPageScrollDirection`, it is considered a valid string equal to `pageScrollDirection`.
+     *
+     * When documenting, we always prefer configuration option strings:
+     *
+     * - No prefix          : If the key works for both iOS and Android.
+     * - `android` prefix   : If the key works only for Android.
+     * - `iOS` prefix       : If the key works only for iOS.
+     */
+    private String addAndroidPrefix(String key) {
+        // Capitalize the first letter.
+        String cap = String.valueOf(key.charAt(0)).toUpperCase() + key.substring(1);
+        return "android" + cap;
+    }
+
+    @Nullable
+    private String getKeyOrNull(ReadableMap configuration, String key) {
+        if (configuration.hasKey(key)) {
+            return key;
+        }
+        String prefixedKey = addAndroidPrefix(key);
+        if (configuration.hasKey(prefixedKey)) {
+            return prefixedKey;
+        }
+        return null;
     }
 }

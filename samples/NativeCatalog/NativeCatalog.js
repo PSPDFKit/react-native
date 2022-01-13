@@ -1,4 +1,4 @@
-//  Copyright © 2016-2021 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2016-2022 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -43,7 +43,7 @@ const pspdfkitColorAlpha = '#267AD450';
 // PSPDFKit.setLicenseKey("YOUR_REACT_NATIVE_LICENSE_KEY_GOES_HERE");
 
 // Document names
-const formDocumentName = 'Form_Example.pdf';
+const formDocumentName = 'Form_example.pdf';
 
 // Document paths
 const formDocumentPath =

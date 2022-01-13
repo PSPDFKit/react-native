@@ -1,5 +1,5 @@
 //
-//  Copyright © 2016-2021 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2016-2022 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -14,6 +14,18 @@
 @interface RCTConvert (PSPDFConfiguration)
 
 + (PSPDFConfiguration *)PSPDFConfiguration:(id)json;
+
+// When reading configuration options, we check not only for the given configuration string,
+// but also for a string with the `iOS` prefix. For instance if the user enters
+// `iOSPageScrollDirection`, it is considered a valid string equal to `pageScrollDirection`.
+// This method will remove the iOS prefix from all the dictionary keys.
+//
+// When documenting, we always prefer configuration option strings:
+//
+// - No prefix          : If the key works for both iOS and Android.
+// - `android` prefix   : If the key works only for Android.
+// - `iOS` prefix       : If the key works only for iOS.
++ (NSDictionary *)processConfigurationOptionsDictionaryForPrefix:(NSDictionary *)dictionary;
 
 @end
 

@@ -32,21 +32,22 @@ The [PSPDFKit SDK](https://pspdfkit.com/) is a framework that allows you to view
 
 PSPDFKit offers support for customers with an active SDK license via https://pspdfkit.com/support/request/
 
-Are you evaluating our SDK? That's great, we're happy to help out! PSPDFKit is a commercial product and requires the purchase of a license key when used in production. By default, this library will 
-initialize in demo mode, placing a watermark on each PDF and limiting usage to 60 minutes. 
+Are you evaluating our SDK? That's great, we're happy to help out! PSPDFKit is a commercial product and requires the purchase of a license key when used in production. By default, this library will initialize in demo mode, placing a watermark on each PDF and limiting usage to 60 minutes.
 
 To purchase a license for production use, please reach out to us via https://pspdfkit.com/sales/form/.
 
 To initialize PSPDFKit using a license key, call either of the following before using any other PSPDFKit APIs or features:
 
 To set the license key for both Android and iOS, use:
+
 ```
-PSPDFKit.setLicenseKeys("YOUR_REACT_NATIVE_ANDROID_LICENSE_KEY_GOES_HERE", "YOUR_REACT_NATIVE_IOS_LICENSE_KEY_GOES_HERE");
+PSPDFKit.setLicenseKeys('YOUR_REACT_NATIVE_ANDROID_LICENSE_KEY_GOES_HERE', 'YOUR_REACT_NATIVE_IOS_LICENSE_KEY_GOES_HERE');
 ```
 
 To set the license key for the currently running platform, use:
+
 ```
-PSPDFKit.setLicenseKey("YOUR_REACT_NATIVE_LICENSE_KEY_GOES_HERE");
+PSPDFKit.setLicenseKey('YOUR_REACT_NATIVE_LICENSE_KEY_GOES_HERE');
 ```
 
 ## iOS
@@ -192,7 +193,7 @@ Let's create a simple app that integrates PSPDFKit and uses the `react-native-ps
          <PSPDFKitView
            document={DOCUMENT}
            configuration={{
-             thumbnailBarMode: "scrollable",
+             showThumbnailBar: "scrollable",
              pageTransition: "scrollContinuous",
              scrollDirection: "vertical",
            }}
@@ -291,7 +292,7 @@ Example - Native Module:
 
 ```javascript
 PSPDFKit.present("document.pdf", {
-  thumbnailBarMode: "scrollable",
+  showThumbnailBar: "scrollable",
   pageTransition: "scrollContinuous",
   scrollDirection: "vertical",
 });
@@ -303,7 +304,7 @@ Example - Native UI Component:
 <PSPDFKitView
   document={"document.pdf"}
   configuration={{
-    thumbnailBarMode: "scrollable",
+    showThumbnailBar: "scrollable",
     pageTransition: "scrollContinuous",
     scrollDirection: "vertical",
   }}
@@ -326,7 +327,7 @@ If you wish to run your project on Mac Catalyst, please try the [following worka
 
 ### Configuration Mapping
 
-On iOS, PSPDFKit for React Native iOS maps most configuration options available in `PSPDFConfiguration` from JSON. Please refer to [`RCTConvert+PSPDFConfiguration.m`](./ios/RCTPSPDFKit/Converters/RCTConvert+PSPDFConfiguration.m#L267) for the complete list and for the exact naming of enum values.
+On iOS, PSPDFKit for React Native iOS maps most configuration options available in `PSPDFConfiguration` from JSON. Take a look at the [list of all configuration options](/documentation/configuration-options.md) for more information. For the iOS-specific implementation, check out [`RCTConvert+PSPDFConfiguration.m`](./ios/RCTPSPDFKit/Converters/RCTConvert+PSPDFConfiguration.m#L267) for the complete list and for the exact naming of enum values.
 
 Annotations are mapped based on their type name. This is case sensitive. For example, to limit annotation types to ink and highlight, use this:
 
@@ -360,7 +361,7 @@ pdfView.setRightBarButtonItems(
 
 Please refer to [`RCTConvert+UIBarButtonItem.m`](./ios/RCTPSPDFKit/Converters/RCTConvert%2BUIBarButtonItem.m#L14) for the complete list of bar button items.
 
-Also, please take a look at the [ToolbarCustomization example from our Catalog app](./samples/Catalog/Catalog.ios.js#L805).
+Also, please take a look at the [ToolbarCustomization example from our Catalog app](./samples/Catalog/Catalog.js).
 
 For a more detailed description of toolbar customizations, refer to our Customizing the Toolbar guide for [iOS](https://pspdfkit.com/guides/ios/current/customizing-the-interface/customizing-the-toolbar/) and [Android](https://pspdfkit.com/guides/android/current/customizing-the-interface/customizing-the-toolbar/).
 
@@ -414,7 +415,7 @@ PSPDFKit for React Native allows you to create a new document with processed (em
 </View>
 ```
 
-For a runnable example, please take a look at the [AnnotationProcessing example from our Catalog app](./samples/Catalog/Catalog.ios.js#L1032).
+For a runnable example, please take a look at the [AnnotationProcessing example from our Catalog app](./samples/Catalog/Catalog.js).
 
 ## Android
 
@@ -489,11 +490,11 @@ Let's create a simple app that integrates PSPDFKit and uses the `react-native-ps
    ```diff
    ...
      defaultConfig {
-         applicationId "com.pspdfkitdemo"
+         applicationId 'com.pspdfkitdemo'
          minSdkVersion rootProject.ext.minSdkVersion
          targetSdkVersion rootProject.ext.targetSdkVersion
          versionCode 1
-         versionName "1.0"
+         versionName '1.0'
    +     multiDexEnabled true
      }
    ...
@@ -536,7 +537,7 @@ Let's create a simple app that integrates PSPDFKit and uses the `react-native-ps
          <PSPDFKitView
            document={DOCUMENT}
            configuration={{
-             thumbnailBarMode: "scrollable",
+             showThumbnailBar: "scrollable",
              pageTransition: "scrollContinuous",
              scrollDirection: "vertical",
            }}
@@ -579,16 +580,15 @@ To bundle a pdf document in the Android app, simply copy it the Android `assets`
 
 #### Viewer options
 
-You can configure the builder with a dictionary representation of the PSPDFConfiguration object. Check [`ConfigurationAdapter.java`](https://github.com/PSPDFKit/react-native/blob/master/android/src/main/java/com/pspdfkit/react/ConfigurationAdapter.java) for all the parameters available.
+You can configure the builder with a dictionary representation of the PSPDFConfiguration object. Take a look at the [list of all configuration options](/documentation/configuration-options.md) for more information. For the Android-specific implementation, check out [`ConfigurationAdapter.java`](https://github.com/PSPDFKit/react-native/blob/master/android/src/main/java/com/pspdfkit/react/ConfigurationAdapter.java).
 
 ```javascript
 const CONFIGURATION = {
-  startPage: 3,
-  scrollContinuously: false,
+  pageTransition: "scrollPerSpread",
   showPageNumberOverlay: true,
   grayScale: true,
   showPageLabels: false,
-  pageScrollDirection: "vertical",
+  scrollDirection: "vertical",
 };
 ```
 
@@ -691,6 +691,6 @@ For Troubleshooting common issues you might encounter when setting up PSPDFKit f
 ## License
 
 This project can be used for evaluation or if you have a valid PSPDFKit license.
-All items and source code Copyright © 2010-2021 PSPDFKit GmbH.
+All items and source code Copyright © 2010-2022 PSPDFKit GmbH.
 
 See [LICENSE](./LICENSE) for details.

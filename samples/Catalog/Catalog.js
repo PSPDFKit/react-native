@@ -1,4 +1,4 @@
-//  Copyright © 2016-2021 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2016-2022 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -42,7 +42,7 @@ const pspdfkitColor = '#267AD4';
 
 // Document names
 const exampleDocumentName = 'PSPDFKit_Quickstart_Guide.pdf';
-const formDocumentName = 'Form_Example.pdf';
+const formDocumentName = 'Form_example.pdf';
 const tiffImageName = 'PSPDFKit_Image_Example.tiff';
 
 // Document paths
@@ -58,21 +58,19 @@ const tiffImagePath =
   Platform.OS === 'ios'
     ? 'PDFs/' + tiffImageName
     : 'file:///android_asset/' + tiffImageName;
-const writableDocumentPath = fileSystem.DocumentDirectoryPath + '/' + exampleDocumentName;
+const writableDocumentPath =
+  fileSystem.DocumentDirectoryPath + '/' + exampleDocumentName;
 
 // Configurations
 const exampleConfiguration = {
-  // This is the page that the document will start on.
-  startPage: 0,
-  backgroundColor: processColor('white'),
+  iOSBackgroundColor: processColor('white'),
   showPageNumberOverlay: true,
   grayScale: false,
   showPageLabels: false,
-  showDocumentLabel: true,
+  documentLabelEnabled: true,
   inlineSearch: true,
-  scrollContinuously: true,
   pageTransition: 'scrollContinuous',
-  pageScrollDirection: 'vertical',
+  scrollDirection: 'vertical',
   showThumbnailBar: 'scrollable',
   // Settings this to false will disable all annotation editing
   enableAnnotationEditing: true,
@@ -318,6 +316,7 @@ class PSPDFKitViewComponent extends AutoHidingHeaderComponent {
           ref="pdfView"
           document={exampleDocumentPath}
           configuration={{
+            allowToolbarTitleChange: false,
             toolbarTitle: 'My Awesome Report',
             backgroundColor: processColor('lightgrey'),
             useParentNavigationBar: false,
@@ -370,6 +369,7 @@ class ManualSave extends AutoHidingHeaderComponent {
           configuration={{
             backgroundColor: processColor('lightgrey'),
           }}
+          pageIndex={3}
           style={{flex: 1, color: pspdfkitColor}}
         />
         <View
@@ -1312,7 +1312,7 @@ class SplitPDF extends AutoHidingHeaderComponent {
           document={exampleDocumentPath}
           configuration={{
             pageTransition: 'scrollContinuous',
-            pageScrollDirection: 'vertical',
+            scrollDirection: 'vertical',
             pageMode: 'single',
           }}
           style={{flex: 1, color: '#9932CC'}}
@@ -1586,10 +1586,11 @@ function extractFromAssetsIfMissing(assetFile, callback) {
   var src = fileSystem.MainBundlePath + '/PDFs/' + assetFile;
 
   if (Platform.OS === 'android') {
-    src = assetFile
+    src = assetFile;
   }
 
-  const copy = (Platform.OS === 'ios') ? fileSystem.copyFile : fileSystem.copyFileAssets;
+  const copy =
+    Platform.OS === 'ios' ? fileSystem.copyFile : fileSystem.copyFileAssets;
 
   fileSystem
     .exists(path)
@@ -1604,13 +1605,13 @@ function extractFromAssetsIfMissing(assetFile, callback) {
         );
         // File exists so it can be extracted to the document directory path.
         copy(src, path)
-        .then(() => {
-          // File copied successfully from assets folder to document directory path.
-          callback();
-        })
-        .catch(error => {
-          console.log(error);
-        });
+          .then(() => {
+            // File copied successfully from assets folder to document directory path.
+            callback();
+          })
+          .catch(error => {
+            console.log(error);
+          });
       }
     })
     .catch(error => {

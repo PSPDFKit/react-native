@@ -1,5 +1,5 @@
 //
-//  Copyright © 2018-2021 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2018-2022 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -66,6 +66,24 @@ RCT_CUSTOM_VIEW_PROPERTY(configuration, PSPDFConfiguration, RCTPSPDFKitView) {
       [builder overrideClass:PSPDFFontPickerViewController.class withClass:CustomFontPickerViewController.class];
       [builder setupFromJSON:json];
     }];
+
+    [self postProcessConfigurationOptionsWithJSON: json forPDFViewController: view.pdfController];
+  }
+}
+
+// These options are configuration options in Android, but not on iOS, so we apply them
+// after we update the actual configuration.
+- (void)postProcessConfigurationOptionsWithJSON:(id)json forPDFViewController:(PSPDFViewController *)controller {
+  if (json) {
+    NSDictionary *dictionary = [RCTConvert processConfigurationOptionsDictionaryForPrefix:[RCTConvert NSDictionary:json]];
+    if (dictionary[@"toolbarTitle"]) {
+      NSString *title = [RCTConvert NSString:dictionary[@"toolbarTitle"]];
+      controller.title = title;
+    }
+    if (dictionary[@"invertColors"]) {
+      BOOL shouldInvertColors = [RCTConvert BOOL:dictionary[@"invertColors"]];
+      controller.appearanceModeManager.appearanceMode = shouldInvertColors ? PSPDFAppearanceModeNight : PSPDFAppearanceModeDefault;
+    }
   }
 }
 

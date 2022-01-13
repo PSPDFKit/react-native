@@ -1,5 +1,5 @@
 //
-//  Copyright © 2016-2021 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2016-2022 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -12,9 +12,31 @@
 @implementation RCTConvert (PSPDFConfiguration)
 
 + (PSPDFConfiguration *)PSPDFConfiguration:(id)json {
-  return [PSPDFConfiguration configurationWithBuilder:^(PSPDFConfigurationBuilder * _Nonnull builder) {
-    [builder setupFromJSON:json];
-  }];
+   return [PSPDFConfiguration configurationWithBuilder:^(PSPDFConfigurationBuilder * _Nonnull builder) {
+      [builder setupFromJSON:json];
+   }];
+}
+
++ (NSString *)removePrefixForKey:(NSString *)key {
+   // If the key length is less than 4, we return it without any modification.
+   if (([key hasPrefix:@"iOS"] || [key hasPrefix:@"ios"]) && key.length > 4) {
+      NSString *prefixRemoved = [key substringFromIndex:3]; // Discard the first 3 letters (iOS).
+      NSString *firstLetterLowerCase = [[prefixRemoved substringToIndex:1] lowercaseString]; // Extract and lowercase the first letter.
+      NSString *everythingExceptFirstLetter = [prefixRemoved substringFromIndex:1];  // Extract everything except the first letter.
+      NSString *cleanedKey = [NSString stringWithFormat:@"%@%@", firstLetterLowerCase, everythingExceptFirstLetter]; // Join the two strings.
+      return cleanedKey;
+   } else {
+      return key;
+   }
+}
+
++ (NSDictionary *)processConfigurationOptionsDictionaryForPrefix:(NSDictionary *)dictionary {
+   NSMutableDictionary *output = [NSMutableDictionary new];
+   for (NSString *key in dictionary) {
+      id value = [dictionary valueForKey:key];
+      [output setValue:value forKey:[self removePrefixForKey:key]];
+   }
+   return [NSDictionary dictionaryWithDictionary:output];
 }
 
 RCT_ENUM_CONVERTER(PSPDFScrollDirection,
@@ -52,10 +74,11 @@ RCT_ENUM_CONVERTER(PSPDFLinkAction,
                    unsignedIntegerValue)
 
 RCT_ENUM_CONVERTER(PSPDFUserInterfaceViewMode,
-                   (@{@"always" : @(PSPDFUserInterfaceViewModeAlways),
-                      @"alwaysVisible" : @(PSPDFUserInterfaceViewModeAlways),
-                      @"automatic" : @(PSPDFUserInterfaceViewModeAutomatic),
+                   (@{@"automatic" : @(PSPDFUserInterfaceViewModeAutomatic),
+                      @"automaticBorderPages" : @(PSPDFUserInterfaceViewModeAutomaticNoFirstLastPage),
                       @"automaticNoFirstLastPage" : @(PSPDFUserInterfaceViewModeAutomaticNoFirstLastPage),
+                      @"always" : @(PSPDFUserInterfaceViewModeAlways),
+                      @"alwaysVisible" : @(PSPDFUserInterfaceViewModeAlways),
                       @"alwaysHidden" : @(PSPDFUserInterfaceViewModeNever),
                       @"never" : @(PSPDFUserInterfaceViewModeNever)}),
                    PSPDFUserInterfaceViewModeAutomatic,
@@ -70,10 +93,12 @@ RCT_ENUM_CONVERTER(PSPDFUserInterfaceViewAnimation,
 
 RCT_ENUM_CONVERTER(PSPDFThumbnailBarMode,
                    (@{@"none" : @(PSPDFThumbnailBarModeNone),
-                      @"default": @(PSPDFThumbnailBarModeScrubberBar),
+                      @"default": @(PSPDFThumbnailBarModeFloatingScrubberBar),
+                      @"floating" : @(PSPDFThumbnailBarModeFloatingScrubberBar),
                       @"scrubberBar" : @(PSPDFThumbnailBarModeScrubberBar),
+                      @"pinned" : @(PSPDFThumbnailBarModeScrubberBar),
                       @"scrollable" : @(PSPDFThumbnailBarModeScrollable)}),
-                   PSPDFThumbnailBarModeNone,
+                   PSPDFThumbnailBarModeFloatingScrubberBar,
                    unsignedIntegerValue)
 
 RCT_ENUM_CONVERTER(PSPDFAdaptiveConditional,
@@ -280,102 +305,147 @@ RCT_MULTI_ENUM_CONVERTER(PSPDFDocumentSharingPagesOptions,
 @implementation PSPDFConfigurationBuilder (RNAdditions)
 
 - (void)setupFromJSON:(id)json {
-  NSDictionary *dictionary = [RCTConvert NSDictionary:json];
+    
+  NSDictionary *dictionary = [RCTConvert processConfigurationOptionsDictionaryForPrefix:[RCTConvert NSDictionary:json]];
 
-  SET(doubleTapAction, PSPDFTapAction)
-  SET(formElementZoomEnabled, BOOL)
-  SET(scrollOnEdgeTapEnabled, BOOL)
-  SET(scrollOnEdgeTapMargin, CGFloat)
-  SET_PROPERTY(enableTextSelection, textSelectionEnabled, BOOL)
-  SET(textSelectionEnabled, BOOL)
-  SET(imageSelectionEnabled, BOOL)
-  SET(textSelectionMode, PSPDFTextSelectionMode)
-  SET(textSelectionShouldSnapToWord, BOOL)
-  SET(typesShowingColorPresets, PSPDFAnnotationType)
-  SET(freeTextAccessoryViewEnabled, BOOL)
-  SET(bookmarkSortOrder, PSPDFBookmarkManagerSortOrder)
-  SET(internalTapGesturesEnabled, BOOL)
-  SET(useParentNavigationBar, BOOL)
-  SET(linkAction, PSPDFLinkAction)
-  SET(allowedMenuActions, PSPDFTextSelectionMenuAction)
-  SET(userInterfaceViewMode, PSPDFUserInterfaceViewMode)
-  SET(userInterfaceViewAnimation, PSPDFUserInterfaceViewAnimation)
-  SET_PROPERTY(showThumbnailBar, thumbnailBarMode, PSPDFThumbnailBarMode)
-  SET(thumbnailBarMode, PSPDFThumbnailBarMode)
-  SET_PROPERTY(showPageLabels, pageLabelEnabled, BOOL)
-  SET(pageLabelEnabled, BOOL)
-  SET_PROPERTY(showDocumentLabel, documentLabelEnabled, PSPDFAdaptiveConditional)
-  SET(documentLabelEnabled, PSPDFAdaptiveConditional)
-  SET(shouldHideUserInterfaceOnPageChange, BOOL)
-  SET(shouldShowUserInterfaceOnViewWillAppear, BOOL)
-  SET(allowToolbarTitleChange, BOOL)
-  SET(renderAnimationEnabled, BOOL)
-  SET(renderStatusViewPosition, PSPDFRenderStatusViewPosition)
-  SET(pageMode, PSPDFPageMode)
-  SET(scrubberBarType, PSPDFScrubberBarType)
-  SET(thumbnailGrouping, PSPDFThumbnailGrouping)
-  SET(pageTransition, PSPDFPageTransition)
-  SET_PROPERTY(pageScrollDirection, scrollDirection, PSPDFScrollDirection)
+  // Document Interaction Options
   SET(scrollDirection, PSPDFScrollDirection)
+  SET(pageTransition, PSPDFPageTransition)
+  SET(shouldScrollToChangedPage, BOOL)
   SET(scrollViewInsetAdjustment, PSPDFScrollInsetAdjustment)
-  SET(firstPageAlwaysSingle, BOOL)
-  SET(spreadFitting, PSPDFConfigurationSpreadFitting)
-  SET(clipToPageBoundaries, BOOL)
-  SET(additionalScrollViewFrameInsets, UIEdgeInsets)
-  SET(additionalContentInsets, UIEdgeInsets)
-  SET(minimumZoomScale, float)
-  SET(maximumZoomScale, float)
-  SET(shadowEnabled, BOOL)
-  SET(shadowOpacity, CGFloat)
-  SET(shouldHideNavigationBarWithUserInterface, BOOL)
-  SET(shouldHideStatusBar, BOOL)
-  SET(shouldHideStatusBarWithUserInterface, BOOL)
-  SET(backgroundColor, UIColor)
-  SET(allowedAppearanceModes, PSPDFAppearanceMode)
-  SET(thumbnailSize, CGSize)
-  SET(thumbnailInteritemSpacing, CGFloat)
-  SET(thumbnailLineSpacing, CGFloat)
-  SET(thumbnailMargin, UIEdgeInsets)
-  SET(annotationAnimationDuration, CGFloat)
-  SET(annotationGroupingEnabled, BOOL)
-  SET(createAnnotationMenuEnabled, BOOL)
-  SET(naturalDrawingAnnotationEnabled, BOOL)
-  SET(drawCreateMode, PSPDFDrawCreateMode)
-  SET(shouldAskForAnnotationUsername, BOOL)
-  SET(annotationEntersEditModeAfterSecondTapEnabled, BOOL)
+  SET(formElementZoomEnabled, BOOL)
+  SET_PROPERTY(enableTextSelection, textSelectionEnabled, BOOL)
+  SET(imageSelectionEnabled, BOOL)
+  SET(textSelectionShouldSnapToWord, BOOL)
+  SET(freeTextAccessoryViewEnabled, BOOL)
+  SET(internalTapGesturesEnabled, BOOL)
   SET(autosaveEnabled, BOOL)
   SET(allowBackgroundSaving, BOOL)
-  SET(soundAnnotationTimeLimit, NSTimeInterval)
-  SET(shouldCacheThumbnails, BOOL)
-  SET(shouldScrollToChangedPage, BOOL)
-  SET(searchMode, PSPDFSearchMode)
-  SET(searchResultZoomScale, CGFloat)
   SET(signatureSavingStrategy, PSPDFSignatureSavingStrategy)
-  SET(naturalSignatureDrawingEnabled, BOOL)
-  // currently unsupported: SET(*galleryConfiguration, PSPDFGalleryConfiguration)
+  SET(minimumZoomScale, float)
+  SET(maximumZoomScale, float)
+  SET(doubleTapAction, PSPDFTapAction)
+  SET(textSelectionMode, PSPDFTextSelectionMode)
+  SET(typesShowingColorPresets, PSPDFAnnotationType)
+  if (dictionary[@"disableAutomaticSaving"]) {
+    self.autosaveEnabled = ![RCTConvert BOOL:dictionary[@"disableAutomaticSaving"]];
+  }
+
+  // Document Presentation Options
+  SET_PROPERTY(showPageLabels, pageLabelEnabled, BOOL)
+  SET(documentLabelEnabled, PSPDFAdaptiveConditional)
+  SET(pageMode, PSPDFPageMode)
+  SET(firstPageAlwaysSingle, BOOL)
+  SET(clipToPageBoundaries, BOOL)
+  SET(spreadFitting, PSPDFConfigurationSpreadFitting)
+  SET(backgroundColor, UIColor)
+  SET(renderAnimationEnabled, BOOL)
+  SET(renderStatusViewPosition, PSPDFRenderStatusViewPosition)
+  SET(allowedAppearanceModes, PSPDFAppearanceMode)
+  if (dictionary[@"fitPageToWidth"]) {
+    NSString *mode = [RCTConvert NSString:dictionary[@"fitPageToWidth"]];
+    self.spreadFitting = [mode isEqualToString:@"fit"] ? PSPDFConfigurationSpreadFittingFit : PSPDFConfigurationSpreadFittingFill;
+  }
+
+  // User Interface Options
+  SET(userInterfaceViewMode, PSPDFUserInterfaceViewMode)
+  SET(userInterfaceViewAnimation, PSPDFUserInterfaceViewAnimation)
+  SET(shouldHideUserInterfaceOnPageChange, BOOL)
+  SET(shouldShowUserInterfaceOnViewWillAppear, BOOL)
+  SET(shouldHideStatusBarWithUserInterface, BOOL)
+  SET(shouldHideNavigationBarWithUserInterface, BOOL)
+  SET(searchMode, PSPDFSearchMode)
+  SET(scrollOnEdgeTapEnabled, BOOL)
+  SET(scrollOnEdgeTapMargin, CGFloat)
+  SET(useParentNavigationBar, BOOL)
+  SET(allowToolbarTitleChange, BOOL)
+  SET(shouldHideStatusBar, BOOL)
   SET(showBackActionButton, BOOL)
   SET(showForwardActionButton, BOOL)
   SET(showBackForwardActionButtonLabels, BOOL)
+  SET(searchResultZoomScale, CGFloat)
+  SET(additionalScrollViewFrameInsets, UIEdgeInsets)
+  SET(additionalContentInsets, UIEdgeInsets)
+  SET(allowedMenuActions, PSPDFTextSelectionMenuAction)
   SET(settingsOptions, PSPDFSettingsOptions)
-  SET(editableAnnotationTypes, NSSet)
-
+  SET(shadowEnabled, BOOL)
+  SET(shadowOpacity, CGFloat)
+  if (dictionary[@"immersiveMode"]) {
+    self.userInterfaceViewMode = [RCTConvert BOOL:dictionary[@"immersiveMode"]] ? PSPDFUserInterfaceViewModeNever : PSPDFUserInterfaceViewModeAutomatic;
+  }
   if (dictionary[@"inlineSearch"]) {
     self.searchMode = [RCTConvert BOOL:dictionary[@"inlineSearch"]] ? PSPDFSearchModeInline : PSPDFSearchModeModal;
   }
 
-  if (dictionary[@"enableAnnotationEditing"] && ![RCTConvert BOOL:dictionary[@"enableAnnotationEditing"]]) {
-    self.editableAnnotationTypes = nil;
-  }
-
-  if (dictionary[@"enableFormEditing"] && ![RCTConvert BOOL:dictionary[@"enableFormEditing"]]) {
-    NSMutableSet *editableTypes = [self.editableAnnotationTypes mutableCopy];
-    [editableTypes removeObject:PSPDFAnnotationStringWidget];
-    self.editableAnnotationTypes = [editableTypes copy];
-  }
+  // Thumbnail Options
+  SET(thumbnailBarMode, PSPDFThumbnailBarMode)
+  SET(scrubberBarType, PSPDFScrubberBarType)
+  SET(thumbnailGrouping, PSPDFThumbnailGrouping)
+  SET(thumbnailSize, CGSize)
+  SET(thumbnailInteritemSpacing, CGFloat)
+  SET(thumbnailLineSpacing, CGFloat)
+  SET(thumbnailMargin, UIEdgeInsets)
+  SET(shouldCacheThumbnails, BOOL)
   
+  // Annotation, Forms and Bookmark Options
+  SET(editableAnnotationTypes, NSSet)
+  SET(shouldAskForAnnotationUsername, BOOL)
+  SET(linkAction, PSPDFLinkAction)
+  SET(drawCreateMode, PSPDFDrawCreateMode)
+  SET(annotationGroupingEnabled, BOOL)
+  SET(naturalDrawingAnnotationEnabled, BOOL)
+  SET(naturalSignatureDrawingEnabled, BOOL)
+  SET(annotationEntersEditModeAfterSecondTapEnabled, BOOL)
+  SET(createAnnotationMenuEnabled, BOOL)
+  SET(annotationAnimationDuration, CGFloat)
+  SET(soundAnnotationTimeLimit, NSTimeInterval)
+  SET(bookmarkSortOrder, PSPDFBookmarkManagerSortOrder)
   if (dictionary[@"sharingConfigurations"]) {
     [self setRCTSharingConfigurations:[RCTConvert NSArray:dictionary[@"sharingConfigurations"]]];
   }
+  if (dictionary[@"enableAnnotationEditing"]) {
+    BOOL enable = [RCTConvert BOOL:dictionary[@"enableAnnotationEditing"]];
+    if (enable) {
+      self.editableAnnotationTypes = [NSSet setWithArray:@[PSPDFAnnotationStringLink, PSPDFAnnotationStringHighlight, PSPDFAnnotationStringUnderline, PSPDFAnnotationStringSquiggly, PSPDFAnnotationStringStrikeOut, PSPDFAnnotationStringNote, PSPDFAnnotationStringCaret, PSPDFAnnotationStringFreeText, PSPDFAnnotationStringInk, PSPDFAnnotationStringSquare, PSPDFAnnotationStringCircle, PSPDFAnnotationStringLine, PSPDFAnnotationStringSignature, PSPDFAnnotationStringStamp, PSPDFAnnotationStringEraser, PSPDFAnnotationStringImage, PSPDFAnnotationStringWidget, PSPDFAnnotationStringFile, PSPDFAnnotationStringSound, PSPDFAnnotationStringPolygon, PSPDFAnnotationStringPolyLine, PSPDFAnnotationStringRichMedia, PSPDFAnnotationStringScreen, PSPDFAnnotationStringPopup, PSPDFAnnotationStringWatermark, PSPDFAnnotationStringTrapNet, PSPDFAnnotationString3D, PSPDFAnnotationStringRedaction]];
+    } else {
+      self.editableAnnotationTypes = nil;
+    }
+  }
+  if (dictionary[@"enableFormEditing"]) {
+    BOOL isFormEditingEnabled = [RCTConvert BOOL:dictionary[@"enableFormEditing"]];
+    NSMutableSet *editableTypes = [self.editableAnnotationTypes mutableCopy];
+    if (isFormEditingEnabled) {
+      [editableTypes addObject:PSPDFAnnotationStringWidget];
+    } else {
+      [editableTypes removeObject:PSPDFAnnotationStringWidget];
+    }
+    self.editableAnnotationTypes = [editableTypes copy];
+  }
+    
+  // Deprecated Options
+   
+  // Use `scrollDirection` instead.
+  SET_PROPERTY(pageScrollDirection, scrollDirection, PSPDFScrollDirection)
+  
+  // Use `pageTransition` instead.
+  if (dictionary[@"scrollContinuously"]) {
+    self.pageTransition = [RCTConvert BOOL:dictionary[@"scrollContinuously"]] ? PSPDFPageTransitionScrollContinuous : PSPDFPageTransitionScrollPerSpread;
+  }
+  
+  // Use `enableTextSelection` instead.
+  SET(textSelectionEnabled, BOOL)
+  
+  // Use `showPageLabels` instead.
+  SET(pageLabelEnabled, BOOL)
+  
+  // Use `showPageLabels` instead.
+  SET_PROPERTY(showPageNumberOverlay, pageLabelEnabled, BOOL)
+  
+  // Use `documentLabelEnabled` instead.
+  SET_PROPERTY(showDocumentLabel, documentLabelEnabled, PSPDFAdaptiveConditional)
+  
+  // Use `thumbnailBarMode` instead.
+  SET_PROPERTY(showThumbnailBar, thumbnailBarMode, PSPDFThumbnailBarMode)
 }
 
 - (void)setRCTSharingConfigurations:(NSArray<NSDictionary *> *)sharingConfigurations {

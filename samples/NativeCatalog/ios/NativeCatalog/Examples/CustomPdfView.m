@@ -1,5 +1,5 @@
 //
-//  Copyright © 2020-2021 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2020-2022 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -102,7 +102,7 @@
   return YES;
 }
 
-#pragma mark - PSPDFSignatureViewControllerDelegate
+// MARK: - PSPDFSignatureViewControllerDelegate
 
 - (void)signatureCreationViewControllerDidFinish:(PSPDFSignatureCreationViewController * _Nonnull)signatureController  API_AVAILABLE(ios(13.0)){
     [signatureController dismissViewControllerAnimated:YES completion:^{
