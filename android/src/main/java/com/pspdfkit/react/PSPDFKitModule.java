@@ -48,12 +48,15 @@ import com.pspdfkit.ui.PdfActivity;
 import com.pspdfkit.ui.PdfFragment;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
 public class PSPDFKitModule extends ReactContextBaseJavaModule implements Application.ActivityLifecycleCallbacks, ActivityEventListener {
 
+    /** Hybrid technology where the application is supposed to be working on. */
+    private static final String HYBRID_TECHNOLOGY = "ReactNative";
     private static final String VERSION_KEY = "versionString";
     private static final String FILE_SCHEME = "file:///";
 
@@ -183,14 +186,14 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
 
     @ReactMethod
     public void setLicenseKey(@Nullable String licenseKey) {
-        PSPDFKit.initialize(getReactApplicationContext().getApplicationContext(), licenseKey);
+        PSPDFKit.initialize(getReactApplicationContext().getApplicationContext(), licenseKey, new ArrayList<>(), HYBRID_TECHNOLOGY);
     }
 
     @ReactMethod
     public void setLicenseKeys(@Nullable String androidLicenseKey, @Nullable String iOSLicenseKey) {
         // Here, we ignore the `iOSLicenseKey` parameter and only care about `androidLicenseKey`.
         // `iOSLicenseKey` will be used to activate the license on iOS.
-        PSPDFKit.initialize(getReactApplicationContext().getApplicationContext(), androidLicenseKey);
+        PSPDFKit.initialize(getReactApplicationContext().getApplicationContext(), androidLicenseKey, new ArrayList<>(), HYBRID_TECHNOLOGY);
     }
 
     @ReactMethod

@@ -350,10 +350,10 @@ public class ConfigurationAdapter {
             return;
         }
         if (mode.equals(SPREAD_FITTING_FIT)) {
-            configuration.fitMode(PageFitMode.FIT_TO_WIDTH);
+            configuration.fitMode(PageFitMode.FIT_TO_SCREEN);
         }
         else if (mode.equals(SPREAD_FITTING_FILL)) {
-            configuration.fitMode(PageFitMode.FIT_TO_SCREEN);
+            configuration.fitMode(PageFitMode.FIT_TO_WIDTH);
         }
     }
 

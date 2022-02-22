@@ -60,6 +60,7 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
     public static final int COMMAND_SET_FORM_FIELD_VALUE = 9;
     public static final int COMMAND_REMOVE_ANNOTATION = 10;
     public static final int COMMAND_GET_ALL_ANNOTATIONS = 11;
+    public static final int COMMAND_REMOVE_FRAGMENT = 12;
 
     private CompositeDisposable annotationDisposables = new CompositeDisposable();
 
@@ -110,6 +111,7 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
         commandMap.put("setFormFieldValue", COMMAND_SET_FORM_FIELD_VALUE);
         commandMap.put("removeAnnotation", COMMAND_REMOVE_ANNOTATION);
         commandMap.put("getAllAnnotations", COMMAND_GET_ALL_ANNOTATIONS);
+        commandMap.put("removeFragment", COMMAND_REMOVE_FRAGMENT);
         return commandMap;
     }
 
@@ -284,6 +286,11 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
                         });
                     annotationDisposables.add(annotationDisposable);
                 }
+                break;
+            case COMMAND_REMOVE_FRAGMENT:
+                // Removing a fragment like this is not recommended, but it can be used as a workaround 
+                // to stop `react-native-screens` from crashing the App when the back button is pressed.
+                root.removeFragment(true);
                 break;
         }
     }

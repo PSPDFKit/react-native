@@ -1,0 +1,240 @@
+import {BaseExampleAutoHidingHeaderComponent} from '../helpers/BaseExampleAutoHidingHeaderComponent';
+import {Button, processColor, View} from 'react-native';
+import PSPDFKitView from 'react-native-pspdfkit';
+import {
+  pspdfkitColor,
+  writableDocumentPath,
+} from '../configuration/Constants';
+import fileSystem from 'react-native-fs';
+import {PSPDFKit} from '../helpers/PSPDFKit';
+import React from 'react';
+
+export class AnnotationProcessing extends BaseExampleAutoHidingHeaderComponent {
+  render() {
+    return (
+      <View style={{flex: 1}}>
+        <PSPDFKitView
+          ref="pdfView"
+          document={writableDocumentPath}
+          disableAutomaticSaving={true}
+          configuration={{
+            backgroundColor: processColor('lightgrey'),
+          }}
+          style={{flex: 1, color: pspdfkitColor}}
+        />
+        <View
+          style={{
+            flexDirection: 'column',
+            alignItems: 'center',
+          }}>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              padding: 5,
+            }}>
+            <View>
+              <Button
+                onPress={async () => {
+                  const processedDocumentPath =
+                    fileSystem.DocumentDirectoryPath + '/embedded.pdf';
+                  // Delete the processed document if it already exists.
+                  fileSystem
+                    .exists(processedDocumentPath)
+                    .then(exists => {
+                      if (exists) {
+                        fileSystem.unlink(processedDocumentPath);
+                      }
+                    })
+                    // First, save all annotations in the current document.
+                    .then(() => {
+                      this.refs.pdfView
+                        .saveCurrentDocument()
+                        .then(saved => {
+                          // Then, embed all the annotations
+                          PSPDFKit.processAnnotations(
+                            'embed',
+                            'all',
+                            writableDocumentPath,
+                            processedDocumentPath,
+                          )
+                            .then(success => {
+                              if (success) {
+                                // And finally, present the newly processed document with embedded annotations.
+                                PSPDFKit.present(
+                                  processedDocumentPath,
+                                  {},
+                                );
+                              } else {
+                                alert('Failed to embed annotations.');
+                              }
+                            })
+                            .catch(error => {
+                              alert(JSON.stringify(error));
+                            });
+                        })
+                        .catch(error => {
+                          alert(JSON.stringify(error));
+                        });
+                    });
+                }}
+                title="Embed Annotations"
+              />
+            </View>
+            <View style={{marginLeft: 10}}>
+              <Button
+                onPress={async () => {
+                  const processedDocumentPath =
+                    fileSystem.DocumentDirectoryPath + '/flattened.pdf';
+                  // Delete the processed document if it already exists.
+                  fileSystem
+                    .exists(processedDocumentPath)
+                    .then(exists => {
+                      if (exists) {
+                        fileSystem.unlink(processedDocumentPath);
+                      }
+                    })
+                    .then(() => {
+                      // First, save all annotations in the current document.
+                      this.refs.pdfView
+                        .saveCurrentDocument()
+                        .then(saved => {
+                          // Then, flatten all the annotations
+                          PSPDFKit.processAnnotations(
+                            'flatten',
+                            'all',
+                            writableDocumentPath,
+                            processedDocumentPath,
+                          )
+                            .then(success => {
+                              if (success) {
+                                // And finally, present the newly processed document with flattened annotations.
+                                PSPDFKit.present(
+                                  processedDocumentPath,
+                                  {},
+                                );
+                              } else {
+                                alert('Failed to embed annotations.');
+                              }
+                            })
+                            .catch(error => {
+                              alert(JSON.stringify(error));
+                            });
+                        })
+                        .catch(error => {
+                          alert(JSON.stringify(error));
+                        });
+                    });
+                }}
+                title="Flatten Annotations"
+              />
+            </View>
+          </View>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              padding: 5,
+            }}>
+            <View>
+              <Button
+                onPress={async () => {
+                  const processedDocumentPath =
+                    fileSystem.DocumentDirectoryPath + '/removed.pdf';
+                  // Delete the processed document if it already exists.
+                  fileSystem
+                    .exists(processedDocumentPath)
+                    .then(exists => {
+                      if (exists) {
+                        fileSystem.unlink(processedDocumentPath);
+                      }
+                    })
+                    .then(() => {
+                      // First, save all annotations in the current document.
+                      this.refs.pdfView
+                        .saveCurrentDocument()
+                        .then(saved => {
+                          // Then, remove all the annotations
+                          PSPDFKit.processAnnotations(
+                            'remove',
+                            'all',
+                            writableDocumentPath,
+                            processedDocumentPath,
+                          )
+                            .then(success => {
+                              if (success) {
+                                // And finally, present the newly processed document with removed annotations.
+                                PSPDFKit.present(
+                                  processedDocumentPath,
+                                  {},
+                                );
+                              } else {
+                                alert('Failed to remove annotations.');
+                              }
+                            })
+                            .catch(error => {
+                              alert(JSON.stringify(error));
+                            });
+                        })
+                        .catch(error => {
+                          alert(JSON.stringify(error));
+                        });
+                    });
+                }}
+                title="Remove Annotations"
+              />
+            </View>
+            <View style={{marginLeft: 10}}>
+              <Button
+                onPress={async () => {
+                  const processedDocumentPath =
+                    fileSystem.DocumentDirectoryPath + '/printed.pdf';
+                  // Delete the processed document if it already exists.
+                  fileSystem
+                    .exists(processedDocumentPath)
+                    .then(exists => {
+                      if (exists) {
+                        fileSystem.unlink(processedDocumentPath);
+                      }
+                    })
+                    .then(() => {
+                      // First, save all annotations in the current document.
+                      this.refs.pdfView
+                        .saveCurrentDocument()
+                        .then(success => {
+                          // Then, print all the annotations
+                          PSPDFKit.processAnnotations(
+                            'print',
+                            'all',
+                            writableDocumentPath,
+                            processedDocumentPath,
+                          )
+                            .then(success => {
+                              if (success) {
+                                // And finally, present the newly processed document with printed annotations.
+                                PSPDFKit.present(
+                                  processedDocumentPath,
+                                  {},
+                                );
+                              } else {
+                                alert('Failed to print annotations.');
+                              }
+                            })
+                            .catch(error => {
+                              alert(JSON.stringify(error));
+                            });
+                        })
+                        .catch(error => {
+                          alert(JSON.stringify(error));
+                        });
+                    });
+                }}
+                title="Print Annotations"
+              />
+            </View>
+          </View>
+        </View>
+      </View>
+    );
+  }
+}

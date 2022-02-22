@@ -16,7 +16,7 @@ target 'Catalog' do
     inherit! :complete
     # Pods for testing
   end
-  pod 'PSPDFKit', '~> 11.2.0'
+  pod 'PSPDFKit', '~> 11.2.2'
   # Enables Flipper.
   #
   # Note that if you have use_frameworks! enabled, Flipper will not work and
@@ -25,5 +25,14 @@ target 'Catalog' do
 
   post_install do |installer|
     react_native_post_install(installer)
+    # Fix for M1 machines: https://github.com/facebook/react-native/issues/31941
+    installer.aggregate_targets.each do |aggregate_target|
+      aggregate_target.user_project.native_targets.each do |target|
+        target.build_configurations.each do |config|
+          config.build_settings['LIBRARY_SEARCH_PATHS'] = ['$(SDKROOT)/usr/lib/swift', '$(inherited)']
+        end
+      end
+      aggregate_target.user_project.save
+    end
   end
 end

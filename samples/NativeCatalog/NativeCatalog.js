@@ -6,31 +6,19 @@
 //  This notice may not be removed from this file.
 //
 
-import React, {Component} from 'react';
-import {
-  StyleSheet,
-  SafeAreaView,
-  findNodeHandle,
-  UIManager,
-  View,
-  NativeModules,
-  Button,
-  Text,
-  Image,
-  FlatList,
-  TouchableHighlight,
-  PermissionsAndroid,
-  requireNativeComponent,
-} from 'react-native';
+import React from 'react';
+import {FlatList, Image, NativeModules, StyleSheet, Text, TouchableHighlight, View,} from 'react-native';
 import {createStackNavigator} from 'react-navigation-stack';
 import {createAppContainer} from 'react-navigation';
+import {BaseExampleAutoHidingHeaderComponent} from "./helpers/BaseExampleAutoHidingHeaderComponent";
+import {pspdfkitColor} from "./configuration/Constants";
+import {ManualSigning} from "./examples/ManualSigning";
+import {Watermark} from "./examples/Watermark";
+import {WatermarkStartup} from "./examples/WatermarkStartup";
+import {InstantExample} from "./examples/InstantExample";
+import {DefaultAnnotationSettings} from "./examples/DefaultAnnotationSettings";
 
-// Constants
-const CustomPdfView = requireNativeComponent('CustomPdfView');
 const PSPDFKit = NativeModules.PSPDFKit;
-const fileSystem = require('react-native-fs');
-const pspdfkitColor = '#267AD4';
-const pspdfkitColorAlpha = '#267AD450';
 
 // By default, this example doesn't set a license key, but instead runs in trial mode (which is the default, and which requires no
 // specific initialization). If you want to use a different license key for evaluation (e.g. a production license), you can uncomment
@@ -41,15 +29,6 @@ const pspdfkitColorAlpha = '#267AD450';
 //
 // To set the license key for the currently running platform, use:
 // PSPDFKit.setLicenseKey("YOUR_REACT_NATIVE_LICENSE_KEY_GOES_HERE");
-
-// Document names
-const formDocumentName = 'Form_example.pdf';
-
-// Document paths
-const formDocumentPath =
-  Platform.OS === 'ios'
-    ? 'PDFs/' + formDocumentName
-    : 'file:///android_asset/' + formDocumentName;
 
 const examples = [
   {
@@ -96,18 +75,7 @@ const examples = [
   },
 ];
 
-class AutoHidingHeaderComponent extends Component {
-  static navigationOptions = ({navigation}) => {
-    if (Platform.OS === 'android') {
-      return {
-        // Since the PSPDFKitView provides it's own toolbar and back button we don't need a header in Android.
-        headerShown: false,
-      };
-    }
-  };
-}
-
-class NativeCatalog extends AutoHidingHeaderComponent {
+class NativeCatalog extends BaseExampleAutoHidingHeaderComponent {
   // Initialize the hardcoded data
   constructor(props) {
     super(props);
@@ -160,175 +128,6 @@ class NativeCatalog extends AutoHidingHeaderComponent {
       </TouchableHighlight>
     );
   };
-}
-
-class ManualSigning extends AutoHidingHeaderComponent {
-  constructor(props) {
-    super(props);
-    this.state = {
-      documentPath: formDocumentPath,
-    };
-  }
-
-  render() {
-    return (
-      <View style={{flex: 1}}>
-        <CustomPdfView
-          ref="pdfView"
-          document={this.state.documentPath}
-          style={{flex: 1}}
-          onDocumentDigitallySigned={event => {
-            this.setState({
-              documentPath: event.nativeEvent.signedDocumentPath,
-            });
-          }}
-        />
-        <SafeAreaView
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-          }}
-        >
-          <View>
-            <Button
-              onPress={() => {
-                // This will open the native signature dialog.
-                if (Platform.OS === 'android') {
-                  UIManager.dispatchViewManagerCommand(
-                    findNodeHandle(this.refs.pdfView),
-                    'startSigning',
-                    [],
-                  );
-                } else {
-                  NativeModules.CustomPdfViewManager.startSigning(
-                    findNodeHandle(this.refs.pdfView),
-                  );
-                }
-              }}
-              title="Start Signing"
-            />
-          </View>
-        </SafeAreaView>
-      </View>
-    );
-  }
-}
-
-class Watermark extends AutoHidingHeaderComponent {
-  constructor(props) {
-    super(props);
-    this.state = {
-      documentPath: formDocumentPath,
-    };
-  }
-
-  render() {
-    return (
-      <View style={{flex: 1}}>
-        <CustomPdfView
-          ref="pdfView"
-          document={this.state.documentPath}
-          style={{flex: 1}}
-          onDocumentWatermarked={event => {
-            this.setState({
-              documentPath: event.nativeEvent.watermarkedDocumentPath,
-            });
-          }}
-        />
-        <SafeAreaView
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-          }}
-        >
-          <View>
-            <Button
-              onPress={() => {
-                // This will create a watermark in native code.
-                if (Platform.OS === 'android') {
-                  UIManager.dispatchViewManagerCommand(
-                    findNodeHandle(this.refs.pdfView),
-                    'createWatermark',
-                    [],
-                  );
-                } else {
-                  NativeModules.CustomPdfViewManager.createWatermark(
-                    findNodeHandle(this.refs.pdfView),
-                  );
-                }
-              }}
-              title="Create Watermark"
-            />
-          </View>
-        </SafeAreaView>
-      </View>
-    );
-  }
-}
-
-class WatermarkStartup extends AutoHidingHeaderComponent {
-  constructor(props) {
-    super(props);
-    this.state = {
-      // This tag tells our CustomPdfView to apply the watermark to the document before loading it.
-      documentPath: formDocumentPath + '|ADD_WATERMARK',
-    };
-  }
-
-  render() {
-    return (
-      <View style={{flex: 1}}>
-        <CustomPdfView
-          ref="pdfView"
-          document={this.state.documentPath}
-          style={{flex: 1}}
-          onDocumentWatermarked={event => {
-            this.setState({
-              documentPath: event.nativeEvent.watermarkedDocumentPath,
-            });
-          }}
-        />
-      </View>
-    );
-  }
-}
-
-class InstantExample extends AutoHidingHeaderComponent {
-  render() {
-    return (
-      <View style={{flex: 1}}>
-        <CustomPdfView ref="pdfView" />
-        <Button
-          onPress={() => {
-            NativeModules.CustomPdfViewManager.presentInstantExample(
-              findNodeHandle(this.refs.pdfView),
-            );
-          }}
-          title="Present Instant Example"
-        />
-      </View>
-    );
-  }
-}
-
-class DefaultAnnotationSettings extends AutoHidingHeaderComponent {
-  render() {
-    return (
-      <View style={{flex: 1}}>
-        <CustomPdfView
-          ref="pdfView"
-          document={formDocumentPath}
-          style={{flex: 1}}
-          // This way only the ink tool and the button to open the inspector is shown.
-          // If you don't need the inspector you can remove the "picker" option completely
-          // and only configure the tool using the AnnotationConfiguration.
-          // See CustomPdfViewManager#setDocument() for how to apply the custom configuration.
-          menuItemGrouping={['pen', 'picker']}
-          rightBarButtonItems={['annotationButtonItem']}
-        />
-      </View>
-    );
-  }
 }
 
 export default createAppContainer(

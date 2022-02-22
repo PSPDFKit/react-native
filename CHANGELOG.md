@@ -1,6 +1,17 @@
-## Next Release
-
 ## Newest Release
+
+### 2.2.0 - 14 Feb 2022
+
+- This release requires you to update your Android project's `compileSdkVersion` to version 31. Please refer to [our migration guide](https://pspdfkit.com/guides/react-native/migration-guides/react-native-2-2-migration-guide) for this release.
+- Adds a `destroyView()` function to `PSPDFKitView` to be used as a workaround for crash caused by a [`react-native-screens` issue](https://github.com/software-mansion/react-native-screens/issues/1300) when navigating back. (#32960)
+- Improves the file structure of the Catalog sample project for better readability. (#32685)
+- Improves the file structure of the NativeCatalog sample project for better readability. (#32887)
+- Updates for PSPDFKit 8.1.1 for Android. (#33017)
+- Updates for PSPDFKit 11.2.2 for iOS. (#33017)
+- Fixes an issue where the `spreadFitting` configuration value is inverted on Android. (#32789)
+- Removes `signingConfig` from React Native Android's sample projects app-level `build.gradle` files. (#32767)
+
+## Previous Releases
 
 ### 2.1.0 - 06 Jan 2022
 
@@ -10,8 +21,6 @@
 - PSPDFKit now requires Xcode 13.2.1 or later. (#32495)
 - Updates for PSPDFKit 11.2 for iOS. (#32495)
 - Fixes an issue where some examples using `Form_example.pdf` would not work. (#32495)
-
-## Previous Releases
 
 ### 2.0.4 - 07 Dec 2021
 
