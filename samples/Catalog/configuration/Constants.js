@@ -24,4 +24,6 @@ export const tiffImagePath =
 export const pspdfkitColor = '#267AD4';
 
 export const writableDocumentPath =
-  fileSystem.DocumentDirectoryPath + '/' + exampleDocumentName;
+  Platform.OS === 'ios'
+    ? fileSystem.DocumentDirectoryPath + '/' + exampleDocumentName
+    : 'file://' + fileSystem.DocumentDirectoryPath + '/' + exampleDocumentName;

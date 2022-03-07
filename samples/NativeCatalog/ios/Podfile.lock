@@ -72,12 +72,12 @@ PODS:
     - FlipperKit/FlipperKitNetworkPlugin
   - fmt (6.2.1)
   - glog (0.3.5)
-  - Instant (11.2.2)
+  - Instant (11.2.4)
   - libevent (2.1.12)
   - OpenSSL-Universal (1.1.180)
-  - PSPDFKit (11.2.2):
-    - PSPDFKit/Core (= 11.2.2)
-  - PSPDFKit/Core (11.2.2)
+  - PSPDFKit (11.2.4):
+    - PSPDFKit/Core (= 11.2.4)
+  - PSPDFKit/Core (11.2.4)
   - RCT-Folly (2021.06.28.00-v2):
     - boost
     - DoubleConversion
@@ -276,7 +276,7 @@ PODS:
   - React-jsinspector (0.66.4)
   - React-logger (0.66.4):
     - glog
-  - react-native-pspdfkit (2.2.0):
+  - react-native-pspdfkit (2.2.1):
     - PSPDFKit
     - React
   - react-native-safe-area-context (3.3.2):
@@ -386,8 +386,8 @@ DEPENDENCIES:
   - FlipperKit/FlipperKitUserDefaultsPlugin (= 0.99.0)
   - FlipperKit/SKIOSNetworkPlugin (= 0.99.0)
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
-  - Instant (~> 11.2.2)
-  - PSPDFKit (~> 11.2.2)
+  - Instant (~> 11.2.4)
+  - PSPDFKit (~> 11.2.4)
   - RCT-Folly (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCTRequired (from `../node_modules/react-native/Libraries/RCTRequired`)
   - RCTTypeSafety (from `../node_modules/react-native/Libraries/TypeSafety`)
@@ -532,10 +532,10 @@ SPEC CHECKSUMS:
   FlipperKit: d8d346844eca5d9120c17d441a2f38596e8ed2b9
   fmt: ff9d55029c625d3757ed641535fd4a75fedc7ce9
   glog: 5337263514dd6f09803962437687240c5dc39aa4
-  Instant: 872613d414ca58677e98a91ce66613a911f1ff7d
+  Instant: d3052a5778e775bbf52a4b16486a2a398a8b88ba
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
   OpenSSL-Universal: 1aa4f6a6ee7256b83db99ec1ccdaa80d10f9af9b
-  PSPDFKit: 1b4214c4d3b371bc73001a907045052be87b3c35
+  PSPDFKit: c4500722e73a3fd620b979d9375601a9479a8a41
   RCT-Folly: a21c126816d8025b547704b777a2ba552f3d9fa9
   RCTRequired: 4bf86c70714490bca4bf2696148638284622644b
   RCTTypeSafety: c475a7059eb77935fa53d2c17db299893f057d5d
@@ -548,7 +548,7 @@ SPEC CHECKSUMS:
   React-jsiexecutor: 94ce921e1d8ce7023366873ec371f3441383b396
   React-jsinspector: d0374f7509d407d2264168b6d0fad0b54e300b85
   React-logger: 933f80c97c633ee8965d609876848148e3fef438
-  react-native-pspdfkit: cd2fdb7c7b2758702e6b28da025f9d550f005bd9
+  react-native-pspdfkit: d1e8169e3f045572187c6ff5753bd349ff778668
   react-native-safe-area-context: 584dc04881deb49474363f3be89e4ca0e854c057
   React-perflogger: 93075d8931c32cd1fce8a98c15d2d5ccc4d891bd
   React-RCTActionSheet: 7d3041e6761b4f3044a37079ddcb156575fb6d89
@@ -569,6 +569,6 @@ SPEC CHECKSUMS:
   Yoga: e7dc4e71caba6472ff48ad7d234389b91dadc280
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
-PODFILE CHECKSUM: bd5bd485f30d0701b85c02187b725eed5ccf8e9c
+PODFILE CHECKSUM: 1d2cac7585bc48baf1570124f7acead4def87be7
 
 COCOAPODS: 1.11.2

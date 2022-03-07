@@ -111,7 +111,7 @@ const examples = [
       component.props.navigation.push('StateChange');
     },
   },
-  Platform.OS === 'ios' && {
+ {
     key: 'item6',
     name: 'Annotation Processing',
     description:
