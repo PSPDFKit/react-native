@@ -101,7 +101,6 @@ class PSPDFKitView extends React.Component {
     this._requestMap.delete(requestId);
   };
 
- 
   /**
    * Enters the annotation creation mode, showing the annotation creation toolbar.
    */
@@ -508,22 +507,21 @@ class PSPDFKitView extends React.Component {
 
   /**
    * Removes the currently displayed Android Native PdfUiFragment.
-   * 
+   *
    * This function should only be used as a workaround for a bug in `react-native-screen` that causes a crash when
-   * `navigation.goBack()` is called or a hardware back button is used to navigate back on Android. Calling this 
+   * `navigation.goBack()` is called or a hardware back button is used to navigate back on Android. Calling this
    * function will prevent the crash by removing the fragment from the `PdfView` before the navigation takes place.
-   * 
+   *
    * <b>Note:</> this function is available for Android only, it will have no effect on iOS.
    */
-   destroyView = function () {
+  destroyView = function () {
     if (Platform.OS === "android") {
       UIManager.dispatchViewManagerCommand(
         findNodeHandle(this.refs.pdfView),
-        this._getViewManagerConfig("RCTPSPDFKitView").Commands
-          .removeFragment,
+        this._getViewManagerConfig("RCTPSPDFKitView").Commands.removeFragment,
         []
       );
-    } 
+    }
   };
 
   _getViewManagerConfig = (viewManagerName) => {

@@ -1,10 +1,7 @@
 import {BaseExampleAutoHidingHeaderComponent} from '../helpers/BaseExampleAutoHidingHeaderComponent';
 import {Button, processColor, View} from 'react-native';
 import PSPDFKitView from 'react-native-pspdfkit';
-import {
-  pspdfkitColor,
-  writableDocumentPath,
-} from '../configuration/Constants';
+import {pspdfkitColor, writableDocumentPath} from '../configuration/Constants';
 import fileSystem from 'react-native-fs';
 import {PSPDFKit} from '../helpers/PSPDFKit';
 import React from 'react';
@@ -26,13 +23,15 @@ export class AnnotationProcessing extends BaseExampleAutoHidingHeaderComponent {
           style={{
             flexDirection: 'column',
             alignItems: 'center',
-          }}>
+          }}
+        >
           <View
             style={{
               flexDirection: 'row',
               alignItems: 'center',
               padding: 5,
-            }}>
+            }}
+          >
             <View>
               <Button
                 onPress={async () => {
@@ -61,10 +60,7 @@ export class AnnotationProcessing extends BaseExampleAutoHidingHeaderComponent {
                             .then(success => {
                               if (success) {
                                 // And finally, present the newly processed document with embedded annotations.
-                                PSPDFKit.present(
-                                  processedDocumentPath,
-                                  {},
-                                );
+                                PSPDFKit.present(processedDocumentPath, {});
                               } else {
                                 alert('Failed to embed annotations.');
                               }
@@ -109,10 +105,7 @@ export class AnnotationProcessing extends BaseExampleAutoHidingHeaderComponent {
                             .then(success => {
                               if (success) {
                                 // And finally, present the newly processed document with flattened annotations.
-                                PSPDFKit.present(
-                                  processedDocumentPath,
-                                  {},
-                                );
+                                PSPDFKit.present(processedDocumentPath, {});
                               } else {
                                 alert('Failed to embed annotations.');
                               }
@@ -135,7 +128,8 @@ export class AnnotationProcessing extends BaseExampleAutoHidingHeaderComponent {
               flexDirection: 'row',
               alignItems: 'center',
               padding: 5,
-            }}>
+            }}
+          >
             <View>
               <Button
                 onPress={async () => {
@@ -164,10 +158,7 @@ export class AnnotationProcessing extends BaseExampleAutoHidingHeaderComponent {
                             .then(success => {
                               if (success) {
                                 // And finally, present the newly processed document with removed annotations.
-                                PSPDFKit.present(
-                                  processedDocumentPath,
-                                  {},
-                                );
+                                PSPDFKit.present(processedDocumentPath, {});
                               } else {
                                 alert('Failed to remove annotations.');
                               }
@@ -212,10 +203,7 @@ export class AnnotationProcessing extends BaseExampleAutoHidingHeaderComponent {
                             .then(success => {
                               if (success) {
                                 // And finally, present the newly processed document with printed annotations.
-                                PSPDFKit.present(
-                                  processedDocumentPath,
-                                  {},
-                                );
+                                PSPDFKit.present(processedDocumentPath, {});
                               } else {
                                 alert('Failed to print annotations.');
                               }

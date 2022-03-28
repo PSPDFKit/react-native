@@ -2,10 +2,7 @@ import {BaseExampleAutoHidingHeaderComponent} from '../helpers/BaseExampleAutoHi
 import {processColor, View} from 'react-native';
 import PSPDFKitView from 'react-native-pspdfkit';
 import React from 'react';
-import {
-  exampleDocumentPath,
-  pspdfkitColor,
-} from '../configuration/Constants';
+import {exampleDocumentPath, pspdfkitColor} from '../configuration/Constants';
 
 export class PSPDFKitViewComponent extends BaseExampleAutoHidingHeaderComponent {
   render() {

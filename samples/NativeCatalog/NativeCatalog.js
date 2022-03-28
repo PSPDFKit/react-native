@@ -7,16 +7,24 @@
 //
 
 import React from 'react';
-import {FlatList, Image, NativeModules, StyleSheet, Text, TouchableHighlight, View,} from 'react-native';
+import {
+  FlatList,
+  Image,
+  NativeModules,
+  StyleSheet,
+  Text,
+  TouchableHighlight,
+  View,
+} from 'react-native';
 import {createStackNavigator} from 'react-navigation-stack';
 import {createAppContainer} from 'react-navigation';
-import {BaseExampleAutoHidingHeaderComponent} from "./helpers/BaseExampleAutoHidingHeaderComponent";
-import {pspdfkitColor} from "./configuration/Constants";
-import {ManualSigning} from "./examples/ManualSigning";
-import {Watermark} from "./examples/Watermark";
-import {WatermarkStartup} from "./examples/WatermarkStartup";
-import {InstantExample} from "./examples/InstantExample";
-import {DefaultAnnotationSettings} from "./examples/DefaultAnnotationSettings";
+import {BaseExampleAutoHidingHeaderComponent} from './helpers/BaseExampleAutoHidingHeaderComponent';
+import {pspdfkitColor} from './configuration/Constants';
+import {ManualSigning} from './examples/ManualSigning';
+import {Watermark} from './examples/Watermark';
+import {WatermarkStartup} from './examples/WatermarkStartup';
+import {InstantExample} from './examples/InstantExample';
+import {DefaultAnnotationSettings} from './examples/DefaultAnnotationSettings';
 
 const PSPDFKit = NativeModules.PSPDFKit;
 

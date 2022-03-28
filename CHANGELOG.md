@@ -1,12 +1,19 @@
 ## Newest Release
 
+### 2.2.2 - 15 Mar 2022
+
+- Adds image support to `PSKDFKit.present()` on Android. (#33312)
+- Adds a new **Save As** example to the Catalog example project. (#33376)
+- Updates for PSPDFKit 11.3.0 for iOS. (#33485)
+- Fixes React Native Annotation Processor API for Android. (#33189, #33302)
+
+## Previous Releases
+
 ### 2.2.1 - 04 Mar 2022
 
 - Updates for PSPDFKit 8.1.2 for Android. (#33315)
 - Updates for PSPDFKit 11.2.4 for iOS. (#33315)
 - Fixes React Native Annotation Processor Catalog example for Android.(#33189)
-
-## Previous Releases
 
 ### 2.2.0 - 14 Feb 2022
 

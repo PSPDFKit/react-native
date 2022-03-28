@@ -1,10 +1,7 @@
 import {BaseExampleAutoHidingHeaderComponent} from '../helpers/BaseExampleAutoHidingHeaderComponent';
 import {Button, processColor, View} from 'react-native';
 import PSPDFKitView from 'react-native-pspdfkit';
-import {
-  exampleDocumentPath,
-  pspdfkitColor,
-} from '../configuration/Constants';
+import {exampleDocumentPath, pspdfkitColor} from '../configuration/Constants';
 import React from 'react';
 
 export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponent {
@@ -36,13 +33,15 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
           style={{
             flexDirection: 'column',
             alignItems: 'center',
-          }}>
+          }}
+        >
           <View
             style={{
               flexDirection: 'row',
               alignItems: 'center',
               padding: 5,
-            }}>
+            }}
+          >
             <View>
               <Button
                 onPress={() => {
@@ -126,7 +125,8 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
               flexDirection: 'row',
               alignItems: 'center',
               padding: 5,
-            }}>
+            }}
+          >
             <View>
               <Button
                 onPress={() => {
@@ -283,7 +283,8 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
               flexDirection: 'row',
               alignItems: 'center',
               padding: 5,
-            }}>
+            }}
+          >
             <View>
               <Button
                 onPress={async () => {

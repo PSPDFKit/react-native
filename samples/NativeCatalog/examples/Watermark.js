@@ -35,7 +35,8 @@ export class Watermark extends BaseExampleAutoHidingHeaderComponent {
           style={{
             flexDirection: 'row',
             alignItems: 'center',
-          }}>
+          }}
+        >
           <View>
             <Button
               onPress={() => {

@@ -1,10 +1,7 @@
 import {BaseExampleAutoHidingHeaderComponent} from '../helpers/BaseExampleAutoHidingHeaderComponent';
 import {Button, processColor, View} from 'react-native';
 import PSPDFKitView from 'react-native-pspdfkit';
-import {
-  exampleDocumentPath,
-  pspdfkitColor,
-} from '../configuration/Constants';
+import {exampleDocumentPath, pspdfkitColor} from '../configuration/Constants';
 import React from 'react';
 
 export class ToolbarCustomization extends BaseExampleAutoHidingHeaderComponent {
@@ -27,7 +24,8 @@ export class ToolbarCustomization extends BaseExampleAutoHidingHeaderComponent {
             height: 60,
             alignItems: 'center',
             padding: 10,
-          }}>
+          }}
+        >
           <View style={{marginLeft: 10}}>
             <Button
               onPress={async () => {

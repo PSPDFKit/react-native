@@ -1,10 +1,7 @@
 import {BaseExampleAutoHidingHeaderComponent} from '../helpers/BaseExampleAutoHidingHeaderComponent';
 import {Button, processColor, Text, View} from 'react-native';
 import PSPDFKitView from 'react-native-pspdfkit';
-import {
-  exampleDocumentPath,
-  pspdfkitColor,
-} from '../configuration/Constants';
+import {exampleDocumentPath, pspdfkitColor} from '../configuration/Constants';
 import React from 'react';
 
 export class StateChange extends BaseExampleAutoHidingHeaderComponent {
@@ -57,13 +54,15 @@ export class StateChange extends BaseExampleAutoHidingHeaderComponent {
             flexDirection: 'column',
             alignItems: 'center',
             padding: 10,
-          }}>
+          }}
+        >
           <View
             style={{
               flexDirection: 'row',
               alignItems: 'center',
               padding: 10,
-            }}>
+            }}
+          >
             <Button
               onPress={() => {
                 if (
@@ -83,7 +82,8 @@ export class StateChange extends BaseExampleAutoHidingHeaderComponent {
               flexDirection: 'row',
               alignItems: 'center',
               padding: 10,
-            }}>
+            }}
+          >
             <Text style={{flex: 1}}>
               {'Page ' +
                 (this.state.currentPageIndex + 1) +

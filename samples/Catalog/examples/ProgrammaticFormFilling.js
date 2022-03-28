@@ -1,10 +1,7 @@
 import {BaseExampleAutoHidingHeaderComponent} from '../helpers/BaseExampleAutoHidingHeaderComponent';
 import {Button, processColor, View} from 'react-native';
 import PSPDFKitView from 'react-native-pspdfkit';
-import {
-  formDocumentPath,
-  pspdfkitColor,
-} from '../configuration/Constants';
+import {formDocumentPath, pspdfkitColor} from '../configuration/Constants';
 import React from 'react';
 
 export class ProgrammaticFormFilling extends BaseExampleAutoHidingHeaderComponent {
@@ -26,7 +23,8 @@ export class ProgrammaticFormFilling extends BaseExampleAutoHidingHeaderComponen
             height: 60,
             alignItems: 'center',
             padding: 10,
-          }}>
+          }}
+        >
           <View style={{marginLeft: 10}}>
             <Button
               onPress={() => {

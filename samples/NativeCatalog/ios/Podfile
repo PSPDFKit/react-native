@@ -16,8 +16,8 @@ target 'NativeCatalog' do
     inherit! :complete
     # Pods for testing
   end
-  pod 'PSPDFKit', '~> 11.2.4'
-  pod 'Instant', '~> 11.2.4'
+  pod 'PSPDFKit', '~> 11.3.0'
+  pod 'Instant', '~> 11.3.0'
   # Enables Flipper.
   #
   # Note that if you have use_frameworks! enabled, Flipper will not work and

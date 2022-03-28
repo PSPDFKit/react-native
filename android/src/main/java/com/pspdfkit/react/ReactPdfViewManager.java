@@ -92,21 +92,14 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
     @Nullable
     @Override
     public Map<String, Integer> getCommandsMap() {
-        Map<String, Integer> commandMap = MapBuilder.of(
-                "enterAnnotationCreationMode",
-                COMMAND_ENTER_ANNOTATION_CREATION_MODE,
-                "exitCurrentlyActiveMode",
-                COMMAND_EXIT_CURRENTLY_ACTIVE_MODE,
-                "saveCurrentDocument",
-                COMMAND_SAVE_CURRENT_DOCUMENT,
-                "getAnnotations",
-                COMMAND_GET_ANNOTATIONS,
-                "addAnnotation",
-                COMMAND_ADD_ANNOTATION,
-                "getAllUnsavedAnnotations",
-                COMMAND_GET_ALL_UNSAVED_ANNOTATIONS,
-                "addAnnotations",
-                COMMAND_ADD_ANNOTATIONS);
+        Map<String, Integer> commandMap = MapBuilder.of();
+        commandMap.put("enterAnnotationCreationMode", COMMAND_ENTER_ANNOTATION_CREATION_MODE);
+        commandMap.put("exitCurrentlyActiveMode", COMMAND_EXIT_CURRENTLY_ACTIVE_MODE);
+        commandMap.put("saveCurrentDocument", COMMAND_SAVE_CURRENT_DOCUMENT);
+        commandMap.put("getAnnotations", COMMAND_GET_ANNOTATIONS);
+        commandMap.put("addAnnotation", COMMAND_ADD_ANNOTATION);
+        commandMap.put("getAllUnsavedAnnotations", COMMAND_GET_ALL_UNSAVED_ANNOTATIONS);
+        commandMap.put("addAnnotations", COMMAND_ADD_ANNOTATIONS);
         commandMap.put("getFormFieldValue", COMMAND_GET_FORM_FIELD_VALUE);
         commandMap.put("setFormFieldValue", COMMAND_SET_FORM_FIELD_VALUE);
         commandMap.put("removeAnnotation", COMMAND_REMOVE_ANNOTATION);

@@ -62,6 +62,14 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
 
     private static final int REQUEST_CODE_TO_INDEX = 16;
     private static final int MASKED_REQUEST_CODE_TO_REAL_CODE = 0xffff;
+    private static final String[] SUPPORTED_IMAGE_TYPES = new String[] {
+        ".jpg",
+        ".png",
+        ".jpeg",
+        ".tif",
+        ".tiff"
+    };
+
 
     @Nullable
     private Activity resumedActivity;
@@ -103,6 +111,23 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
 
     @ReactMethod
     public void present(@NonNull String document, @NonNull ReadableMap configuration, @Nullable Promise promise) {
+        File documentFile = new File(document);
+        if(isPdf(documentFile)) {
+            lastPresentPromise = promise;
+            presentPdf(document, configuration, promise);
+        } else if(isImage(documentFile)) {
+            lastPresentPromise = promise;
+            presentImage(document, configuration, promise);
+        }else {
+            Throwable error = new Throwable("The document must be one of these file types: .pdf, .jpg, .png, .jpeg, .tif, .tiff");
+            if (promise!=null){
+                promise.reject(error);
+            }
+        }
+    }
+
+    @ReactMethod
+    public void presentPdf(@NonNull String document, @NonNull ReadableMap configuration, @Nullable Promise promise) {
         if (getCurrentActivity() != null) {
             if (resumedActivity == null) {
                 // We register an activity lifecycle callback so we can get notified of the current activity.
@@ -118,7 +143,7 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
             PdfActivity.showDocument(getCurrentActivity(), Uri.parse(document), configurationAdapter.build());
         }
     }
-
+    
     @ReactMethod
     public void presentImage(@NonNull String imageDocument, @NonNull ReadableMap configuration, @Nullable Promise promise) {
         if (getCurrentActivity() != null) {
@@ -202,7 +227,12 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
                                    @NonNull final String sourceDocumentPath,
                                    @NonNull final String targetDocumentPath,
                                    @NonNull final Promise promise) {
-        PdfDocumentLoader.openDocumentAsync(getReactApplicationContext(), Uri.parse(sourceDocumentPath))
+       
+       // This is an edge case where file scheme is missing.
+        String documentPath = Uri.parse(sourceDocumentPath).getScheme() == null
+                ? FILE_SCHEME + sourceDocumentPath : sourceDocumentPath;
+
+        PdfDocumentLoader.openDocumentAsync(getReactApplicationContext(), Uri.parse(documentPath))
             .flatMapCompletable(document -> {
                 PdfProcessorTask task = PdfProcessorTask.fromDocument(document);
                 final EnumSet<AnnotationType> types = ConversionHelpers.getAnnotationTypeFromString(annotationType);
@@ -343,5 +373,18 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
     @Override
     public void onNewIntent(Intent intent) {
         // Not required right now.
+    }
+
+    private boolean isPdf(File file) {
+        return file.getName().toLowerCase().endsWith(".pdf");
+    }
+    
+    private boolean isImage(File file) {
+        for (String extension: SUPPORTED_IMAGE_TYPES) {
+            if (file.getName().toLowerCase().endsWith(extension)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

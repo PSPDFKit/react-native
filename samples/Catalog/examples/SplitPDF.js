@@ -23,7 +23,8 @@ export class SplitPDF extends BaseExampleAutoHidingHeaderComponent {
           flexDirection: layoutDirection,
           justifyContent: 'center',
         }}
-        onLayout={this._onLayout}>
+        onLayout={this._onLayout}
+      >
         <PSPDFKitView
           ref="pdfView1"
           document={formDocumentPath}

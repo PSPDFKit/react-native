@@ -8,25 +8,39 @@
 
 // Imports
 import React, {Component} from 'react';
-import {FlatList, Image, processColor, StyleSheet, Text, TouchableHighlight, View} from 'react-native';
+import {
+  FlatList,
+  Image,
+  processColor,
+  StyleSheet,
+  Text,
+  TouchableHighlight,
+  View,
+} from 'react-native';
 import {createStackNavigator} from 'react-navigation-stack';
 import {createAppContainer} from 'react-navigation';
 
-import {exampleDocumentName, exampleDocumentPath, pspdfkitColor, tiffImagePath} from "./configuration/Constants";
-import {extractFromAssetsIfMissing} from "./helpers/FileSystemHelpers";
-import {PSPDFKitViewComponent} from "./examples/PSPDFKitViewComponent";
-import {OpenImageDocument} from "./examples/OpenImageDocument";
-import {ManualSave} from "./examples/ManualSave";
-import {EventListeners} from "./examples/EventListeners";
-import {StateChange} from "./examples/StateChange";
-import {PSPDFKit} from "./helpers/PSPDFKit";
-import {AnnotationProcessing} from "./examples/AnnotationProcessing";
-import {ProgrammaticAnnotations} from "./examples/ProgrammaticAnnotations";
-import {ProgrammaticFormFilling} from "./examples/ProgrammaticFormFilling";
-import {SplitPDF} from "./examples/SplitPDF";
-import {ToolbarCustomization} from "./examples/ToolbarCustomization";
-import {HiddenToolbar} from "./examples/HiddenToolbar";
-import {CustomFontPicker} from "./examples/CustomFontPicker";
+import {
+  exampleDocumentName,
+  exampleDocumentPath,
+  pspdfkitColor,
+  tiffImagePath,
+} from './configuration/Constants';
+import {extractFromAssetsIfMissing} from './helpers/FileSystemHelpers';
+import {PSPDFKitViewComponent} from './examples/PSPDFKitViewComponent';
+import {OpenImageDocument} from './examples/OpenImageDocument';
+import {SaveAs} from './examples/SaveAs';
+import {ManualSave} from './examples/ManualSave';
+import {EventListeners} from './examples/EventListeners';
+import {StateChange} from './examples/StateChange';
+import {PSPDFKit} from './helpers/PSPDFKit';
+import {AnnotationProcessing} from './examples/AnnotationProcessing';
+import {ProgrammaticAnnotations} from './examples/ProgrammaticAnnotations';
+import {ProgrammaticFormFilling} from './examples/ProgrammaticFormFilling';
+import {SplitPDF} from './examples/SplitPDF';
+import {ToolbarCustomization} from './examples/ToolbarCustomization';
+import {HiddenToolbar} from './examples/HiddenToolbar';
+import {CustomFontPicker} from './examples/CustomFontPicker';
 
 const fileSystem = require('react-native-fs');
 
@@ -95,6 +109,16 @@ const examples = [
   },
   {
     key: 'item4',
+    name: 'Save As',
+    description: 'Save changes to the PDF in a separate file',
+    action: component => {
+      extractFromAssetsIfMissing(exampleDocumentName, function () {
+        component.props.navigation.push('SaveAs');
+      });
+    },
+  },
+  {
+    key: 'item5',
     name: 'Event Listeners',
     description:
       'Show how to use the listeners exposed by the PSPDFKitView component.',
@@ -103,7 +127,7 @@ const examples = [
     },
   },
   {
-    key: 'item5',
+    key: 'item6',
     name: 'Changing the State',
     description:
       'Add a toolbar at the bottom with buttons to toggle the annotation toolbar, and to programmatically change pages.',
@@ -111,8 +135,8 @@ const examples = [
       component.props.navigation.push('StateChange');
     },
   },
- {
-    key: 'item6',
+  {
+    key: 'item7',
     name: 'Annotation Processing',
     description:
       'Show how to embed, flatten, remove, and print annotations; then present the newly processed document.',
@@ -123,7 +147,7 @@ const examples = [
     },
   },
   {
-    key: 'item7',
+    key: 'item8',
     name: 'Programmatic Annotations',
     description: 'Show how to get and add new annotations using Instant JSON.',
     action: component => {
@@ -131,7 +155,7 @@ const examples = [
     },
   },
   {
-    key: 'item8',
+    key: 'item9',
     name: 'Programmatic Form Filling',
     description:
       'Show how to get the value of a form element and how to programmatically fill forms.',
@@ -140,7 +164,7 @@ const examples = [
     },
   },
   Platform.OS === 'ios' && {
-    key: 'item9',
+    key: 'item10',
     name: 'Split PDF',
     description:
       'Show two PDFs side by side by using multiple PSPDFKitView components.',
@@ -149,7 +173,7 @@ const examples = [
     },
   },
   Platform.OS === 'ios' && {
-    key: 'item10',
+    key: 'item11',
     name: 'Customize the Toolbar',
     description: 'Show how to customize buttons in the toolbar.',
     action: component => {
@@ -157,7 +181,7 @@ const examples = [
     },
   },
   {
-    key: 'item11',
+    key: 'item12',
     name: 'Hidden Toolbar',
     description:
       'Hide the main toolbar while keeping the thumbnail bar visible.',
@@ -166,7 +190,7 @@ const examples = [
     },
   },
   {
-    key: 'item12',
+    key: 'item13',
     name: 'Custom Font Picker',
     description:
       'Show how to customize the font picker for free text annotations.',
@@ -176,7 +200,7 @@ const examples = [
   },
   /// Present examples.
   {
-    key: 'item13',
+    key: 'item14',
     name: 'Open a Document Using the Native Module API',
     description:
       'Open a document using the Native Module API by passing its path.',
@@ -193,7 +217,7 @@ const examples = [
     },
   },
   {
-    key: 'item14',
+    key: 'item15',
     name: 'Customize Document Configuration',
     description:
       'Customize various aspects of the document by passing a configuration dictionary.',
@@ -202,18 +226,13 @@ const examples = [
     },
   },
   {
-    key: 'item15',
+    key: 'item16',
     name: 'Open an Image Document Using the Native Module API',
     description:
       'Open an image document using the Native Module API. Supported filetypes are PNG, JPEG and TIFF.',
     action: () => {
       // PSPDFKit can open PNG, JPEG and TIFF image files directly.
-      if (Platform.OS === 'ios') {
-        PSPDFKit.present(tiffImagePath, tiffImageConfiguration);
-      }
-      if (Platform.OS === 'android') {
-        PSPDFKit.presentImage(tiffImagePath, tiffImageConfiguration);
-      }
+      PSPDFKit.present(tiffImagePath, tiffImageConfiguration);
     },
   },
 ];
@@ -266,8 +285,7 @@ class Catalog extends Component {
           item.action(this);
         }}
         style={styles.row}
-        underlayColor={pspdfkitColor}
-      >
+        underlayColor={pspdfkitColor}>
         <View style={styles.rowContent}>
           <Text style={styles.name}>{item.name}</Text>
           <Text style={styles.description}>{item.description}</Text>
@@ -291,6 +309,9 @@ export default createAppContainer(
       },
       ManualSave: {
         screen: ManualSave,
+      },
+      SaveAs: {
+        screen: SaveAs,
       },
       EventListeners: {
         screen: EventListeners,
@@ -366,4 +387,3 @@ var styles = StyleSheet.create({
     padding: 10,
   },
 });
-

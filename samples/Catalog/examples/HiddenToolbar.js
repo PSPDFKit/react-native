@@ -1,10 +1,7 @@
 import React, {Component} from 'react';
 import {Button, processColor, View} from 'react-native';
 import PSPDFKitView from 'react-native-pspdfkit';
-import {
-  exampleDocumentPath,
-  pspdfkitColor,
-} from '../configuration/Constants';
+import {exampleDocumentPath, pspdfkitColor} from '../configuration/Constants';
 
 export class HiddenToolbar extends Component {
   static navigationOptions = ({navigation}) => {
