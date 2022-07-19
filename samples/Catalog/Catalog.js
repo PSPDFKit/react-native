@@ -6,7 +6,6 @@
 //  This notice may not be removed from this file.
 //
 
-// Imports
 import React, {Component} from 'react';
 import {
   FlatList,
