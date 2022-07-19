@@ -1,5 +1,6 @@
 // Document names
 import fileSystem from 'react-native-fs';
+import { Platform } from 'react-native';
 
 const tiffImageName = 'PSPDFKit_Image_Example.tiff';
 const formDocumentName = 'Form_example.pdf';
@@ -24,4 +25,6 @@ export const tiffImagePath =
 export const pspdfkitColor = '#267AD4';
 
 export const writableDocumentPath =
-  fileSystem.DocumentDirectoryPath + '/' + exampleDocumentName;
+  Platform.OS === 'ios'
+    ? fileSystem.DocumentDirectoryPath + '/' + exampleDocumentName
+    : 'file://' + fileSystem.DocumentDirectoryPath + '/' + exampleDocumentName;

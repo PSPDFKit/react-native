@@ -1,13 +1,16 @@
-import {BaseExampleAutoHidingHeaderComponent} from '../helpers/BaseExampleAutoHidingHeaderComponent';
-import {Button, processColor, View} from 'react-native';
+import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
+import { Button, processColor, View } from 'react-native';
 import PSPDFKitView from 'react-native-pspdfkit';
-import {pspdfkitColor, writableDocumentPath} from '../configuration/Constants';
+import {
+  pspdfkitColor,
+  writableDocumentPath,
+} from '../configuration/Constants';
 import React from 'react';
 
 export class ManualSave extends BaseExampleAutoHidingHeaderComponent {
   render() {
     return (
-      <View style={{flex: 1}}>
+      <View style={styles.flex}>
         <PSPDFKitView
           ref="pdfView"
           document={writableDocumentPath}
@@ -16,16 +19,10 @@ export class ManualSave extends BaseExampleAutoHidingHeaderComponent {
             backgroundColor: processColor('lightgrey'),
           }}
           pageIndex={3}
-          style={{flex: 1, color: pspdfkitColor}}
+          style={styles.pdfColor}
         />
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            padding: 10,
-          }}
-        >
-          <View style={{flex: 1}}>
+        <View style={styles.wrapper}>
+          <View style={styles.flex}>
             <Button
               onPress={() => {
                 // Manual Save
@@ -50,3 +47,13 @@ export class ManualSave extends BaseExampleAutoHidingHeaderComponent {
     );
   }
 }
+
+const styles = {
+  flex: { flex: 1 },
+  pdfColor: { flex: 1, color: pspdfkitColor },
+  wrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
+  },
+};

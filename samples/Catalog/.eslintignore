@@ -1,0 +1,4 @@
+./android
+./ios
+./assets
+./node_modules/**/*.js

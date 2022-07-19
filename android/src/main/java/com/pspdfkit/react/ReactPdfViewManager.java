@@ -30,6 +30,8 @@ import com.pspdfkit.preferences.PSPDFKitPreferences;
 import com.pspdfkit.react.events.PdfViewDataReturnedEvent;
 import com.pspdfkit.react.menu.ReactGroupingRule;
 import com.pspdfkit.views.PdfView;
+import com.pspdfkit.configuration.activity.PdfActivityConfiguration;
+
 
 import org.json.JSONObject;
 
@@ -61,6 +63,7 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
     public static final int COMMAND_REMOVE_ANNOTATION = 10;
     public static final int COMMAND_GET_ALL_ANNOTATIONS = 11;
     public static final int COMMAND_REMOVE_FRAGMENT = 12;
+    public static final int COMMAND_SET_TOOLBAR_MENU_ITEMS = 13;
 
     private CompositeDisposable annotationDisposables = new CompositeDisposable();
 
@@ -105,6 +108,7 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
         commandMap.put("removeAnnotation", COMMAND_REMOVE_ANNOTATION);
         commandMap.put("getAllAnnotations", COMMAND_GET_ALL_ANNOTATIONS);
         commandMap.put("removeFragment", COMMAND_REMOVE_FRAGMENT);
+        commandMap.put("setToolbarMenuItems", COMMAND_SET_TOOLBAR_MENU_ITEMS);
         return commandMap;
     }
 
@@ -168,6 +172,15 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
     @ReactProp(name = "selectedFontName")
     public void setSelectedFontName(@NonNull final PdfView view, @Nullable final String selectedFontName) {
         view.setSelectedFontName(selectedFontName);
+    }
+
+    @ReactProp(name = "toolbarMenuItems")
+    public void setToolbarMenuItems(@NonNull final PdfView view, @Nullable final ReadableArray toolbarItems) {
+        if (toolbarItems != null) {
+            PdfActivityConfiguration.Builder currentConfiguration = new PdfActivityConfiguration.Builder(view.getConfiguration());
+            ToolbarMenuItemsAdapter newConfigurations = new ToolbarMenuItemsAdapter(currentConfiguration, toolbarItems);
+            view.setConfiguration(newConfigurations.build());
+        }
     }
 
     @Nullable
@@ -284,6 +297,11 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
                 // Removing a fragment like this is not recommended, but it can be used as a workaround 
                 // to stop `react-native-screens` from crashing the App when the back button is pressed.
                 root.removeFragment(true);
+                break;
+            case COMMAND_SET_TOOLBAR_MENU_ITEMS:
+                if (args != null && args.size() == 1) {
+                    setToolbarMenuItems(root,args.getArray(0));
+                }
                 break;
         }
     }

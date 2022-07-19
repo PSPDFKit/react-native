@@ -1,13 +1,22 @@
 ## Newest Release
 
+### 2.3.0 - 19 Jul 2022
+
+- Adds Android Toolbar menu customization from `PSPDFKitView` properties. (#33417)
+- Adds handling multiple initializations exception. (#35079)
+- Updates the deployment target to iOS 14.0. (#33871)
+- Updates for PSPDFKit 11.4.0 for iOS. (#33485)
+- PSPDFKit now requires React Native 0.68 or later. (#33875)
+- PSPDFKit now requires Xcode 13.4.1 or later. (#32495)
+
+## Previous Releases
+
 ### 2.2.2 - 15 Mar 2022
 
 - Adds image support to `PSKDFKit.present()` on Android. (#33312)
 - Adds a new **Save As** example to the Catalog example project. (#33376)
 - Updates for PSPDFKit 11.3.0 for iOS. (#33485)
 - Fixes React Native Annotation Processor API for Android. (#33189, #33302)
-
-## Previous Releases
 
 ### 2.2.1 - 04 Mar 2022
 

@@ -1,5 +1,5 @@
 // Constants
-import {requireNativeComponent} from 'react-native';
+import { Platform, requireNativeComponent } from 'react-native';
 
 export const CustomPdfView = requireNativeComponent('CustomPdfView');
 export const pspdfkitColor = '#267AD4';

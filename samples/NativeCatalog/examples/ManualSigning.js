@@ -1,9 +1,10 @@
-import {BaseExampleAutoHidingHeaderComponent} from '../helpers/BaseExampleAutoHidingHeaderComponent';
-import {CustomPdfView, formDocumentPath} from '../configuration/Constants';
+import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
+import { CustomPdfView, formDocumentPath } from '../configuration/Constants';
 import {
   Button,
   findNodeHandle,
   NativeModules,
+  Platform,
   SafeAreaView,
   UIManager,
   View,
@@ -20,23 +21,18 @@ export class ManualSigning extends BaseExampleAutoHidingHeaderComponent {
 
   render() {
     return (
-      <View style={{flex: 1}}>
+      <View style={styles.flex}>
         <CustomPdfView
           ref="pdfView"
           document={this.state.documentPath}
-          style={{flex: 1}}
+          style={styles.flex}
           onDocumentDigitallySigned={event => {
             this.setState({
               documentPath: event.nativeEvent.signedDocumentPath,
             });
           }}
         />
-        <SafeAreaView
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-          }}
-        >
+        <SafeAreaView style={styles.row}>
           <View>
             <Button
               onPress={() => {
@@ -61,3 +57,11 @@ export class ManualSigning extends BaseExampleAutoHidingHeaderComponent {
     );
   }
 }
+
+const styles = {
+  flex: { flex: 1 },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+};

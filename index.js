@@ -506,6 +506,23 @@ class PSPDFKitView extends React.Component {
   };
 
   /**
+   * Customise visible toolbar menu items for Android.
+   *
+   * @param toolbarMenuItems The list of bar button items. See the full list of button items here: https://pspdfkit.com/guides/react-native/user-interface/toolbars/main-toolbar/.
+   *
+   * @platform android
+   */
+  setToolbarMenuItems = function(toolbarMenuItems){
+    if(Platform.OS =="android"){
+      UIManager.dispatchViewManagerCommand(
+        findNodeHandle(this.refs.pdfView),
+        this._getViewManagerConfig("RCTPSPDFKitView").Commands.setToolbarMenuItems,
+        [toolbarMenuItems]
+      );
+    }
+  }
+
+  /**
    * Removes the currently displayed Android Native PdfUiFragment.
    *
    * This function should only be used as a workaround for a bug in `react-native-screen` that causes a crash when
@@ -667,6 +684,12 @@ PSPDFKitView.propTypes = {
    * @platform ios
    */
   toolbarTitle: PropTypes.string,
+   /**
+    * androidToolbarMenuItems: Customize the the toolbar menu items for Android. 
+    * The full list of toolbar menu items: https://github.com/PSPDFKit/react-native/blob/master/android/src/main/java/com/pspdfkit/react/ToolbarMenuItemsAdapter.java
+    * @platform android
+    */ 
+  androidToolbarMenuItems: PropTypes.array,
   /**
    * showNavigationButtonInToolbar: When set to true the toolbar integrated into the PSPDFKitView will display a back button in the top left corner.
    *

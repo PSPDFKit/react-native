@@ -1,13 +1,13 @@
-import {BaseExampleAutoHidingHeaderComponent} from '../helpers/BaseExampleAutoHidingHeaderComponent';
-import {processColor, View} from 'react-native';
+import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
+import { processColor, View } from 'react-native';
 import PSPDFKitView from 'react-native-pspdfkit';
-import {exampleDocumentPath, pspdfkitColor} from '../configuration/Constants';
+import { exampleDocumentPath, pspdfkitColor } from '../configuration/Constants';
 import React from 'react';
 
 export class CustomFontPicker extends BaseExampleAutoHidingHeaderComponent {
   render() {
     return (
-      <View style={{flex: 1}}>
+      <View style={styles.flex}>
         <PSPDFKitView
           document={exampleDocumentPath}
           configuration={{
@@ -25,9 +25,13 @@ export class CustomFontPicker extends BaseExampleAutoHidingHeaderComponent {
           ]}
           selectedFontName={'Courier New'}
           showDownloadableFonts={false}
-          style={{flex: 1, color: pspdfkitColor}}
+          style={styles.pdfColor}
         />
       </View>
     );
   }
 }
+const styles = {
+  flex: { flex: 1 },
+  pdfColor: { flex: 1, color: pspdfkitColor },
+};

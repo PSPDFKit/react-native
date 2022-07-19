@@ -1,6 +1,6 @@
-import {BaseExampleAutoHidingHeaderComponent} from '../helpers/BaseExampleAutoHidingHeaderComponent';
-import {CustomPdfView, formDocumentPath} from '../configuration/Constants';
-import {View} from 'react-native';
+import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
+import { CustomPdfView, formDocumentPath } from '../configuration/Constants';
+import { View } from 'react-native';
 import React from 'react';
 
 export class WatermarkStartup extends BaseExampleAutoHidingHeaderComponent {
@@ -14,11 +14,11 @@ export class WatermarkStartup extends BaseExampleAutoHidingHeaderComponent {
 
   render() {
     return (
-      <View style={{flex: 1}}>
+      <View style={styles.flex}>
         <CustomPdfView
           ref="pdfView"
           document={this.state.documentPath}
-          style={{flex: 1}}
+          style={styles.flex}
           onDocumentWatermarked={event => {
             this.setState({
               documentPath: event.nativeEvent.watermarkedDocumentPath,
@@ -29,3 +29,7 @@ export class WatermarkStartup extends BaseExampleAutoHidingHeaderComponent {
     );
   }
 }
+
+const styles = {
+  flex: { flex: 1 },
+};

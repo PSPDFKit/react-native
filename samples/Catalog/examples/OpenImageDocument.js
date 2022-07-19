@@ -1,13 +1,13 @@
-import {BaseExampleAutoHidingHeaderComponent} from '../helpers/BaseExampleAutoHidingHeaderComponent';
-import {processColor, View} from 'react-native';
+import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
+import { processColor, View } from 'react-native';
 import PSPDFKitView from 'react-native-pspdfkit';
-import {pspdfkitColor, tiffImagePath} from '../configuration/Constants';
+import { pspdfkitColor, tiffImagePath } from '../configuration/Constants';
 import React from 'react';
 
 export class OpenImageDocument extends BaseExampleAutoHidingHeaderComponent {
   render() {
     return (
-      <View style={{flex: 1}}>
+      <View style={styles.flex}>
         <PSPDFKitView
           document={tiffImagePath}
           configuration={{
@@ -16,9 +16,14 @@ export class OpenImageDocument extends BaseExampleAutoHidingHeaderComponent {
             useParentNavigationBar: false,
             allowToolbarTitleChange: false,
           }}
-          style={{flex: 1, color: pspdfkitColor}}
+          style={styles.pdfColor}
         />
       </View>
     );
   }
 }
+
+const styles = {
+  flex: { flex: 1 },
+  pdfColor: { flex: 1, color: pspdfkitColor },
+};

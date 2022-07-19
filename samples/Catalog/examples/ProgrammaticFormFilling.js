@@ -1,13 +1,13 @@
-import {BaseExampleAutoHidingHeaderComponent} from '../helpers/BaseExampleAutoHidingHeaderComponent';
-import {Button, processColor, View} from 'react-native';
+import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
+import { Button, processColor, View } from 'react-native';
 import PSPDFKitView from 'react-native-pspdfkit';
-import {formDocumentPath, pspdfkitColor} from '../configuration/Constants';
+import { formDocumentPath, pspdfkitColor } from '../configuration/Constants';
 import React from 'react';
 
 export class ProgrammaticFormFilling extends BaseExampleAutoHidingHeaderComponent {
   render() {
     return (
-      <View style={{flex: 1}}>
+      <View style={styles.flex}>
         <PSPDFKitView
           ref="pdfView"
           document={formDocumentPath}
@@ -15,17 +15,10 @@ export class ProgrammaticFormFilling extends BaseExampleAutoHidingHeaderComponen
           configuration={{
             backgroundColor: processColor('lightgrey'),
           }}
-          style={{flex: 1, color: pspdfkitColor}}
+          style={styles.pdfColor}
         />
-        <View
-          style={{
-            flexDirection: 'row',
-            height: 60,
-            alignItems: 'center',
-            padding: 10,
-          }}
-        >
-          <View style={{marginLeft: 10}}>
+        <View style={styles.wrapperView}>
+          <View style={styles.marginLeft}>
             <Button
               onPress={() => {
                 // Fill Text Form Fields.
@@ -155,7 +148,7 @@ export class ProgrammaticFormFilling extends BaseExampleAutoHidingHeaderComponen
               title="Fill Form"
             />
           </View>
-          <View style={{marginLeft: 10}}>
+          <View style={styles.marginLeft}>
             <Button
               onPress={async () => {
                 // Get the First Name Value.
@@ -171,3 +164,15 @@ export class ProgrammaticFormFilling extends BaseExampleAutoHidingHeaderComponen
     );
   }
 }
+
+const styles = {
+  flex: { flex: 1 },
+  marginLeft: { marginLeft: 10 },
+  wrapperView: {
+    flexDirection: 'row',
+    height: 60,
+    alignItems: 'center',
+    padding: 10,
+  },
+  pdfColor: { flex: 1, color: pspdfkitColor },
+};

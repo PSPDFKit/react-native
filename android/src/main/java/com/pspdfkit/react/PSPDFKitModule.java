@@ -52,6 +52,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
+import com.pspdfkit.exceptions.InvalidPSPDFKitLicenseException;
 
 public class PSPDFKitModule extends ReactContextBaseJavaModule implements Application.ActivityLifecycleCallbacks, ActivityEventListener {
 
@@ -210,15 +211,25 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
     }
 
     @ReactMethod
-    public void setLicenseKey(@Nullable String licenseKey) {
-        PSPDFKit.initialize(getReactApplicationContext().getApplicationContext(), licenseKey, new ArrayList<>(), HYBRID_TECHNOLOGY);
+    public void setLicenseKey(@Nullable String licenseKey, @Nullable Promise promise) {
+         try {
+            PSPDFKit.initialize(resumedActivity, licenseKey, new ArrayList<>(), HYBRID_TECHNOLOGY);
+            promise.resolve("Initialised PSPDFKit");
+        } catch (InvalidPSPDFKitLicenseException e) {
+            promise.reject(e);
+        }
     }
 
     @ReactMethod
-    public void setLicenseKeys(@Nullable String androidLicenseKey, @Nullable String iOSLicenseKey) {
+    public void setLicenseKeys(@Nullable String androidLicenseKey, @Nullable String iOSLicenseKey, @Nullable Promise promise) {
         // Here, we ignore the `iOSLicenseKey` parameter and only care about `androidLicenseKey`.
         // `iOSLicenseKey` will be used to activate the license on iOS.
-        PSPDFKit.initialize(getReactApplicationContext().getApplicationContext(), androidLicenseKey, new ArrayList<>(), HYBRID_TECHNOLOGY);
+        try {
+            PSPDFKit.initialize(resumedActivity, androidLicenseKey, new ArrayList<>(), HYBRID_TECHNOLOGY);
+            promise.resolve("Initialised PSPDFKit");
+        } catch (InvalidPSPDFKitLicenseException e) {
+            promise.reject(e);
+        }
     }
 
     @ReactMethod

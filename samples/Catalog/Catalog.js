@@ -172,7 +172,7 @@ const examples = [
       component.props.navigation.navigate('SplitPDF');
     },
   },
-  Platform.OS === 'ios' && {
+  {
     key: 'item11',
     name: 'Customize the Toolbar',
     description: 'Show how to customize buttons in the toolbar.',

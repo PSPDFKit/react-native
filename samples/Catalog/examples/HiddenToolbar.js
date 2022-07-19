@@ -1,15 +1,15 @@
-import React, {Component} from 'react';
-import {Button, processColor, View} from 'react-native';
+import React, { Component } from 'react';
+import { Button, processColor, View } from 'react-native';
 import PSPDFKitView from 'react-native-pspdfkit';
-import {exampleDocumentPath, pspdfkitColor} from '../configuration/Constants';
+import { exampleDocumentPath, pspdfkitColor } from '../configuration/Constants';
 
 export class HiddenToolbar extends Component {
-  static navigationOptions = ({navigation}) => {
+  static navigationOptions = ({ navigation }) => {
     const params = navigation.state.params || {};
     return {
       title: 'HiddenToolbar',
       headerRight: () => (
-        <View style={{marginRight: 10}}>
+        <View style={styles.marginLeft}>
           <Button
             onPress={() => params.handleAnnotationButtonPress()}
             title="Annotations"
@@ -28,7 +28,8 @@ export class HiddenToolbar extends Component {
   }
 
   componentDidMount() {
-    this.props.navigation.setParams({
+    const { navigation } = this.props;
+    navigation.setParams({
       handleAnnotationButtonPress: () => {
         if (
           this.state.annotationCreationActive ||
@@ -44,7 +45,7 @@ export class HiddenToolbar extends Component {
 
   render() {
     return (
-      <View style={{flex: 1}}>
+      <View style={styles.flex}>
         <PSPDFKitView
           ref="pdfView"
           document={exampleDocumentPath}
@@ -66,9 +67,14 @@ export class HiddenToolbar extends Component {
               annotationEditingActive: event.annotationEditingActive,
             });
           }}
-          style={{flex: 1, color: pspdfkitColor}}
+          style={styles.pdfColor}
         />
       </View>
     );
   }
 }
+const styles = {
+  marginLeft: { marginLeft: 10 },
+  flex: { flex: 1 },
+  pdfColor: { flex: 1, color: pspdfkitColor },
+};

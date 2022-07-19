@@ -1,15 +1,18 @@
-import {BaseExampleAutoHidingHeaderComponent} from '../helpers/BaseExampleAutoHidingHeaderComponent';
-import {Button, processColor, View} from 'react-native';
+import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
+import { Button, processColor, View } from 'react-native';
 import PSPDFKitView from 'react-native-pspdfkit';
-import {pspdfkitColor, writableDocumentPath} from '../configuration/Constants';
+import {
+  pspdfkitColor,
+  writableDocumentPath,
+} from '../configuration/Constants';
 import fileSystem from 'react-native-fs';
-import {PSPDFKit} from '../helpers/PSPDFKit';
+import { PSPDFKit } from '../helpers/PSPDFKit';
 import React from 'react';
 
 export class AnnotationProcessing extends BaseExampleAutoHidingHeaderComponent {
   render() {
     return (
-      <View style={{flex: 1}}>
+      <View style={styles.flex}>
         <PSPDFKitView
           ref="pdfView"
           document={writableDocumentPath}
@@ -17,21 +20,10 @@ export class AnnotationProcessing extends BaseExampleAutoHidingHeaderComponent {
           configuration={{
             backgroundColor: processColor('lightgrey'),
           }}
-          style={{flex: 1, color: pspdfkitColor}}
+          style={styles.pdfColor}
         />
-        <View
-          style={{
-            flexDirection: 'column',
-            alignItems: 'center',
-          }}
-        >
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              padding: 5,
-            }}
-          >
+        <View style={styles.column}>
+          <View style={styles.wrapper}>
             <View>
               <Button
                 onPress={async () => {
@@ -77,7 +69,7 @@ export class AnnotationProcessing extends BaseExampleAutoHidingHeaderComponent {
                 title="Embed Annotations"
               />
             </View>
-            <View style={{marginLeft: 10}}>
+            <View style={styles.marginLeft}>
               <Button
                 onPress={async () => {
                   const processedDocumentPath =
@@ -123,13 +115,7 @@ export class AnnotationProcessing extends BaseExampleAutoHidingHeaderComponent {
               />
             </View>
           </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              padding: 5,
-            }}
-          >
+          <View style={styles.wrapper}>
             <View>
               <Button
                 onPress={async () => {
@@ -175,7 +161,7 @@ export class AnnotationProcessing extends BaseExampleAutoHidingHeaderComponent {
                 title="Remove Annotations"
               />
             </View>
-            <View style={{marginLeft: 10}}>
+            <View style={styles.marginLeft}>
               <Button
                 onPress={async () => {
                   const processedDocumentPath =
@@ -200,8 +186,8 @@ export class AnnotationProcessing extends BaseExampleAutoHidingHeaderComponent {
                             writableDocumentPath,
                             processedDocumentPath,
                           )
-                            .then(success => {
-                              if (success) {
+                            .then(successResult => {
+                              if (successResult) {
                                 // And finally, present the newly processed document with printed annotations.
                                 PSPDFKit.present(processedDocumentPath, {});
                               } else {
@@ -226,3 +212,18 @@ export class AnnotationProcessing extends BaseExampleAutoHidingHeaderComponent {
     );
   }
 }
+
+const styles = {
+  flex: { flex: 1 },
+  pdfColor: { flex: 1, color: pspdfkitColor },
+  column: {
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  wrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 5,
+  },
+  marginLeft: { marginLeft: 10 },
+};

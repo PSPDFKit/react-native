@@ -1,7 +1,7 @@
-import {BaseExampleAutoHidingHeaderComponent} from '../helpers/BaseExampleAutoHidingHeaderComponent';
-import {Button, processColor, View} from 'react-native';
+import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
+import { Button, processColor, View } from 'react-native';
 import PSPDFKitView from 'react-native-pspdfkit';
-import {exampleDocumentPath, pspdfkitColor} from '../configuration/Constants';
+import { exampleDocumentPath, pspdfkitColor } from '../configuration/Constants';
 import React from 'react';
 
 export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponent {
@@ -14,7 +14,7 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
 
   render() {
     return (
-      <View style={{flex: 1}}>
+      <View style={styles.flex}>
         <PSPDFKitView
           ref="pdfView"
           document={exampleDocumentPath}
@@ -22,26 +22,15 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
           configuration={{
             backgroundColor: processColor('lightgrey'),
           }}
-          style={{flex: 1, color: pspdfkitColor}}
+          style={styles.pdfColor}
           onStateChanged={event => {
             this.setState({
               currentPageIndex: event.currentPageIndex,
             });
           }}
         />
-        <View
-          style={{
-            flexDirection: 'column',
-            alignItems: 'center',
-          }}
-        >
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              padding: 5,
-            }}
-          >
+        <View style={styles.column}>
+          <View style={styles.wrapper}>
             <View>
               <Button
                 onPress={() => {
@@ -94,7 +83,7 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
                 title="Add Ink Annotation"
               />
             </View>
-            <View style={{marginLeft: 5}}>
+            <View style={styles.marginLeft}>
               <Button
                 onPress={async () => {
                   // Programmatically remove an existing ink annotation.
@@ -102,7 +91,7 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
                     this.state.currentPageIndex,
                     'pspdfkit/ink',
                   );
-                  const firstInkAnnotation = inkAnnotations['annotations'][0];
+                  const firstInkAnnotation = inkAnnotations.annotations[0];
                   this.refs.pdfView
                     .removeAnnotation(firstInkAnnotation)
                     .then(result => {
@@ -120,13 +109,7 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
               />
             </View>
           </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              padding: 5,
-            }}
-          >
+          <View style={styles.wrapper}>
             <View>
               <Button
                 onPress={() => {
@@ -257,7 +240,7 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
                 title="Add Multiple Annotations"
               />
             </View>
-            <View style={{marginLeft: 5}}>
+            <View style={styles.marginLeft}>
               <Button
                 onPress={async () => {
                   // Get ink annotations from the current page.
@@ -278,13 +261,7 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
               />
             </View>
           </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              padding: 5,
-            }}
-          >
+          <View style={styles.wrapper}>
             <View>
               <Button
                 onPress={async () => {
@@ -305,7 +282,7 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
                 title="Get Unsaved Annotations"
               />
             </View>
-            <View style={{marginLeft: 5}}>
+            <View style={styles.marginLeft}>
               <Button
                 onPress={async () => {
                   // Get all annotations annotations from the document.
@@ -331,3 +308,18 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
     );
   }
 }
+
+const styles = {
+  flex: { flex: 1 },
+  marginLeft: { marginLeft: 5 },
+  wrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 5,
+  },
+  pdfColor: { flex: 1, color: pspdfkitColor },
+  column: {
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+};

@@ -1,13 +1,13 @@
-import {BaseExampleAutoHidingHeaderComponent} from '../helpers/BaseExampleAutoHidingHeaderComponent';
-import {Button, processColor, View} from 'react-native';
+import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
+import { Button, Platform, processColor, View } from 'react-native';
 import PSPDFKitView from 'react-native-pspdfkit';
-import {exampleDocumentPath, pspdfkitColor} from '../configuration/Constants';
+import { exampleDocumentPath, pspdfkitColor } from '../configuration/Constants';
 import React from 'react';
 
 export class ToolbarCustomization extends BaseExampleAutoHidingHeaderComponent {
   render() {
     return (
-      <View style={{flex: 1}}>
+      <View style={styles.fullScreen}>
         <PSPDFKitView
           ref="pdfView"
           document={exampleDocumentPath}
@@ -15,38 +15,50 @@ export class ToolbarCustomization extends BaseExampleAutoHidingHeaderComponent {
             backgroundColor: processColor('lightgrey'),
             useParentNavigationBar: false,
           }}
+          //Only IOS
           leftBarButtonItems={['settingsButtonItem']}
-          style={{flex: 1, color: pspdfkitColor}}
+          rightBarButtonItems={[
+            'searchButtonItem',
+            'thumbnailsButtonItem',
+            'annotationButtonItem',
+          ]}
+          //Only for Android.
+          toolbarMenuItems={[
+            'annotationButtonItem',
+            'settingsButtonItem',
+            'searchButtonItem',
+            'thumbnailsButtonItem',
+          ]}
+          style={styles.pdfColor}
         />
-        <View
-          style={{
-            flexDirection: 'row',
-            height: 60,
-            alignItems: 'center',
-            padding: 10,
-          }}
-        >
-          <View style={{marginLeft: 10}}>
+        <View style={styles.wrapperView}>
+          <View style={styles.marginLeft}>
             <Button
               onPress={async () => {
-                // Update the right bar buttons.
-                await this.refs.pdfView.setRightBarButtonItems(
-                  [
-                    'thumbnailsButtonItem',
-                    'searchButtonItem',
-                    'annotationButtonItem',
-                    'readerViewButtonItem',
-                  ],
-                  'document',
-                  false,
-                );
+                const items = ['searchButtonItem', 'readerViewButtonItem'];
+
+                if (Platform.OS === 'ios') {
+                  // Update the right bar buttons for iOS.
+                  await this.refs.pdfView.setRightBarButtonItems(
+                    items,
+                    'document',
+                    false,
+                  );
+                } else if (Platform.OS === 'android') {
+                  // Update the toolbar menu items for Android.
+                  await this.refs.pdfView.setToolbarMenuItems(items);
+                }
               }}
-              title="Set Bar Button Items"
+              title="Set Toolbar Items"
             />
           </View>
-          <View style={{marginLeft: 10}}>
+          <View style={styles.marginLeft}>
             <Button
               onPress={async () => {
+                if (Platform.OS === 'android') {
+                  alert('Not supported on Android');
+                  return;
+                }
                 // Get the right bar buttons.
                 const rightBarButtonItems =
                   await this.refs.pdfView.getRightBarButtonItemsForViewMode(
@@ -62,3 +74,15 @@ export class ToolbarCustomization extends BaseExampleAutoHidingHeaderComponent {
     );
   }
 }
+
+const styles = {
+  fullScreen: { flex: 1 },
+  wrapperView: {
+    flexDirection: 'row',
+    height: 60,
+    alignItems: 'center',
+    padding: 10,
+  },
+  marginLeft: { marginLeft: 10 },
+  pdfColor: { flex: 1, color: pspdfkitColor },
+};

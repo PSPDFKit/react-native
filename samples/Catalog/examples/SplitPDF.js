@@ -1,5 +1,5 @@
-import {BaseExampleAutoHidingHeaderComponent} from '../helpers/BaseExampleAutoHidingHeaderComponent';
-import {Dimensions, processColor, View} from 'react-native';
+import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
+import { Dimensions, processColor, View } from 'react-native';
 import PSPDFKitView from 'react-native-pspdfkit';
 import {
   exampleDocumentPath,
@@ -11,27 +11,20 @@ import React from 'react';
 export class SplitPDF extends BaseExampleAutoHidingHeaderComponent {
   constructor(props) {
     super(props);
-    this.state = {dimensions: undefined};
+    this.state = { dimensions: undefined };
   }
 
   render() {
     const layoutDirection = this._getOptimalLayoutDirection();
     return (
-      <View
-        style={{
-          flex: 1,
-          flexDirection: layoutDirection,
-          justifyContent: 'center',
-        }}
-        onLayout={this._onLayout}
-      >
+      <View style={styles.wrapper(layoutDirection)} onLayout={this._onLayout}>
         <PSPDFKitView
           ref="pdfView1"
           document={formDocumentPath}
           configuration={{
             backgroundColor: processColor('lightgrey'),
           }}
-          style={{flex: 1, color: pspdfkitColor}}
+          style={styles.pdfView}
         />
         <PSPDFKitView
           ref="pdfView2"
@@ -41,7 +34,7 @@ export class SplitPDF extends BaseExampleAutoHidingHeaderComponent {
             scrollDirection: 'vertical',
             pageMode: 'single',
           }}
-          style={{flex: 1, color: '#9932CC'}}
+          style={styles.pdfColor}
         />
       </View>
     );
@@ -55,7 +48,16 @@ export class SplitPDF extends BaseExampleAutoHidingHeaderComponent {
   };
 
   _onLayout = event => {
-    let {width, height} = event.nativeEvent.layout;
-    this.setState({dimensions: {width, height}});
+    let { width, height } = event.nativeEvent.layout;
+    this.setState({ dimensions: { width, height } });
   };
 }
+const styles = {
+  wrapper: layoutDirection => ({
+    flex: 1,
+    flexDirection: layoutDirection,
+    justifyContent: 'center',
+  }),
+  pdfView: { flex: 1, color: pspdfkitColor },
+  pdfColor: { flex: 1, color: '#9932CC' },
+};

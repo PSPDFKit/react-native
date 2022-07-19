@@ -1,15 +1,18 @@
-import {BaseExampleAutoHidingHeaderComponent} from '../helpers/BaseExampleAutoHidingHeaderComponent';
-import {Button, processColor, View} from 'react-native';
+import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
+import { Button, processColor, View } from 'react-native';
 import PSPDFKitView from 'react-native-pspdfkit';
-import {pspdfkitColor, writableDocumentPath} from '../configuration/Constants';
+import {
+  pspdfkitColor,
+  writableDocumentPath,
+} from '../configuration/Constants';
 import React from 'react';
 import fileSystem from 'react-native-fs';
-import {PSPDFKit} from '../helpers/PSPDFKit';
+import { PSPDFKit } from '../helpers/PSPDFKit';
 
 export class SaveAs extends BaseExampleAutoHidingHeaderComponent {
   render() {
     return (
-      <View style={{flex: 1}}>
+      <View style={styles.flex}>
         <PSPDFKitView
           ref="pdfView"
           document={writableDocumentPath}
@@ -18,15 +21,10 @@ export class SaveAs extends BaseExampleAutoHidingHeaderComponent {
             backgroundColor: processColor('lightgrey'),
           }}
           pageIndex={3}
-          style={{flex: 1, color: pspdfkitColor}}
+          style={styles.colorView(pspdfkitColor)}
         />
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            padding: 10,
-          }}>
-          <View style={{flex: 1}}>
+        <View style={styles.buttonContainer}>
+          <View style={styles.flex}>
             <Button
               onPress={() => {
                 // Ensure that the path to the new document is a writable document path
@@ -77,3 +75,13 @@ export class SaveAs extends BaseExampleAutoHidingHeaderComponent {
     );
   }
 }
+
+const styles = {
+  flex: { flex: 1 },
+  colorView: color => ({ flex: 1, color }),
+  buttonContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
+  },
+};

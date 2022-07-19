@@ -1,13 +1,15 @@
-import {BaseExampleAutoHidingHeaderComponent} from '../helpers/BaseExampleAutoHidingHeaderComponent';
-import {processColor, View} from 'react-native';
+import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
+import { processColor, View } from 'react-native';
 import PSPDFKitView from 'react-native-pspdfkit';
 import React from 'react';
-import {exampleDocumentPath, pspdfkitColor} from '../configuration/Constants';
+import { exampleDocumentPath, pspdfkitColor } from '../configuration/Constants';
 
 export class PSPDFKitViewComponent extends BaseExampleAutoHidingHeaderComponent {
   render() {
+    const { navigation } = this.props;
+
     return (
-      <View style={{flex: 1}}>
+      <View style={styles.flex}>
         <PSPDFKitView
           ref="pdfView"
           document={exampleDocumentPath}
@@ -19,18 +21,20 @@ export class PSPDFKitViewComponent extends BaseExampleAutoHidingHeaderComponent 
           }}
           fragmentTag="PDF1"
           showNavigationButtonInToolbar={true}
-          onNavigationButtonClicked={event => {
-            this.props.navigation.goBack();
-          }}
+          onNavigationButtonClicked={() => navigation.goBack()}
           menuItemGrouping={[
             'freetext',
-            {key: 'markup', items: ['highlight', 'underline']},
+            { key: 'markup', items: ['highlight', 'underline'] },
             'ink',
             'image',
           ]}
-          style={{flex: 1, color: pspdfkitColor}}
+          style={styles.pdfColor}
         />
       </View>
     );
   }
 }
+const styles = {
+  flex: { flex: 1 },
+  pdfColor: { flex: 1, color: pspdfkitColor },
+};

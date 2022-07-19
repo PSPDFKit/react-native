@@ -1,8 +1,9 @@
 import fileSystem from 'react-native-fs';
+import { Platform } from 'react-native';
 
 export function extractFromAssetsIfMissing(assetFile, callback) {
   const path = fileSystem.DocumentDirectoryPath + '/' + assetFile;
-  var src = fileSystem.MainBundlePath + '/PDFs/' + assetFile;
+  let src = fileSystem.MainBundlePath + '/PDFs/' + assetFile;
 
   if (Platform.OS === 'android') {
     src = assetFile;

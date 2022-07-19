@@ -1,16 +1,16 @@
-import {BaseExampleAutoHidingHeaderComponent} from '../helpers/BaseExampleAutoHidingHeaderComponent';
-import {View} from 'react-native';
-import {CustomPdfView, formDocumentPath} from '../configuration/Constants';
+import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
+import { View } from 'react-native';
+import { CustomPdfView, formDocumentPath } from '../configuration/Constants';
 import React from 'react';
 
 export class DefaultAnnotationSettings extends BaseExampleAutoHidingHeaderComponent {
   render() {
     return (
-      <View style={{flex: 1}}>
+      <View style={styles.flex}>
         <CustomPdfView
           ref="pdfView"
           document={formDocumentPath}
-          style={{flex: 1}}
+          style={styles.flex}
           // This way only the ink tool and the button to open the inspector is shown.
           // If you don't need the inspector you can remove the "picker" option completely
           // and only configure the tool using the AnnotationConfiguration.
@@ -22,3 +22,5 @@ export class DefaultAnnotationSettings extends BaseExampleAutoHidingHeaderCompon
     );
   }
 }
+
+const styles = { flex: { flex: 1 } };

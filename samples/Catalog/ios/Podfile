@@ -1,7 +1,7 @@
 require_relative '../node_modules/react-native/scripts/react_native_pods'
 require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
 
-platform :ios, '13.0'
+platform :ios, '14.0'
 
 target 'Catalog' do
   config = use_native_modules!
@@ -16,7 +16,7 @@ target 'Catalog' do
     inherit! :complete
     # Pods for testing
   end
-  pod 'PSPDFKit', '~> 11.3.0'
+  pod 'PSPDFKit', '~> 11.4.0'
   # Enables Flipper.
   #
   # Note that if you have use_frameworks! enabled, Flipper will not work and
@@ -30,6 +30,8 @@ target 'Catalog' do
       aggregate_target.user_project.native_targets.each do |target|
         target.build_configurations.each do |config|
           config.build_settings['LIBRARY_SEARCH_PATHS'] = ['$(SDKROOT)/usr/lib/swift', '$(inherited)']
+          config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
+          config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = "11.0"
         end
       end
       aggregate_target.user_project.save
