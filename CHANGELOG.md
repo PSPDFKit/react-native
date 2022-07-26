@@ -1,5 +1,11 @@
 ## Newest Release
 
+### 2.3.1 - 22 Jul 2022
+
+- Updates for PSPDFKit 8.2.1 for Android. (#34430)
+
+## Previous Releases
+
 ### 2.3.0 - 19 Jul 2022
 
 - Adds Android Toolbar menu customization from `PSPDFKitView` properties. (#33417)
@@ -8,8 +14,6 @@
 - Updates for PSPDFKit 11.4.0 for iOS. (#33485)
 - PSPDFKit now requires React Native 0.68 or later. (#33875)
 - PSPDFKit now requires Xcode 13.4.1 or later. (#32495)
-
-## Previous Releases
 
 ### 2.2.2 - 15 Mar 2022
 
