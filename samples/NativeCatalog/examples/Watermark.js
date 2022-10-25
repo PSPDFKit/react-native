@@ -10,28 +10,54 @@ import {
   View,
 } from 'react-native';
 import React from 'react';
+import { hideToolbar } from '../helpers/NavigationHelper';
 
 export class Watermark extends BaseExampleAutoHidingHeaderComponent {
   constructor(props) {
     super(props);
+    const { navigation } = this.props;
     this.state = {
+      shouldReturn: false,
       documentPath: formDocumentPath,
     };
+
+    hideToolbar(navigation);
+
+    navigation.addListener('beforeRemove', e => {
+      if (Platform.OS !== 'android') {
+        return;
+      }
+      const { shouldReturn } = this.state;
+      if (!shouldReturn) {
+        this.setState({ shouldReturn: true });
+        e.preventDefault();
+      }
+      setTimeout(() => {
+        this.goBack();
+      }, 50);
+    });
+  }
+
+  goBack() {
+    this.props.navigation.goBack(null);
   }
 
   render() {
+    const { shouldReturn } = this.state;
     return (
       <View style={styles.flex}>
-        <CustomPdfView
-          ref="pdfView"
-          document={this.state.documentPath}
-          style={styles.flex}
-          onDocumentWatermarked={event => {
-            this.setState({
-              documentPath: event.nativeEvent.watermarkedDocumentPath,
-            });
-          }}
-        />
+        {!shouldReturn && (
+          <CustomPdfView
+            ref="pdfView"
+            document={this.state.documentPath}
+            style={styles.flex}
+            onDocumentWatermarked={event => {
+              this.setState({
+                documentPath: event.nativeEvent.watermarkedDocumentPath,
+              });
+            }}
+          />
+        )}
         <SafeAreaView style={styles.row}>
           <View>
             <Button

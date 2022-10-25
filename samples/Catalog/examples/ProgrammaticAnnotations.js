@@ -3,20 +3,39 @@ import { Button, processColor, View } from 'react-native';
 import PSPDFKitView from 'react-native-pspdfkit';
 import { exampleDocumentPath, pspdfkitColor } from '../configuration/Constants';
 import React from 'react';
+import { hideToolbar } from '../helpers/NavigationHelper';
 
 export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponent {
   constructor(props) {
     super(props);
+    const { navigation } = this.props;
+    this.pdfRef = React.createRef();
+
+    hideToolbar(navigation);
+
     this.state = {
       currentPageIndex: 0,
     };
+  }
+
+  pdfRef = null;
+  componentDidMount() {
+    const { navigation } = this.props;
+    navigation.addListener('beforeRemove', e => {
+      this.pdfRef?.current?.destroyView();
+    });
+  }
+
+  componentWillUnmount() {
+    const { navigation } = this.props;
+    navigation.removeListener('beforeRemove');
   }
 
   render() {
     return (
       <View style={styles.flex}>
         <PSPDFKitView
-          ref="pdfView"
+          ref={this.pdfRef}
           document={exampleDocumentPath}
           disableAutomaticSaving={true}
           configuration={{
@@ -67,7 +86,7 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
                     type: 'pspdfkit/ink',
                     v: 1,
                   };
-                  this.refs.pdfView
+                  this.pdfRef.current
                     .addAnnotation(annotationJSON)
                     .then(result => {
                       if (result) {
@@ -81,18 +100,20 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
                     });
                 }}
                 title="Add Ink Annotation"
+                accessibilityLabel="Add Ink Annotation"
               />
             </View>
             <View style={styles.marginLeft}>
               <Button
                 onPress={async () => {
                   // Programmatically remove an existing ink annotation.
-                  const inkAnnotations = await this.refs.pdfView.getAnnotations(
-                    this.state.currentPageIndex,
-                    'pspdfkit/ink',
-                  );
+                  const inkAnnotations =
+                    await this.pdfRef.current.getAnnotations(
+                      this.state.currentPageIndex,
+                      'pspdfkit/ink',
+                    );
                   const firstInkAnnotation = inkAnnotations.annotations[0];
-                  this.refs.pdfView
+                  this.pdfRef.current
                     .removeAnnotation(firstInkAnnotation)
                     .then(result => {
                       if (result) {
@@ -106,6 +127,7 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
                     });
                 }}
                 title="Remove Ink Annotation"
+                accessibilityLabel="Remove Ink Annotation"
               />
             </View>
           </View>
@@ -224,7 +246,7 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
                     ],
                     format: 'https://pspdfkit.com/instant-json/v1',
                   };
-                  this.refs.pdfView
+                  this.pdfRef.current
                     .addAnnotations(annotationsJSON)
                     .then(result => {
                       if (result) {
@@ -244,7 +266,7 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
               <Button
                 onPress={async () => {
                   // Get ink annotations from the current page.
-                  await this.refs.pdfView
+                  await this.pdfRef.current
                     .getAnnotations(this.state.currentPageIndex, 'pspdfkit/ink')
                     .then(result => {
                       if (result) {
@@ -266,7 +288,7 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
               <Button
                 onPress={async () => {
                   // Get all unsaved annotations from the document.
-                  await this.refs.pdfView
+                  await this.pdfRef.current
                     .getAllUnsavedAnnotations()
                     .then(result => {
                       if (result) {
@@ -286,7 +308,7 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
               <Button
                 onPress={async () => {
                   // Get all annotations annotations from the document.
-                  await this.refs.pdfView
+                  await this.pdfRef.current
                     .getAllAnnotations()
                     .then(result => {
                       if (result) {

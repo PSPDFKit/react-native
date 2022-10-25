@@ -9,9 +9,23 @@ import {
 import React from 'react';
 
 export class SplitPDF extends BaseExampleAutoHidingHeaderComponent {
+  pdfRef1 = null;
+  pdfRef2 = null;
+
   constructor(props) {
     super(props);
     this.state = { dimensions: undefined };
+    this.pdfRef2 = React.createRef();
+    const { navigation } = this.props;
+    navigation.addListener('beforeRemove', e => {
+      this.pdfRef1?.current?.destroyView();
+      this.pdfRef2?.current?.destroyView();
+    });
+  }
+
+  componentWillUnmount() {
+    const { navigation } = this.props;
+    navigation.removeListener('beforeRemove');
   }
 
   render() {
@@ -19,7 +33,7 @@ export class SplitPDF extends BaseExampleAutoHidingHeaderComponent {
     return (
       <View style={styles.wrapper(layoutDirection)} onLayout={this._onLayout}>
         <PSPDFKitView
-          ref="pdfView1"
+          ref={this.pdfRef1}
           document={formDocumentPath}
           configuration={{
             backgroundColor: processColor('lightgrey'),
@@ -27,7 +41,7 @@ export class SplitPDF extends BaseExampleAutoHidingHeaderComponent {
           style={styles.pdfView}
         />
         <PSPDFKitView
-          ref="pdfView2"
+          ref={this.pdfRef2}
           document={exampleDocumentPath}
           configuration={{
             pageTransition: 'scrollContinuous',

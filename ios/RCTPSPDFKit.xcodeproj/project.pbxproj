@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0724CD992901E405003BB2A3 /* RNFileHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0724CD972901E405003BB2A3 /* RNFileHelper.swift */; };
+		0724CD9A2901E405003BB2A3 /* RNConfigurationHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0724CD982901E405003BB2A3 /* RNConfigurationHelper.swift */; };
+		0754B44928B4310E00431465 /* RNProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0754B44828B4310E00431465 /* RNProcessor.swift */; };
+		0754B44D28B43B4200431465 /* RNProcessor.m in Sources */ = {isa = PBXBuildFile; fileRef = 0754B44C28B43B4200431465 /* RNProcessor.m */; };
 		6540D1841D89D22E00B8F94F /* RCTPSPDFKitManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 6540D1831D89D22E00B8F94F /* RCTPSPDFKitManager.m */; };
 		6572780C1D86AE7300A5E1A8 /* RCTConvert+PSPDFConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 657278071D86AE7300A5E1A8 /* RCTConvert+PSPDFConfiguration.m */; };
 		657278111D86AEC600A5E1A8 /* RCTConvert+PSPDFDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 657278101D86AEC600A5E1A8 /* RCTConvert+PSPDFDocument.m */; };
@@ -32,6 +36,11 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0724CD972901E405003BB2A3 /* RNFileHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RNFileHelper.swift; sourceTree = "<group>"; };
+		0724CD982901E405003BB2A3 /* RNConfigurationHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RNConfigurationHelper.swift; sourceTree = "<group>"; };
+		0754B44728B4310E00431465 /* RCTPSPDFKit-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RCTPSPDFKit-Bridging-Header.h"; sourceTree = "<group>"; };
+		0754B44828B4310E00431465 /* RNProcessor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RNProcessor.swift; sourceTree = "<group>"; };
+		0754B44C28B43B4200431465 /* RNProcessor.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNProcessor.m; sourceTree = "<group>"; };
 		6540D1821D89D22E00B8F94F /* RCTPSPDFKitManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RCTPSPDFKitManager.h; sourceTree = "<group>"; };
 		6540D1831D89D22E00B8F94F /* RCTPSPDFKitManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RCTPSPDFKitManager.m; sourceTree = "<group>"; };
 		657277151D8312EA00A5E1A8 /* libRCTPSPDFKit.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRCTPSPDFKit.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -75,7 +84,12 @@
 				F8C1A2E4202DCC9700E98192 /* RCTPSPDFKitViewManager.m */,
 				F84F8B1A2032D55E00153D9E /* RCTPSPDFKitView.h */,
 				F84F8B182032D54F00153D9E /* RCTPSPDFKitView.m */,
+				0754B44828B4310E00431465 /* RNProcessor.swift */,
+				0754B44C28B43B4200431465 /* RNProcessor.m */,
+				0724CD982901E405003BB2A3 /* RNConfigurationHelper.swift */,
+				0724CD972901E405003BB2A3 /* RNFileHelper.swift */,
 				657278051D86AE7300A5E1A8 /* Converters */,
+				0754B44728B4310E00431465 /* RCTPSPDFKit-Bridging-Header.h */,
 			);
 			path = RCTPSPDFKit;
 			sourceTree = "<group>";
@@ -150,6 +164,7 @@
 				TargetAttributes = {
 					657277141D8312EA00A5E1A8 = {
 						CreatedOnToolsVersion = 8.0;
+						LastSwiftMigration = 1400;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -177,6 +192,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0724CD992901E405003BB2A3 /* RNFileHelper.swift in Sources */,
+				0754B44D28B43B4200431465 /* RNProcessor.m in Sources */,
+				0724CD9A2901E405003BB2A3 /* RNConfigurationHelper.swift in Sources */,
+				0754B44928B4310E00431465 /* RNProcessor.swift in Sources */,
 				657278111D86AEC600A5E1A8 /* RCTConvert+PSPDFDocument.m in Sources */,
 				F8C1A2E5202DCC9700E98192 /* RCTPSPDFKitViewManager.m in Sources */,
 				84545BA4210A5CCF00FBB0A7 /* RCTConvert+PSPDFAnnotation.m in Sources */,
@@ -197,13 +216,18 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/../../../ios/Pods/PSPDFKit";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "RCTPSPDFKit/RCTPSPDFKit-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -211,14 +235,18 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/../../../ios/Pods/PSPDFKit";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "RCTPSPDFKit/RCTPSPDFKit-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};

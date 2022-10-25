@@ -10,11 +10,28 @@ import fileSystem from 'react-native-fs';
 import { PSPDFKit } from '../helpers/PSPDFKit';
 
 export class SaveAs extends BaseExampleAutoHidingHeaderComponent {
+  pdfRef = null;
+
+  constructor(props) {
+    super(props);
+    const { navigation } = this.props;
+    this.pdfRef = React.createRef();
+
+    navigation.addListener('beforeRemove', e => {
+      this.pdfRef?.current?.destroyView();
+    });
+  }
+
+  componentWillUnmount() {
+    const { navigation } = this.props;
+    navigation.removeListener('beforeRemove');
+  }
+
   render() {
     return (
       <View style={styles.flex}>
         <PSPDFKitView
-          ref="pdfView"
+          ref={this.pdfRef}
           document={writableDocumentPath}
           disableAutomaticSaving={true}
           configuration={{
@@ -41,7 +58,7 @@ export class SaveAs extends BaseExampleAutoHidingHeaderComponent {
                   })
                   // First, save all annotations in the current document.
                   .then(() => {
-                    this.refs.pdfView
+                    this.pdfRef.current
                       .saveCurrentDocument()
                       .then(saved => {
                         // Then, embed all the annotations

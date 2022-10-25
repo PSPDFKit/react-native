@@ -6,6 +6,12 @@ const tiffImageName = 'PSPDFKit_Image_Example.tiff';
 const formDocumentName = 'Form_example.pdf';
 export const exampleDocumentName = 'PSPDFKit_Quickstart_Guide.pdf';
 
+export const exampleImage = 'PSPDFKit_Image_Example.jpg';
+export const exampleImagePath =
+  Platform.OS === 'ios'
+    ? 'PDFs/' + exampleImage
+    : 'file:///android_asset/' + exampleImage;
+
 // Document paths
 export const formDocumentPath =
   Platform.OS === 'ios'

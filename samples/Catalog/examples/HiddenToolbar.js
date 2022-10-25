@@ -4,40 +4,57 @@ import PSPDFKitView from 'react-native-pspdfkit';
 import { exampleDocumentPath, pspdfkitColor } from '../configuration/Constants';
 
 export class HiddenToolbar extends Component {
+  pdfRef = null;
+
+  headerRight(params) {
+    return (
+      <View style={styles.marginLeft}>
+        <Button
+          onPress={() => params.handleAnnotationButtonPress()}
+          title="Annotations"
+        />
+      </View>
+    );
+  }
+
   static navigationOptions = ({ navigation }) => {
     const params = navigation.state.params || {};
-    return {
+    navigation.setOptions({
       title: 'HiddenToolbar',
-      headerRight: () => (
-        <View style={styles.marginLeft}>
-          <Button
-            onPress={() => params.handleAnnotationButtonPress()}
-            title="Annotations"
-          />
-        </View>
-      ),
-    };
+      headerRight: () => this.headerRight(params),
+    });
   };
 
   constructor(props) {
     super(props);
+    this.pdfRef = React.createRef();
+
     this.state = {
       annotationCreationActive: false,
       annotationEditingActive: false,
     };
   }
 
+  componentWillUnmount() {
+    const { navigation } = this.props;
+    navigation.removeListener('beforeRemove');
+  }
+
   componentDidMount() {
     const { navigation } = this.props;
-    navigation.setParams({
+    navigation.addListener('beforeRemove', e => {
+      this.pdfRef?.current?.destroyView();
+    });
+
+    navigation.setOptions({
       handleAnnotationButtonPress: () => {
         if (
           this.state.annotationCreationActive ||
           this.state.annotationEditingActive
         ) {
-          this.refs.pdfView.exitCurrentlyActiveMode();
+          this.pdfRef.current.exitCurrentlyActiveMode();
         } else {
-          this.refs.pdfView.enterAnnotationCreationMode();
+          this.pdfRef.current.enterAnnotationCreationMode();
         }
       },
     });
@@ -47,7 +64,7 @@ export class HiddenToolbar extends Component {
     return (
       <View style={styles.flex}>
         <PSPDFKitView
-          ref="pdfView"
+          ref={this.pdfRef}
           document={exampleDocumentPath}
           configuration={{
             backgroundColor: processColor('lightgrey'),
@@ -73,6 +90,7 @@ export class HiddenToolbar extends Component {
     );
   }
 }
+
 const styles = {
   marginLeft: { marginLeft: 10 },
   flex: { flex: 1 },

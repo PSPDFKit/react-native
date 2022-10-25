@@ -3,15 +3,35 @@ import { processColor, View } from 'react-native';
 import PSPDFKitView from 'react-native-pspdfkit';
 import React from 'react';
 import { exampleDocumentPath, pspdfkitColor } from '../configuration/Constants';
+import { hideToolbar } from '../helpers/NavigationHelper';
 
 export class PSPDFKitViewComponent extends BaseExampleAutoHidingHeaderComponent {
+  pdfRef = null;
+
+  constructor(props) {
+    super(props);
+    const { navigation } = this.props;
+    this.pdfRef = React.createRef();
+
+    hideToolbar(navigation);
+
+    navigation.addListener('beforeRemove', e => {
+      this.pdfRef?.current?.destroyView();
+    });
+  }
+
+  componentWillUnmount() {
+    const { navigation } = this.props;
+    navigation.removeListener('beforeRemove');
+  }
+
   render() {
     const { navigation } = this.props;
 
     return (
       <View style={styles.flex}>
         <PSPDFKitView
-          ref="pdfView"
+          ref={this.pdfRef}
           document={exampleDocumentPath}
           configuration={{
             allowToolbarTitleChange: false,

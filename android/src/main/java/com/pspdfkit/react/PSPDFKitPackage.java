@@ -32,6 +32,7 @@ public class PSPDFKitPackage implements ReactPackage {
         List<NativeModule> modules = new ArrayList<>();
         modules.add(new PSPDFKitModule(reactContext));
         modules.add(new TestingModule(reactContext));
+        modules.add(new RNProcessor(reactContext));
         return modules;
     }
 

@@ -5,14 +5,27 @@ import { exampleDocumentPath, pspdfkitColor } from '../configuration/Constants';
 import React from 'react';
 
 export class StateChange extends BaseExampleAutoHidingHeaderComponent {
+  pdfRef = null;
+
   constructor(props) {
     super(props);
+    const { navigation } = this.props;
+    this.pdfRef = React.createRef();
     this.state = {
       currentPageIndex: 0,
       pageCount: 0,
       annotationCreationActive: false,
       annotationEditingActive: false,
     };
+
+    navigation.addListener('beforeRemove', e => {
+      this.pdfRef?.current?.destroyView();
+    });
+  }
+
+  componentWillUnmount() {
+    const { navigation } = this.props;
+    navigation.removeListener('beforeRemove');
   }
 
   render() {
@@ -27,10 +40,11 @@ export class StateChange extends BaseExampleAutoHidingHeaderComponent {
     return (
       <View style={styles.flex}>
         <PSPDFKitView
-          ref="pdfView"
+          ref={this.pdfRef}
           document={exampleDocumentPath}
           configuration={{
             backgroundColor: processColor('lightgrey'),
+            showPageLabels: true,
           }}
           menuItemGrouping={[
             'freetext',
@@ -52,27 +66,31 @@ export class StateChange extends BaseExampleAutoHidingHeaderComponent {
         <View style={styles.annotatoinWrapper}>
           <View style={styles.annotationContainer}>
             <Button
+              accessibilityLabel="Change state"
+              testID="Change state"
+              nativeID="change_state"
               onPress={() => {
                 if (
                   this.state.annotationCreationActive ||
                   this.state.annotationEditingActive
                 ) {
-                  this.refs.pdfView.exitCurrentlyActiveMode();
+                  this.pdfRef.current.exitCurrentlyActiveMode();
                 } else {
-                  this.refs.pdfView.enterAnnotationCreationMode();
+                  this.pdfRef.current.enterAnnotationCreationMode();
                 }
               }}
               title={buttonTitle}
             />
           </View>
           <View style={styles.annotationContainer}>
-            <Text style={styles.flex}>
+            <Text accessibilityLabel="Page Number" style={styles.flex}>
               {'Page ' +
                 (this.state.currentPageIndex + 1) +
                 ' of ' +
                 this.state.pageCount}
             </Text>
             <Button
+              accessibilityLabel="Previous Page"
               onPress={() => {
                 this.setState(previousState => {
                   return {
@@ -85,6 +103,7 @@ export class StateChange extends BaseExampleAutoHidingHeaderComponent {
             />
             <View style={styles.leftMargin}>
               <Button
+                accessibilityLabel="Next Page"
                 onPress={() => {
                   this.setState(previousState => {
                     return {

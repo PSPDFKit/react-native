@@ -5,11 +5,28 @@ import { exampleDocumentPath, pspdfkitColor } from '../configuration/Constants';
 import React from 'react';
 
 export class ToolbarCustomization extends BaseExampleAutoHidingHeaderComponent {
+  pdfRef = null;
+
+  constructor(props) {
+    super(props);
+    const { navigation } = this.props;
+    this.pdfRef = React.createRef();
+
+    navigation.addListener('beforeRemove', () => {
+      this.pdfRef?.current?.destroyView();
+    });
+  }
+
+  componentWillUnmount() {
+    const { navigation } = this.props;
+    navigation.removeListener('beforeRemove');
+  }
+
   render() {
     return (
       <View style={styles.fullScreen}>
         <PSPDFKitView
-          ref="pdfView"
+          ref={this.pdfRef}
           document={exampleDocumentPath}
           configuration={{
             backgroundColor: processColor('lightgrey'),
@@ -39,17 +56,18 @@ export class ToolbarCustomization extends BaseExampleAutoHidingHeaderComponent {
 
                 if (Platform.OS === 'ios') {
                   // Update the right bar buttons for iOS.
-                  await this.refs.pdfView.setRightBarButtonItems(
+                  await this.pdfRef.current.setRightBarButtonItems(
                     items,
                     'document',
                     false,
                   );
                 } else if (Platform.OS === 'android') {
                   // Update the toolbar menu items for Android.
-                  await this.refs.pdfView.setToolbarMenuItems(items);
+                  await this.pdfRef.current.setToolbarMenuItems(items);
                 }
               }}
               title="Set Toolbar Items"
+              accessibilityLabel="Set Toolbar Items"
             />
           </View>
           <View style={styles.marginLeft}>
@@ -61,7 +79,7 @@ export class ToolbarCustomization extends BaseExampleAutoHidingHeaderComponent {
                 }
                 // Get the right bar buttons.
                 const rightBarButtonItems =
-                  await this.refs.pdfView.getRightBarButtonItemsForViewMode(
+                  await this.pdfRef.current.getRightBarButtonItemsForViewMode(
                     'document',
                   );
                 alert(JSON.stringify(rightBarButtonItems));

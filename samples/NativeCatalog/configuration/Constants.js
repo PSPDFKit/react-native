@@ -12,3 +12,9 @@ export const formDocumentPath =
   Platform.OS === 'ios'
     ? 'PDFs/' + formDocumentName
     : 'file:///android_asset/' + formDocumentName;
+
+export const exampleImage = 'PSPDFKit_Image_Example.jpg';
+export const exampleImagePath =
+  Platform.OS === 'ios'
+    ? 'PDFs/' + exampleImage
+    : 'file:///android_asset/' + exampleImage;

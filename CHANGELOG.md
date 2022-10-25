@@ -1,10 +1,16 @@
 ## Newest Release
 
+### 2.4.0 - 25 Oct 2022
+
+- Adds PDF generation from HTML, images and template. (#36736)
+- Updates for PSPDFKit 8.4.1 for Android 
+- Updates for PSPDFKit 12.0 for iOS
+
+## Previous Releases
+
 ### 2.3.1 - 22 Jul 2022
 
 - Updates for PSPDFKit 8.2.1 for Android. (#34430)
-
-## Previous Releases
 
 ### 2.3.0 - 19 Jul 2022
 

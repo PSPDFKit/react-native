@@ -8,13 +8,33 @@ import {
 import fileSystem from 'react-native-fs';
 import { PSPDFKit } from '../helpers/PSPDFKit';
 import React from 'react';
+import { hideToolbar } from '../helpers/NavigationHelper';
 
 export class AnnotationProcessing extends BaseExampleAutoHidingHeaderComponent {
+  pdfRef = null;
+
+  constructor(props) {
+    super(props);
+    const { navigation } = this.props;
+    this.pdfRef = React.createRef();
+
+    hideToolbar(navigation);
+
+    navigation.addListener('beforeRemove', e => {
+      this.pdfRef?.current?.destroyView();
+    });
+  }
+
+  componentWillUnmount() {
+    const { navigation } = this.props;
+    navigation.removeListener('beforeRemove');
+  }
+
   render() {
     return (
       <View style={styles.flex}>
         <PSPDFKitView
-          ref="pdfView"
+          ref={this.pdfRef}
           document={writableDocumentPath}
           disableAutomaticSaving={true}
           configuration={{

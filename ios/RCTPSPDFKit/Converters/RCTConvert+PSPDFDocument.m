@@ -11,22 +11,36 @@
 
 @implementation RCTConvert (PSPDFDocument)
 
-+ (PSPDFDocument *)PSPDFDocument:(NSString *)string {
-  NSURL *url;
++ (PSPDFDocument *)PSPDFDocument: (NSString *)urlString {
+    NSURL* url = [self parseURL: urlString];
 
-  if ([string hasPrefix:@"/"]) {
-    url = [NSURL fileURLWithPath:string];
-  } else {
-    url = [NSBundle.mainBundle URLForResource:string withExtension:nil];
-  }
+    NSString *fileExtension = url.pathExtension.lowercaseString;
 
-  NSString *fileExtension = url.pathExtension.lowercaseString;
-  BOOL isImageFile = [fileExtension isEqualToString:@"png"] || [fileExtension isEqualToString:@"jpeg"] || [fileExtension isEqualToString:@"jpg"] || [fileExtension isEqualToString:@"tiff"] || [fileExtension isEqualToString:@"tif"];
-  if (isImageFile) {
-    return [[PSPDFImageDocument alloc] initWithImageURL:url];
-  } else {
-    return [[PSPDFDocument alloc] initWithURL:url];
-  }
+    BOOL isImageFile = [fileExtension isEqualToString: @"png"] || [fileExtension isEqualToString: @"jpeg"] || [fileExtension isEqualToString: @"jpg"] || [fileExtension isEqualToString: @"tiff"] || [fileExtension isEqualToString:@"tif"];
+
+    if (isImageFile) {
+        return [[PSPDFImageDocument alloc] initWithImageURL: url];
+    }
+
+    return [[PSPDFDocument alloc] initWithURL: url];
+}
+
++ (NSURL*) parseURL: (NSString*) urlString {
+    NSURL* url;
+
+    if ([urlString hasPrefix: @"/"] || [urlString containsString: @"file:/"]) {
+        url = [NSURL fileURLWithPath: urlString];
+    }
+
+    if (url == nil) {
+        url = [NSBundle.mainBundle URLForResource:urlString withExtension: nil];
+    }
+
+    if (url == nil && [urlString containsString: @".pdf"]) {
+        url = [[NSBundle mainBundle] URLForResource: urlString withExtension: @"pdf"];
+    }
+
+    return url;
 }
 
 @end

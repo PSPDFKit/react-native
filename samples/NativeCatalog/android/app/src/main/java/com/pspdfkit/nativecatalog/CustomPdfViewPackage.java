@@ -10,7 +10,6 @@ import com.facebook.react.uimanager.ViewManager;
 import java.util.Collections;
 import java.util.List;
 
-
 /**
  * This tells react-native about our CustomPdfViewManager.
  */
