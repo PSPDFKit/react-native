@@ -1,6 +1,5 @@
 import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
 import { CustomPdfView, formDocumentPath } from '../configuration/Constants';
-import { withNavigation } from 'react-navigation';
 import {
   Button,
   findNodeHandle,
@@ -12,34 +11,15 @@ import {
 } from 'react-native';
 import React from 'react';
 
-class ManualSigning extends BaseExampleAutoHidingHeaderComponent {
+export class ManualSigning extends BaseExampleAutoHidingHeaderComponent {
   pdfRef = React.createRef();
 
   constructor(props) {
     super(props);
-    const { navigation } = props;
     this.state = {
       documentPath: formDocumentPath,
       shouldReturn: false,
     };
-
-    navigation.addListener('beforeRemove', e => {
-      if (Platform.OS !== 'android') {
-        return;
-      }
-      const { shouldReturn } = this.state;
-      if (!shouldReturn) {
-        this.setState({ shouldReturn: true });
-        e.preventDefault();
-      }
-      setTimeout(() => {
-        this.goBack();
-      }, 50);
-    });
-  }
-
-  goBack(navigation) {
-    this.props.navigation.goBack();
   }
 
   render() {
@@ -84,8 +64,6 @@ class ManualSigning extends BaseExampleAutoHidingHeaderComponent {
     );
   }
 }
-
-export default withNavigation(ManualSigning);
 
 const styles = {
   flex: { flex: 1 },

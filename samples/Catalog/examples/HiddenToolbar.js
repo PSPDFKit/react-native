@@ -35,17 +35,8 @@ export class HiddenToolbar extends Component {
     };
   }
 
-  componentWillUnmount() {
-    const { navigation } = this.props;
-    navigation.removeListener('beforeRemove');
-  }
-
   componentDidMount() {
     const { navigation } = this.props;
-    navigation.addListener('beforeRemove', e => {
-      this.pdfRef?.current?.destroyView();
-    });
-
     navigation.setOptions({
       handleAnnotationButtonPress: () => {
         if (

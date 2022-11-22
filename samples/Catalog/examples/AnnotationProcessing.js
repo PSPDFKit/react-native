@@ -17,17 +17,7 @@ export class AnnotationProcessing extends BaseExampleAutoHidingHeaderComponent {
     super(props);
     const { navigation } = this.props;
     this.pdfRef = React.createRef();
-
     hideToolbar(navigation);
-
-    navigation.addListener('beforeRemove', e => {
-      this.pdfRef?.current?.destroyView();
-    });
-  }
-
-  componentWillUnmount() {
-    const { navigation } = this.props;
-    navigation.removeListener('beforeRemove');
   }
 
   render() {
@@ -59,7 +49,7 @@ export class AnnotationProcessing extends BaseExampleAutoHidingHeaderComponent {
                     })
                     // First, save all annotations in the current document.
                     .then(() => {
-                      this.refs.pdfView
+                      this.pdfRef.current
                         .saveCurrentDocument()
                         .then(saved => {
                           // Then, embed all the annotations
@@ -104,7 +94,7 @@ export class AnnotationProcessing extends BaseExampleAutoHidingHeaderComponent {
                     })
                     .then(() => {
                       // First, save all annotations in the current document.
-                      this.refs.pdfView
+                      this.pdfRef.current
                         .saveCurrentDocument()
                         .then(saved => {
                           // Then, flatten all the annotations
@@ -151,7 +141,7 @@ export class AnnotationProcessing extends BaseExampleAutoHidingHeaderComponent {
                     })
                     .then(() => {
                       // First, save all annotations in the current document.
-                      this.refs.pdfView
+                      this.pdfRef.current
                         .saveCurrentDocument()
                         .then(saved => {
                           // Then, remove all the annotations
@@ -196,7 +186,7 @@ export class AnnotationProcessing extends BaseExampleAutoHidingHeaderComponent {
                     })
                     .then(() => {
                       // First, save all annotations in the current document.
-                      this.refs.pdfView
+                      this.pdfRef.current
                         .saveCurrentDocument()
                         .then(success => {
                           // Then, print all the annotations

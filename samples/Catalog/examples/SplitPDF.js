@@ -16,16 +16,6 @@ export class SplitPDF extends BaseExampleAutoHidingHeaderComponent {
     super(props);
     this.state = { dimensions: undefined };
     this.pdfRef2 = React.createRef();
-    const { navigation } = this.props;
-    navigation.addListener('beforeRemove', e => {
-      this.pdfRef1?.current?.destroyView();
-      this.pdfRef2?.current?.destroyView();
-    });
-  }
-
-  componentWillUnmount() {
-    const { navigation } = this.props;
-    navigation.removeListener('beforeRemove');
   }
 
   render() {

@@ -15,31 +15,13 @@ import { hideToolbar } from '../helpers/NavigationHelper';
 export class Watermark extends BaseExampleAutoHidingHeaderComponent {
   constructor(props) {
     super(props);
-    const { navigation } = this.props;
+    const { navigation } = props;
     this.state = {
       shouldReturn: false,
       documentPath: formDocumentPath,
     };
 
     hideToolbar(navigation);
-
-    navigation.addListener('beforeRemove', e => {
-      if (Platform.OS !== 'android') {
-        return;
-      }
-      const { shouldReturn } = this.state;
-      if (!shouldReturn) {
-        this.setState({ shouldReturn: true });
-        e.preventDefault();
-      }
-      setTimeout(() => {
-        this.goBack();
-      }, 50);
-    });
-  }
-
-  goBack() {
-    this.props.navigation.goBack(null);
   }
 
   render() {

@@ -9,13 +9,13 @@
 import React from 'react';
 import { BaseExampleAutoHidingHeaderComponent } from './helpers/BaseExampleAutoHidingHeaderComponent';
 import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createStackNavigator } from '@react-navigation/stack';
 
 import HomeScreen from './examples/HomeScreen';
 import examples from './ExamplesNavigationMenu';
 import GeneratePDF from './examples/GeneratePDF';
 import GeneratePDFMenu from './examples/GeneratePDFMenu';
-import ManualSigning from './examples/ManualSigning';
+import { ManualSigning } from './examples/ManualSigning';
 import { Watermark } from './examples/Watermark';
 import { WatermarkStartup } from './examples/WatermarkStartup';
 import { InstantExample } from './examples/InstantExample';
@@ -43,7 +43,7 @@ class NativeCatalog extends BaseExampleAutoHidingHeaderComponent {
   }
 
   render() {
-    const Stack = createNativeStackNavigator();
+    const Stack = createStackNavigator();
 
     return (
       <NavigationContainer>

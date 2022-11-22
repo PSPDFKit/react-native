@@ -9,7 +9,6 @@ export class StateChange extends BaseExampleAutoHidingHeaderComponent {
 
   constructor(props) {
     super(props);
-    const { navigation } = this.props;
     this.pdfRef = React.createRef();
     this.state = {
       currentPageIndex: 0,
@@ -17,15 +16,6 @@ export class StateChange extends BaseExampleAutoHidingHeaderComponent {
       annotationCreationActive: false,
       annotationEditingActive: false,
     };
-
-    navigation.addListener('beforeRemove', e => {
-      this.pdfRef?.current?.destroyView();
-    });
-  }
-
-  componentWillUnmount() {
-    const { navigation } = this.props;
-    navigation.removeListener('beforeRemove');
   }
 
   render() {
@@ -55,6 +45,10 @@ export class StateChange extends BaseExampleAutoHidingHeaderComponent {
           pageIndex={this.state.currentPageIndex}
           style={styles.pdfColor}
           onStateChanged={event => {
+            if (event.currentPageIndex !== this.state.currentPageIndex) {
+              return;
+            }
+
             this.setState({
               annotationCreationActive: event.annotationCreationActive,
               annotationEditingActive: event.annotationEditingActive,

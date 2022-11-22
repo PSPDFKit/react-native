@@ -18,18 +18,7 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
     };
   }
 
-  pdfRef = null;
-  componentDidMount() {
-    const { navigation } = this.props;
-    navigation.addListener('beforeRemove', e => {
-      this.pdfRef?.current?.destroyView();
-    });
-  }
-
-  componentWillUnmount() {
-    const { navigation } = this.props;
-    navigation.removeListener('beforeRemove');
-  }
+  // pdfRef = null;
 
   render() {
     return (

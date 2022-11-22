@@ -9,7 +9,7 @@
 // Imports
 import React, { Component } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createStackNavigator } from '@react-navigation/stack';
 
 import { PSPDFKitViewComponent } from './examples/PSPDFKitViewComponent';
 import { OpenImageDocument } from './examples/OpenImageDocument';
@@ -44,7 +44,7 @@ class Catalog extends Component {
   };
 
   render() {
-    const Stack = createNativeStackNavigator();
+    const Stack = createStackNavigator();
 
     return (
       <NavigationContainer>

@@ -14,15 +14,6 @@ export class PSPDFKitViewComponent extends BaseExampleAutoHidingHeaderComponent 
     this.pdfRef = React.createRef();
 
     hideToolbar(navigation);
-
-    navigation.addListener('beforeRemove', e => {
-      this.pdfRef?.current?.destroyView();
-    });
-  }
-
-  componentWillUnmount() {
-    const { navigation } = this.props;
-    navigation.removeListener('beforeRemove');
   }
 
   render() {

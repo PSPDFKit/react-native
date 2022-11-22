@@ -14,17 +14,7 @@ export class SaveAs extends BaseExampleAutoHidingHeaderComponent {
 
   constructor(props) {
     super(props);
-    const { navigation } = this.props;
     this.pdfRef = React.createRef();
-
-    navigation.addListener('beforeRemove', e => {
-      this.pdfRef?.current?.destroyView();
-    });
-  }
-
-  componentWillUnmount() {
-    const { navigation } = this.props;
-    navigation.removeListener('beforeRemove');
   }
 
   render() {
