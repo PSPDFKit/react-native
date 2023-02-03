@@ -1,5 +1,5 @@
 //
-//  Copyright © 2018-2022 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2018-2023 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -251,6 +251,38 @@ RCT_EXPORT_METHOD(removeAnnotation:(id)jsonAnnotation reactTag:(nonnull NSNumber
       reject(@"error", @"Failed to remove annotation.", nil);
     }
   });
+}
+
+RCT_EXPORT_METHOD(removeAnnotations:(id)jsonAnnotations reactTag:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+    NSLog(@"remove annotations %@", jsonAnnotations);
+    if(![jsonAnnotations isKindOfClass: [NSArray class]]) {
+        reject(@"error", @"Please provide list of annotation objects", nil);
+        return;
+    }
+    NSMutableArray* annotationIDs = [@[] mutableCopy];
+    for(NSDictionary* annotation in jsonAnnotations) {
+        [annotationIDs addObject: annotation[@"uuid"]];
+    }
+
+    NSMutableArray* errors = [@[] mutableCopy];
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
+        for(NSString* uuid in annotationIDs){
+            BOOL isSuccessful = [component removeAnnotationWithUUID: uuid];
+            NSLog(@"Deleted annotation %@", uuid);
+            if(!isSuccessful) {
+                [errors addObject: uuid];
+            }
+        }
+
+        if([errors count] > 1) {
+            NSString* errorMessage = [NSString stringWithFormat: @"Failed to remove annotations: %@", errors];
+            reject(@"error", errorMessage, nil);
+            return;
+        }
+        resolve(@(true));
+    });
 }
 
 RCT_EXPORT_METHOD(getAllUnsavedAnnotations:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {

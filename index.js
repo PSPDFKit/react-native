@@ -1,4 +1,4 @@
-//  Copyright © 2018-2022 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2018-2023 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -266,6 +266,31 @@ class PSPDFKitView extends React.Component {
       );
     }
   };
+
+  removeAnnotations = function(annotations) {
+    if (Platform.OS === 'android') {
+      let requestId = this._nextRequestId++;
+      let requestMap = this._requestMap;
+      // We create a promise here that will be resolved once onDataReturned is called.
+      let promise = new Promise(function (resolve, reject) {
+        requestMap[requestId] = { resolve: resolve, reject: reject };
+      });
+
+      UIManager.dispatchViewManagerCommand(
+          findNodeHandle(this.refs.pdfView),
+          this._getViewManagerConfig('RCTPSPDFKitView').Commands.removeAnnotations,
+          [requestId, annotations],
+      );
+
+      return promise;
+    } else if (Platform.OS === 'ios') {
+      return NativeModules.PSPDFKitViewManager.removeAnnotations(
+          annotations,
+          findNodeHandle(this.refs.pdfView),
+      );
+    }
+  }
+
 
   /**
    * Gets all unsaved changes to annotations.

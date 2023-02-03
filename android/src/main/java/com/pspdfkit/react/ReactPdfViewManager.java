@@ -3,7 +3,7 @@
  *
  *   PSPDFKit
  *
- *   Copyright © 2021-2022 PSPDFKit GmbH. All rights reserved.
+ *   Copyright © 2021-2023 PSPDFKit GmbH. All rights reserved.
  *
  *   THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
  *   AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -60,10 +60,11 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
     public static final int COMMAND_ADD_ANNOTATIONS = 7;
     public static final int COMMAND_GET_FORM_FIELD_VALUE = 8;
     public static final int COMMAND_SET_FORM_FIELD_VALUE = 9;
-    public static final int COMMAND_REMOVE_ANNOTATION = 10;
     public static final int COMMAND_GET_ALL_ANNOTATIONS = 11;
+    public static final int COMMAND_REMOVE_ANNOTATION = 10;
     public static final int COMMAND_REMOVE_FRAGMENT = 12;
     public static final int COMMAND_SET_TOOLBAR_MENU_ITEMS = 13;
+    public static final int COMMAND_REMOVE_ANNOTATIONS = 14;
 
     private CompositeDisposable annotationDisposables = new CompositeDisposable();
 
@@ -106,6 +107,7 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
         commandMap.put("getFormFieldValue", COMMAND_GET_FORM_FIELD_VALUE);
         commandMap.put("setFormFieldValue", COMMAND_SET_FORM_FIELD_VALUE);
         commandMap.put("removeAnnotation", COMMAND_REMOVE_ANNOTATION);
+        commandMap.put("removeAnnotations", COMMAND_REMOVE_ANNOTATIONS);
         commandMap.put("getAllAnnotations", COMMAND_GET_ALL_ANNOTATIONS);
         commandMap.put("removeFragment", COMMAND_REMOVE_FRAGMENT);
         commandMap.put("setToolbarMenuItems", COMMAND_SET_TOOLBAR_MENU_ITEMS);
@@ -249,6 +251,17 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
                     annotationDisposables.add(root.removeAnnotation(requestId, args.getMap(1)));
                 }
                 break;
+            case COMMAND_REMOVE_ANNOTATIONS:
+                if(args != null && args.size() == 2) {
+                    final int requestId = args.getInt(0);
+                    final ReadableArray annotations = args.getArray(1);
+                    final int length = annotations.size();
+                    for (int i = 0; i < length; i++) {
+                        ReadableMap annotation = annotations.getMap(i);
+                        annotationDisposables.add(root.removeAnnotation(requestId, annotation));
+                    }
+                }
+                break;
             case COMMAND_GET_ALL_UNSAVED_ANNOTATIONS:
                 if (args != null) {
                     final int requestId = args.getInt(0);
@@ -294,7 +307,7 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
                 }
                 break;
             case COMMAND_REMOVE_FRAGMENT:
-                // Removing a fragment like this is not recommended, but it can be used as a workaround 
+                // Removing a fragment like this is not recommended, but it can be used as a workaround
                 // to stop `react-native-screens` from crashing the App when the back button is pressed.
                 root.removeFragment(true);
                 break;

@@ -252,6 +252,26 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
               />
             </View>
             <View style={styles.marginLeft}>
+              {/* Change the type of annotations you would like to remove, for full list check in the file: ConversionHelpers.java or RCTConvert+PSPDFAnnotation.m */}
+              <Button
+                title={'Remove annotations'}
+                onPress={() => {
+                  this.pdfRef.current
+                    .getAllAnnotations('all') // other types example: "pspdfkit/ink" or "pspdfkit/stamp"
+                    .then(({ annotations = [] }) => {
+                      if (annotations.length > 1) {
+                        this.pdfRef.current.removeAnnotations(annotations);
+                      }
+                    })
+                    .catch(error => {
+                      alert(JSON.stringify(error));
+                    });
+                }}
+              />
+            </View>
+          </View>
+          <View style={styles.wrapper}>
+            <View>
               <Button
                 onPress={async () => {
                   // Get ink annotations from the current page.
@@ -269,6 +289,29 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
                     });
                 }}
                 title="Get Ink Annotations"
+              />
+            </View>
+            <View style={styles.marginLeft}>
+              <Button
+                onPress={async () => {
+                  // Get ink annotations from the current page.
+                  await this.pdfRef.current
+                    .getAnnotations(
+                      this.state.currentPageIndex,
+                      'pspdfkit/stamp',
+                    )
+                    .then(result => {
+                      if (result) {
+                        alert(JSON.stringify(result));
+                      } else {
+                        alert('Failed to get annotations.');
+                      }
+                    })
+                    .catch(error => {
+                      alert(JSON.stringify(error));
+                    });
+                }}
+                title="Get Image Annotations"
               />
             </View>
           </View>

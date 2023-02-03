@@ -3,7 +3,7 @@
  *
  *   PSPDFKit
  *
- *   Copyright © 2021-2022 PSPDFKit GmbH. All rights reserved.
+ *   Copyright © 2021-2023 PSPDFKit GmbH. All rights reserved.
  *
  *   THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
  *   AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -15,7 +15,7 @@
  *   Contains gradle configuration constants
  */
 ext {
-    PSPDFKIT_VERSION = '8.4.1'
+    PSPDFKIT_VERSION = '8.5.0'
 }
 
 buildscript {
@@ -46,7 +46,7 @@ android {
         versionCode 1
         versionName "1.0"
     }
-    
+
      compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8

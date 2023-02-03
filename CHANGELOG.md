@@ -1,11 +1,17 @@
 ## Newest Release
 
+### 2.4.2 - 01 Feb 2023
+- Fixes bug issue for deleting multiple annotations (#38518)
+- Bump PSPDFKit for Android version to 8.5.0
+- Bump PSPDFKit for iOS version to 12.0.3
+- Bump minimum SDK version compileSdkVersion to API 33
+
+## Previous Releases
+
 ### 2.4.1 - 22 Nov 2022
 - Updates for PSPDFKit 12.0.1 for iOS.
 - Fixes Catalog example toolbar menu items not rendering. (#37368)
 - Fixes the Annotation Processing Catalog example. (#37534)
-
-## Previous Releases
 
 ### 2.4.0 - 25 Oct 2022
 

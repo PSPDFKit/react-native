@@ -1,5 +1,5 @@
 //
-//  Copyright © 2018-2022 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2018-2023 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -27,44 +27,51 @@
       [annotationsJSON addObject:@{@"uuid" : annotation.uuid, @"name" : annotation.name ?: [NSNull null], @"creatorName" : annotation.user ?: [NSNull null]}];
     }
   }
-  
+
   return [annotationsJSON copy];
 }
 
 + (PSPDFAnnotationType)annotationTypeFromInstantJSONType:(NSString *)type {
-  if (!type) {
-    return PSPDFAnnotationTypeAll;
-  } else if ([type isEqualToString:@"pspdfkit/ink"]) {
-    return PSPDFAnnotationTypeInk;
-  } else if ([type isEqualToString:@"pspdfkit/link"]) {
-    return PSPDFAnnotationTypeLink;
-  } else if ([type isEqualToString:@"pspdfkit/markup/highlight"]) {
-    return PSPDFAnnotationTypeHighlight;
-  } else if ([type isEqualToString:@"pspdfkit/markup/squiggly"]) {
-    return PSPDFAnnotationTypeSquiggly;
-  } else if ([type isEqualToString:@"pspdfkit/markup/strikeout"]) {
-    return PSPDFAnnotationTypeStrikeOut;
-  } else if ([type isEqualToString:@"pspdfkit/markup/underline"]) {
-    return PSPDFAnnotationTypeUnderline;
-  } else if ([type isEqualToString:@"pspdfkit/note"]) {
-    return PSPDFAnnotationTypeNote;
-  } else if ([type isEqualToString:@"pspdfkit/shape/ellipse"]) {
-    return PSPDFAnnotationTypeCircle;
-  } else if ([type isEqualToString:@"pspdfkit/shape/line"]) {
-    return PSPDFAnnotationTypeLine;
-  } else if ([type isEqualToString:@"pspdfkit/shape/polygon"]) {
-    return PSPDFAnnotationTypePolygon;
-  } else if ([type isEqualToString:@"pspdfkit/shape/polyline"]) {
-    return PSPDFAnnotationTypePolyLine;
-  } else if ([type isEqualToString:@"pspdfkit/shape/rectangle"]) {
-    return PSPDFAnnotationTypeSquare;
-  } else if ([type isEqualToString:@"pspdfkit/text"]) {
-    return PSPDFAnnotationTypeFreeText;
-  } else if ([type isEqualToString:@"pspdfkit/stamp"]) {
-    return PSPDFAnnotationTypeStamp;
-  } else {
-    return PSPDFAnnotationTypeUndefined;
-  }
+
+    if (!type) {
+        return PSPDFAnnotationTypeAll;
+    }
+
+   NSDictionary* annotationTypes = @{
+        @"all": @(PSPDFAnnotationTypeAll),
+        @"pspdfkit/ink": @(PSPDFAnnotationTypeInk),
+        @"pspdfkit/link": @(PSPDFAnnotationTypeLink),
+        @"pspdfkit/markup/highlight": @(PSPDFAnnotationTypeHighlight),
+        @"pspdfkit/markup/squiggly": @(PSPDFAnnotationTypeSquiggly),
+        @"pspdfkit/markup/strikeout": @(PSPDFAnnotationTypeStrikeOut),
+        @"pspdfkit/markup/underline":@(PSPDFAnnotationTypeUnderline),
+        @"pspdfkit/note":@(PSPDFAnnotationTypeNote),
+        @"pspdfkit/shape/ellipse": @(PSPDFAnnotationTypeCircle),
+        @"pspdfkit/shape/line":@(PSPDFAnnotationTypeLine),
+        @"pspdfkit/shape/polygon":@(PSPDFAnnotationTypePolygon),
+        @"pspdfkit/shape/polyline":@(PSPDFAnnotationTypePolyLine),
+        @"pspdfkit/shape/rectangle":@(PSPDFAnnotationTypeSquare),
+        @"pspdfkit/text":@(PSPDFAnnotationTypeFreeText),
+        @"pspdfkit/stamp":@(PSPDFAnnotationTypeStamp),
+        @"pspdfkit/image":@(PSPDFAnnotationTypeStamp),
+        @"pspdfkit/caret":@(PSPDFAnnotationTypeCaret),
+        @"pspdfkit/richmedia":@(PSPDFAnnotationTypeRichMedia),
+        @"pspdfkit/widget":@(PSPDFAnnotationTypeWidget),
+        @"pspdfkit/watermark":@(PSPDFAnnotationTypeWatermark),
+        @"pspdfkit/file":@(PSPDFAnnotationTypeFile),
+        @"pspdfkit/sound":@(PSPDFAnnotationTypeSound),
+        @"pspdfkit/popup":@(PSPDFAnnotationTypePopup),
+        @"pspdfkit/trapnet":@(PSPDFAnnotationTypeTrapNet),
+        @"pspdfkit/type3d":@(PSPDFAnnotationTypeThreeDimensional),
+        @"pspdfkit/redact":@(PSPDFAnnotationTypeRedaction),
+    };
+
+    // Return undefined type, if submitted type is not supported
+    if(![[annotationTypes allKeys] containsObject: type.lowercaseString]) {
+        return PSPDFAnnotationTypeUndefined;
+    }
+
+    return (unsigned long) annotationTypes[type.lowercaseString];
 }
 
 @end

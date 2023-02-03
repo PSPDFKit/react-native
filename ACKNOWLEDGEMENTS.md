@@ -462,7 +462,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 
 
 --------------------------------------------------------------------------------
-## clipper (http://www.angusj.com/delphi/clipper.php)
+## clipper2 (http://www.angusj.com/delphi/clipper.php)
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -487,6 +487,7 @@ SHALL THE COPYRIGHT HOLDERS OR ANYONE DISTRIBUTING THE SOFTWARE BE LIABLE
 FOR ANY DAMAGES OR OTHER LIABILITY, WHETHER IN CONTRACT, TORT OR OTHERWISE,
 ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
+
 
 --------------------------------------------------------------------------------
 ## cppformat (https://github.com/cppformat/cppformat)

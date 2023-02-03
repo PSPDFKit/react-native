@@ -3,7 +3,7 @@
  *
  *   PSPDFKit
  *
- *   Copyright © 2021-2022 PSPDFKit GmbH. All rights reserved.
+ *   Copyright © 2021-2023 PSPDFKit GmbH. All rights reserved.
  *
  *   THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
  *   AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -21,6 +21,7 @@ import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.uimanager.events.Event;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
 import com.pspdfkit.annotations.Annotation;
+import com.pspdfkit.annotations.AnnotationType;
 import com.pspdfkit.react.helper.JsonUtilities;
 
 import org.json.JSONException;
@@ -46,6 +47,9 @@ public class PdfViewDataReturnedEvent extends Event<PdfViewDataReturnedEvent> {
         try {
             List<Map<String, Object>> annotationsSerialized = new ArrayList<>();
             for (Annotation annotation : annotationsToSerialize) {
+                if (annotation.getType() == AnnotationType.POPUP) {
+                    continue;
+                }
                 JSONObject instantJson = new JSONObject(annotation.toInstantJson());
                 annotationsSerialized.add(JsonUtilities.jsonObjectToMap(instantJson));
             }
