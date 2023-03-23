@@ -7,7 +7,7 @@
 //  This notice may not be removed from this file.
 //
 
-
+import Foundation
 import PSPDFKit
 
 struct RNConfigurationHelper {
@@ -25,10 +25,10 @@ struct RNConfigurationHelper {
         let pageTemplate =  PageTemplate(pageType: .tiledPatternPage, identifier: parsePageTemplate())
 
         return PDFNewPageConfiguration(pageTemplate: pageTemplate, builderBlock: { builder in
-            builder.pageSize = parseSize()
-            builder.pageRotation = parseRotation()
-            builder.pageMargins = parseMargins()
-            builder.backgroundColor = parseBackgroundColor()
+            builder.pageSize = self.parseSize()
+            builder.pageRotation = self.parseRotation()
+            builder.pageMargins = self.parseMargins()
+            builder.backgroundColor = self.parseBackgroundColor()
         })
     }
 
@@ -45,7 +45,7 @@ struct RNConfigurationHelper {
 
         return PDFNewPageConfiguration(pageTemplate: pageTemplate) { builder in
             builder.item = ProcessorItem(image: image, jpegCompressionQuality: 0.7, builderBlock: nil)
-            builder.pageSize = parseSize()
+            builder.pageSize = self.parseSize()
         }
     }
 

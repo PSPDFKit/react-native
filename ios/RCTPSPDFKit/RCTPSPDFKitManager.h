@@ -9,7 +9,8 @@
 
 #import <Foundation/Foundation.h>
 #import <React/RCTBridgeModule.h>
+#import <React/RCTEventEmitter.h>
 
-@interface RCTPSPDFKitManager : NSObject <RCTBridgeModule>
+@interface RCTPSPDFKitManager: RCTEventEmitter <RCTBridgeModule>
 
 @end

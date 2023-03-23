@@ -41,7 +41,7 @@ import com.pspdfkit.document.image.CameraImagePickerFragment;
 import com.pspdfkit.document.image.GalleryImagePickerFragment;
 import com.pspdfkit.document.processor.PdfProcessor;
 import com.pspdfkit.document.processor.PdfProcessorTask;
-import com.pspdfkit.instant.ui.InstantPdfActivity;
+import com.pspdfkit.react.RNInstantPdfActivity;
 import com.pspdfkit.listeners.SimpleDocumentListener;
 import com.pspdfkit.react.helper.ConversionHelpers;
 import com.pspdfkit.ui.PdfActivity;
@@ -173,7 +173,7 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
             ConfigurationAdapter configurationAdapter = new ConfigurationAdapter(getCurrentActivity(), configuration);
 
             lastPresentPromise = promise;
-            InstantPdfActivity.showInstantDocument(getCurrentActivity(), serverUrl, jwt, configurationAdapter.build());
+            RNInstantPdfActivity.showInstantDocument(getCurrentActivity(), serverUrl, jwt, configurationAdapter.build());
         }
     }
 
@@ -213,7 +213,7 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
     @ReactMethod
     public void setLicenseKey(@Nullable String licenseKey, @Nullable Promise promise) {
          try {
-            PSPDFKit.initialize(resumedActivity, licenseKey, new ArrayList<>(), HYBRID_TECHNOLOGY);
+            PSPDFKit.initialize(getCurrentActivity(), licenseKey, new ArrayList<>(), HYBRID_TECHNOLOGY);
             promise.resolve("Initialised PSPDFKit");
         } catch (InvalidPSPDFKitLicenseException e) {
             promise.reject(e);
@@ -225,7 +225,7 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
         // Here, we ignore the `iOSLicenseKey` parameter and only care about `androidLicenseKey`.
         // `iOSLicenseKey` will be used to activate the license on iOS.
         try {
-            PSPDFKit.initialize(resumedActivity, androidLicenseKey, new ArrayList<>(), HYBRID_TECHNOLOGY);
+            PSPDFKit.initialize(getCurrentActivity(), androidLicenseKey, new ArrayList<>(), HYBRID_TECHNOLOGY);
             promise.resolve("Initialised PSPDFKit");
         } catch (InvalidPSPDFKitLicenseException e) {
             promise.reject(e);

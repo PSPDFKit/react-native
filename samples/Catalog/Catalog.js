@@ -27,6 +27,8 @@ import { CustomFontPicker } from './examples/CustomFontPicker';
 import { GeneratePDF } from './examples/GeneratePDF';
 import HomeScreen from './examples/HomeScreen';
 import GeneratePDFMenu from './examples/GeneratePDFMenu';
+import InstantSynchronization from './examples/InstantSynchronization';
+import { PSPDFKit } from './helpers/PSPDFKit';
 
 // By default, this example doesn't set a license key, but instead runs in trial mode (which is the default, and which requires no
 // specific initialization). If you want to use a different license key for evaluation (e.g. a production license), you can uncomment
@@ -42,6 +44,10 @@ class Catalog extends Component {
   static navigationOptions = {
     title: 'Catalog',
   };
+
+  componentDidMount() {
+    PSPDFKit.setLicenseKey('YOUR_REACT_NATIVE_LICENSE_KEY_GOES_HERE');
+  }
 
   render() {
     const Stack = createStackNavigator();
@@ -83,6 +89,10 @@ class Catalog extends Component {
           <Stack.Screen name="CustomFontPicker" component={CustomFontPicker} />
           <Stack.Screen name="GeneratePDFMenu" component={GeneratePDFMenu} />
           <Stack.Screen name="GeneratePDF" component={GeneratePDF} />
+          <Stack.Screen
+            name="InstantSynchronization"
+            component={InstantSynchronization}
+          />
         </Stack.Navigator>
       </NavigationContainer>
     );

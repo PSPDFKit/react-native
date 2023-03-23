@@ -190,6 +190,16 @@ export default [
       });
     },
   },
+  {
+    key: 'item18',
+    name: 'PSPDFKit Instant',
+    description: 'PSPDFKit Instant synchronisation example',
+    action: component => {
+      component.props.navigation.push('InstantSynchronization', {
+        title: 'Instant Synchronization',
+      });
+    },
+  },
 ];
 
 const generatePDFMenu = [
@@ -198,7 +208,7 @@ const generatePDFMenu = [
     name: 'Generate Blank PDF',
     description: 'Generate blank PDF from configuration.',
     action: async component => {
-      const fileName = 'newBlankPDF.pdf';
+      const fileName = 'newBlankPDF';
       const configuration = {
         name: fileName,
         width: 595,

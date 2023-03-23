@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+
 import { pspdfkitColor } from '../configuration/Constants';
 
 export default StyleSheet.create({
@@ -40,5 +41,27 @@ export default StyleSheet.create({
   },
   rowContent: {
     padding: 10,
+  },
+  text: {
+    fontSize: 16,
+  },
+  horizontalContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  linkText: {
+    color: pspdfkitColor,
+    fontWeight: '500',
+  },
+  textInput: {
+    borderColor: pspdfkitColor,
+    borderWidth: 0,
+    borderBottomWidth: 2,
+    marginBottom: 30,
+    maxWidth: 80,
+    width: 100,
+    flex: 1,
+    textAlign: 'center',
   },
 });

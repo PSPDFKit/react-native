@@ -1,4 +1,7 @@
 ## Newest Release
+- Added magic ink tool for Android annotation toolbar configuration. (#39174)
+- Upgrades React Native dependencies and project configuration to 0.71.2
+- Adds Instant JSON for React Native
 
 ### 2.4.2 - 01 Feb 2023
 - Fixes bug issue for deleting multiple annotations (#38518)

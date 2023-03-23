@@ -134,6 +134,12 @@ public class ReactGroupingRule extends PresetMenuItemGroupingRule {
                 return R.id.pspdf__annotation_creation_toolbar_item_redaction;
             case "picker":
                 return R.id.pspdf__annotation_creation_toolbar_item_picker;
+            case "magic_ink":
+                return R.id.pspdf__annotation_creation_toolbar_item_magic_ink;
+            case "undo":
+                return R.id.pspdf__annotation_creation_toolbar_item_undo;
+            case "redo":
+                return R.id.pspdf__annotation_creation_toolbar_item_redo;
         }
 
         Log.i(TAG, String.format("Received unknown menu item %s.", name));

@@ -19,8 +19,8 @@ target "NativeCatalog" do
     # Pods for testing
   end
 
-  pod "PSPDFKit", "~> 12.0.3"
-  pod "Instant", "~> 12.0.3"
+  pod "PSPDFKit", podspec: "https://customers.pspdfkit.com/pspdfkit-ios/nightly.podspec"
+  pod "Instant", podspec: "https://customers.pspdfkit.com/instant/nightly.podspec"
 
   # Enables Flipper.
   #

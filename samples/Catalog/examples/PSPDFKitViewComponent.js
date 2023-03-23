@@ -36,8 +36,8 @@ export class PSPDFKitViewComponent extends BaseExampleAutoHidingHeaderComponent 
           menuItemGrouping={[
             'freetext',
             { key: 'markup', items: ['highlight', 'underline'] },
-            'ink',
             'image',
+            'note'
           ]}
           style={styles.pdfColor}
         />

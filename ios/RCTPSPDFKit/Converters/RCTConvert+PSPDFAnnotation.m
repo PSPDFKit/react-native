@@ -37,41 +37,97 @@
         return PSPDFAnnotationTypeAll;
     }
 
-   NSDictionary* annotationTypes = @{
-        @"all": @(PSPDFAnnotationTypeAll),
-        @"pspdfkit/ink": @(PSPDFAnnotationTypeInk),
-        @"pspdfkit/link": @(PSPDFAnnotationTypeLink),
-        @"pspdfkit/markup/highlight": @(PSPDFAnnotationTypeHighlight),
-        @"pspdfkit/markup/squiggly": @(PSPDFAnnotationTypeSquiggly),
-        @"pspdfkit/markup/strikeout": @(PSPDFAnnotationTypeStrikeOut),
-        @"pspdfkit/markup/underline":@(PSPDFAnnotationTypeUnderline),
-        @"pspdfkit/note":@(PSPDFAnnotationTypeNote),
-        @"pspdfkit/shape/ellipse": @(PSPDFAnnotationTypeCircle),
-        @"pspdfkit/shape/line":@(PSPDFAnnotationTypeLine),
-        @"pspdfkit/shape/polygon":@(PSPDFAnnotationTypePolygon),
-        @"pspdfkit/shape/polyline":@(PSPDFAnnotationTypePolyLine),
-        @"pspdfkit/shape/rectangle":@(PSPDFAnnotationTypeSquare),
-        @"pspdfkit/text":@(PSPDFAnnotationTypeFreeText),
-        @"pspdfkit/stamp":@(PSPDFAnnotationTypeStamp),
-        @"pspdfkit/image":@(PSPDFAnnotationTypeStamp),
-        @"pspdfkit/caret":@(PSPDFAnnotationTypeCaret),
-        @"pspdfkit/richmedia":@(PSPDFAnnotationTypeRichMedia),
-        @"pspdfkit/widget":@(PSPDFAnnotationTypeWidget),
-        @"pspdfkit/watermark":@(PSPDFAnnotationTypeWatermark),
-        @"pspdfkit/file":@(PSPDFAnnotationTypeFile),
-        @"pspdfkit/sound":@(PSPDFAnnotationTypeSound),
-        @"pspdfkit/popup":@(PSPDFAnnotationTypePopup),
-        @"pspdfkit/trapnet":@(PSPDFAnnotationTypeTrapNet),
-        @"pspdfkit/type3d":@(PSPDFAnnotationTypeThreeDimensional),
-        @"pspdfkit/redact":@(PSPDFAnnotationTypeRedaction),
-    };
+    NSArray* keys = @[
+        @"all",
+        @"pspdfkit/ink",
+        @"pspdfkit/link",
+        @"pspdfkit/markup/highlight",
+        @"pspdfkit/markup/squiggly",
+        @"pspdfkit/markup/strikeout",
+        @"pspdfkit/markup/underline",
+        @"pspdfkit/note",
+        @"pspdfkit/shape/ellipse",
+        @"pspdfkit/shape/line",
+        @"pspdfkit/shape/polygon",
+        @"pspdfkit/shape/polyline",
+        @"pspdfkit/shape/rectangle",
+        @"pspdfkit/text",
+        @"pspdfkit/stamp",
+        @"pspdfkit/image",
+        @"pspdfkit/caret",
+        @"pspdfkit/richmedia",
+        @"pspdfkit/widget",
+        @"pspdfkit/watermark",
+        @"pspdfkit/file",
+        @"pspdfkit/sound",
+        @"pspdfkit/popup",
+        @"pspdfkit/trapnet",
+        @"pspdfkit/type3d",
+        @"pspdfkit/redact",
+    ];
 
     // Return undefined type, if submitted type is not supported
-    if(![[annotationTypes allKeys] containsObject: type.lowercaseString]) {
+    if(![keys containsObject: type.lowercaseString]) {
         return PSPDFAnnotationTypeUndefined;
     }
 
-    return (unsigned long) annotationTypes[type.lowercaseString];
+    switch([keys indexOfObject: type.lowercaseString]) {
+        case 0:
+            return PSPDFAnnotationTypeAll;
+        case 1:
+            return PSPDFAnnotationTypeInk;
+        case 2:
+            return PSPDFAnnotationTypeLink;
+        case 3:
+            return PSPDFAnnotationTypeHighlight;
+        case 4:
+            return PSPDFAnnotationTypeSquiggly;
+        case 5:
+            return PSPDFAnnotationTypeStrikeOut;
+        case 6:
+            return PSPDFAnnotationTypeUnderline;
+        case 7:
+            return PSPDFAnnotationTypeNote;
+        case 8:
+            return PSPDFAnnotationTypeCircle;
+        case 9:
+            return PSPDFAnnotationTypeLine;
+        case 10:
+            return PSPDFAnnotationTypePolygon;
+        case 11:
+            return PSPDFAnnotationTypePolyLine;
+        case 12:
+            return PSPDFAnnotationTypeSquare;
+        case 13:
+            return PSPDFAnnotationTypeFreeText;
+        case 14:
+            return PSPDFAnnotationTypeStamp;
+        case 15:
+            return PSPDFAnnotationTypeStamp;
+        case 16:
+            return PSPDFAnnotationTypeCaret;
+        case 17:
+            return PSPDFAnnotationTypeRichMedia;
+        case 18:
+            return PSPDFAnnotationTypeWidget;
+        case 19:
+            return PSPDFAnnotationTypeWatermark;
+        case 20:
+            return PSPDFAnnotationTypeFile;
+        case 21:
+            return PSPDFAnnotationTypeSound;
+        case 22:
+            return PSPDFAnnotationTypePopup;
+        case 23:
+            return PSPDFAnnotationTypeTrapNet;
+        case 24:
+            return PSPDFAnnotationTypeThreeDimensional;
+        case 25:
+            return PSPDFAnnotationTypeRedaction;
+
+        default:
+            return PSPDFAnnotationTypeAll;
+    }
 }
 
 @end

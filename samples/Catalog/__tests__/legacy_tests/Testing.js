@@ -11,7 +11,7 @@
 // This notice may not be removed from this file.
 //
 
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import {
   AppRegistry,
   StyleSheet,
@@ -95,7 +95,6 @@ class CatalogScreen extends Component<{}> {
   }
 
   _renderRow = example => {
-    console.log(example);
     return (
       <TouchableHighlight
         onPress={() => {

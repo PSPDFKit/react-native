@@ -11,6 +11,10 @@
 		0724CD9A2901E405003BB2A3 /* RNConfigurationHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0724CD982901E405003BB2A3 /* RNConfigurationHelper.swift */; };
 		0754B44928B4310E00431465 /* RNProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0754B44828B4310E00431465 /* RNProcessor.swift */; };
 		0754B44D28B43B4200431465 /* RNProcessor.m in Sources */ = {isa = PBXBuildFile; fileRef = 0754B44C28B43B4200431465 /* RNProcessor.m */; };
+		0756A13C29C2124C00D3462C /* UIColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0756A13829C2124B00D3462C /* UIColor.swift */; };
+		0756A13D29C2124C00D3462C /* InstantDocumentInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0756A13929C2124B00D3462C /* InstantDocumentInfo.swift */; };
+		0756A13E29C2124C00D3462C /* NSExceptionError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0756A13A29C2124B00D3462C /* NSExceptionError.swift */; };
+		0756A13F29C2124C00D3462C /* InstantDocumentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0756A13B29C2124B00D3462C /* InstantDocumentViewController.swift */; };
 		6540D1841D89D22E00B8F94F /* RCTPSPDFKitManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 6540D1831D89D22E00B8F94F /* RCTPSPDFKitManager.m */; };
 		6572780C1D86AE7300A5E1A8 /* RCTConvert+PSPDFConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 657278071D86AE7300A5E1A8 /* RCTConvert+PSPDFConfiguration.m */; };
 		657278111D86AEC600A5E1A8 /* RCTConvert+PSPDFDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 657278101D86AEC600A5E1A8 /* RCTConvert+PSPDFDocument.m */; };
@@ -41,6 +45,10 @@
 		0754B44728B4310E00431465 /* RCTPSPDFKit-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RCTPSPDFKit-Bridging-Header.h"; sourceTree = "<group>"; };
 		0754B44828B4310E00431465 /* RNProcessor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RNProcessor.swift; sourceTree = "<group>"; };
 		0754B44C28B43B4200431465 /* RNProcessor.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNProcessor.m; sourceTree = "<group>"; };
+		0756A13829C2124B00D3462C /* UIColor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIColor.swift; sourceTree = "<group>"; };
+		0756A13929C2124B00D3462C /* InstantDocumentInfo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InstantDocumentInfo.swift; sourceTree = "<group>"; };
+		0756A13A29C2124B00D3462C /* NSExceptionError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSExceptionError.swift; sourceTree = "<group>"; };
+		0756A13B29C2124B00D3462C /* InstantDocumentViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InstantDocumentViewController.swift; sourceTree = "<group>"; };
 		6540D1821D89D22E00B8F94F /* RCTPSPDFKitManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RCTPSPDFKitManager.h; sourceTree = "<group>"; };
 		6540D1831D89D22E00B8F94F /* RCTPSPDFKitManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RCTPSPDFKitManager.m; sourceTree = "<group>"; };
 		657277151D8312EA00A5E1A8 /* libRCTPSPDFKit.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRCTPSPDFKit.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -79,6 +87,10 @@
 			isa = PBXGroup;
 			children = (
 				6540D1821D89D22E00B8F94F /* RCTPSPDFKitManager.h */,
+				0756A13929C2124B00D3462C /* InstantDocumentInfo.swift */,
+				0756A13B29C2124B00D3462C /* InstantDocumentViewController.swift */,
+				0756A13A29C2124B00D3462C /* NSExceptionError.swift */,
+				0756A13829C2124B00D3462C /* UIColor.swift */,
 				6540D1831D89D22E00B8F94F /* RCTPSPDFKitManager.m */,
 				F8C1A2E6202DCD3800E98192 /* RCTPSPDFKitViewManager.h */,
 				F8C1A2E4202DCC9700E98192 /* RCTPSPDFKitViewManager.m */,
@@ -192,15 +204,19 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0756A13D29C2124C00D3462C /* InstantDocumentInfo.swift in Sources */,
 				0724CD992901E405003BB2A3 /* RNFileHelper.swift in Sources */,
 				0754B44D28B43B4200431465 /* RNProcessor.m in Sources */,
 				0724CD9A2901E405003BB2A3 /* RNConfigurationHelper.swift in Sources */,
 				0754B44928B4310E00431465 /* RNProcessor.swift in Sources */,
+				0756A13C29C2124C00D3462C /* UIColor.swift in Sources */,
 				657278111D86AEC600A5E1A8 /* RCTConvert+PSPDFDocument.m in Sources */,
+				0756A13F29C2124C00D3462C /* InstantDocumentViewController.swift in Sources */,
 				F8C1A2E5202DCC9700E98192 /* RCTPSPDFKitViewManager.m in Sources */,
 				84545BA4210A5CCF00FBB0A7 /* RCTConvert+PSPDFAnnotation.m in Sources */,
 				6540D1841D89D22E00B8F94F /* RCTPSPDFKitManager.m in Sources */,
 				84694AA822AFC7510077FD01 /* RCTConvert+UIBarButtonItem.m in Sources */,
+				0756A13E29C2124C00D3462C /* NSExceptionError.swift in Sources */,
 				84B9870023FC208600C6711A /* RCTConvert+PSPDFAnnotationChange.m in Sources */,
 				B783BA3421C3F55300FD981A /* RCTConvert+PSPDFAnnotationToolbarConfiguration.m in Sources */,
 				F84F8B192032D54F00153D9E /* RCTPSPDFKitView.m in Sources */,

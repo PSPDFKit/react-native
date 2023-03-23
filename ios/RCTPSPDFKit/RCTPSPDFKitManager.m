@@ -14,15 +14,20 @@
 #import <React/RCTConvert.h>
 #import "RCTConvert+PSPDFAnnotation.h"
 #import "RCTConvert+PSPDFAnnotationChange.h"
+#import "PSPDFKitReactNativeiOS-Swift.h"
+#import "RCTConvert+PSPDFConfiguration.h"
 
 #define PROPERTY(property) NSStringFromSelector(@selector(property))
 
 @import PSPDFKit;
 @import PSPDFKitUI;
+@import Instant;
 
 @implementation RCTPSPDFKitManager
 
 PSPDFSettingKey const PSPDFSettingKeyHybridEnvironment = @"com.pspdfkit.hybrid-environment";
+
+BOOL hasListeners = NO;
 
 RCT_EXPORT_MODULE(PSPDFKit)
 
@@ -104,6 +109,91 @@ RCT_REMAP_METHOD(processAnnotations, processAnnotations:(PSPDFAnnotationChange)a
   } else {
     reject(@"error", @"Failed to process annotations.", error);
   }
+}
+
+RCT_EXPORT_METHOD(presentInstant: (NSDictionary*)documentData configuration: (NSDictionary*)configuration resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+    NSLog(@"presentInstant %@", configuration);
+
+    NSString* jwt = [documentData objectForKey:@"jwt"];
+    NSURL* url = [[NSURL alloc] initWithString:  [documentData objectForKey:@"url"]];
+    NSURL* serverUrl = [[NSURL alloc] initWithString: [documentData objectForKey:@"serverUrl"]];
+    NSError *error;
+
+    InstantDocumentInfo* documentInfo = [[InstantDocumentInfo alloc] initWithServerURL:serverUrl url:url jwt:jwt];
+    NSMutableDictionary* parsedConfig = [[RCTConvert processConfigurationOptionsDictionaryForPrefix: configuration] mutableCopy];
+    if(![configuration objectForKey:@"enableInstantComments"]) {
+        [parsedConfig setValue:@(YES) forKey: @"enableInstantComments"];
+    }
+    NSNumber* delay = [NSNumber numberWithInt:[configuration[@"delay"] intValue]];
+    [parsedConfig removeObjectForKey:@"delay"];
+
+    PSPDFConfiguration* pdfConfiguration = [[PSPDFConfiguration alloc] initWithDictionary: parsedConfig error:&error];
+
+    InstantDocumentViewController *instantViewController = [[InstantDocumentViewController alloc] initWithDocumentInfo:documentInfo configurations: [pdfConfiguration configurationUpdatedWithBuilder:^(PSPDFConfigurationBuilder * builder) {
+        // Add `PSPDFAnnotationStringInstantCommentMarker` to the `editableAnnotationTypes` to enable editing of Instant Comments.
+        if([[configuration objectForKey:@"enableInstantComments"]  isEqual: @(YES)]) {
+                   NSMutableSet *editableAnnotationTypes = [builder.editableAnnotationTypes mutableCopy];
+                   [editableAnnotationTypes addObject:PSPDFAnnotationStringInstantCommentMarker];
+                   builder.editableAnnotationTypes = editableAnnotationTypes;
+               }
+           }] error:nil];
+
+    if ([delay doubleValue] > 0) {
+        instantViewController.documentDescriptor.delayForSyncingLocalChanges = [delay doubleValue];
+    }
+
+    UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController: instantViewController];
+    navigationController.modalPresentationStyle = UIModalPresentationFullScreen;
+    UIViewController *presentingViewController = RCTPresentedViewController();
+
+    if (presentingViewController) {
+        [presentingViewController showViewController: navigationController sender:self];
+    } else {
+        NSLog(@"Error presenting instant view controller %@", error.localizedDescription);
+        NSString* errorMessage = [NSString stringWithFormat: @"Failed to present instant document. %@", error.localizedDescription];
+        reject(@"error", errorMessage, nil);
+    }
+}
+
+RCT_EXPORT_METHOD(setDelayForSyncingLocalChanges: (NSNumber*)delay resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+
+    if (delay == nil || [delay doubleValue] < 0) {
+        reject(@"error", @"Delay must be a positive number", nil);
+    }
+    UIViewController *presentingViewController = RCTPresentedViewController();
+
+    // if pdfViewController is an instance of InstantDocumentViewController, then we can set the delay
+    if ([presentingViewController isKindOfClass:[InstantDocumentViewController class]]) {
+        InstantDocumentViewController *instantDocumentViewController = (InstantDocumentViewController *)presentingViewController;
+        instantDocumentViewController.documentDescriptor.delayForSyncingLocalChanges = [delay doubleValue];
+        resolve(@(YES));
+    }
+
+    reject(@"error", @"Delay can only be set for Instant documents", nil);
+}
+
+- (NSArray<NSString*> *)supportedEvents {
+    return @[@"didFinishDownloadFor", @"didFailDownloadWithError", @"didFailAuthenticationFor", @"didFinishReauthenticationWithJWT", @"didFailReauthenticationWithError"];
+}
+
+-(void) addListener:(NSString *)eventName{
+    NSLog(@"event %@", eventName);
+}
+
+// Will be called when this module's first listener is added.
+-(void)startObserving {
+    hasListeners = YES;
+    // Set up any upstream listeners or background tasks as necessary
+}
+
+// Will be called when this module's last listener is removed, or on dealloc.
+-(void)stopObserving {
+    hasListeners = NO;
+    // Remove upstream listeners, stop unnecessary background tasks
+}
+
+-(void) sendEventWithName:(NSString *)name body:(id)body {
+    [self sendEventWithName: name body:body];
 }
 
 - (dispatch_queue_t)methodQueue {

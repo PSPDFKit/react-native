@@ -63,7 +63,7 @@
     [mapping setValue:PSPDFAnnotationStringSound forKeyPath:@"sound"];
     [mapping setValue:PSPDFAnnotationStringImage forKeyPath:@"image"];
     [mapping setValue:PSPDFAnnotationStringRedaction forKeyPath:@"redaction"];
-    
+
     nameToAnnotationStringMapping = [[NSDictionary alloc] initWithDictionary:mapping];
   });
   
