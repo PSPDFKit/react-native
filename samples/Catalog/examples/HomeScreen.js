@@ -3,9 +3,10 @@ import examples from '../ExamplesNavigationMenu';
 const { View, Image, Text, FlatList } = require('react-native');
 const { PSPDFKit } = require('../helpers/PSPDFKit');
 import React, { Component } from 'react';
-import styles from '../styles/styles';
 import { TouchableHighlight } from 'react-native';
+
 import { pspdfkitColor } from '../configuration/Constants';
+import styles from '../styles/styles';
 
 class HomeScreen extends Component {
   exampleList = examples.filter(item => item && item?.name !== null);

@@ -1,8 +1,9 @@
 import React from 'react';
-import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
 import { processColor, View } from 'react-native';
 import PSPDFKitView from 'react-native-pspdfkit';
+
 import { pspdfkitColor } from '../configuration/Constants';
+import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
 
 export class GeneratePDF extends BaseExampleAutoHidingHeaderComponent {
   pdfRef = null;

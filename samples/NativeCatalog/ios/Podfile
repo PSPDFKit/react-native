@@ -4,9 +4,30 @@ require_relative "../node_modules/react-native/scripts/react_native_pods"
 require_relative "../node_modules/@react-native-community/cli-platform-ios/native_modules"
 
 platform :ios, "14.0"
+prepare_react_native_project!
+
+# If you are using a `react-native-flipper` your iOS build will fail when `NO_FLIPPER=1` is set.
+# because `react-native-flipper` depends on (FlipperKit,...) that will be excluded
+#
+# To fix this you can also exclude `react-native-flipper` using a `react-native.config.js`
+# ```js
+# module.exports = {
+#   dependencies: {
+#     ...(process.env.NO_FLIPPER ? { 'react-native-flipper': { platforms: { ios: null } } } : {}),
+# ```
+flipper_config = ENV["NO_FLIPPER"] == "1" ? FlipperConfiguration.disabled : FlipperConfiguration.enabled
+
+linkage = ENV.fetch("USE_FRAMEWORKS", nil)
+unless linkage.nil?
+  Pod::UI.puts "Configuring Pod with #{linkage}ally linked Frameworks".green
+  use_frameworks! linkage: linkage.to_sym
+end
 
 target "NativeCatalog" do
   config = use_native_modules!
+
+  # Flags change depending on the env values.
+  flags = get_default_flags
 
   use_react_native!(
     path: config[:reactNativePath],
@@ -19,8 +40,8 @@ target "NativeCatalog" do
     # Pods for testing
   end
 
-  pod "PSPDFKit", podspec: "https://customers.pspdfkit.com/pspdfkit-ios/nightly.podspec"
-  pod "Instant", podspec: "https://customers.pspdfkit.com/instant/nightly.podspec"
+  pod "PSPDFKit", '~> 12.1.3'
+  pod "Instant", '~> 12.1.0'
 
   # Enables Flipper.
   #
@@ -29,8 +50,6 @@ target "NativeCatalog" do
   use_flipper!
 
   post_install do |installer|
-    react_native_post_install(installer)
-    # Fix for M1 machines: https://github.com/facebook/react-native/issues/31941
     installer.aggregate_targets.each do |aggregate_target|
       aggregate_target.user_project.native_targets.each do |target|
         target.build_configurations.each do |target_config|
@@ -41,10 +60,12 @@ target "NativeCatalog" do
       end
       aggregate_target.user_project.save
     end
-    installer.pods_project.build_configurations.each do |excl_config|
-      excl_config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
-      excl_config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = "14.0"
-    end
-    react_native_post_install(installer)
+    react_native_post_install(
+      installer,
+      # Set `mac_catalyst_enabled` to `true` in order to apply patches
+      # necessary for Mac Catalyst builds
+      mac_catalyst_enabled: false
+    )
+    __apply_Xcode_12_5_M1_post_install_workaround(installer)
   end
 end

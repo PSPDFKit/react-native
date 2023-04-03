@@ -1,12 +1,11 @@
 import { NativeModules, Platform } from 'react-native';
-import { extractFromAssetsIfMissing } from './helpers/FileSystemHelpers';
+
 import {
   exampleDocumentName,
   exampleDocumentPath,
-  tiffImagePath,
   exampleImagePath,
+  tiffImagePath,
 } from './configuration/Constants';
-import { PSPDFKit } from './helpers/PSPDFKit';
 import exampleDocumentConfiguration, {
   tiffImageConfiguration,
 } from './helpers/ExampleDocumentConfiguration';
@@ -16,7 +15,9 @@ import {
   fileExists,
   getOutputPath,
 } from './helpers/FileHelper';
+import { extractFromAssetsIfMissing } from './helpers/FileSystemHelpers';
 import { getMainBundlePath } from './helpers/ImageHelper';
+import { PSPDFKit } from './helpers/PSPDFKit';
 
 const { RNProcessor: Processor } = NativeModules;
 

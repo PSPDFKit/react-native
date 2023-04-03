@@ -15,7 +15,7 @@
  *   Contains gradle configuration constants
  */
 ext {
-    PSPDFKIT_VERSION = 'SNAPSHOT'
+    PSPDFKIT_VERSION = '8.6.0'
 }
 
 buildscript {
@@ -38,7 +38,7 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 33
-    buildToolsVersion "30.0.2"
+    buildToolsVersion "30.0.3"
 
     defaultConfig {
         minSdkVersion 21

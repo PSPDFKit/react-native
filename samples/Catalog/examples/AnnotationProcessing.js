@@ -1,14 +1,15 @@
-import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
+import React from 'react';
 import { Button, processColor, View } from 'react-native';
+import fileSystem from 'react-native-fs';
 import PSPDFKitView from 'react-native-pspdfkit';
+
 import {
   pspdfkitColor,
   writableDocumentPath,
 } from '../configuration/Constants';
-import fileSystem from 'react-native-fs';
-import { PSPDFKit } from '../helpers/PSPDFKit';
-import React from 'react';
+import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
 import { hideToolbar } from '../helpers/NavigationHelper';
+import { PSPDFKit } from '../helpers/PSPDFKit';
 
 export class AnnotationProcessing extends BaseExampleAutoHidingHeaderComponent {
   pdfRef = null;

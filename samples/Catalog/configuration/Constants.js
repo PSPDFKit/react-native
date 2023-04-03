@@ -1,6 +1,6 @@
 // Document names
-import fileSystem from 'react-native-fs';
 import { Platform } from 'react-native';
+import fileSystem from 'react-native-fs';
 
 const tiffImageName = 'PSPDFKit_Image_Example.tiff';
 const formDocumentName = 'Form_example.pdf';

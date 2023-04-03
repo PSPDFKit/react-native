@@ -1,5 +1,5 @@
-import RNFS from 'react-native-fs';
 import { NativeModules, Platform } from 'react-native';
+import RNFS from 'react-native-fs';
 
 const { RNProcessor: Processor } = NativeModules;
 

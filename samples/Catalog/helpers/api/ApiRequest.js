@@ -17,8 +17,6 @@ export const callApi = async ({
     if (body) {
       request.body = shouldStringifyBody ? JSON.stringify(body) : body;
     }
-    console.log('log apiUrl', apiUrl);
-    let response = null;
 
     fetch(apiUrl, {
       ...request,

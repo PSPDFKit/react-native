@@ -4,14 +4,15 @@ import { CustomPdfView } from '../configuration/Constants';
 import React from 'react';
 
 export class InstantExample extends BaseExampleAutoHidingHeaderComponent {
+  pdfRef = React.createRef();
   render() {
     return (
       <View style={styles.flex}>
-        <CustomPdfView ref="pdfView" />
+        <CustomPdfView ref={this.pdfRef} />
         <Button
           onPress={() => {
             NativeModules.CustomPdfViewManager.presentInstantExample(
-              findNodeHandle(this.refs.pdfView),
+              findNodeHandle(this.pdfRef?.current),
             );
           }}
           title="Present Instant Example"

@@ -1,15 +1,24 @@
 ## Newest Release
+
+### 2.5.1 - 03 Apr 2023
+- Updated NativeCatalog configuration and replaced deprecated AppDelegate.m
+- Bumps PSPDFKit for Android version to 8.6.0
+
+## Previous Releases
+
+### 2.5.0 - 23 Mar 2023
 - Added magic ink tool for Android annotation toolbar configuration. (#39174)
 - Upgrades React Native dependencies and project configuration to 0.71.2
 - Adds Instant JSON for React Native
+- Updates for PSPDFKit for Android 8.5.1
+- Updates for PSPDFKit for iOS 12.1.3
+- PSPDFKit now requires React Native 0.71.0 or later.
 
 ### 2.4.2 - 01 Feb 2023
 - Fixes bug issue for deleting multiple annotations (#38518)
 - Bump PSPDFKit for Android version to 8.5.0
 - Bump PSPDFKit for iOS version to 12.0.3
 - Bump minimum SDK version compileSdkVersion to API 33
-
-## Previous Releases
 
 ### 2.4.1 - 22 Nov 2022
 - Updates for PSPDFKit 12.0.1 for iOS.

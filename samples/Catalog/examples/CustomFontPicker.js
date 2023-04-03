@@ -1,8 +1,9 @@
-import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
+import React from 'react';
 import { processColor, View } from 'react-native';
 import PSPDFKitView from 'react-native-pspdfkit';
+
 import { exampleDocumentPath, pspdfkitColor } from '../configuration/Constants';
-import React from 'react';
+import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
 import { hideToolbar } from '../helpers/NavigationHelper';
 
 export class CustomFontPicker extends BaseExampleAutoHidingHeaderComponent {

@@ -7,27 +7,27 @@
 //
 
 // Imports
-import React, { Component } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import React, { Component } from 'react';
 
-import { PSPDFKitViewComponent } from './examples/PSPDFKitViewComponent';
-import { OpenImageDocument } from './examples/OpenImageDocument';
-import { SaveAs } from './examples/SaveAs';
-import { ManualSave } from './examples/ManualSave';
-import { EventListeners } from './examples/EventListeners';
-import { StateChange } from './examples/StateChange';
 import { AnnotationProcessing } from './examples/AnnotationProcessing';
+import { CustomFontPicker } from './examples/CustomFontPicker';
+import { EventListeners } from './examples/EventListeners';
+import { GeneratePDF } from './examples/GeneratePDF';
+import GeneratePDFMenu from './examples/GeneratePDFMenu';
+import { HiddenToolbar } from './examples/HiddenToolbar';
+import HomeScreen from './examples/HomeScreen';
+import InstantSynchronization from './examples/InstantSynchronization';
+import { ManualSave } from './examples/ManualSave';
+import { OpenImageDocument } from './examples/OpenImageDocument';
 import { ProgrammaticAnnotations } from './examples/ProgrammaticAnnotations';
 import { ProgrammaticFormFilling } from './examples/ProgrammaticFormFilling';
+import { PSPDFKitViewComponent } from './examples/PSPDFKitViewComponent';
+import { SaveAs } from './examples/SaveAs';
 import { SplitPDF } from './examples/SplitPDF';
+import { StateChange } from './examples/StateChange';
 import { ToolbarCustomization } from './examples/ToolbarCustomization';
-import { HiddenToolbar } from './examples/HiddenToolbar';
-import { CustomFontPicker } from './examples/CustomFontPicker';
-import { GeneratePDF } from './examples/GeneratePDF';
-import HomeScreen from './examples/HomeScreen';
-import GeneratePDFMenu from './examples/GeneratePDFMenu';
-import InstantSynchronization from './examples/InstantSynchronization';
 import { PSPDFKit } from './helpers/PSPDFKit';
 
 // By default, this example doesn't set a license key, but instead runs in trial mode (which is the default, and which requires no

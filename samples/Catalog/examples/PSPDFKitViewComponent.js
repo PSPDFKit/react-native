@@ -1,8 +1,9 @@
-import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
+import React from 'react';
 import { processColor, View } from 'react-native';
 import PSPDFKitView from 'react-native-pspdfkit';
-import React from 'react';
+
 import { exampleDocumentPath, pspdfkitColor } from '../configuration/Constants';
+import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
 import { hideToolbar } from '../helpers/NavigationHelper';
 
 export class PSPDFKitViewComponent extends BaseExampleAutoHidingHeaderComponent {
@@ -37,7 +38,7 @@ export class PSPDFKitViewComponent extends BaseExampleAutoHidingHeaderComponent 
             'freetext',
             { key: 'markup', items: ['highlight', 'underline'] },
             'image',
-            'note'
+            'note',
           ]}
           style={styles.pdfColor}
         />

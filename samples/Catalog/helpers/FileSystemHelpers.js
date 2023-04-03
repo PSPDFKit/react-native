@@ -1,5 +1,5 @@
-import fileSystem from 'react-native-fs';
 import { Platform } from 'react-native';
+import fileSystem from 'react-native-fs';
 
 export function extractFromAssetsIfMissing(assetFile, callback) {
   const path = fileSystem.DocumentDirectoryPath + '/' + assetFile;

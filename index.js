@@ -28,7 +28,6 @@ class PSPDFKitView extends React.Component {
           }
         : null;
       return (
-        // eslint-disable-next-line react/jsx-no-undef
         <RCTPSPDFKitView
           ref="pdfView"
           fragmentTag="PSPDFKitView.FragmentTag"
@@ -267,7 +266,7 @@ class PSPDFKitView extends React.Component {
     }
   };
 
-  removeAnnotations = function(annotations) {
+  removeAnnotations = function (annotations) {
     if (Platform.OS === 'android') {
       let requestId = this._nextRequestId++;
       let requestMap = this._requestMap;
@@ -277,20 +276,20 @@ class PSPDFKitView extends React.Component {
       });
 
       UIManager.dispatchViewManagerCommand(
-          findNodeHandle(this.refs.pdfView),
-          this._getViewManagerConfig('RCTPSPDFKitView').Commands.removeAnnotations,
-          [requestId, annotations],
+        findNodeHandle(this.refs.pdfView),
+        this._getViewManagerConfig('RCTPSPDFKitView').Commands
+          .removeAnnotations,
+        [requestId, annotations],
       );
 
       return promise;
     } else if (Platform.OS === 'ios') {
       return NativeModules.PSPDFKitViewManager.removeAnnotations(
-          annotations,
-          findNodeHandle(this.refs.pdfView),
+        annotations,
+        findNodeHandle(this.refs.pdfView),
       );
     }
-  }
-
+  };
 
   /**
    * Gets all unsaved changes to annotations.
@@ -756,7 +755,6 @@ PSPDFKitView.propTypes = {
 };
 
 if (Platform.OS === 'ios' || Platform.OS === 'android') {
-  // eslint-disable-next-line no-unused-vars
   var RCTPSPDFKitView = requireNativeComponent(
     'RCTPSPDFKitView',
     PSPDFKitView,

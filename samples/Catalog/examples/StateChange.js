@@ -1,8 +1,9 @@
-import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
+import React from 'react';
 import { Button, processColor, Text, View } from 'react-native';
 import PSPDFKitView from 'react-native-pspdfkit';
+
 import { exampleDocumentPath, pspdfkitColor } from '../configuration/Constants';
-import React from 'react';
+import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
 
 export class StateChange extends BaseExampleAutoHidingHeaderComponent {
   pdfRef = null;

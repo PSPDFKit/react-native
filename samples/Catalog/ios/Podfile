@@ -45,8 +45,8 @@ target "Catalog" do
     app_path: "#{Pod::Config.instance.installation_root}/.."
   )
 
-  pod "PSPDFKit", podspec: "https://customers.pspdfkit.com/pspdfkit-ios/nightly.podspec"
-  pod "Instant",  podspec: "https://customers.pspdfkit.com/instant/latest.podspec"
+  pod "PSPDFKit", '~> 12.1.3'
+  pod "Instant", '~> 12.1.0'
 
   target "CatalogTests" do
     inherit! :complete
@@ -63,10 +63,6 @@ target "Catalog" do
         end
       end
       aggregate_target.user_project.save
-    end
-    installer.pods_project.build_configurations.each do |excl_config|
-      excl_config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
-      excl_config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = "14.0"
     end
     react_native_post_install(
       installer,

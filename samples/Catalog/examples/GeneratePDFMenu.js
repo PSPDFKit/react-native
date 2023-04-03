@@ -7,11 +7,12 @@ import {
   TouchableHighlight,
   View,
 } from 'react-native';
+
 import { pspdfkitColor } from '../configuration/Constants';
 
 const PSPDFKit = NativeModules.PSPDFKit;
-import styles from '../styles/styles';
 import { generatePDFMenu } from '../ExamplesNavigationMenu';
+import styles from '../styles/styles';
 
 class GeneratePDFMenu extends Component {
   render() {

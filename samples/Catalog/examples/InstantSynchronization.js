@@ -129,7 +129,7 @@ export default class InstantSynchronization extends BaseExampleAutoHidingHeaderC
             onPress={() => this.toggleOption('isUrlInputPresented')}
           />
         </View>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+        <View style={styles.delayContainer}>
           <Text style={defaultStyles.text}>
             Delay for syncing local changes:{' '}
           </Text>
@@ -178,4 +178,5 @@ const styles = {
     },
   },
   pdfColor: { flex: 1, color: pspdfkitColor },
+  delayContainer: { flexDirection: 'row', justifyContent: 'space-between' },
 };

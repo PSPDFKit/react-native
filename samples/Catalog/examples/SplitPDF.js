@@ -1,12 +1,13 @@
-import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
+import React from 'react';
 import { Dimensions, processColor, View } from 'react-native';
 import PSPDFKitView from 'react-native-pspdfkit';
+
 import {
   exampleDocumentPath,
   formDocumentPath,
   pspdfkitColor,
 } from '../configuration/Constants';
-import React from 'react';
+import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
 
 export class SplitPDF extends BaseExampleAutoHidingHeaderComponent {
   pdfRef1 = null;

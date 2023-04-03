@@ -200,8 +200,15 @@
   UIViewController *presentingViewController = RCTPresentedViewController();
   InstantExampleViewController *instantExampleViewController = [[InstantExampleViewController alloc] init];
   self.topController = [[PSPDFNavigationController alloc] initWithRootViewController:instantExampleViewController];
-  self.topController.modalPresentationStyle = UIModalPresentationFullScreen;
-  instantExampleViewController.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[PSPDFKitGlobal imageNamed:@"x"] style:UIBarButtonItemStylePlain target:self action:@selector(closeInstantExampleButtonPressed:)];
+  self.topController.modalPresentationStyle = UIModalPresentationOverFullScreen;
+  
+  UIButton* closeButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 40, 40)];
+  [closeButton addTarget:self action: @selector(closeInstantExampleButtonPressed:) forControlEvents: UIControlEventTouchUpInside];
+  [closeButton setImage:[UIImage imageNamed:@"x"] forState:UIControlStateNormal];
+  closeButton.tintColor = [UIColor systemBlueColor];
+  instantExampleViewController.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView: closeButton];
+  
+  presentingViewController.modalPresentationStyle = UIModalPresentationOverFullScreen;
   [presentingViewController presentViewController:self.topController animated:YES completion:NULL];
   return YES;
 }

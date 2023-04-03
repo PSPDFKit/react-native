@@ -1,0 +1,7 @@
+<svg id="icon_24_cancel" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <rect id="Region" width="24" height="24" fill="rgba(255,255,255,0)"/>
+  <g id="Icon" transform="translate(3.5 3.5)">
+    <line id="Line_1" data-name="Line 1" x2="16" y2="16" transform="translate(0.5 0.5)" fill="none" stroke="#fff" stroke-width="1.5"/>
+    <line id="Line_2" data-name="Line 2" y1="16" x2="16" transform="translate(0.5 0.5)" fill="none" stroke="#fff" stroke-width="1.5"/>
+  </g>
+</svg>
