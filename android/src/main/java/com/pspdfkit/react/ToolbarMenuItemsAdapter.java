@@ -17,7 +17,7 @@ import com.facebook.react.bridge.ReadableArray;
 import com.pspdfkit.configuration.activity.PdfActivityConfiguration;
 import com.pspdfkit.configuration.sharing.ShareFeatures;
 
-import io.reactivex.annotations.NonNull;
+import io.reactivex.rxjava3.annotations.NonNull;
 
 /**
  * This class is used for mapping the toolbar menu items for customization.

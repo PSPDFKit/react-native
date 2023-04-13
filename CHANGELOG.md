@@ -1,10 +1,13 @@
 ## Newest Release
 
+### 2.5.2 - 13 Apr 2023
+- Fixes missing RXJava dependencies for Android. (#39813)
+
+## Previous Releases
+
 ### 2.5.1 - 03 Apr 2023
 - Updated NativeCatalog configuration and replaced deprecated AppDelegate.m
 - Bumps PSPDFKit for Android version to 8.6.0
-
-## Previous Releases
 
 ### 2.5.0 - 23 Mar 2023
 - Added magic ink tool for Android annotation toolbar configuration. (#39174)

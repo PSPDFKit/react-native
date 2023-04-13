@@ -168,7 +168,7 @@ dependencies {
         implementation jscFlavor
     }
 
-    implementation 'com.pspdfkit:pspdfkit:8.5.0'
+    implementation 'com.pspdfkit:pspdfkit:8.6.0'
 }
 
 apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)

@@ -80,17 +80,18 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.Callable;
 
-import io.reactivex.Completable;
-import io.reactivex.Maybe;
-import io.reactivex.Observable;
-import io.reactivex.ObservableSource;
-import io.reactivex.Single;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Function;
-import io.reactivex.schedulers.Schedulers;
-import io.reactivex.subjects.BehaviorSubject;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Completable;
+import io.reactivex.rxjava3.core.Maybe;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.ObservableSource;
+import io.reactivex.rxjava3.core.Single;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.functions.Function;
+import io.reactivex.rxjava3.schedulers.Schedulers;
+import io.reactivex.rxjava3.subjects.BehaviorSubject;
+
 
 import static com.pspdfkit.react.helper.ConversionHelpers.getAnnotationTypeFromString;
 
@@ -625,13 +626,13 @@ public class PdfView extends FrameLayout {
         return DocumentJsonFormatter.exportDocumentJsonAsync(document, outputStream)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .toSingle(new Callable<JSONObject>() {
-                @Override
-                public JSONObject call() throws Exception {
-                    final String jsonString = outputStream.toString();
-                    return new JSONObject(jsonString);
-                }
-            });
+            .toSingle(() -> {
+                    try {
+                        return new JSONObject(outputStream.toString());
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
     }
 
     public Disposable addAnnotations(final int requestId, ReadableMap annotation) {

@@ -1,6 +1,6 @@
 {
   "name": "catalog",
-  "version": "2.5.1",
+  "version": "2.5.2",
   "private": true,
   "scripts": {
     "android": "npx react-native run-android",
@@ -9,8 +9,8 @@
     "start": "react-native start",
     "test": "jest",
     "refresh": "yarn upgrade react-native-pspdfkit",
-    "postinstall": "rm -rf ./node_modules/react-native-pspdfkit/samples/*/node_modules && cd ios/ && pod install --repo-update",
-    "preinstall":  "rm -rf ./node_modules && rm -rf yarn.lock && rm -rf ios/Pods && rm -rf ios/Podfile.lock",
+    "postinstall": "rm -rf ./node_modules/react-native-pspdfkit/samples/*/node_modules",
+    "preinstall":  "rm -rf ./node_modules && rm -rf ios/Pods",
     "pods": "cd ios; pod install --repo-update"
   },
   "dependencies": {
@@ -71,5 +71,9 @@
     "testPathIgnorePatterns": [
       "legacy_tests"
     ]
+  },
+  "resolutions": {
+    "react-native-gesture-handler": "2.9.0"
   }
+
 }

@@ -59,7 +59,8 @@ import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 import java.util.Map;
 
-import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+
 
 /**
  * Shows you how to leverage the {@link PdfView} to build your own react view.
