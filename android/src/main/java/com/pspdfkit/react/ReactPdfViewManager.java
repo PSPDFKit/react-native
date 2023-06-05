@@ -31,15 +31,10 @@ import com.pspdfkit.react.events.PdfViewDataReturnedEvent;
 import com.pspdfkit.react.menu.ReactGroupingRule;
 import com.pspdfkit.views.PdfView;
 import com.pspdfkit.configuration.activity.PdfActivityConfiguration;
-
-
 import org.json.JSONObject;
-
 import java.util.List;
 import java.util.Map;
-
 import javax.annotation.Nullable;
-
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
@@ -65,14 +60,18 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
     public static final int COMMAND_REMOVE_FRAGMENT = 12;
     public static final int COMMAND_SET_TOOLBAR_MENU_ITEMS = 13;
     public static final int COMMAND_REMOVE_ANNOTATIONS = 14;
+    public  static final int COMMAND_SET_MEASUREMENT_SCALE = 17;
+    public static final int COMMAND_SET_MEASUREMENT_PRECISION = 16;
 
-    private CompositeDisposable annotationDisposables = new CompositeDisposable();
+    private final CompositeDisposable annotationDisposables = new CompositeDisposable();
 
+    @NonNull
     @Override
     public String getName() {
         return "RCTPSPDFKitView";
     }
 
+    @NonNull
     @Override
     protected PdfView createViewInstance(ThemedReactContext reactContext) {
         Activity currentActivity = reactContext.getCurrentActivity();
@@ -111,6 +110,8 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
         commandMap.put("getAllAnnotations", COMMAND_GET_ALL_ANNOTATIONS);
         commandMap.put("removeFragment", COMMAND_REMOVE_FRAGMENT);
         commandMap.put("setToolbarMenuItems", COMMAND_SET_TOOLBAR_MENU_ITEMS);
+        commandMap.put("setMeasurementScale", COMMAND_SET_MEASUREMENT_SCALE);
+        commandMap.put("setMeasurementPrecision", COMMAND_SET_MEASUREMENT_PRECISION);
         return commandMap;
     }
 
@@ -192,7 +193,7 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
     }
 
     @Override
-    public void receiveCommand(final PdfView root, int commandId, @Nullable ReadableArray args) {
+    public void receiveCommand(@NonNull final PdfView root, int commandId, @Nullable ReadableArray args) {
         switch (commandId) {
             case COMMAND_ENTER_ANNOTATION_CREATION_MODE:
                 root.enterAnnotationCreationMode();
@@ -268,12 +269,8 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
                     Disposable annotationDisposable = root.getAllUnsavedAnnotations()
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(new Consumer<JSONObject>() {
-                                @Override
-                                public void accept(JSONObject jsonObject) {
-                                    root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, jsonObject));
-                                }
-                            });
+                            .subscribe(jsonObject -> root.getEventDispatcher()
+                                    .dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, jsonObject)));
                     annotationDisposables.add(annotationDisposable);
                 }
                 break;
@@ -314,6 +311,28 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
             case COMMAND_SET_TOOLBAR_MENU_ITEMS:
                 if (args != null && args.size() == 1) {
                     setToolbarMenuItems(root,args.getArray(0));
+                }
+                break;
+            case COMMAND_SET_MEASUREMENT_SCALE:
+                if (args != null) {
+                    final int requestId = args.getInt(0);
+                    try {
+                        boolean result = root.setMeasurementScale(args.getMap(1));
+                        root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, result));
+                    } catch (Exception e) {
+                        root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, e));
+                    }
+                }
+                break;
+            case COMMAND_SET_MEASUREMENT_PRECISION:
+                if (args != null) {
+                    final int requestId = args.getInt(0);
+                    try {
+                        boolean result = root.setMeasurementPrecision(args.getString(1));
+                        root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, result));
+                    } catch (Exception e) {
+                        root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, e));
+                    }
                 }
                 break;
         }

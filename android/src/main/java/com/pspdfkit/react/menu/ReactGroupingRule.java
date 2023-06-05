@@ -85,7 +85,7 @@ public class ReactGroupingRule extends PresetMenuItemGroupingRule {
     private int getIdFromName(@NonNull String name) {
         switch (name) {
             case "markup":
-                return R.id.pspdf__annotation_creation_toolbar_item_markup;
+                return R.id.pspdf__annotation_creation_toolbar_group_markup;
             case "writing":
                 return R.id.pspdf__annotation_creation_toolbar_item_writing;
             case "highlight":
@@ -109,9 +109,9 @@ public class ReactGroupingRule extends PresetMenuItemGroupingRule {
             case "note":
                 return R.id.pspdf__annotation_creation_toolbar_item_note;
             case "drawing":
-                return R.id.pspdf__annotation_creation_toolbar_item_drawing;
+                return R.id.pspdf__annotation_creation_toolbar_group_drawing;
             case "multimedia":
-                return R.id.pspdf__annotation_creation_toolbar_item_multimedia;
+                return R.id.pspdf__annotation_creation_toolbar_group_multimedia;
             case "image":
                 return R.id.pspdf__annotation_creation_toolbar_item_image;
             case "camera":
@@ -136,10 +136,24 @@ public class ReactGroupingRule extends PresetMenuItemGroupingRule {
                 return R.id.pspdf__annotation_creation_toolbar_item_picker;
             case "magic_ink":
                 return R.id.pspdf__annotation_creation_toolbar_item_magic_ink;
+            case "undo_redo":
+                return R.id.pspdf__annotation_creation_toolbar_group_undo_redo;
             case "undo":
                 return R.id.pspdf__annotation_creation_toolbar_item_undo;
             case "redo":
                 return R.id.pspdf__annotation_creation_toolbar_item_redo;
+            case "measurement":
+                return R.id.pspdf__annotation_creation_toolbar_group_measurement;
+            case "distance":
+                return  R.id.pspdf__annotation_creation_toolbar_item_measurement_distance;
+            case "perimeter":
+                return R.id.pspdf__annotation_creation_toolbar_item_measurement_perimeter;
+            case "area_polygon":
+                return R.id.pspdf__annotation_creation_toolbar_item_measurement_area_polygon;
+            case "area_square":
+                return R.id.pspdf__annotation_creation_toolbar_item_measurement_area_rect;
+            case "area_circle":
+                return R.id.pspdf__annotation_creation_toolbar_item_measurement_area_ellipse;
         }
 
         Log.i(TAG, String.format("Received unknown menu item %s.", name));
@@ -150,5 +164,10 @@ public class ReactGroupingRule extends PresetMenuItemGroupingRule {
     @Override
     public List<MenuItem> getGroupPreset(@IntRange(from = ContextualToolbar.MIN_TOOLBAR_CAPACITY) int capacity, int itemsCount) {
         return items;
+    }
+
+    @Override
+    public boolean areGeneratedGroupItemsSelectable() {
+        return true;
     }
 }

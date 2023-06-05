@@ -32,6 +32,7 @@ import com.pspdfkit.configuration.page.PageScrollDirection;
 import com.pspdfkit.configuration.page.PageScrollMode;
 import com.pspdfkit.configuration.sharing.ShareFeatures;
 import com.pspdfkit.configuration.signatures.SignatureSavingStrategy;
+import com.pspdfkit.preferences.PSPDFKitPreferences;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -108,6 +109,11 @@ public class ConfigurationAdapter {
     private static final String SHOW_ANNOTATION_LIST_ACTION = "showAnnotationListAction";
     private static final String ANNOTATION_EDITING_ENABLED = "enableAnnotationEditing";
 
+    // Measurement tools options
+    private static final String ENABLED_MEASUREMENT_TOOLS = "enableMeasurementTools";
+    private static final String ENABLE_MAGNIFIER = "enableMagnifier";
+    private static final String ENABLED_MEASUREMENT_TOOL_SNAPPING = "enableMeasurementToolSnapping";
+
     // Deprecated Options
     /**
      * @deprecated This key word was deprecated with PSPDFKit for React Native 2.1.
@@ -152,6 +158,7 @@ public class ConfigurationAdapter {
         ReadableMapKeySetIterator iterator = configuration.keySetIterator();
         boolean hasConfiguration = iterator.hasNextKey();
         this.configuration = new PdfActivityConfiguration.Builder(context);
+        this.configuration.disableContentEditing();
         if (hasConfiguration) {
             String key;
 
@@ -303,6 +310,18 @@ public class ConfigurationAdapter {
             if (key != null) {
                 configureToolbarTitle(configuration.getString(key));
             }
+            key = getKeyOrNull(configuration, ENABLE_MAGNIFIER);
+            if (key != null) {
+                configureMagnifierEnabled(configuration.getBoolean(key));
+            }
+            key = getKeyOrNull(configuration, ENABLED_MEASUREMENT_TOOLS);
+            if (key != null) {
+                configureMeasurementToolsEnabled(configuration.getBoolean(key));
+            }
+            key = getKeyOrNull(configuration, ENABLED_MEASUREMENT_TOOL_SNAPPING);
+            if (key != null) {
+                configureMeasurementToolSnappingEnabled(context, configuration.getBoolean(key));
+            }
         }
     }
 
@@ -427,18 +446,21 @@ public class ConfigurationAdapter {
             return;
         }
 
-        if (showThumbnailBar.equals(SHOW_THUMBNAIL_BAR_NONE)) {
-            configuration.setThumbnailBarMode(ThumbnailBarMode.THUMBNAIL_BAR_MODE_NONE);
-        } else if (showThumbnailBar.equals(SHOW_THUMBNAIL_BAR_DEFAULT)) {
-            configuration.setThumbnailBarMode(ThumbnailBarMode.THUMBNAIL_BAR_MODE_FLOATING);
-        } else if (showThumbnailBar.equals(SHOW_THUMBNAIL_BAR_FLOATING)) {
-            configuration.setThumbnailBarMode(ThumbnailBarMode.THUMBNAIL_BAR_MODE_FLOATING);
-        } else if (showThumbnailBar.equals(SHOW_THUMBNAIL_BAR_SCRUBBERBAR)) {
-            configuration.setThumbnailBarMode(ThumbnailBarMode.THUMBNAIL_BAR_MODE_PINNED);
-        } else if (showThumbnailBar.equals(SHOW_THUMBNAIL_BAR_PINNED)) {
-            configuration.setThumbnailBarMode(ThumbnailBarMode.THUMBNAIL_BAR_MODE_PINNED);
-        } else if (showThumbnailBar.equals(SHOW_THUMBNAIL_BAR_SCROLLABLE)) {
-            configuration.setThumbnailBarMode(ThumbnailBarMode.THUMBNAIL_BAR_MODE_SCROLLABLE);
+        switch (showThumbnailBar) {
+            case SHOW_THUMBNAIL_BAR_NONE:
+                configuration.setThumbnailBarMode(ThumbnailBarMode.THUMBNAIL_BAR_MODE_NONE);
+                break;
+            case SHOW_THUMBNAIL_BAR_DEFAULT:
+            case SHOW_THUMBNAIL_BAR_FLOATING:
+                configuration.setThumbnailBarMode(ThumbnailBarMode.THUMBNAIL_BAR_MODE_FLOATING);
+                break;
+            case SHOW_THUMBNAIL_BAR_SCRUBBERBAR:
+            case SHOW_THUMBNAIL_BAR_PINNED:
+                configuration.setThumbnailBarMode(ThumbnailBarMode.THUMBNAIL_BAR_MODE_PINNED);
+                break;
+            case SHOW_THUMBNAIL_BAR_SCROLLABLE:
+                configuration.setThumbnailBarMode(ThumbnailBarMode.THUMBNAIL_BAR_MODE_SCROLLABLE);
+                break;
         }
     }
 
@@ -611,6 +633,18 @@ public class ConfigurationAdapter {
 
     private void configureToolbarTitle(@Nullable final String customTitle) {
         configuration.title(customTitle);
+    }
+
+    private void configureMeasurementToolsEnabled(final Boolean measurementToolsEnabled) {
+        configuration.setMeasurementToolsEnabled(measurementToolsEnabled);
+    }
+
+    private void configureMagnifierEnabled(final Boolean magnifierEnabled) {
+        configuration.enableMagnifier(magnifierEnabled);
+    }
+
+    private void configureMeasurementToolSnappingEnabled(Context context, final Boolean snappingEnabled) {
+        PSPDFKitPreferences.get(context).setMeasurementSnappingEnabled(snappingEnabled);
     }
 
     public PdfActivityConfiguration build() {

@@ -46,13 +46,13 @@ export class ManualSigning extends BaseExampleAutoHidingHeaderComponent {
                 // This will open the native signature dialog.
                 if (Platform.OS === 'android') {
                   UIManager.dispatchViewManagerCommand(
-                    findNodeHandle(this.pdfRef?.current),
+                    findNodeHandle(this.refs.pdfView),
                     'startSigning',
                     [],
                   );
                 } else {
-                  NativeModules.CustomPdfViewManager?.startSigning(
-                    findNodeHandle(this.pdfRef?.current),
+                  NativeModules.CustomPdfViewManager.startSigning(
+                    findNodeHandle(this.refs.pdfView),
                   );
                 }
               }}

@@ -37,6 +37,31 @@ export class ToolbarCustomization extends BaseExampleAutoHidingHeaderComponent {
             'searchButtonItem',
             'thumbnailsButtonItem',
           ]}
+          menuItemGrouping={[
+            {
+              key: 'markup',
+              items: ['squiggly', 'strikeout', 'underline'],
+            },
+            {
+              key: 'writing',
+              items: ['freetext', 'note'],
+            },
+            {
+              key: 'drawing',
+              items: [
+                'line',
+                'square',
+                'circle',
+                'polygon',
+                'polyline',
+                'arrow',
+              ],
+            },
+            {
+              key: 'measurement',
+              items: ['area_square', 'perimeter', 'distance', 'area_circle'],
+            },
+          ]}
           style={styles.pdfColor}
         />
         <View style={styles.wrapperView}>

@@ -35,12 +35,15 @@ import com.facebook.react.bridge.ReadableMap;
 import com.pspdfkit.PSPDFKit;
 import com.pspdfkit.annotations.Annotation;
 import com.pspdfkit.annotations.AnnotationType;
+import com.pspdfkit.annotations.measurements.FloatPrecision;
+import com.pspdfkit.annotations.measurements.Scale;
 import com.pspdfkit.document.PdfDocument;
 import com.pspdfkit.document.PdfDocumentLoader;
 import com.pspdfkit.document.image.CameraImagePickerFragment;
 import com.pspdfkit.document.image.GalleryImagePickerFragment;
 import com.pspdfkit.document.processor.PdfProcessor;
 import com.pspdfkit.document.processor.PdfProcessorTask;
+import com.pspdfkit.exceptions.InvalidPSPDFKitLicenseException;
 import com.pspdfkit.react.RNInstantPdfActivity;
 import com.pspdfkit.listeners.SimpleDocumentListener;
 import com.pspdfkit.react.helper.ConversionHelpers;
@@ -52,7 +55,6 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
-import com.pspdfkit.exceptions.InvalidPSPDFKitLicenseException;
 
 public class PSPDFKitModule extends ReactContextBaseJavaModule implements Application.ActivityLifecycleCallbacks, ActivityEventListener {
 
@@ -144,7 +146,7 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
             PdfActivity.showDocument(getCurrentActivity(), Uri.parse(document), configurationAdapter.build());
         }
     }
-    
+
     @ReactMethod
     public void presentImage(@NonNull String imageDocument, @NonNull ReadableMap configuration, @Nullable Promise promise) {
         if (getCurrentActivity() != null) {
@@ -238,7 +240,7 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
                                    @NonNull final String sourceDocumentPath,
                                    @NonNull final String targetDocumentPath,
                                    @NonNull final Promise promise) {
-       
+
        // This is an edge case where file scheme is missing.
         String documentPath = Uri.parse(sourceDocumentPath).getScheme() == null
                 ? FILE_SCHEME + sourceDocumentPath : sourceDocumentPath;
@@ -259,6 +261,66 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
             }, throwable -> {
                 promise.reject(throwable);
             });
+    }
+
+    @ReactMethod
+    public void setMeasurementScale(@Nullable  final Scale scale) {
+        if (resumedActivity instanceof PdfActivity) {
+            final PdfActivity activity = (PdfActivity) resumedActivity;
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    PdfDocument document = activity.getDocument();
+                    if (document != null && scale != null) {
+                        document.setMeasurementScale(scale);
+                    } else {
+                        activity.getPdfFragment().addDocumentListener(new SimpleDocumentListener() {
+                            @Override
+                            public void onDocumentLoaded(@NonNull PdfDocument document) {
+                                activity.getPdfFragment().removeDocumentListener(this);
+                            }
+                        });
+                    }
+                }
+            });
+        } else {
+            onPdfActivityOpenedTask = new Runnable() {
+                @Override
+                public void run() {
+                    setMeasurementScale(scale);
+                }
+            };
+        }
+    }
+    @ReactMethod
+    public void setMeasurementPrecision(@Nullable final FloatPrecision floatPrecision) {
+        if (resumedActivity instanceof PdfActivity) {
+            final PdfActivity activity = (PdfActivity) resumedActivity;
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    PdfDocument document = activity.getDocument();
+                    FloatPrecision precision = floatPrecision;
+                    if (document != null && precision != null) {
+                        document.setMeasurementPrecision(precision);
+                    } else {
+                        activity.getPdfFragment().addDocumentListener(new SimpleDocumentListener() {
+                            @Override
+                            public void onDocumentLoaded(@NonNull PdfDocument document) {
+                                activity.getPdfFragment().removeDocumentListener(this);
+                            }
+                        });
+                    }
+                }
+            });
+        } else {
+            onPdfActivityOpenedTask = new Runnable() {
+                @Override
+                public void run() {
+                    setMeasurementPrecision(floatPrecision);
+                }
+            };
+        }
     }
 
     private static PdfProcessorTask.AnnotationProcessingMode getProcessingModeFromString(@NonNull final String mode) {
@@ -300,7 +362,7 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
             // Run our queued up task when a PdfActivity is displayed.
             onPdfActivityOpenedTask.run();
             onPdfActivityOpenedTask = null;
-            
+
             // We notify the called as soon as the document is loaded or loading failed.
             if (lastPresentPromise != null) {
                 PdfActivity pdfActivity = (PdfActivity) resumedActivity;
@@ -389,7 +451,7 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
     private boolean isPdf(File file) {
         return file.getName().toLowerCase().endsWith(".pdf");
     }
-    
+
     private boolean isImage(File file) {
         for (String extension: SUPPORTED_IMAGE_TYPES) {
             if (file.getName().toLowerCase().endsWith(extension)) {

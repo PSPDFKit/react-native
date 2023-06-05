@@ -28,7 +28,7 @@ export class DefaultAnnotationSettings extends BaseExampleAutoHidingHeaderCompon
     });
   }
 
-  goBack() {
+  goBack(navigation) {
     this.props.navigation.goBack();
   }
 
@@ -38,7 +38,7 @@ export class DefaultAnnotationSettings extends BaseExampleAutoHidingHeaderCompon
       <View style={styles.flex}>
         {!shouldReturn && (
           <CustomPdfView
-            ref={this.pdfRef?.current}
+            ref={this.pdfRef}
             document={formDocumentPath}
             style={styles.flex}
             // This way only the ink tool and the button to open the inspector is shown.

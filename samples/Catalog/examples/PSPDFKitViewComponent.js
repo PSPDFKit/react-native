@@ -13,7 +13,6 @@ export class PSPDFKitViewComponent extends BaseExampleAutoHidingHeaderComponent 
     super(props);
     const { navigation } = this.props;
     this.pdfRef = React.createRef();
-
     hideToolbar(navigation);
   }
 
@@ -34,12 +33,6 @@ export class PSPDFKitViewComponent extends BaseExampleAutoHidingHeaderComponent 
           fragmentTag="PDF1"
           showNavigationButtonInToolbar={true}
           onNavigationButtonClicked={() => navigation.goBack()}
-          menuItemGrouping={[
-            'freetext',
-            { key: 'markup', items: ['highlight', 'underline'] },
-            'image',
-            'note',
-          ]}
           style={styles.pdfColor}
         />
       </View>

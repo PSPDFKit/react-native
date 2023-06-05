@@ -10,7 +10,7 @@
  *   UNAUTHORIZED REPRODUCTION OR DISTRIBUTION IS SUBJECT TO CIVIL AND CRIMINAL PENALTIES.
  *   This notice may not be removed from this file.
  */
- 
+
 package com.pspdfkit.react;
 
 import com.facebook.react.bridge.ReadableArray;

@@ -1,9 +1,15 @@
 ## Newest Release
 
-### 2.5.2 - 13 Apr 2023
-- Fixes missing RXJava dependencies for Android. (#39813)
+### 2.6.0 - 05 Jun 2023
+- Adds measurement tools configurations (#40296)
+- Updates for PSPDFKit 8.7.2 for Android. (#40697)
+- Updates for PSPDFKit 12.2 for iOS. (#40697)
+- Fixes annotation tools subgroups selection with menuItem grouping customization (#40593)
 
 ## Previous Releases
+
+### 2.5.2 - 13 Apr 2023
+- Fixes missing RXJava dependencies for Android. (#39813)
 
 ### 2.5.1 - 03 Apr 2023
 - Updated NativeCatalog configuration and replaced deprecated AppDelegate.m

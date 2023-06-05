@@ -82,7 +82,7 @@ project.ext.react = [
     enableHermes: false,  // clean and rebuild if changing
 ]
 
-//apply from: "../../node_modules/react-native/react.gradle"
+apply from: "../../node_modules/react-native/react.gradle"
 
 /**
  * Set this to true to create two separate APKs instead of one:
@@ -125,7 +125,6 @@ android {
     ndkVersion rootProject.ext.ndkVersion
 
     compileSdkVersion rootProject.ext.compileSdkVersion
-    namespace "com.pspdfkit.nativecatalog"
 
     defaultConfig {
         applicationId "com.pspdfkit.nativecatalog"
@@ -177,15 +176,13 @@ android {
     }
 
     sourceSets { main { assets.srcDirs = ['src/main/assets', '../../../PDFs'] } }
+
 }
 
 dependencies {
-
     implementation fileTree(dir: "libs", include: ["*.jar"])
     //noinspection GradleDynamicVersion
-    implementation "com.facebook.react:react-native:+" 
-    
-    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
+    implementation "com.facebook.react:react-native:+"  // From node_modules
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {
       exclude group:'com.facebook.fbjni'

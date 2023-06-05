@@ -12,7 +12,6 @@ export class GeneratePDF extends BaseExampleAutoHidingHeaderComponent {
     };
   }
 
-  pdfRef = React.createRef();
   render() {
     const { route } = this.props;
     const { shouldReturn } = this.state;
@@ -22,7 +21,7 @@ export class GeneratePDF extends BaseExampleAutoHidingHeaderComponent {
       <View style={styles.flex}>
         {!shouldReturn && (
           <CustomPdfView
-            ref={this.pdfRef?.current}
+            ref="pdfView"
             document={fullPath}
             style={styles.flex}
           />

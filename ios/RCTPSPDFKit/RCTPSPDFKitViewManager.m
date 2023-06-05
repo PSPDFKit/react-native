@@ -14,6 +14,8 @@
 #import "RCTConvert+PSPDFAnnotationToolbarConfiguration.h"
 #import "RCTConvert+PSPDFViewMode.h"
 #import "RCTPSPDFKitView.h"
+#import "PSPDFKitReactNativeiOS-Swift.h"
+
 #import <React/RCTUIManager.h>
 
 @import PSPDFKit;
@@ -49,7 +51,14 @@ RCT_CUSTOM_VIEW_PROPERTY(document, PSPDFDocument, RCTPSPDFKitView) {
     }
 
     view.pdfController.pageIndex = view.pageIndex;
-  }
+
+      // Update measurement scale and precision after document is created and remove it from memory after reading
+      [PspdfkitMeasurementConvertor setConfig: _configuration document: view.pdfController.document];
+      _configuration = nil;
+      if(view.onDocumentLoaded) {
+          view.onDocumentLoaded(@{});
+      }
+    }
 }
 
 RCT_CUSTOM_VIEW_PROPERTY(pageIndex, PSPDFPageIndex, RCTPSPDFKitView) {
@@ -61,14 +70,15 @@ RCT_CUSTOM_VIEW_PROPERTY(pageIndex, PSPDFPageIndex, RCTPSPDFKitView) {
 }
 
 RCT_CUSTOM_VIEW_PROPERTY(configuration, PSPDFConfiguration, RCTPSPDFKitView) {
-  if (json) {
-    [view.pdfController updateConfigurationWithBuilder:^(PSPDFConfigurationBuilder *builder) {
-      [builder overrideClass:PSPDFFontPickerViewController.class withClass:CustomFontPickerViewController.class];
-      [builder setupFromJSON:json];
-    }];
+    if (json) {
+        [view.pdfController updateConfigurationWithBuilder:^(PSPDFConfigurationBuilder *builder) {
+            [builder overrideClass:PSPDFFontPickerViewController.class withClass:CustomFontPickerViewController.class];
+            [builder setupFromJSON:json];
+            _configuration = json;
+        }];
 
-    [self postProcessConfigurationOptionsWithJSON: json forPDFViewController: view.pdfController];
-  }
+        [self postProcessConfigurationOptionsWithJSON: json forPDFViewController: view.pdfController];
+    }
 }
 
 // These options are configuration options in Android, but not on iOS, so we apply them
@@ -156,6 +166,8 @@ RCT_EXPORT_VIEW_PROPERTY(onAnnotationTapped, RCTBubblingEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onAnnotationsChanged, RCTBubblingEventBlock)
 
 RCT_EXPORT_VIEW_PROPERTY(onStateChanged, RCTBubblingEventBlock)
+
+RCT_EXPORT_VIEW_PROPERTY(onDocumentLoaded, RCTBubblingEventBlock)
 
 RCT_CUSTOM_VIEW_PROPERTY(availableFontNames, NSArray, RCTPSPDFKitView) {
   if (json && [RCTConvert NSArray:json]) {
@@ -384,6 +396,41 @@ RCT_EXPORT_METHOD(getRightBarButtonItemsForViewMode:(nullable NSString *)viewMod
       reject(@"error", @"Failed to get the right bar button items.", nil);
     }
   });
+}
+
+RCT_EXPORT_METHOD(setMeasurementConfig:(nullable NSDictionary*)config reactTag:(nonnull NSNumber*) reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
+        PSPDFMeasurementScale* scaleConfig = [PspdfkitMeasurementConvertor getScaleConfig: config];
+        if (scaleConfig != nil) {
+            component.pdfController.document.measurementScale = scaleConfig;
+        }
+
+        if([config objectForKey: @"precision"] != nil) {
+        NSInteger precisionUnit =  [PspdfkitMeasurementConvertor getPrecisionInt: [config objectForKey: @"precision"]];
+
+            component.pdfController.document.measurementPrecision = precisionUnit;
+        }
+    });
+}
+
+RCT_EXPORT_METHOD(setMeasurementScale:(nullable NSDictionary*)config reactTag:(nonnull NSNumber*) reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
+        PSPDFMeasurementScale* scaleConfig =  [PspdfkitMeasurementConvertor getScaleConfig: config];
+        if (scaleConfig != nil) {
+            component.pdfController.document.measurementScale = scaleConfig;
+        }
+    });
+}
+
+RCT_EXPORT_METHOD(setMeasurementPrecision:(NSString*)precision reactTag:(nonnull NSNumber*) reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
+        NSInteger precisionUnit =  [PspdfkitMeasurementConvertor getPrecisionInt: precision];
+
+        component.pdfController.document.measurementPrecision = precisionUnit;
+    });
 }
 
 - (UIView *)view {

@@ -4,6 +4,7 @@ import fileSystem from 'react-native-fs';
 
 const tiffImageName = 'PSPDFKit_Image_Example.tiff';
 const formDocumentName = 'Form_example.pdf';
+const measurementsName = 'Measurements.pdf';
 export const exampleDocumentName = 'PSPDFKit_Quickstart_Guide.pdf';
 
 export const exampleImage = 'PSPDFKit_Image_Example.jpg';
@@ -27,6 +28,11 @@ export const tiffImagePath =
   Platform.OS === 'ios'
     ? 'PDFs/' + tiffImageName
     : 'file:///android_asset/' + tiffImageName;
+
+export const measurementsDocument =
+  Platform.OS === 'ios'
+    ? 'PDFs/' + measurementsName
+    : 'file:///android_asset/' + measurementsName;
 
 export const pspdfkitColor = '#267AD4';
 

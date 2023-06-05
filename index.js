@@ -35,6 +35,7 @@ class PSPDFKitView extends React.Component {
           onCloseButtonPressed={onCloseButtonPressedHandler}
           onStateChanged={this._onStateChanged}
           onDocumentSaved={this._onDocumentSaved}
+          onDocumentLoaded={this._onDocumentLoaded}
           onDocumentSaveFailed={this._onDocumentSaveFailed}
           onDocumentLoadFailed={this._onDocumentLoadFailed}
           onAnnotationTapped={this._onAnnotationTapped}
@@ -53,7 +54,11 @@ class PSPDFKitView extends React.Component {
       this.props.onStateChanged(event.nativeEvent);
     }
   };
-
+  _onDocumentLoaded = event => {
+    if (this.props.onDocumentLoaded) {
+      this.props.onDocumentLoaded(event.nativeEvent);
+    }
+  };
   _onDocumentSaved = event => {
     if (this.props.onDocumentSaved) {
       this.props.onDocumentSaved(event.nativeEvent);
@@ -511,7 +516,98 @@ class PSPDFKitView extends React.Component {
         findNodeHandle(this.refs.pdfView),
       );
     }
+  }
+
+  /**
+   * Measurements configuration for the PSPDFKitView.
+   * @param config
+   */
+  setMeasurementConfig = function (config) {
+    if (Platform.OS === 'android') {
+      let requestId = this._nextRequestId++;
+      let requestMap = this._requestMap;
+
+      // We create a promise here that will be resolved once onDataReturned is called.
+      let promise = new Promise(function (resolve, reject) {
+        requestMap[requestId] = { resolve: resolve, reject: reject };
+      });
+
+      UIManager.dispatchViewManagerCommand(
+          findNodeHandle(this.refs.pdfView),
+          this._getViewManagerConfig('RCTPSPDFKitView').Commands
+              .setMeasurementConfig(config),
+          [requestId, config],
+      );
+
+      return promise;
+    }
+
+    NativeModules.PSPDFKitViewManager.setMeasurementConfig(
+      config,
+      findNodeHandle(this.refs.pdfView),
+    );
   };
+
+  /**
+   * Measurements scale object for PSPDFKitView.
+   * @param scale
+   */
+  setMeasurementScale = function (scale) {
+    if (Platform.OS === 'android') {
+      let requestId = this._nextRequestId++;
+      let requestMap = this._requestMap;
+
+      // We create a promise here that will be resolved once onDataReturned is called.
+      let promise = new Promise(function (resolve, reject) {
+        requestMap[requestId] = { resolve: resolve, reject: reject };
+      });
+
+      UIManager.dispatchViewManagerCommand(
+          findNodeHandle(this.refs.pdfView),
+          this._getViewManagerConfig('RCTPSPDFKitView').Commands
+              .setMeasurementScale,
+          [requestId, scale],
+      );
+
+      return promise;
+    }
+
+    // iOS implementation
+    NativeModules.PSPDFKitViewManager.setMeasurementScale(scale, findNodeHandle(this.refs.pdfView)
+    );
+  }
+
+  /**
+   * Measurements precision for PSPDFKitView. Available options are: oneDP, twoDP, threeDP, fourDP, whole.
+   * @param precision
+   */
+  setMeasurementPrecision = function (precision) {
+    if (Platform.OS === 'android') {
+      let requestId = this._nextRequestId++;
+      let requestMap = this._requestMap;
+
+      // We create a promise here that will be resolved once onDataReturned is called.
+      let promise = new Promise(function (resolve, reject) {
+        requestMap[requestId] = {resolve: resolve, reject: reject};
+      });
+
+      UIManager.dispatchViewManagerCommand(
+          findNodeHandle(this.refs.pdfView),
+          this._getViewManagerConfig('RCTPSPDFKitView').Commands
+              .setMeasurementPrecision,
+          [requestId, precision],
+      );
+
+      return promise;
+    }
+    // iOS implementation
+    NativeModules.PSPDFKitViewManager.setMeasurementPrecision(
+        precision,
+        findNodeHandle(this.refs.pdfView)
+    );
+  }
+
+
   /**
    * Get the right bar button items for the specified view mode.
    *
@@ -595,7 +691,7 @@ PSPDFKitView.propTypes = {
    */
   pageIndex: PropTypes.number,
   /**
-   * Controls wheter a navigation bar is created and shown or not. Defaults to showing a navigation bar (false).
+   * Controls whether a navigation bar is created and shown or not. Defaults to showing a navigation bar (false).
    *
    * @platform ios
    */
@@ -609,7 +705,7 @@ PSPDFKitView.propTypes = {
    */
   showCloseButton: PropTypes.bool,
   /**
-   * Controls wheter or not the default action for tapped annotations is processed. Defaults to processing the action (false).
+   * Controls whether or not the default action for tapped annotations is processed. Defaults to processing the action (false).
    */
   disableDefaultActionForTappedAnnotations: PropTypes.bool,
   /**
@@ -630,6 +726,10 @@ PSPDFKitView.propTypes = {
    * @platform ios
    */
   onCloseButtonPressed: PropTypes.func,
+  /**
+   * Callback that is called when the document is loaded in PDFViewer.
+   */
+  onDocumentLoaded: PropTypes.func,
   /**
    * Callback that is called when the document is saved.
    */

@@ -11,4 +11,6 @@
 
 @interface RCTPSPDFKitViewManager : RCTViewManager
 
+@property (nonatomic, strong) id configuration;
+
 @end

@@ -201,6 +201,16 @@ export default [
       });
     },
   },
+  {
+    key: 'item19',
+    name: 'PSPDFKit Measurement',
+    description: 'PSPDFKit measurement tools example',
+    action: component => {
+      component.props.navigation.push('Measurement', {
+        title: 'PSPDFKit Measurement',
+      });
+    },
+  },
 ];
 
 const generatePDFMenu = [

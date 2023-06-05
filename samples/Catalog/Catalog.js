@@ -20,6 +20,7 @@ import { HiddenToolbar } from './examples/HiddenToolbar';
 import HomeScreen from './examples/HomeScreen';
 import InstantSynchronization from './examples/InstantSynchronization';
 import { ManualSave } from './examples/ManualSave';
+import Measurement from './examples/Measurement';
 import { OpenImageDocument } from './examples/OpenImageDocument';
 import { ProgrammaticAnnotations } from './examples/ProgrammaticAnnotations';
 import { ProgrammaticFormFilling } from './examples/ProgrammaticFormFilling';
@@ -55,7 +56,8 @@ class Catalog extends Component {
     return (
       <NavigationContainer>
         <Stack.Navigator>
-          <Stack.Screen name="Home" component={HomeScreen} initial={true} />
+          <Stack.Screen name="Home" component={HomeScreen} />
+          {/*initial={true} />*/}
           <Stack.Screen
             name="PSPDFKitViewComponent"
             component={PSPDFKitViewComponent}
@@ -92,6 +94,11 @@ class Catalog extends Component {
           <Stack.Screen
             name="InstantSynchronization"
             component={InstantSynchronization}
+          />
+          <Stack.Screen
+            name="Measurement"
+            component={Measurement}
+            initial={true}
           />
         </Stack.Navigator>
       </NavigationContainer>

@@ -13,6 +13,8 @@
 
 package com.pspdfkit.views;
 
+import static com.pspdfkit.react.helper.ConversionHelpers.getAnnotationTypeFromString;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.Uri;
@@ -56,6 +58,7 @@ import com.pspdfkit.react.events.PdfViewDocumentSavedEvent;
 import com.pspdfkit.react.events.PdfViewNavigationButtonClickedEvent;
 import com.pspdfkit.react.events.PdfViewStateChangedEvent;
 import com.pspdfkit.react.helper.DocumentJsonDataProvider;
+import com.pspdfkit.react.helper.MeasurementHelper;
 import com.pspdfkit.ui.DocumentDescriptor;
 import com.pspdfkit.ui.PdfFragment;
 import com.pspdfkit.ui.PdfUiFragment;
@@ -485,13 +488,10 @@ public class PdfView extends FrameLayout {
             // Clear everything.
             isActive = false;
             document = null;
-
             pendingFragmentActions.dispose();
             pendingFragmentActions = new CompositeDisposable();
         }
-
         fragment = null;
-
         pdfUiFragmentGetter.onNext(Collections.emptyList());
     }
 
@@ -525,6 +525,19 @@ public class PdfView extends FrameLayout {
                     pdfViewModeController.isFormEditingActive()));
             } else {
                 eventDispatcher.dispatchEvent(new PdfViewStateChangedEvent(getId()));
+            }
+        }
+    }
+
+    public void setMeasurementConfiguration(@NonNull ReadableMap measurementConfiguration) {
+        if (fragment != null) {
+            PdfDocument document = fragment.getDocument();
+            if(document != null) {
+                document.setMeasurementPrecision(MeasurementHelper.getPrecision(measurementConfiguration.getString("precision")));
+                ReadableMap scaleConfig = measurementConfiguration.getMap("scale");
+                if(scaleConfig != null) {
+                    document.setMeasurementScale(MeasurementHelper.getScale(scaleConfig));
+                }
             }
         }
     }
@@ -564,7 +577,7 @@ public class PdfView extends FrameLayout {
 
     public Single<List<Annotation>> getAnnotations(final int pageIndex, @Nullable final String type) {
         return getCurrentPdfFragment()
-            .map(pdfFragment -> pdfFragment.getDocument())
+            .map(PdfFragment::getDocument)
             .flatMap((Function<PdfDocument, ObservableSource<Annotation>>) pdfDocument ->
                 pdfDocument.getAnnotationProvider().getAllAnnotationsOfTypeAsync(getAnnotationTypeFromString(type), pageIndex, 1)).toList();
     }
@@ -624,9 +637,9 @@ public class PdfView extends FrameLayout {
     public Single<JSONObject> getAllUnsavedAnnotations() {
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         return DocumentJsonFormatter.exportDocumentJsonAsync(document, outputStream)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .toSingle(() -> {
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .toSingle(() -> {
                     try {
                         return new JSONObject(outputStream.toString());
                     } catch (JSONException e) {
@@ -734,7 +747,7 @@ public class PdfView extends FrameLayout {
                             choiceFormElement.setSelectedIndexes(selectedIndices);
                             return true;
                         } catch (JSONException ex) {
-                            // This isn't an index maybe we can set a custom value on a combobox.
+                            // This isn't an index maybe we can set a custom value on a combo box.
                             if (formElement instanceof ComboBoxFormElement) {
                                 ((ComboBoxFormElement) formElement).setCustomText(value);
                                 return true;
@@ -790,9 +803,43 @@ public class PdfView extends FrameLayout {
             PdfViewDocumentSaveFailedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onDocumentSaveFailed"),
             PdfViewDocumentLoadFailedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onDocumentLoadFailed")
         );
-
        map.put(PdfViewNavigationButtonClickedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onNavigationButtonClicked"));
-
        return map;
+    }
+
+    /**
+     * Returns the event registration map for the default events emitted by the {@link PdfView}.
+     * @param scaleConfig
+     * @return true if the scale was set, false otherwise.
+     */
+    public boolean setMeasurementScale(ReadableMap scaleConfig) {
+        if (fragment != null) {
+            PdfDocument document = fragment.getDocument();
+            if(document != null) {
+                if(scaleConfig != null) {
+                    document.setMeasurementScale(MeasurementHelper.getScale(scaleConfig));
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Returns the event registration map for the default events emitted by the {@link PdfView}.
+     * @param precisionString
+     * @return true if the precision was set, false otherwise.
+     */
+    public boolean setMeasurementPrecision(String precisionString) {
+        if (fragment != null) {
+            PdfDocument document = fragment.getDocument();
+            if(document != null) {
+                if(precisionString != null) {
+                    document.setMeasurementPrecision(MeasurementHelper.getPrecision(precisionString));
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

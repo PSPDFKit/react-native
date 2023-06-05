@@ -23,8 +23,6 @@ import com.pspdfkit.ui.toolbar.AnnotationEditingToolbar;
 import com.pspdfkit.ui.toolbar.ContextualToolbar;
 import com.pspdfkit.ui.toolbar.ToolbarCoordinatorLayout;
 import com.pspdfkit.ui.toolbar.grouping.MenuItemGroupingRule;
-import com.pspdfkit.ui.toolbar.grouping.presets.AnnotationCreationToolbarGroupingRule;
-
 import javax.annotation.Nullable;
 
 /**
@@ -86,8 +84,6 @@ class PdfViewModeController implements
         if (contextualToolbar instanceof AnnotationCreationToolbar) {
             if (itemGroupingRule != null) {
                 contextualToolbar.setMenuItemGroupingRule(itemGroupingRule);
-            } else {
-                contextualToolbar.setMenuItemGroupingRule(new AnnotationCreationToolbarGroupingRule(parent.getContext()));
             }
         }
     }

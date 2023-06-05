@@ -4,18 +4,21 @@ buildscript {
     ext {
         minSdkVersion = 21
         compileSdkVersion = 33
-        targetSdkVersion = 33
+        targetSdkVersion = 30
         ndkVersion = "20.1.5948944"
-        kotlin_version = '1.8.0'
+        kotlin_version = '1.8.10'
     }
     repositories {
         google()
         mavenCentral()
+             maven {
+            url 'https://customers.pspdfkit.com/maven/'
+        }
     }
     dependencies {
-        classpath('com.android.tools.build:gradle:7.4.2')
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath('com.android.tools.build:gradle:7.1.3')
         classpath("com.facebook.react:react-native-gradle-plugin")
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
@@ -23,31 +26,10 @@ buildscript {
 
 allprojects {
     repositories {
-        // exclusiveContent {
-        //    filter {
-        //        includeGroup "com.facebook.react"
-        //    }
-        //    forRepository {
-        //        maven {
-        //            url "$rootDir/../node_modules/react-native/android"
-        //        }
-        //    }
-        // }
-        // mavenLocal()
-        // mavenCentral()
-        // maven {
-        //     // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
-        //     url("$rootDir/../node_modules/react-native/android")
-        // }
-        // maven {
-        //     // Android JSC is installed from npm
-        //     url("$rootDir/../node_modules/jsc-android/dist")
-        // }
-
+        mavenCentral()
+        google()
         maven {
             url 'https://customers.pspdfkit.com/maven/'
         }
-        google()
-        maven { url 'https://www.jitpack.io' }
     }
 }

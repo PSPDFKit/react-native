@@ -8,6 +8,7 @@
 //
 
 #import "RCTConvert+PSPDFConfiguration.h"
+#import "PSPDFKitReactNativeiOS-Swift.h"
 
 @implementation RCTConvert (PSPDFConfiguration)
 
@@ -305,7 +306,7 @@ RCT_MULTI_ENUM_CONVERTER(PSPDFDocumentSharingPagesOptions,
 @implementation PSPDFConfigurationBuilder (RNAdditions)
 
 - (void)setupFromJSON:(id)json {
-    
+
   NSDictionary *dictionary = [RCTConvert processConfigurationOptionsDictionaryForPrefix:[RCTConvert NSDictionary:json]];
 
   // Document Interaction Options
@@ -386,7 +387,7 @@ RCT_MULTI_ENUM_CONVERTER(PSPDFDocumentSharingPagesOptions,
   SET(thumbnailLineSpacing, CGFloat)
   SET(thumbnailMargin, UIEdgeInsets)
   SET(shouldCacheThumbnails, BOOL)
-  
+
   // Annotation, Forms and Bookmark Options
   SET(editableAnnotationTypes, NSSet)
   SET(shouldAskForAnnotationUsername, BOOL)
@@ -421,29 +422,29 @@ RCT_MULTI_ENUM_CONVERTER(PSPDFDocumentSharingPagesOptions,
     }
     self.editableAnnotationTypes = [editableTypes copy];
   }
-    
+
   // Deprecated Options
-   
+
   // Use `scrollDirection` instead.
   SET_PROPERTY(pageScrollDirection, scrollDirection, PSPDFScrollDirection)
-  
+
   // Use `pageTransition` instead.
   if (dictionary[@"scrollContinuously"]) {
     self.pageTransition = [RCTConvert BOOL:dictionary[@"scrollContinuously"]] ? PSPDFPageTransitionScrollContinuous : PSPDFPageTransitionScrollPerSpread;
   }
-  
+
   // Use `enableTextSelection` instead.
   SET(textSelectionEnabled, BOOL)
-  
+
   // Use `showPageLabels` instead.
   SET(pageLabelEnabled, BOOL)
-  
+
   // Use `showPageLabels` instead.
   SET_PROPERTY(showPageNumberOverlay, pageLabelEnabled, BOOL)
-  
+
   // Use `documentLabelEnabled` instead.
   SET_PROPERTY(showDocumentLabel, documentLabelEnabled, PSPDFAdaptiveConditional)
-  
+
   // Use `thumbnailBarMode` instead.
   SET_PROPERTY(showThumbnailBar, thumbnailBarMode, PSPDFThumbnailBarMode)
 }
@@ -463,7 +464,6 @@ RCT_MULTI_ENUM_CONVERTER(PSPDFDocumentSharingPagesOptions,
 
     [rnSharingConfigurations addObject:rnSharingConfiguration];
   }];
-
 
   self.sharingConfigurations = rnSharingConfigurations;
 }
