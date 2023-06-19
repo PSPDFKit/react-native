@@ -6,6 +6,6 @@
 //  This notice may not be removed from this file.
 //
 
-import { requireNativeComponent } from "react-native";
+import { requireNativeComponent } from 'react-native';
 
-module.exports = requireNativeComponent("ReactPSPDFKitView", null);
+module.exports = requireNativeComponent('ReactPSPDFKitView', null);

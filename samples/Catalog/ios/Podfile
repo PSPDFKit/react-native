@@ -45,8 +45,8 @@ target "Catalog" do
     app_path: "#{Pod::Config.instance.installation_root}/.."
   )
 
-  pod "PSPDFKit", "~> 12.2"
-  pod "Instant", "~> 12.1"
+  pod "PSPDFKit", "~> 12.3"
+  pod "Instant", "~> 12.3"
   target "CatalogTests" do
     inherit! :complete
     # Pods for testing

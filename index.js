@@ -516,7 +516,7 @@ class PSPDFKitView extends React.Component {
         findNodeHandle(this.refs.pdfView),
       );
     }
-  }
+  };
 
   /**
    * Measurements configuration for the PSPDFKitView.
@@ -533,10 +533,11 @@ class PSPDFKitView extends React.Component {
       });
 
       UIManager.dispatchViewManagerCommand(
-          findNodeHandle(this.refs.pdfView),
-          this._getViewManagerConfig('RCTPSPDFKitView').Commands
-              .setMeasurementConfig(config),
-          [requestId, config],
+        findNodeHandle(this.refs.pdfView),
+        this._getViewManagerConfig(
+          'RCTPSPDFKitView',
+        ).Commands.setMeasurementConfig(config),
+        [requestId, config],
       );
 
       return promise;
@@ -563,19 +564,21 @@ class PSPDFKitView extends React.Component {
       });
 
       UIManager.dispatchViewManagerCommand(
-          findNodeHandle(this.refs.pdfView),
-          this._getViewManagerConfig('RCTPSPDFKitView').Commands
-              .setMeasurementScale,
-          [requestId, scale],
+        findNodeHandle(this.refs.pdfView),
+        this._getViewManagerConfig('RCTPSPDFKitView').Commands
+          .setMeasurementScale,
+        [requestId, scale],
       );
 
       return promise;
     }
 
     // iOS implementation
-    NativeModules.PSPDFKitViewManager.setMeasurementScale(scale, findNodeHandle(this.refs.pdfView)
+    NativeModules.PSPDFKitViewManager.setMeasurementScale(
+      scale,
+      findNodeHandle(this.refs.pdfView),
     );
-  }
+  };
 
   /**
    * Measurements precision for PSPDFKitView. Available options are: oneDP, twoDP, threeDP, fourDP, whole.
@@ -588,25 +591,24 @@ class PSPDFKitView extends React.Component {
 
       // We create a promise here that will be resolved once onDataReturned is called.
       let promise = new Promise(function (resolve, reject) {
-        requestMap[requestId] = {resolve: resolve, reject: reject};
+        requestMap[requestId] = { resolve: resolve, reject: reject };
       });
 
       UIManager.dispatchViewManagerCommand(
-          findNodeHandle(this.refs.pdfView),
-          this._getViewManagerConfig('RCTPSPDFKitView').Commands
-              .setMeasurementPrecision,
-          [requestId, precision],
+        findNodeHandle(this.refs.pdfView),
+        this._getViewManagerConfig('RCTPSPDFKitView').Commands
+          .setMeasurementPrecision,
+        [requestId, precision],
       );
 
       return promise;
     }
     // iOS implementation
     NativeModules.PSPDFKitViewManager.setMeasurementPrecision(
-        precision,
-        findNodeHandle(this.refs.pdfView)
+      precision,
+      findNodeHandle(this.refs.pdfView),
     );
-  }
-
+  };
 
   /**
    * Get the right bar button items for the specified view mode.

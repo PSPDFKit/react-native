@@ -19,8 +19,8 @@ target "NativeCatalog" do
     # Pods for testing
   end
 
-  pod "PSPDFKit", "~> 12.2"
-  pod "Instant", "~> 12.1"
+  pod "PSPDFKit", "~> 12.3"
+  pod "Instant", "~> 12.3"
 
   # Enables Flipper.
   #

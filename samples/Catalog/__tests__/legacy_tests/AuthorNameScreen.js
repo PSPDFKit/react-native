@@ -11,12 +11,12 @@
 // This notice may not be removed from this file.
 //
 
-import React, {Component} from 'react';
-import {NativeModules} from 'react-native';
+import React, { Component } from 'react';
+import { NativeModules } from 'react-native';
 import PSPDFKitView from 'react-native-pspdfkit';
 
 export default class AuthorNameScreen extends Component<{}> {
-  static navigationOptions = ({navigation}) => {
+  static navigationOptions = ({ navigation }) => {
     return {
       title: 'PDF',
     };
@@ -34,7 +34,7 @@ export default class AuthorNameScreen extends Component<{}> {
         configuration={{}}
         fragmentTag="PDF1"
         annotationAuthorName="Author"
-        style={{flex: 1}}
+        style={{ flex: 1 }}
       />
     );
   }

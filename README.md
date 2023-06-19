@@ -180,23 +180,23 @@ Let's create a simple app that integrates PSPDFKit and uses the `react-native-ps
 1. Replace the entire contents of `App.js` with the following code snippet:
 
    ```js
-   import React, { Component } from "react";
-   import { Platform } from "react-native";
-   import PSPDFKitView from "react-native-pspdfkit";
+   import React, { Component } from 'react';
+   import { Platform } from 'react-native';
+   import PSPDFKitView from 'react-native-pspdfkit';
 
    const DOCUMENT =
-     Platform.OS === "ios"
-       ? "Document.pdf"
-       : "file:///android_asset/Document.pdf";
+     Platform.OS === 'ios'
+       ? 'Document.pdf'
+       : 'file:///android_asset/Document.pdf';
    export default class PSPDFKitDemo extends Component<{}> {
      render() {
        return (
          <PSPDFKitView
            document={DOCUMENT}
            configuration={{
-             showThumbnailBar: "scrollable",
-             pageTransition: "scrollContinuous",
-             scrollDirection: "vertical",
+             showThumbnailBar: 'scrollable',
+             pageTransition: 'scrollContinuous',
+             scrollDirection: 'vertical',
            }}
            ref="pdfView"
            fragmentTag="PDF1"
@@ -228,14 +228,14 @@ Using the Native Module `PSPDFKit.present()`, you can present a document with PS
 You can specify the path to the document you want to present, and [configuration options](#configuration).
 
 ```javascript
-import React, { Component } from "react";
-import { NativeModules, Text, TouchableHighlight, View } from "react-native";
+import React, { Component } from 'react';
+import { NativeModules, Text, TouchableHighlight, View } from 'react-native';
 
 export default class App extends Component<{}> {
   _onPressButton() {
-    PSPDFKit.present("document.pdf", {
-      pageTransition: "scrollContinuous",
-      scrollDirection: "vertical",
+    PSPDFKit.present('document.pdf', {
+      pageTransition: 'scrollContinuous',
+      scrollDirection: 'vertical',
       documentLabelEnabled: true,
     });
   }
@@ -264,21 +264,21 @@ For all the `props` that you can pass to `PSPDFKitView`, have a look at the [sou
 This is how you would show a PDF as a React component:
 
 ```javascript
-import React, { Component } from "react";
-import { NativeModules } from "react-native";
-import PSPDFKitView from "react-native-pspdfkit";
+import React, { Component } from 'react';
+import { NativeModules } from 'react-native';
+import PSPDFKitView from 'react-native-pspdfkit';
 
 export default class App extends Component<{}> {
   render() {
     return (
       <PSPDFKitView
-        document={"document.pdf"}
+        document={'document.pdf'}
         configuration={{
-          pageTransition: "scrollContinuous",
-          scrollDirection: "vertical",
+          pageTransition: 'scrollContinuous',
+          scrollDirection: 'vertical',
           documentLabelEnabled: true,
         }}
-        style={{ flex: 1, color: "#267AD4" }}
+        style={{ flex: 1, color: '#267AD4' }}
       />
     );
   }
@@ -292,10 +292,10 @@ You can configure the presentation with a configuration dictionary which is a mi
 Example - Native Module:
 
 ```javascript
-PSPDFKit.present("document.pdf", {
-  showThumbnailBar: "scrollable",
-  pageTransition: "scrollContinuous",
-  scrollDirection: "vertical",
+PSPDFKit.present('document.pdf', {
+  showThumbnailBar: 'scrollable',
+  pageTransition: 'scrollContinuous',
+  scrollDirection: 'vertical',
 });
 ```
 
@@ -303,11 +303,11 @@ Example - Native UI Component:
 
 ```javascript
 <PSPDFKitView
-  document={"document.pdf"}
+  document={'document.pdf'}
   configuration={{
-    showThumbnailBar: "scrollable",
-    pageTransition: "scrollContinuous",
-    scrollDirection: "vertical",
+    showThumbnailBar: 'scrollable',
+    pageTransition: 'scrollContinuous',
+    scrollDirection: 'vertical',
   }}
 />
 ```
@@ -333,7 +333,7 @@ On iOS, PSPDFKit for React Native iOS maps most configuration options available 
 Annotations are mapped based on their type name. This is case sensitive. For example, to limit annotation types to ink and highlight, use this:
 
 ```javascript
-editableAnnotationTypes: ["Ink", "Highlight"];
+editableAnnotationTypes: ['Ink', 'Highlight'];
 ```
 
 ### Menu Item Mapping
@@ -354,9 +354,9 @@ You can customize the toolbar buttons on the Native UI View component by specify
 
 ```javascript
 pdfView.setRightBarButtonItems(
-  ["thumbnailsButtonItem", "searchButtonItem", "annotationButtonItem"],
-  "document",
-  false
+  ['thumbnailsButtonItem', 'searchButtonItem', 'annotationButtonItem'],
+  'document',
+  false,
 );
 ```
 
@@ -375,38 +375,38 @@ PSPDFKit for React Native allows you to create a new document with processed (em
   <Button
     onPress={async () => {
       const processedDocumentPath =
-        RNFS.DocumentDirectoryPath + "/flattened.pdf";
+        RNFS.DocumentDirectoryPath + '/flattened.pdf';
       // Delete the processed document if it already exists.
       RNFS.exists(processedDocumentPath)
-        .then((exists) => {
+        .then(exists => {
           if (exists) {
             RNFS.unlink(processedDocumentPath);
           }
         })
         .then(() => {
           // First, save all annotations in the current document.
-          this.refs.pdfView.saveCurrentDocument().then((success) => {
+          this.refs.pdfView.saveCurrentDocument().then(success => {
             if (success) {
               // Then, flatten all the annotations
               PSPDFKit.processAnnotations(
-                "flatten",
-                "all",
+                'flatten',
+                'all',
                 sourceDocumentPath,
-                processedDocumentPath
+                processedDocumentPath,
               )
-                .then((success) => {
+                .then(success => {
                   if (success) {
                     // And finally, present the newly processed document with flattened annotations.
                     PSPDFKit.present(processedDocumentPath, {});
                   } else {
-                    alert("Failed to embed annotations.");
+                    alert('Failed to embed annotations.');
                   }
                 })
-                .catch((error) => {
+                .catch(error => {
                   alert(JSON.stringify(error));
                 });
             } else {
-              alert("Failed to save current document.");
+              alert('Failed to save current document.');
             }
           });
         });
@@ -524,23 +524,23 @@ Let's create a simple app that integrates PSPDFKit and uses the `react-native-ps
 1. Replace the entire contents of `App.js` with the following code snippet:
 
    ```js
-   import React, { Component } from "react";
-   import { Platform } from "react-native";
-   import PSPDFKitView from "react-native-pspdfkit";
+   import React, { Component } from 'react';
+   import { Platform } from 'react-native';
+   import PSPDFKitView from 'react-native-pspdfkit';
 
    const DOCUMENT =
-     Platform.OS === "ios"
-       ? "Document.pdf"
-       : "file:///android_asset/Document.pdf";
+     Platform.OS === 'ios'
+       ? 'Document.pdf'
+       : 'file:///android_asset/Document.pdf';
    export default class PSPDFKitDemo extends Component<{}> {
      render() {
        return (
          <PSPDFKitView
            document={DOCUMENT}
            configuration={{
-             showThumbnailBar: "scrollable",
-             pageTransition: "scrollContinuous",
-             scrollDirection: "vertical",
+             showThumbnailBar: 'scrollable',
+             pageTransition: 'scrollContinuous',
+             scrollDirection: 'vertical',
            }}
            ref="pdfView"
            fragmentTag="PDF1"
@@ -585,11 +585,11 @@ You can configure the builder with a dictionary representation of the PSPDFConfi
 
 ```javascript
 const CONFIGURATION = {
-  pageTransition: "scrollPerSpread",
+  pageTransition: 'scrollPerSpread',
   showPageNumberOverlay: true,
   grayScale: true,
   showPageLabels: false,
-  scrollDirection: "vertical",
+  scrollDirection: 'vertical',
 };
 ```
 
@@ -680,10 +680,6 @@ defaultConfig {
 }
 ...
 ```
-
-## Windows UWP
-
-Windows UWP is not currently supported on `master`, please follow the integration steps on the [`windows-support`](https://github.com/PSPDFKit/react-native/tree/windows-support#windows-uwp) branch.
 
 # Troubleshooting
 

@@ -1,21 +1,31 @@
 ## Newest Release
 
+### 2.6.1 - 19 Jun 2023
+
+- Updates for PSPDFKit 8.7.3 for Android. (#40880)
+- Updates for PSPDFKit 12.3 for iOS. (##40880)
+- Fixes issue when showThumbnailBar is set to pinned (#40807)
+
+## Previous Releases
+
 ### 2.6.0 - 05 Jun 2023
+
 - Adds measurement tools configurations (#40296)
 - Updates for PSPDFKit 8.7.2 for Android. (#40697)
 - Updates for PSPDFKit 12.2 for iOS. (#40697)
 - Fixes annotation tools subgroups selection with menuItem grouping customization (#40593)
 
-## Previous Releases
-
 ### 2.5.2 - 13 Apr 2023
+
 - Fixes missing RXJava dependencies for Android. (#39813)
 
 ### 2.5.1 - 03 Apr 2023
+
 - Updated NativeCatalog configuration and replaced deprecated AppDelegate.m
 - Bumps PSPDFKit for Android version to 8.6.0
 
 ### 2.5.0 - 23 Mar 2023
+
 - Added magic ink tool for Android annotation toolbar configuration. (#39174)
 - Upgrades React Native dependencies and project configuration to 0.71.2
 - Adds Instant JSON for React Native
@@ -24,12 +34,14 @@
 - PSPDFKit now requires React Native 0.71.0 or later.
 
 ### 2.4.2 - 01 Feb 2023
+
 - Fixes bug issue for deleting multiple annotations (#38518)
 - Bump PSPDFKit for Android version to 8.5.0
 - Bump PSPDFKit for iOS version to 12.0.3
 - Bump minimum SDK version compileSdkVersion to API 33
 
 ### 2.4.1 - 22 Nov 2022
+
 - Updates for PSPDFKit 12.0.1 for iOS.
 - Fixes Catalog example toolbar menu items not rendering. (#37368)
 - Fixes the Annotation Processing Catalog example. (#37534)
@@ -37,7 +49,7 @@
 ### 2.4.0 - 25 Oct 2022
 
 - Adds PDF generation from HTML, images and template. (#36736)
-- Updates for PSPDFKit 8.4.1 for Android 
+- Updates for PSPDFKit 8.4.1 for Android
 - Updates for PSPDFKit 12.0 for iOS
 
 ### 2.3.1 - 22 Jul 2022
