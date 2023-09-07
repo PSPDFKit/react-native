@@ -19,7 +19,7 @@ import { extractFromAssetsIfMissing } from './helpers/FileSystemHelpers';
 import { getMainBundlePath } from './helpers/ImageHelper';
 import { PSPDFKit } from './helpers/PSPDFKit';
 
-const { RNProcessor: Processor } = NativeModules;
+const Processor = NativeModules.RNProcessor;
 
 export default [
   {
@@ -208,6 +208,16 @@ export default [
     action: component => {
       component.props.navigation.push('Measurement', {
         title: 'PSPDFKit Measurement',
+      });
+    },
+  },
+  {
+    key: 'item20',
+    name: 'Annotation Preset customization',
+    description: 'Customize default annotation presets',
+    action: component => {
+      component.props.navigation.push('AnnotationPresetCustomization', {
+        title: 'PSPDFKit preset customization',
       });
     },
   },
@@ -442,7 +452,7 @@ body {
     description: 'Generate PDF document from array of images.',
     action: async component => {
       let fileName = 'PDFFromImages';
-      // For images from assets, you'll need to use provide global path for images in iOS.
+      // For images from assets, you'll need to provide the global path for images in iOS.
       // In case you took image from the camera, you can use local path, instead.
       // Remote images from web URL will need to be downloaded first and then used as local path.
       let globalPath = getMainBundlePath(exampleImagePath.toString());
@@ -476,6 +486,70 @@ body {
               documentPath: `PDFs/${documentName(fileName)}`,
               fullPath: mainPath,
               title: 'Generate PDF from images',
+            });
+          }
+        });
+      } catch (e) {
+        console.log(e.message, e.code);
+        alert(e.message);
+      }
+    },
+  },
+  {
+    key: 'item6',
+    name: 'Generate PDF from PDF documents',
+    description: 'Generate PDF document from existing PDF documents.',
+    action: async component => {
+      let fileName = 'PDFromDocuments';
+      let outputFile = null;
+      // For images from assets, you'll need to provide the global path for images in iOS.
+      // In case you took image from the camera, you can use local path, instead.
+      // Remote images from web URL will need to be downloaded first and then used as local path.
+      let globalPath = getMainBundlePath(exampleDocumentPath.toString());
+      try {
+        outputFile = await getOutputPath(fileName);
+      } catch (e) {
+        console.log(e.message, e.code);
+        alert(e.message);
+      }
+
+      const configuration = {
+        filePath: outputFile,
+        name: fileName,
+        documents: [
+          {
+            documentPath:
+              Platform.OS === 'ios' ? globalPath : exampleDocumentPath,
+            pageIndex: 5,
+          },
+          {
+            documentPath:
+              Platform.OS === 'ios' ? globalPath : exampleDocumentPath,
+            pageIndex: 8,
+          },
+        ],
+        override: true,
+      };
+
+      try {
+        const { fileURL } = await Processor.generatePDFFromDocuments(
+          configuration,
+        );
+
+        if (Platform.OS === 'android') {
+          PSPDFKit.present(fileURL, { title: 'Generate PDF from images' });
+          return;
+        }
+
+        // Do something with new file
+        console.log('Your new file is stored in: ', fileURL);
+        // In this example, we will open it in PSPDFKit view component from the same location where other pdf documents resides, PDFs folder in the root of the RN app
+        await extractAsset(fileURL, documentName(fileName), async mainPath => {
+          if (await fileExists(mainPath)) {
+            component.props.navigation.push('GeneratePDF', {
+              documentPath: `PDFs/${documentName(fileName)}`,
+              fullPath: mainPath,
+              title: 'Generate PDF from PDF documents',
             });
           }
         });

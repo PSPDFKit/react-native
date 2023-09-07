@@ -6,7 +6,7 @@ import { exampleDocumentPath, pspdfkitColor } from '../configuration/Constants';
 import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
 import { hideToolbar } from '../helpers/NavigationHelper';
 
-export class PSPDFKitViewComponent extends BaseExampleAutoHidingHeaderComponent {
+export class AnnotationPresetCustomization extends BaseExampleAutoHidingHeaderComponent {
   pdfRef = null;
   constructor(props) {
     super(props);
@@ -28,6 +28,18 @@ export class PSPDFKitViewComponent extends BaseExampleAutoHidingHeaderComponent 
             toolbarTitle: 'My Awesome Report',
             backgroundColor: processColor('lightgrey'),
             useParentNavigationBar: false,
+          }}
+          annotationPresets={{
+            inkPen: {
+              defaultThickness: 50,
+              minimumThickness: 1,
+              maximumThickness: 60,
+              defaultColor: '#99cc00',
+            },
+            freeText: {
+              defaultTextSize: 20,
+              defaultColor: '#FF0000',
+            },
           }}
           fragmentTag="PDF1"
           showNavigationButtonInToolbar={true}

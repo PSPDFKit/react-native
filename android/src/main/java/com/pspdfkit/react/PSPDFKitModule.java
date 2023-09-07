@@ -35,7 +35,7 @@ import com.facebook.react.bridge.ReadableMap;
 import com.pspdfkit.PSPDFKit;
 import com.pspdfkit.annotations.Annotation;
 import com.pspdfkit.annotations.AnnotationType;
-import com.pspdfkit.annotations.measurements.FloatPrecision;
+import com.pspdfkit.annotations.measurements.MeasurementPrecision;
 import com.pspdfkit.annotations.measurements.Scale;
 import com.pspdfkit.document.PdfDocument;
 import com.pspdfkit.document.PdfDocumentLoader;
@@ -293,14 +293,14 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
         }
     }
     @ReactMethod
-    public void setMeasurementPrecision(@Nullable final FloatPrecision floatPrecision) {
+    public void setMeasurementPrecision(@Nullable final MeasurementPrecision floatPrecision) {
         if (resumedActivity instanceof PdfActivity) {
             final PdfActivity activity = (PdfActivity) resumedActivity;
             activity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     PdfDocument document = activity.getDocument();
-                    FloatPrecision precision = floatPrecision;
+                    MeasurementPrecision precision = floatPrecision;
                     if (document != null && precision != null) {
                         document.setMeasurementPrecision(precision);
                     } else {

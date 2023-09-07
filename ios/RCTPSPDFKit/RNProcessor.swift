@@ -208,7 +208,7 @@ class RNProcessor: RCTEventEmitter {
 
         guard let images = configuration["images"] as? [[String: Any]] else {
             let error = NSError(domain: "", code: 200, userInfo: nil)
-            onError("E_NEW_MISSING_IMAGES", "Pls provide at least one image", error)
+            onError("E_NEW_MISSING_IMAGES", "Please provide at least one image", error)
             return
         }
 
@@ -216,6 +216,39 @@ class RNProcessor: RCTEventEmitter {
             let pageConfigurationHelper = RNConfigurationHelper(imageConfig)
             guard let imagePageConfig = pageConfigurationHelper.newPageFromImage(imageConfig) else { continue }
             pageConfiguration.addNewPage(at: PageIndex(index), configuration: imagePageConfig)
+        }
+
+        let processor = Processor(configuration: pageConfiguration, securityOptions: nil)
+
+        do {
+            try processor.write(toFileURL: outputFileURL)
+            onSuccess(["fileURL": outputFileURL.absoluteString])
+        } catch {
+            onError("E_NEW_FAILED", "Generating PDF failed: \(error.localizedDescription)", error)
+        }
+    }
+    
+    @objc func generatePDFFromDocuments(_ configuration: [String: Any] = [:], onSuccess: @escaping  RCTPromiseResolveBlock, onError: @escaping RCTPromiseRejectBlock) -> Void {
+        guard var outputFileURL = RNFileHelper.getFilePath(configuration, onError: onError)  else {
+            onError("E_MISSING_PATH_DOCUMENT_NAME", "Please provide either document path or name", RNFileHelper.invalidFileError())
+            return
+        }
+
+        outputFileURL = RNFileHelper.updateFileNameIfNeeded(outputFileURL)
+        RNFileHelper.deleteExistingFileIfNeeded(filePath: outputFileURL, configuration: configuration)
+
+        let pageConfiguration = Processor.Configuration()
+
+        guard let documents = configuration["documents"] as? [[String: Any]] else {
+            let error = NSError(domain: "", code: 200, userInfo: nil)
+            onError("E_NEW_MISSING_DOCUMENTS", "Please provide at least one document", error)
+            return
+        }
+
+        for (index, documentConfig) in documents.enumerated() {
+            let pageConfigurationHelper = RNConfigurationHelper(documentConfig)
+            guard let documentPageConfig = pageConfigurationHelper.newPageFromDocument(documentConfig) else { continue }
+            pageConfiguration.addNewPage(at: PageIndex(index), configuration: documentPageConfig)
         }
 
         let processor = Processor(configuration: pageConfiguration, securityOptions: nil)

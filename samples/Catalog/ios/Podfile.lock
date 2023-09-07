@@ -76,12 +76,12 @@ PODS:
   - hermes-engine (0.71.8):
     - hermes-engine/Pre-built (= 0.71.8)
   - hermes-engine/Pre-built (0.71.8)
-  - Instant (12.3.0)
+  - Instant (12.4.0-dev)
   - libevent (2.1.12)
   - OpenSSL-Universal (1.1.1100)
-  - PSPDFKit (12.3.0):
-    - PSPDFKit/Core (= 12.3.0)
-  - PSPDFKit/Core (12.3.0)
+  - PSPDFKit (12.4.0-dev):
+    - PSPDFKit/Core (= 12.4.0-dev)
+  - PSPDFKit/Core (12.4.0-dev)
   - RCT-Folly (2021.07.22.00):
     - boost
     - DoubleConversion
@@ -333,7 +333,7 @@ PODS:
   - React-jsinspector (0.71.8)
   - React-logger (0.71.8):
     - glog
-  - react-native-pspdfkit (2.6.0):
+  - react-native-pspdfkit (2.6.1):
     - Instant
     - PSPDFKit
     - React
@@ -471,10 +471,10 @@ DEPENDENCIES:
   - FlipperKit/SKIOSNetworkPlugin (= 0.125.0)
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
   - hermes-engine (from `../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec`)
-  - Instant (~> 12.3)
+  - Instant (from `https://customers.pspdfkit.com/instant/nightly.podspec`)
   - libevent (~> 2.1.12)
   - OpenSSL-Universal (= 1.1.1100)
-  - PSPDFKit (~> 12.3)
+  - PSPDFKit (from `https://customers.pspdfkit.com/pspdfkit-ios/nightly.podspec`)
   - RCT-Folly (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCTRequired (from `../node_modules/react-native/Libraries/RCTRequired`)
   - RCTTypeSafety (from `../node_modules/react-native/Libraries/TypeSafety`)
@@ -526,10 +526,8 @@ SPEC REPOS:
     - Flipper-RSocket
     - FlipperKit
     - fmt
-    - Instant
     - libevent
     - OpenSSL-Universal
-    - PSPDFKit
     - SocketRocket
     - YogaKit
 
@@ -546,6 +544,10 @@ EXTERNAL SOURCES:
     :podspec: "../node_modules/react-native/third-party-podspecs/glog.podspec"
   hermes-engine:
     :podspec: "../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec"
+  Instant:
+    :podspec: https://customers.pspdfkit.com/instant/nightly.podspec
+  PSPDFKit:
+    :podspec: https://customers.pspdfkit.com/pspdfkit-ios/nightly.podspec
   RCT-Folly:
     :podspec: "../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec"
   RCTRequired:
@@ -635,10 +637,10 @@ SPEC CHECKSUMS:
   fmt: ff9d55029c625d3757ed641535fd4a75fedc7ce9
   glog: 04b94705f318337d7ead9e6d17c019bd9b1f6b1b
   hermes-engine: 47986d26692ae75ee7a17ab049caee8864f855de
-  Instant: 80f55e5467866f4fcdb69beffcdab9caa5c70a5d
+  Instant: 4951b6c445fc87741ab3e49e917d971472b42335
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
   OpenSSL-Universal: ebc357f1e6bc71fa463ccb2fe676756aff50e88c
-  PSPDFKit: 39123c1bff6051a2a11d6b50cfe7ffab221fcfe0
+  PSPDFKit: b2d8a35e8e2662c4a5c93f7c8463107dccfd7f6b
   RCT-Folly: 424b8c9a7a0b9ab2886ffe9c3b041ef628fd4fb1
   RCTRequired: 8af6a32dfc2b65ec82193c2dee6e1011ff22ac2a
   RCTTypeSafety: bee9dd161c175896c680d47ef1d9eaacf2b587f4
@@ -653,7 +655,7 @@ SPEC CHECKSUMS:
   React-jsiexecutor: 747911ab5921641b4ed7e4900065896597142125
   React-jsinspector: c712f9e3bb9ba4122d6b82b4f906448b8a281580
   React-logger: 342f358b8decfbf8f272367f4eacf4b6154061be
-  react-native-pspdfkit: f570df72d0c75e5e86692d7629bb4b2b8a772ca0
+  react-native-pspdfkit: 62b32a4e09f1bff1ad80b5adadb67ad55e6585f3
   react-native-safe-area: e8230b0017d76c00de6b01e2412dcf86b127c6a3
   react-native-safe-area-context: b8979f5eda6ed5903d4dbc885be3846ea3daa753
   React-perflogger: d21f182895de9d1b077f8a3cd00011095c8c9100
@@ -677,6 +679,6 @@ SPEC CHECKSUMS:
   Yoga: 065f0b74dba4832d6e328238de46eb72c5de9556
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
-PODFILE CHECKSUM: 57cc8aa1bb2db451841ec3a8f65ba97ae0321156
+PODFILE CHECKSUM: 699a0bd86ccd09b1ff2b6bbb2c0feb65df1032ab
 
-COCOAPODS: 1.11.3
+COCOAPODS: 1.12.1

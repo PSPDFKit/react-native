@@ -25,6 +25,8 @@ import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.UIManagerModule;
 import com.facebook.react.uimanager.ViewGroupManager;
 import com.facebook.react.uimanager.annotations.ReactProp;
+import com.pspdfkit.annotations.AnnotationType;
+import com.pspdfkit.annotations.configuration.AnnotationConfiguration;
 import com.pspdfkit.annotations.Annotation;
 import com.pspdfkit.preferences.PSPDFKitPreferences;
 import com.pspdfkit.react.events.PdfViewDataReturnedEvent;
@@ -34,6 +36,7 @@ import com.pspdfkit.configuration.activity.PdfActivityConfiguration;
 import org.json.JSONObject;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 import javax.annotation.Nullable;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
@@ -126,6 +129,14 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
         view.setConfiguration(configurationAdapter.build());
     }
 
+     @ReactProp(name = "annotationPresets")
+    public void setAnnotationPresets(PdfView view, @NonNull ReadableMap annotationPresets) {
+        Map<AnnotationType, AnnotationConfiguration> annotationsConfiguration = AnnotationConfigurationAdaptor.convertAnnotationConfigurations(
+                view.getContext(), annotationPresets
+        );
+        view.setAnnotationConfiguration(annotationsConfiguration);
+    }
+
     @ReactProp(name = "document")
     public void setDocument(PdfView view, @NonNull String document) {
         view.setDocument(document);
@@ -180,7 +191,7 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
     @ReactProp(name = "toolbarMenuItems")
     public void setToolbarMenuItems(@NonNull final PdfView view, @Nullable final ReadableArray toolbarItems) {
         if (toolbarItems != null) {
-            PdfActivityConfiguration.Builder currentConfiguration = new PdfActivityConfiguration.Builder(view.getConfiguration());
+            PdfActivityConfiguration currentConfiguration = view.getConfiguration();
             ToolbarMenuItemsAdapter newConfigurations = new ToolbarMenuItemsAdapter(currentConfiguration, toolbarItems);
             view.setConfiguration(newConfigurations.build());
         }

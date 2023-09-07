@@ -16,7 +16,7 @@ package com.pspdfkit.react.helper;
 
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableMapKeySetIterator;
-import com.pspdfkit.annotations.measurements.FloatPrecision;
+import com.pspdfkit.annotations.measurements.MeasurementPrecision;
 import com.pspdfkit.annotations.measurements.Scale;
 import com.pspdfkit.document.PdfDocument;
 
@@ -24,23 +24,23 @@ import javax.annotation.Nullable;
 
 public class MeasurementHelper {
 
-    public static FloatPrecision getPrecision(@Nullable String precisionString) {
+    public static MeasurementPrecision getPrecision(@Nullable String precisionString) {
         if (precisionString == null) {
-            return FloatPrecision.TWO_DP;
+            return MeasurementPrecision.TWO_DP;
         }
 
         switch (precisionString.toLowerCase()) {
             case "whole":
-                return FloatPrecision.WHOLE;
+                return MeasurementPrecision.WHOLE;
             case "onedp":
-                return FloatPrecision.ONE_DP;
+                return MeasurementPrecision.ONE_DP;
             case "threedp":
-                return FloatPrecision.THREE_DP;
+                return MeasurementPrecision.THREE_DP;
             case "fourdp":
-                return FloatPrecision.FOUR_DP;
+                return MeasurementPrecision.FOUR_DP;
 
             default:
-                return FloatPrecision.TWO_DP;
+                return MeasurementPrecision.TWO_DP;
         }
     }
 

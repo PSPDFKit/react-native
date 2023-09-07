@@ -36,10 +36,11 @@ NSString *const annotationEllipticalAreaMeasurement = @"area_circle";
 NSString *const annotationSquareAreaMeasurement = @"area_square";
 NSString *const annotationInkPen = @"pen";
 NSString *const annotationInkMagic = @"magic_ink";
-NSString *const annotationInkHighlighter = @"highligter";
+NSString *const annotationInkHighlighter = @"highlighter";
 NSString *const annotationLineArrow = @"arrow";
 NSString *const annotationFreeTextCallout = @"freetext_callout";
 NSString *const annotationPolygonCloud = @"cloudy_polygon";
+NSString *const annotationTextHighlighter = @"highlight";
 
 + (PSPDFAnnotationToolbarConfiguration *)PSPDFAnnotationToolbarConfiguration:(id)json {
   NSArray *itemsToParse = [RCTConvert NSArray:json];
@@ -100,7 +101,8 @@ NSString *const annotationPolygonCloud = @"cloudy_polygon";
       annotationInkHighlighter: PSPDFAnnotationStringInk,
       annotationLineArrow: PSPDFAnnotationStringLine,
       annotationFreeTextCallout: PSPDFAnnotationStringFreeText,
-      annotationPolygonCloud: PSPDFAnnotationStringPolygon
+      annotationPolygonCloud: PSPDFAnnotationStringPolygon,
+      annotationTextHighlighter: PSPDFAnnotationStringHighlight
     };
 
   return nameToAnnotationStringMapping[name];

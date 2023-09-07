@@ -11,6 +11,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import React, { Component } from 'react';
 
+import { AnnotationPresetCustomization } from './examples/AnnotationPresetCustomization';
 import { AnnotationProcessing } from './examples/AnnotationProcessing';
 import { CustomFontPicker } from './examples/CustomFontPicker';
 import { EventListeners } from './examples/EventListeners';
@@ -98,6 +99,11 @@ class Catalog extends Component {
           <Stack.Screen
             name="Measurement"
             component={Measurement}
+            initial={true}
+          />
+          <Stack.Screen
+            name="AnnotationPresetCustomization"
+            component={AnnotationPresetCustomization}
             initial={true}
           />
         </Stack.Navigator>

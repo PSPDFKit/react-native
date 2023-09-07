@@ -22,7 +22,7 @@ struct RNConfigurationHelper {
         configBuilder.pageSize = parseSize()
 
         configBuilder.pageRotation = parseRotation()
-        let pageTemplate =  PageTemplate(pageType: .tiledPatternPage, identifier: parsePageTemplate())
+        let pageTemplate = PageTemplate(pageType: .tiledPatternPage, identifier: parsePageTemplate())
 
         return PDFNewPageConfiguration(pageTemplate: pageTemplate, builderBlock: { builder in
             builder.pageSize = self.parseSize()
@@ -36,7 +36,6 @@ struct RNConfigurationHelper {
         guard
             let imageUri = configuration["imageUri"] as? String,
             let imagePath = URL(string: imageUri),
-//            let imagePath = configuration["imageUri"] as? String,
             let image = UIImage(contentsOfFile: imagePath.path) else {
             return nil
         }
@@ -46,6 +45,30 @@ struct RNConfigurationHelper {
         return PDFNewPageConfiguration(pageTemplate: pageTemplate) { builder in
             builder.item = ProcessorItem(image: image, jpegCompressionQuality: 0.7, builderBlock: nil)
             builder.pageSize = self.parseSize()
+            builder.pageRotation = self.parseRotation()
+            builder.pageMargins = self.parseMargins()
+            builder.backgroundColor = self.parseBackgroundColor()
+        }
+    }
+    
+    public func newPageFromDocument(_ configuration: [String: Any]) -> PDFNewPageConfiguration? {
+        guard let documentUri = configuration["documentPath"] as? String,
+        let pageIndex = configuration["pageIndex"] as? UInt else {
+            return nil
+        }
+        
+        let documentPath = URL(fileURLWithPath: documentUri)
+        let document = Document(url: documentPath, loadCheckpointIfAvailable: false)
+        let validRange = 0...document.pageCount-1
+        if !(validRange ~= pageIndex) {
+            return nil
+        }
+        let pageTemplate = PageTemplate(document: document, sourcePageIndex: pageIndex)
+        return PDFNewPageConfiguration(pageTemplate: pageTemplate) { builder in
+            builder.pageSize = self.parseSize()
+            builder.pageRotation = self.parseRotation()
+            builder.pageMargins = self.parseMargins()
+            builder.backgroundColor = self.parseBackgroundColor()
         }
     }
 

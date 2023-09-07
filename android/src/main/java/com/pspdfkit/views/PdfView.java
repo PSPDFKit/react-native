@@ -36,6 +36,7 @@ import com.facebook.react.uimanager.events.EventDispatcher;
 import com.pspdfkit.PSPDFKit;
 import com.pspdfkit.annotations.Annotation;
 import com.pspdfkit.annotations.AnnotationType;
+import com.pspdfkit.annotations.configuration.AnnotationConfiguration;
 import com.pspdfkit.annotations.configuration.FreeTextAnnotationConfiguration;
 import com.pspdfkit.configuration.activity.PdfActivityConfiguration;
 import com.pspdfkit.document.PdfDocument;
@@ -153,6 +154,9 @@ public class PdfView extends FrameLayout {
     @Nullable
     private String selectedFontName;
 
+    @Nullable
+    private Map<AnnotationType, AnnotationConfiguration> annotationsConfigurations;
+
     public PdfView(@NonNull Context context) {
         super(context);
         init();
@@ -219,6 +223,11 @@ public class PdfView extends FrameLayout {
 
     public PdfActivityConfiguration getConfiguration() {
         return configuration;
+    }
+
+    public void setAnnotationConfiguration(final  Map<AnnotationType,AnnotationConfiguration> annotationsConfigurations) {
+        this.annotationsConfigurations = annotationsConfigurations;
+        setupFragment();
     }
 
     public void setDocument(@Nullable String documentPath) {
@@ -475,6 +484,16 @@ public class PdfView extends FrameLayout {
         pdfFragment.addDocumentListener(pdfViewDocumentListener);
         pdfFragment.addOnAnnotationSelectedListener(pdfViewDocumentListener);
         pdfFragment.addOnAnnotationUpdatedListener(pdfViewDocumentListener);
+
+        // Add annotation configurations.
+        if (annotationsConfigurations != null) {
+            for (AnnotationType annotationType : annotationsConfigurations.keySet()) {
+                AnnotationConfiguration annotationConfiguration = annotationsConfigurations.get(annotationType);
+                if (annotationConfiguration != null) {
+                    pdfFragment.getAnnotationConfiguration().put(annotationType, annotationConfiguration);
+                }
+            }
+        }
     }
 
     public void removeFragment(boolean makeInactive) {

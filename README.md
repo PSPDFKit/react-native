@@ -93,7 +93,7 @@ Let's create a simple app that integrates PSPDFKit and uses the `react-native-ps
    yarn install
    ```
 
-1. Open your project’s Podfile in a text editor to update the platform to iOS 14, and add the PSPDFKit Podspec:
+1. Open your project’s Podfile in a text editor to update the platform to iOS 15, and add the PSPDFKit Podspec:
 
    ```bash
    open ios/Podfile
@@ -106,7 +106,7 @@ Let's create a simple app that integrates PSPDFKit and uses the `react-native-ps
    require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
 
    - platform :ios, '10.0'
-   + platform :ios, '14.0'
+   + platform :ios, '15.0'
 
    target 'PSPDFKitDemo' do
      config = use_native_modules!
@@ -153,7 +153,7 @@ Let's create a simple app that integrates PSPDFKit and uses the `react-native-ps
    open PSPDFKitDemo.xcworkspace
    ```
 
-1. Make sure the deployment target is set to 14.0 or higher:
+1. Make sure the deployment target is set to 15.0 or higher:
 
    ![deployment-target](./screenshots/deployment-target.png)
 

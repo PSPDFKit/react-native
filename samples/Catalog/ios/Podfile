@@ -3,7 +3,7 @@
 require_relative "../node_modules/react-native/scripts/react_native_pods"
 require_relative "../node_modules/@react-native-community/cli-platform-ios/native_modules"
 
-platform :ios, "14.0"
+platform :ios, "15.0"
 prepare_react_native_project!
 
 # If you are using a `react-native-flipper` your iOS build will fail when `NO_FLIPPER=1` is set.
@@ -45,8 +45,9 @@ target "Catalog" do
     app_path: "#{Pod::Config.instance.installation_root}/.."
   )
 
-  pod "PSPDFKit", "~> 12.3"
-  pod "Instant", "~> 12.3"
+  pod "PSPDFKit", "~> 12.3.1"
+  pod "Instant", "~> 12.3.1"
+
   target "CatalogTests" do
     inherit! :complete
     # Pods for testing
@@ -58,18 +59,18 @@ target "Catalog" do
         target.build_configurations.each do |target_config|
           target_config.build_settings["LIBRARY_SEARCH_PATHS"] = ["$(SDKROOT)/usr/lib/swift", "$(inherited)"]
           target_config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
-          target_config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = "14.0"
+          target_config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = "15.0"
         end
       end
       aggregate_target.user_project.save
     end
     installer.pods_project.build_configurations.each do |excl_config|
       excl_config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
-      excl_config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = "14.0"
+      excl_config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = "15.0"
     end
     installer.pods_project.targets.each do |target|
       target.build_configurations.each do |target_config|
-        target_config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = "14.0"
+        target_config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = "15.0"
       end
     end
     react_native_post_install(

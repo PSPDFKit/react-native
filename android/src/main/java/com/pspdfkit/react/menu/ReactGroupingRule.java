@@ -61,7 +61,11 @@ public class ReactGroupingRule extends PresetMenuItemGroupingRule {
                 }
                 items.add(new MenuItem(id));
             }
+
         }
+        //Add undo and redo to the end of the list
+        items.add(new MenuItem(R.id.pspdf__annotation_creation_toolbar_item_undo));
+        items.add(new MenuItem(R.id.pspdf__annotation_creation_toolbar_item_redo));
     }
 
     private int[] collectItemIds(ReadableArray items) {
@@ -78,6 +82,7 @@ public class ReactGroupingRule extends PresetMenuItemGroupingRule {
         for (int i = 0; i < itemIds.size(); i++) {
             ids[i] = itemIds.get(i);
         }
+
         return ids;
     }
 
@@ -128,12 +133,10 @@ public class ReactGroupingRule extends PresetMenuItemGroupingRule {
                 return R.id.pspdf__annotation_creation_toolbar_item_polygon;
             case "polyline":
                 return R.id.pspdf__annotation_creation_toolbar_item_polyline;
-            case "erase":
+            case "eraser":
                 return R.id.pspdf__annotation_creation_toolbar_item_eraser;
             case "redaction":
                 return R.id.pspdf__annotation_creation_toolbar_item_redaction;
-            case "picker":
-                return R.id.pspdf__annotation_creation_toolbar_item_picker;
             case "magic_ink":
                 return R.id.pspdf__annotation_creation_toolbar_item_magic_ink;
             case "undo_redo":

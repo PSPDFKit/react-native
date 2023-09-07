@@ -3,7 +3,7 @@
 require_relative "../node_modules/react-native/scripts/react_native_pods"
 require_relative "../node_modules/@react-native-community/cli-platform-ios/native_modules"
 
-platform :ios, "14.0"
+platform :ios, "15.0"
 
 target "NativeCatalog" do
   config = use_native_modules!
@@ -19,8 +19,8 @@ target "NativeCatalog" do
     # Pods for testing
   end
 
-  pod "PSPDFKit", "~> 12.3"
-  pod "Instant", "~> 12.3"
+  pod "PSPDFKit", "~> 12.3.1"
+  pod "Instant", "~> 12.3.1"
 
   # Enables Flipper.
   #
@@ -36,14 +36,14 @@ target "NativeCatalog" do
         target.build_configurations.each do |target_config|
           target_config.build_settings["LIBRARY_SEARCH_PATHS"] = ["$(SDKROOT)/usr/lib/swift", "$(inherited)"]
           target_config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
-          target_config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = "14.0"
+          target_config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = "15.0"
         end
       end
       aggregate_target.user_project.save
     end
     installer.pods_project.build_configurations.each do |excl_config|
       excl_config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
-      excl_config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = "14.0"
+      excl_config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = "15.0"
     end
     react_native_post_install(installer)
   end

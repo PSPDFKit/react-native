@@ -6608,7 +6608,7 @@ react-native-gradle-plugin@^0.71.18:
   integrity sha512-7F6bD7B8Xsn3JllxcwHhFcsl9aHIig47+3eN4IHFNqfLhZr++3ElDrcqfMzugM+niWbaMi7bJ0kAkAL8eCpdWg==
 
 "react-native-pspdfkit@file:../..":
-  version "2.6.1"
+  version "2.7.0"
 
 react-native-safe-area-context@^4.5.3:
   version "4.5.3"

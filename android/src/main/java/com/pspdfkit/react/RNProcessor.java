@@ -237,6 +237,45 @@ public class RNProcessor extends ReactContextBaseJavaModule {
         }
     }
 
+    @ReactMethod
+    public void generatePDFFromDocuments(@NonNull ReadableMap configuration, Promise callback) {
+        try {
+            File outputFile = RNFileHelper.getFilePath(getContext(), configuration, callback);
+            Context context = Objects.requireNonNull(getCurrentActivity()).getApplication().getApplicationContext();
+
+            WritableMap result = Arguments.createMap();
+            assert outputFile != null;
+
+            result.putString("fileURL", outputFile.toURI().toString());
+            RNFileHelper.deleteExistingFileIfNeeded(outputFile, configuration, callback);
+
+            final PdfProcessorTask pdfProcessorTask = PdfProcessorTask.empty();
+
+            @Nullable ReadableArray documents = configuration.getArray("documents");
+
+            if (documents == null) {
+                callback.reject("ERROR_MISSING_DOCUMENTS", "Please provide array of document objects.");
+                return;
+            }
+
+            for (int i = 0; i < documents.size(); i++) {
+                RNConfigurationHelper configHelper = new RNConfigurationHelper(configuration, context);
+                NewPage newPage = configHelper.parseConfiguration("document", documents.getMap(i));
+                if (newPage != null) {
+                    pdfProcessorTask.addNewPage(newPage, i);
+                }
+            }
+
+            PdfProcessor.processDocumentAsync(pdfProcessorTask, outputFile)
+                    .doOnError(callback::reject)
+                    .doFinally(() -> callback.resolve(result))
+                    .subscribe();
+
+        } catch (Exception e) {
+            callback.reject(e);
+        }
+    }
+
     private Context getContext() {
         return Objects.requireNonNull(getCurrentActivity()).getApplication().getApplicationContext();
     }

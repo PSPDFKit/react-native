@@ -54,4 +54,4 @@ This example shows you how to change the default settings of the ink annotation 
 
 #### Instant Example (iOS only)
 
-In this example, we bridged the native iOS Instant example from [PSPDFKit Catalog](https://pspdfkit.com/guides/ios/current/getting-started/example-projects/#pspdfcatalog) over to React Natice.
+In this example, we bridged the native iOS Instant example from [PSPDFKit Catalog](https://pspdfkit.com/guides/ios/current/getting-started/example-projects/#pspdfcatalog) over to React Native.

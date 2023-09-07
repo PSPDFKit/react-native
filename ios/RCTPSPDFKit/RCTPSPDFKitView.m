@@ -21,6 +21,7 @@
 @interface RCTPSPDFKitView ()<PSPDFDocumentDelegate, PSPDFViewControllerDelegate, PSPDFFlexibleToolbarContainerDelegate>
 
 @property (nonatomic, nullable) UIViewController *topController;
+@property (nonatomic, strong) NSDictionary *closeButtonAttributes;
 
 @end
 
@@ -31,7 +32,14 @@
     _pdfController = [[RCTPSPDFKitViewController alloc] init];
     _pdfController.delegate = self;
     _pdfController.annotationToolbarController.delegate = self;
-    _closeButton = [[UIBarButtonItem alloc] initWithImage:[PSPDFKitGlobal imageNamed:@"x"] style:UIBarButtonItemStylePlain target:self action:@selector(closeButtonPressed:)];
+    
+    // Store the closeButton's target and selector in order to call it later.
+    _closeButtonAttributes = @{@"target" : _pdfController.closeButtonItem.target,
+                              @"action" : NSStringFromSelector(_pdfController.closeButtonItem.action)};
+      
+    [_pdfController.closeButtonItem setTarget:self];
+    [_pdfController.closeButtonItem setAction:@selector(closeButtonPressed:)];
+    _closeButton = _pdfController.closeButtonItem;
     
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(annotationChangedNotification:) name:PSPDFAnnotationChangedNotification object:nil];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(annotationChangedNotification:) name:PSPDFAnnotationsAddedNotification object:nil];
@@ -96,19 +104,16 @@
     self.onCloseButtonPressed(@{});
     
   } else {
-    // try to be smart and pop if we are not displayed modally.
-    BOOL shouldDismiss = YES;
-    if (self.pdfController.navigationController) {
-      UIViewController *topViewController = self.pdfController.navigationController.topViewController;
-      UIViewController *parentViewController = self.pdfController.parentViewController;
-      if ((topViewController == self.pdfController || topViewController == parentViewController) && self.pdfController.navigationController.viewControllers.count > 1) {
-        [self.pdfController.navigationController popViewControllerAnimated:YES];
-        shouldDismiss = NO;
+      // Invoke the closeButtonItem's default behaviour
+      id target = _closeButtonAttributes[@"target"];
+      NSString *action = _closeButtonAttributes[@"action"];
+      
+      if (target != nil && action != nil) {
+          SEL selector = NSSelectorFromString(action);
+          IMP imp = [target methodForSelector:selector];
+          void (*func)(id, SEL) = (void *)imp;
+          func(target, selector);
       }
-    }
-    if (shouldDismiss) {
-      [self.pdfController dismissViewControllerAnimated:YES completion:NULL];
-    }
   }
 }
 

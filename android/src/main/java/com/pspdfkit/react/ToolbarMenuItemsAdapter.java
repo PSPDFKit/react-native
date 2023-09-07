@@ -40,47 +40,70 @@ public class ToolbarMenuItemsAdapter {
     private final PdfActivityConfiguration.Builder newConfigurations;
 
     /**
-     * @param currentConfiguration The current configurations.
+     * @param currentConfiguration The current configuration.
      * @param toolbarItems         The toolbar items to be customized.
      */
-    public ToolbarMenuItemsAdapter(@NonNull final PdfActivityConfiguration.Builder currentConfiguration, @NonNull final ReadableArray toolbarItems) {
-        PdfActivityConfiguration.Builder configuration = disableDefaultToolbarItems(currentConfiguration);
+    public ToolbarMenuItemsAdapter(@NonNull final PdfActivityConfiguration currentConfiguration, @NonNull final ReadableArray toolbarItems) {
+        PdfActivityConfiguration.Builder configurationBuilder = new PdfActivityConfiguration.Builder(currentConfiguration);
+        PdfActivityConfiguration.Builder configuration = disableDefaultToolbarItems(configurationBuilder);
 
         for (int i = 0; i < toolbarItems.size(); i++) {
             String toolbarItem = toolbarItems.getString(i);
             switch (toolbarItem) {
                 case TOOLBAR_ITEM_SEARCH:
-                    configuration.enableSearch();
+                    if (currentConfiguration.isSearchEnabled()) {
+                        configuration.enableSearch();
+                    }
                     break;
                 case TOOLBAR_ITEM_READER_VIEW:
-                    configuration.enableReaderView(true);
+                    if (currentConfiguration.isReaderViewEnabled()) {
+                        configuration.enableReaderView(true);
+                    }
                     break;
                 case TOOLBAR_ITEM_ANNOTATIONS:
-                    configuration.enableAnnotationEditing();
+                    if (currentConfiguration.getConfiguration().isAnnotationEditingEnabled()) {
+                        configuration.enableAnnotationEditing();
+                    }
                     break;
                 case TOOLBAR_ITEM_THUMBNAILS:
-                    configuration.showThumbnailGrid();
+                    if (currentConfiguration.isThumbnailGridEnabled()) {
+                        configuration.showThumbnailGrid();
+                    }
                     break;
                 case TOOLBAR_ITEM_SHARE:
-                    configuration.setEnabledShareFeatures(ShareFeatures.all());
+                    if (!currentConfiguration.getConfiguration().getEnabledShareFeatures().isEmpty()) {
+                        configuration.setEnabledShareFeatures(ShareFeatures.all());
+                    }
                     break;
                 case TOOLBAR_ITEM_SETTINGS:
-                    configuration.showSettingsMenu();
+                    if (currentConfiguration.isSettingsItemEnabled()) {
+                        configuration.showSettingsMenu();
+                    }
                     break;
                 case TOOLBAR_ITEM_OUTLINE:
-                    configuration.enableOutline();
+                    if (currentConfiguration.isOutlineEnabled()) {
+                        configuration.enableOutline();
+                    }
                     break;
                 case TOOLBAR_ITEM_BOOKMARKS:
-                    configuration.enableBookmarkList();
+                    if (currentConfiguration.isBookmarkListEnabled()) {
+                        configuration.enableBookmarkList();
+                    }
                     break;
                 case TOOLBAR_ITEM_PRINT:
-                    configuration.enablePrinting();
+                    if (currentConfiguration.isPrintingEnabled()) {
+                        configuration.enablePrinting();
+                    }
                     break;
                 case TOOLBAR_ITEM_ANNOTATION_LIST:
-                    configuration.enableAnnotationList();
+                    if (currentConfiguration.isAnnotationListEnabled()) {
+                        configuration.enableAnnotationList();
+                    }
                     break;
                 case TOOLBAR_ITEM_DOCUMENT_INFO_VIEW:
-                    configuration.enableDocumentInfoView();
+                    if (currentConfiguration.isDocumentInfoViewEnabled()) {
+                        configuration.enableDocumentInfoView();
+                    }
                     break;
             }
         }

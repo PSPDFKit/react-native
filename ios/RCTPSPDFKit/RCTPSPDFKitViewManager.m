@@ -81,6 +81,13 @@ RCT_CUSTOM_VIEW_PROPERTY(configuration, PSPDFConfiguration, RCTPSPDFKitView) {
     }
 }
 
+RCT_CUSTOM_VIEW_PROPERTY(annotationPresets, Dictionary , RCTPSPDFKitView) {
+   // Call AnnotationConfigurationConvertor with the configuration dictionary
+   if (json) {
+       [AnnotationsConfigurationsConvertor convertAnnotationConfigurationsWithAnnotationPreset:json];
+   }
+}
+
 // These options are configuration options in Android, but not on iOS, so we apply them
 // after we update the actual configuration.
 - (void)postProcessConfigurationOptionsWithJSON:(id)json forPDFViewController:(PSPDFViewController *)controller {
@@ -149,7 +156,14 @@ RCT_REMAP_VIEW_PROPERTY(color, tintColor, UIColor)
 
 RCT_CUSTOM_VIEW_PROPERTY(showCloseButton, BOOL, RCTPSPDFKitView) {
   if (json && [RCTConvert BOOL:json]) {
-    view.pdfController.navigationItem.leftBarButtonItems = @[view.closeButton];
+      NSMutableArray *leftBarButtons = [[NSMutableArray alloc] initWithArray:view.pdfController.navigationItem.leftBarButtonItems];
+      if (leftBarButtons == nil) {
+          leftBarButtons = [NSMutableArray new];
+      }
+      if (![leftBarButtons containsObject:view.closeButton]) {
+          [leftBarButtons addObject:view.closeButton];
+      }
+      view.pdfController.navigationItem.leftBarButtonItems = leftBarButtons;
   }
 }
 

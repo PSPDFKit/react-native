@@ -24,14 +24,17 @@ import androidx.annotation.ColorInt;
 import androidx.annotation.Nullable;
 
 import com.facebook.react.bridge.ReadableMap;
+import com.pspdfkit.document.PdfDocument;
+import com.pspdfkit.document.PdfDocumentLoader;
 import com.pspdfkit.document.processor.NewPage;
 import com.pspdfkit.document.processor.PageImage;
 import com.pspdfkit.document.processor.PagePattern;
 import com.pspdfkit.document.processor.PagePosition;
 import com.pspdfkit.utils.Size;
 
+import java.io.IOException;
 import java.util.Arrays;
-
+import java.util.List;
 
 public class RNConfigurationHelper {
     public ReadableMap configuration = null;
@@ -50,18 +53,37 @@ public class RNConfigurationHelper {
         NewPage.Builder pageBuilder;
         this.configuration = configuration;
 
-        if (type.equals("template")) {
-            pageBuilder = newPageFromTemplate(configuration);
-        } else if (type.equals("image")) {
-            pageBuilder = newPageFromImage(configuration);
-        } else {
-            return null;
+        switch (type) {
+            case "template":
+                pageBuilder = newPageFromTemplate(configuration);
+                break;
+            case "image":
+                pageBuilder = newPageFromImage(configuration);
+                break;
+            case "document":
+                pageBuilder = newPageFromDocument(configuration);
+                break;
+            default:
+                return null;
         }
 
         pageBuilder.rotation(parseRotation());
         pageBuilder.withMargins(parseMargins());
         pageBuilder.backgroundColor(parseBackgroundColor());
         return pageBuilder.build();
+    }
+
+    private NewPage.Builder newPageFromDocument(ReadableMap configuration) {
+        String documentPath = configuration.getString("documentPath");
+        int pageIndex = configuration.getInt("pageIndex");
+
+        try {
+            PdfDocument sourceDocument = PdfDocumentLoader.openDocument(context, Uri.parse(documentPath));
+            assert (pageIndex >= 0 && pageIndex <= sourceDocument.getPageCount()-1);
+            return NewPage.fromPage(sourceDocument, pageIndex);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public NewPage parseConfiguration() {
@@ -129,7 +151,7 @@ public class RNConfigurationHelper {
             return new Size((float) width, (float) height);
         }
 
-        if(!configuration.hasKey("width") && !configuration.hasKey("height")) {
+        if (!configuration.hasKey("width") && !configuration.hasKey("height")) {
             return new Size((float) defaultSize.width, (float) defaultSize.height);
         }
 
@@ -182,9 +204,9 @@ public class RNConfigurationHelper {
             return 0;
         }
         int rawRotation = configuration.getInt("rotation");
-        int[] availableRotations = {0, 90, 180, 270};
+        List<Integer> availableRotations = Arrays.asList(0, 90, 180, 270);
 
-        if (rawRotation > 0 && Arrays.asList(availableRotations).contains(rawRotation)) {
+        if (rawRotation > 0 && availableRotations.contains(rawRotation)) {
             return rawRotation;
         }
 

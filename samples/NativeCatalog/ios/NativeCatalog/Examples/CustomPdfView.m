@@ -201,7 +201,11 @@
   InstantExampleViewController *instantExampleViewController = [[InstantExampleViewController alloc] init];
   self.topController = [[PSPDFNavigationController alloc] initWithRootViewController:instantExampleViewController];
   self.topController.modalPresentationStyle = UIModalPresentationFullScreen;
-  instantExampleViewController.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[PSPDFKitGlobal imageNamed:@"x"] style:UIBarButtonItemStylePlain target:self action:@selector(closeInstantExampleButtonPressed:)];
+  instantExampleViewController.navigationItem.leftBarButtonItem =
+  [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemClose
+                                                target:self
+                                                action:@selector(closeInstantExampleButtonPressed:)];
+  
   [presentingViewController presentViewController:self.topController animated:YES completion:NULL];
   return YES;
 }

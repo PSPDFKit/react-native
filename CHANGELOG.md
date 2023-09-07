@@ -1,12 +1,25 @@
 ## Newest Release
 
+### 2.7.0 - 07 Sep 2023
+
+- Adds Annotation Preset customization. (#41528)
+- Updates for PSPDFKit 8.8.1 for Android. (#41910)
+- Updates for PSPDFKit 12.3.1 for iOS. (#41910)
+- Updates the deployment target to iOS 15. (#39956)
+- Fixed issue where configuration is overridden by ToolbarMenuItems. (#41681)
+- Fixed issue where PDF generation returns "can not get property of null" on iOS. (#41247)
+- Fixed annotation toolbar menu grouping customization values. (#41197)
+- Fixed issue where the close button is not displayed on iOS. (#41710)
+- Fixed issue where showCloseButton config removes all other BarButtonItems on iOS. (#41731)
+- Fixed issue where presentInstant uses different parameters on iOS and Android. (#41922)
+
+## Previous Releases
+
 ### 2.6.1 - 19 Jun 2023
 
 - Updates for PSPDFKit 8.7.3 for Android. (#40880)
 - Updates for PSPDFKit 12.3 for iOS. (##40880)
 - Fixes issue when showThumbnailBar is set to pinned (#40807)
-
-## Previous Releases
 
 ### 2.6.0 - 05 Jun 2023
 
