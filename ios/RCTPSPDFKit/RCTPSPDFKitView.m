@@ -19,15 +19,24 @@
 
 @property (nonatomic, strong) UIScrollView *scrollView;
 @property (nonatomic, strong) UIScrollView *zoomView;
+@property (readonly, assign) BOOL documentInteractionEnabled;
 
 @end
 
 @implementation OverrideScrolling
 
+- (id)init {
+    if (self = [super init])  {
+        _documentInteractionEnabled = YES;
+    }
+    return self;
+}
+
 - (BOOL)enableInteraction:(BOOL)enable {
     if (_scrollView != nil && _zoomView != nil) {
         _scrollView.panGestureRecognizer.enabled = enable;
         _zoomView.panGestureRecognizer.enabled = enable;
+        _documentInteractionEnabled = enable;
         return YES;
     }
     return NO;
@@ -64,6 +73,14 @@
     _pdfController.annotationToolbarController.delegate = self;
       
     _overrideScrolling = [OverrideScrolling new];
+      
+      NSMutableArray *buttonItems = [NSMutableArray arrayWithArray:_pdfController.navigationItem.rightBarButtonItems];
+      // ** If using a custom image **
+      // UIBarButtonItem *newItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"myImage.png"] style:UIBarButtonItemStylePlain target:self action:@selector(buttonPressed)];
+      // ** If using a custom image **
+      UIBarButtonItem *newItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCompose target:self action:@selector(customButtonPressed)];
+      [buttonItems addObject:newItem];
+      [_pdfController.navigationItem setRightBarButtonItems:buttonItems forViewMode:PSPDFViewModeDocument animated:NO];
     
     // Store the closeButton's target and selector in order to call it later.
     _closeButtonAttributes = @{@"target" : _pdfController.closeButtonItem.target,
@@ -188,6 +205,10 @@
 
 - (BOOL)disableDocumentInteraction {
     return [self enableDocumentInteraction:NO];
+}
+
+- (void)customButtonPressed {
+    [self enableDocumentInteraction:![_overrideScrolling documentInteractionEnabled]];
 }
 
 // MARK: - PSPDFDocumentDelegate
