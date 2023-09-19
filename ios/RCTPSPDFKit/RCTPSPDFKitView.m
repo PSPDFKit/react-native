@@ -15,6 +15,35 @@
 
 #define VALIDATE_DOCUMENT(document, ...) { if (!document.isValid) { NSLog(@"Document is invalid."); if (self.onDocumentLoadFailed) { self.onDocumentLoadFailed(@{@"error": @"Document is invalid."}); } return __VA_ARGS__; }}
 
+@interface OverrideScrolling: NSObject <PSPDFDocumentViewControllerDelegate>
+
+@property (nonatomic, strong) UIScrollView *scrollView;
+@property (nonatomic, strong) UIScrollView *zoomView;
+
+@end
+
+@implementation OverrideScrolling
+
+- (BOOL)enableInteraction:(BOOL)enable {
+    if (_scrollView != nil && _zoomView != nil) {
+        _scrollView.panGestureRecognizer.enabled = enable;
+        _zoomView.panGestureRecognizer.enabled = enable;
+        return YES;
+    }
+    return NO;
+}
+
+- (void)documentViewController:(PSPDFDocumentViewController *)documentViewController configureScrollView:(UIScrollView *)scrollView {
+    _scrollView = scrollView;
+}
+
+- (void)documentViewController:(PSPDFDocumentViewController *)documentViewController configureZoomView:(UIScrollView *)zoomView forSpreadAtIndex:(NSInteger)spreadIndex {
+    _zoomView = zoomView;
+}
+
+@end
+
+
 @interface RCTPSPDFKitViewController : PSPDFViewController
 @end
 
@@ -22,6 +51,7 @@
 
 @property (nonatomic, nullable) UIViewController *topController;
 @property (nonatomic, strong) NSDictionary *closeButtonAttributes;
+@property (nonatomic, strong) OverrideScrolling *overrideScrolling;
 
 @end
 
@@ -32,6 +62,8 @@
     _pdfController = [[RCTPSPDFKitViewController alloc] init];
     _pdfController.delegate = self;
     _pdfController.annotationToolbarController.delegate = self;
+      
+    _overrideScrolling = [OverrideScrolling new];
     
     // Store the closeButton's target and selector in order to call it later.
     _closeButtonAttributes = @{@"target" : _pdfController.closeButtonItem.target,
@@ -141,6 +173,23 @@
   return [self.pdfController.document saveWithOptions:nil error:error];
 }
 
+- (BOOL)enableDocumentInteraction:(BOOL)enable {
+    
+    // Disable all interactions on the document itself
+    _pdfController.interactions.allInteractions.enabled = enable;
+    
+    // Disable ScrollView panGestureRecognizer
+    return [_overrideScrolling enableInteraction:enable];
+}
+
+- (BOOL)enableDocumentInteraction {
+    return [self enableDocumentInteraction:YES];
+}
+
+- (BOOL)disableDocumentInteraction {
+    return [self enableDocumentInteraction:NO];
+}
+
 // MARK: - PSPDFDocumentDelegate
 
 - (void)pdfDocumentDidSave:(nonnull PSPDFDocument *)document {
@@ -180,6 +229,7 @@
 
 - (void)pdfViewController:(PSPDFViewController *)pdfController didChangeDocument:(nullable PSPDFDocument *)document {
   VALIDATE_DOCUMENT(document)
+  _pdfController.documentViewController.delegate = _overrideScrolling;
 }
 
 // MARK: - PSPDFFlexibleToolbarContainerDelegate

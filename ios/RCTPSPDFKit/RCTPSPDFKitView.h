@@ -61,6 +61,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSArray <NSString *> *)getLeftBarButtonItemsForViewMode:(NSString *)viewMode;
 - (NSArray <NSString *> *)getRightBarButtonItemsForViewMode:(NSString *)viewMode;
 
+/// Document interaction
+- (BOOL)enableDocumentInteraction;
+- (BOOL)disableDocumentInteraction;
+
 @end
 
 NS_ASSUME_NONNULL_END

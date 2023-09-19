@@ -143,6 +143,30 @@ class PSPDFKitView extends React.Component {
   };
 
   /**
+   * Enable all interaction with the document
+   */
+  enableDocumentInteraction = function () {
+    console.log('enableDocumentInteraction');
+      if (Platform.OS === 'ios') {
+          return NativeModules.PSPDFKitViewManager.enableDocumentInteraction(
+          findNodeHandle(this.refs.pdfView),
+        );
+      }
+    };
+
+  /**
+   * Disable all interaction with the document
+   */
+  disableDocumentInteraction = function () {
+    console.log('disableDocumentInteraction');
+      if (Platform.OS === 'ios') {
+        return NativeModules.PSPDFKitViewManager.disableDocumentInteraction(
+        findNodeHandle(this.refs.pdfView),
+      );
+    }
+  };
+
+  /**
    * Saves the currently opened document.
    *
    * Returns a promise resolving to true if the document was saved, and false otherwise.
