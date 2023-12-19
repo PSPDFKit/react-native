@@ -14,7 +14,11 @@
 #import "RCTConvert+PSPDFAnnotationToolbarConfiguration.h"
 #import "RCTConvert+PSPDFViewMode.h"
 #import "RCTPSPDFKitView.h"
+#if __has_include("PSPDFKitReactNativeiOS-Swift.h")
 #import "PSPDFKitReactNativeiOS-Swift.h"
+#else
+#import <PSPDFKitReactNativeiOS/PSPDFKitReactNativeiOS-Swift.h>
+#endif
 
 #import <React/RCTUIManager.h>
 

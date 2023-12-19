@@ -1,19 +1,32 @@
 ## Newest Release
 
+### 2.8.0 - 18 Dec 2023
+
+- Adds TypeScript types support to PSPDFKit plugin. (#42380)
+- Adds support for loading image documents using the PSPDFKit component on Android. (#42692)
+- Updates plugin to target React Native 0.72.7. (#42800)
+- Updates Android compileSdkVersion to API 34 and Gradle to 8. (#42380)
+- Updates PSPDFKit for Android version to 8.10.0.
+- Updates PSPDFKit for iOS version to 13.1.0.
+- Fixes issue where building iOS project led to "'PSPDFKitReactNativeiOS-Swift.h' file not found" error. (#41986)
+- Fixes issue where getAnnotations with invalid page index caused a crash on Android. (#42073)
+- Fixes issue where onAnnotationsChanged event did not fire when a form field was updated on Android. (#42525)
+- Fixes issue where annotation toolbar color picker wasn't added by default. (#42761)
+
+## Previous Releases
+
 ### 2.7.0 - 07 Sep 2023
 
 - Adds Annotation Preset customization. (#41528)
 - Updates for PSPDFKit 8.8.1 for Android. (#41910)
 - Updates for PSPDFKit 12.3.1 for iOS. (#41910)
 - Updates the deployment target to iOS 15. (#39956)
-- Fixed issue where configuration is overridden by ToolbarMenuItems. (#41681)
-- Fixed issue where PDF generation returns "can not get property of null" on iOS. (#41247)
-- Fixed annotation toolbar menu grouping customization values. (#41197)
-- Fixed issue where the close button is not displayed on iOS. (#41710)
-- Fixed issue where showCloseButton config removes all other BarButtonItems on iOS. (#41731)
-- Fixed issue where presentInstant uses different parameters on iOS and Android. (#41922)
-
-## Previous Releases
+- Fixes issue where configuration is overridden by ToolbarMenuItems. (#41681)
+- Fixes issue where PDF generation returns "can not get property of null" on iOS. (#41247)
+- Fixes annotation toolbar menu grouping customization values. (#41197)
+- Fixes issue where the close button is not displayed on iOS. (#41710)
+- Fixes issue where showCloseButton config removes all other BarButtonItems on iOS. (#41731)
+- Fixes issue where presentInstant uses different parameters on iOS and Android. (#41922)
 
 ### 2.6.1 - 19 Jun 2023
 

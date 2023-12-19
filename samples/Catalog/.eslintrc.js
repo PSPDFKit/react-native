@@ -1,6 +1,6 @@
 module.exports = {
   root: true,
-  extends: '@react-native-community',
+  extends: '@react-native',
   plugins: ['simple-import-sort'],
   rules: {
     'react/no-string-refs': 'off',

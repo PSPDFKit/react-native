@@ -1,0 +1,25 @@
+pre,
+code {
+  font:
+    12px Menlo,
+    monospace;
+  color: #777;
+  word-break: break-word;
+  margin: 0;
+}
+
+pre {
+  margin: 1em 0;
+  display: table;
+}
+
+pre code {
+  white-space: pre;
+}
+
+p code,
+li code {
+  background-color: #eee;
+  padding: 2px 4px;
+  border-radius: 4px;
+}

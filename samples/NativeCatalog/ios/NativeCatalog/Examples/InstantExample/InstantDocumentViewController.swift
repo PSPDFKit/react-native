@@ -116,14 +116,14 @@ class InstantDocumentViewController: InstantViewController {
     }
 
     @objc private func showCollaborationOptions(_ sender: UIBarButtonItem) {
-        let alertController = UIAlertController(title: documentInfo.url.absoluteString, message: nil, preferredStyle: .actionSheet)
+        let alertController = UIAlertController(title: documentInfo.serverURL.absoluteString, message: nil, preferredStyle: .actionSheet)
         alertController.popoverPresentationController?.barButtonItem = sender
 
         alertController.addAction(UIAlertAction(title: "Open in Safari", style: .default, handler: { [unowned self] _ in
-            UIApplication.shared.open(self.documentInfo.url, options: [:], completionHandler: nil)
+            UIApplication.shared.open(self.documentInfo.serverURL, options: [:], completionHandler: nil)
         }))
         alertController.addAction(UIAlertAction(title: "Share Document Link", style: .default, handler: { [unowned self] _ in
-            let activityViewController = UIActivityViewController(activityItems: [self.documentInfo.url], applicationActivities: nil)
+            let activityViewController = UIActivityViewController(activityItems: [self.documentInfo.serverURL], applicationActivities: nil)
             activityViewController.popoverPresentationController?.barButtonItem = sender
 
             self.present(activityViewController, animated: true)

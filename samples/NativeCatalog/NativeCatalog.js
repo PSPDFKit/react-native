@@ -20,10 +20,11 @@ import { Watermark } from './examples/Watermark';
 import { WatermarkStartup } from './examples/WatermarkStartup';
 import { InstantExample } from './examples/InstantExample';
 import { DefaultAnnotationSettings } from './examples/DefaultAnnotationSettings';
+import { NativeModules } from 'react-native';
 
-// By default, this example doesn't set a license key, but instead runs in trial mode (which is the default, and which requires no
-// specific initialization). If you want to use a different license key for evaluation (e.g. a production license), you can uncomment
-// the next line and set the license key.
+// By default, this example doesn't set a license key, but instead runs in trial mode (which is the default,
+// and requires SDK initialization with a null key)
+// If you want to use a different license key for evaluation (e.g. a production license), you can set the license key using below methods:
 //
 // To set the license key for both platforms, use:
 // PSPDFKit.setLicenseKeys("YOUR_REACT_NATIVE_ANDROID_LICENSE_KEY_GOES_HERE", "YOUR_REACT_NATIVE_IOS_LICENSE_KEY_GOES_HERE");
@@ -40,6 +41,11 @@ class NativeCatalog extends BaseExampleAutoHidingHeaderComponent {
         return element != null && element !== [];
       }),
     };
+  }
+
+  componentDidMount() {
+    const PSPDFKit = NativeModules.PSPDFKit;
+    PSPDFKit.setLicenseKey(null);
   }
 
   render() {

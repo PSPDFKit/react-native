@@ -1,0 +1,59 @@
+.dash-link {
+  float: right;
+  display: block;
+  background: #414141;
+  color: #fff;
+  padding: 2px 6px;
+  line-height: 20px;
+}
+
+.dash-link:hover {
+  color: #fff;
+}
+
+.dash-link img {
+  width: 20px;
+  height: 20px;
+  margin-right: 5px;
+}
+
+html.dash .dash-link {
+  display: none;
+}
+
+html.dash .container-col-sidebar,
+html.dash .nav-sub {
+  display: none;
+}
+
+html.dash .container-col-content,
+html.dash .main-content {
+  width: 100% !important;
+  height: 100% !important;
+  display: block !important;
+  border: none;
+}
+
+html.dash .height-container {
+  display: block;
+}
+
+html.dash .item .token {
+  margin-left: 0;
+}
+
+html.dash .content-wrapper {
+  width: auto;
+}
+
+html.dash .pointer-container {
+  display: none;
+}
+
+html.dash .height-container .section {
+  background: #fff;
+}
+
+html.dash h3 {
+  margin: 0;
+}

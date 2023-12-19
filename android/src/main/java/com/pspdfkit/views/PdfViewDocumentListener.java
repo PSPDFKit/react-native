@@ -24,6 +24,9 @@ import com.pspdfkit.annotations.Annotation;
 import com.pspdfkit.annotations.AnnotationProvider;
 import com.pspdfkit.document.DocumentSaveOptions;
 import com.pspdfkit.document.PdfDocument;
+import com.pspdfkit.forms.FormElement;
+import com.pspdfkit.forms.FormField;
+import com.pspdfkit.forms.FormListeners;
 import com.pspdfkit.listeners.DocumentListener;
 import com.pspdfkit.react.events.PdfViewAnnotationChangedEvent;
 import com.pspdfkit.react.events.PdfViewAnnotationTappedEvent;
@@ -34,7 +37,7 @@ import com.pspdfkit.ui.special_mode.manager.AnnotationManager;
 
 import java.util.List;
 
-class PdfViewDocumentListener implements DocumentListener, AnnotationManager.OnAnnotationSelectedListener, AnnotationProvider.OnAnnotationUpdatedListener {
+class PdfViewDocumentListener implements DocumentListener, AnnotationManager.OnAnnotationSelectedListener, AnnotationProvider.OnAnnotationUpdatedListener, FormListeners.OnFormFieldUpdatedListener {
 
     @NonNull
     private final PdfView parent;
@@ -49,7 +52,6 @@ class PdfViewDocumentListener implements DocumentListener, AnnotationManager.OnA
         this.parent = parent;
         this.eventDispatcher = eventDispatcher;
     }
-
 
     public void setDisableDefaultActionForTappedAnnotations(boolean disableDefaultActionForTappedAnnotations) {
         this.disableDefaultActionForTappedAnnotations = disableDefaultActionForTappedAnnotations;
@@ -144,5 +146,18 @@ class PdfViewDocumentListener implements DocumentListener, AnnotationManager.OnA
     @Override
     public void onAnnotationZOrderChanged(int i, @NonNull List<Annotation> list, @NonNull List<Annotation> list1) {
         // Not required.
+    }
+
+    @Override
+    public void onFormFieldUpdated(@NonNull FormField formField) {
+        Annotation annotation = formField.getFormElement().getAnnotation();
+        if (annotation != null) {
+            eventDispatcher.dispatchEvent(new PdfViewAnnotationChangedEvent(parent.getId(), PdfViewAnnotationChangedEvent.EVENT_TYPE_CHANGED, annotation));
+        }
+    }
+
+    @Override
+    public void onFormFieldReset(@NonNull FormField formField, @NonNull FormElement formElement) {
+        // Not used.
     }
 }

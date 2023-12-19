@@ -1,10 +1,6 @@
 module.exports = {
   root: true,
-  extends: [
-    'eslint:recommended',
-    'plugin:react/recommended',
-    '@react-native-community',
-  ],
+  extends: ['eslint:recommended', 'plugin:react/recommended', '@react-native'],
   plugins: ['simple-import-sort'],
   parserOptions: {
     ecmaVersion: 12,

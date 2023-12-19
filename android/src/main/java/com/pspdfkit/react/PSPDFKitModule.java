@@ -47,6 +47,7 @@ import com.pspdfkit.exceptions.InvalidPSPDFKitLicenseException;
 import com.pspdfkit.react.RNInstantPdfActivity;
 import com.pspdfkit.listeners.SimpleDocumentListener;
 import com.pspdfkit.react.helper.ConversionHelpers;
+import com.pspdfkit.react.helper.PSPDFKitUtils;
 import com.pspdfkit.ui.PdfActivity;
 import com.pspdfkit.ui.PdfFragment;
 
@@ -65,15 +66,7 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
 
     private static final int REQUEST_CODE_TO_INDEX = 16;
     private static final int MASKED_REQUEST_CODE_TO_REAL_CODE = 0xffff;
-    private static final String[] SUPPORTED_IMAGE_TYPES = new String[] {
-        ".jpg",
-        ".png",
-        ".jpeg",
-        ".tif",
-        ".tiff"
-    };
-
-
+    
     @Nullable
     private Activity resumedActivity;
     @Nullable
@@ -115,10 +108,10 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
     @ReactMethod
     public void present(@NonNull String document, @NonNull ReadableMap configuration, @Nullable Promise promise) {
         File documentFile = new File(document);
-        if(isPdf(documentFile)) {
+        if(PSPDFKitUtils.isValidPdf(documentFile)) {
             lastPresentPromise = promise;
             presentPdf(document, configuration, promise);
-        } else if(isImage(documentFile)) {
+        } else if(PSPDFKitUtils.isValidImage(documentFile)) {
             lastPresentPromise = promise;
             presentImage(document, configuration, promise);
         }else {
@@ -166,7 +159,18 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
     }
 
     @ReactMethod
-    public void presentInstant(@NonNull String serverUrl, @NonNull String jwt, @NonNull ReadableMap configuration, @Nullable Promise promise) {
+    public void presentInstant(@NonNull ReadableMap documentData, @NonNull ReadableMap configuration, @Nullable Promise promise) {
+        String serverUrl = documentData.getString("serverUrl");
+        String jwt = documentData.getString("jwt");
+
+        if (serverUrl == null || jwt == null) {
+            Throwable error = new Throwable("serverUrl and jwt are required");
+            if (promise != null) {
+                promise.reject(error);
+            }
+            return;
+        }
+
         if (getCurrentActivity() != null) {
             if (resumedActivity == null) {
                 // We register an activity lifecycle callback so we can get notified of the current activity.
@@ -178,7 +182,7 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
             RNInstantPdfActivity.showInstantDocument(getCurrentActivity(), serverUrl, jwt, configurationAdapter.build());
         }
     }
-
+    
     @ReactMethod
     public synchronized void setPageIndex(final int pageIndex, final boolean animated) {
         if (resumedActivity instanceof PdfActivity) {
@@ -446,18 +450,5 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
     @Override
     public void onNewIntent(Intent intent) {
         // Not required right now.
-    }
-
-    private boolean isPdf(File file) {
-        return file.getName().toLowerCase().endsWith(".pdf");
-    }
-
-    private boolean isImage(File file) {
-        for (String extension: SUPPORTED_IMAGE_TYPES) {
-            if (file.getName().toLowerCase().endsWith(extension)) {
-                return true;
-            }
-        }
-        return false;
     }
 }

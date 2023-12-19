@@ -50,4 +50,7 @@ PSPDFKit/PSPDFKitUI.xcframework
 # UWP license file
 samples/Catalog/windows/Catalog/License.xaml
 
+#Jsdoc
+jsdoc/
+
 .fake

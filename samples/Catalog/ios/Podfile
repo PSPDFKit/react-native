@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require_relative "../node_modules/react-native/scripts/react_native_pods"
-require_relative "../node_modules/@react-native-community/cli-platform-ios/native_modules"
+# Resolve react_native_pods.rb with node to allow for hoisting
+require Pod::Executable.execute_command("node", ["-p", "require.resolve('react-native/scripts/react_native_pods.rb',{paths: [process.argv[1]]},)", __dir__]).strip
 
 platform :ios, "15.0"
 prepare_react_native_project!
@@ -25,6 +25,7 @@ end
 
 target "Catalog" do
   config = use_native_modules!
+  host_cpu = RbConfig::CONFIG["host_cpu"]
 
   # Flags change depending on the env values.
   flags = get_default_flags
@@ -45,8 +46,8 @@ target "Catalog" do
     app_path: "#{Pod::Config.instance.installation_root}/.."
   )
 
-  pod "PSPDFKit", "~> 12.3.1"
-  pod "Instant", "~> 12.3.1"
+  # PSPDFKit iOS SDK version specified by PSPDFKit React Native Plugin. Do not remove this line.
+  # Instant iOS SDK version specified by PSPDFKit React Native Plugin. Do not remove this line.
 
   target "CatalogTests" do
     inherit! :complete
@@ -58,14 +59,19 @@ target "Catalog" do
       aggregate_target.user_project.native_targets.each do |target|
         target.build_configurations.each do |target_config|
           target_config.build_settings["LIBRARY_SEARCH_PATHS"] = ["$(SDKROOT)/usr/lib/swift", "$(inherited)"]
-          target_config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
+          puts host_cpu.inspect
+          if host_cpu.eql?("x86_64")
+            target_config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
+          end
           target_config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = "15.0"
         end
       end
       aggregate_target.user_project.save
     end
     installer.pods_project.build_configurations.each do |excl_config|
-      excl_config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
+      if host_cpu.eql?("x86_64")
+        excl_config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
+      end
       excl_config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = "15.0"
     end
     installer.pods_project.targets.each do |target|
@@ -75,10 +81,10 @@ target "Catalog" do
     end
     react_native_post_install(
       installer,
+      config[:reactNativePath],
       # Set `mac_catalyst_enabled` to `true` in order to apply patches
       # necessary for Mac Catalyst builds
       mac_catalyst_enabled: false
     )
-    __apply_Xcode_12_5_M1_post_install_workaround(installer)
   end
 end

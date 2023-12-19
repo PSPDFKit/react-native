@@ -1,0 +1,63 @@
+.form-search .form-group {
+  position: relative;
+}
+
+/* Typeahead */
+
+.tt-input {
+  width: 300px;
+  min-height: 40px;
+  padding-left: 15px;
+  border-radius: 30px;
+}
+
+.tt-menu {
+  line-height: 1.4;
+}
+
+.tt-hint {
+  color: #ccc;
+}
+
+.tt-highlight {
+  font-weight: 500;
+}
+
+.tt-spinner {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  opacity: 0;
+}
+
+.tt-spinner.in {
+  opacity: 1;
+}
+
+.tt-suggestion span {
+  display: table-cell;
+  white-space: nowrap;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tt-suggestion .doc-parent-name {
+  width: 100%;
+  text-align: right;
+  font-weight: normal;
+  font-size: 13px;
+  color: #666;
+}
+
+.tt-suggestion:hover,
+.tt-suggestion.tt-cursor {
+  cursor: pointer;
+  background-color: #0097cf;
+  color: #fff;
+}
+
+.tt-suggestion:hover .doc-parent-name,
+.tt-suggestion.tt-cursor .doc-parent-name {
+  color: #fff;
+}

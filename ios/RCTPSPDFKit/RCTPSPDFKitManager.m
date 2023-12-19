@@ -14,7 +14,11 @@
 #import <React/RCTConvert.h>
 #import "RCTConvert+PSPDFAnnotation.h"
 #import "RCTConvert+PSPDFAnnotationChange.h"
+#if __has_include("PSPDFKitReactNativeiOS-Swift.h")
 #import "PSPDFKitReactNativeiOS-Swift.h"
+#else
+#import <PSPDFKitReactNativeiOS/PSPDFKitReactNativeiOS-Swift.h>
+#endif
 #import "RCTConvert+PSPDFConfiguration.h"
 
 #define PROPERTY(property) NSStringFromSelector(@selector(property))
@@ -115,11 +119,10 @@ RCT_EXPORT_METHOD(presentInstant: (NSDictionary*)documentData configuration: (NS
     NSLog(@"presentInstant %@", configuration);
 
     NSString* jwt = [documentData objectForKey:@"jwt"];
-    NSURL* url = [[NSURL alloc] initWithString:  [documentData objectForKey:@"url"]];
     NSURL* serverUrl = [[NSURL alloc] initWithString: [documentData objectForKey:@"serverUrl"]];
     NSError *error;
 
-    InstantDocumentInfo* documentInfo = [[InstantDocumentInfo alloc] initWithServerURL:serverUrl url:url jwt:jwt];
+    InstantDocumentInfo* documentInfo = [[InstantDocumentInfo alloc] initWithServerURL:serverUrl jwt:jwt];
     NSMutableDictionary* parsedConfig = [[RCTConvert processConfigurationOptionsDictionaryForPrefix: configuration] mutableCopy];
     if(![configuration objectForKey:@"enableInstantComments"]) {
         [parsedConfig setValue:@(YES) forKey: @"enableInstantComments"];
@@ -174,10 +177,6 @@ RCT_EXPORT_METHOD(setDelayForSyncingLocalChanges: (NSNumber*)delay resolver:(RCT
 
 - (NSArray<NSString*> *)supportedEvents {
     return @[@"didFinishDownloadFor", @"didFailDownloadWithError", @"didFailAuthenticationFor", @"didFinishReauthenticationWithJWT", @"didFailReauthenticationWithError"];
-}
-
--(void) addListener:(NSString *)eventName{
-    NSLog(@"event %@", eventName);
 }
 
 // Will be called when this module's first listener is added.

@@ -16,32 +16,28 @@ import Foundation
 @objc
 public class InstantDocumentInfo: NSObject{
     let serverURL: URL
-    let url: URL
     let jwt: String
 
- @objc public init(serverURL: URL, url: URL, jwt: String) {
+ @objc public init(serverURL: URL, jwt: String) {
         self.serverURL = serverURL
-        self.url = url
         self.jwt = jwt
     }
 }
 
 extension InstantDocumentInfo {
     enum JSONKeys: String {
-        case serverUrl, url, documentId, jwt
+        case serverUrl, documentId, jwt
     }
 
     convenience init?(json: Any) {
         guard let dictionary = json as? [String: Any],
             let serverUrlString = dictionary[JSONKeys.serverUrl.rawValue] as? String,
             let serverURL = URL(string: serverUrlString),
-            let urlString = dictionary[JSONKeys.url.rawValue] as? String,
-            let url = URL(string: urlString),
             let jwt = dictionary[JSONKeys.jwt.rawValue] as? String else {
                 return nil
         }
 
-        self.init(serverURL: serverURL, url: url, jwt: jwt)
+        self.init(serverURL: serverURL, jwt: jwt)
     }
 }
 

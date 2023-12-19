@@ -61,11 +61,11 @@ public class ReactGroupingRule extends PresetMenuItemGroupingRule {
                 }
                 items.add(new MenuItem(id));
             }
-
         }
-        //Add undo and redo to the end of the list
-        items.add(new MenuItem(R.id.pspdf__annotation_creation_toolbar_item_undo));
-        items.add(new MenuItem(R.id.pspdf__annotation_creation_toolbar_item_redo));
+        // Add colour picker, undo and redo to the end of the list, as iOS always include these items.
+        items.add(new MenuItem(com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_item_picker));
+        items.add(new MenuItem(com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_item_undo));
+        items.add(new MenuItem(com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_item_redo));
     }
 
     private int[] collectItemIds(ReadableArray items) {
@@ -90,73 +90,73 @@ public class ReactGroupingRule extends PresetMenuItemGroupingRule {
     private int getIdFromName(@NonNull String name) {
         switch (name) {
             case "markup":
-                return R.id.pspdf__annotation_creation_toolbar_group_markup;
+                return com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_group_markup;
             case "writing":
-                return R.id.pspdf__annotation_creation_toolbar_item_writing;
+                return com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_item_writing;
             case "highlight":
-                return R.id.pspdf__annotation_creation_toolbar_item_highlight;
+                return com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_item_highlight;
             case "squiggly":
-                return R.id.pspdf__annotation_creation_toolbar_item_squiggly;
+                return com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_item_squiggly;
             case "strikeout":
-                return R.id.pspdf__annotation_creation_toolbar_item_strikeout;
+                return com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_item_strikeout;
             case "underline":
-                return R.id.pspdf__annotation_creation_toolbar_item_underline;
+                return com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_item_underline;
             case "freetext":
-                return R.id.pspdf__annotation_creation_toolbar_item_freetext;
+                return com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_item_freetext;
             case "freetext_callout":
-                return R.id.pspdf__annotation_creation_toolbar_item_freetext_callout;
+                return com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_item_freetext_callout;
             case "signature":
-                return R.id.pspdf__annotation_creation_toolbar_item_signature;
+                return com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_item_signature;
             case "pen":
-                return R.id.pspdf__annotation_creation_toolbar_item_ink_pen;
+                return com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_item_ink_pen;
             case "highlighter":
-                return R.id.pspdf__annotation_creation_toolbar_item_ink_highlighter;
+                return com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_item_ink_highlighter;
             case "note":
-                return R.id.pspdf__annotation_creation_toolbar_item_note;
+                return com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_item_note;
             case "drawing":
-                return R.id.pspdf__annotation_creation_toolbar_group_drawing;
+                return com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_group_drawing;
             case "multimedia":
-                return R.id.pspdf__annotation_creation_toolbar_group_multimedia;
+                return com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_group_multimedia;
             case "image":
-                return R.id.pspdf__annotation_creation_toolbar_item_image;
+                return com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_item_image;
             case "camera":
-                return R.id.pspdf__annotation_creation_toolbar_item_camera;
+                return com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_item_camera;
             case "stamp":
-                return R.id.pspdf__annotation_creation_toolbar_item_stamp;
+                return com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_item_stamp;
             case "line":
-                return R.id.pspdf__annotation_creation_toolbar_item_line;
+                return com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_item_line;
             case "square":
-                return R.id.pspdf__annotation_creation_toolbar_item_square;
+                return com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_item_square;
             case "circle":
-                return R.id.pspdf__annotation_creation_toolbar_item_circle;
+                return com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_item_circle;
             case "polygon":
-                return R.id.pspdf__annotation_creation_toolbar_item_polygon;
+                return com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_item_polygon;
             case "polyline":
-                return R.id.pspdf__annotation_creation_toolbar_item_polyline;
+                return com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_item_polyline;
             case "eraser":
-                return R.id.pspdf__annotation_creation_toolbar_item_eraser;
+                return com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_item_eraser;
             case "redaction":
-                return R.id.pspdf__annotation_creation_toolbar_item_redaction;
+                return com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_item_redaction;
             case "magic_ink":
-                return R.id.pspdf__annotation_creation_toolbar_item_magic_ink;
+                return com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_item_magic_ink;
             case "undo_redo":
-                return R.id.pspdf__annotation_creation_toolbar_group_undo_redo;
+                return com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_group_undo_redo;
             case "undo":
-                return R.id.pspdf__annotation_creation_toolbar_item_undo;
+                return com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_item_undo;
             case "redo":
-                return R.id.pspdf__annotation_creation_toolbar_item_redo;
+                return com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_item_redo;
             case "measurement":
-                return R.id.pspdf__annotation_creation_toolbar_group_measurement;
+                return com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_group_measurement;
             case "distance":
-                return  R.id.pspdf__annotation_creation_toolbar_item_measurement_distance;
+                return com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_item_measurement_distance;
             case "perimeter":
-                return R.id.pspdf__annotation_creation_toolbar_item_measurement_perimeter;
+                return com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_item_measurement_perimeter;
             case "area_polygon":
-                return R.id.pspdf__annotation_creation_toolbar_item_measurement_area_polygon;
+                return com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_item_measurement_area_polygon;
             case "area_square":
-                return R.id.pspdf__annotation_creation_toolbar_item_measurement_area_rect;
+                return com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_item_measurement_area_rect;
             case "area_circle":
-                return R.id.pspdf__annotation_creation_toolbar_item_measurement_area_ellipse;
+                return com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_item_measurement_area_ellipse;
         }
 
         Log.i(TAG, String.format("Received unknown menu item %s.", name));

@@ -1,50 +1,89 @@
 # frozen_string_literal: true
 
-require_relative "../node_modules/react-native/scripts/react_native_pods"
-require_relative "../node_modules/@react-native-community/cli-platform-ios/native_modules"
+# Resolve react_native_pods.rb with node to allow for hoisting
+require Pod::Executable.execute_command("node", ["-p", "require.resolve('react-native/scripts/react_native_pods.rb',{paths: [process.argv[1]]},)", __dir__]).strip
 
 platform :ios, "15.0"
+prepare_react_native_project!
+
+# If you are using a `react-native-flipper` your iOS build will fail when `NO_FLIPPER=1` is set.
+# because `react-native-flipper` depends on (FlipperKit,...) that will be excluded
+#
+# To fix this you can also exclude `react-native-flipper` using a `react-native.config.js`
+# ```js
+# module.exports = {
+#   dependencies: {
+#     ...(process.env.NO_FLIPPER ? { 'react-native-flipper': { platforms: { ios: null } } } : {}),
+# ```
+flipper_config = ENV["NO_FLIPPER"] == "1" ? FlipperConfiguration.disabled : FlipperConfiguration.enabled
+
+linkage = ENV.fetch("USE_FRAMEWORKS", nil)
+unless linkage.nil?
+  Pod::UI.puts "Configuring Pod with #{linkage}ally linked Frameworks".green
+  use_frameworks! linkage: linkage.to_sym
+end
 
 target "NativeCatalog" do
   config = use_native_modules!
+  host_cpu = RbConfig::CONFIG["host_cpu"]
+
+  # Flags change depending on the env values.
+  flags = get_default_flags
 
   use_react_native!(
     path: config[:reactNativePath],
-    # to enable hermes on iOS, change `false` to `true` and then install pods
-    hermes_enabled: false
+    # Hermes is now enabled by default. Disable by setting this flag to false.
+    # Upcoming versions of React Native may rely on get_default_flags(), but
+    # we make it explicit here to aid in the React Native upgrade process.
+    hermes_enabled: flags[:hermes_enabled],
+    fabric_enabled: flags[:fabric_enabled],
+    # Enables Flipper.
+    #
+    # Note that if you have use_frameworks! enabled, Flipper will not work and
+    # you should disable the next line.
+    flipper_configuration: flipper_config,
+    # An absolute path to your application root.
+    app_path: "#{Pod::Config.instance.installation_root}/.."
   )
+
+  # PSPDFKit iOS SDK version specified by PSPDFKit React Native Plugin. Do not remove this line.
+  # Instant iOS SDK version specified by PSPDFKit React Native Plugin. Do not remove this line.
 
   target "NativeCatalogTests" do
     inherit! :complete
     # Pods for testing
   end
 
-  pod "PSPDFKit", "~> 12.3.1"
-  pod "Instant", "~> 12.3.1"
-
-  # Enables Flipper.
-  #
-  # Note that if you have use_frameworks! enabled, Flipper will not work and
-  # you should disable the next line.
-  use_flipper!
-
   post_install do |installer|
-    react_native_post_install(installer)
-    # Fix for M1 machines: https://github.com/facebook/react-native/issues/31941
     installer.aggregate_targets.each do |aggregate_target|
       aggregate_target.user_project.native_targets.each do |target|
         target.build_configurations.each do |target_config|
           target_config.build_settings["LIBRARY_SEARCH_PATHS"] = ["$(SDKROOT)/usr/lib/swift", "$(inherited)"]
-          target_config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
+          if host_cpu.eql?("x86_64")
+            target_config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
+          end
           target_config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = "15.0"
         end
       end
       aggregate_target.user_project.save
     end
     installer.pods_project.build_configurations.each do |excl_config|
-      excl_config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
+      if host_cpu.eql?("x86_64")
+        excl_config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
+      end
       excl_config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = "15.0"
     end
-    react_native_post_install(installer)
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |target_config|
+        target_config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = "15.0"
+      end
+    end
+    react_native_post_install(
+      installer,
+      config[:reactNativePath],
+      # Set `mac_catalyst_enabled` to `true` in order to apply patches
+      # necessary for Mac Catalyst builds
+      mac_catalyst_enabled: false
+    )
   end
 end

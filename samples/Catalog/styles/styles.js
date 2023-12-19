@@ -40,7 +40,7 @@ export default StyleSheet.create({
     fontSize: 12,
   },
   rowContent: {
-    padding: 10,
+    padding: 5,
   },
   text: {
     fontSize: 16,

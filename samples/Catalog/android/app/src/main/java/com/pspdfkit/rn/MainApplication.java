@@ -11,6 +11,7 @@ import com.facebook.react.defaults.DefaultReactNativeHost;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 import com.rnfs.RNFSPackage;
+import com.facebook.react.flipper.ReactNativeFlipper;
 
 import java.util.Arrays;
 import java.util.List;

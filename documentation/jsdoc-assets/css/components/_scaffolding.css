@@ -1,0 +1,58 @@
+body {
+  background: #f7fcfc;
+  font-family: 'Canal Book', Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.7;
+  word-wrap: break-word;
+}
+
+h1,
+h2,
+h3 {
+  font-family: 'Canal Medium';
+  margin-top: 0.8em;
+  margin-bottom: 0.3em;
+  font-weight: 300;
+}
+
+h1 {
+  font-size: 2.5em;
+}
+
+h2 {
+  font-size: 2em;
+  border-bottom: 1px solid #e2e2e2;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+}
+
+h4 {
+  font-size: 13px;
+  line-height: 1.5;
+  margin-top: 21px;
+}
+
+h5 {
+  font-size: 1.1em;
+}
+
+h6 {
+  font-size: 1.1em;
+  color: $code_color;
+}
+
+ul {
+  padding-left: 15px;
+}
+
+ul > li {
+  line-height: 1.8;
+}
+
+.section-name {
+  color: rgba(128, 128, 128, 1);
+  display: block;
+  font-size: 22px;
+  font-weight: 300;
+  margin-bottom: 15px;
+}

@@ -102,8 +102,12 @@ Let's create a simple app that integrates PSPDFKit and uses the `react-native-ps
    Your Podfile should look like this:
 
    ```diff
-   require_relative '../node_modules/react-native/scripts/react_native_pods'
-   require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
+   # Resolve react_native_pods.rb with node to allow for hoisting
+   require Pod::Executable.execute_command('node', ['-p',
+    'require.resolve(
+      "react-native/scripts/react_native_pods.rb",
+      {paths: [process.argv[1]]},
+   )', __dir__]).strip
 
    - platform :ios, '10.0'
    + platform :ios, '15.0'
@@ -130,7 +134,7 @@ Let's create a simple app that integrates PSPDFKit and uses the `react-native-ps
      use_flipper!()
 
      post_install do |installer|
-       react_native_post_install(installer)
+       react_native_post_install(installer, config[:reactNativePath])
      end
    end
    ```
@@ -542,7 +546,7 @@ Let's create a simple app that integrates PSPDFKit and uses the `react-native-ps
              pageTransition: 'scrollContinuous',
              scrollDirection: 'vertical',
            }}
-           ref="pdfView"
+           ref={ this.pdfRef }
            fragmentTag="PDF1"
            style={{ flex: 1 }}
          />

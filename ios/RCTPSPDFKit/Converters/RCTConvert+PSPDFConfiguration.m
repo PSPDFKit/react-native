@@ -8,7 +8,11 @@
 //
 
 #import "RCTConvert+PSPDFConfiguration.h"
+#if __has_include("PSPDFKitReactNativeiOS-Swift.h")
 #import "PSPDFKitReactNativeiOS-Swift.h"
+#else
+#import <PSPDFKitReactNativeiOS/PSPDFKitReactNativeiOS-Swift.h>
+#endif
 
 @implementation RCTConvert (PSPDFConfiguration)
 

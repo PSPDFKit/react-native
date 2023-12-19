@@ -1,0 +1,68 @@
+.sidebar {
+  overflow-y: auto;
+  overflow-x: hidden;
+  word-wrap: normal;
+  background: #fff;
+  border-bottom: 1px solid #e2e2e2;
+  border-radius: 0.3rem;
+}
+
+@media (min-width: 992px) {
+  .sidebar {
+    height: calc(100vh - 150px);
+    border: 1px solid #e2e2e2;
+  }
+}
+
+.sidebar a {
+  text-overflow: ellipsis;
+  max-width: 100%;
+  overflow: hidden;
+  display: block;
+  padding-right: 20px;
+}
+
+.nav-groups {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.nav-groups-select {
+  background: #f7fcfc;
+  padding: 15px;
+}
+
+@media (min-width: 768px) {
+  .nav-groups-select {
+    background: none;
+  }
+}
+
+.nav-group-name {
+  border-bottom: 1px solid #e2e2e2;
+  font-size: 1.1em;
+  padding: 15px 0 15px 20px;
+  color: #333;
+}
+
+.nav-group-tasks {
+  margin-top: 5px;
+  padding-left: 0;
+}
+
+.nav-group-name.active .nav-group-tasks {
+  display: block;
+}
+
+.nav-group-task {
+  font-size: 0.9em;
+  list-style-type: none;
+}
+
+.nav-group-task a {
+  color: #888;
+}
+
+.nav-group-task a.active {
+  color: black;
+}

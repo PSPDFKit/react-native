@@ -21,6 +21,10 @@
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
 
     <application>
+        <meta-data
+            android:name="pspdfkit_automatic_initialize"
+            android:value="false" />
+
         <activity
             android:name="com.pspdfkit.ui.PdfActivity"
             android:windowSoftInputMode="adjustNothing" />
