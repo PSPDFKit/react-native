@@ -809,6 +809,16 @@ declare class PSPDFKitView extends React.Component<Props, any, any> {
      */
     saveCurrentDocument: () => Promise<boolean>;
     /**
+     * Saves the document that’s currently open.
+     * @method saveCurrentDocumentWithIndex
+     * @memberof PSPDFKitView
+     * @example
+     * const result = await this.pdfRef.current.saveCurrentDocumentWithIndex();
+     *
+     * @returns { Promise<boolean> } A promise resolving to ```true``` if the document was saved, and ```false``` if not.
+     */
+    saveCurrentDocumentWithIndex: () => Promise<boolean>;
+    /**
      * Gets all annotations of the given type from the specified page.
      *
      * @method getAnnotations

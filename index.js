@@ -237,6 +237,40 @@ class PSPDFKitView extends React.Component {
   };
 
   /**
+   * Saves a Page of the document that’s currently open given an index. 
+   * @method saveCurrentDocumentWithPageIndex
+   * @memberof PSPDFKitView
+   * @example
+   * const result = await this.pdfRef.current.saveCurrentDocumentWithPageIndex();
+   *
+   * @returns { Promise<boolean> } A promise resolving to ```true``` if the document was saved, and ```false``` if not.
+   */
+  saveDocumentWithIndex = function () {
+    if (Platform.OS === 'android') {
+      let requestId = this._nextRequestId++;
+      let requestMap = this._requestMap;
+
+      // We create a promise here that will be resolved once onDataReturned is called.
+      let promise = new Promise(function (resolve, reject) {
+        requestMap[requestId] = { resolve: resolve, reject: reject };
+      });
+
+      UIManager.dispatchViewManagerCommand(
+        findNodeHandle(this.refs.pdfView),
+        this._getViewManagerConfig('RCTPSPDFKitView').Commands
+          .saveCurrentDocument,
+        [requestId],
+      );
+
+      return promise;
+    } else if (Platform.OS === 'ios') {
+      return NativeModules.PSPDFKitViewManager.saveCurrentDocument(
+        findNodeHandle(this.refs.pdfView),
+      );
+    }
+  };
+
+  /**
    * Gets all annotations of the given type from the specified page.
    *
    * @method getAnnotations
