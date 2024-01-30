@@ -653,6 +653,32 @@ public class PdfView extends FrameLayout {
         return false;
     }
 
+    public boolean saveDocumentWithPageIndices() throws Exception {
+        if (fragment != null && document != null) {
+            try {
+                // Hardcode to keep only the first page
+                HashSet<Integer> pageIndices = new HashSet<>(Arrays.asList(0));
+                PdfProcessorTask task = PdfProcessorTask.fromDocument(document)
+                                                        .keepPages(pageIndices);
+
+                // Process the task
+                PdfProcessor.processDocument(task, document.getDataProvider());
+
+                // Save the modified document
+                if (document.saveIfModified()) {
+                    eventDispatcher.dispatchEvent(new PdfViewDocumentSavedEvent(getId()));
+                    return true;
+                }
+                return false;
+            } catch (Exception e) {
+                eventDispatcher.dispatchEvent(new PdfViewDocumentSaveFailedEvent(getId(), e.getMessage()));
+                throw e;
+            }
+        }
+        return false;
+    }
+
+
     public Single<List<Annotation>> getAnnotations(final int pageIndex, @Nullable final String type) {
         PdfDocument document = fragment.getDocument();
         if (pageIndex > document.getPageCount()-1) {

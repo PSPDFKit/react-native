@@ -102,6 +102,7 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
         commandMap.put("enterAnnotationCreationMode", COMMAND_ENTER_ANNOTATION_CREATION_MODE);
         commandMap.put("exitCurrentlyActiveMode", COMMAND_EXIT_CURRENTLY_ACTIVE_MODE);
         commandMap.put("saveCurrentDocument", COMMAND_SAVE_CURRENT_DOCUMENT);
+        commandMap.put("saveDocumentWithPageIndices", COMMAND_SAVE_DOCUMENT_WITH_PAGE_INDICES);
         commandMap.put("getAnnotations", COMMAND_GET_ANNOTATIONS);
         commandMap.put("addAnnotation", COMMAND_ADD_ANNOTATION);
         commandMap.put("getAllUnsavedAnnotations", COMMAND_GET_ALL_UNSAVED_ANNOTATIONS);
@@ -217,6 +218,18 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
                     final int requestId = args.getInt(0);
                     try {
                         boolean result = root.saveCurrentDocument();
+                        root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, result));
+                    } catch (Exception e) {
+                        root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, e));
+                    }
+                }
+                break;
+            case COMMAND_SAVE_DOCUMENT_WITH_PAGE_INDICES:
+                if (args != null) {
+                    final int requestId = args.getInt(0);
+                    try {
+                        // Since the page index is hardcoded, no need to extract additional arguments
+                        boolean result = root.saveDocumentWithPageIndices(); // Call without parameters
                         root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, result));
                     } catch (Exception e) {
                         root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, e));
