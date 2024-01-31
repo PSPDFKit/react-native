@@ -46,6 +46,8 @@ import com.pspdfkit.document.ImageDocument;
 import com.pspdfkit.document.ImageDocumentLoader;
 import com.pspdfkit.document.PdfDocument;
 import com.pspdfkit.document.PdfDocumentLoader;
+import com.pspdfkit.document.processor.PdfProcessor;
+import com.pspdfkit.document.processor.PdfProcessorTask;
 import com.pspdfkit.document.formatters.DocumentJsonFormatter;
 import com.pspdfkit.document.providers.DataProvider;
 import com.pspdfkit.forms.ChoiceFormElement;
@@ -84,6 +86,7 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.HashSet;
@@ -656,25 +659,27 @@ public class PdfView extends FrameLayout {
 
     public boolean saveDocumentWithPageIndices() throws Exception {
         if (fragment != null && document != null) {
-            try {
-                // Hardcode to keep only the first page
-                HashSet<Integer> pageIndices = new HashSet<>(Arrays.asList(0));
-                PdfProcessorTask task = PdfProcessorTask.fromDocument(document)
-                                                        .keepPages(pageIndices);
+        try {
+            // Define output file path
+            File outputFile = new File(getContext().getFilesDir(), "processed_document.pdf");
 
-                // Process the task
-                PdfProcessor.processDocument(task, document.getDataProvider());
+            // Hardcode to keep only the first page
+            HashSet<Integer> pageIndices = new HashSet<>(Arrays.asList(0));
+            PdfProcessorTask task = PdfProcessorTask.fromDocument(document)
+            .keepPages(pageIndices);
 
-                // Save the modified document
-                if (document.saveIfModified()) {
-                    eventDispatcher.dispatchEvent(new PdfViewDocumentSavedEvent(getId()));
-                    return true;
-                }
-                return false;
-            } catch (Exception e) {
-                eventDispatcher.dispatchEvent(new PdfViewDocumentSaveFailedEvent(getId(), e.getMessage()));
-                throw e;
-            }
+            // Process the task and save to outputFile
+            PdfProcessor.processDocument(task, outputFile);
+
+            // fragment.setDocument(DocumentSource.fromFile(outputFile), null);
+
+            // Trigger event that document has been saved
+            eventDispatcher.dispatchEvent(new PdfViewDocumentSavedEvent(getId()));
+            return true;
+        } catch (Exception e) {
+            eventDispatcher.dispatchEvent(new PdfViewDocumentSaveFailedEvent(getId(), e.getMessage()));
+            throw e;
+        }
         }
         return false;
     }
