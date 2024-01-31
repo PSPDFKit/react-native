@@ -14,6 +14,7 @@
 package com.pspdfkit.react;
 
 import android.app.Activity;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
@@ -226,7 +227,7 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
                 }
                 break;
             case COMMAND_SAVE_DOCUMENT_WITH_PAGE_INDICES:
-                Log.d("COMMAND_SAVE_DOCUMENT_WITH_PAGE_INDICES");
+                Log.d("ReactPdfViewManager", "COMMAND_SAVE_DOCUMENT_WITH_PAGE_INDICES");
                 if (args != null) {
                     final int requestId = args.getInt(0);
                     try {
