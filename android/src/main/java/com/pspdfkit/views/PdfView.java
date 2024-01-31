@@ -658,6 +658,7 @@ public class PdfView extends FrameLayout {
     }
 
     public boolean saveDocumentWithPageIndices() throws Exception {
+        Log.d("PdfView: saveDocumentWithPageIndices");
         if (fragment != null && document != null) {
         try {
             // Define output file path

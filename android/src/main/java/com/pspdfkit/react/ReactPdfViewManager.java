@@ -226,6 +226,7 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
                 }
                 break;
             case COMMAND_SAVE_DOCUMENT_WITH_PAGE_INDICES:
+                Log.d("COMMAND_SAVE_DOCUMENT_WITH_PAGE_INDICES");
                 if (args != null) {
                     final int requestId = args.getInt(0);
                     try {
