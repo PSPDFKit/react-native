@@ -230,12 +230,13 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
                 Log.d("ReactPdfViewManager", "COMMAND_SAVE_DOCUMENT_WITH_PAGE_INDICES");
                 if (args != null) {
                     final int requestId = args.getInt(0);
+                    final int pageIndex = args.getInt(1);  // Get the page index
+                    Log.d("ReactPdfViewManager", "Page Index: " + pageIndex);  // Log the page index
                     try {
-                        // Since the page index is hardcoded, no need to extract additional arguments
-                        boolean result = root.saveDocumentWithPageIndices(); // Call without parameters
-                        root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, result));
+                    boolean result = root.saveDocumentWithPageIndices(pageIndex); // Pass page index to the method
+                    root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, result));
                     } catch (Exception e) {
-                        root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, e));
+                    root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, e));
                     }
                 }
                 break;
