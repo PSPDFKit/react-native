@@ -661,7 +661,7 @@ public class PdfView extends FrameLayout {
         Log.d("PdfView", "saveDocumentWithPageIndices: Page Index - " + pageIndex + ", Output Path: " + outputPath);
         if (fragment != null && document != null) {
             try {
-            File outputFile = new File(outputPath); // Use the provided output path
+            File outputFile = new File(getContext().getFilesDir(), outputPath);
             HashSet<Integer> pageIndices = new HashSet<>(Arrays.asList(pageIndex));
             PdfProcessorTask task = PdfProcessorTask.fromDocument(document).keepPages(pageIndices);
             PdfProcessor.processDocument(task, outputFile);
