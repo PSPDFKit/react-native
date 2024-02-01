@@ -657,34 +657,23 @@ public class PdfView extends FrameLayout {
         return false;
     }
 
-    public boolean saveDocumentWithPageIndices(int pageIndex) throws Exception {
-        Log.d("PdfView", "saveDocumentWithPageIndices: Page Index - " + pageIndex);
+    public boolean saveDocumentWithPageIndices(int pageIndex, String outputPath) throws Exception {
+        Log.d("PdfView", "saveDocumentWithPageIndices: Page Index - " + pageIndex + ", Output Path: " + outputPath);
         if (fragment != null && document != null) {
-        try {
-            // Define output file path
-            File outputFile = new File(getContext().getFilesDir(), "processed_document.pdf");
-
-            // Hardcode to keep only the first page
-            HashSet<Integer> pageIndices = new HashSet<>(Arrays.asList(0));
-            PdfProcessorTask task = PdfProcessorTask.fromDocument(document)
-            .keepPages(pageIndices);
-
-            // Process the task and save to outputFile
+            try {
+            File outputFile = new File(outputPath); // Use the provided output path
+            HashSet<Integer> pageIndices = new HashSet<>(Arrays.asList(pageIndex));
+            PdfProcessorTask task = PdfProcessorTask.fromDocument(document).keepPages(pageIndices);
             PdfProcessor.processDocument(task, outputFile);
-
-            // fragment.setDocument(DocumentSource.fromFile(outputFile), null);
-
-            // Trigger event that document has been saved
             eventDispatcher.dispatchEvent(new PdfViewDocumentSavedEvent(getId()));
             return true;
-        } catch (Exception e) {
+            } catch (Exception e) {
             eventDispatcher.dispatchEvent(new PdfViewDocumentSaveFailedEvent(getId(), e.getMessage()));
             throw e;
-        }
+            }
         }
         return false;
-    }
-
+        }
 
     public Single<List<Annotation>> getAnnotations(final int pageIndex, @Nullable final String type) {
         PdfDocument document = fragment.getDocument();
