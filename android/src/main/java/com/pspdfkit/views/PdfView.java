@@ -658,22 +658,27 @@ public class PdfView extends FrameLayout {
     }
 
     public boolean saveDocumentWithPageIndices(int pageIndex, String outputPath) throws Exception {
-        Log.d("PdfView", "saveDocumentWithPageIndices: Page Index - " + pageIndex + ", Output Path: " + outputPath);
+        // Prepare the full output path
+        File outputFile = new File(getContext().getExternalFilesDir(null), outputPath);
+        String fullOutputPath = outputFile.getAbsolutePath();
+
+        Log.d("PdfView", "saveDocumentWithPageIndices: Page Index - " + pageIndex + ", Full Output Path: " + fullOutputPath);
+
         if (fragment != null && document != null) {
             try {
-            File outputFile = new File(getContext().getFilesDir(), outputPath);
-            HashSet<Integer> pageIndices = new HashSet<>(Arrays.asList(pageIndex));
-            PdfProcessorTask task = PdfProcessorTask.fromDocument(document).keepPages(pageIndices);
-            PdfProcessor.processDocument(task, outputFile);
-            eventDispatcher.dispatchEvent(new PdfViewDocumentSavedEvent(getId()));
-            return true;
+                HashSet<Integer> pageIndices = new HashSet<>(Arrays.asList(pageIndex));
+                PdfProcessorTask task = PdfProcessorTask.fromDocument(document).keepPages(pageIndices);
+                PdfProcessor.processDocument(task, outputFile);
+
+                eventDispatcher.dispatchEvent(new PdfViewDocumentSavedEvent(getId()));
+                return true;
             } catch (Exception e) {
-            eventDispatcher.dispatchEvent(new PdfViewDocumentSaveFailedEvent(getId(), e.getMessage()));
-            throw e;
+                eventDispatcher.dispatchEvent(new PdfViewDocumentSaveFailedEvent(getId(), e.getMessage()));
+                throw e;
             }
         }
         return false;
-        }
+    }
 
     public Single<List<Annotation>> getAnnotations(final int pageIndex, @Nullable final String type) {
         PdfDocument document = fragment.getDocument();
