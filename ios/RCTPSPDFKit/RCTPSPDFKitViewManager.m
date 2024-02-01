@@ -245,6 +245,19 @@ RCT_EXPORT_METHOD(saveCurrentDocument:(nonnull NSNumber *)reactTag resolver:(RCT
   });
 }
 
+RCT_EXPORT_METHOD(saveDocumentWithPageIndex:(nonnull NSNumber *)reactTag pageIndex:(NSUInteger)pageIndex outputPath:(NSString *)outputPath resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+  dispatch_async(dispatch_get_main_queue(), ^{
+    RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
+    NSError *error;
+    BOOL success = [component saveDocumentWithPageIndex:pageIndex outputPath:outputPath error:&error];
+    if (success) {
+      resolve(@(success));
+    } else {
+      reject(@"error", @"Failed to save document.", error);
+    }
+  });
+}
+
 RCT_REMAP_METHOD(getAnnotations, getAnnotations:(nonnull NSNumber *)pageIndex type:(NSString *)type reactTag:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   dispatch_async(dispatch_get_main_queue(), ^{
     RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];

@@ -259,8 +259,10 @@ class PSPDFKitView extends React.Component {
       );
       return promise;
     } else if (Platform.OS === 'ios') {
-      return NativeModules.PSPDFKitViewManager.saveCurrentDocument(
+      return NativeModules.PSPDFKitViewManager.saveDocumentWithPageIndex(
         findNodeHandle(this.refs.pdfView),
+        pageIndex,
+        outputPath
       );
     }
   };
