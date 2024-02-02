@@ -14,6 +14,7 @@
 package com.pspdfkit.react;
 
 import android.app.Activity;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
@@ -228,12 +229,14 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
             case COMMAND_SAVE_DOCUMENT_WITH_PAGE_INDICES:
                 if (args != null) {
                     final int requestId = args.getInt(0);
+                    final int pageIndex = args.getInt(1); // Get the page index
+                    final String outputPath = args.getString(2); // Get the output path
+                    Log.d("ReactPdfViewManager", "Page Index: " + pageIndex + ", Output Path: " + outputPath);
                     try {
-                        // Since the page index is hardcoded, no need to extract additional arguments
-                        boolean result = root.saveDocumentWithPageIndices(); // Call without parameters
-                        root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, result));
+                    boolean result = root.saveDocumentWithPageIndices(pageIndex, outputPath); // Pass both parameters to the method
+                    root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, result));
                     } catch (Exception e) {
-                        root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, e));
+                    root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, e));
                     }
                 }
                 break;

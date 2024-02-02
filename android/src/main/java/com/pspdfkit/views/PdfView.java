@@ -657,33 +657,28 @@ public class PdfView extends FrameLayout {
         return false;
     }
 
-    public boolean saveDocumentWithPageIndices() throws Exception {
+    public boolean saveDocumentWithPageIndices(int pageIndex, String outputPath) throws Exception {
+        // Prepare the full output path
+        File outputFile = new File(getContext().getExternalFilesDir(null), outputPath);
+        String fullOutputPath = outputFile.getAbsolutePath();
+
+        Log.d("PdfView", "saveDocumentWithPageIndices: Page Index - " + pageIndex + ", Full Output Path: " + fullOutputPath);
+
         if (fragment != null && document != null) {
-        try {
-            // Define output file path
-            File outputFile = new File(getContext().getFilesDir(), "processed_document.pdf");
+            try {
+                HashSet<Integer> pageIndices = new HashSet<>(Arrays.asList(pageIndex));
+                PdfProcessorTask task = PdfProcessorTask.fromDocument(document).keepPages(pageIndices);
+                PdfProcessor.processDocument(task, outputFile);
 
-            // Hardcode to keep only the first page
-            HashSet<Integer> pageIndices = new HashSet<>(Arrays.asList(0));
-            PdfProcessorTask task = PdfProcessorTask.fromDocument(document)
-            .keepPages(pageIndices);
-
-            // Process the task and save to outputFile
-            PdfProcessor.processDocument(task, outputFile);
-
-            // fragment.setDocument(DocumentSource.fromFile(outputFile), null);
-
-            // Trigger event that document has been saved
-            eventDispatcher.dispatchEvent(new PdfViewDocumentSavedEvent(getId()));
-            return true;
-        } catch (Exception e) {
-            eventDispatcher.dispatchEvent(new PdfViewDocumentSaveFailedEvent(getId(), e.getMessage()));
-            throw e;
-        }
+                eventDispatcher.dispatchEvent(new PdfViewDocumentSavedEvent(getId()));
+                return true;
+            } catch (Exception e) {
+                eventDispatcher.dispatchEvent(new PdfViewDocumentSaveFailedEvent(getId(), e.getMessage()));
+                throw e;
+            }
         }
         return false;
     }
-
 
     public Single<List<Annotation>> getAnnotations(final int pageIndex, @Nullable final String type) {
         PdfDocument document = fragment.getDocument();
