@@ -153,9 +153,16 @@
   NSURL *outputURL = [NSURL fileURLWithPath:outputPath];
 
   PSPDFProcessor *processor = [[PSPDFProcessor alloc] initWithConfiguration:configuration securityOptions:nil];
-  [processor writeToFileURL:outputURL error:error];
+  BOOL success = [processor writeToFileURL:outputURL error:error];
 
-  return *error == nil;
+  // Check if the document was successfully saved and log the file path
+  if (success) {
+    NSLog(@"Document saved successfully at path: %@", outputPath);
+  } else {
+    NSLog(@"Failed to save document. Error: %@", *error);
+  }
+
+  return success;
 }
 
 // MARK: - PSPDFDocumentDelegate
