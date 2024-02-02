@@ -248,12 +248,17 @@ RCT_EXPORT_METHOD(saveCurrentDocument:(nonnull NSNumber *)reactTag resolver:(RCT
 RCT_EXPORT_METHOD(saveDocumentWithPageIndex:(nonnull NSNumber *)reactTag pageIndex:(NSUInteger)pageIndex outputPath:(NSString *)outputPath resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   dispatch_async(dispatch_get_main_queue(), ^{
     RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
-    NSError *error;
-    BOOL success = [component saveDocumentWithPageIndex:pageIndex outputPath:outputPath error:&error];
-    if (success) {
-      resolve(@(success));
+    if ([component isKindOfClass:[RCTPSPDFKitView class]]) {
+        NSError *error;
+        BOOL success = [component saveDocumentWithPageIndex:pageIndex outputPath:outputPath error:&error];
+        if (success) {
+          resolve(@(success));
+        } else {
+          reject(@"error", @"Failed to save document.", error);
+        }
     } else {
-      reject(@"error", @"Failed to save document.", error);
+        NSLog(@"Error: Object is not of type RCTPSPDFKitView.");
+        reject(@"error", @"The component is not of type RCTPSPDFKitView.", nil);
     }
   });
 }
