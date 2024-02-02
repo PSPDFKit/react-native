@@ -141,28 +141,25 @@
   return [self.pdfController.document saveWithOptions:nil error:error];
 }
 
-- (BOOL)saveDocumentWithPageIndex:(NSUInteger)pageIndex filename:(NSString *)filename error:(NSError **)error {
-  PSPDFDocument *document = self.pdfController.document;
-  PSPDFProcessorConfiguration *configuration = [[PSPDFProcessorConfiguration alloc] initWithDocument:document];
-  [configuration includeOnlyIndexes:[NSIndexSet indexSetWithIndex:pageIndex]];
+- (BOOL)saveDocumentWithPageIndex:(NSUInteger)pageIndex outputPath:(NSString *)outputPath error:(NSError **)error {
+    PSPDFDocument *document = self.pdfController.document;
+    PSPDFProcessorConfiguration *configuration = [[PSPDFProcessorConfiguration alloc] initWithDocument:document];
+    [configuration includeOnlyIndexes:[NSIndexSet indexSetWithIndex:pageIndex]];
 
-  // Construct the full path using the provided filename
-  NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-  NSString *documentsDirectory = [paths objectAtIndex:0];
-  NSString *outputPath = [documentsDirectory stringByAppendingPathComponent:filename];
-  NSURL *outputURL = [NSURL fileURLWithPath:outputPath];
+    // Use outputPath directly
+    NSURL *outputURL = [NSURL fileURLWithPath:outputPath];
 
-  PSPDFProcessor *processor = [[PSPDFProcessor alloc] initWithConfiguration:configuration securityOptions:nil];
-  BOOL success = [processor writeToFileURL:outputURL error:error];
+    PSPDFProcessor *processor = [[PSPDFProcessor alloc] initWithConfiguration:configuration securityOptions:nil];
+    BOOL success = [processor writeToFileURL:outputURL error:error];
 
-  // Check if the document was successfully saved and log the file path
-  if (success) {
-    NSLog(@"Document saved successfully at path: %@", outputPath);
-  } else {
-    NSLog(@"Failed to save document. Error: %@", *error);
-  }
+    // Check if the document was successfully saved and log the file path
+    if (success) {
+        NSLog(@"Document saved successfully at path: %@", outputPath);
+    } else {
+        NSLog(@"Failed to save document. Error: %@", *error);
+    }
 
-  return success;
+    return success;
 }
 
 // MARK: - PSPDFDocumentDelegate
