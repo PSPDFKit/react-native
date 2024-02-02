@@ -141,22 +141,25 @@
   return [self.pdfController.document saveWithOptions:nil error:error];
 }
 
-- (BOOL)saveDocumentWithPageIndex:(NSUInteger)pageIndex outputPath:(NSString *)outputPath error:(NSError **)error {
+- (BOOL)saveDocumentWithPageIndex:(NSUInteger)pageIndex outputPath:(NSString *)filename error:(NSError **)error {
     PSPDFDocument *document = self.pdfController.document;
     PSPDFProcessorConfiguration *configuration = [[PSPDFProcessorConfiguration alloc] initWithDocument:document];
     [configuration includeOnlyIndexes:[NSIndexSet indexSetWithIndex:pageIndex]];
 
-    // Use outputPath directly
-    NSURL *outputURL = [NSURL fileURLWithPath:outputPath];
+    // Construct the full path using the provided filename
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    NSString *fullPath = [documentsDirectory stringByAppendingPathComponent:filename];
+    NSURL *outputURL = [NSURL fileURLWithPath:fullPath];
 
     PSPDFProcessor *processor = [[PSPDFProcessor alloc] initWithConfiguration:configuration securityOptions:nil];
     BOOL success = [processor writeToFileURL:outputURL error:error];
 
     // Check if the document was successfully saved and log the file path
     if (success) {
-        NSLog(@"Document saved successfully at path: %@", outputPath);
+        NSLog(@"Document saved successfully at path: %@", fullPath);
     } else {
-        NSLog(@"Failed to save document. Error: %@", *error);
+        NSLog(@"Failed to save document. Error: %@", *error ? *error : @"Unknown error");
     }
 
     return success;
