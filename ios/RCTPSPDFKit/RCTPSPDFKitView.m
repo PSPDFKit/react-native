@@ -142,27 +142,34 @@
 }
 
 - (BOOL)saveDocumentWithPageIndex:(NSUInteger)pageIndex outputPath:(NSString *)filename error:(NSError **)error {
-    PSPDFDocument *document = self.pdfController.document;
-    PSPDFProcessorConfiguration *configuration = [[PSPDFProcessorConfiguration alloc] initWithDocument:document];
-    [configuration includeOnlyIndexes:[NSIndexSet indexSetWithIndex:pageIndex]];
+  PSPDFDocument *document = self.pdfController.document;
+  PSPDFProcessorConfiguration *configuration = [[PSPDFProcessorConfiguration alloc] initWithDocument:document];
+  [configuration includeOnlyIndexes:[NSIndexSet indexSetWithIndex:pageIndex]];
 
+  // Determine if filename is an absolute path
+  NSString *fullPath;
+  if ([filename isAbsolutePath]) {
+    fullPath = filename;
+  } else {
     // Construct the full path using the provided filename
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsDirectory = [paths objectAtIndex:0];
-    NSString *fullPath = [documentsDirectory stringByAppendingPathComponent:filename];
-    NSURL *outputURL = [NSURL fileURLWithPath:fullPath];
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+    NSString *cacheDirectory = [paths objectAtIndex:0];
+    fullPath = [cacheDirectory stringByAppendingPathComponent:filename];
+  }
 
-    PSPDFProcessor *processor = [[PSPDFProcessor alloc] initWithConfiguration:configuration securityOptions:nil];
-    BOOL success = [processor writeToFileURL:outputURL error:error];
+  NSURL *outputURL = [NSURL fileURLWithPath:fullPath];
 
-    // Check if the document was successfully saved and log the file path
-    if (success) {
-        NSLog(@"Document saved successfully at path: %@", fullPath);
-    } else {
-        NSLog(@"Failed to save document. Error: %@", *error ? *error : @"Unknown error");
-    }
+  PSPDFProcessor *processor = [[PSPDFProcessor alloc] initWithConfiguration:configuration securityOptions:nil];
+  BOOL success = [processor writeToFileURL:outputURL error:error];
 
-    return success;
+  // Check if the document was successfully saved and log the file path
+  if (success) {
+    NSLog(@"Document saved successfully at path: %@", fullPath);
+  } else {
+    NSLog(@"Failed to save document. Error: %@", *error ? *error : @"Unknown error");
+  }
+
+  return success;
 }
 
 // MARK: - PSPDFDocumentDelegate

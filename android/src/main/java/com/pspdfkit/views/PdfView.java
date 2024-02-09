@@ -658,11 +658,16 @@ public class PdfView extends FrameLayout {
     }
 
     public boolean saveDocumentWithPageIndices(int pageIndex, String outputPath) throws Exception {
-        // Prepare the full output path
-        File outputFile = new File(getContext().getExternalFilesDir(null), outputPath);
-        String fullOutputPath = outputFile.getAbsolutePath();
+        // Check if outputPath is an absolute path
+        File outputFile;
+        if (new File(outputPath).isAbsolute()) {
+            outputFile = new File(outputPath);
+        } else {
+            // Prepare the full output path
+            outputFile = new File(getContext().getCacheDir(), outputPath);
+        }
 
-        Log.d("PdfView", "saveDocumentWithPageIndices: Page Index - " + pageIndex + ", Full Output Path: " + fullOutputPath);
+        Log.d("PdfView", "saveDocumentWithPageIndices: Page Index - " + pageIndex);
 
         if (fragment != null && document != null) {
             try {
