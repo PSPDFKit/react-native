@@ -157,6 +157,9 @@
     fullPath = [cacheDirectory stringByAppendingPathComponent:filename];
   }
 
+  // Print the full output path to the console
+  NSLog(@"Full output path: %@", fullPath);
+
   NSURL *outputURL = [NSURL fileURLWithPath:fullPath];
 
   PSPDFProcessor *processor = [[PSPDFProcessor alloc] initWithConfiguration:configuration securityOptions:nil];
