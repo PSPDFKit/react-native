@@ -145,6 +145,9 @@
   PSPDFDocument *document = self.pdfController.document;
   PSPDFProcessorConfiguration *configuration = [[PSPDFProcessorConfiguration alloc] initWithDocument:document];
   [configuration includeOnlyIndexes:[NSIndexSet indexSetWithIndex:pageIndex]];
+  
+  // Set the output format to TIFF
+  [configuration setOutputImageFormat:PSPDFImageFormatTIFF];
 
   // Determine if filename is an absolute path
   NSString *fullPath;
