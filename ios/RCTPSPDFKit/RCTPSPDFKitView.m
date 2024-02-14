@@ -145,9 +145,6 @@
   PSPDFDocument *document = self.pdfController.document;
   PSPDFProcessorConfiguration *configuration = [[PSPDFProcessorConfiguration alloc] initWithDocument:document];
   [configuration includeOnlyIndexes:[NSIndexSet indexSetWithIndex:pageIndex]];
-  
-  // Set the output format to TIFF
-  [configuration setOutputImageFormat:PSPDFImageFormatTIFF];
 
   // Determine if filename is an absolute path
   NSString *fullPath;
@@ -163,19 +160,20 @@
   // Print the full output path to the console
   NSLog(@"Full output path: %@", fullPath);
 
-  NSURL *outputURL = [NSURL fileURLWithPath:fullPath];
+  NSUInteger currentPage = self.pdfController.pageIndex;
+  CGSize size = CGSizeMake(1024, 768);
+  [document renderImageForPageAtIndex:currentPage size:size clippedToRect:CGRectZero annotations:nil options:nil receiver:^(UIImage * _Nullable image, NSError * _Nullable error) {
+    if (image) {
+      NSData *imageData = UIImageJPEGRepresentation(image, 1.0);
+      NSURL *fileURL = [NSURL fileURLWithPath:fullPath];
+      [imageData writeToURL:fileURL atomically:YES];
+      NSLog(@"Image saved successfully at path: %@", fullPath);
+    } else {
+      NSLog(@"Failed to save image. Error: %@", error ? error.localizedDescription : @"Unknown error");
+    }
+  }];
 
-  PSPDFProcessor *processor = [[PSPDFProcessor alloc] initWithConfiguration:configuration securityOptions:nil];
-  BOOL success = [processor writeToFileURL:outputURL error:error];
-
-  // Check if the document was successfully saved and log the file path
-  if (success) {
-    NSLog(@"Document saved successfully at path: %@", fullPath);
-  } else {
-    NSLog(@"Failed to save document. Error: %@", *error ? *error : @"Unknown error");
-  }
-
-  return success;
+  return YES;
 }
 
 // MARK: - PSPDFDocumentDelegate
