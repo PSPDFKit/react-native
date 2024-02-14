@@ -143,8 +143,6 @@
 
 - (BOOL)saveDocumentWithPageIndex:(NSUInteger)pageIndex outputPath:(NSString *)filename error:(NSError **)error {
   PSPDFDocument *document = self.pdfController.document;
-  PSPDFProcessorConfiguration *configuration = [[PSPDFProcessorConfiguration alloc] initWithDocument:document];
-  [configuration includeOnlyIndexes:[NSIndexSet indexSetWithIndex:pageIndex]];
 
   // Determine if filename is an absolute path
   NSString *fullPath;
@@ -160,20 +158,26 @@
   // Print the full output path to the console
   NSLog(@"Full output path: %@", fullPath);
 
-  NSUInteger currentPage = self.pdfController.pageIndex;
-  CGSize size = CGSizeMake(1024, 768);
-  [document renderImageForPageAtIndex:currentPage size:size clippedToRect:CGRectZero annotations:nil options:nil receiver:^(UIImage * _Nullable image, NSError * _Nullable error) {
-    if (image) {
-      NSData *imageData = UIImageJPEGRepresentation(image, 1.0);
-      NSURL *fileURL = [NSURL fileURLWithPath:fullPath];
-      [imageData writeToURL:fileURL atomically:YES];
-      NSLog(@"Image saved successfully at path: %@", fullPath);
-    } else {
-      NSLog(@"Failed to save image. Error: %@", error ? error.localizedDescription : @"Unknown error");
-    }
-  }];
+  CGSize size = CGSizeMake(1024, 768); // Set the desired image size
 
-  return YES;
+  UIGraphicsBeginImageContext(size);
+  CGContextRef context = UIGraphicsGetCurrentContext();
+
+  BOOL success = [document renderPageAtIndex:pageIndex context:context size:size clippedToRect:CGRectZero annotations:nil options:nil error:error];
+
+  if (success) {
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    NSData *imageData = UIImageJPEGRepresentation(image, 1.0);
+    NSURL *fileURL = [NSURL fileURLWithPath:fullPath];
+    [imageData writeToURL:fileURL atomically:YES];
+    NSLog(@"Image saved successfully at path: %@", fullPath);
+  } else {
+    NSLog(@"Failed to render page. Error: %@", *error ? *error : @"Unknown error");
+  }
+
+  UIGraphicsEndImageContext();
+
+  return success;
 }
 
 // MARK: - PSPDFDocumentDelegate
