@@ -26,6 +26,8 @@ import android.view.Choreographer;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -44,6 +46,7 @@ import com.pspdfkit.configuration.activity.PdfActivityConfiguration;
 import com.pspdfkit.document.DocumentSaveOptions;
 import com.pspdfkit.document.ImageDocument;
 import com.pspdfkit.document.ImageDocumentLoader;
+import com.pspdfkit.configuration.page.PageRenderConfiguration;
 import com.pspdfkit.document.PdfDocument;
 import com.pspdfkit.document.PdfDocumentLoader;
 import com.pspdfkit.document.processor.PdfProcessor;
@@ -85,6 +88,8 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -668,12 +673,20 @@ public class PdfView extends FrameLayout {
         }
 
         Log.d("PdfView", "saveDocumentWithPageIndices: Page Index - " + pageIndex);
+        Log.d("PdfView", "saveDocumentWithPageIndices: Output Directory - " + outputFile.getAbsolutePath());
 
         if (fragment != null && document != null) {
             try {
-                HashSet<Integer> pageIndices = new HashSet<>(Arrays.asList(pageIndex));
-                PdfProcessorTask task = PdfProcessorTask.fromDocument(document).keepPages(pageIndices);
-                PdfProcessor.processDocument(task, outputFile);
+                // Render the page to a bitmap.
+                PageRenderConfiguration configuration = new PageRenderConfiguration.Builder()
+                    .setTransparentBackground(true)
+                    .build();
+                Bitmap bitmap = document.renderPageToBitmap(getContext(), pageIndex, 1024, 768, configuration);
+
+                // Save the bitmap to a file.
+                try (OutputStream out = new FileOutputStream(outputFile)) {
+                    bitmap.compress(CompressFormat.JPEG, 100, out);
+                }
 
                 eventDispatcher.dispatchEvent(new PdfViewDocumentSavedEvent(getId()));
                 return true;
