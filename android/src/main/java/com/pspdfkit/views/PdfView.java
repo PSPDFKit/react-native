@@ -46,7 +46,6 @@ import com.pspdfkit.configuration.activity.PdfActivityConfiguration;
 import com.pspdfkit.document.DocumentSaveOptions;
 import com.pspdfkit.document.ImageDocument;
 import com.pspdfkit.document.ImageDocumentLoader;
-import com.pspdfkit.configuration.page.PageRenderConfiguration;
 import com.pspdfkit.document.PdfDocument;
 import com.pspdfkit.document.PdfDocumentLoader;
 import com.pspdfkit.document.processor.PdfProcessor;
@@ -677,16 +676,9 @@ public class PdfView extends FrameLayout {
 
         if (fragment != null && document != null) {
             try {
-                // Render the page to a bitmap.
-                PageRenderConfiguration configuration = new PageRenderConfiguration.Builder()
-                    .setTransparentBackground(true)
-                    .build();
-                Bitmap bitmap = document.renderPageToBitmap(getContext(), pageIndex, 1024, 768, configuration);
-
-                // Save the bitmap to a file.
-                try (OutputStream out = new FileOutputStream(outputFile)) {
-                    bitmap.compress(CompressFormat.JPEG, 100, out);
-                }
+                HashSet<Integer> pageIndices = new HashSet<>(Arrays.asList(pageIndex));
+                PdfProcessorTask task = PdfProcessorTask.fromDocument(document).keepPages(pageIndices);
+                PdfProcessor.processDocument(task, outputFile);
 
                 eventDispatcher.dispatchEvent(new PdfViewDocumentSavedEvent(getId()));
                 return true;
