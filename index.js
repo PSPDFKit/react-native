@@ -245,7 +245,7 @@ class PSPDFKitView extends React.Component {
    *
    * @returns { Promise<boolean> } A promise resolving to ```true``` if the document was saved, and ```false``` if not.
    */
-  saveDocumentWithIndex = function (pageIndex, outputPath) {
+  saveDocumentWithIndex = function (pageIndex, outputPath, documentType) {
     if (Platform.OS === 'android') {
       let requestId = this._nextRequestId++;
       let requestMap = this._requestMap;
@@ -262,7 +262,8 @@ class PSPDFKitView extends React.Component {
       return NativeModules.PSPDFKitViewManager.saveDocumentWithPageIndex(
         findNodeHandle(this.refs.pdfView),
         pageIndex,
-        outputPath
+        outputPath,
+        documentType // Adding the documentType parameter
       );
     }
   };

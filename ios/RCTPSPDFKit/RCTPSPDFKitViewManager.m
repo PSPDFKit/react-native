@@ -245,12 +245,32 @@ RCT_EXPORT_METHOD(saveCurrentDocument:(nonnull NSNumber *)reactTag resolver:(RCT
   });
 }
 
-RCT_EXPORT_METHOD(saveDocumentWithPageIndex:(nonnull NSNumber *)reactTag pageIndex:(NSUInteger)pageIndex outputPath:(NSString *)outputPath resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+RCT_EXPORT_METHOD(saveDocumentWithPageIndex:(nonnull NSNumber *)reactTag 
+                                  pageIndex:(NSUInteger)pageIndex 
+                                 outputPath:(NSString *)outputPath
+                               documentType:(NSString *)documentType
+                                   resolver:(RCTPromiseResolveBlock)resolve 
+                                   rejecter:(RCTPromiseRejectBlock)reject) {
   dispatch_async(dispatch_get_main_queue(), ^{
     RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
     if ([component isKindOfClass:[RCTPSPDFKitView class]]) {
         NSError *error;
-        BOOL success = [component saveDocumentWithPageIndex:pageIndex outputPath:outputPath error:&error];
+        BOOL success;
+
+        // Use a switch case or if-else to handle different document types
+        if ([documentType isEqualToString:@"pdf"]) {
+          // Save PDF logic
+          success = [component saveDocumentWithPageIndex:pageIndex outputPath:outputPath error:&error];
+        } else if ([documentType isEqualToString:@"image"]) {
+          // Save image logic
+          success = [component saveImageFromPDF:pageIndex outputPath:outputPath error:&error];
+        } else {
+          // Handle unsupported document types
+          NSLog(@"Unsupported document type.");
+          reject(@"error", @"Unsupported document type.", nil);
+          return;
+        }
+        
         if (success) {
           resolve(@(success));
         } else {
