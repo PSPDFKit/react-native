@@ -690,6 +690,31 @@ public class PdfView extends FrameLayout {
         return false;
     }
 
+    public boolean saveImageFromPDF(int pageIndex, String outputPath) throws Exception {
+        // Check if outputPath is an absolute path
+        File outputFile;
+        if (new File(outputPath).isAbsolute()) {
+            outputFile = new File(outputPath);
+        } else {
+            // Prepare the full output path
+            outputFile = new File(getContext().getCacheDir(), outputPath);
+        }
+
+        Log.d("PdfView", "saveDocumentWithPageIndices: Page Index - " + pageIndex);
+        Log.d("PdfView", "saveDocumentWithPageIndices: Output Directory - " + outputFile.getAbsolutePath());
+
+        if (fragment != null && document != null) {
+            try {
+                Log.d("PdfView", "saveImageFromPDF: Saving Image from PDF *TEST*");
+                return true;
+            } catch (Exception e) {
+                eventDispatcher.dispatchEvent(new PdfViewDocumentSaveFailedEvent(getId(), e.getMessage()));
+                throw e;
+            }
+        }
+        return false;
+    }
+
     public Single<List<Annotation>> getAnnotations(final int pageIndex, @Nullable final String type) {
         PdfDocument document = fragment.getDocument();
         if (pageIndex > document.getPageCount()-1) {

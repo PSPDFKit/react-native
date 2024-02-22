@@ -54,6 +54,7 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
     public static final int COMMAND_EXIT_CURRENTLY_ACTIVE_MODE = 2;
     public static final int COMMAND_SAVE_CURRENT_DOCUMENT = 3;
     public static final int COMMAND_SAVE_DOCUMENT_WITH_PAGE_INDICES = 18;
+    public static final int COMMAND_SAVE_IMAGE_FROM_PDF = 19;
     public static final int COMMAND_GET_ANNOTATIONS = 4;
     public static final int COMMAND_ADD_ANNOTATION = 5;
     public static final int COMMAND_GET_ALL_UNSAVED_ANNOTATIONS = 6;
@@ -105,6 +106,7 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
         commandMap.put("exitCurrentlyActiveMode", COMMAND_EXIT_CURRENTLY_ACTIVE_MODE);
         commandMap.put("saveCurrentDocument", COMMAND_SAVE_CURRENT_DOCUMENT);
         commandMap.put("saveDocumentWithPageIndices", COMMAND_SAVE_DOCUMENT_WITH_PAGE_INDICES);
+        commandMap.put("saveImageFromPDF", COMMAND_SAVE_IMAGE_FROM_PDF);
         commandMap.put("getAnnotations", COMMAND_GET_ANNOTATIONS);
         commandMap.put("addAnnotation", COMMAND_ADD_ANNOTATION);
         commandMap.put("getAllUnsavedAnnotations", COMMAND_GET_ALL_UNSAVED_ANNOTATIONS);
@@ -234,6 +236,20 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
                     Log.d("ReactPdfViewManager", "Page Index: " + pageIndex + ", Output Path: " + outputPath);
                     try {
                     boolean result = root.saveDocumentWithPageIndices(pageIndex, outputPath); // Pass both parameters to the method
+                    root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, result));
+                    } catch (Exception e) {
+                    root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, e));
+                    }
+                }
+                break;
+            case COMMAND_SAVE_IMAGE_FROM_PDF:
+                if (args != null) {
+                    final int requestId = args.getInt(0);
+                    final int pageIndex = args.getInt(1); // Get the page index
+                    final String outputPath = args.getString(2); // Get the output path
+                    Log.d("ReactPdfViewManager", "Page Index: " + pageIndex + ", Output Path: " + outputPath);
+                    try {
+                    boolean result = root.saveImageFromPDF(pageIndex, outputPath); // Pass both parameters to the method
                     root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, result));
                     } catch (Exception e) {
                     root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, e));

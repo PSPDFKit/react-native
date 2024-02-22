@@ -252,11 +252,22 @@ class PSPDFKitView extends React.Component {
       let promise = new Promise(function (resolve, reject) {
         requestMap[requestId] = { resolve, reject };
       });
-      UIManager.dispatchViewManagerCommand(
-        findNodeHandle(this.refs.pdfView),
-        this._getViewManagerConfig('RCTPSPDFKitView').Commands.saveDocumentWithPageIndices,
-        [requestId, pageIndex, outputPath]
-      );
+      
+      // If the documentType is pdf, we call the saveDocumentWithPageIndices method
+      if (documentType === 'pdf') {
+        UIManager.dispatchViewManagerCommand(
+          findNodeHandle(this.refs.pdfView),
+          this._getViewManagerConfig('RCTPSPDFKitView').Commands.saveDocumentWithPageIndices,
+          [requestId, pageIndex, outputPath]
+        );
+      } else if (documentType === 'image') {
+        UIManager.dispatchViewManagerCommand(
+          findNodeHandle(this.refs.pdfView),
+          this._getViewManagerConfig('RCTPSPDFKitView').Commands.saveImageFromPDF,
+          [requestId, pageIndex, outputPath]
+        );
+      }
+
       return promise;
     } else if (Platform.OS === 'ios') {
       return NativeModules.PSPDFKitViewManager.saveDocumentWithPageIndex(
