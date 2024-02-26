@@ -700,12 +700,23 @@ public class PdfView extends FrameLayout {
             outputFile = new File(getContext().getCacheDir(), outputPath);
         }
 
-        Log.d("PdfView", "saveDocumentWithPageIndices: Page Index - " + pageIndex);
-        Log.d("PdfView", "saveDocumentWithPageIndices: Output Directory - " + outputFile.getAbsolutePath());
+        Log.d("PdfView", "saveImageFromPDF: Page Index - " + pageIndex);
+        Log.d("PdfView", "saveImageFromPDF: Output Directory - " + outputFile.getAbsolutePath());
 
         if (fragment != null && document != null) {
             try {
-                Log.d("PdfView", "saveImageFromPDF: Saving Image from PDF *TEST*");
+                // Render the page to a bitmap.
+                PageRenderConfiguration configuration = new PageRenderConfiguration.Builder()
+                    .setTransparentBackground(true)
+                    .build();
+                Bitmap bitmap = document.renderPageToBitmap(getContext(), pageIndex, 1024, 768, configuration);
+
+                // Save the bitmap to a file.
+                try (OutputStream out = new FileOutputStream(outputFile)) {
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+                }
+
+                Log.d("PdfView", "saveImageFromPDF: Saving Image from PDF *SUCCESS*");
                 return true;
             } catch (Exception e) {
                 eventDispatcher.dispatchEvent(new PdfViewDocumentSaveFailedEvent(getId(), e.getMessage()));
