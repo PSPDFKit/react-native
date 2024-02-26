@@ -708,7 +708,6 @@ public class PdfView extends FrameLayout {
             try {
                 // Render the page to a bitmap.
                 PageRenderConfiguration configuration = new PageRenderConfiguration.Builder()
-                    .setTransparentBackground(true)
                     .build();
                 Bitmap bitmap = document.renderPageToBitmap(getContext(), pageIndex, 1024, 768, configuration);
 
