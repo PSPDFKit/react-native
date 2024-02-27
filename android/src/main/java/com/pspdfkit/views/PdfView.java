@@ -709,8 +709,8 @@ public class PdfView extends FrameLayout {
             try {
                 // Get the dimensions of the page
                 Size pageSize = document.getPageSize(pageIndex);
-                int pageWidth = pageSize.width;
-                int pageHeight = pageSize.height;
+                int pageWidth = Math.round(pageSize.width);
+                int pageHeight = Math.round(pageSize.height);
                 
                 // Render the page to a bitmap.
                 PageRenderConfiguration configuration = new PageRenderConfiguration.Builder()
