@@ -706,10 +706,17 @@ public class PdfView extends FrameLayout {
 
         if (fragment != null && document != null) {
             try {
+                // Get the page from the document
+                Page page = document.getPage(pageIndex);
+
+                // Get the dimensions of the page
+                int pageWidth = page.getWidth();
+                int pageHeight = page.getHeight();
+
                 // Render the page to a bitmap.
                 PageRenderConfiguration configuration = new PageRenderConfiguration.Builder()
                     .build();
-                Bitmap bitmap = document.renderPageToBitmap(getContext(), pageIndex, 1024, 768, configuration);
+                Bitmap bitmap = document.renderPageToBitmap(getContext(), pageIndex, pageWidth, pageHeight, configuration);
 
                 // Save the bitmap to a file.
                 try (OutputStream out = new FileOutputStream(outputFile)) {
