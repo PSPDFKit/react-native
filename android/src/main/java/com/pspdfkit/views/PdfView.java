@@ -39,6 +39,7 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.events.EventDispatcher;
 import com.pspdfkit.PSPDFKit;
+import com.pspdfkit.utils.Size;
 import com.pspdfkit.annotations.Annotation;
 import com.pspdfkit.annotations.AnnotationType;
 import com.pspdfkit.annotations.configuration.AnnotationConfiguration;
@@ -706,12 +707,10 @@ public class PdfView extends FrameLayout {
 
         if (fragment != null && document != null) {
             try {
-                // Get the page from the document
-                Page page = document.getPage(pageIndex);
-
                 // Get the dimensions of the page
-                int pageWidth = page.getWidth();
-                int pageHeight = page.getHeight();
+                Size pageSize = document.getPageSize(pageIndex);
+                int pageWidth = pageSize.getWidth();
+                int pageHeight = pageSize.getHeight();
 
                 // Render the page to a bitmap.
                 PageRenderConfiguration configuration = new PageRenderConfiguration.Builder()
