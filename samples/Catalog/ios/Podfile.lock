@@ -71,12 +71,12 @@ PODS:
   - hermes-engine (0.73.0):
     - hermes-engine/Pre-built (= 0.73.0)
   - hermes-engine/Pre-built (0.73.0)
-  - Instant (13.1.0)
+  - Instant (13.3.1)
   - libevent (2.1.12)
   - OpenSSL-Universal (1.1.1100)
-  - PSPDFKit (13.1.0):
-    - PSPDFKit/Core (= 13.1.0)
-  - PSPDFKit/Core (13.1.0)
+  - PSPDFKit (13.3.1):
+    - PSPDFKit/Core (= 13.3.1)
+  - PSPDFKit/Core (13.3.1)
   - RCT-Folly (2022.05.16.00):
     - boost
     - DoubleConversion
@@ -948,9 +948,9 @@ PODS:
   - React-Mapbuffer (0.73.0):
     - glog
     - React-debug
-  - react-native-pspdfkit (2.8.0):
-    - Instant (= 13.1.0)
-    - PSPDFKit (= 13.1.0)
+  - react-native-pspdfkit (2.8.1):
+    - Instant (= 13.3.1)
+    - PSPDFKit (= 13.3.1)
     - React
   - react-native-safe-area (0.5.1):
     - React
@@ -1368,10 +1368,10 @@ SPEC CHECKSUMS:
   fmt: ff9d55029c625d3757ed641535fd4a75fedc7ce9
   glog: c5d68082e772fa1c511173d6b30a9de2c05a69a2
   hermes-engine: 34304f8c6e8fa68f63a5fe29af82f227d817d7a7
-  Instant: 3f30e011da0c0b2fe5f46cd6d67ef1eb84adc505
+  Instant: a15ca1e24402a7e03821268b1352333fab6bbcd2
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
   OpenSSL-Universal: ebc357f1e6bc71fa463ccb2fe676756aff50e88c
-  PSPDFKit: e107b219f944d3d4ec1be1fc52a67055444f1657
+  PSPDFKit: 55697d64f1296860a179e1701236dd8239c366a4
   RCT-Folly: 7169b2b1c44399c76a47b5deaaba715eeeb476c0
   RCTRequired: 5e3631b27c08716986980ef23eed8abdee1cdcaf
   RCTTypeSafety: 02a64828b0b428eb4f63de1397d44fb2d0747e85
@@ -1393,7 +1393,7 @@ SPEC CHECKSUMS:
   React-jsinspector: 9f6fb9ed9f03a0fb961ab8dc2e0e0ee0dc729e77
   React-logger: 008caec0d6a587abc1e71be21bfac5ba1662fe6a
   React-Mapbuffer: 58fe558faf52ecde6705376700f848d0293d1cef
-  react-native-pspdfkit: edf58100b9dfa4af08ab023f22a8bfa55e3c592c
+  react-native-pspdfkit: 7e3741c63b65af2149047e197f4b812b2ec47887
   react-native-safe-area: e8230b0017d76c00de6b01e2412dcf86b127c6a3
   react-native-safe-area-context: cd1169d797a2ef722a00bfc5af10748d5b6c94f9
   React-nativeconfig: a063483672b8add47a4875b0281e202908ff6747
@@ -1421,8 +1421,8 @@ SPEC CHECKSUMS:
   RNGestureHandler: 61bfdfc05db9b79dd61f894dcd29d3dcc6db3c02
   RNScreens: b582cb834dc4133307562e930e8fa914b8c04ef2
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
-  Yoga: 44003f970aa541b79dfdd59cf236fda41bd5890f
+  Yoga: 20d6a900dcc8d61d5e3b799bbf627cc34474a8c4
 
 PODFILE CHECKSUM: c62711289da4cd7e2158ac353387fd0d3d211c7f
 
-COCOAPODS: 1.14.3
+COCOAPODS: 1.12.1

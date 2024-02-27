@@ -1,5 +1,12 @@
 ## Newest Release
 
+### 2.8.1 - 27 Feb 2024
+
+- Updates for PSPDFKit 13.3.1 for iOS. (#43565)
+- Removes `scrollViewInsetAdjustment`, `spreadFitting` and `allowedMenuActions` configuration options which are deprecated in PSPDFKit for iOS. (#43565)
+
+## Previous Releases
+
 ### 2.8.0 - 18 Dec 2023
 
 - Adds TypeScript types support to PSPDFKit plugin. (#42380)
@@ -12,8 +19,6 @@
 - Fixes issue where getAnnotations with invalid page index caused a crash on Android. (#42073)
 - Fixes issue where onAnnotationsChanged event did not fire when a form field was updated on Android. (#42525)
 - Fixes issue where annotation toolbar color picker wasn't added by default. (#42761)
-
-## Previous Releases
 
 ### 2.7.0 - 07 Sep 2023
 
