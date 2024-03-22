@@ -3,7 +3,7 @@
  *
  *   PSPDFKit
  *
- *   Copyright © 2021-2023 PSPDFKit GmbH. All rights reserved.
+ *   Copyright © 2021-2024 PSPDFKit GmbH. All rights reserved.
  *
  *   THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
  *   AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -20,6 +20,8 @@ import androidx.fragment.app.FragmentActivity;
 
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.WritableArray;
+import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.UIManagerModule;
@@ -34,6 +36,8 @@ import com.pspdfkit.react.menu.ReactGroupingRule;
 import com.pspdfkit.views.PdfView;
 import com.pspdfkit.configuration.activity.PdfActivityConfiguration;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
@@ -63,8 +67,10 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
     public static final int COMMAND_REMOVE_FRAGMENT = 12;
     public static final int COMMAND_SET_TOOLBAR_MENU_ITEMS = 13;
     public static final int COMMAND_REMOVE_ANNOTATIONS = 14;
-    public  static final int COMMAND_SET_MEASUREMENT_SCALE = 17;
-    public static final int COMMAND_SET_MEASUREMENT_PRECISION = 16;
+    public static final int COMMAND_GET_CONFIGURATION = 18;
+    public static final int COMMAND_SET_TOOLBAR = 19;
+    public static final int COMMAND_SET_MEASUREMENT_VALUE_CONFIGURATIONS = 21;
+    public static final int COMMAND_GET_MEASUREMENT_VALUE_CONFIGURATIONS = 22;
 
     private final CompositeDisposable annotationDisposables = new CompositeDisposable();
 
@@ -113,8 +119,10 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
         commandMap.put("getAllAnnotations", COMMAND_GET_ALL_ANNOTATIONS);
         commandMap.put("removeFragment", COMMAND_REMOVE_FRAGMENT);
         commandMap.put("setToolbarMenuItems", COMMAND_SET_TOOLBAR_MENU_ITEMS);
-        commandMap.put("setMeasurementScale", COMMAND_SET_MEASUREMENT_SCALE);
-        commandMap.put("setMeasurementPrecision", COMMAND_SET_MEASUREMENT_PRECISION);
+        commandMap.put("setMeasurementValueConfigurations", COMMAND_SET_MEASUREMENT_VALUE_CONFIGURATIONS);
+        commandMap.put("getMeasurementValueConfigurations", COMMAND_GET_MEASUREMENT_VALUE_CONFIGURATIONS);
+        commandMap.put("getConfiguration", COMMAND_GET_CONFIGURATION);
+        commandMap.put("setToolbar", COMMAND_SET_TOOLBAR);
         return commandMap;
     }
 
@@ -126,7 +134,20 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
     @ReactProp(name = "configuration")
     public void setConfiguration(PdfView view, @NonNull ReadableMap configuration) {
         ConfigurationAdapter configurationAdapter = new ConfigurationAdapter(view.getContext(), configuration);
-        view.setConfiguration(configurationAdapter.build());
+        PdfActivityConfiguration configurationBuild = configurationAdapter.build();
+        view.setInitialConfiguration(configurationBuild);
+        // If there are pending toolbar items, we need to apply them.
+        if (view.getPendingToolbarItems() != null) {
+            ToolbarMenuItemsAdapter newConfigurations = new ToolbarMenuItemsAdapter(configurationBuild, view.getPendingToolbarItems(), view.getInitialConfiguration());
+            view.setConfiguration(newConfigurations.build());
+        } else {
+            view.setConfiguration(configurationBuild);
+        }
+        view.setDocumentPassword(configuration.getString("documentPassword"));
+        // Although MeasurementValueConfigurations is specified as part of Configuration, it is configured separately on the Android SDK
+        if (configuration.getArray("measurementValueConfigurations") != null) {
+            view.setMeasurementValueConfigurations(configuration.getArray("measurementValueConfigurations"));
+        }        
     }
 
      @ReactProp(name = "annotationPresets")
@@ -145,6 +166,36 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
     @ReactProp(name = "pageIndex")
     public void setPageIndex(PdfView view, int pageIndex) {
         view.setPageIndex(pageIndex);
+    }
+
+    @ReactProp(name = "toolbar")
+    public void setToolbar(@NonNull final PdfView view, @NonNull ReadableMap toolbar) {
+        ReadableMap toolbarMenuItems = toolbar.getMap("toolbarMenuItems");
+        ArrayList buttons = toolbarMenuItems.getArray("buttons").toArrayList();
+        WritableArray stockToolbarItems = new WritableNativeArray();
+        ArrayList customToolbarItems = new ArrayList();
+        for(int i = 0; i < buttons.size(); i++) {
+            Object item = buttons.get(i);
+            if (item instanceof String) {
+                stockToolbarItems.pushString((String)item);
+            } else if (item instanceof HashMap) {
+                ((HashMap<String, Integer>) item).put("index", i);
+                customToolbarItems.add(item);
+            }
+        }
+        if (stockToolbarItems != null) {
+            PdfActivityConfiguration currentConfiguration = view.getConfiguration();
+            ToolbarMenuItemsAdapter newConfigurations = new ToolbarMenuItemsAdapter(currentConfiguration, stockToolbarItems, view.getInitialConfiguration());
+            // If the initial config is null, it means that the user-provided config has not been applied yet, so we set toolbar items as pending.
+            if (view.getInitialConfiguration() == null) {
+                view.setPendingToolbarItems(stockToolbarItems);
+            } else {
+                view.setConfiguration(newConfigurations.build());
+            }
+        }
+        if (customToolbarItems != null) {
+            view.setCustomToolbarItems(customToolbarItems);
+        }
     }
 
     @ReactProp(name = "disableDefaultActionForTappedAnnotations")
@@ -192,8 +243,20 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
     public void setToolbarMenuItems(@NonNull final PdfView view, @Nullable final ReadableArray toolbarItems) {
         if (toolbarItems != null) {
             PdfActivityConfiguration currentConfiguration = view.getConfiguration();
-            ToolbarMenuItemsAdapter newConfigurations = new ToolbarMenuItemsAdapter(currentConfiguration, toolbarItems);
-            view.setConfiguration(newConfigurations.build());
+            ToolbarMenuItemsAdapter newConfigurations = new ToolbarMenuItemsAdapter(currentConfiguration, toolbarItems, view.getInitialConfiguration());
+            // If the initial config is null, it means that the user-provided config has not been applied yet, so we set toolbar items as pending.
+            if (view.getInitialConfiguration() == null) {
+                view.setPendingToolbarItems(toolbarItems);
+            } else {
+                view.setConfiguration(newConfigurations.build());
+            }
+        }
+    }
+
+    @ReactProp(name = "measurementValueConfigurations")
+    public void setMeasurementValueConfigurations(@NonNull final PdfView view, @Nullable final ReadableArray measurementValueConfigs) {
+        if (measurementValueConfigs != null) {
+            view.setMeasurementValueConfigurations(measurementValueConfigs);
         }
     }
 
@@ -324,26 +387,38 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
                     setToolbarMenuItems(root,args.getArray(0));
                 }
                 break;
-            case COMMAND_SET_MEASUREMENT_SCALE:
+            case COMMAND_SET_MEASUREMENT_VALUE_CONFIGURATIONS:
+                if (args != null && args.size() == 2) {
+                    final int requestId = args.getInt(0);
+                    setMeasurementValueConfigurations(root, args.getArray(1));
+                    root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, true));
+                }
+                break;
+            case COMMAND_GET_MEASUREMENT_VALUE_CONFIGURATIONS:
                 if (args != null) {
                     final int requestId = args.getInt(0);
                     try {
-                        boolean result = root.setMeasurementScale(args.getMap(1));
+                        JSONObject result = root.getMeasurementValueConfigurations();
                         root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, result));
                     } catch (Exception e) {
                         root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, e));
                     }
                 }
                 break;
-            case COMMAND_SET_MEASUREMENT_PRECISION:
+            case COMMAND_GET_CONFIGURATION:
                 if (args != null) {
                     final int requestId = args.getInt(0);
                     try {
-                        boolean result = root.setMeasurementPrecision(args.getString(1));
+                        JSONObject result = root.convertConfiguration();
                         root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, result));
                     } catch (Exception e) {
                         root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, e));
                     }
+                }
+                break;
+            case COMMAND_SET_TOOLBAR:
+                if (args != null && args.size() == 1) {
+                    setToolbar(root,args.getMap(0));
                 }
                 break;
         }

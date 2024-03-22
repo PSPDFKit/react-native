@@ -1,6 +1,6 @@
 {
   "name": "catalog",
-  "version": "2.8.1",
+  "version": "2.9.0",
   "private": true,
   "scripts": {
     "android": "npx react-native run-android",
@@ -25,7 +25,7 @@
     "@xmldom/xmldom": ">=0.8.10",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
-    "react-native": "0.73.0",
+    "react-native": "0.73.6",
     "react-native-fs": "https://github.com/1nspir3d/react-native-fs.git",
     "react-native-gesture-handler": "^2.14.0",
     "react-native-gradle-plugin": "^0.71.19",
@@ -41,9 +41,9 @@
     "@babel/preset-env": "^7.23.5",
     "@babel/runtime": "^7.23.5",
     "@react-native/eslint-config": "^0.74.0",
-    "@react-native/metro-config": "^0.73.2",
+    "@react-native/metro-config": "^0.73.5",
     "@react-native/typescript-config": "^0.73.1",
-    "@react-native/babel-preset": "^0.73.18",
+    "@react-native/babel-preset": "^0.73.21",
     "@types/jest": "^29.5.11",
     "@types/react": "^18.2.43",
     "@types/react-test-renderer": "^18.0.7",

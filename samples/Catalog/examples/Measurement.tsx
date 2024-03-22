@@ -1,12 +1,13 @@
 import React from 'react';
 import {
+  Alert,
   processColor,
   SafeAreaView,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
-import PSPDFKitView from 'react-native-pspdfkit';
+import PSPDFKitView, { Measurements, MeasurementScale, MeasurementValueConfiguration } from 'react-native-pspdfkit';
 
 import {
   measurementsDocument,
@@ -22,18 +23,31 @@ class Measurement extends BaseExampleAutoHidingHeaderComponent {
     this.pdfRef = React.createRef();
   }
 
-  onChangeScale = () => {
-    this.pdfRef.current?.setMeasurementScale({
-      unitFrom: 'mm',
+  onChangeMeasurement = async () => {
+     const scale: MeasurementScale = {
+      unitFrom: Measurements.ScaleUnitFrom.INCH,
       valueFrom: 1.0,
-      unitTo: 'mi',
-      valueTo: 1.0,
-    });
+      unitTo: Measurements.ScaleUnitTo.CM,
+      valueTo: 2.54
+     };
+     
+     const measurementValueConfig: MeasurementValueConfiguration = {
+      name: 'Custom Scale 3',
+      scale: scale,
+      precision: Measurements.Precision.FOUR_DP,
+      isSelected: true
+     };
+     
+     const configs = [measurementValueConfig];
+     await this.pdfRef.current?.setMeasurementValueConfigurations(configs);
+     Alert.alert('PSPDFKit', 'New Measurement Config Added!');
   };
 
-  onChangePrecision = () => {
-    this.pdfRef.current?.setMeasurementPrecision('fourDP');
-  };
+  onGetMeasurementConfigs = async () => {
+    const result = await this.pdfRef.current?.getMeasurementValueConfigurations();
+    Alert.alert('PSPDFKit', 'Measurement Configs: ' + JSON.stringify(result));
+    console.log(JSON.stringify(result));
+ };
 
   override render() {
     return (
@@ -42,8 +56,30 @@ class Measurement extends BaseExampleAutoHidingHeaderComponent {
           ref={this.pdfRef}
           document={measurementsDocument}
           configuration={{
-            backgroundColor: processColor('lightgrey'),
+            iOSBackgroundColor: processColor('lightgrey'),
             pageMode: 'single',
+            measurementValueConfigurations: [
+              {
+                name: 'Custom Scale 1',
+                scale: {
+                  unitFrom: Measurements.ScaleUnitFrom.INCH,
+                  valueFrom: 1.0,
+                  unitTo: Measurements.ScaleUnitTo.CM,
+                  valueTo: 3.0,
+                },
+                precision: Measurements.Precision.TWO_DP,
+              },
+              {
+                name: 'Custom Scale 2',
+                scale: {
+                  unitFrom: Measurements.ScaleUnitFrom.INCH,
+                  valueFrom: 3.0,
+                  unitTo: Measurements.ScaleUnitTo.FT,
+                  valueTo: 6.54,
+                },
+                precision: Measurements.Precision.THREE_DP,
+              },
+            ]
           }}
           fragmentTag="PDF1"
           style={styles.pdfColor}
@@ -52,11 +88,11 @@ class Measurement extends BaseExampleAutoHidingHeaderComponent {
           <View style={styles.column}>
             <View>
               <View style={styles.horizontalContainer}>
-                <TouchableOpacity onPress={this.onChangePrecision}>
-                  <Text style={styles.button}>{'Change precision'}</Text>
+                <TouchableOpacity onPress={this.onChangeMeasurement}>
+                  <Text style={styles.button}>{'Change Measurements'}</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={this.onChangeScale}>
-                  <Text style={styles.button}>{'Change scale'}</Text>
+                <TouchableOpacity onPress={this.onGetMeasurementConfigs}>
+                  <Text style={styles.button}>{'Get Measurements'}</Text>
                 </TouchableOpacity>
               </View>
             </View>

@@ -1,5 +1,5 @@
 //
-//  Copyright © 2018-2023 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2018-2024 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -22,6 +22,7 @@
 
 @property (nonatomic, nullable) UIViewController *topController;
 @property (nonatomic, strong) NSDictionary *closeButtonAttributes;
+@property (nonatomic, strong) NSMutableDictionary *customBarButtons;
 
 @end
 
@@ -32,6 +33,7 @@
     _pdfController = [[RCTPSPDFKitViewController alloc] init];
     _pdfController.delegate = self;
     _pdfController.annotationToolbarController.delegate = self;
+    _customBarButtons = [NSMutableDictionary new];
     
     // Store the closeButton's target and selector in order to call it later.
     _closeButtonAttributes = @{@"target" : _pdfController.closeButtonItem.target,
@@ -102,7 +104,6 @@
 - (void)closeButtonPressed:(nullable id)sender {
   if (self.onCloseButtonPressed) {
     self.onCloseButtonPressed(@{});
-    
   } else {
       // Invoke the closeButtonItem's default behaviour
       id target = _closeButtonAttributes[@"target"];
@@ -402,13 +403,23 @@
 
 // MARK: - Customize the Toolbar
 
-- (void)setLeftBarButtonItems:(nullable NSArray <NSString *> *)items forViewMode:(nullable NSString *) viewMode animated:(BOOL)animated {
+- (void)setLeftBarButtonItems:(nullable NSArray *)items forViewMode:(nullable NSString *) viewMode animated:(BOOL)animated {
   NSMutableArray *leftItems = [NSMutableArray array];
-  for (NSString *barButtonItemString in items) {
-    UIBarButtonItem *barButtonItem = [RCTConvert uiBarButtonItemFrom:barButtonItemString forViewController:self.pdfController];
-    if (barButtonItem && ![self.pdfController.navigationItem.rightBarButtonItems containsObject:barButtonItem]) {
-      [leftItems addObject:barButtonItem];
-    }
+  for (id item in items) {
+      if ([item isKindOfClass:[NSString class]]) {
+          UIBarButtonItem *barButtonItem = [RCTConvert uiBarButtonItemFrom:item forViewController:self.pdfController];
+          if (barButtonItem && ![self.pdfController.navigationItem.rightBarButtonItems containsObject:barButtonItem]) {
+            [leftItems addObject:barButtonItem];
+          }
+      } else if ([item isKindOfClass:[NSDictionary class]]) {
+          UIImage *image = [[UIImage imageNamed:[item objectForKey:@"image"]]
+                            imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+          UIBarButtonItem *barButtonItem = [[UIBarButtonItem alloc] initWithImage:image style:UIBarButtonItemStylePlain target:self action:@selector(handleCustomBarButtonEvent:)];
+          [_customBarButtons setObject:barButtonItem forKey:[item objectForKey:@"id"]];
+          if (barButtonItem && ![self.pdfController.navigationItem.rightBarButtonItems containsObject:barButtonItem]) {
+            [leftItems addObject:barButtonItem];
+          }
+      }
   }
   
   if (viewMode.length) {
@@ -419,13 +430,23 @@
 }
 
 - (void)setRightBarButtonItems:(nullable NSArray <NSString *> *)items forViewMode:(nullable NSString *) viewMode animated:(BOOL)animated {
-  NSMutableArray *rightItems = [NSMutableArray array];
-  for (NSString *barButtonItemString in items) {
-    UIBarButtonItem *barButtonItem = [RCTConvert uiBarButtonItemFrom:barButtonItemString forViewController:self.pdfController];
-    if (barButtonItem && ![self.pdfController.navigationItem.leftBarButtonItems containsObject:barButtonItem]) {
-      [rightItems addObject:barButtonItem];
+    NSMutableArray *rightItems = [NSMutableArray array];
+    for (id item in items) {
+        if ([item isKindOfClass:[NSString class]]) {
+            UIBarButtonItem *barButtonItem = [RCTConvert uiBarButtonItemFrom:item forViewController:self.pdfController];
+            if (barButtonItem && ![self.pdfController.navigationItem.leftBarButtonItems containsObject:barButtonItem]) {
+              [rightItems addObject:barButtonItem];
+            }
+        } else if ([item isKindOfClass:[NSDictionary class]]) {
+            UIImage *image = [[UIImage imageNamed:[item objectForKey:@"image"]]
+                              imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+            UIBarButtonItem *barButtonItem = [[UIBarButtonItem alloc] initWithImage:image style:UIBarButtonItemStylePlain target:self action:@selector(handleCustomBarButtonEvent:)];
+            [_customBarButtons setObject:barButtonItem forKey:[item objectForKey:@"id"]];
+            if (barButtonItem && ![self.pdfController.navigationItem.leftBarButtonItems containsObject:barButtonItem]) {
+              [rightItems addObject:barButtonItem];
+            }
+        }
     }
-  }
   
   if (viewMode.length) {
     [self.pdfController.navigationItem setRightBarButtonItems:[rightItems copy] forViewMode:[RCTConvert PSPDFViewMode:viewMode] animated:animated];
@@ -490,10 +511,37 @@
   [barButtonItems enumerateObjectsUsingBlock:^(UIBarButtonItem * _Nonnull barButtonItem, NSUInteger idx, BOOL * _Nonnull stop) {
     NSString *buttonNameString = [RCTConvert stringBarButtonItemFrom:barButtonItem forViewController:self.pdfController];
     if (buttonNameString) {
-      [barButtonItemsString addObject:buttonNameString];
+        [barButtonItemsString addObject:buttonNameString];
+    } else {
+        NSString *customId = [self findCustomButtonID:barButtonItem];
+        if (customId != nil) {
+            [barButtonItemsString addObject:customId];
+        }
     }
   }];
   return [barButtonItemsString copy];
+}
+
+- (NSString *)findCustomButtonID:(UIBarButtonItem *)barButton {
+    NSString *foundKey = nil;
+    NSArray *keys = [_customBarButtons allKeys];
+    for (NSString *key in keys) {
+        if ([_customBarButtons objectForKey:key] == barButton) {
+            foundKey = key;
+            break;
+        }
+    }
+    return foundKey;
+}
+
+- (void)handleCustomBarButtonEvent:(id)sender {
+    UIBarButtonItem *barButton = (UIBarButtonItem *)sender;
+    if (self.onCustomToolbarButtonTapped) {
+        NSString *customId = [self findCustomButtonID:barButton];
+        if (customId != nil) {
+            self.onCustomToolbarButtonTapped(@{@"id" : customId});
+        }
+    }
 }
 
 @end

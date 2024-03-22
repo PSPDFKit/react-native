@@ -31,7 +31,7 @@ export class SaveAs extends BaseExampleAutoHidingHeaderComponent {
           showNavigationButtonInToolbar={true}
           onNavigationButtonClicked={() => navigation.goBack()}
           configuration={{
-            backgroundColor: processColor('lightgrey'),
+            iOSBackgroundColor: processColor('lightgrey'),
           }}
           pageIndex={3}
           style={styles.colorView(pspdfkitColor)}

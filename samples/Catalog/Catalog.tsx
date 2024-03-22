@@ -1,4 +1,4 @@
-//  Copyright © 2016-2023 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2016-2024 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -30,6 +30,8 @@ import { SaveAs } from './examples/SaveAs';
 import { SplitPDF } from './examples/SplitPDF';
 import { StateChange } from './examples/StateChange';
 import { ToolbarCustomization } from './examples/ToolbarCustomization';
+import { GetConfiguration } from './examples/GetConfiguration';
+import { PasswordProtectedDocument } from './examples/PasswordProtectedDocument';
 import { PSPDFKit } from './helpers/PSPDFKit';
 
 // By default, this example doesn't set a license key, but instead runs in trial mode (which is the default, 
@@ -101,6 +103,8 @@ class Catalog extends React.Component {
             name="AnnotationPresetCustomization"
             component={AnnotationPresetCustomization}
           />
+          <Stack.Screen name="GetConfiguration" component={GetConfiguration} />
+          <Stack.Screen name="PasswordProtectedDocument" component={PasswordProtectedDocument} />
         </Stack.Navigator>
       </NavigationContainer>
     );

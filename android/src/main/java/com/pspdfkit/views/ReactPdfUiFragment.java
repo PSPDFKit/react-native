@@ -3,7 +3,7 @@
  *
  *   PSPDFKit
  *
- *   Copyright © 2021-2023 PSPDFKit GmbH. All rights reserved.
+ *   Copyright © 2021-2024 PSPDFKit GmbH. All rights reserved.
  *
  *   THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
  *   AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -13,17 +13,29 @@
 
 package com.pspdfkit.views;
 
+import android.content.Context;
+import android.content.res.TypedArray;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.pspdfkit.react.R;
 import com.pspdfkit.ui.PdfFragment;
 import com.pspdfkit.ui.PdfUiFragment;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * This {@link PdfUiFragment} provides additional callbacks to improve integration into react native.
@@ -34,6 +46,9 @@ import com.pspdfkit.ui.PdfUiFragment;
  * </ul>
  */
 public class ReactPdfUiFragment extends PdfUiFragment {
+
+    private ArrayList<HashMap> customToolbarItems = new ArrayList<>();
+    private MenuItemListener menuItemListener;
 
     @Nullable private ReactPdfUiFragmentListener reactPdfUiFragmentListener;
 
@@ -96,5 +111,63 @@ public class ReactPdfUiFragment extends PdfUiFragment {
 
         /** Called when the back navigation button was clicked. */
         void onNavigationButtonClicked(@NonNull PdfUiFragment pdfUiFragment);
+    }
+
+    private static int getCustomResourceId(@NonNull String resName, @NonNull String type, @NonNull Context context) {
+        int resourceId = context.getResources().getIdentifier(resName, type, context.getPackageName());
+        return resourceId;
+    }
+
+    void setCustomToolbarItems(@NonNull ArrayList<HashMap> customToolbarItems, MenuItemListener listener) {
+        this.customToolbarItems = customToolbarItems;
+        this.menuItemListener = listener;
+    }
+
+    @NonNull
+    @Override
+    public List<Integer> onGenerateMenuItemIds(@NonNull List<Integer> menuItems) {
+        for (HashMap item : customToolbarItems) {
+            String customId = item.get("id").toString();
+            int index = (Integer) item.get("index");
+            int resId = getCustomResourceId(customId, "id", getContext());
+            menuItems.add(Math.min(menuItems.size(), index), resId);
+        }
+        return menuItems;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+
+        for (HashMap item : customToolbarItems) {
+            String customId = item.get("id").toString();
+            String image = item.get("image").toString();
+            String title = item.get("title") != null ? item.get("title").toString() : "";
+            int resId = getCustomResourceId(customId, "id", getContext());
+            Boolean showAsAction = item.get("showAsAction") != null ? (Boolean) item.get("showAsAction") : true;
+            MenuItem customMenuItem = menu.findItem(resId);
+            customMenuItem.setTitle(title);
+            int iconId = getCustomResourceId(image, "drawable", getContext());
+            customMenuItem.setIcon(iconId);
+            customMenuItem.setShowAsAction(showAsAction == true ? MenuItem.SHOW_AS_ACTION_ALWAYS : MenuItem.SHOW_AS_ACTION_NEVER);
+            customMenuItem.setOnMenuItemClickListener(this.menuItemListener);
+
+            // Apply toolbar theme color to custom menu item icon
+            Drawable customIcon = customMenuItem.getIcon();
+            final TypedArray a = getContext().getTheme().obtainStyledAttributes(
+                    null,
+                    com.pspdfkit.R.styleable.pspdf__ActionBarIcons,
+                    com.pspdfkit.R.attr.pspdf__actionBarIconsStyle,
+                    com.pspdfkit.R.style.PSPDFKit_ActionBarIcons
+            );
+            int mainToolbarIconsColor = a.getColor(com.pspdfkit.R.styleable.pspdf__ActionBarIcons_pspdf__iconsColor, ContextCompat.getColor(getContext(), android.R.color.white));
+            a.recycle();
+            try {
+                DrawableCompat.setTint(customIcon, mainToolbarIconsColor);
+                customMenuItem.setIcon(customIcon);
+            } catch (Exception e) {
+                // Omit the icon if the image is missing
+            }
+        }
     }
 }

@@ -29,7 +29,7 @@ export class AnnotationProcessing extends BaseExampleAutoHidingHeaderComponent {
           document={writableDocumentPath}
           disableAutomaticSaving={true}
           configuration={{
-            backgroundColor: processColor('lightgrey'),
+            iOSBackgroundColor: processColor('lightgrey'),
           }}
           style={styles.pdfColor}
         />

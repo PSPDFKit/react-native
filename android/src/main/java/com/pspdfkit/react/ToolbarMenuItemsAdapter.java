@@ -3,7 +3,7 @@
  *
  *   PSPDFKit
  *
- *   Copyright © 2022-2023 PSPDFKit GmbH. All rights reserved.
+ *   Copyright © 2022-2024 PSPDFKit GmbH. All rights reserved.
  *
  *   THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
  *   AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -43,7 +43,11 @@ public class ToolbarMenuItemsAdapter {
      * @param currentConfiguration The current configuration.
      * @param toolbarItems         The toolbar items to be customized.
      */
-    public ToolbarMenuItemsAdapter(@NonNull final PdfActivityConfiguration currentConfiguration, @NonNull final ReadableArray toolbarItems) {
+    public ToolbarMenuItemsAdapter(@NonNull final PdfActivityConfiguration currentConfiguration, @NonNull final ReadableArray toolbarItems, PdfActivityConfiguration initialConfiguration) {
+        // Initial config is used as the source for the user-defined config. If not available, use the current config. 
+        if (initialConfiguration == null) {
+            initialConfiguration = currentConfiguration;
+        }
         PdfActivityConfiguration.Builder configurationBuilder = new PdfActivityConfiguration.Builder(currentConfiguration);
         PdfActivityConfiguration.Builder configuration = disableDefaultToolbarItems(configurationBuilder);
 
@@ -51,57 +55,57 @@ public class ToolbarMenuItemsAdapter {
             String toolbarItem = toolbarItems.getString(i);
             switch (toolbarItem) {
                 case TOOLBAR_ITEM_SEARCH:
-                    if (currentConfiguration.isSearchEnabled()) {
+                    if (initialConfiguration.isSearchEnabled()) {
                         configuration.enableSearch();
                     }
                     break;
                 case TOOLBAR_ITEM_READER_VIEW:
-                    if (currentConfiguration.isReaderViewEnabled()) {
+                    if (initialConfiguration.isReaderViewEnabled()) {
                         configuration.enableReaderView(true);
                     }
                     break;
                 case TOOLBAR_ITEM_ANNOTATIONS:
-                    if (currentConfiguration.getConfiguration().isAnnotationEditingEnabled()) {
+                    if (initialConfiguration.getConfiguration().isAnnotationEditingEnabled()) {
                         configuration.enableAnnotationEditing();
                     }
                     break;
                 case TOOLBAR_ITEM_THUMBNAILS:
-                    if (currentConfiguration.isThumbnailGridEnabled()) {
+                    if (initialConfiguration.isThumbnailGridEnabled()) {
                         configuration.showThumbnailGrid();
                     }
                     break;
                 case TOOLBAR_ITEM_SHARE:
-                    if (!currentConfiguration.getConfiguration().getEnabledShareFeatures().isEmpty()) {
+                    if (!initialConfiguration.getConfiguration().getEnabledShareFeatures().isEmpty()) {
                         configuration.setEnabledShareFeatures(ShareFeatures.all());
                     }
                     break;
                 case TOOLBAR_ITEM_SETTINGS:
-                    if (currentConfiguration.isSettingsItemEnabled()) {
+                    if (initialConfiguration.isSettingsItemEnabled()) {
                         configuration.showSettingsMenu();
                     }
                     break;
                 case TOOLBAR_ITEM_OUTLINE:
-                    if (currentConfiguration.isOutlineEnabled()) {
+                    if (initialConfiguration.isOutlineEnabled()) {
                         configuration.enableOutline();
                     }
                     break;
                 case TOOLBAR_ITEM_BOOKMARKS:
-                    if (currentConfiguration.isBookmarkListEnabled()) {
+                    if (initialConfiguration.isBookmarkListEnabled()) {
                         configuration.enableBookmarkList();
                     }
                     break;
                 case TOOLBAR_ITEM_PRINT:
-                    if (currentConfiguration.isPrintingEnabled()) {
+                    if (initialConfiguration.isPrintingEnabled()) {
                         configuration.enablePrinting();
                     }
                     break;
                 case TOOLBAR_ITEM_ANNOTATION_LIST:
-                    if (currentConfiguration.isAnnotationListEnabled()) {
+                    if (initialConfiguration.isAnnotationListEnabled()) {
                         configuration.enableAnnotationList();
                     }
                     break;
                 case TOOLBAR_ITEM_DOCUMENT_INFO_VIEW:
-                    if (currentConfiguration.isDocumentInfoViewEnabled()) {
+                    if (initialConfiguration.isDocumentInfoViewEnabled()) {
                         configuration.enableDocumentInfoView();
                     }
                     break;

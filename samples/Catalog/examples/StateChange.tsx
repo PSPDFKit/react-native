@@ -34,7 +34,7 @@ export class StateChange extends BaseExampleAutoHidingHeaderComponent {
           ref={this.pdfRef}
           document={exampleDocumentPath}
           configuration={{
-            backgroundColor: processColor('lightgrey'),
+            iOSBackgroundColor: processColor('lightgrey'),
             showPageLabels: true,
           }}
           menuItemGrouping={[

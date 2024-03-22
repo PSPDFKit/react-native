@@ -1,5 +1,5 @@
 //
-//  Copyright © 2018-2023 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2018-2024 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -94,5 +94,14 @@ extension UIColor {
             blue: blue > 1 ? blue/255 : blue,
             alpha: alpha
         )
+    }
+    
+    @objc public var hexa: Int {
+        var red: CGFloat = 0, green: CGFloat = 0, blue: CGFloat = 0, alpha: CGFloat = 0
+        getRed(&red, green: &green, blue: &blue, alpha: &alpha)
+        return Int(alpha * 255) << 24
+             + Int(red   * 255) << 16
+             + Int(green * 255) << 8
+             + Int(blue  * 255)
     }
 }

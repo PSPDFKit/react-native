@@ -74,8 +74,20 @@ target "NativeCatalog" do
       excl_config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = "15.0"
     end
     installer.pods_project.targets.each do |target|
+      # Flipper issue, see https://github.com/facebook/react-native/issues/43335
+      if target.name == "Flipper"
+        file_path = "Pods/Flipper/xplat/Flipper/FlipperTransportTypes.h"
+        contents = File.read(file_path)
+        unless contents.include?("#include <functional>")
+          File.open(file_path, "w") do |file|
+            file.puts("#include <functional>")
+            file.puts(contents)
+          end
+        end
+      end
       target.build_configurations.each do |target_config|
         target_config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = "15.0"
+        target_config.build_settings["OTHER_CFLAGS"] = "$(inherited) -Qunused-arguments -Xanalyzer -analyzer-disable-all-checks"
       end
     end
     react_native_post_install(

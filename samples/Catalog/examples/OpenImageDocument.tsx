@@ -26,10 +26,10 @@ export class OpenImageDocument extends BaseExampleAutoHidingHeaderComponent {
           document={tiffImagePath}
           ref={this.pdfRef}
           configuration={{
-            backgroundColor: processColor('lightgrey'),
+            iOSBackgroundColor: processColor('lightgrey'),
             showPageLabels: false,
-            useParentNavigationBar: false,
-            allowToolbarTitleChange: false,
+            iOSUseParentNavigationBar: false,
+            iOSAllowToolbarTitleChange: false,
           }}
           showNavigationButtonInToolbar={true}
           onNavigationButtonClicked={() => navigation.goBack()}

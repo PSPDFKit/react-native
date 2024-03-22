@@ -67,12 +67,12 @@ export class HiddenToolbar extends Component<IProps, IState> {
           ref={this.pdfRef}
           document={exampleDocumentPath}
           configuration={{
-            backgroundColor: processColor('lightgrey'),
+            iOSBackgroundColor: processColor('lightgrey'),
             // If you want to hide the toolbar it's essential to also hide the document label overlay.
             documentLabelEnabled: false,
             // We want to keep the thumbnail bar always visible, but the automatic mode is also supported with hideDefaultToolbar.
             userInterfaceViewMode: 'alwaysVisible',
-            useParentNavigationBar: true,
+            iOSUseParentNavigationBar: true,
           }}
           // This will just hide the toolbar, keeping the thumbnail bar visible.
           hideDefaultToolbar={true}

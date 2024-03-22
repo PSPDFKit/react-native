@@ -1,5 +1,5 @@
 //
-//  Copyright © 2018-2023 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2018-2024 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -34,7 +34,6 @@ import com.pspdfkit.annotations.configuration.SoundAnnotationConfiguration
 import com.pspdfkit.annotations.configuration.StampAnnotationConfiguration
 import com.pspdfkit.annotations.stamps.StampPickerItem
 import com.pspdfkit.configuration.annotations.AnnotationAggregationStrategy
-import com.pspdfkit.react.helper.MeasurementHelper
 import com.pspdfkit.ui.fonts.Font
 import com.pspdfkit.ui.inspector.views.BorderStylePreset
 import com.pspdfkit.ui.special_mode.controller.AnnotationTool
@@ -70,8 +69,6 @@ const val MIN_TEXT_SIZE = "minimumTextSize"
 const val MAX_TEXT_SIZE = "maximumTextSize"
 const val DEFAULT_FONT = "defaultFont"
 const val AVAILABLE_FONTS = "availableFonts"
-const val DEFAULT_SCALE = "defaultScale"
-const val DEFAULT_PRECISION = "defaultPrecision"
 
 const val ANNOTATION_INK_PEN = "inkPen"
 const val ANNOTATION_INK_MAGIC = "inkMagic"
@@ -306,16 +303,6 @@ class AnnotationConfigurationAdaptor {
                         )
                     }
 
-                    DEFAULT_SCALE -> configuration.getMap(key)?.let { scaleObject ->
-                        val scale = MeasurementHelper.getScale(scaleObject)
-                        builder.setDefaultScale(scale)
-                    }
-
-                    DEFAULT_PRECISION -> configuration.getString(key)?.let { precisionString ->
-                        val precision = MeasurementHelper.getPrecision(precisionString)
-                        builder.setDefaultPrecision(precision)
-                    }
-
                     MAX_ALPHA -> builder.setMaxAlpha(configuration.getDouble(key).toFloat())
                     MIN_ALPHA -> builder.setMinAlpha(configuration.getDouble(key).toFloat())
                     MAX_THICKNESS -> builder.setMaxThickness(configuration.getDouble(key).toFloat())
@@ -364,16 +351,6 @@ class AnnotationConfigurationAdaptor {
 
                     AVAILABLE_COLORS -> configuration.getArray(key)?.let { colors ->
                         builder.setAvailableColors(extractColors(colors.toArrayList().map { it as String }))
-                    }
-
-                    DEFAULT_SCALE -> configuration.getMap(key)?.let { scaleObject ->
-                        val scale = MeasurementHelper.getScale(scaleObject)
-                        builder.setDefaultScale(scale)
-                    }
-
-                    DEFAULT_PRECISION -> configuration.getString(key)?.let { precisionString ->
-                        val precision = MeasurementHelper.getPrecision(precisionString)
-                        builder.setDefaultPrecision(precision)
                     }
 
                     MAX_ALPHA -> builder.setMaxAlpha(configuration.getDouble(key).toFloat())
@@ -427,16 +404,6 @@ class AnnotationConfigurationAdaptor {
                         builder.setAvailableColors(
                             extractColors(colors.toArrayList().map { it as String })
                         )
-                    }
-
-                    DEFAULT_SCALE -> configuration.getMap(key)?.let { scaleObject ->
-                        val scale = MeasurementHelper.getScale(scaleObject)
-                        builder.setDefaultScale(scale)
-                    }
-
-                    DEFAULT_PRECISION -> configuration.getString(key)?.let { precisionString ->
-                        val precision = MeasurementHelper.getPrecision(precisionString)
-                        builder.setDefaultPrecision(precision)
                     }
 
                     DEFAULT_LINE_END -> configuration.getString(key)?.let { lineEndPair ->

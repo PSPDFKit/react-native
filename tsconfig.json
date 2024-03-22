@@ -1,13 +1,9 @@
 {
     "include": [
-        "index.js"
+        "./src/**/*",
     ],
     "compilerOptions": {
-        "declaration": true,
-        "emitDeclarationOnly": true,
-        "allowJs": true,
-        "declarationMap": true,
-        "skipLibCheck": true,
-        "outDir": "./types"
+        "rootDir": "src",
+        "outDir": "./lib",
     }
 }

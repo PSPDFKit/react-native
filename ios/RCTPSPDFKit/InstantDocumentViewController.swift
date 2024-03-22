@@ -1,5 +1,5 @@
 //
-//  Copyright © 2019-2022 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2019-2024 PSPDFKit GmbH. All rights reserved.
 //
 //  The PSPDFKit Sample applications are licensed with a modified BSD license.
 //  Please see License for details. This notice may not be removed from this file.
@@ -35,7 +35,7 @@ public class InstantDocumentViewController: InstantViewController {
         // Store document info for sharing later.
         self.documentInfo = documentInfo
 
-        // Tell Instant to download the document from Web examples server’s PSPDFKit Server instance.
+        // Tell Instant to download the document from Web examples server’s PSPDFKit Document Engine instance.
         do {
             try documentDescriptor.download(usingJWT: documentInfo.jwt)
         } catch InstantError.alreadyDownloaded {

@@ -6,6 +6,7 @@ const tiffImageName = 'PSPDFKit_Image_Example.tiff';
 export const formDocumentName = 'Form_example.pdf';
 const measurementsName = 'Measurements.pdf';
 export const exampleDocumentName = 'PSPDFKit_Quickstart_Guide.pdf';
+export const examplePasswordDocumentName = 'PSPDFKit_Quickstart_Guide_Password.pdf';
 
 export const exampleImage = 'PSPDFKit_Image_Example.jpg';
 export const exampleImagePath =
@@ -23,6 +24,11 @@ export const exampleDocumentPath =
   Platform.OS === 'ios'
     ? 'PDFs/' + exampleDocumentName
     : 'file:///android_asset/' + exampleDocumentName;
+
+export const examplePasswordDocumentPath =
+    Platform.OS === 'ios'
+      ? 'PDFs/' + examplePasswordDocumentName
+      : 'file:///android_asset/' + examplePasswordDocumentName;
 
 export const tiffImagePath =
   Platform.OS === 'ios'

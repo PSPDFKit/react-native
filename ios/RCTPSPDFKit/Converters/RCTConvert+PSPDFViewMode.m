@@ -1,5 +1,5 @@
 //
-//  Copyright © 2019-2023 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2019-2024 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -20,6 +20,18 @@
     return PSPDFViewModeDocumentEditor;;
   } else {
     return PSPDFViewModeDocument;
+  }
+}
+
++ (NSString *)PSPDFViewModeString:(PSPDFViewMode)viewMode {
+  if (viewMode == PSPDFViewModeDocument) {
+    return @"document";
+  } else if (viewMode == PSPDFViewModeThumbnails) {
+    return @"thumbnails";
+  } else if (viewMode == PSPDFViewModeDocumentEditor) {
+    return @"documentEditor";
+  } else {
+      return @"document";
   }
 }
 

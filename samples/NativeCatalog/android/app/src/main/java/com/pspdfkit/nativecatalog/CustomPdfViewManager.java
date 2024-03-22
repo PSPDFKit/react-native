@@ -35,6 +35,7 @@ import com.pspdfkit.document.processor.PdfProcessor;
 import com.pspdfkit.document.processor.PdfProcessorTask;
 import com.pspdfkit.forms.SignatureFormElement;
 import com.pspdfkit.listeners.DocumentSigningListener;
+import com.pspdfkit.listeners.SimpleDocumentListener;
 import com.pspdfkit.nativecatalog.events.DocumentDigitallySignedEvent;
 import com.pspdfkit.nativecatalog.events.DocumentWatermarkedEvent;
 import com.pspdfkit.react.menu.ReactGroupingRule;
@@ -72,16 +73,6 @@ public class CustomPdfViewManager extends SimpleViewManager<PdfView> {
     public CustomPdfViewManager(ReactApplicationContext reactApplicationContext) {
         super();
         this.reactApplicationContext = reactApplicationContext;
-
-        // Our test certificate is self-signed, so we need to add it to trusted certificate store for it to validate. Otherwise
-        // the new signature won't validate. Since PSPDFKit and other readers (like Acrobat) will warn when using self-signed certificates
-        // your app should use a CA issued certificate instead.
-        addJohnAppleseedCertificateToTrustedCertificates(reactApplicationContext.getApplicationContext());
-
-        // The signer is a named entity holding a certificate (usually a person) and has a display name shown in the app. Registration of the Signer instance
-        // has to happen using a unique string identifier. The signer can be associated with a signature for signing the document.
-        final Signer johnAppleseed = new Pkcs12Signer("John Appleseed", Uri.parse("file:///android_asset/JohnAppleseed.p12"));
-        SignatureManager.addSigner("john_appleseed", johnAppleseed);
     }
 
     private void addJohnAppleseedCertificateToTrustedCertificates(@NonNull Context context) {
@@ -162,10 +153,21 @@ public class CustomPdfViewManager extends SimpleViewManager<PdfView> {
             view.setDocument(document);
         }
 
-        // When the document is loaded we configure a custom annotation configuration for ink annotations.
-        // While this is applied in all examples, the DefaultAnnotationSettingsScreen example is
-        // the reason this was added.
-        applyCustomAnnotationConfiguration(view);
+        view.getPdfFragment()
+                .take(1)
+                .firstOrError()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe((pdfFragment, throwable) -> {
+                    pdfFragment.addDocumentListener(new SimpleDocumentListener() {
+                        @Override
+                        public void onDocumentLoaded(@NonNull PdfDocument document) {
+                            // When the document is loaded we configure a custom annotation configuration for ink annotations.
+                            // While this is applied in all examples, the DefaultAnnotationSettingsScreen example is
+                            // the reason this was added.
+                            applyCustomAnnotationConfiguration(view);
+                        }
+                    });
+                });
     }
 
     @SuppressLint("CheckResult")
@@ -271,8 +273,16 @@ public class CustomPdfViewManager extends SimpleViewManager<PdfView> {
     }
 
     private void performDigitalSigning(@NonNull PdfView pdfView, @NonNull PdfFragment pdfFragment, @NonNull SignatureFormElement signatureFormElement) {
-        // Retrieve the signer we've created in the constructor.
-        Signer signer = SignatureManager.getSigners().get("john_appleseed");
+
+        // Our test certificate is self-signed, so we need to add it to trusted certificate store for it to validate. Otherwise
+        // the new signature won't validate. Since PSPDFKit and other readers (like Acrobat) will warn when using self-signed certificates
+        // your app should use a CA issued certificate instead.
+        addJohnAppleseedCertificateToTrustedCertificates(reactApplicationContext.getApplicationContext());
+
+        // The signer is a named entity holding a certificate (usually a person) and has a display name shown in the app. Registration of the Signer instance
+        // has to happen using a unique string identifier. The signer can be associated with a signature for signing the document.
+        final Signer signer = new Pkcs12Signer("John Appleseed", Uri.parse("file:///android_asset/JohnAppleseed.p12"));
+        SignatureManager.addSigner("john_appleseed", signer);
         if (signer != null) {
             // Provide a password to the signer, which will be used to unlock its private key.
             if (signer instanceof InteractiveSigner) {

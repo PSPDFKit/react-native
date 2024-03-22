@@ -1,4 +1,4 @@
-//  Copyright © 2018-2023 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2018-2024 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -24,9 +24,9 @@ import {
  * <PSPDFKitView
  *      document={DOCUMENT_PATH}
  *      configuration={{
- *        showThumbnailBar: 'scrollable',
- *        pageTransition: 'scrollContinuous',
- *        scrollDirection: 'vertical',
+ *        showThumbnailBar: PDFConfiguration.ShowThumbnailBar.SCROLLABLE,
+ *        pageTransition: PDFConfiguration.PageTransition.SCROLL_CONTINUOUS,
+ *        scrollDirection: PDFConfiguration.ScrollDirection.VERTICAL,
  *      }}
  *      ref={this.pdfRef}
  *      fragmentTag="PDF1"
@@ -65,6 +65,7 @@ class PSPDFKitView extends React.Component {
           onAnnotationsChanged={this._onAnnotationsChanged}
           onNavigationButtonClicked={this._onNavigationButtonClicked}
           onDataReturned={this._onDataReturned}
+          onCustomToolbarButtonTapped={this._onCustomToolbarButtonTapped}
         />
       );
     } else {
@@ -156,6 +157,15 @@ class PSPDFKitView extends React.Component {
       promise.reject(error);
     }
     this._requestMap.delete(requestId);
+  };
+
+  /**
+   * @ignore
+   */
+  _onCustomToolbarButtonTapped = event => {
+    if (this.props.onCustomToolbarButtonTapped) {
+      this.props.onCustomToolbarButtonTapped(event.nativeEvent);
+    }
   };
 
   /**
@@ -683,31 +693,88 @@ class PSPDFKitView extends React.Component {
   };
 
   /**
-   * @typedef MeasurementConfig
-   * @property { string } unitFrom The unit for the distance on a document page.
-   * @property { number } valueFrom A distance on a document page.
-   * @property { string } unitTo The unit for the real-world distance.
-   * @property { number } valueTo A real-world distance.
-   * @property { string } precision This value is used as the default measurement precision when creating new measurement annotations. Available options are: ```whole```, ```oneDP```, ```twoDP```, ```threeDP```, and ```fourDP```.
+   * Sets the Toolbar object to customize the toolbar appearance and behaviour.
+   *
+   * @method setToolbar
+   * @memberof PSPDFKitView
+   * @param { Toolbar } toolbar The toolbar object.
+   * @example
+   * const toolbar = {
+   *		// iOS
+   *		rightBarButtonItems: {
+   *		  viewMode: Toolbar.PDFViewMode.VIEW_MODE_DOCUMENT,
+   *		  animated: true,
+   *		  buttons: ['searchButtonItem', 'readerViewButtonItem']
+   *		},
+   *		// Android
+   *		toolbarMenuItems: {
+   *		  buttons: ['searchButtonItem', 'readerViewButtonItem']
+   *	  },
+   *	}
+   *	this.refs.pdfView.setToolbar(toolbar);
+   *
    */
+    setToolbar = function (toolbar) {
+      if (Platform.OS === 'ios') {
+        NativeModules.PSPDFKitViewManager.setToolbar(
+          toolbar,
+          findNodeHandle(this.refs.pdfView),
+        );
+      } else if (Platform.OS === 'android') {
+        UIManager.dispatchViewManagerCommand(
+          findNodeHandle(this.refs.pdfView),
+          this._getViewManagerConfig('RCTPSPDFKitView').Commands
+          .setToolbar,
+          [toolbar],
+        );
+      }
+    };
 
   /**
-   * Sets the measurements configuration for the ```PSPDFKitView```.
+   * Gets the toolbar for the specified view mode.
    *
-   * @method setMeasurementConfig
+   * @method getToolbar
    * @memberof PSPDFKitView
-   * @param { MeasurementConfig } config The measurement configuration object.
+   * @param { string } [viewMode] The view mode to query. Options are: ```document```, ```thumbnails```, ```documentEditor```, or ```null```. If ```null``` is passed, the toolbar buttons for the current view mode are returned.
+   *
+   * @returns { Promise<Array<string>> } A promise containing the toolbar object, or an error if it couldn’t be retrieved.
    * @example
-   * const config = {
-   *  unitForm: "inch",
-   *  valueFrom: 2.74,
-   *  unitTo: "mm",
-   *  valueTo: 69.60
-   *  precision: 'twodp'
-   * };
-   * const result = await this.pdfRef.current.setMeasurementConfig(config);
+   * const toolbar = await this.pdfRef.current.getToolbar('document');
+   *
    */
-  setMeasurementConfig = function (config) {
+    getToolbar = function (viewMode) {
+      if (Platform.OS === 'ios') {
+        return NativeModules.PSPDFKitViewManager.getToolbar(
+          viewMode,
+          findNodeHandle(this.refs.pdfView),
+        );
+      }
+    };
+
+  /**
+   * Sets the measurement value configurations for the ```PSPDFKitView```.
+   *
+   * @method setMeasurementValueConfigurations
+   * @memberof PSPDFKitView
+   * @param { MeasurementValueConfiguration[] } configurations The array of MeasurementValueConfiguration objects that should be applied to the document.
+   * @example
+   * const scale: MeasurementScale = {
+   *    unitFrom: Measurements.ScaleUnitFrom.INCH,
+   *    valueFrom: 1.0,
+   *    unitTo: Measurements.ScaleUnitTo.INCH,
+   *    valueTo: 2.54
+   *  };
+   *  
+   *  const measurementValueConfig: MeasurementValueConfiguration = {
+   *    name: 'Custom Scale',
+   *    scale: scale,
+   *    precision: Measurements.Precision.FOUR_DP
+   *  };
+   *  
+   *  const configs = [measurementValueConfig];
+   *  await this.pdfRef.current?.setMeasurementValueConfigurations(configs);
+   */
+  setMeasurementValueConfigurations = function (configurations) {
     if (Platform.OS === 'android') {
       let requestId = this._nextRequestId++;
       let requestMap = this._requestMap;
@@ -721,43 +788,30 @@ class PSPDFKitView extends React.Component {
         findNodeHandle(this.refs.pdfView),
         this._getViewManagerConfig(
           'RCTPSPDFKitView',
-        ).Commands.setMeasurementConfig(config),
-        [requestId, config],
+        ).Commands.setMeasurementValueConfigurations,
+        [requestId, configurations],
       );
 
       return promise;
     }
 
-    NativeModules.PSPDFKitViewManager.setMeasurementConfig(
-      config,
+    NativeModules.PSPDFKitViewManager.setMeasurementValueConfigurations(
+      configurations,
       findNodeHandle(this.refs.pdfView),
     );
   };
 
   /**
-   * @typedef MeasurementScale
-   * @property { string } unitFrom The unit for the distance on a document page.
-   * @property { number } valueFrom A distance on a document page.
-   * @property { string } unitTo The unit for the real-world distance.
-   * @property { number } valueTo A real-world distance.
-   */
-
-  /**
-   * Sets the measurements scale for the ```PSPDFKitView```.
+   * Gets the current PSPDFKitView MeasurementValueConfigurations.
    *
-   * @method setMeasurementScale
+   * @method getMeasurementValueConfigurations
    * @memberof PSPDFKitView
-   * @param { MeasurementScale } scale The scale object.
+   *
+   * @returns { Promise<MeasurementValueConfiguration[]> } A promise containing an array of ```MeasurementValueConfiguration``` objects.
    * @example
-   * const config = {
-   *  unitForm: "inch",
-   *  valueFrom: 2.74,
-   *  unitTo: "mm",
-   *  valueTo: 69.60
-   * };
-   * const result = await this.pdfRef.current.setMeasurementScale(config);
+   * const configurations = await this.pdfRef.current.getMeasurementValueConfigurations();
    */
-  setMeasurementScale = function (scale) {
+  getMeasurementValueConfigurations = function () {
     if (Platform.OS === 'android') {
       let requestId = this._nextRequestId++;
       let requestMap = this._requestMap;
@@ -770,55 +824,19 @@ class PSPDFKitView extends React.Component {
       UIManager.dispatchViewManagerCommand(
         findNodeHandle(this.refs.pdfView),
         this._getViewManagerConfig('RCTPSPDFKitView').Commands
-          .setMeasurementScale,
-        [requestId, scale],
+          .getMeasurementValueConfigurations,
+        [requestId],
       );
 
       return promise;
     }
-
-    // iOS implementation
-    NativeModules.PSPDFKitViewManager.setMeasurementScale(
-      scale,
-      findNodeHandle(this.refs.pdfView),
-    );
-  };
-
-  /**
-   * Sets the measurements precision for the ```PSPDFKitView```.
-   *
-   * @method setMeasurementPrecision
-   * @memberof PSPDFKitView
-   * @param { string } precision This value is used as the default measurement precision when creating new measurement annotations. Available options are: ```whole```, ```oneDP```, ```twoDP```, ```threeDP```, and ```fourDP```.
-   * @example
-   * const result = await this.pdfRef.current.setMeasurementPrecision('fourDP');
-   */
-  setMeasurementPrecision = function (precision) {
-    if (Platform.OS === 'android') {
-      let requestId = this._nextRequestId++;
-      let requestMap = this._requestMap;
-
-      // We create a promise here that will be resolved once onDataReturned is called.
-      let promise = new Promise(function (resolve, reject) {
-        requestMap[requestId] = { resolve: resolve, reject: reject };
-      });
-
-      UIManager.dispatchViewManagerCommand(
+    else if (Platform.OS === 'ios') {
+      return NativeModules.PSPDFKitViewManager.getMeasurementValueConfigurations(
         findNodeHandle(this.refs.pdfView),
-        this._getViewManagerConfig('RCTPSPDFKitView').Commands
-          .setMeasurementPrecision,
-        [requestId, precision],
       );
-
-      return promise;
     }
-    // iOS implementation
-    NativeModules.PSPDFKitViewManager.setMeasurementPrecision(
-      precision,
-      findNodeHandle(this.refs.pdfView),
-    );
   };
-
+  
   /**
    * Customizes the visible toolbar menu items for Android.
    *
@@ -837,6 +855,42 @@ class PSPDFKitView extends React.Component {
         this._getViewManagerConfig('RCTPSPDFKitView').Commands
           .setToolbarMenuItems,
         [toolbarMenuItems],
+      );
+    }
+  };
+
+  /**
+   * Gets the current PSPDFKitView configuration.
+   *
+   * @method getConfiguration
+   * @memberof PSPDFKitView
+   *
+   * @returns { Promise<PDFConfiguration> } A promise containing a ```PDFConfiguration``` object with the document configuration.
+   * @example
+   * const configuration = await this.pdfRef.current.getConfiguration();
+   */
+  getConfiguration = function () {
+    if (Platform.OS === 'android') {
+      let requestId = this._nextRequestId++;
+      let requestMap = this._requestMap;
+
+      // We create a promise here that will be resolved once onDataReturned is called.
+      let promise = new Promise(function (resolve, reject) {
+        requestMap[requestId] = { resolve: resolve, reject: reject };
+      });
+
+      UIManager.dispatchViewManagerCommand(
+        findNodeHandle(this.refs.pdfView),
+        this._getViewManagerConfig('RCTPSPDFKitView').Commands
+          .getConfiguration,
+        [requestId],
+      );
+
+      return promise;
+    }
+    else if (Platform.OS === 'ios') {
+      return NativeModules.PSPDFKitViewManager.getConfiguration(
+        findNodeHandle(this.refs.pdfView),
       );
     }
   };
@@ -895,7 +949,8 @@ if (Platform.OS === 'ios' || Platform.OS === 'android') {
  * @ignore
  * @typedef {object} Props
  * @property {string} document The path to the PDF file that should be displayed.
- * @property {object} [configuration] Configuration object to customize the appearance and behavior of PSPDFKit. See {@link https://github.com/PSPDFKit/react-native/blob/master/documentation/configuration-options.md} for available options.
+ * @property {PDFConfiguration} [configuration] Configuration object to customize the appearance and behavior of PSPDFKit. See {@link https://pspdfkit.com/api/react-native/PDFConfiguration.html} for available options.
+ * @property {Toolbar} [toolbar] Toolbar object to customize the toolbar appearance and behaviour.
  * @property {number} [pageIndex] Page index of the document that will be shown. Starts at 0.
  * @property {boolean} [hideNavigationBar] Controls whether a navigation bar is created and shown or not. Navigation bar is shown by default (```false```).
  * @property {boolean} [showCloseButton] Specifies whether the close button should be shown in the navigation bar. Disabled by default (```false```). Only applies when the ```PSPDFKitView``` is presented modally. Will call ```onCloseButtonPressed``` when tapped if a callback was provided. If ```onCloseButtonPressed``` wasn’t provided, ```PSPDFKitView``` will automatically be dismissed when modally presented.
@@ -909,6 +964,7 @@ if (Platform.OS === 'ios' || Platform.OS === 'android') {
  * @property {function} [onAnnotationTapped] Callback that’s called when an annotation is tapped.
  * @property {function} [onAnnotationsChanged] Callback that’s called when an annotation is added, changed, or removed.
  * @property {function} [onStateChanged] Callback that’s called when the state of the ```PSPDFKitView``` changes.
+ * @property {function} [onCustomToolbarButtonTapped] Callback that’s called when a custom toolbar button is tapped.
  * @property {string} [fragmentTag] The tag used to identify a single PdfFragment in the view hierarchy. This needs to be unique in the view hierarchy.
  * @property {Array} [menuItemGrouping] Used to specify a custom grouping for the menu items in the annotation creation toolbar.
  * @property {Array<string>} [leftBarButtonItems] Sets the left bar button items. Note: The same button item cannot be added to both the left and right bar button items simultaneously. See {@link https://github.com/PSPDFKit/react-native/blob/master/ios/RCTPSPDFKit/Converters/RCTConvert+UIBarButtonItem.m} for supported button items.
@@ -917,9 +973,9 @@ if (Platform.OS === 'ios' || Platform.OS === 'android') {
  * @property {Array<string>} [toolbarMenuItems] Used to customize the toolbar menu items for Android. See {@link https://github.com/PSPDFKit/react-native/blob/master/android/src/main/java/com/pspdfkit/react/ToolbarMenuItemsAdapter.java} for supported toolbar menu items.
  * @property {boolean} [showNavigationButtonInToolbar] When set to ```true```, the toolbar integrated into the ```PSPDFKitView``` will display a back button in the top-left corner.
  * @property {function} [onNavigationButtonClicked] If ```showNavigationButtonInToolbar``` is set to ```true```, this callback will notify you when the back button is tapped.
- * @property {Array<string>} [availableFontNames] Used to specify the available font names in the font picker. Note on iOS: You need to set the desired font family names as ```UIFontDescriptor```. See {@link https://developer.apple.com/documentation/uikit/uifontdescriptor?language=objc} for more information. See {@link https://github.com/PSPDFKit/react-native/blob/master/samples/Catalog/examples/CustomFontPicker.js}
- * @property {string} [selectedFontName] Used to specify the current selected font in the font picker. Note on iOS: You need to set the desired font family names as ```UIFontDescriptor```. See {@link https://developer.apple.com/documentation/uikit/uifontdescriptor?language=objc} for more information. See {@link https://github.com/PSPDFKit/react-native/blob/master/samples/Catalog/examples/CustomFontPicker.js}
- * @property {boolean} [showDownloadableFonts] Used to show or hide the downloadable fonts section in the font picker. Defaults to ```true```, showing the downloadable fonts. See {@link https://developer.apple.com/documentation/uikit/uifontdescriptor?language=objc} for more information. See {@link https://github.com/PSPDFKit/react-native/blob/master/samples/Catalog/examples/CustomFontPicker.js}
+ * @property {Array<string>} [availableFontNames] Used to specify the available font names in the font picker. Note on iOS: You need to set the desired font family names as ```UIFontDescriptor```. See {@link https://developer.apple.com/documentation/uikit/uifontdescriptor?language=objc} for more information. See {@link https://github.com/PSPDFKit/react-native/blob/master/samples/Catalog/examples/CustomFontPicker.tsx}
+ * @property {string} [selectedFontName] Used to specify the current selected font in the font picker. Note on iOS: You need to set the desired font family names as ```UIFontDescriptor```. See {@link https://developer.apple.com/documentation/uikit/uifontdescriptor?language=objc} for more information. See {@link https://github.com/PSPDFKit/react-native/blob/master/samples/Catalog/examples/CustomFontPicker.tsx}
+ * @property {boolean} [showDownloadableFonts] Used to show or hide the downloadable fonts section in the font picker. Defaults to ```true```, showing the downloadable fonts. See {@link https://developer.apple.com/documentation/uikit/uifontdescriptor?language=objc} for more information. See {@link https://github.com/PSPDFKit/react-native/blob/master/samples/Catalog/examples/CustomFontPicker.tsx}
  * @property {object} [annotationPresets] The annotation preset configuration. See {@link https://github.com/PSPDFKit/react-native/blob/5b2716a3f3cd3732c0e5845cc39e28d19b618aa4/ios/RCTPSPDFKit/Converters/AnnotationConfigurationsConvertor.swift#L31} for a list of the supported preset types and {@link https://github.com/PSPDFKit/react-native/blob/5b2716a3f3cd3732c0e5845cc39e28d19b618aa4/ios/RCTPSPDFKit/Converters/AnnotationConfigurationsConvertor.swift#L13} for the supported configuration options.
  * @property {boolean} [hideDefaultToolbar] Used to show or hide the annotation toolbar on Android.
  * @property {any} [style] Used to style the React Native component.
@@ -936,13 +992,19 @@ PSPDFKitView.propTypes = {
   document: PropTypes.string.isRequired,
   /**
    * Configuration object to customize the appearance and behavior of PSPDFKit.
-   * @type {object}
+   * @type {PDFConfiguration}
    * @memberof PSPDFKitView
-   * @see {@link https://github.com/PSPDFKit/react-native/blob/master/documentation/configuration-options.md} for available options.
+   * @see {@link https://pspdfkit.com/api/react-native/PDFConfiguration.html} for available options.
    * Note: On iOS, set the ```useParentNavigationBar``` configuration option to ```true``` if you're using a navigation plugin such as
    * ```NavigatorIOS``` or ```react-native-navigation```. This is because the plugin will manage the navigation bar.
    */
   configuration: PropTypes.object,
+  /**
+   * Toolbar object to customize the toolbar appearance and behaviour.
+   * @type {Toolbar}
+   * @memberof PSPDFKitView
+   */
+  toolbar: PropTypes.object,
   /**
    * Page index of the document that will be shown. Starts at 0.
    * @type {number}
@@ -1081,6 +1143,20 @@ PSPDFKitView.propTypes = {
    *  }}
    */
   onStateChanged: PropTypes.func,
+    /**
+   * Callback that’s called when a custom toolbar button is tapped.
+   * @type {function}
+   * @memberof PSPDFKitView
+   * @example
+   * onCustomToolbarButtonTapped={result => {
+   *     if (result.error) {
+   *         alert(result.error);
+   *     } else {
+   *         alert('Custom bar button item tapped: ' + JSON.stringify(result));
+   *     }
+   *  }}
+   */
+    onCustomToolbarButtonTapped: PropTypes.func,
   /**
    * The tag used to identify a single ```PdfFragment``` in the view hierarchy.
    * This needs to be unique in the view hierarchy.
@@ -1150,7 +1226,7 @@ PSPDFKitView.propTypes = {
    * @type {Array<string>}
    * @memberof PSPDFKitView
    * @see {@link https://developer.apple.com/documentation/uikit/uifontdescriptor?language=objc} for more information.
-   * @see {@link https://github.com/PSPDFKit/react-native/blob/master/samples/Catalog/examples/CustomFontPicker.js}
+   * @see {@link https://github.com/PSPDFKit/react-native/blob/master/samples/Catalog/examples/CustomFontPicker.tsx}
    */
   availableFontNames: PropTypes.array,
   /**
@@ -1159,7 +1235,7 @@ PSPDFKitView.propTypes = {
    * @type {string}
    * @memberof PSPDFKitView
    * @see {@link https://developer.apple.com/documentation/uikit/uifontdescriptor?language=objc} for more information.
-   * @see {@link https://github.com/PSPDFKit/react-native/blob/master/samples/Catalog/examples/CustomFontPicker.js}
+   * @see {@link https://github.com/PSPDFKit/react-native/blob/master/samples/Catalog/examples/CustomFontPicker.tsx}
    *
    * Note on Android: This is the default font that’s selected. If the user changes the font, it’ll become the new default.
    */
@@ -1169,7 +1245,7 @@ PSPDFKitView.propTypes = {
    * Defaults to ```true```, showing the downloadable fonts.
    * @type {boolean}
    * @memberof PSPDFKitView
-   * @see {@link https://github.com/PSPDFKit/react-native/blob/master/samples/Catalog/examples/CustomFontPicker.js}
+   * @see {@link https://github.com/PSPDFKit/react-native/blob/master/samples/Catalog/examples/CustomFontPicker.tsx}
    */
   showDownloadableFonts: PropTypes.bool,
   /**
@@ -1235,7 +1311,7 @@ export class PSPDFKit {
    * Used to get the current version of the underlying PSPDFKit SDK.
    * @member versionString
    * @memberof PSPDFKit
-   * @returns { string } The underlying PSPDFKit SDK version number.
+   * @type { string }
    * @example
    * const version = PSPDFKit.versionString
    */
@@ -1273,7 +1349,7 @@ export class PSPDFKit {
    * @method present
    * @memberof PSPDFKit
    * @param { string } documentPath The path to the PDF document to be presented.
-   * @param { object } configuration Configuration object to customize the appearance and behavior of PSPDFKit. See {@link https://github.com/PSPDFKit/react-native/blob/master/documentation/configuration-options.md} for available options.
+   * @param { PDFConfiguration } configuration Configuration object to customize the appearance and behavior of PSPDFKit. See {@link https://pspdfkit.com/api/react-native/PDFConfiguration.html} for available options.
    * @returns { Promise<boolean> } A promise returning ```true``` if the document was successfully presented, and ```false``` if not.
    * @example
    * const fileName = 'document.pdf';
@@ -1281,10 +1357,11 @@ export class PSPDFKit {
    * Platform.OS === 'ios' ? 'PDFs/' + fileName
    * : 'file:///android_asset/' + fileName;
    *
-   * const configuration = {
-   *    showThumbnailBar: 'scrollable',
-   *    pageTransition: 'scrollContinuous',
-   *    scrollDirection: 'vertical'
+   * const configuration: PDFConfiguration = {
+   *    pageMode: PDFConfiguration.PageMode.AUTOMATIC,
+   *    scrollDirection: PDFConfiguration.ScrollDirection.HORIZONTAL,
+   *    enableAnnotationEditing: PDFConfiguration.BooleanType.TRUE,
+   *    pageTransition: PDFConfiguration.PageTransition.SCROLL_CONTINUOUS
    * };
    *
    * PSPDFKit.present(exampleDocumentPath, configuration);
@@ -1341,7 +1418,7 @@ export class PSPDFKit {
    * @method presentInstant
    * @memberof PSPDFKit
    * @param { InstantDocumentData } documentData The Instant document data received entirely from the web response.
-   * @param { object } configuration Configuration object to customize the appearance and behavior of PSPDFKit. See {@link https://github.com/PSPDFKit/react-native/blob/master/documentation/configuration-options.md} for available options. Also see {@link InstantConfiguration} for additional Instant configuration options.
+   * @param { PDFConfiguration } configuration Configuration object to customize the appearance and behavior of PSPDFKit. See {@link https://pspdfkit.com/api/react-native/PDFConfiguration.html} for available options. Also see {@link InstantConfiguration} for additional Instant configuration options.
    * @returns { Promise<boolean> } A promise returning ```true``` if the document was successfully presented, and ```false``` if not.
    * @see {@link https://github.com/PSPDFKit/react-native/blob/5b2716a3f3cd3732c0e5845cc39e28d19b618aa4/samples/Catalog/examples/InstantSynchronization.js#L85C7-L85C7} for an example implementation.
    * @example
@@ -1351,11 +1428,11 @@ export class PSPDFKit {
    *     jwt: serverResult.jwt,
    *     serverUrl: Constants.InstantServerURL
    * };
-   * const configuration = {
-   *    enableInstantComments: false,
-   *    listenToServerChanges: true,
+   * const configuration: PDFConfiguration = {
+   *    enableInstantComments: PDFConfiguration.BooleanType.FALSE,
+   *    listenToServerChanges: PDFConfiguration.BooleanType.TRUE,
    *    delay: 1,
-   *    syncAnnotations: true,
+   *    syncAnnotations: PDFConfiguration.BooleanType.TRUE,
    * };
    *
    * PSPDFKit.presentInstant(documentData, configuration);
@@ -1644,3 +1721,24 @@ export class Processor {
    */
   getTemporaryDirectory = function () {};
 }
+
+import { PDFConfiguration } from "./lib/configuration/PDFConfiguration";
+export { PDFConfiguration } from "./lib/configuration/PDFConfiguration";
+
+import { Toolbar } from "./lib/toolbar/Toolbar";
+export { Toolbar } from "./lib/toolbar/Toolbar";
+
+import { Measurements } from "./lib/measurements/Measurements";
+export { Measurements } from "./lib/measurements/Measurements";
+
+import { MeasurementScale } from "./lib/measurements/Measurements";
+export { MeasurementScale } from "./lib/measurements/Measurements";
+
+import { MeasurementValueConfiguration } from "./lib/measurements/Measurements";
+export { MeasurementValueConfiguration } from "./lib/measurements/Measurements";
+
+module.exports.PDFConfiguration = PDFConfiguration;
+module.exports.Toolbar = Toolbar;
+module.exports.Measurements = Measurements;
+module.exports.MeasurementScale = MeasurementScale;
+module.exports.MeasurementValueConfiguration = MeasurementValueConfiguration;

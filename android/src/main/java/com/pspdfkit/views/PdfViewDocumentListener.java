@@ -3,7 +3,7 @@
  *
  *   PSPDFKit
  *
- *   Copyright © 2021-2023 PSPDFKit GmbH. All rights reserved.
+ *   Copyright © 2021-2024 PSPDFKit GmbH. All rights reserved.
  *
  *   THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
  *   AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -30,6 +30,7 @@ import com.pspdfkit.forms.FormListeners;
 import com.pspdfkit.listeners.DocumentListener;
 import com.pspdfkit.react.events.PdfViewAnnotationChangedEvent;
 import com.pspdfkit.react.events.PdfViewAnnotationTappedEvent;
+import com.pspdfkit.react.events.PdfViewDocumentLoadedEvent;
 import com.pspdfkit.react.events.PdfViewDocumentSaveFailedEvent;
 import com.pspdfkit.react.events.PdfViewDocumentSavedEvent;
 import com.pspdfkit.ui.special_mode.controller.AnnotationSelectionController;
@@ -63,7 +64,7 @@ class PdfViewDocumentListener implements DocumentListener, AnnotationManager.OnA
 
     @Override
     public void onDocumentLoaded(@NonNull PdfDocument pdfDocument) {
-
+        eventDispatcher.dispatchEvent(new PdfViewDocumentLoadedEvent(parent.getId()));
     }
 
     @Override

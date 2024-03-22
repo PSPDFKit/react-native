@@ -23,7 +23,7 @@ export class EventListeners extends BaseExampleAutoHidingHeaderComponent {
           document={exampleDocumentPath}
           ref={this.pdfRef}
           configuration={{
-            backgroundColor: processColor('lightgrey'),
+            iOSBackgroundColor: processColor('lightgrey'),
           }}
           style={styles.pdfColor}
           // Event Listeners
@@ -59,6 +59,13 @@ export class EventListeners extends BaseExampleAutoHidingHeaderComponent {
               Alert.alert('PSPDFKit', event.error);
             } else {
               Alert.alert('PSPDFKit', 'Document Saved!');
+            }
+          }}
+          onDocumentLoaded={(event: { error: any }) => {
+            if (event.error) {
+              Alert.alert('PSPDFKit', event.error);
+            } else {
+              Alert.alert('PSPDFKit', 'Document Loaded!');
             }
           }}
         />

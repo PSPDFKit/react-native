@@ -24,10 +24,10 @@ export class AnnotationPresetCustomization extends BaseExampleAutoHidingHeaderCo
           ref={this.pdfRef}
           document={exampleDocumentPath}
           configuration={{
-            allowToolbarTitleChange: false,
+            iOSAllowToolbarTitleChange: false,
             toolbarTitle: 'My Awesome Report',
-            backgroundColor: processColor('lightgrey'),
-            useParentNavigationBar: false,
+            iOSBackgroundColor: processColor('lightgrey'),
+            iOSUseParentNavigationBar: false,
           }}
           annotationPresets={{
             inkPen: {

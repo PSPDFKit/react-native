@@ -3,7 +3,7 @@
  *
  *   PSPDFKit
  *
- *   Copyright © 2021-2023 PSPDFKit GmbH. All rights reserved.
+ *   Copyright © 2021-2024 PSPDFKit GmbH. All rights reserved.
  *
  *   THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
  *   AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -15,7 +15,7 @@
  *   Contains gradle configuration constants
  */
 ext {
-    PSPDFKIT_VERSION = '8.10.0'
+    PSPDFKIT_VERSION = '2024.1.2'
 }
 
 buildscript {
@@ -70,6 +70,13 @@ dependencies {
     api("com.pspdfkit:pspdfkit:${PSPDFKIT_VERSION}") {
         exclude group: 'com.google.auto.value', module: 'auto-value'
     }
+
+    implementation "androidx.compose.material:material:1.5.4"
+    implementation "androidx.constraintlayout:constraintlayout:2.1.4"
+    implementation "androidx.constraintlayout:constraintlayout-compose:1.0.1"
+    implementation "androidx.compose.foundation:foundation:1.5.4"
+    implementation "androidx.compose.ui:ui:1.5.4"
+
     implementation "com.facebook.react:react-native:+"
     implementation 'com.squareup.okhttp3:okhttp:4.9.2'
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"

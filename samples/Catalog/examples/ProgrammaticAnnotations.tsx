@@ -29,8 +29,10 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
           document={exampleDocumentPath}
           disableAutomaticSaving={true}
           configuration={{
-            backgroundColor: processColor('lightgrey'),
+            editableAnnotationTypes: ['ink', 'freeText', 'eraser', 'signature'],
+            iOSBackgroundColor: processColor('lightgrey'),
           }}
+          menuItemGrouping={['ink', 'freetext', 'eraser', 'signature']}
           style={styles.pdfColor}
           onStateChanged={(event: { currentPageIndex: any }) => {
             this.setState({

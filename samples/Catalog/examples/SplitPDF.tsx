@@ -28,7 +28,7 @@ export class SplitPDF extends BaseExampleAutoHidingHeaderComponent {
           ref={this.pdfRef1}
           document={formDocumentPath}
           configuration={{
-            backgroundColor: processColor('lightgrey'),
+            iOSBackgroundColor: processColor('lightgrey'),
           }}
           style={styles.pdfView}
         />

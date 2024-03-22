@@ -1,5 +1,5 @@
 //
-//  Copyright © 2016-2023 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2016-2024 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -26,6 +26,8 @@
 // - `android` prefix   : If the key works only for Android.
 // - `iOS` prefix       : If the key works only for iOS.
 + (NSDictionary *)processConfigurationOptionsDictionaryForPrefix:(NSDictionary *)dictionary;
+
++ (NSDictionary *)convertConfiguration:(PSPDFViewController *)viewController;
 
 @end
 

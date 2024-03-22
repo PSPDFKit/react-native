@@ -692,6 +692,6 @@ For Troubleshooting common issues you might encounter when setting up PSPDFKit f
 ## License
 
 This project can be used for evaluation or if you have a valid PSPDFKit license.
-All items and source code Copyright © 2010-2023 PSPDFKit GmbH.
+All items and source code Copyright © 2010-2024 PSPDFKit GmbH.
 
 See [LICENSE](./LICENSE) for details.

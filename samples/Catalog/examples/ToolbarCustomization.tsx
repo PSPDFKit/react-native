@@ -1,6 +1,6 @@
 import React from 'react';
 import { Alert, Button, Platform, processColor, View } from 'react-native';
-import PSPDFKitView from 'react-native-pspdfkit';
+import PSPDFKitView, { Toolbar } from 'react-native-pspdfkit';
 
 import { exampleDocumentPath, pspdfkitColor } from '../configuration/Constants';
 import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
@@ -20,23 +20,47 @@ export class ToolbarCustomization extends BaseExampleAutoHidingHeaderComponent {
           ref={this.pdfRef}
           document={exampleDocumentPath}
           configuration={{
-            backgroundColor: processColor('lightgrey'),
-            useParentNavigationBar: false,
+            iOSBackgroundColor: processColor('lightgrey'),
+            iOSUseParentNavigationBar: false,
           }}
-          //Only IOS
-          leftBarButtonItems={['settingsButtonItem']}
-          rightBarButtonItems={[
-            'searchButtonItem',
-            'thumbnailsButtonItem',
-            'annotationButtonItem',
-          ]}
-          //Only for Android.
-          toolbarMenuItems={[
-            'annotationButtonItem',
-            'settingsButtonItem',
-            'searchButtonItem',
-            'thumbnailsButtonItem',
-          ]}
+          toolbar={{
+            // iOS only.
+            leftBarButtonItems: {
+              viewMode: Toolbar.PDFViewMode.VIEW_MODE_DOCUMENT,
+              animated: true,
+              buttons: [
+                Toolbar.DefaultToolbarButton.EMAIL_BUTTON_ITEM,
+              ],
+            },
+            // iOS only.
+            rightBarButtonItems: {
+              viewMode: Toolbar.PDFViewMode.VIEW_MODE_DOCUMENT,
+              animated: true,
+              buttons: [
+                {
+                  image: 'customImage.png',
+                  id: 'myCustomButton'
+                }
+              ],
+            },
+            // Android only.
+            toolbarMenuItems: {
+              buttons: [
+                {
+                  image: 'example_toolbar_icon', 
+                  id: 'custom_action',
+                  title: 'Android title',
+                  showAsAction: true
+                },
+                Toolbar.DefaultToolbarButton.SETTINGS_BUTTON_ITEM,
+                Toolbar.DefaultToolbarButton.SEARCH_BUTTON_ITEM,
+                Toolbar.DefaultToolbarButton.ANNOTATION_BUTTON_ITEM,
+              ],
+            },
+          }}
+          onCustomToolbarButtonTapped={(event: any) => {
+            Alert.alert('PSPDFKit', `Custom button tapped: ${JSON.stringify(event)}`);
+          }}
           menuItemGrouping={[
             {
               key: 'markup',
@@ -68,19 +92,40 @@ export class ToolbarCustomization extends BaseExampleAutoHidingHeaderComponent {
           <View style={styles.marginLeft}>
             <Button
               onPress={async () => {
-                const items = ['searchButtonItem', 'readerViewButtonItem'];
+                const toolbar: Toolbar = {
+                  leftBarButtonItems: {
+                    viewMode: Toolbar.PDFViewMode.VIEW_MODE_DOCUMENT,
+                    animated: true,
+                    buttons: [
+                      Toolbar.DefaultToolbarButton.SETTINGS_BUTTON_ITEM,
+                      {
+                        image: 'customImage.png',
+                        id: 'myCustomButton1'
+                      }
+                    ],
+                  },
+                  rightBarButtonItems: {
+                    viewMode: Toolbar.PDFViewMode.VIEW_MODE_DOCUMENT,
+                    animated: true,
+                    buttons: [
+                      Toolbar.DefaultToolbarButton.SEARCH_BUTTON_ITEM
+                      
+                    ],
+                  },
+                  toolbarMenuItems: {
+                    buttons: [
+                      Toolbar.DefaultToolbarButton.THUMBNAILS_BUTTON_ITEM,
+                      {
+                        image: 'example_toolbar_icon', 
+                        id: 'custom_action',
+                        title: 'Android title',
+                        showAsAction: true
+                      },
+                    ],
+                  },
 
-                if (Platform.OS === 'ios') {
-                  // Update the right bar buttons for iOS.
-                  await this.pdfRef.current?.setRightBarButtonItems(
-                    items,
-                    'document',
-                    false,
-                  );
-                } else if (Platform.OS === 'android') {
-                  // Update the toolbar menu items for Android.
-                  await this.pdfRef.current?.setToolbarMenuItems(items);
-                }
+              };
+              this.pdfRef.current?.setToolbar(toolbar);
               }}
               title="Set Toolbar Items"
               accessibilityLabel="Set Toolbar Items"
@@ -93,14 +138,10 @@ export class ToolbarCustomization extends BaseExampleAutoHidingHeaderComponent {
                   Alert.alert('PSPDFKit', 'Not supported on Android');
                   return;
                 }
-                // Get the right bar buttons.
-                const rightBarButtonItems =
-                  await this.pdfRef.current?.getRightBarButtonItemsForViewMode(
-                    'document',
-                  );
-                Alert.alert('PSPDFKit', JSON.stringify(rightBarButtonItems));
+                const toolbarItems = await this.pdfRef.current?.getToolbar();
+                Alert.alert('PSPDFKit', JSON.stringify(toolbarItems));
               }}
-              title="Get Bar Button Items"
+              title="Get Toolbar Items"
             />
           </View>
         </View>

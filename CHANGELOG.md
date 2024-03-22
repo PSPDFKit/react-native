@@ -1,11 +1,25 @@
 ## Newest Release
 
+### 2.9.0 - 22 Mar 2024
+
+- Adds new getConfiguration method to retrieve current PSPDFKitView configuration options. (J#HYB-192)
+- Adds the option to open a password protected document through configuration. (J#HYB-213)
+- Adds the ability to add custom toolbar buttons to the PSPDFKit toolbar. (J#HYB-198)
+- Adds support for new `MeasurementValueConfiguration` configuration option, replacing deprecated `setMeasurementScale` and `setMeasurementPrecision` methods. (J#HYB-205)
+- Updates `showPageLabels` property to also control page number overlay on Android. (J#HYB-223)
+- Updates for PSPDFKit 2024.1.2 for Android.
+- Updates for PSPDFKit 13.3.3 for iOS.
+- Fixes issue of document URIs with file:/// scheme on iOS. (#43160)
+- Fixes issue where `onDocumentLoaded` callback was not called on Android. (#43187)
+- Fixes signatureSavingStrategy configuration option to save signature if enabled. (J#HYB-210)
+- Fixes `spreadFitting` configuration option behaviour on iOS. (J#HYB-222)
+
+## Previous Releases
+
 ### 2.8.1 - 27 Feb 2024
 
 - Updates for PSPDFKit 13.3.1 for iOS. (#43565)
 - Removes `scrollViewInsetAdjustment`, `spreadFitting` and `allowedMenuActions` configuration options which are deprecated in PSPDFKit for iOS. (#43565)
-
-## Previous Releases
 
 ### 2.8.0 - 18 Dec 2023
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Alert, Button, processColor, View } from 'react-native';
-import PSPDFKitView from 'react-native-pspdfkit';
+import PSPDFKitView, { PDFConfiguration } from 'react-native-pspdfkit';
 
 import {
   formDocumentName,
@@ -10,6 +10,7 @@ import {
 } from '../configuration/Constants';
 import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
 import { extractFromAssetsIfMissing } from '../helpers/FileSystemHelpers';
+import { PSPDFKit } from '../helpers/PSPDFKit';
 
 export class ProgrammaticFormFilling extends BaseExampleAutoHidingHeaderComponent {
   pdfRef: React.RefObject<PSPDFKitView>;
@@ -35,9 +36,12 @@ export class ProgrammaticFormFilling extends BaseExampleAutoHidingHeaderComponen
         <PSPDFKitView
           ref={this.pdfRef}
           document={this.state.documentPath}
-          disableAutomaticSaving={true}
           configuration={{
-            backgroundColor: processColor('lightgrey'),
+            iOSBackgroundColor: processColor('lightgray'),
+            documentLabelEnabled: true,
+            firstPageAlwaysSingle: false,
+            disableAutomaticSaving: true,
+            signatureSavingStrategy: 'saveIfSelected',
           }}
           onAnnotationsChanged={(event: { error: any }) => {
             if (event.error) {

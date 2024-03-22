@@ -24,7 +24,7 @@ export class ManualSave extends BaseExampleAutoHidingHeaderComponent {
           document={writableDocumentPath}
           disableAutomaticSaving={true}
           configuration={{
-            backgroundColor: processColor('lightgrey'),
+            iOSBackgroundColor: processColor('lightgrey'),
           }}
           menuItemGrouping={[
             'pen',

@@ -23,7 +23,7 @@ export class GeneratePDF extends BaseExampleAutoHidingHeaderComponent {
           ref={this.pdfRef}
           document={fullPath}
           configuration={{
-            backgroundColor: processColor('lightgrey'),
+            iOSBackgroundColor: processColor('lightgrey'),
           }}
           style={styles.pdfColor}
         />

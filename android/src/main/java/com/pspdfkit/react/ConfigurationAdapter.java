@@ -3,7 +3,7 @@
  *
  *   PSPDFKit
  *
- *   Copyright © 2017-2023 PSPDFKit GmbH. All rights reserved.
+ *   Copyright © 2017-2024 PSPDFKit GmbH. All rights reserved.
  *
  *   THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
  *   AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -325,6 +325,61 @@ public class ConfigurationAdapter {
         }
     }
 
+    public static List<String> getStringValuesForConfigurationItems(final List<AnnotationType> items) {
+        List<String> foundKeys = new ArrayList<>();
+        for (AnnotationType item : items) {
+            foundKeys.add(item.toString());
+        }
+        return foundKeys;
+    }
+
+    public static String getStringValueForConfigurationItem(final Enum item) {
+        String resolvedValue = "";
+        if (item instanceof PageScrollDirection) {
+            if (item == PageScrollDirection.HORIZONTAL) { resolvedValue = PAGE_SCROLL_DIRECTION_HORIZONTAL; }
+            else if (item == PageScrollDirection.VERTICAL) { resolvedValue = PAGE_SCROLL_DIRECTION_VERTICAL; }
+        }
+
+        if (item instanceof PageScrollMode) {
+            if (item == PageScrollMode.PER_PAGE) { resolvedValue = PAGE_TRANSITION_PER_SPREAD; }
+            else if (item == PageScrollMode.CONTINUOUS) { resolvedValue = PAGE_TRANSITION_CONTINUOUS; }
+        }
+
+        if (item instanceof PageLayoutMode) {
+            if (item == PageLayoutMode.AUTO) { resolvedValue = PAGE_MODE_AUTO; }
+            else if (item == PageLayoutMode.SINGLE) { resolvedValue = PAGE_MODE_SINGLE; }
+            else if (item == PageLayoutMode.DOUBLE) { resolvedValue = PAGE_MODE_DOUBLE; }
+        }
+
+        if (item instanceof SignatureSavingStrategy) {
+            if (item == SignatureSavingStrategy.ALWAYS_SAVE) { resolvedValue = SIGNATURE_SAVING_STRATEGY_ALWAYS; }
+            else if (item == SignatureSavingStrategy.NEVER_SAVE) { resolvedValue = SIGNATURE_SAVING_STRATEGY_NEVER; }
+            else if (item == SignatureSavingStrategy.SAVE_IF_SELECTED) { resolvedValue = SIGNATURE_SAVING_STRATEGY_IF_SELECTED; }
+        }
+
+        if (item instanceof PageFitMode) {
+            if (item == PageFitMode.FIT_TO_SCREEN) { resolvedValue = SPREAD_FITTING_FIT; }
+            else if (item == PageFitMode.FIT_TO_WIDTH) { resolvedValue = SPREAD_FITTING_FILL; }
+        }
+
+        if (item instanceof UserInterfaceViewMode) {
+            if (item == UserInterfaceViewMode.USER_INTERFACE_VIEW_MODE_AUTOMATIC) { resolvedValue = USER_INTERFACE_VIEW_MODE_AUTOMATIC; }
+            else if (item == UserInterfaceViewMode.USER_INTERFACE_VIEW_MODE_AUTOMATIC_BORDER_PAGES) { resolvedValue = USER_INTERFACE_VIEW_MODE_AUTOMATIC_BORDER_PAGES; }
+            else if (item == UserInterfaceViewMode.USER_INTERFACE_VIEW_MODE_VISIBLE) { resolvedValue = USER_INTERFACE_VIEW_MODE_ALWAYS_VISIBLE; }
+            else if (item == UserInterfaceViewMode.USER_INTERFACE_VIEW_MODE_HIDDEN) { resolvedValue = USER_INTERFACE_VIEW_MODE_ALWAYS_HIDDEN; }
+            else if (item == UserInterfaceViewMode.USER_INTERFACE_VIEW_MODE_MANUAL) { resolvedValue = USER_INTERFACE_VIEW_MODE_ALWAYS_HIDDEN; }
+        }
+
+        if (item instanceof ThumbnailBarMode) {
+            if (item == ThumbnailBarMode.THUMBNAIL_BAR_MODE_FLOATING) { resolvedValue = SHOW_THUMBNAIL_BAR_FLOATING; }
+            else if (item == ThumbnailBarMode.THUMBNAIL_BAR_MODE_NONE) { resolvedValue = SHOW_THUMBNAIL_BAR_NONE; }
+            else if (item == ThumbnailBarMode.THUMBNAIL_BAR_MODE_SCROLLABLE) { resolvedValue = SHOW_THUMBNAIL_BAR_SCROLLABLE; }
+            else if (item == ThumbnailBarMode.THUMBNAIL_BAR_MODE_PINNED) { resolvedValue = SHOW_THUMBNAIL_BAR_PINNED; }
+        }
+
+        return resolvedValue;
+    }
+
     private void configureShowPageNumberOverlay(final boolean showPageNumberOverlay) {
         if (showPageNumberOverlay) {
             configuration.showPageNumberOverlay();
@@ -499,8 +554,10 @@ public class ConfigurationAdapter {
     private void configureShowPageLabels(final boolean showPageLabels) {
         if (showPageLabels) {
             configuration.showPageLabels();
+            configuration.showPageNumberOverlay();
         } else {
             configuration.hidePageLabels();
+            configuration.hidePageNumberOverlay();
         }
     }
 

@@ -1,5 +1,5 @@
 //
-//  Copyright © 2016-2023 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2016-2024 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -13,6 +13,124 @@
 #else
 #import <PSPDFKitReactNativeiOS/PSPDFKitReactNativeiOS-Swift.h>
 #endif
+
+#define PageTransitionMap @{@"scrollPerSpread" : @(PSPDFPageTransitionScrollPerSpread), \
+                            @"scrollContinuous" : @(PSPDFPageTransitionScrollContinuous), \
+                            @"curl" : @(PSPDFPageTransitionCurl)} \
+
+#define PageModeMap @{@"single" : @(PSPDFPageModeSingle), \
+                      @"double" : @(PSPDFPageModeDouble), \
+                      @"automatic" : @(PSPDFPageModeAutomatic)} \
+
+#define ScrollDirectionMap @{@"horizontal" : @(PSPDFScrollDirectionHorizontal), \
+                             @"vertical" : @(PSPDFScrollDirectionVertical)} \
+
+#define AppearanceModeMap @{@"default" : @(PSPDFAppearanceModeDefault), \
+                            @"sepia" : @(PSPDFAppearanceModeSepia), \
+                            @"night" : @(PSPDFAppearanceModeNight), \
+                            @"all" : @(PSPDFAppearanceModeAll)} \
+
+#define SpreadFittingMap @{@"fit" : @(PSPDFConfigurationSpreadFittingFit), \
+                           @"fill" : @(PSPDFConfigurationSpreadFittingFill), \
+                           @"adaptive" : @(PSPDFConfigurationSpreadFittingAdaptive)} \
+
+#define SignatureSavingStrategyMap @{@"alwaysSave" : @(PSPDFSignatureSavingStrategyAlwaysSave), \
+                                     @"neverSave" : @(PSPDFSignatureSavingStrategyNeverSave), \
+                                     @"saveIfSelected" : @(PSPDFSignatureSavingStrategySaveIfSelected)} \
+
+#define DoubleTapActionMap @{@"none" : @(PSPDFTapActionNone), \
+                             @"zoom" : @(PSPDFTapActionZoom), \
+                             @"smartZoom" : @(PSPDFTapActionSmartZoom)} \
+
+#define TextSelectionModeMap @{@"regular" : @(PSPDFTextSelectionModeRegular), \
+                               @"simple" : @(PSPDFTextSelectionModeSimple), \
+                               @"automatic": @(PSPDFTextSelectionModeAutomatic)} \
+
+#define TypesShowingColorPresetsMap @{@"none" : @(PSPDFAnnotationTypeNone), \
+                                    @"undefined" : @(PSPDFAnnotationTypeUndefined), \
+                                    PSPDFAnnotationStringLink : @(PSPDFAnnotationTypeLink), \
+                                    PSPDFAnnotationStringHighlight : @(PSPDFAnnotationTypeHighlight), \
+                                    PSPDFAnnotationStringStrikeOut : @(PSPDFAnnotationTypeStrikeOut), \
+                                    PSPDFAnnotationStringUnderline : @(PSPDFAnnotationTypeUnderline), \
+                                    PSPDFAnnotationStringSquiggly : @(PSPDFAnnotationTypeSquiggly), \
+                                    PSPDFAnnotationStringFreeText : @(PSPDFAnnotationTypeFreeText), \
+                                    PSPDFAnnotationStringInk : @(PSPDFAnnotationTypeInk), \
+                                    PSPDFAnnotationStringSquare : @(PSPDFAnnotationTypeSquare), \
+                                    PSPDFAnnotationStringCircle : @(PSPDFAnnotationTypeCircle), \
+                                    PSPDFAnnotationStringLine : @(PSPDFAnnotationTypeLine), \
+                                    PSPDFAnnotationStringNote : @(PSPDFAnnotationTypeNote), \
+                                    PSPDFAnnotationStringStamp : @(PSPDFAnnotationTypeStamp), \
+                                    PSPDFAnnotationStringCaret : @(PSPDFAnnotationTypeCaret), \
+                                    PSPDFAnnotationStringRichMedia : @(PSPDFAnnotationTypeRichMedia), \
+                                    PSPDFAnnotationStringScreen : @(PSPDFAnnotationTypeScreen), \
+                                    PSPDFAnnotationStringWidget : @(PSPDFAnnotationTypeWidget), \
+                                    PSPDFAnnotationStringFile : @(PSPDFAnnotationTypeFile), \
+                                    PSPDFAnnotationStringSound : @(PSPDFAnnotationTypeSound), \
+                                    PSPDFAnnotationStringPolygon : @(PSPDFAnnotationTypePolygon), \
+                                    PSPDFAnnotationStringPolyLine : @(PSPDFAnnotationTypePolyLine), \
+                                    PSPDFAnnotationStringPopup : @(PSPDFAnnotationTypePopup), \
+                                    PSPDFAnnotationStringWatermark : @(PSPDFAnnotationTypeWatermark), \
+                                    PSPDFAnnotationStringTrapNet : @(PSPDFAnnotationTypeTrapNet), \
+                                    PSPDFAnnotationString3D : @(PSPDFAnnotationTypeThreeDimensional), \
+                                    PSPDFAnnotationStringRedaction : @(PSPDFAnnotationTypeRedaction), \
+                                    @"all" : @(PSPDFAnnotationTypeAll)} \
+
+#define RenderStatusViewPositionMap @{@"top" : @(PSPDFRenderStatusViewPositionTop), \
+                                      @"centered" : @(PSPDFRenderStatusViewPositionCentered)} \
+
+#define UserInterfaceViewModeMap @{@"automatic" : @(PSPDFUserInterfaceViewModeAutomatic), \
+                                   @"automaticBorderPages" : @(PSPDFUserInterfaceViewModeAutomaticNoFirstLastPage), \
+                                   @"automaticNoFirstLastPage" : @(PSPDFUserInterfaceViewModeAutomaticNoFirstLastPage), \
+                                   @"always" : @(PSPDFUserInterfaceViewModeAlways), \
+                                   @"alwaysVisible" : @(PSPDFUserInterfaceViewModeAlways), \
+                                   @"alwaysHidden" : @(PSPDFUserInterfaceViewModeNever), \
+                                   @"never" : @(PSPDFUserInterfaceViewModeNever)} \
+
+#define SearchModeMap @{@"modal" : @(PSPDFSearchModeModal), \
+                        @"inline" : @(PSPDFSearchModeInline)} \
+
+#define AllowedMenuActionsMap @{@"none" : @(PSPDFTextSelectionMenuActionNone), \
+                                @"search" : @(PSPDFTextSelectionMenuActionSearch), \
+                                @"define" : @(PSPDFTextSelectionMenuActionDefine), \
+                                @"wikipedia" : @(PSPDFTextSelectionMenuActionWikipedia), \
+                                @"speak" : @(PSPDFTextSelectionMenuActionSpeak), \
+                                @"all" : @(PSPDFTextSelectionMenuActionAll)} \
+
+#define SettingsOptionsMap @{@"scrollDirection" : @(PSPDFSettingsOptionScrollDirection), \
+                             @"pageTransition" : @(PSPDFSettingsOptionPageTransition), \
+                             @"appearance" : @(PSPDFSettingsOptionAppearance), \
+                             @"brightness" : @(PSPDFSettingsOptionBrightness), \
+                             @"pageMode" : @(PSPDFSettingsOptionPageMode), \
+                             @"spreadFitting" : @(PSPDFSettingsOptionSpreadFitting), \
+                             @"default" : @(PSPDFSettingsOptionDefault), \
+                             @"all" : @(PSPDFSettingsOptionAll)} \
+
+#define ThumbnailBarMap @{@"none" : @(PSPDFThumbnailBarModeNone), \
+                          @"default": @(PSPDFThumbnailBarModeFloatingScrubberBar), \
+                          @"floating" : @(PSPDFThumbnailBarModeFloatingScrubberBar), \
+                          @"scrubberBar" : @(PSPDFThumbnailBarModeScrubberBar), \
+                          @"pinned" : @(PSPDFThumbnailBarModeScrubberBar), \
+                          @"scrollable" : @(PSPDFThumbnailBarModeScrollable)} \
+
+#define ScrubberBarTypeMap @{@"horizontal" : @(PSPDFScrubberBarTypeHorizontal), \
+                             @"verticalLeft" : @(PSPDFScrubberBarTypeVerticalLeft), \
+                             @"verticalRight" : @(PSPDFScrubberBarTypeVerticalRight)} \
+
+#define ThumbnailGroupingMap @{@"automatic" : @(PSPDFThumbnailGroupingAutomatic), \
+                               @"never" : @(PSPDFThumbnailGroupingNever), \
+                               @"always" : @(PSPDFThumbnailGroupingAlways)} \
+
+#define LinkActionMap @{@"none" : @(PSPDFLinkActionNone), \
+                        @"alertView" : @(PSPDFLinkActionAlertView), \
+                        @"openSafari" : @(PSPDFLinkActionOpenSafari), \
+                        @"inlineBrowser" : @(PSPDFLinkActionInlineBrowser), \
+                        @"InlineWebViewController" : @(PSPDFLinkActionInlineWebViewController)} \
+
+#define DrawCreateModeMap @{@"separate" : @(PSPDFDrawCreateModeSeparate), \
+                            @"mergeIfPossible" : @(PSPDFDrawCreateModeMergeIfPossible)} \
+
+#define BookmarkSortOrderMap @{@"custom" : @(PSPDFBookmarkManagerSortOrderCustom), \
+                               @"pageBased" : @(PSPDFBookmarkManagerSortOrderPageBased)} \
 
 @implementation RCTConvert (PSPDFConfiguration)
 
@@ -45,47 +163,32 @@
 }
 
 RCT_ENUM_CONVERTER(PSPDFScrollDirection,
-                   (@{@"horizontal" : @(PSPDFScrollDirectionHorizontal),
-                      @"vertical" : @(PSPDFScrollDirectionVertical)}),
+                   (ScrollDirectionMap),
                    PSPDFScrollDirectionHorizontal,
                    unsignedIntegerValue)
 
 RCT_ENUM_CONVERTER(PSPDFTapAction,
-                   (@{@"none" : @(PSPDFTapActionNone),
-                      @"zoom" : @(PSPDFTapActionZoom),
-                      @"smartZoom" : @(PSPDFTapActionSmartZoom)}),
+                   (DoubleTapActionMap),
                    PSPDFTapActionNone,
                    unsignedIntegerValue)
 
 RCT_ENUM_CONVERTER(PSPDFTextSelectionMode,
-                   (@{@"regular" : @(PSPDFTextSelectionModeRegular),
-                      @"simple" : @(PSPDFTextSelectionModeSimple)}),
+                   (TextSelectionModeMap),
                    PSPDFTextSelectionModeRegular,
                    unsignedIntegerValue)
 
 RCT_ENUM_CONVERTER(PSPDFBookmarkManagerSortOrder,
-                   (@{@"custom" : @(PSPDFBookmarkManagerSortOrderCustom),
-                      @"pageBased" : @(PSPDFBookmarkManagerSortOrderPageBased)}),
+                   (BookmarkSortOrderMap),
                    PSPDFBookmarkManagerSortOrderPageBased,
                    unsignedIntegerValue)
 
 RCT_ENUM_CONVERTER(PSPDFLinkAction,
-                   (@{@"none" : @(PSPDFLinkActionNone),
-                      @"alertView" : @(PSPDFLinkActionAlertView),
-                      @"openSafari" : @(PSPDFLinkActionOpenSafari),
-                      @"inlineBrowser" : @(PSPDFLinkActionInlineBrowser),
-                      @"InlineWebViewController" : @(PSPDFLinkActionInlineWebViewController)}),
+                   (LinkActionMap),
                    PSPDFLinkActionNone,
                    unsignedIntegerValue)
 
 RCT_ENUM_CONVERTER(PSPDFUserInterfaceViewMode,
-                   (@{@"automatic" : @(PSPDFUserInterfaceViewModeAutomatic),
-                      @"automaticBorderPages" : @(PSPDFUserInterfaceViewModeAutomaticNoFirstLastPage),
-                      @"automaticNoFirstLastPage" : @(PSPDFUserInterfaceViewModeAutomaticNoFirstLastPage),
-                      @"always" : @(PSPDFUserInterfaceViewModeAlways),
-                      @"alwaysVisible" : @(PSPDFUserInterfaceViewModeAlways),
-                      @"alwaysHidden" : @(PSPDFUserInterfaceViewModeNever),
-                      @"never" : @(PSPDFUserInterfaceViewModeNever)}),
+                   (UserInterfaceViewModeMap),
                    PSPDFUserInterfaceViewModeAutomatic,
                    unsignedIntegerValue)
 
@@ -97,12 +200,7 @@ RCT_ENUM_CONVERTER(PSPDFUserInterfaceViewAnimation,
                    unsignedIntegerValue)
 
 RCT_ENUM_CONVERTER(PSPDFThumbnailBarMode,
-                   (@{@"none" : @(PSPDFThumbnailBarModeNone),
-                      @"default": @(PSPDFThumbnailBarModeFloatingScrubberBar),
-                      @"floating" : @(PSPDFThumbnailBarModeFloatingScrubberBar),
-                      @"scrubberBar" : @(PSPDFThumbnailBarModeScrubberBar),
-                      @"pinned" : @(PSPDFThumbnailBarModeScrubberBar),
-                      @"scrollable" : @(PSPDFThumbnailBarModeScrollable)}),
+                   (ThumbnailBarMap),
                    PSPDFThumbnailBarModeFloatingScrubberBar,
                    unsignedIntegerValue)
 
@@ -114,55 +212,42 @@ RCT_ENUM_CONVERTER(PSPDFAdaptiveConditional,
                    unsignedIntegerValue)
 
 RCT_ENUM_CONVERTER(PSPDFRenderStatusViewPosition,
-                   (@{@"top" : @(PSPDFRenderStatusViewPositionTop),
-                      @"centered" : @(PSPDFRenderStatusViewPositionCentered)}),
+                   (RenderStatusViewPositionMap),
                    PSPDFRenderStatusViewPositionTop,
                    unsignedIntegerValue)
 
 RCT_ENUM_CONVERTER(PSPDFPageMode,
-                   (@{@"single" : @(PSPDFPageModeSingle),
-                      @"double" : @(PSPDFPageModeDouble),
-                      @"automatic" : @(PSPDFPageModeAutomatic)}),
+                   (PageModeMap),
                    PSPDFPageModeAutomatic,
                    unsignedIntegerValue)
 
 RCT_ENUM_CONVERTER(PSPDFScrubberBarType,
-                   (@{@"horizontal" : @(PSPDFScrubberBarTypeHorizontal),
-                      @"verticalLeft" : @(PSPDFScrubberBarTypeVerticalLeft),
-                      @"verticalRight" : @(PSPDFScrubberBarTypeVerticalRight)}),
+                   (ScrubberBarTypeMap),
                    PSPDFScrubberBarTypeHorizontal,
                    unsignedIntegerValue)
 
 RCT_ENUM_CONVERTER(PSPDFThumbnailGrouping,
-                   (@{@"automatic" : @(PSPDFThumbnailGroupingAutomatic),
-                      @"never" : @(PSPDFThumbnailGroupingNever),
-                      @"always" : @(PSPDFThumbnailGroupingAlways)}),
+                   (ThumbnailGroupingMap),
                    PSPDFThumbnailGroupingAutomatic,
                    unsignedIntegerValue)
 
 RCT_ENUM_CONVERTER(PSPDFPageTransition,
-                   (@{@"scrollPerSpread" : @(PSPDFPageTransitionScrollPerSpread),
-                      @"scrollContinuous" : @(PSPDFPageTransitionScrollContinuous),
-                      @"curl" : @(PSPDFPageTransitionCurl)}),
+                   (PageTransitionMap),
                    PSPDFPageTransitionScrollPerSpread,
                    unsignedIntegerValue)
 
 RCT_ENUM_CONVERTER(PSPDFDrawCreateMode,
-                   (@{@"separate" : @(PSPDFDrawCreateModeSeparate),
-                      @"mergeIfPossible" : @(PSPDFDrawCreateModeMergeIfPossible)}),
+                   (DrawCreateModeMap),
                    PSPDFDrawCreateModeMergeIfPossible,
                    unsignedIntegerValue)
 
 RCT_ENUM_CONVERTER(PSPDFSearchMode,
-                   (@{@"modal" : @(PSPDFSearchModeModal),
-                      @"inline" : @(PSPDFSearchModeInline)}),
+                   (SearchModeMap),
                    PSPDFSearchModeModal,
                    unsignedIntegerValue)
 
 RCT_ENUM_CONVERTER(PSPDFSignatureSavingStrategy,
-                   (@{@"alwaysSave" : @(PSPDFSignatureSavingStrategyAlwaysSave),
-                      @"neverSave" : @(PSPDFSignatureSavingStrategyNeverSave),
-                      @"saveIfSelected" : @(PSPDFSignatureSavingStrategySaveIfSelected)}),
+                   (SignatureSavingStrategyMap),
                    PSPDFSignatureSavingStrategyAlwaysSave,
                    unsignedIntegerValue)
 
@@ -200,56 +285,24 @@ RCT_ENUM_CONVERTER(PSPDFSignatureSavingStrategy,
  */
 
 RCT_MULTI_ENUM_CONVERTER(PSPDFAnnotationType,
-                         (@{@"none" : @(PSPDFAnnotationTypeNone),
-                            @"undefined" : @(PSPDFAnnotationTypeUndefined),
-                            PSPDFAnnotationStringLink : @(PSPDFAnnotationTypeLink),
-                            PSPDFAnnotationStringHighlight : @(PSPDFAnnotationTypeHighlight),
-                            PSPDFAnnotationStringStrikeOut : @(PSPDFAnnotationTypeStrikeOut),
-                            PSPDFAnnotationStringUnderline : @(PSPDFAnnotationTypeUnderline),
-                            PSPDFAnnotationStringSquiggly : @(PSPDFAnnotationTypeSquiggly),
-                            PSPDFAnnotationStringFreeText : @(PSPDFAnnotationTypeFreeText),
-                            PSPDFAnnotationStringInk : @(PSPDFAnnotationTypeInk),
-                            PSPDFAnnotationStringSquare : @(PSPDFAnnotationTypeSquare),
-                            PSPDFAnnotationStringCircle : @(PSPDFAnnotationTypeCircle),
-                            PSPDFAnnotationStringLine : @(PSPDFAnnotationTypeLine),
-                            PSPDFAnnotationStringNote : @(PSPDFAnnotationTypeNote),
-                            PSPDFAnnotationStringStamp : @(PSPDFAnnotationTypeStamp),
-                            PSPDFAnnotationStringCaret : @(PSPDFAnnotationTypeCaret),
-                            PSPDFAnnotationStringRichMedia : @(PSPDFAnnotationTypeRichMedia),
-                            PSPDFAnnotationStringScreen : @(PSPDFAnnotationTypeScreen),
-                            PSPDFAnnotationStringWidget : @(PSPDFAnnotationTypeWidget),
-                            PSPDFAnnotationStringFile : @(PSPDFAnnotationTypeFile),
-                            PSPDFAnnotationStringSound : @(PSPDFAnnotationTypeSound),
-                            PSPDFAnnotationStringPolygon : @(PSPDFAnnotationTypePolygon),
-                            PSPDFAnnotationStringPolyLine : @(PSPDFAnnotationTypePolyLine),
-                            PSPDFAnnotationStringPopup : @(PSPDFAnnotationTypePopup),
-                            PSPDFAnnotationStringWatermark : @(PSPDFAnnotationTypeWatermark),
-                            PSPDFAnnotationStringTrapNet : @(PSPDFAnnotationTypeTrapNet),
-                            PSPDFAnnotationString3D : @(PSPDFAnnotationTypeThreeDimensional),
-                            PSPDFAnnotationStringRedaction : @(PSPDFAnnotationTypeRedaction),
-                            @"all" : @(PSPDFAnnotationTypeAll)}),
+                         (TypesShowingColorPresetsMap),
                          PSPDFAnnotationTypeNone,
                          unsignedIntegerValue)
 
 RCT_MULTI_ENUM_CONVERTER(PSPDFAppearanceMode,
-                         (@{@"default" : @(PSPDFAppearanceModeDefault),
-                            @"sepia" : @(PSPDFAppearanceModeSepia),
-                            @"night" : @(PSPDFAppearanceModeNight),
-                            @"all" : @(PSPDFAppearanceModeAll)}),
+                         (AppearanceModeMap),
                          PSPDFAppearanceModeDefault,
                          unsignedIntegerValue)
 
 RCT_MULTI_ENUM_CONVERTER(PSPDFSettingsOptions,
-                         (@{@"scrollDirection" : @(PSPDFSettingsOptionScrollDirection),
-                            @"pageTransition" : @(PSPDFSettingsOptionPageTransition),
-                            @"appearance" : @(PSPDFSettingsOptionAppearance),
-                            @"brightness" : @(PSPDFSettingsOptionBrightness),
-                            @"pageMode" : @(PSPDFSettingsOptionPageMode),
-                            @"spreadFitting" : @(PSPDFSettingsOptionSpreadFitting),
-                            @"default" : @(PSPDFSettingsOptionDefault),
-                            @"all" : @(PSPDFSettingsOptionAll)}),
+                         (SettingsOptionsMap),
                          PSPDFSettingsOptionAll,
                          unsignedIntegerValue)
+
+RCT_ENUM_CONVERTER(PSPDFConfigurationSpreadFitting,
+                   (SpreadFittingMap),
+                   PSPDFConfigurationSpreadFittingAdaptive,
+                   unsignedIntegerValue)
 
 RCT_MULTI_ENUM_CONVERTER(PSPDFDocumentSharingFileFormatOptions,
                          (@{@"PDF" : @(PSPDFDocumentSharingFileFormatOptionPDF),
@@ -276,6 +329,242 @@ RCT_MULTI_ENUM_CONVERTER(PSPDFDocumentSharingPagesOptions,
                          PSPDFDocumentSharingPagesOptionAll,
                          unsignedIntegerValue)
 
++ (NSArray *)translateSize:(NSString *)input {
+    return [RCTConvert stringToFloatArray:[[RCTConvert sanitiseSizeString:input] componentsSeparatedByString:@","]];
+}
+
++ (NSArray *)stringToFloatArray:(NSArray *)stringArray {
+    
+    NSMutableArray *intArray = [NSMutableArray new];
+    
+    for (NSString *item in stringArray) {
+        [intArray addObject:@([item floatValue])];
+    }
+    
+    return intArray;
+}
+
++ (NSString *)sanitiseSizeString:(NSString *)input {
+    
+    input = [input stringByReplacingOccurrencesOfString:@"{" withString:@""];
+    input = [input stringByReplacingOccurrencesOfString:@"}" withString:@""];
+    input = [input stringByReplacingOccurrencesOfString:@" " withString:@""];
+    
+    return input;
+}
+
++ (NSString *)findKeyForValue:(NSUInteger)value
+                 inDictionary:(NSDictionary *)dictionary {
+    
+    NSString *foundKey = @"";
+    for (NSString* key in [dictionary allKeys]) {
+        NSNumber *foundValue = [dictionary objectForKey:key];
+        if([foundValue isEqual:@(value)]) {
+            foundKey = key;
+            break;
+        }
+    }
+    return foundKey;
+}
+
++ (NSArray *)findKeysForValues:(NSSet *)values
+                 inDictionary:(NSDictionary *)dictionary {
+    
+    NSMutableArray *foundKeys = [NSMutableArray new];
+    for (NSString *item in values) {
+        if (dictionary[item]) {
+            [foundKeys addObject:item];
+        }
+    }
+    return foundKeys;
+}
+
++ (BOOL)extractBooleanFrom:(NSUInteger)value
+             positiveValue:(NSUInteger)positive {
+    
+    return value == positive;
+}
+
++ (NSDictionary *)convertConfiguration:(PSPDFViewController *)viewController {
+    
+    PSPDFConfiguration *configuration = viewController.configuration;
+    
+    NSMutableDictionary *convertedConfiguration = [NSMutableDictionary new];
+    
+    [convertedConfiguration setObject:[RCTConvert findKeyForValue:configuration.scrollDirection
+                                                     inDictionary:ScrollDirectionMap] forKey:@"scrollDirection"];
+    
+    [convertedConfiguration setObject:[RCTConvert findKeyForValue:configuration.pageTransition
+                                                     inDictionary:PageTransitionMap] forKey:@"pageTransition"];
+    
+    [convertedConfiguration setObject:@(configuration.textSelectionEnabled) forKey:@"enableTextSelection"];
+    
+    [convertedConfiguration setObject:@(configuration.autosaveEnabled) forKey:@"autosaveEnabled"];
+    
+    [convertedConfiguration setObject:!configuration.autosaveEnabled ? @YES : @NO forKey:@"disableAutomaticSaving"];
+    
+    [convertedConfiguration setObject:[RCTConvert findKeyForValue:configuration.signatureSavingStrategy
+                                                     inDictionary:SignatureSavingStrategyMap] forKey:@"signatureSavingStrategy"];
+    
+    [convertedConfiguration setObject:@(configuration.formElementZoomEnabled) forKey:@"iOSFormElementZoomEnabled"];
+    
+    [convertedConfiguration setObject:@(configuration.imageSelectionEnabled) forKey:@"iOSImageSelectionEnabled"];
+    
+    [convertedConfiguration setObject:@(configuration.textSelectionShouldSnapToWord) forKey:@"iOSTextSelectionShouldSnapToWord"];
+    
+    [convertedConfiguration setObject:@(configuration.freeTextAccessoryViewEnabled) forKey:@"iOSFreeTextAccessoryViewEnabled"];
+    
+    [convertedConfiguration setObject:@(configuration.internalTapGesturesEnabled) forKey:@"iOSInternalTapGesturesEnabled"];
+    
+    [convertedConfiguration setObject:@(configuration.allowBackgroundSaving) forKey:@"iOSAllowBackgroundSaving"];
+    
+    [convertedConfiguration setObject:@(configuration.minimumZoomScale) forKey:@"iOSMinimumZoomScale"];
+    
+    [convertedConfiguration setObject:@(configuration.maximumZoomScale) forKey:@"iOSMaximumZoomScale"];
+    
+    [convertedConfiguration setObject:[RCTConvert findKeyForValue:configuration.doubleTapAction
+                                                     inDictionary:DoubleTapActionMap] forKey:@"iOSDoubleTapAction"];
+    
+    [convertedConfiguration setObject:[RCTConvert findKeyForValue:configuration.textSelectionMode
+                                                     inDictionary:TextSelectionModeMap] forKey:@"iOSTextSelectionMode"];
+    
+    [convertedConfiguration setObject:[RCTConvert findKeyForValue:configuration.typesShowingColorPresets
+                                                     inDictionary:TypesShowingColorPresetsMap] forKey:@"iOSTypesShowingColorPresets"];
+    
+    [convertedConfiguration setObject:[RCTConvert findKeyForValue:configuration.pageMode
+                                                     inDictionary:PageModeMap] forKey:@"pageMode"];
+    
+    [convertedConfiguration setObject:@(configuration.firstPageAlwaysSingle) forKey:@"firstPageAlwaysSingle"];
+    
+    [convertedConfiguration setObject:@(configuration.pageLabelEnabled) forKey:@"showPageLabels"];
+    
+    [convertedConfiguration setObject:@([RCTConvert extractBooleanFrom:configuration.documentLabelEnabled
+                                                         positiveValue:PSPDFAdaptiveConditionalYES]) forKey:@"documentLabelEnabled"];
+    
+    [convertedConfiguration setObject:[RCTConvert findKeyForValue:configuration.spreadFitting
+                                                     inDictionary:SpreadFittingMap] forKey:@"spreadFitting"];
+    
+    [convertedConfiguration setObject:viewController.appearanceModeManager.appearanceMode == PSPDFAppearanceModeNight ? @YES : @NO forKey:@"invertColors"];
+    
+    [convertedConfiguration setObject:@(configuration.clipToPageBoundaries) forKey:@"iOSClipToPageBoundaries"];
+
+    [convertedConfiguration setObject:@(configuration.backgroundColor.hexa) forKey:@"iOSBackgroundColor"];
+    
+    [convertedConfiguration setObject:@(configuration.renderAnimationEnabled) forKey:@"iOSRenderAnimationEnabled"];
+    
+    [convertedConfiguration setObject:[RCTConvert findKeyForValue:configuration.renderStatusViewPosition
+                                                     inDictionary:RenderStatusViewPositionMap] forKey:@"iOSRenderStatusViewPosition"];
+    
+    [convertedConfiguration setObject:[RCTConvert findKeyForValue:configuration.allowedAppearanceModes
+                                                     inDictionary:AppearanceModeMap] forKey:@"allowedAppearanceModes"];
+    
+    [convertedConfiguration setObject:[RCTConvert findKeyForValue:configuration.userInterfaceViewMode
+                                                     inDictionary:UserInterfaceViewModeMap] forKey:@"userInterfaceViewMode"];
+
+    [convertedConfiguration setObject:@([RCTConvert extractBooleanFrom:configuration.searchMode positiveValue:PSPDFSearchModeInline])  forKey:@"inlineSearch"];
+    
+    [convertedConfiguration setObject:@([RCTConvert extractBooleanFrom:configuration.userInterfaceViewMode positiveValue:PSPDFUserInterfaceViewModeNever]) forKey:@"immersiveMode"];
+    
+    [convertedConfiguration setObject:viewController.title == nil ? @"" : viewController.title forKey:@"toolbarTitle"];
+    
+    [convertedConfiguration setObject:@(configuration.shouldHideUserInterfaceOnPageChange) forKey:@"iOSShouldHideUserInterfaceOnPageChange"];
+    
+    [convertedConfiguration setObject:@(configuration.shouldShowUserInterfaceOnViewWillAppear) forKey:@"iOSShouldShowUserInterfaceOnViewWillAppear"];
+    
+    [convertedConfiguration setObject:@(configuration.shouldHideStatusBarWithUserInterface) forKey:@"iOSShouldHideStatusBarWithUserInterface"];
+    
+    [convertedConfiguration setObject:@(configuration.shouldHideNavigationBarWithUserInterface) forKey:@"iOSShouldHideNavigationBarWithUserInterface"];
+    
+    [convertedConfiguration setObject:[RCTConvert findKeyForValue:configuration.searchMode
+                                                     inDictionary:SearchModeMap] forKey:@"iOSSearchMode"];
+    
+    [convertedConfiguration setObject:@(configuration.scrollOnEdgeTapEnabled) forKey:@"iOSScrollOnEdgeTapEnabled"];
+    
+    [convertedConfiguration setObject:@(configuration.scrollOnEdgeTapMargin) forKey:@"iOSScrollOnEdgeTapMargin"];
+    
+    [convertedConfiguration setObject:@(configuration.useParentNavigationBar) forKey:@"iOSUseParentNavigationBar"];
+    
+    [convertedConfiguration setObject:@(configuration.allowToolbarTitleChange) forKey:@"iOSAllowToolbarTitleChange"];
+    
+    [convertedConfiguration setObject:@(configuration.shouldHideStatusBar) forKey:@"iOSShouldHideStatusBar"];
+    
+    [convertedConfiguration setObject:@(configuration.showBackActionButton) forKey:@"iOSShowBackActionButton"];
+    
+    [convertedConfiguration setObject:@(configuration.showForwardActionButton) forKey:@"iOSShowForwardActionButton"];
+    
+    [convertedConfiguration setObject:@(configuration.showBackForwardActionButtonLabels) forKey:@"iOSShowBackForwardActionButtonLabels"];
+    
+    [convertedConfiguration setObject:@(configuration.searchResultZoomScale) forKey:@"iOSSearchResultZoomScale"];
+    
+    [convertedConfiguration setObject:[RCTConvert translateSize:NSStringFromUIEdgeInsets(configuration.additionalScrollViewFrameInsets)] forKey:@"iOSAdditionalScrollViewFrameInsets"];
+    [convertedConfiguration setObject:[RCTConvert translateSize:NSStringFromUIEdgeInsets(configuration.additionalContentInsets)] forKey:@"iOSAdditionalContentInsets"];
+    
+    [convertedConfiguration setObject:[RCTConvert findKeyForValue:configuration.allowedMenuActions
+                                                     inDictionary:AllowedMenuActionsMap] forKey:@"iOSAllowedMenuActions"];
+    
+    [convertedConfiguration setObject:[RCTConvert findKeyForValue:configuration.settingsOptions
+                                                     inDictionary:SettingsOptionsMap] forKey:@"iOSSettingsOptions"];
+    
+    [convertedConfiguration setObject:@(configuration.shadowEnabled) forKey:@"iOSShadowEnabled"];
+    
+    [convertedConfiguration setObject:@(configuration.shadowOpacity) forKey:@"iOSShadowOpacity"];
+    
+    [convertedConfiguration setObject:[RCTConvert findKeyForValue:configuration.thumbnailBarMode
+                                                     inDictionary:ThumbnailBarMap] forKey:@"showThumbnailBar"];
+    
+    [convertedConfiguration setObject:[RCTConvert findKeyForValue:configuration.scrubberBarType
+                                                     inDictionary:ScrubberBarTypeMap] forKey:@"iOSScrubberBarType"];
+    
+    [convertedConfiguration setObject:[RCTConvert findKeyForValue:configuration.thumbnailGrouping
+                                                     inDictionary:ThumbnailGroupingMap] forKey:@"iOSThumbnailGrouping"];
+    
+    [convertedConfiguration setObject:[RCTConvert translateSize:NSStringFromCGSize(configuration.thumbnailSize)] forKey:@"iOSThumbnailSize"];
+    
+    [convertedConfiguration setObject:@(configuration.thumbnailInteritemSpacing) forKey:@"iOSThumbnailInteritemSpacing"];
+    
+    [convertedConfiguration setObject:@(configuration.thumbnailLineSpacing) forKey:@"iOSThumbnailLineSpacing"];
+    
+    [convertedConfiguration setObject:[RCTConvert translateSize:NSStringFromUIEdgeInsets(configuration.thumbnailMargin)] forKey:@"iOSThumbnailMargin"];
+    
+    [convertedConfiguration setObject:@(configuration.shouldCacheThumbnails) forKey:@"iOSShouldCacheThumbnails"];
+    
+    [convertedConfiguration setObject:[RCTConvert findKeysForValues:configuration.editableAnnotationTypes
+                                                     inDictionary:TypesShowingColorPresetsMap] forKey:@"editableAnnotationTypes"];
+    
+    // If there are editableAnnotationTypes set, returning enableAnnotationEditing = true would enable all annotations the next time the Configuration is applied to a new PDFViewController instance. So include only if editableAnnotationTypes are 0 or enableAnnotationEditing was explicitly disabled.
+    if (configuration.editableAnnotationTypes.count == 0) {
+        [convertedConfiguration setObject:@NO forKey:@"enableAnnotationEditing"];
+    }
+    
+    [convertedConfiguration setObject:[configuration.editableAnnotationTypes containsObject:PSPDFAnnotationStringWidget] ? @YES : @NO forKey:@"enableFormEditing"];
+    
+    [convertedConfiguration setObject:@(configuration.shouldAskForAnnotationUsername) forKey:@"iOSShouldAskForAnnotationUsername"];
+    
+    [convertedConfiguration setObject:[RCTConvert findKeyForValue:configuration.linkAction
+                                                     inDictionary:LinkActionMap] forKey:@"iOSLinkAction"];
+    
+    [convertedConfiguration setObject:[RCTConvert findKeyForValue:configuration.drawCreateMode
+                                                     inDictionary:DrawCreateModeMap] forKey:@"iOSDrawCreateMode"];
+    
+    [convertedConfiguration setObject:@(configuration.annotationGroupingEnabled) forKey:@"iOSAnnotationGroupingEnabled"];
+    
+    [convertedConfiguration setObject:@(configuration.naturalDrawingAnnotationEnabled) forKey:@"iOSNaturalDrawingAnnotationEnabled"];
+    
+    [convertedConfiguration setObject:@(configuration.naturalSignatureDrawingEnabled) forKey:@"iOSNaturalSignatureDrawingEnabled"];
+    
+    [convertedConfiguration setObject:@(configuration.annotationEntersEditModeAfterSecondTapEnabled) forKey:@"iOSAnnotationEntersEditModeAfterSecondTapEnabled"];
+    
+    [convertedConfiguration setObject:@(configuration.createAnnotationMenuEnabled) forKey:@"iOSCreateAnnotationMenuEnabled"];
+    
+    [convertedConfiguration setObject:@(configuration.annotationAnimationDuration) forKey:@"iOSAnnotationAnimationDuration"];
+    
+    [convertedConfiguration setObject:@(configuration.soundAnnotationTimeLimit) forKey:@"iOSSoundAnnotationTimeLimit"];
+    
+    [convertedConfiguration setObject:[RCTConvert findKeyForValue:configuration.bookmarkSortOrder
+                                                     inDictionary:BookmarkSortOrderMap] forKey:@"iOSBookmarkSortOrder"];
+    
+    return convertedConfiguration;
+}
 
 @end
 
@@ -302,6 +591,10 @@ RCT_MULTI_ENUM_CONVERTER(PSPDFDocumentSharingPagesOptions,
   SET(autosaveEnabled, BOOL)
   SET(allowBackgroundSaving, BOOL)
   SET(signatureSavingStrategy, PSPDFSignatureSavingStrategy)
+  if ([dictionary[@"signatureSavingStrategy"] isEqualToString:@"alwaysSave"] ||
+      [dictionary[@"signatureSavingStrategy"] isEqualToString:@"saveIfSelected"] ) {
+      self.signatureStore = [PSPDFKeychainSignatureStore new];
+  }
   SET(minimumZoomScale, float)
   SET(maximumZoomScale, float)
   SET(doubleTapAction, PSPDFTapAction)
@@ -317,6 +610,7 @@ RCT_MULTI_ENUM_CONVERTER(PSPDFDocumentSharingPagesOptions,
   SET(pageMode, PSPDFPageMode)
   SET(firstPageAlwaysSingle, BOOL)
   SET(clipToPageBoundaries, BOOL)
+  SET(spreadFitting, PSPDFConfigurationSpreadFitting)
   SET(backgroundColor, UIColor)
   SET(renderAnimationEnabled, BOOL)
   SET(renderStatusViewPosition, PSPDFRenderStatusViewPosition)

@@ -1,11 +1,11 @@
 // Configurations
 import { processColor } from 'react-native';
+import { PDFConfiguration } from 'react-native-pspdfkit';
 
-const exampleDocumentConfiguration = {
+const exampleDocumentConfiguration: PDFConfiguration = {
   iOSBackgroundColor: processColor('white'),
-  showPageNumberOverlay: false,
-  grayScale: false,
   showPageLabels: false,
+  androidGrayScale: false,
   documentLabelEnabled: false,
   inlineSearch: false,
   pageTransition: 'scrollContinuous',
@@ -17,8 +17,7 @@ const exampleDocumentConfiguration = {
   editableAnnotationTypes: ['Stamp', 'Square'],
 };
 
-const tiffImageConfiguration = {
-  showPageNumberOverlay: false,
+const tiffImageConfiguration: PDFConfiguration = {
   showPageLabels: false,
   showThumbnailBar: 'none',
 };

@@ -23,9 +23,9 @@ export class CustomFontPicker extends BaseExampleAutoHidingHeaderComponent {
           document={exampleDocumentPath}
           ref={this.pdfRef}
           configuration={{
-            backgroundColor: processColor('lightgrey'),
+            iOSBackgroundColor: processColor('lightgrey'),
             showThumbnailBar: 'scrubberBar',
-            useParentNavigationBar: false,
+            iOSUseParentNavigationBar: false,
           }}
           availableFontNames={[
             'Arial',

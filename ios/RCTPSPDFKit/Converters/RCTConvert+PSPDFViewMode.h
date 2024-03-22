@@ -1,5 +1,5 @@
 //
-//  Copyright © 2019-2023 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2019-2024 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -14,5 +14,6 @@
 @interface RCTConvert (PSPDFViewMode)
 
 + (PSPDFViewMode)PSPDFViewMode:(NSString *)viewMode;
++ (NSString *)PSPDFViewModeString:(PSPDFViewMode)viewMode;
 
 @end

@@ -1,5 +1,5 @@
 //
-//  Copyright © 2018-2023 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2018-2024 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -32,6 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) RCTBubblingEventBlock onAnnotationsChanged;
 @property (nonatomic, copy) RCTBubblingEventBlock onStateChanged;
 @property (nonatomic, copy) RCTBubblingEventBlock onDocumentLoaded;
+@property (nonatomic, copy) RCTBubblingEventBlock onCustomToolbarButtonTapped;
 @property (nonatomic, copy, nullable) NSArray<NSString *> *availableFontNames;
 @property (nonatomic, copy, nullable) NSString *selectedFontName;
 @property (nonatomic) BOOL showDownloadableFonts;
