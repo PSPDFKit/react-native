@@ -71,6 +71,8 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
     public static final int COMMAND_SET_TOOLBAR = 19;
     public static final int COMMAND_SET_MEASUREMENT_VALUE_CONFIGURATIONS = 21;
     public static final int COMMAND_GET_MEASUREMENT_VALUE_CONFIGURATIONS = 22;
+    public static final int COMMAND_IMPORT_XFDF = 23;
+    public static final int COMMAND_EXPORT_XFDF = 24;
 
     private final CompositeDisposable annotationDisposables = new CompositeDisposable();
 
@@ -123,6 +125,8 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
         commandMap.put("getMeasurementValueConfigurations", COMMAND_GET_MEASUREMENT_VALUE_CONFIGURATIONS);
         commandMap.put("getConfiguration", COMMAND_GET_CONFIGURATION);
         commandMap.put("setToolbar", COMMAND_SET_TOOLBAR);
+        commandMap.put("importXFDF", COMMAND_IMPORT_XFDF);
+        commandMap.put("exportXFDF", COMMAND_EXPORT_XFDF);
         return commandMap;
     }
 
@@ -419,6 +423,18 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
             case COMMAND_SET_TOOLBAR:
                 if (args != null && args.size() == 1) {
                     setToolbar(root,args.getMap(0));
+                }
+                break;
+            case COMMAND_IMPORT_XFDF:
+                if (args != null && args.size() == 2) {
+                    final int requestId = args.getInt(0);
+                    root.importXFDF(requestId, args.getString(1));
+                }
+                break;
+            case COMMAND_EXPORT_XFDF:
+                if (args != null && args.size() == 2) {
+                    final int requestId = args.getInt(0);
+                    root.exportXFDF(requestId, args.getString(1));
                 }
                 break;
         }

@@ -15,7 +15,7 @@
  *   Contains gradle configuration constants
  */
 ext {
-    PSPDFKIT_VERSION = '2024.1.2'
+    PSPDFKIT_VERSION = '2024.2.1'
 }
 
 buildscript {
@@ -70,13 +70,7 @@ dependencies {
     api("com.pspdfkit:pspdfkit:${PSPDFKIT_VERSION}") {
         exclude group: 'com.google.auto.value', module: 'auto-value'
     }
-
-    implementation "androidx.compose.material:material:1.5.4"
-    implementation "androidx.constraintlayout:constraintlayout:2.1.4"
-    implementation "androidx.constraintlayout:constraintlayout-compose:1.0.1"
-    implementation "androidx.compose.foundation:foundation:1.5.4"
-    implementation "androidx.compose.ui:ui:1.5.4"
-
+    
     implementation "com.facebook.react:react-native:+"
     implementation 'com.squareup.okhttp3:okhttp:4.9.2'
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"

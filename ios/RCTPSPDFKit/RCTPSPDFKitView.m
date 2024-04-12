@@ -12,6 +12,7 @@
 #import "RCTConvert+PSPDFAnnotation.h"
 #import "RCTConvert+PSPDFViewMode.h"
 #import "RCTConvert+UIBarButtonItem.h"
+#import "RCTConvert+PSPDFDocument.h"
 
 #define VALIDATE_DOCUMENT(document, ...) { if (!document.isValid) { NSLog(@"Document is invalid."); if (self.onDocumentLoadFailed) { self.onDocumentLoadFailed(@{@"error": @"Document is invalid."}); } return __VA_ARGS__; }}
 
@@ -299,6 +300,43 @@
   
   [self.pdfController reloadData];
   return success;
+}
+// MARK: - XFDF
+
+- (NSDictionary *)importXFDF:(NSString *)filePath withError:(NSError *_Nullable *)error {
+  
+    NSURL *externalAnnotationsFile = [RCTConvert parseURL:filePath];
+    PSPDFDocument *document = self.pdfController.document;
+    VALIDATE_DOCUMENT(document, nil)
+    
+    PSPDFDocumentProvider *documentProvider = document.documentProviders.firstObject;
+    PSPDFFileDataProvider *dataProvider = [[PSPDFFileDataProvider alloc] initWithFileURL:externalAnnotationsFile];
+
+    PSPDFXFDFParser *parser = [[PSPDFXFDFParser alloc] initWithDataProvider:dataProvider documentProvider:documentProvider];
+    NSArray<PSPDFAnnotation *> *annotations = [parser parseWithError:error];
+
+    BOOL result = [document addAnnotations:annotations options:nil];
+    NSDictionary *response = @{@"success" : @(result)};
+    return response;
+}
+
+- (NSDictionary *)exportXFDF:(NSString *)filePath withError:(NSError *_Nullable *)error {
+    
+    NSURL *externalAnnotationsFile = [RCTConvert parseURL:filePath];
+    PSPDFDocument *document = self.pdfController.document;
+    VALIDATE_DOCUMENT(document, nil)
+    
+    PSPDFDocumentProvider *documentProvider = document.documentProviders.firstObject;
+    
+    NSMutableArray<PSPDFAnnotation *> *annotations = [NSMutableArray<PSPDFAnnotation *> array];
+    for (NSArray<PSPDFAnnotation *> *pageAnnotations in [document allAnnotationsOfType:PSPDFAnnotationTypeAll].allValues) {
+        [annotations addObjectsFromArray:pageAnnotations];
+    }
+    
+    PSPDFFileDataSink *dataSink = [[PSPDFFileDataSink alloc] initWithFileURL:externalAnnotationsFile options:PSPDFDataSinkOptionNone error:error];
+    BOOL result = [[PSPDFXFDFWriter new] writeAnnotations:annotations toDataSink:dataSink documentProvider:documentProvider error:error];
+    NSDictionary *response = @{@"success" : @(result), @"filePath" : filePath};
+    return response;
 }
 
 // MARK: - Forms

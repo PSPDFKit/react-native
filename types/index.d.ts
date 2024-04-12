@@ -909,6 +909,30 @@ declare class PSPDFKitView extends React.Component<Props, any, any> {
      */
     addAnnotations: (annotations: object) => Promise<boolean>;
     /**
+     * Imports the supplied XFDF file into the current document.
+     *
+     * @method importXFDF
+     * @memberof PSPDFKitView
+     * @param { string } filePath The path to the XFDF file to import.
+     * @example
+     * const result = await this.pdfRef.current.importXFDF('path/to/XFDF.xfdf');
+     *
+     * @returns { Promise<any> } A promise containing an object with the result. ```true``` if the xfdf file was imported successfully, and ```false``` if an error occurred.
+     */
+    importXFDF: (filePath: string) => Promise<any>;
+    /**
+     * Exports the annotations from the current document to a XFDF file.
+     *
+     * @method exportXFDF
+     * @memberof PSPDFKitView
+     * @param { string } filePath The path where the XFDF file should be exported to.
+     * @example
+     * const result = await this.pdfRef.current.exportXFDF('path/to/XFDF.xfdf');
+     *
+     * @returns { Promise<any> } A promise containing an object with the exported file path and result. ```true``` if the xfdf file was exported successfully, and ```false``` if an error occurred.
+     */
+    exportXFDF: (filePath: string) => Promise<any>;
+    /**
      * @typedef FormFieldResult
      * @property { string } [formElement] The form field value
      * @property { string } [error] The error description
@@ -1059,7 +1083,7 @@ declare class PSPDFKitView extends React.Component<Props, any, any> {
      *
      * @method setMeasurementValueConfigurations
      * @memberof PSPDFKitView
-     * @param { MeasurementValueConfiguration[] } configurations The array of MeasurementValueConfiguration objects that should be applied to the document.
+     * @param { MeasurementValueConfiguration[] } configurations The array of ```MeasurementValueConfiguration``` objects that should be applied to the document.
      * @example
      * const scale: MeasurementScale = {
      *    unitFrom: Measurements.ScaleUnitFrom.INCH,

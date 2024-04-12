@@ -32,6 +32,7 @@ import { StateChange } from './examples/StateChange';
 import { ToolbarCustomization } from './examples/ToolbarCustomization';
 import { GetConfiguration } from './examples/GetConfiguration';
 import { PasswordProtectedDocument } from './examples/PasswordProtectedDocument';
+import { XFDF } from './examples/XFDF';
 import { PSPDFKit } from './helpers/PSPDFKit';
 
 // By default, this example doesn't set a license key, but instead runs in trial mode (which is the default, 
@@ -105,6 +106,7 @@ class Catalog extends React.Component {
           />
           <Stack.Screen name="GetConfiguration" component={GetConfiguration} />
           <Stack.Screen name="PasswordProtectedDocument" component={PasswordProtectedDocument} />
+          <Stack.Screen name="XFDF" component={XFDF} />
         </Stack.Navigator>
       </NavigationContainer>
     );

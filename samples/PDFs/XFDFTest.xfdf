@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xfdf xml:space="preserve" xmlns="http://ns.adobe.com/xfdf/"><annots><freetext creationdate="D:20190501011645Z" date="D:20190501012727Z" flags="print" fringe="0.000000,0.000000,0.000000,0.000000" name="57C83E0A-9EF1-4578-99D1-FE49433F7CFC" page="0" rect="51.679996,364.701019,564.671936,436.008240" title="user" width="0.000000"><contents>Hello XFDF World!</contents>
+<contents-richtext><body xfa:APIVersion="Acrobat:11.0.12" xfa:spec="2.0.2" xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"><p>Hello XFDF World!</p></body></contents-richtext>
+<defaultappearance>/Helvetica_0 55.9007 Tf 1 1 1 rg </defaultappearance>
+<defaultstyle>font:55.90pt &quot;Helvetica&quot;; color:#FFFFFF; </defaultstyle>
+</freetext>
+<freetext creationdate="D:20190501011645Z" date="D:20190501012640Z" flags="print" fringe="0.000000,0.000000,0.000000,0.000000" name="57C83E0A-9EF1-4578-99D1-FE49433F7CFC" page="1" rect="101.183998,602.573120,408.543976,659.183411" title="user" width="0.000000"><contents>Hello XFDF Mars!</contents>
+<contents-richtext><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/" xfa:APIVersion="Acrobat:11.0.12" xfa:spec="2.0.2"><p>Hello XFDF Mars!</p></body></contents-richtext>
+<defaultappearance>/Helvetica_0 37 Tf 1 0.388235 0.278431 rg </defaultappearance>
+<defaultstyle>font:37.00pt &quot;Helvetica&quot;; color:#FF6347; </defaultstyle>
+</freetext>
+</annots>
+<f href="JKHF-AnnualReport.pdf"/>
+<ids modified="EA010CF47E6F434582A18A3FDD135B95" original="F33604585AA946D485FA21E7FC0C4F57"/>
+</xfdf>

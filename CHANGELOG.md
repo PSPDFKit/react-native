@@ -1,5 +1,13 @@
 ## Newest Release
 
+### 2.9.1 - 12 Apr 2024
+
+- Adds the ability to import and export annotations from XFDF files. (J#HYB-293)
+- Updates for PSPDFKit 2024.2.1 for Android.
+- Fixes issue where password input UI for password-protected documents wasn't shown on Android. (J#HYB-285)
+
+## Previous Releases
+
 ### 2.9.0 - 22 Mar 2024
 
 - Adds new getConfiguration method to retrieve current PSPDFKitView configuration options. (J#HYB-192)
@@ -13,8 +21,6 @@
 - Fixes issue where `onDocumentLoaded` callback was not called on Android. (#43187)
 - Fixes signatureSavingStrategy configuration option to save signature if enabled. (J#HYB-210)
 - Fixes `spreadFitting` configuration option behaviour on iOS. (J#HYB-222)
-
-## Previous Releases
 
 ### 2.8.1 - 27 Feb 2024
 

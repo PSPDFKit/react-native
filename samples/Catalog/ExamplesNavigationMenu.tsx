@@ -4,6 +4,8 @@ import {
   exampleDocumentName,
   exampleDocumentPath,
   exampleImagePath,
+  exampleReportName,
+  exampleXFDFName,
   tiffImagePath,
 } from './configuration/Constants';
 import exampleDocumentConfiguration, {
@@ -244,6 +246,19 @@ export default [
         title: 'PSPDFKitView Component',
       });
     },
+  },
+  {
+    key: 'item23',
+    name: 'XFDF Import and Export',
+    description: 'Import and export annotations from XFDF files',
+    action: (component: any) => {
+      extractFromAssetsIfMissing(exampleXFDFName, function () {
+        component.props.navigation.push('XFDF', {
+          title: 'XFDF Import and Export',
+        });
+      });
+    },
+
   },
 ];
 

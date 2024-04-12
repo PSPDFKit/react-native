@@ -504,6 +504,78 @@ class PSPDFKitView extends React.Component {
   };
 
   /**
+   * Imports the supplied XFDF file into the current document.
+   *
+   * @method importXFDF
+   * @memberof PSPDFKitView
+   * @param { string } filePath The path to the XFDF file to import.
+   * @example
+   * const result = await this.pdfRef.current.importXFDF('path/to/XFDF.xfdf');
+   *
+   * @returns { Promise<any> } A promise containing an object with the result. ```true``` if the xfdf file was imported successfully, and ```false``` if an error occurred.
+   */
+  importXFDF = function (filePath) {
+    if (Platform.OS === 'android') {
+      let requestId = this._nextRequestId++;
+      let requestMap = this._requestMap;
+
+      // We create a promise here that will be resolved once onDataReturned is called.
+      let promise = new Promise(function (resolve, reject) {
+        requestMap[requestId] = { resolve: resolve, reject: reject };
+      });
+
+      UIManager.dispatchViewManagerCommand(
+        findNodeHandle(this.refs.pdfView),
+        this._getViewManagerConfig('RCTPSPDFKitView').Commands.importXFDF,
+        [requestId, filePath],
+      );
+
+      return promise;
+    } else if (Platform.OS === 'ios') {
+      return NativeModules.PSPDFKitViewManager.importXFDF(
+        filePath,
+        findNodeHandle(this.refs.pdfView),
+      );
+    }
+  };
+
+  /**
+   * Exports the annotations from the current document to a XFDF file.
+   *
+   * @method exportXFDF
+   * @memberof PSPDFKitView
+   * @param { string } filePath The path where the XFDF file should be exported to.
+   * @example
+   * const result = await this.pdfRef.current.exportXFDF('path/to/XFDF.xfdf');
+   *
+   * @returns { Promise<any> } A promise containing an object with the exported file path and result. ```true``` if the xfdf file was exported successfully, and ```false``` if an error occurred.
+   */
+  exportXFDF = function (filePath) {
+    if (Platform.OS === 'android') {
+      let requestId = this._nextRequestId++;
+      let requestMap = this._requestMap;
+
+      // We create a promise here that will be resolved once onDataReturned is called.
+      let promise = new Promise(function (resolve, reject) {
+        requestMap[requestId] = { resolve: resolve, reject: reject };
+      });
+
+      UIManager.dispatchViewManagerCommand(
+        findNodeHandle(this.refs.pdfView),
+        this._getViewManagerConfig('RCTPSPDFKitView').Commands.exportXFDF,
+        [requestId, filePath],
+      );
+
+      return promise;
+    } else if (Platform.OS === 'ios') {
+      return NativeModules.PSPDFKitViewManager.exportXFDF(
+        filePath,
+        findNodeHandle(this.refs.pdfView),
+      );
+    }
+  };
+
+  /**
    * @typedef FormFieldResult
    * @property { string } [formElement] The form field value
    * @property { string } [error] The error description
@@ -756,7 +828,7 @@ class PSPDFKitView extends React.Component {
    *
    * @method setMeasurementValueConfigurations
    * @memberof PSPDFKitView
-   * @param { MeasurementValueConfiguration[] } configurations The array of MeasurementValueConfiguration objects that should be applied to the document.
+   * @param { MeasurementValueConfiguration[] } configurations The array of ```MeasurementValueConfiguration``` objects that should be applied to the document.
    * @example
    * const scale: MeasurementScale = {
    *    unitFrom: Measurements.ScaleUnitFrom.INCH,

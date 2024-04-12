@@ -384,6 +384,32 @@ RCT_EXPORT_METHOD(addAnnotations:(id)jsonAnnotations reactTag:(nonnull NSNumber 
   });
 }
 
+RCT_EXPORT_METHOD(importXFDF:(id)filePath reactTag:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+  dispatch_async(dispatch_get_main_queue(), ^{
+    RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
+    NSError *error;
+    NSDictionary *result = [component importXFDF:filePath withError:&error];
+    if (result) {
+      resolve(result);
+    } else {
+      reject(@"error", @"Failed to import XFDF.", error);
+    }
+  });
+}
+
+RCT_EXPORT_METHOD(exportXFDF:(id)filePath reactTag:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+  dispatch_async(dispatch_get_main_queue(), ^{
+    RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
+    NSError *error;
+    NSDictionary *result = [component exportXFDF:filePath withError:&error];
+    if (result) {
+      resolve(result);
+    } else {
+      reject(@"error", @"Failed to export XFDF.", error);
+    }
+  });
+}
+
 RCT_EXPORT_METHOD(getFormFieldValue:(NSString *)fullyQualifiedName reactTag:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   dispatch_async(dispatch_get_main_queue(), ^{
     RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];

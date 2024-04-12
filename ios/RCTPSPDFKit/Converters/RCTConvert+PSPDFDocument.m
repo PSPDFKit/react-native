@@ -25,7 +25,7 @@
     return [[PSPDFDocument alloc] initWithURL: url];
 }
 
-+ (NSURL*) parseURL: (NSString*) urlString {
++ (NSURL*)parseURL:(NSString*)urlString {
     NSURL* url;
 
     if ([urlString hasPrefix: @"/"] || [urlString containsString: @"file:/"]) {

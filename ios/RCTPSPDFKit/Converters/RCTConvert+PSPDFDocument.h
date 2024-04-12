@@ -14,5 +14,6 @@
 @interface RCTConvert (PSPDFDocument)
 
 + (PSPDFDocument *)PSPDFDocument:(NSString *)string;
++ (NSURL*)parseURL:(NSString*)urlString;
 
 @end
