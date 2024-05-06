@@ -18,6 +18,8 @@ import static com.pspdfkit.react.helper.ConversionHelpers.getAnnotationTypeFromS
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.res.TypedArray;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.util.AttributeSet;
@@ -30,6 +32,8 @@ import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.FragmentManager;
 
 import com.facebook.react.bridge.ReadableArray;
@@ -38,13 +42,13 @@ import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.events.EventDispatcher;
 import com.pspdfkit.PSPDFKit;
 import com.pspdfkit.annotations.Annotation;
+import com.pspdfkit.annotations.AnnotationFlags;
 import com.pspdfkit.annotations.AnnotationProvider;
 import com.pspdfkit.annotations.AnnotationType;
 import com.pspdfkit.annotations.configuration.AnnotationConfiguration;
 import com.pspdfkit.annotations.configuration.FreeTextAnnotationConfiguration;
 import com.pspdfkit.configuration.activity.PdfActivityConfiguration;
 import com.pspdfkit.configuration.sharing.ShareFeatures;
-import com.pspdfkit.document.DocumentSaveOptions;
 import com.pspdfkit.document.ImageDocument;
 import com.pspdfkit.document.ImageDocumentLoader;
 import com.pspdfkit.document.PdfDocument;
@@ -59,9 +63,11 @@ import com.pspdfkit.forms.ComboBoxFormElement;
 import com.pspdfkit.forms.EditableButtonFormElement;
 import com.pspdfkit.forms.FormField;
 import com.pspdfkit.forms.TextFormElement;
+import com.pspdfkit.internal.model.ImageDocumentImpl;
 import com.pspdfkit.listeners.OnVisibilityChangedListener;
 import com.pspdfkit.listeners.SimpleDocumentListener;
 import com.pspdfkit.react.R;
+import com.pspdfkit.react.events.CustomAnnotationContextualMenuItemTappedEvent;
 import com.pspdfkit.react.events.PdfViewAnnotationChangedEvent;
 import com.pspdfkit.react.ConfigurationAdapter;
 import com.pspdfkit.react.events.PdfViewAnnotationTappedEvent;
@@ -73,8 +79,10 @@ import com.pspdfkit.react.events.PdfViewDocumentSavedEvent;
 import com.pspdfkit.react.events.PdfViewNavigationButtonClickedEvent;
 import com.pspdfkit.react.events.CustomToolbarButtonTappedEvent;
 import com.pspdfkit.react.events.PdfViewStateChangedEvent;
+import com.pspdfkit.react.helper.ConversionHelpers;
 import com.pspdfkit.react.helper.DocumentJsonDataProvider;
 import com.pspdfkit.react.helper.MeasurementsHelper;
+import com.pspdfkit.react.menu.ContextualToolbarMenuItemConfig;
 import com.pspdfkit.signatures.storage.DatabaseSignatureStorage;
 import com.pspdfkit.signatures.storage.SignatureStorage;
 import com.pspdfkit.react.helper.PSPDFKitUtils;
@@ -87,6 +95,7 @@ import com.pspdfkit.ui.fonts.FontManager;
 import com.pspdfkit.ui.search.PdfSearchView;
 import com.pspdfkit.ui.search.PdfSearchViewInline;
 import com.pspdfkit.ui.special_mode.controller.AnnotationTool;
+import com.pspdfkit.ui.toolbar.ContextualToolbarMenuItem;
 import com.pspdfkit.ui.toolbar.grouping.MenuItemGroupingRule;
 
 import org.json.JSONArray;
@@ -99,9 +108,11 @@ import java.io.FileNotFoundException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Completable;
@@ -143,8 +154,8 @@ public class PdfView extends FrameLayout {
 
     private PdfViewModeController pdfViewModeController;
     private PdfViewDocumentListener pdfViewDocumentListener;
-
     private MenuItemListener menuItemListener;
+    private ToolbarMenuItemListener toolbarMenuItemListener;
 
     @NonNull
     private CompositeDisposable pendingFragmentActions = new CompositeDisposable();
@@ -163,6 +174,9 @@ public class PdfView extends FrameLayout {
     private boolean isNavigationButtonShown = false;
     /** We keep track if the inline search view is shown since we don't want to add a second navigation button while it is shown. */
     private boolean isSearchViewShown = false;
+
+    /** Indicates whether the image document annotations should be flattened only or flattened and embedded. */
+    private String imageSaveMode = "flatten";
 
     /** Disposable keeping track of our subscription to update the annotation configuration on each emitted PdfFragment. */
     @Nullable
@@ -229,6 +243,7 @@ public class PdfView extends FrameLayout {
         pdfViewDocumentListener = new PdfViewDocumentListener(this,
             eventDispatcher);
         menuItemListener = new MenuItemListener(this, eventDispatcher, getContext());
+        toolbarMenuItemListener = new ToolbarMenuItemListener(this, eventDispatcher, getContext());
     }
 
     public void setFragmentTag(String fragmentTag) {
@@ -426,6 +441,10 @@ public class PdfView extends FrameLayout {
                     ((ReactPdfUiFragment) pdfUiFragment).setShowNavigationButtonInToolbar(showNavigationButtonInToolbar);
                 }
             }));
+    }
+
+    public void setImageSaveMode(final String imageSaveMode) {
+        this.imageSaveMode = imageSaveMode;
     }
 
     public void setHideDefaultToolbar(boolean hideDefaultToolbar) {
@@ -695,10 +714,20 @@ public class PdfView extends FrameLayout {
     public boolean saveCurrentDocument() throws Exception {
         if (fragment != null) {
             try {
-                if (document.saveIfModified()) {
-                    // Since the document listeners won't be called when manually saving we also dispatch this event here.
-                    eventDispatcher.dispatchEvent(new PdfViewDocumentSavedEvent(getId()));
-                    return true;
+                if (document instanceof ImageDocumentImpl.ImagePdfDocumentWrapper) {
+                    boolean metadata = this.imageSaveMode.equals("flattenAndEmbed") ? true : false;
+                    if (((ImageDocumentImpl.ImagePdfDocumentWrapper) document).getImageDocument().saveIfModified(metadata)) {
+                        // Since the document listeners won't be called when manually saving we also dispatch this event here.
+                        eventDispatcher.dispatchEvent(new PdfViewDocumentSavedEvent(getId()));
+                        return true;
+                    }
+                }
+                else {
+                    if (document.saveIfModified()) {
+                        // Since the document listeners won't be called when manually saving we also dispatch this event here.
+                        eventDispatcher.dispatchEvent(new PdfViewDocumentSavedEvent(getId()));
+                        return true;
+                    }
                 }
                 return false;
             } catch (Exception e) {
@@ -794,6 +823,46 @@ public class PdfView extends FrameLayout {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(() -> eventDispatcher.dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, true)),
                 (throwable) -> eventDispatcher.dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, throwable)));
+    }
+
+    public Disposable setAnnotationFlags(final int requestId, String uuid, ReadableArray flags) {
+        AtomicBoolean found = new AtomicBoolean(false);
+        return getCurrentPdfFragment().map(PdfFragment::getDocument).subscribeOn(Schedulers.io())
+                .flatMapCompletable(currentDocument -> Completable.fromAction(() -> {
+                    List<Annotation> allAnnotations = currentDocument.getAnnotationProvider().getAllAnnotationsOfType(AnnotationProvider.ALL_ANNOTATION_TYPES);
+                    for (int i = 0; i < allAnnotations.size(); i++) {
+                        Annotation annotation = allAnnotations.get(i);
+                        if (annotation.getUuid().equals(uuid)) {
+                            EnumSet<AnnotationFlags> convertedFlags = ConversionHelpers.getAnnotationFlags(flags);
+                            annotation.setFlags(convertedFlags);
+                            getCurrentPdfFragment().subscribe(pdfFragment -> {
+                               pdfFragment.notifyAnnotationHasChanged(annotation);
+                            });
+                            found.set(true);
+                            break;
+                        }
+                    }
+                }))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(() -> eventDispatcher.dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, found.get())),
+                        (throwable) -> eventDispatcher.dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, throwable)));
+    }
+
+    public Disposable getAnnotationFlags(final int requestId, @NonNull String uuid) {
+        return getCurrentPdfFragment().map(PdfFragment::getDocument).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(currentDocument -> {
+                    List<Annotation> allAnnotations = currentDocument.getAnnotationProvider().getAllAnnotationsOfType(AnnotationProvider.ALL_ANNOTATION_TYPES);
+                    ArrayList<String> convertedFlags = new ArrayList<>();
+                    for (int i = 0; i < allAnnotations.size(); i++) {
+                        Annotation annotation = allAnnotations.get(i);
+                        if (annotation.getUuid().equals(uuid)) {
+                            EnumSet<AnnotationFlags> flags = annotation.getFlags();
+                            convertedFlags = ConversionHelpers.convertAnnotationFlags(flags);
+                            break;
+                        }
+                    }
+                    eventDispatcher.dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, convertedFlags));
+                });
     }
 
     public Disposable getFormFieldValue(final int requestId, @NonNull String formElementName) {
@@ -1045,6 +1114,7 @@ public class PdfView extends FrameLayout {
        map.put(PdfViewNavigationButtonClickedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onNavigationButtonClicked"));
        map.put(PdfViewDocumentLoadedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onDocumentLoaded"));
        map.put(CustomToolbarButtonTappedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onCustomToolbarButtonTapped"));
+       map.put(CustomAnnotationContextualMenuItemTappedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onCustomAnnotationContextualMenuItemTapped"));
        return map;
     }
 
@@ -1083,5 +1153,67 @@ public class PdfView extends FrameLayout {
         return result;
     }
 
-    
+    /**
+     * Sets the Annotation menu toolbar items on the current pdfFragment during setup
+     * @param annotationContextualMenuItems
+     */
+    public void setAnnotationToolbarMenuButtonItems(ReadableMap annotationContextualMenuItems) {
+        List<ContextualToolbarMenuItem> toolbarMenuItems = new ArrayList<>();
+        ReadableArray menuItems = annotationContextualMenuItems.getArray("buttons");
+        boolean retainSuggestedMenuItems = annotationContextualMenuItems.hasKey("retainSuggestedMenuItems") ? annotationContextualMenuItems.getBoolean("retainSuggestedMenuItems") : true;
+        String position = annotationContextualMenuItems.hasKey("position") ? annotationContextualMenuItems.getString("position") : "end";
+        ContextualToolbarMenuItem.Position buttonPosition = ConversionHelpers.getContextualToolbarMenuItemPosition(position);
+
+        for (int i = 0; i < menuItems.size(); i++) {
+            ReadableMap item = menuItems.getMap(i);
+            String customId = item.getString("id");
+            String image = item.getString("image");
+            String title = item.hasKey("title") ? item.getString("title") : customId;
+            boolean selectable = item.hasKey("selectable") ? item.getBoolean("selectable") : false;
+            int resId = PSPDFKitUtils.getCustomResourceId(customId, "id", getContext());
+            int iconId = PSPDFKitUtils.getCustomResourceId(image, "drawable", getContext());
+
+            // Apply contextual toolbar theme color to custom menu item icon
+            Drawable customIcon = ContextCompat.getDrawable(getContext(), iconId);
+            final TypedArray a = getContext().getTheme().obtainStyledAttributes(
+                    null,
+                    com.pspdfkit.R.styleable.pspdf__ContextualToolbar,
+                    com.pspdfkit.R.attr.pspdf__contextualToolbarStyle,
+                    com.pspdfkit.R.style.PSPDFKit_ContextualToolbar
+            );
+            int contextualToolbarIconsColor = a.getColor(com.pspdfkit.R.styleable.pspdf__ContextualToolbar_pspdf__iconsColor, ContextCompat.getColor(getContext(), android.R.color.white));
+            int contextualToolbarIconsColorActivated = a.getColor(com.pspdfkit.R.styleable.pspdf__ContextualToolbar_pspdf__iconsColorActivated, ContextCompat.getColor(getContext(), android.R.color.white));
+            a.recycle();
+            try {
+                DrawableCompat.setTint(customIcon, contextualToolbarIconsColor);
+            } catch (Exception e) {
+                // Omit the icon if the image is missing
+            }
+
+            ContextualToolbarMenuItem customItem = ContextualToolbarMenuItem.createSingleItem(
+                    getContext(),
+                    resId,
+                    customIcon,
+                    title,
+                    contextualToolbarIconsColor,
+                    contextualToolbarIconsColorActivated,
+                    buttonPosition,
+                    selectable);
+
+            toolbarMenuItems.add(customItem);
+            pendingFragmentActions.add(getCurrentPdfUiFragment()
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(pdfUiFragment -> {
+                        pdfUiFragment.registerForContextMenu(customItem);
+                    }));
+        }
+
+        List<Integer> resIds = new ArrayList();
+        for (ContextualToolbarMenuItem menuItem : toolbarMenuItems) {
+            resIds.add(menuItem.getId());
+        }
+        toolbarMenuItemListener.setResourceIds(resIds);
+        ContextualToolbarMenuItemConfig config = new ContextualToolbarMenuItemConfig(toolbarMenuItems, retainSuggestedMenuItems, toolbarMenuItemListener);
+        pdfViewModeController.setAnnotationSelectionMenuConfig(config);
+    }
 }

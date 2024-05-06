@@ -22,21 +22,51 @@
  * @property { Toolbar.ToolbarItems } [toolbarMenuItems] The toolbar buttons to display on the toolbar (Android only).
  */
 export class Toolbar {
+ /**
+  * The bar buttons to display on the left side of the navigation bar (iOS only).
+  */
     leftBarButtonItems?: ToolbarItems;
+ /**
+  * The bar buttons to display on the right side of the navigation bar (iOS only).
+  */
     rightBarButtonItems?: ToolbarItems;
+ /**
+  * The toolbar buttons to display on the toolbar (Android only).
+  */
     toolbarMenuItems?: ToolbarItems;
 }
 
 export interface ToolbarItem {
+ /**
+  * The unique identifier for the custom toolbar button. This will be used to identify the button in the ```onCustomToolbarButtonTapped``` callback. On Android the ID needs to be specified as a resource item inside your application's ```ids.xml``` file.
+  */
     id: string;
+ /**
+  * The image name (iOS) or resource ID (Android) for the toolbar button. Images must be included in the application bundle on iOS and specified as a drawable resource on Android.
+  */
     image: string;
+ /**
+  * The title of the toolbar button (Android only).
+  */
     title?: string;
+ /**
+  * Whether the toolbar button should be displayed on the main toolbar (not in the drop down menu) (Android only).
+  */
     showAsAction?: boolean;
 }
 
 export interface ToolbarItems {
+ /**
+  * An array of buttons that should be displayed on the toolbar. The buttons can be either stock toolbar buttons, custom toolbar buttons, or a combination of both.
+  */
     buttons: Array<Toolbar.DefaultToolbarButton | ToolbarItem>;
+ /**
+  * The viewMode for which the toolbar buttons should be set (iOS only).
+  */
     viewMode?: Toolbar.PDFViewMode;
+ /**
+  * Whether the toolbar button change should be animated when they are set (iOS only).
+  */
     animated?: boolean;
 }
 

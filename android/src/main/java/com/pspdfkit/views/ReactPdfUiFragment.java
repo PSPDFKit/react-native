@@ -30,6 +30,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.pspdfkit.react.R;
+import com.pspdfkit.react.helper.PSPDFKitUtils;
 import com.pspdfkit.ui.PdfFragment;
 import com.pspdfkit.ui.PdfUiFragment;
 
@@ -113,11 +114,6 @@ public class ReactPdfUiFragment extends PdfUiFragment {
         void onNavigationButtonClicked(@NonNull PdfUiFragment pdfUiFragment);
     }
 
-    private static int getCustomResourceId(@NonNull String resName, @NonNull String type, @NonNull Context context) {
-        int resourceId = context.getResources().getIdentifier(resName, type, context.getPackageName());
-        return resourceId;
-    }
-
     void setCustomToolbarItems(@NonNull ArrayList<HashMap> customToolbarItems, MenuItemListener listener) {
         this.customToolbarItems = customToolbarItems;
         this.menuItemListener = listener;
@@ -129,7 +125,7 @@ public class ReactPdfUiFragment extends PdfUiFragment {
         for (HashMap item : customToolbarItems) {
             String customId = item.get("id").toString();
             int index = (Integer) item.get("index");
-            int resId = getCustomResourceId(customId, "id", getContext());
+            int resId = PSPDFKitUtils.getCustomResourceId(customId, "id", getContext());
             menuItems.add(Math.min(menuItems.size(), index), resId);
         }
         return menuItems;
@@ -143,11 +139,11 @@ public class ReactPdfUiFragment extends PdfUiFragment {
             String customId = item.get("id").toString();
             String image = item.get("image").toString();
             String title = item.get("title") != null ? item.get("title").toString() : "";
-            int resId = getCustomResourceId(customId, "id", getContext());
+            int resId = PSPDFKitUtils.getCustomResourceId(customId, "id", getContext());
             Boolean showAsAction = item.get("showAsAction") != null ? (Boolean) item.get("showAsAction") : true;
             MenuItem customMenuItem = menu.findItem(resId);
             customMenuItem.setTitle(title);
-            int iconId = getCustomResourceId(image, "drawable", getContext());
+            int iconId = PSPDFKitUtils.getCustomResourceId(image, "drawable", getContext());
             customMenuItem.setIcon(iconId);
             customMenuItem.setShowAsAction(showAsAction == true ? MenuItem.SHOW_AS_ACTION_ALWAYS : MenuItem.SHOW_AS_ACTION_NEVER);
             customMenuItem.setOnMenuItemClickListener(this.menuItemListener);

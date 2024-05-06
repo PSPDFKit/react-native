@@ -220,7 +220,7 @@ export default [
   {
     key: 'item20',
     name: 'Annotation Preset customization',
-    description: 'Customize default annotation presets',
+    description: 'Customize default annotation presets and annotation menu',
     action: (component: any) => {
       component.props.navigation.push('AnnotationPresetCustomization', {
         title: 'PSPDFKit preset customization',

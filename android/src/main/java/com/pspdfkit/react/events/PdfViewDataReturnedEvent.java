@@ -74,6 +74,16 @@ public class PdfViewDataReturnedEvent extends Event<PdfViewDataReturnedEvent> {
         payload = Arguments.makeNativeMap(map);
     }
 
+    public PdfViewDataReturnedEvent(@IdRes int viewId, int requestId, ArrayList result) {
+        super(viewId);
+        this.requestId = requestId;
+        Map<String, Object> map = new HashMap<>();
+        map.put("requestId", requestId);
+        map.put("result", result);
+
+        payload = Arguments.makeNativeMap(map);
+    }
+
     public PdfViewDataReturnedEvent(@IdRes int viewId, int requestId, @NonNull JSONObject jsonObject) {
         super(viewId);
         this.requestId = requestId;

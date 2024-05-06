@@ -15,14 +15,21 @@ package com.pspdfkit.views;
 
 import androidx.annotation.NonNull;
 
+import com.pspdfkit.react.menu.AnnotationContextualToolbarGroupingRule;
+import com.pspdfkit.react.menu.ContextualToolbarMenuItemConfig;
 import com.pspdfkit.ui.forms.FormEditingBar;
 import com.pspdfkit.ui.special_mode.controller.TextSelectionController;
 import com.pspdfkit.ui.special_mode.manager.TextSelectionManager;
 import com.pspdfkit.ui.toolbar.AnnotationCreationToolbar;
 import com.pspdfkit.ui.toolbar.AnnotationEditingToolbar;
 import com.pspdfkit.ui.toolbar.ContextualToolbar;
+import com.pspdfkit.ui.toolbar.ContextualToolbarMenuItem;
 import com.pspdfkit.ui.toolbar.ToolbarCoordinatorLayout;
 import com.pspdfkit.ui.toolbar.grouping.MenuItemGroupingRule;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.annotation.Nullable;
 
 /**
@@ -42,6 +49,8 @@ class PdfViewModeController implements
     @Nullable
     private MenuItemGroupingRule itemGroupingRule;
 
+    private ContextualToolbarMenuItemConfig annotationSelectionMenuConfig;
+
     PdfViewModeController(@NonNull PdfView parent) {
         this.parent = parent;
     }
@@ -51,6 +60,13 @@ class PdfViewModeController implements
      */
     public void setMenuItemGroupingRule(@Nullable MenuItemGroupingRule groupingRule) {
         this.itemGroupingRule = groupingRule;
+    }
+
+    /**
+     * Sets the annotation menu items used when an annotation is selected.
+     */
+    public void setAnnotationSelectionMenuConfig(ContextualToolbarMenuItemConfig annotationSelectionMenuConfig) {
+        this.annotationSelectionMenuConfig = annotationSelectionMenuConfig;
     }
 
     @Override
@@ -84,6 +100,21 @@ class PdfViewModeController implements
         if (contextualToolbar instanceof AnnotationCreationToolbar) {
             if (itemGroupingRule != null) {
                 contextualToolbar.setMenuItemGroupingRule(itemGroupingRule);
+            }
+        }
+        if (contextualToolbar instanceof AnnotationEditingToolbar) {
+            if (this.annotationSelectionMenuConfig != null) {
+                List<ContextualToolbarMenuItem> annotationSelectionMenuItems = this.annotationSelectionMenuConfig.getAnnotationSelectionMenuItems();
+                boolean retainSuggestedMenuItems = this.annotationSelectionMenuConfig.getRetainSuggestedMenuItems();
+
+                if (annotationSelectionMenuItems != null) {
+                    final List<ContextualToolbarMenuItem> menuItems = ((AnnotationEditingToolbar) contextualToolbar).getMenuItems();
+                    List<ContextualToolbarMenuItem> newList = new ArrayList<>(menuItems);
+                    newList.addAll(annotationSelectionMenuItems);
+                    contextualToolbar.setMenuItemGroupingRule(new AnnotationContextualToolbarGroupingRule(contextualToolbar.getContext(), annotationSelectionMenuItems));
+                    contextualToolbar.setMenuItems(retainSuggestedMenuItems ? newList : annotationSelectionMenuItems);
+                }
+                contextualToolbar.setOnMenuItemClickListener(this.annotationSelectionMenuConfig.getToolbarMenuItemListener());
             }
         }
     }

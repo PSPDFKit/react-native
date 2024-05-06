@@ -73,6 +73,8 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
     public static final int COMMAND_GET_MEASUREMENT_VALUE_CONFIGURATIONS = 22;
     public static final int COMMAND_IMPORT_XFDF = 23;
     public static final int COMMAND_EXPORT_XFDF = 24;
+    public static final int COMMAND_SET_ANNOTATION_FLAGS = 25;
+    public static final int COMMAND_GET_ANNOTATION_FLAGS = 26;
 
     private final CompositeDisposable annotationDisposables = new CompositeDisposable();
 
@@ -127,6 +129,8 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
         commandMap.put("setToolbar", COMMAND_SET_TOOLBAR);
         commandMap.put("importXFDF", COMMAND_IMPORT_XFDF);
         commandMap.put("exportXFDF", COMMAND_EXPORT_XFDF);
+        commandMap.put("setAnnotationFlags", COMMAND_SET_ANNOTATION_FLAGS);
+        commandMap.put("getAnnotationFlags", COMMAND_GET_ANNOTATION_FLAGS);
         return commandMap;
     }
 
@@ -217,6 +221,11 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
         PSPDFKitPreferences.get(view.getContext()).setAnnotationCreator(annotationAuthorName);
     }
 
+    @ReactProp(name = "imageSaveMode")
+    public void setImageSaveMode(PdfView view, String imageSaveMode) {
+        view.setImageSaveMode(imageSaveMode);
+    }
+
     @ReactProp(name = "menuItemGrouping")
     public void setMenuItemGrouping(PdfView view, @NonNull ReadableArray menuItemGrouping) {
         ReactGroupingRule groupingRule = new ReactGroupingRule(view.getContext(), menuItemGrouping);
@@ -254,6 +263,13 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
             } else {
                 view.setConfiguration(newConfigurations.build());
             }
+        }
+    }
+
+    @ReactProp(name = "annotationContextualMenu")
+    public void setAnnotationContextualMenu(@NonNull final PdfView view, @NonNull ReadableMap annotationContextualMenuItems) {
+        if (annotationContextualMenuItems != null) {
+            view.setAnnotationToolbarMenuButtonItems(annotationContextualMenuItems);
         }
     }
 
@@ -356,6 +372,18 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
                 if (args != null && args.size() == 2) {
                     final int requestId = args.getInt(0);
                     annotationDisposables.add(root.addAnnotations(requestId, args.getMap(1)));
+                }
+                break;
+            case COMMAND_SET_ANNOTATION_FLAGS:
+                if (args != null && args.size() == 3) {
+                    final int requestId = args.getInt(0);
+                    annotationDisposables.add(root.setAnnotationFlags(requestId, args.getString(1), args.getArray(2)));
+                }
+                break;
+            case COMMAND_GET_ANNOTATION_FLAGS:
+                if (args != null && args.size() == 2) {
+                    final int requestId = args.getInt(0);
+                    annotationDisposables.add(root.getAnnotationFlags(requestId, args.getString(1)));
                 }
                 break;
             case COMMAND_GET_FORM_FIELD_VALUE:

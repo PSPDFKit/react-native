@@ -15,9 +15,14 @@ package com.pspdfkit.react.helper;
 
 import androidx.annotation.Nullable;
 
+import com.facebook.react.bridge.ReadableArray;
+import com.pspdfkit.annotations.AnnotationFlags;
 import com.pspdfkit.annotations.AnnotationType;
+import com.pspdfkit.ui.toolbar.ContextualToolbarMenuItem;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.List;
 
 public class ConversionHelpers {
 
@@ -80,6 +85,88 @@ public class ConversionHelpers {
             case "all":
             default:
                 return EnumSet.allOf(AnnotationType.class);
+        }
+    }
+
+    public static EnumSet<AnnotationFlags> getAnnotationFlags(final ReadableArray flags) {
+
+        EnumSet<AnnotationFlags> convertedFlags = EnumSet.noneOf(AnnotationFlags.class);
+
+        for (int i = 0; i < flags.size(); i++) {
+            String flag = flags.getString(i);
+            switch (flag) {
+                case "hidden":
+                    convertedFlags.add(AnnotationFlags.HIDDEN);
+                    break;
+                case "invisible":
+                    convertedFlags.add(AnnotationFlags.INVISIBLE);
+                    break;
+                case "locked":
+                    convertedFlags.add(AnnotationFlags.LOCKED);
+                    break;
+                case "lockedContents":
+                    convertedFlags.add(AnnotationFlags.LOCKEDCONTENTS);
+                    break;
+                case "print":
+                    convertedFlags.add(AnnotationFlags.PRINT);
+                    break;
+                case "readOnly":
+                    convertedFlags.add(AnnotationFlags.READONLY);
+                    break;
+                case "noView":
+                    convertedFlags.add(AnnotationFlags.NOVIEW);
+                    break;
+                case "noZoom":
+                    convertedFlags.add(AnnotationFlags.NOZOOM);
+                    break;
+                default:
+                    break;
+            }
+
+        }
+        return convertedFlags;
+    }
+
+    public static ArrayList<String> convertAnnotationFlags(final EnumSet<AnnotationFlags> flags) {
+
+        ArrayList<String> stringFlags = new ArrayList<String>();
+
+        if (flags.contains(AnnotationFlags.HIDDEN)) {
+            stringFlags.add("hidden");
+        }
+        if (flags.contains(AnnotationFlags.INVISIBLE)) {
+            stringFlags.add("invisible");
+        }
+        if (flags.contains(AnnotationFlags.LOCKED)) {
+            stringFlags.add("locked");
+        }
+        if (flags.contains(AnnotationFlags.LOCKEDCONTENTS)) {
+            stringFlags.add("lockedContents");
+        }
+        if (flags.contains(AnnotationFlags.PRINT)) {
+            stringFlags.add("print");
+        }
+        if (flags.contains(AnnotationFlags.READONLY)) {
+            stringFlags.add("readOnly");
+        }
+        if (flags.contains(AnnotationFlags.NOVIEW)) {
+            stringFlags.add("noView");
+        }
+        if (flags.contains(AnnotationFlags.NOZOOM)) {
+            stringFlags.add("noZoom");
+        }
+
+        return stringFlags;
+    }
+
+    public static ContextualToolbarMenuItem.Position getContextualToolbarMenuItemPosition(final String position) {
+        switch (position.toLowerCase()) {
+            case "start":
+                return ContextualToolbarMenuItem.Position.START;
+            case "end":
+                return ContextualToolbarMenuItem.Position.END;
+            default:
+                return ContextualToolbarMenuItem.Position.END;
         }
     }
 }

@@ -71,12 +71,12 @@ PODS:
   - hermes-engine (0.73.6):
     - hermes-engine/Pre-built (= 0.73.6)
   - hermes-engine/Pre-built (0.73.6)
-  - Instant (13.3.3)
+  - Instant (13.5.0)
   - libevent (2.1.12)
   - OpenSSL-Universal (1.1.1100)
-  - PSPDFKit (13.3.3):
-    - PSPDFKit/Core (= 13.3.3)
-  - PSPDFKit/Core (13.3.3)
+  - PSPDFKit (13.5.0):
+    - PSPDFKit/Core (= 13.5.0)
+  - PSPDFKit/Core (13.5.0)
   - RCT-Folly (2022.05.16.00):
     - boost
     - DoubleConversion
@@ -948,13 +948,13 @@ PODS:
   - React-Mapbuffer (0.73.6):
     - glog
     - React-debug
-  - react-native-pspdfkit (2.9.1):
-    - Instant (= 13.3.3)
-    - PSPDFKit (= 13.3.3)
+  - react-native-pspdfkit (2.10.0):
+    - Instant (= 13.5.0)
+    - PSPDFKit (= 13.5.0)
     - React
   - react-native-safe-area (0.5.1):
     - React
-  - react-native-safe-area-context (4.8.2):
+  - react-native-safe-area-context (4.9.0):
     - React-Core
   - React-nativeconfig (0.73.6)
   - React-NativeModulesApple (0.73.6):
@@ -1127,11 +1127,11 @@ PODS:
     - React-Core
   - RNFS (2.20.0):
     - React-Core
-  - RNGestureHandler (2.14.0):
+  - RNGestureHandler (2.15.0):
     - glog
     - RCT-Folly (= 2022.05.16.00)
     - React-Core
-  - RNScreens (3.29.0):
+  - RNScreens (3.30.1):
     - glog
     - RCT-Folly (= 2022.05.16.00)
     - React-Core
@@ -1368,10 +1368,10 @@ SPEC CHECKSUMS:
   fmt: ff9d55029c625d3757ed641535fd4a75fedc7ce9
   glog: c5d68082e772fa1c511173d6b30a9de2c05a69a2
   hermes-engine: 9cecf9953a681df7556b8cc9c74905de8f3293c0
-  Instant: 04c0f0f49669d0125a858d2748cfa00429bcc92e
+  Instant: 467e06b544dacbd5fe149942a2fd4784051434ff
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
   OpenSSL-Universal: ebc357f1e6bc71fa463ccb2fe676756aff50e88c
-  PSPDFKit: aa10d31769f5d539cf77483b4c97edd6ba5df1db
+  PSPDFKit: 64d4750cd8b53efe7af0b18f0671e17c29c20822
   RCT-Folly: 7169b2b1c44399c76a47b5deaaba715eeeb476c0
   RCTRequired: ca1d7414aba0b27efcfa2ccd37637edb1ab77d96
   RCTTypeSafety: 678e344fb976ff98343ca61dc62e151f3a042292
@@ -1393,9 +1393,9 @@ SPEC CHECKSUMS:
   React-jsinspector: 85583ef014ce53d731a98c66a0e24496f7a83066
   React-logger: 3eb80a977f0d9669468ef641a5e1fabbc50a09ec
   React-Mapbuffer: 84ea43c6c6232049135b1550b8c60b2faac19fab
-  react-native-pspdfkit: d63089e9b6e7ccc4ce32fed72fa57ab5beb18526
+  react-native-pspdfkit: e46c6cc86a62d4b8a275d7cc645203a217242c90
   react-native-safe-area: e8230b0017d76c00de6b01e2412dcf86b127c6a3
-  react-native-safe-area-context: 0ee144a6170530ccc37a0fd9388e28d06f516a89
+  react-native-safe-area-context: b97eb6f9e3b7f437806c2ce5983f479f8eb5de4b
   React-nativeconfig: b4d4e9901d4cabb57be63053fd2aa6086eb3c85f
   React-NativeModulesApple: cd26e56d56350e123da0c1e3e4c76cb58a05e1ee
   React-perflogger: 5f49905de275bac07ac7ea7f575a70611fa988f2
@@ -1418,8 +1418,8 @@ SPEC CHECKSUMS:
   ReactCommon: 2aa35648354bd4c4665b9a5084a7d37097b89c10
   RNCMaskedView: 090213d32d8b3bb83a4dcb7d12c18f0152591906
   RNFS: 4ac0f0ea233904cb798630b3c077808c06931688
-  RNGestureHandler: a4c4561307e67f2942f5a4fe1526ff78cf3f5280
-  RNScreens: 17e2f657f1b09a71ec3c821368a04acbb7ebcb46
+  RNGestureHandler: 67fb54b3e6ca338a8044e85cd6f340265aa41091
+  RNScreens: b6b64d956af3715adbfe84808694ae82d3fec74f
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
   Yoga: 805bf71192903b20fc14babe48080582fee65a80
 

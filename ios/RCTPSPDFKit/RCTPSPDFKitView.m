@@ -13,6 +13,11 @@
 #import "RCTConvert+PSPDFViewMode.h"
 #import "RCTConvert+UIBarButtonItem.h"
 #import "RCTConvert+PSPDFDocument.h"
+#if __has_include("PSPDFKitReactNativeiOS-Swift.h")
+#import "PSPDFKitReactNativeiOS-Swift.h"
+#else
+#import <PSPDFKitReactNativeiOS/PSPDFKitReactNativeiOS-Swift.h>
+#endif
 
 #define VALIDATE_DOCUMENT(document, ...) { if (!document.isValid) { NSLog(@"Document is invalid."); if (self.onDocumentLoadFailed) { self.onDocumentLoadFailed(@{@"error": @"Document is invalid."}); } return __VA_ARGS__; }}
 
@@ -22,8 +27,7 @@
 @interface RCTPSPDFKitView ()<PSPDFDocumentDelegate, PSPDFViewControllerDelegate, PSPDFFlexibleToolbarContainerDelegate>
 
 @property (nonatomic, nullable) UIViewController *topController;
-@property (nonatomic, strong) NSDictionary *closeButtonAttributes;
-@property (nonatomic, strong) NSMutableDictionary *customBarButtons;
+@property (nonatomic, strong) SessionStorage *sessionStorage;
 
 @end
 
@@ -34,11 +38,11 @@
     _pdfController = [[RCTPSPDFKitViewController alloc] init];
     _pdfController.delegate = self;
     _pdfController.annotationToolbarController.delegate = self;
-    _customBarButtons = [NSMutableDictionary new];
+    _sessionStorage = [SessionStorage new];
     
     // Store the closeButton's target and selector in order to call it later.
-    _closeButtonAttributes = @{@"target" : _pdfController.closeButtonItem.target,
-                              @"action" : NSStringFromSelector(_pdfController.closeButtonItem.action)};
+    [_sessionStorage setCloseButtonAttributes:@{@"target" : _pdfController.closeButtonItem.target,
+                                                @"action" : NSStringFromSelector(_pdfController.closeButtonItem.action)}];
       
     [_pdfController.closeButtonItem setTarget:self];
     [_pdfController.closeButtonItem setAction:@selector(closeButtonPressed:)];
@@ -107,8 +111,8 @@
     self.onCloseButtonPressed(@{});
   } else {
       // Invoke the closeButtonItem's default behaviour
-      id target = _closeButtonAttributes[@"target"];
-      NSString *action = _closeButtonAttributes[@"action"];
+      id target = [_sessionStorage getCloseButtonAttributes][@"target"];
+      NSString *action = [_sessionStorage getCloseButtonAttributes][@"action"];
       
       if (target != nil && action != nil) {
           SEL selector = NSSelectorFromString(action);
@@ -162,8 +166,10 @@
 - (BOOL)pdfViewController:(PSPDFViewController *)pdfController didTapOnAnnotation:(PSPDFAnnotation *)annotation annotationPoint:(CGPoint)annotationPoint annotationView:(UIView<PSPDFAnnotationPresenting> *)annotationView pageView:(PSPDFPageView *)pageView viewPoint:(CGPoint)viewPoint {
   if (self.onAnnotationTapped) {
     NSData *annotationData = [annotation generateInstantJSONWithError:NULL];
-    NSDictionary *annotationDictionary = [NSJSONSerialization JSONObjectWithData:annotationData options:kNilOptions error:NULL];
-    self.onAnnotationTapped(annotationDictionary);
+    if (annotationData != nil) {
+        NSDictionary *annotationDictionary = [NSJSONSerialization JSONObjectWithData:annotationData options:kNilOptions error:NULL];
+        self.onAnnotationTapped(annotationDictionary);
+    }
   }
   return self.disableDefaultActionForTappedAnnotations;
 }
@@ -182,6 +188,35 @@
 
 - (void)pdfViewController:(PSPDFViewController *)pdfController didChangeDocument:(nullable PSPDFDocument *)document {
   VALIDATE_DOCUMENT(document)
+}
+
+- (UIMenu *)pdfViewController:(PSPDFViewController *)sender menuForAnnotations:(NSArray<PSPDFAnnotation *> *)annotations onPageView:(PSPDFPageView *)pageView appearance:(PSPDFEditMenuAppearance)appearance suggestedMenu:(UIMenu *)suggestedMenu {
+    
+    NSDictionary *annotationButtons = [_sessionStorage getAnnotationContextualMenuItems];
+    
+    if (annotationButtons[@"appearance"] == nil ||
+        appearance == [RCTConvert PSPDFEditMenuAppearance:annotationButtons[@"appearance"]]) {
+        
+        if ([annotationButtons count] > 0) {
+            UIMenu *newMenu;
+            NSArray *items = annotationButtons[@"buttons"];
+            
+            if (annotationButtons[@"retainSuggestedMenuItems"] == nil || [annotationButtons[@"retainSuggestedMenuItems"] boolValue] == YES) {
+                if (annotationButtons[@"position"] != nil && [annotationButtons[@"position"] isEqualToString:@"start"]) {
+                    newMenu = [suggestedMenu menuByReplacingChildren:[items arrayByAddingObjectsFromArray:suggestedMenu.children]];
+                } else {
+                    newMenu = [suggestedMenu menuByReplacingChildren:[suggestedMenu.children arrayByAddingObjectsFromArray:items]];
+                }
+            } else {
+                newMenu = [suggestedMenu menuByReplacingChildren:items];
+            }
+            return newMenu;
+        } else {
+            return suggestedMenu;
+        }
+    } else {
+        return suggestedMenu;
+    }
 }
 
 // MARK: - PSPDFFlexibleToolbarContainerDelegate
@@ -239,23 +274,27 @@
   return success;
 }
 
-- (BOOL)removeAnnotationWithUUID:(NSString *)annotationUUID {
+- (BOOL)removeAnnotations:(NSArray<NSDictionary *> *)annotationsJSON {
   PSPDFDocument *document = self.pdfController.document;
   VALIDATE_DOCUMENT(document, NO)
-  BOOL success = NO;
-  
+
+  NSMutableArray *annotationsToRemove = [NSMutableArray new];
   NSArray<PSPDFAnnotation *> *allAnnotations = [[document allAnnotationsOfType:PSPDFAnnotationTypeAll].allValues valueForKeyPath:@"@unionOfArrays.self"];
   for (PSPDFAnnotation *annotation in allAnnotations) {
-    // Remove the annotation if the uuids match.
-    if ([annotation.uuid isEqualToString:annotationUUID]) {
-      success = [document removeAnnotations:@[annotation] options:nil];
-      break;
-    }
+      for (NSDictionary *annotationJSON in annotationsJSON) {
+          // Try to remove the annotation according to either uuid or name
+          if ((![annotationJSON[@"uuid"] isEqual:[NSNull null]] &&
+               ![annotation.uuid isEqual:[NSNull null]] &&
+               [annotation.uuid isEqualToString:annotationJSON[@"uuid"]]) ||
+              (![annotationJSON[@"name"] isEqual:[NSNull null]] &&
+               ![annotation.name isEqual:[NSNull null]] &&
+               [annotation.name isEqualToString:annotationJSON[@"name"]])) {
+                    [annotationsToRemove addObject:annotation];
+                    break;
+               }
+        }
   }
-  
-  if (!success) {
-    NSLog(@"Failed to remove annotation.");
-  }
+  BOOL success = [document removeAnnotations:annotationsToRemove options:nil];
   return success;
 }
 
@@ -301,6 +340,40 @@
   [self.pdfController reloadData];
   return success;
 }
+
+- (BOOL)setAnnotationFlags:(NSString *)uuid flags:(NSArray<NSString *> *)flags {
+    
+    PSPDFDocument *document = self.pdfController.document;
+    VALIDATE_DOCUMENT(document, nil);
+    
+    NSArray<PSPDFAnnotation *> *allAnnotations = [[document allAnnotationsOfType:PSPDFAnnotationTypeAll].allValues valueForKeyPath:@"@unionOfArrays.self"];
+    for (PSPDFAnnotation *annotation in allAnnotations) {
+      if ([annotation.uuid isEqualToString:uuid]) {
+          NSUInteger convertedFlags = [RCTConvert parseAnnotationFlags:flags];
+          [annotation setFlags:convertedFlags];
+          [document.documentProviders.firstObject.annotationManager updateAnnotations:@[annotation] animated:YES];
+          return YES;
+      }
+    }
+    return NO;
+}
+
+- (NSArray <NSString *> *)getAnnotationFlags:(NSString *)uuid {
+    
+    PSPDFDocument *document = self.pdfController.document;
+    VALIDATE_DOCUMENT(document, nil);
+    
+    NSArray<PSPDFAnnotation *> *allAnnotations = [[document allAnnotationsOfType:PSPDFAnnotationTypeAll].allValues valueForKeyPath:@"@unionOfArrays.self"];
+    for (PSPDFAnnotation *annotation in allAnnotations) {
+      if ([annotation.uuid isEqualToString:uuid]) {
+          PSPDFAnnotationFlags flags = annotation.flags;
+          NSArray <NSString *>* convertedFlags = [RCTConvert convertAnnotationFlags:flags];
+          return convertedFlags;
+      }
+    }
+    return @[];
+}
+
 // MARK: - XFDF
 
 - (NSDictionary *)importXFDF:(NSString *)filePath withError:(NSError *_Nullable *)error {
@@ -453,7 +526,7 @@
           UIImage *image = [[UIImage imageNamed:[item objectForKey:@"image"]]
                             imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
           UIBarButtonItem *barButtonItem = [[UIBarButtonItem alloc] initWithImage:image style:UIBarButtonItemStylePlain target:self action:@selector(handleCustomBarButtonEvent:)];
-          [_customBarButtons setObject:barButtonItem forKey:[item objectForKey:@"id"]];
+          [_sessionStorage addBarButtonItem:barButtonItem key:[item objectForKey:@"id"]];
           if (barButtonItem && ![self.pdfController.navigationItem.rightBarButtonItems containsObject:barButtonItem]) {
             [leftItems addObject:barButtonItem];
           }
@@ -479,7 +552,7 @@
             UIImage *image = [[UIImage imageNamed:[item objectForKey:@"image"]]
                               imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
             UIBarButtonItem *barButtonItem = [[UIBarButtonItem alloc] initWithImage:image style:UIBarButtonItemStylePlain target:self action:@selector(handleCustomBarButtonEvent:)];
-            [_customBarButtons setObject:barButtonItem forKey:[item objectForKey:@"id"]];
+            [_sessionStorage addBarButtonItem:barButtonItem key:[item objectForKey:@"id"]];
             if (barButtonItem && ![self.pdfController.navigationItem.leftBarButtonItems containsObject:barButtonItem]) {
               [rightItems addObject:barButtonItem];
             }
@@ -513,6 +586,37 @@
   }
   
   return [self buttonItemsStringFromUIBarButtonItems:items];
+}
+
+// MARK: - Customize the Annotation Contextual Menu
+
+- (void)setAnnotationContextualMenuItems:(NSDictionary *)items {
+    
+    NSArray *buttonItems = items[@"buttons"];
+    
+    NSMutableArray *updatedButtons = [NSMutableArray array];
+    for (id item in buttonItems) {
+        UIAction *menuAction = [UIAction actionWithTitle:item[@"title"] image:nil identifier:item[@"id"] handler:^(__kindof UIAction * _Nonnull action) {
+          [self handleCustomAnnotationContextualMenuItemEvent:action];
+        }];
+        
+        if (item[@"image"]) {
+            // First check if the image specified is a system image
+            UIImage *image = [UIImage systemImageNamed:item[@"image"]];
+            // Otherwise lookup the image from the app bundle
+            if (image == nil) {
+                image = [[UIImage imageNamed:item[@"image"]]
+                         imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+            }
+            [menuAction setImage:image];
+        }
+        [updatedButtons addObject:menuAction];
+    }
+    
+    NSMutableDictionary *updatedItems = [NSMutableDictionary dictionaryWithDictionary:items];
+    [updatedItems setObject:updatedButtons forKey:@"buttons"];
+    
+    [_sessionStorage setAnnotationContextualMenuItems:updatedItems];
 }
 
 // MARK: - Helpers
@@ -562,9 +666,9 @@
 
 - (NSString *)findCustomButtonID:(UIBarButtonItem *)barButton {
     NSString *foundKey = nil;
-    NSArray *keys = [_customBarButtons allKeys];
+    NSArray *keys = [[_sessionStorage getBarButtonItems] allKeys];
     for (NSString *key in keys) {
-        if ([_customBarButtons objectForKey:key] == barButton) {
+        if ([[_sessionStorage getBarButtonItems] objectForKey:key] == barButton) {
             foundKey = key;
             break;
         }
@@ -578,6 +682,16 @@
         NSString *customId = [self findCustomButtonID:barButton];
         if (customId != nil) {
             self.onCustomToolbarButtonTapped(@{@"id" : customId});
+        }
+    }
+}
+
+- (void)handleCustomAnnotationContextualMenuItemEvent:(id)sender {
+    UIAction *actionButton = (UIAction *)sender;
+    if (self.onCustomAnnotationContextualMenuItemTapped) {
+        NSString *customId = actionButton.identifier;
+        if (customId != nil) {
+            self.onCustomAnnotationContextualMenuItemTapped(@{@"id" : customId});
         }
     }
 }

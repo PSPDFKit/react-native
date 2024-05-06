@@ -1,6 +1,6 @@
 import React from 'react';
 import { Alert, Button, processColor, View } from 'react-native';
-import PSPDFKitView from 'react-native-pspdfkit';
+import PSPDFKitView, { Annotation } from 'react-native-pspdfkit';
 
 import { exampleDocumentPath, pspdfkitColor } from '../configuration/Constants';
 import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
@@ -8,6 +8,7 @@ import { hideToolbar } from '../helpers/NavigationHelper';
 
 export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponent {
   pdfRef: React.RefObject<PSPDFKitView>;
+  lastAddedAnnotationUUID: string | undefined;
 
   constructor(props: any) {
     super(props);
@@ -38,6 +39,13 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
             this.setState({
               currentPageIndex: event.currentPageIndex,
             });
+          }}
+          onAnnotationsChanged={(event: {
+            error: any;
+            change: string;
+            annotations: any;
+          }) => {
+            this.lastAddedAnnotationUUID = event.annotations[0]?.uuid;
           }}
         />
         <View style={styles.column}>
@@ -85,6 +93,31 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
                         Alert.alert(
                           'PSPDFKit',
                           'Annotation was successfully added.',
+                          [
+                            {
+                              text: 'Set readOnly flag',
+                              onPress: async () => {
+
+                                // Get the existing annotation flags
+                                const flags = await this.pdfRef.current?.getAnnotationFlags(
+                                  this.lastAddedAnnotationUUID!);
+                                
+                                // Add the READ_ONLY flag
+                                flags?.push(Annotation.Flags.READ_ONLY);
+
+                                // Set the new flags
+                                await this.pdfRef.current?.setAnnotationFlags(
+                                  this.lastAddedAnnotationUUID!,
+                                  flags!,
+                                );
+                                this.pdfRef.current?.getAnnotationFlags(
+                                  this.lastAddedAnnotationUUID!).then((flags: Annotation.Flags[]): any => {
+                                  Alert.alert('PSPDFKit', `New annotation flags: ${JSON.stringify(flags)}`);
+                                });
+                              },
+                            },
+                            {text: 'OK'},
+                          ]
                         );
                       } else {
                         Alert.alert('PSPDFKit', 'Failed to add annotation.');

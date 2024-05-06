@@ -51,10 +51,13 @@ public class PdfViewAnnotationTappedEvent extends Event<PdfViewAnnotationTappedE
     @Override
     public void dispatch(RCTEventEmitter rctEventEmitter) {
         try {
-            JSONObject instantJson = new JSONObject(annotation.toInstantJson());
-            Map<String, Object> map = JsonUtilities.jsonObjectToMap(instantJson);
-            WritableMap eventData = Arguments.makeNativeMap(map);
-            rctEventEmitter.receiveEvent(getViewTag(), getEventName(), eventData);
+            String rawInstantJson = annotation.toInstantJson();
+            if (rawInstantJson != null && !rawInstantJson.equals("null")) {
+                JSONObject instantJson = new JSONObject(rawInstantJson);
+                Map<String, Object> map = JsonUtilities.jsonObjectToMap(instantJson);
+                WritableMap eventData = Arguments.makeNativeMap(map);
+                rctEventEmitter.receiveEvent(getViewTag(), getEventName(), eventData);
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }

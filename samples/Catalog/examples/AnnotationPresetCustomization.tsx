@@ -1,6 +1,6 @@
 import React from 'react';
-import { processColor, View } from 'react-native';
-import PSPDFKitView from 'react-native-pspdfkit';
+import { Alert, processColor, View } from 'react-native';
+import PSPDFKitView, { Annotation } from 'react-native-pspdfkit';
 
 import { exampleDocumentPath, pspdfkitColor } from '../configuration/Constants';
 import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
@@ -29,6 +29,24 @@ export class AnnotationPresetCustomization extends BaseExampleAutoHidingHeaderCo
             iOSBackgroundColor: processColor('lightgrey'),
             iOSUseParentNavigationBar: false,
           }}
+          annotationContextualMenu={
+            {
+              buttons: [
+                {
+                  id: 'custom_annotation_item',
+                  image: 'example_annotation_icon',
+                  title: 'Custom',
+                  selectable: false,
+                },
+              ],
+              retainSuggestedMenuItems: true,
+            }
+          }
+          onCustomAnnotationContextualMenuItemTapped={
+            (result: any) => {
+              Alert.alert('PSPDFKit', `Custom annotation contextual menu item tapped: ${JSON.stringify(result)}`);
+            }
+          }
           annotationPresets={{
             inkPen: {
               defaultThickness: 50,

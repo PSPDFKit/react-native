@@ -18,3 +18,8 @@ import measurements = require('../src/measurements/Measurements');
 export import Measurements = measurements.Measurements;
 export import MeasurementScale = measurements.MeasurementScale;
 export import MeasurementValueConfiguration = measurements.MeasurementValueConfiguration;
+//@ts-ignore
+import annotation = require('../src/annotations/Annotation');
+export import Annotation = annotation.Annotation;
+export import AnnotationContextualMenu = annotation.AnnotationContextualMenu;
+export import AnnotationContextualMenuItem = annotation.AnnotationContextualMenuItem;

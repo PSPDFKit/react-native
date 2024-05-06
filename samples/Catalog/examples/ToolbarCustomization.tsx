@@ -38,7 +38,7 @@ export class ToolbarCustomization extends BaseExampleAutoHidingHeaderComponent {
               animated: true,
               buttons: [
                 {
-                  image: 'customImage.png',
+                  image: 'example_toolbar_icon',
                   id: 'myCustomButton'
                 }
               ],
@@ -99,7 +99,7 @@ export class ToolbarCustomization extends BaseExampleAutoHidingHeaderComponent {
                     buttons: [
                       Toolbar.DefaultToolbarButton.SETTINGS_BUTTON_ITEM,
                       {
-                        image: 'customImage.png',
+                        image: 'example_toolbar_icon',
                         id: 'myCustomButton1'
                       }
                     ],
@@ -123,7 +123,6 @@ export class ToolbarCustomization extends BaseExampleAutoHidingHeaderComponent {
                       },
                     ],
                   },
-
               };
               this.pdfRef.current?.setToolbar(toolbar);
               }}

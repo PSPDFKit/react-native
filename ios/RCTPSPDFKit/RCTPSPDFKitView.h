@@ -24,6 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) BOOL disableAutomaticSaving;
 @property (nonatomic) PSPDFPageIndex pageIndex;
 @property (nonatomic, copy, nullable) NSString *annotationAuthorName;
+@property (nonatomic) PSPDFImageSaveMode imageSaveMode;
 @property (nonatomic, copy) RCTBubblingEventBlock onCloseButtonPressed;
 @property (nonatomic, copy) RCTBubblingEventBlock onDocumentSaved;
 @property (nonatomic, copy) RCTBubblingEventBlock onDocumentSaveFailed;
@@ -33,6 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) RCTBubblingEventBlock onStateChanged;
 @property (nonatomic, copy) RCTBubblingEventBlock onDocumentLoaded;
 @property (nonatomic, copy) RCTBubblingEventBlock onCustomToolbarButtonTapped;
+@property (nonatomic, copy) RCTBubblingEventBlock onCustomAnnotationContextualMenuItemTapped;
 @property (nonatomic, copy, nullable) NSArray<NSString *> *availableFontNames;
 @property (nonatomic, copy, nullable) NSString *selectedFontName;
 @property (nonatomic) BOOL showDownloadableFonts;
@@ -47,10 +49,12 @@ NS_ASSUME_NONNULL_BEGIN
 /// Anotations
 - (NSDictionary<NSString *, NSArray<NSDictionary *> *> *)getAnnotations:(PSPDFPageIndex)pageIndex type:(PSPDFAnnotationType)type error:(NSError *_Nullable *)error;
 - (BOOL)addAnnotation:(id)jsonAnnotation error:(NSError *_Nullable *)error;
-- (BOOL)removeAnnotationWithUUID:(NSString *)annotationUUID;
+- (BOOL)removeAnnotations:(NSArray<NSDictionary *> *)annotationsJSON;
 - (NSDictionary<NSString *, NSArray<NSDictionary *> *> *)getAllUnsavedAnnotationsWithError:(NSError *_Nullable *)error;
 - (NSDictionary<NSString *, NSArray<NSDictionary *> *> *)getAllAnnotations:(PSPDFAnnotationType)type error:(NSError *_Nullable *)error;
 - (BOOL)addAnnotations:(NSString *)jsonAnnotations error:(NSError *_Nullable *)error;
+- (BOOL)setAnnotationFlags:(NSString *)uuid flags:(NSArray<NSString *> *)flags;
+- (NSArray <NSString *> *)getAnnotationFlags:(NSString *)uuid;
 
 /// Forms
 - (NSDictionary<NSString *, NSString *> *)getFormFieldValue:(NSString *)fullyQualifiedName;
@@ -65,6 +69,9 @@ NS_ASSUME_NONNULL_BEGIN
 /// XFDF
 - (NSDictionary *)importXFDF:(NSString *)filePath withError:(NSError *_Nullable *)error;
 - (NSDictionary *)exportXFDF:(NSString *)filePath withError:(NSError *_Nullable *)error;
+
+/// Annotation Contextual Menu Customization
+- (void)setAnnotationContextualMenuItems:(NSDictionary *)items;
 
 @end
 

@@ -66,6 +66,7 @@ class PSPDFKitView extends React.Component {
           onNavigationButtonClicked={this._onNavigationButtonClicked}
           onDataReturned={this._onDataReturned}
           onCustomToolbarButtonTapped={this._onCustomToolbarButtonTapped}
+          onCustomAnnotationContextualMenuItemTapped={this._onCustomAnnotationContextualMenuItemTapped}
         />
       );
     } else {
@@ -167,6 +168,15 @@ class PSPDFKitView extends React.Component {
       this.props.onCustomToolbarButtonTapped(event.nativeEvent);
     }
   };
+
+  /**
+   * @ignore
+   */
+  _onCustomAnnotationContextualMenuItemTapped = event => {
+      if (this.props.onCustomAnnotationContextualMenuItemTapped) {
+        this.props.onCustomAnnotationContextualMenuItemTapped(event.nativeEvent);
+      }
+    };
 
   /**
    * Enters annotation creation mode, showing the annotation creation toolbar.
@@ -504,6 +514,80 @@ class PSPDFKitView extends React.Component {
   };
 
   /**
+   * Sets the flags of the specified annotation.
+   *
+   * @method setAnnotationFlags
+   * @memberof PSPDFKitView
+   * @param { string } uuid The UUID of the annotation to update.
+   * @param { Annotation.Flags[] } flags The flags to apply to the annotation.
+   * @example
+   * const result = await this.pdfRef.current.setAnnotationFlags('bb61b1bf-eacd-4227-a5bf-db205e591f5a', ['locked', 'hidden']);
+   *
+   * @returns { Promise<boolean> } A promise resolving to ```true``` if the annotations were added successfully, and ```false``` if an error occurred.
+   */
+  setAnnotationFlags = function (uuid, flags) {
+    if (Platform.OS === 'android') {
+      let requestId = this._nextRequestId++;
+      let requestMap = this._requestMap;
+
+      // We create a promise here that will be resolved once onDataReturned is called.
+      let promise = new Promise(function (resolve, reject) {
+        requestMap[requestId] = { resolve: resolve, reject: reject };
+      });
+
+      UIManager.dispatchViewManagerCommand(
+        findNodeHandle(this.refs.pdfView),
+        this._getViewManagerConfig('RCTPSPDFKitView').Commands.setAnnotationFlags,
+        [requestId, uuid, flags],
+      );
+
+      return promise;
+    } else if (Platform.OS === 'ios') {
+      return NativeModules.PSPDFKitViewManager.setAnnotationFlags(
+        uuid,
+        flags,
+        findNodeHandle(this.refs.pdfView),
+      );
+    }
+  };
+
+  /**
+   * Gets the flags for the specified annotation.
+   *
+   * @method getAnnotationFlags
+   * @memberof PSPDFKitView
+   * @param { string } uuid The UUID of the annotation to query.
+   * @example
+   * const flags = await this.pdfRef.current.getAnnotationFlags('bb61b1bf-eacd-4227-a5bf-db205e591f5a');
+   *
+   * @returns { Promise<Annotation.Flags[]> } A promise containing the flags of the specified annotation.
+   */
+  getAnnotationFlags = function (uuid) {
+    if (Platform.OS === 'android') {
+      let requestId = this._nextRequestId++;
+      let requestMap = this._requestMap;
+
+      // We create a promise here that will be resolved once onDataReturned is called.
+      let promise = new Promise(function (resolve, reject) {
+        requestMap[requestId] = { resolve: resolve, reject: reject };
+      });
+
+      UIManager.dispatchViewManagerCommand(
+        findNodeHandle(this.refs.pdfView),
+        this._getViewManagerConfig('RCTPSPDFKitView').Commands.getAnnotationFlags,
+        [requestId, uuid],
+      );
+
+      return promise;
+    } else if (Platform.OS === 'ios') {
+      return NativeModules.PSPDFKitViewManager.getAnnotationFlags(
+        uuid,
+        findNodeHandle(this.refs.pdfView),
+      );
+    }
+  };
+
+  /**
    * Imports the supplied XFDF file into the current document.
    *
    * @method importXFDF
@@ -783,7 +867,7 @@ class PSPDFKitView extends React.Component {
    *		  buttons: ['searchButtonItem', 'readerViewButtonItem']
    *	  },
    *	}
-   *	this.refs.pdfView.setToolbar(toolbar);
+   *	this.pdfRef.current.setToolbar(toolbar);
    *
    */
     setToolbar = function (toolbar) {
@@ -1023,12 +1107,14 @@ if (Platform.OS === 'ios' || Platform.OS === 'android') {
  * @property {string} document The path to the PDF file that should be displayed.
  * @property {PDFConfiguration} [configuration] Configuration object to customize the appearance and behavior of PSPDFKit. See {@link https://pspdfkit.com/api/react-native/PDFConfiguration.html} for available options.
  * @property {Toolbar} [toolbar] Toolbar object to customize the toolbar appearance and behaviour.
+ * @property {AnnotationContextualMenu} [annotationContextualMenu] Object to customize the menu shown when selecting an annotation.
  * @property {number} [pageIndex] Page index of the document that will be shown. Starts at 0.
  * @property {boolean} [hideNavigationBar] Controls whether a navigation bar is created and shown or not. Navigation bar is shown by default (```false```).
  * @property {boolean} [showCloseButton] Specifies whether the close button should be shown in the navigation bar. Disabled by default (```false```). Only applies when the ```PSPDFKitView``` is presented modally. Will call ```onCloseButtonPressed``` when tapped if a callback was provided. If ```onCloseButtonPressed``` wasn’t provided, ```PSPDFKitView``` will automatically be dismissed when modally presented.
  * @property {boolean} [disableDefaultActionForTappedAnnotations] Controls whether or not the default action for tapped annotations is processed. Defaults to processing the action (```false```).
  * @property {boolean} [disableAutomaticSaving] Controls whether or not the document will automatically be saved. Defaults to automatically saving (```false```).
  * @property {boolean} [annotationAuthorName] Controls the author name that’s set for new annotations. If not set and the user hasn’t specified it before, the user will be asked and the result will be saved. The value set here will be persisted and the user won’t be asked, even if this isn’t set the next time.
+ * @property {string} [imageSaveMode] Specifies what is written back to the original image URL when the receiver is saved. If this property is ```flattenAndEmbed```, then this allows for changes made to the image to be saved as metadata in the original file. If the same file is reopened, all previous changes made will remain editable. If this property is ```flatten```, the changes are simply written to the image, and will not be editable when reopened. Available options are: ```flatten``` or ```flattenAndEmbed```.
  * @property {function} [onCloseButtonPressed] Callback that’s called when the user tapped the close button. If you provide this function, you need to handle dismissal yourself. If you don't provide this function, ```PSPDFKitView``` will be automatically dismissed. Only applies when the ```PSPDFKitView``` is presented modally.
  * @property {function} [onDocumentLoaded] Callback that’s called when the document is loaded in the ```PSPDFKitView```.
  * @property {function} [onDocumentSaved] Callback that’s called when the document is saved.
@@ -1037,6 +1123,7 @@ if (Platform.OS === 'ios' || Platform.OS === 'android') {
  * @property {function} [onAnnotationsChanged] Callback that’s called when an annotation is added, changed, or removed.
  * @property {function} [onStateChanged] Callback that’s called when the state of the ```PSPDFKitView``` changes.
  * @property {function} [onCustomToolbarButtonTapped] Callback that’s called when a custom toolbar button is tapped.
+ * @property {function} [onCustomAnnotationContextualMenuItemTapped] Callback that’s called when a custom annotation menu item is tapped.
  * @property {string} [fragmentTag] The tag used to identify a single PdfFragment in the view hierarchy. This needs to be unique in the view hierarchy.
  * @property {Array} [menuItemGrouping] Used to specify a custom grouping for the menu items in the annotation creation toolbar.
  * @property {Array<string>} [leftBarButtonItems] Sets the left bar button items. Note: The same button item cannot be added to both the left and right bar button items simultaneously. See {@link https://github.com/PSPDFKit/react-native/blob/master/ios/RCTPSPDFKit/Converters/RCTConvert+UIBarButtonItem.m} for supported button items.
@@ -1078,6 +1165,12 @@ PSPDFKitView.propTypes = {
    */
   toolbar: PropTypes.object,
   /**
+   * Object to customize the menu shown when selecting an annotation.
+   * @type {AnnotationContextualMenu}
+   * @memberof PSPDFKitView
+   */
+  annotationContextualMenu: PropTypes.object,
+  /**
    * Page index of the document that will be shown. Starts at 0.
    * @type {number}
    * @memberof PSPDFKitView
@@ -1118,6 +1211,16 @@ PSPDFKitView.propTypes = {
    * @memberof PSPDFKitView
    */
   annotationAuthorName: PropTypes.string,
+  /**
+   * Specifies what is written back to the original image URL when the receiver is saved.
+   * If this property is ```flattenAndEmbed```, then this allows for changes made to the image to be saved as metadata in the original file.
+   * If the same file is reopened, all previous changes made will remain editable.
+   * If this property is ```flatten```, the changes are simply written to the image, and will not be editable when reopened.
+   * Available options are: ```flatten``` or ```flattenAndEmbed```.
+   * @type {string}
+   * @memberof PSPDFKitView
+   */
+  imageSaveMode: PropTypes.string,
   /**
    * Callback that’s called when the user tapped the close button.
    * If you provide this function, you need to handle dismissal yourself.
@@ -1215,7 +1318,7 @@ PSPDFKitView.propTypes = {
    *  }}
    */
   onStateChanged: PropTypes.func,
-    /**
+  /**
    * Callback that’s called when a custom toolbar button is tapped.
    * @type {function}
    * @memberof PSPDFKitView
@@ -1228,7 +1331,21 @@ PSPDFKitView.propTypes = {
    *     }
    *  }}
    */
-    onCustomToolbarButtonTapped: PropTypes.func,
+  onCustomToolbarButtonTapped: PropTypes.func,
+  /**
+   * Callback that’s called when a custom annotation menu item is tapped.
+   * @type {function}
+   * @memberof PSPDFKitView
+   * @example
+   * onCustomAnnotationContextualMenuItemTapped={result => {
+   *     if (result.error) {
+   *         alert(result.error);
+   *     } else {
+   *         alert('Custom annotation contextual menu item tapped: ' + JSON.stringify(result));
+   *     }
+   *  }}
+   */
+  onCustomAnnotationContextualMenuItemTapped: PropTypes.func,
   /**
    * The tag used to identify a single ```PdfFragment``` in the view hierarchy.
    * This needs to be unique in the view hierarchy.
@@ -1809,8 +1926,20 @@ export { MeasurementScale } from "./lib/measurements/Measurements";
 import { MeasurementValueConfiguration } from "./lib/measurements/Measurements";
 export { MeasurementValueConfiguration } from "./lib/measurements/Measurements";
 
+import { Annotation } from "./lib/annotations/Annotation";
+export { Annotation } from "./lib/annotations/Annotation";
+
+import { AnnotationContextualMenu } from "./lib/annotations/Annotation";
+export { AnnotationContextualMenu } from "./lib/annotations/Annotation";
+
+import { AnnotationContextualMenuItem } from "./lib/annotations/Annotation";
+export { AnnotationContextualMenuItem } from "./lib/annotations/Annotation";
+
 module.exports.PDFConfiguration = PDFConfiguration;
 module.exports.Toolbar = Toolbar;
 module.exports.Measurements = Measurements;
 module.exports.MeasurementScale = MeasurementScale;
 module.exports.MeasurementValueConfiguration = MeasurementValueConfiguration;
+module.exports.Annotation = Annotation;
+module.exports.AnnotationContextualMenu = AnnotationContextualMenu;
+module.exports.AnnotationContextualMenuItem = AnnotationContextualMenuItem;

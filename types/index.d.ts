@@ -412,6 +412,10 @@ export type Props = {
      */
     toolbar?: Toolbar;
     /**
+     * Object to customize the menu shown when selecting an annotation.
+     */
+    annotationContextualMenu?: AnnotationContextualMenu;
+    /**
      * Page index of the document that will be shown. Starts at 0.
      */
     pageIndex?: number;
@@ -435,6 +439,10 @@ export type Props = {
      * Controls the author name that’s set for new annotations. If not set and the user hasn’t specified it before, the user will be asked and the result will be saved. The value set here will be persisted and the user won’t be asked, even if this isn’t set the next time.
      */
     annotationAuthorName?: boolean;
+    /**
+     * Specifies what is written back to the original image URL when the receiver is saved. If this property is ```flattenAndEmbed```, then this allows for changes made to the image to be saved as metadata in the original file. If the same file is reopened, all previous changes made will remain editable. If this property is ```flatten```, the changes are simply written to the image, and will not be editable when reopened. Available options are: ```flatten``` or ```flattenAndEmbed```.
+     */
+    imageSaveMode?: string;
     /**
      * Callback that’s called when the user tapped the close button. If you provide this function, you need to handle dismissal yourself. If you don't provide this function, ```PSPDFKitView``` will be automatically dismissed. Only applies when the ```PSPDFKitView``` is presented modally.
      */
@@ -467,6 +475,10 @@ export type Props = {
      * Callback that’s called when a custom toolbar button is tapped.
      */
     onCustomToolbarButtonTapped?: Function;
+    /**
+     * Callback that’s called when a custom annotation menu item is tapped.
+     */
+    onCustomAnnotationContextualMenuItemTapped?: Function;
     /**
      * The tag used to identify a single PdfFragment in the view hierarchy. This needs to be unique in the view hierarchy.
      */
@@ -796,6 +808,10 @@ declare class PSPDFKitView extends React.Component<Props, any, any> {
      */
     _onCustomToolbarButtonTapped: (event: any) => void;
     /**
+     * @ignore
+     */
+    _onCustomAnnotationContextualMenuItemTapped: (event: any) => void;
+    /**
      * Enters annotation creation mode, showing the annotation creation toolbar.
      * @method enterAnnotationCreationMode
      * @example
@@ -908,6 +924,31 @@ declare class PSPDFKitView extends React.Component<Props, any, any> {
      * @returns { Promise<boolean> } A promise resolving to ```true``` if the annotations were added successfully, and ```false``` if an error occurred.
      */
     addAnnotations: (annotations: object) => Promise<boolean>;
+    /**
+     * Sets the flags of the specified annotation.
+     *
+     * @method setAnnotationFlags
+     * @memberof PSPDFKitView
+     * @param { string } uuid The UUID of the annotation to update.
+     * @param { Annotation.Flags[] } flags The flags to apply to the annotation.
+     * @example
+     * const result = await this.pdfRef.current.setAnnotationFlags('bb61b1bf-eacd-4227-a5bf-db205e591f5a', ['locked', 'hidden']);
+     *
+     * @returns { Promise<boolean> } A promise resolving to ```true``` if the annotations were added successfully, and ```false``` if an error occurred.
+     */
+    setAnnotationFlags: (uuid: string, flags: Annotation.Flags[]) => Promise<boolean>;
+    /**
+     * Gets the flags for the specified annotation.
+     *
+     * @method getAnnotationFlags
+     * @memberof PSPDFKitView
+     * @param { string } uuid The UUID of the annotation to query.
+     * @example
+     * const flags = await this.pdfRef.current.getAnnotationFlags('bb61b1bf-eacd-4227-a5bf-db205e591f5a');
+     *
+     * @returns { Promise<Annotation.Flags[]> } A promise containing the flags of the specified annotation.
+     */
+    getAnnotationFlags: (uuid: string) => Promise<Annotation.Flags[]>;
     /**
      * Imports the supplied XFDF file into the current document.
      *
@@ -1061,7 +1102,7 @@ declare class PSPDFKitView extends React.Component<Props, any, any> {
      *		  buttons: ['searchButtonItem', 'readerViewButtonItem']
      *	  },
      *	}
-     *	this.refs.pdfView.setToolbar(toolbar);
+     *	this.pdfRef.current.setToolbar(toolbar);
      *
      */
     setToolbar: (toolbar: Toolbar) => void;
@@ -1154,12 +1195,14 @@ declare namespace PSPDFKitView {
         let document: string;
         let configuration: PDFConfiguration;
         let toolbar: Toolbar;
+        let annotationContextualMenu: AnnotationContextualMenu;
         let pageIndex: number;
         let hideNavigationBar: boolean;
         let showCloseButton: boolean;
         let disableDefaultActionForTappedAnnotations: boolean;
         let disableAutomaticSaving: boolean;
         let annotationAuthorName: string;
+        let imageSaveMode: string;
         let onCloseButtonPressed: Function;
         let onDocumentLoaded: Function;
         let onDocumentSaved: Function;
@@ -1168,6 +1211,7 @@ declare namespace PSPDFKitView {
         let onAnnotationsChanged: Function;
         let onStateChanged: Function;
         let onCustomToolbarButtonTapped: Function;
+        let onCustomAnnotationContextualMenuItemTapped: Function;
         let fragmentTag: string;
         let menuItemGrouping: any[];
         let leftBarButtonItems: Array<string>;
@@ -1207,3 +1251,8 @@ import measurements = require('../src/measurements/Measurements');
 export import Measurements = measurements.Measurements;
 export import MeasurementScale = measurements.MeasurementScale;
 export import MeasurementValueConfiguration = measurements.MeasurementValueConfiguration;
+//@ts-ignore
+import annotation = require('../src/annotations/Annotation');
+export import Annotation = annotation.Annotation;
+export import AnnotationContextualMenu = annotation.AnnotationContextualMenu;
+export import AnnotationContextualMenuItem = annotation.AnnotationContextualMenuItem;

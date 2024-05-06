@@ -74,6 +74,7 @@ public class PdfViewAnnotationChangedEvent extends Event<PdfViewAnnotationChange
             } else {
                 JSONObject instantJson = new JSONObject(annotation.toInstantJson());
                 annotationMap = JsonUtilities.jsonObjectToMap(instantJson);
+                annotationMap.put("uuid", annotation.getUuid());
             }
 
             List<Map<String, Object>> annotations = new ArrayList<>();

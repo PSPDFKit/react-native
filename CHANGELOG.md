@@ -1,26 +1,35 @@
 ## Newest Release
 
+### 2.10.0 - 06 May 2024
+
+- Adds the ability to define annotation behavior using flags. (J#HYB-283)
+- Adds the ability to add custom menu items to the annotation selection menu. (J#HYB-280)
+- Adds the `imageSaveMode` property to the `PSPDFKitView` component to specify how annotations should be treated when saving image documents. (J#HYB-334)
+- Updates for PSPDFKit 13.5.0 for iOS.
+- Fixes an issue where selecting a measurement annotation without the Measurement Tools license causes a crash. (J#HYB-318)
+- Fixes an issue where the `removeAnnotation` API sometimes failed to remove an annotation on iOS. (J#HYB-43)
+
+## Previous Releases
+
 ### 2.9.1 - 12 Apr 2024
 
 - Adds the ability to import and export annotations from XFDF files. (J#HYB-293)
 - Updates for PSPDFKit 2024.2.1 for Android.
 - Fixes issue where password input UI for password-protected documents wasn't shown on Android. (J#HYB-285)
 
-## Previous Releases
-
 ### 2.9.0 - 22 Mar 2024
 
-- Adds new getConfiguration method to retrieve current PSPDFKitView configuration options. (J#HYB-192)
-- Adds the option to open a password protected document through configuration. (J#HYB-213)
+- Adds new `getConfiguration` method to retrieve current PSPDFKitView configuration options. (J#HYB-192)
+- Adds the option to open a password-protected document through configuration. (J#HYB-213)
 - Adds the ability to add custom toolbar buttons to the PSPDFKit toolbar. (J#HYB-198)
-- Adds support for new `MeasurementValueConfiguration` configuration option, replacing deprecated `setMeasurementScale` and `setMeasurementPrecision` methods. (J#HYB-205)
-- Updates `showPageLabels` property to also control page number overlay on Android. (J#HYB-223)
+- Adds support for the new `MeasurementValueConfiguration` configuration option, replacing the deprecated `setMeasurementScale` and `setMeasurementPrecision` methods. (J#HYB-205)
+- Updates the `showPageLabels` property to also control page number overlay on Android. (J#HYB-223)
 - Updates for PSPDFKit 2024.1.2 for Android.
 - Updates for PSPDFKit 13.3.3 for iOS.
 - Fixes issue of document URIs with file:/// scheme on iOS. (#43160)
-- Fixes issue where `onDocumentLoaded` callback was not called on Android. (#43187)
-- Fixes signatureSavingStrategy configuration option to save signature if enabled. (J#HYB-210)
-- Fixes `spreadFitting` configuration option behaviour on iOS. (J#HYB-222)
+- Fixes issue where the `onDocumentLoaded` callback was not called on Android. (#43187)
+- Fixes the `signatureSavingStrategy` configuration option to save signatures if enabled. (J#HYB-210)
+- Fixes `spreadFitting` configuration option behavior on iOS. (J#HYB-222)
 
 ### 2.8.1 - 27 Feb 2024
 

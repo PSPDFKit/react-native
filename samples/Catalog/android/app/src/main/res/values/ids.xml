@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <item name="custom_action" type="id"/>
+    <item name="custom_annotation_item" type="id"/>
 </resources>

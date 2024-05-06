@@ -23,17 +23,44 @@
 export class Measurements {}
 
 export interface MeasurementValueConfiguration {
+ /**
+  * Names are displayed in user interface and serve to help distinguish different scales.
+  */
     name?: string;
+ /**
+  * Whether this new measurement configuration should be added to the undo stack (Android only).
+  */
     addToUndo? : boolean;
+ /**
+  * Whether this new measurement configuration should be set as selected on the UI.
+  */
     isSelected? : boolean;
+ /**
+  * A ratio of a distance on a document page to a corresponding real world distance.
+  */
     scale: MeasurementScale;
+ /**
+  * The smallest value to which measurements will be rounded.
+  */
     precision: Measurements.Precision;
 }
 
 export interface MeasurementScale {
+ /**
+  * The unit for the distance on a document page.
+  */
     unitFrom: Measurements.ScaleUnitFrom;
+ /**
+  * A distance on a document page. The unit of this value is given by ```unitFrom```.
+  */
     valueFrom: number;
+ /**
+  * The unit for the real world distance.
+  */
     unitTo: Measurements.ScaleUnitTo;
+ /**
+  * A real world distance. The unit of this value is given by ```unitTo```.
+  */
     valueTo: number;
 }
 

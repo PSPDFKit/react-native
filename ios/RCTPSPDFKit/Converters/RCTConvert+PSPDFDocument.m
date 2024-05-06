@@ -19,7 +19,9 @@
     BOOL isImageFile = [fileExtension isEqualToString: @"png"] || [fileExtension isEqualToString: @"jpeg"] || [fileExtension isEqualToString: @"jpg"] || [fileExtension isEqualToString: @"tiff"] || [fileExtension isEqualToString:@"tif"];
 
     if (isImageFile) {
-        return [[PSPDFImageDocument alloc] initWithImageURL: url];
+        PSPDFImageDocument *imageDocument = [[PSPDFImageDocument alloc] initWithImageURL: url];
+        [imageDocument waitUntilLoaded];
+        return imageDocument;
     }
 
     return [[PSPDFDocument alloc] initWithURL: url];

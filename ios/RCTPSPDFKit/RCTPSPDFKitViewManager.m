@@ -59,6 +59,11 @@ RCT_CUSTOM_VIEW_PROPERTY(document, PSPDFDocument, RCTPSPDFKitView) {
     if ([_configuration objectForKey:@"documentPassword"]) {
         [view.pdfController.document unlockWithPassword:[_configuration objectForKey:@"documentPassword"]];
     }
+      
+    if ([view.pdfController.document isKindOfClass:[PSPDFImageDocument class]]) {
+        PSPDFImageDocument *imageDocument = (PSPDFImageDocument *)view.pdfController.document;
+        imageDocument.imageSaveMode = view.imageSaveMode;
+    }
 
     // Apply any measurementValueConfigurations once the document is loaded
     if ([_configuration objectForKey:@"measurementValueConfigurations"]) {
@@ -124,6 +129,17 @@ RCT_CUSTOM_VIEW_PROPERTY(annotationAuthorName, NSString, RCTPSPDFKitView) {
     view.annotationAuthorName = json;
   }
 }
+
+RCT_CUSTOM_VIEW_PROPERTY(imageSaveMode, NSString, RCTPSPDFKitView) {
+  if (json) {
+      view.imageSaveMode = [RCTConvert PSPDFImageSaveMode:json];
+      if ([view.pdfController.document isKindOfClass:PSPDFImageDocument.class]) {
+          PSPDFImageDocument *imageDoc = (PSPDFImageDocument *)view.pdfController.document;
+          imageDoc.imageSaveMode = view.imageSaveMode;
+      }
+  }
+}
+
 
 RCT_CUSTOM_VIEW_PROPERTY(menuItemGrouping, PSPDFAnnotationToolbarConfiguration, RCTPSPDFKitView) {
   if (json) {
@@ -199,6 +215,8 @@ RCT_EXPORT_VIEW_PROPERTY(onDocumentLoaded, RCTBubblingEventBlock)
 
 RCT_EXPORT_VIEW_PROPERTY(onCustomToolbarButtonTapped, RCTBubblingEventBlock)
 
+RCT_EXPORT_VIEW_PROPERTY(onCustomAnnotationContextualMenuItemTapped, RCTBubblingEventBlock)
+
 RCT_CUSTOM_VIEW_PROPERTY(availableFontNames, NSArray, RCTPSPDFKitView) {
   if (json && [RCTConvert NSArray:json]) {
     view.availableFontNames = [RCTConvert NSArray:json];
@@ -222,19 +240,26 @@ RCT_CUSTOM_VIEW_PROPERTY(showDownloadableFonts, BOOL, RCTPSPDFKitView) {
 
 RCT_CUSTOM_VIEW_PROPERTY(toolbar, NSDictionary, RCTPSPDFKitView) {
   if (json) {
-    NSDictionary *navigation = [RCTConvert NSDictionary:json];
+    NSDictionary *toolbar = [RCTConvert NSDictionary:json];
 
-    if ([navigation objectForKey:@"leftBarButtonItems"] != nil) {
-      [view setLeftBarButtonItems:[[navigation objectForKey:@"leftBarButtonItems"] objectForKey:@"buttons"]
-                      forViewMode:[[navigation objectForKey:@"leftBarButtonItems"] objectForKey:@"viewMode"]
-                        animated:[[navigation objectForKey:@"leftBarButtonItems"] objectForKey:@"animated"]];
+    if ([toolbar objectForKey:@"leftBarButtonItems"] != nil) {
+      [view setLeftBarButtonItems:[[toolbar objectForKey:@"leftBarButtonItems"] objectForKey:@"buttons"]
+                      forViewMode:[[toolbar objectForKey:@"leftBarButtonItems"] objectForKey:@"viewMode"]
+                        animated:[[toolbar objectForKey:@"leftBarButtonItems"] objectForKey:@"animated"]];
     }
   
-    if ([navigation objectForKey:@"rightBarButtonItems"] != nil) {
-      [view setRightBarButtonItems:[[navigation objectForKey:@"rightBarButtonItems"] objectForKey:@"buttons"]
-                      forViewMode:[[navigation objectForKey:@"rightBarButtonItems"] objectForKey:@"viewMode"]
-                          animated:[[navigation objectForKey:@"rightBarButtonItems"] objectForKey:@"animated"]];
+    if ([toolbar objectForKey:@"rightBarButtonItems"] != nil) {
+      [view setRightBarButtonItems:[[toolbar objectForKey:@"rightBarButtonItems"] objectForKey:@"buttons"]
+                      forViewMode:[[toolbar objectForKey:@"rightBarButtonItems"] objectForKey:@"viewMode"]
+                          animated:[[toolbar objectForKey:@"rightBarButtonItems"] objectForKey:@"animated"]];
     }
+  }
+}
+
+RCT_CUSTOM_VIEW_PROPERTY(annotationContextualMenu, NSDictionary, RCTPSPDFKitView) {
+  if (json) {
+      NSDictionary *annotationContextualMenu = [RCTConvert NSDictionary:json];
+      [view setAnnotationContextualMenuItems:annotationContextualMenu];
   }
 }
 
@@ -304,7 +329,7 @@ RCT_EXPORT_METHOD(addAnnotation:(id)jsonAnnotation reactTag:(nonnull NSNumber *)
 RCT_EXPORT_METHOD(removeAnnotation:(id)jsonAnnotation reactTag:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   dispatch_async(dispatch_get_main_queue(), ^{
     RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
-    BOOL success = [component removeAnnotationWithUUID:jsonAnnotation[@"uuid"]];
+    BOOL success = [component removeAnnotations:jsonAnnotation == nil ? @[] : @[jsonAnnotation]];
     if (success) {
       resolve(@(success));
     } else {
@@ -319,25 +344,12 @@ RCT_EXPORT_METHOD(removeAnnotations:(id)jsonAnnotations reactTag:(nonnull NSNumb
         reject(@"error", @"Please provide list of annotation objects", nil);
         return;
     }
-    NSMutableArray* annotationIDs = [@[] mutableCopy];
-    for(NSDictionary* annotation in jsonAnnotations) {
-        [annotationIDs addObject: annotation[@"uuid"]];
-    }
-
-    NSMutableArray* errors = [@[] mutableCopy];
-
+    
     dispatch_async(dispatch_get_main_queue(), ^{
         RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
-        for(NSString* uuid in annotationIDs){
-            BOOL isSuccessful = [component removeAnnotationWithUUID: uuid];
-            NSLog(@"Deleted annotation %@", uuid);
-            if(!isSuccessful) {
-                [errors addObject: uuid];
-            }
-        }
-
-        if([errors count] > 1) {
-            NSString* errorMessage = [NSString stringWithFormat: @"Failed to remove annotations: %@", errors];
+        BOOL success = [component removeAnnotations:jsonAnnotations == nil ? @[] : jsonAnnotations];
+        if(!success) {
+            NSString* errorMessage = [NSString stringWithFormat: @"Failed to remove annotations"];
             reject(@"error", errorMessage, nil);
             return;
         }
@@ -381,6 +393,22 @@ RCT_EXPORT_METHOD(addAnnotations:(id)jsonAnnotations reactTag:(nonnull NSNumber 
     } else {
       reject(@"error", @"Failed to add annotations.", error);
     }
+  });
+}
+
+RCT_REMAP_METHOD(setAnnotationFlags, setAnnotationFlags:(nonnull NSString *)uuid flags:(NSArray<NSString *> *)flags reactTag:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+  dispatch_async(dispatch_get_main_queue(), ^{
+    RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
+    BOOL success = [component setAnnotationFlags:uuid flags:flags];
+    resolve(@(success));
+  });
+}
+
+RCT_REMAP_METHOD(getAnnotationFlags, getAnnotationFlags:(nonnull NSString *)uuid reactTag:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+  dispatch_async(dispatch_get_main_queue(), ^{
+    RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
+    NSArray<NSString *>* result = [component getAnnotationFlags:uuid];
+    resolve(result);
   });
 }
 
