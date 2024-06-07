@@ -20,7 +20,7 @@ public class InstantDocumentViewController: InstantViewController {
 
     @objc var manager: RCTPSPDFKitManager?
 
-    @objc public init(documentInfo: InstantDocumentInfo, configurations: PDFConfiguration) throws {
+    @objc public init(documentInfo: InstantDocumentInfo, configuration: PDFConfiguration) throws {
         /*
          Create the Instant objects with the information from the PSPDFKit for Web examples server.
 
@@ -47,7 +47,7 @@ public class InstantDocumentViewController: InstantViewController {
         let pdfDocument = documentDescriptor.editableDocument
 
         // Set the document on the `PSPDFInstantViewController` (the superclass) so it can show the download progress, and then show the document.
-        super.init(document: pdfDocument,configuration: configurations)
+        super.init(document: pdfDocument, configuration:configuration)
     }
 
     @available(*, unavailable)

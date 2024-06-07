@@ -18,6 +18,7 @@ import android.app.Activity;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 
+import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
@@ -77,6 +78,12 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
     public static final int COMMAND_GET_ANNOTATION_FLAGS = 26;
 
     private final CompositeDisposable annotationDisposables = new CompositeDisposable();
+
+    private final ReactApplicationContext reactApplicationContext;
+
+    public ReactPdfViewManager(ReactApplicationContext reactApplicationContext) {
+        this.reactApplicationContext = reactApplicationContext;
+    }
 
     @NonNull
     @Override
@@ -152,13 +159,14 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
             view.setConfiguration(configurationBuild);
         }
         view.setDocumentPassword(configuration.getString("documentPassword"));
+        view.setRemoteDocumentConfiguration(configuration.getMap("remoteDocumentConfiguration"));
         // Although MeasurementValueConfigurations is specified as part of Configuration, it is configured separately on the Android SDK
         if (configuration.getArray("measurementValueConfigurations") != null) {
             view.setMeasurementValueConfigurations(configuration.getArray("measurementValueConfigurations"));
-        }        
+        }
     }
 
-     @ReactProp(name = "annotationPresets")
+    @ReactProp(name = "annotationPresets")
     public void setAnnotationPresets(PdfView view, @NonNull ReadableMap annotationPresets) {
         Map<AnnotationType, AnnotationConfiguration> annotationsConfiguration = AnnotationConfigurationAdaptor.convertAnnotationConfigurations(
                 view.getContext(), annotationPresets
@@ -168,7 +176,7 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
 
     @ReactProp(name = "document")
     public void setDocument(PdfView view, @NonNull String document) {
-        view.setDocument(document);
+        view.setDocument(document, this.reactApplicationContext);
     }
 
     @ReactProp(name = "pageIndex")

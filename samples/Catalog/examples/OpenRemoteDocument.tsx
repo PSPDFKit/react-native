@@ -1,12 +1,13 @@
 import React from 'react';
 import { Alert, Button, processColor, View } from 'react-native';
-import PSPDFKitView from 'react-native-pspdfkit';
+import PSPDFKitView, { RemoteDocumentConfiguration } from 'react-native-pspdfkit';
 
 import { exampleDocumentPath, pspdfkitColor } from '../configuration/Constants';
 import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
 import { hideToolbar } from '../helpers/NavigationHelper';
+import RNFS from 'react-native-fs';
 
-export class PSPDFKitViewComponent extends BaseExampleAutoHidingHeaderComponent {
+export class OpenRemoteDocument extends BaseExampleAutoHidingHeaderComponent {
   pdfRef: React.RefObject<PSPDFKitView>;
 
   constructor(props: any) {
@@ -18,13 +19,18 @@ export class PSPDFKitViewComponent extends BaseExampleAutoHidingHeaderComponent 
 
   override render() {
     const { navigation } = this.props;
+    const myDocumentPath = RNFS.TemporaryDirectoryPath + '/test.pdf';
 
     return (
       <View style={styles.flex}>
         <PSPDFKitView
           ref={this.pdfRef}
-          document={exampleDocumentPath}
+          document="https://pspdfkit.com/downloads/pspdfkit-react-native-quickstart-guide.pdf"
           configuration={{
+            remoteDocumentConfiguration: {
+              outputFilePath: myDocumentPath,
+              overwriteExisting: true
+            },
             iOSAllowToolbarTitleChange: false,
             toolbarTitle: 'My Awesome Report',
             iOSBackgroundColor: processColor('lightgrey'),
@@ -46,6 +52,8 @@ export class PSPDFKitViewComponent extends BaseExampleAutoHidingHeaderComponent 
                   'PSPDFKit',
                   'Document ID: ' + await document?.getDocumentId(),
                 );
+                const result = await this.pdfRef.current?.saveCurrentDocument();
+                console.log(result);
               }}
               title="Get Document Info"
             />

@@ -97,7 +97,7 @@ export namespace Annotation {
        /**
         * If set, print the annotation when the page is printed.
         */
-        PRINT: 'documentEditorButtonItem',
+        PRINT: 'print',
        /**
         * If set, don’t allow the annotation to be deleted or its properties to be modified, including contents.
         */

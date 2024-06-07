@@ -46,8 +46,12 @@ RCT_EXPORT_MODULE()
 
 RCT_CUSTOM_VIEW_PROPERTY(document, PSPDFDocument, RCTPSPDFKitView) {
   if (json) {
-    view.pdfController.document = [RCTConvert PSPDFDocument:json];
+    view.pdfController.document = [RCTConvert PSPDFDocument:json 
+                                       remoteDocumentConfig:[_configuration objectForKey:@"remoteDocumentConfiguration"]];
     view.pdfController.document.delegate = (id<PSPDFDocumentDelegate>)view;
+      
+    PDFDocumentManager *documentManager = [self.bridge moduleForClass:[PDFDocumentManager class]];
+    [documentManager setDocument:view.pdfController.document reference:view.reactTag];
 
     // The following properties need to be set after the document is set.
     // We set them again here when we're certain the document exists.

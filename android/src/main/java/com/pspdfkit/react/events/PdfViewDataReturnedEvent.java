@@ -51,7 +51,9 @@ public class PdfViewDataReturnedEvent extends Event<PdfViewDataReturnedEvent> {
                     continue;
                 }
                 JSONObject instantJson = new JSONObject(annotation.toInstantJson());
-                annotationsSerialized.add(JsonUtilities.jsonObjectToMap(instantJson));
+                Map<String, Object> annotationMap = JsonUtilities.jsonObjectToMap(instantJson);
+                annotationMap.put("uuid", annotation.getUuid());
+                annotationsSerialized.add(annotationMap);
             }
 
             Map<String, Object> annotations = new HashMap<>();

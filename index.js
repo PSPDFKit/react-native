@@ -42,6 +42,10 @@ class PSPDFKitView extends React.Component {
    * @ignore
    */
   _requestMap = new Map();
+  /**
+   * @ignore
+   */
+  _pdfDocument = null;
 
   render() {
     if (Platform.OS === 'ios' || Platform.OS === 'android') {
@@ -255,6 +259,19 @@ class PSPDFKitView extends React.Component {
       );
     }
   };
+
+  /**
+   * Get the current PDF document.
+   * @method getDocument
+   * @example
+   * const document = this.pdfRef.current?.getDocument();
+   * @see {@link https://pspdfkit.com/api/react-native/PDFDocument.html} for available methods.
+   * @memberof PSPDFKitView
+   * @returns { PDFDocument } A reference to the document that is currently loaded in the PSPDFKitView component.
+   */
+    getDocument = function () {
+      return this._pdfDocument == null ? new PDFDocument(this.refs.pdfView) : this._pdfDocument;
+    };
 
   /**
    * Gets all annotations of the given type from the specified page.
@@ -1714,7 +1731,7 @@ export class PSPDFKit {
  */
 
 /**
- * @typedef PDFDocument
+ * @typedef PDFDocumentConfiguration
  * @property { string } documentPath The URI to the existing document.
  * @property { number } pageIndex The index of the page that should be used from the document. Starts at 0.
  */
@@ -1723,7 +1740,7 @@ export class PSPDFKit {
  * @typedef DocumentPDFConfiguration
  * @property { string } [name] The name of the new document.
  * @property { string } [filePath] The directory where the new document should be stored.
- * @property { Array<PDFDocument> } documents An array of the documents that should be used to construct the new document.
+ * @property { Array<PDFDocumentConfiguration> } documents An array of the documents that should be used to construct the new document.
  * @property { boolean } override If ```true```, will override existing document with the same name.
  */
 
@@ -1914,6 +1931,9 @@ export class Processor {
 import { PDFConfiguration } from "./lib/configuration/PDFConfiguration";
 export { PDFConfiguration } from "./lib/configuration/PDFConfiguration";
 
+import { RemoteDocumentConfiguration } from "./lib/configuration/PDFConfiguration";
+export { RemoteDocumentConfiguration } from "./lib/configuration/PDFConfiguration";
+
 import { Toolbar } from "./lib/toolbar/Toolbar";
 export { Toolbar } from "./lib/toolbar/Toolbar";
 
@@ -1935,7 +1955,11 @@ export { AnnotationContextualMenu } from "./lib/annotations/Annotation";
 import { AnnotationContextualMenuItem } from "./lib/annotations/Annotation";
 export { AnnotationContextualMenuItem } from "./lib/annotations/Annotation";
 
+import { PDFDocument } from "./lib/document/PDFDocument";
+export { PDFDocument } from "./lib/document/PDFDocument";
+
 module.exports.PDFConfiguration = PDFConfiguration;
+module.exports.RemoteDocumentConfiguration = RemoteDocumentConfiguration;
 module.exports.Toolbar = Toolbar;
 module.exports.Measurements = Measurements;
 module.exports.MeasurementScale = MeasurementScale;
@@ -1943,3 +1967,4 @@ module.exports.MeasurementValueConfiguration = MeasurementValueConfiguration;
 module.exports.Annotation = Annotation;
 module.exports.AnnotationContextualMenu = AnnotationContextualMenu;
 module.exports.AnnotationContextualMenuItem = AnnotationContextualMenuItem;
+module.exports.PDFDocument = PDFDocument;

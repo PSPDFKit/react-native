@@ -92,7 +92,7 @@ public class ReactGroupingRule extends PresetMenuItemGroupingRule {
             case "markup":
                 return com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_group_markup;
             case "writing":
-                return com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_item_writing;
+                return com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_group_writing;
             case "highlight":
                 return com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_item_highlight;
             case "squiggly":

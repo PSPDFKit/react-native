@@ -107,11 +107,10 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
 
     @ReactMethod
     public void present(@NonNull String document, @NonNull ReadableMap configuration, @Nullable Promise promise) {
-        File documentFile = new File(document);
-        if(PSPDFKitUtils.isValidPdf(documentFile)) {
+        if(PSPDFKitUtils.isValidPdf(document)) {
             lastPresentPromise = promise;
             presentPdf(document, configuration, promise);
-        } else if(PSPDFKitUtils.isValidImage(documentFile)) {
+        } else if(PSPDFKitUtils.isValidImage(document)) {
             lastPresentPromise = promise;
             presentImage(document, configuration, promise);
         }else {

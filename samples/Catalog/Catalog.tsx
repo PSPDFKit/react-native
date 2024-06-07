@@ -34,6 +34,7 @@ import { GetConfiguration } from './examples/GetConfiguration';
 import { PasswordProtectedDocument } from './examples/PasswordProtectedDocument';
 import { XFDF } from './examples/XFDF';
 import { PSPDFKit } from './helpers/PSPDFKit';
+import { OpenRemoteDocument } from './examples/OpenRemoteDocument';
 
 // By default, this example doesn't set a license key, but instead runs in trial mode (which is the default, 
 // and requires SDK initialization with a null key).
@@ -69,6 +70,10 @@ class Catalog extends React.Component {
           <Stack.Screen
             name="OpenImageDocument"
             component={OpenImageDocument}
+          />
+          <Stack.Screen
+            name="OpenRemoteDocument"
+            component={OpenRemoteDocument}
           />
           <Stack.Screen name="ManualSave" component={ManualSave} />
           <Stack.Screen name="SaveAs" component={SaveAs} />

@@ -16,6 +16,8 @@
 		0756A13E29C2124C00D3462C /* NSExceptionError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0756A13A29C2124B00D3462C /* NSExceptionError.swift */; };
 		0756A13F29C2124C00D3462C /* InstantDocumentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0756A13B29C2124B00D3462C /* InstantDocumentViewController.swift */; };
 		07D79CA52A086568006E90D7 /* PspdfkitMeasurementConvertor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07D79CA42A086568006E90D7 /* PspdfkitMeasurementConvertor.swift */; };
+		4856D2FD2BEC037E00EA03C6 /* PDFDocumentManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4856D2FB2BEC037E00EA03C6 /* PDFDocumentManager.m */; };
+		4856D2FE2BEC037E00EA03C6 /* PDFDocumentManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4856D2FC2BEC037E00EA03C6 /* PDFDocumentManager.swift */; };
 		48A73FC42BD8281500BDD8FD /* AnnotationConfigurationsConvertor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48A73FC32BD8281500BDD8FD /* AnnotationConfigurationsConvertor.swift */; };
 		48A73FC62BD8283100BDD8FD /* RCTConvert+PSPDFAnnotationFlags.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48A73FC52BD8283100BDD8FD /* RCTConvert+PSPDFAnnotationFlags.swift */; };
 		48A73FC82BD8283A00BDD8FD /* RCTConvert+PSPDFEditMenuAppearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48A73FC72BD8283A00BDD8FD /* RCTConvert+PSPDFEditMenuAppearance.swift */; };
@@ -56,6 +58,8 @@
 		0756A13A29C2124B00D3462C /* NSExceptionError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSExceptionError.swift; sourceTree = "<group>"; };
 		0756A13B29C2124B00D3462C /* InstantDocumentViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InstantDocumentViewController.swift; sourceTree = "<group>"; };
 		07D79CA42A086568006E90D7 /* PspdfkitMeasurementConvertor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PspdfkitMeasurementConvertor.swift; sourceTree = "<group>"; };
+		4856D2FB2BEC037E00EA03C6 /* PDFDocumentManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PDFDocumentManager.m; sourceTree = "<group>"; };
+		4856D2FC2BEC037E00EA03C6 /* PDFDocumentManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PDFDocumentManager.swift; sourceTree = "<group>"; };
 		48A73FC32BD8281500BDD8FD /* AnnotationConfigurationsConvertor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnnotationConfigurationsConvertor.swift; sourceTree = "<group>"; };
 		48A73FC52BD8283100BDD8FD /* RCTConvert+PSPDFAnnotationFlags.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "RCTConvert+PSPDFAnnotationFlags.swift"; sourceTree = "<group>"; };
 		48A73FC72BD8283A00BDD8FD /* RCTConvert+PSPDFEditMenuAppearance.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "RCTConvert+PSPDFEditMenuAppearance.swift"; sourceTree = "<group>"; };
@@ -111,6 +115,8 @@
 				0756A13B29C2124B00D3462C /* InstantDocumentViewController.swift */,
 				0756A13A29C2124B00D3462C /* NSExceptionError.swift */,
 				0756A13829C2124B00D3462C /* UIColor.swift */,
+				4856D2FB2BEC037E00EA03C6 /* PDFDocumentManager.m */,
+				4856D2FC2BEC037E00EA03C6 /* PDFDocumentManager.swift */,
 				6540D1831D89D22E00B8F94F /* RCTPSPDFKitManager.m */,
 				F8C1A2E6202DCD3800E98192 /* RCTPSPDFKitViewManager.h */,
 				F8C1A2E4202DCC9700E98192 /* RCTPSPDFKitViewManager.m */,
@@ -251,8 +257,10 @@
 				B783BA3421C3F55300FD981A /* RCTConvert+PSPDFAnnotationToolbarConfiguration.m in Sources */,
 				F84F8B192032D54F00153D9E /* RCTPSPDFKitView.m in Sources */,
 				6572780C1D86AE7300A5E1A8 /* RCTConvert+PSPDFConfiguration.m in Sources */,
+				4856D2FE2BEC037E00EA03C6 /* PDFDocumentManager.swift in Sources */,
 				48A73FC62BD8283100BDD8FD /* RCTConvert+PSPDFAnnotationFlags.swift in Sources */,
 				48A73FC42BD8281500BDD8FD /* AnnotationConfigurationsConvertor.swift in Sources */,
+				4856D2FD2BEC037E00EA03C6 /* PDFDocumentManager.m in Sources */,
 				84BC2EAD229EE9FF00A386C6 /* RCTConvert+PSPDFViewMode.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

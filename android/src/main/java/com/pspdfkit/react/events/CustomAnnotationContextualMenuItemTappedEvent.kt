@@ -13,7 +13,7 @@ class CustomAnnotationContextualMenuItemTappedEvent: Event<CustomAnnotationConte
         this.buttonId = buttonId
     }
 
-    override fun getEventName(): String? {
+    override fun getEventName(): String {
         return EVENT_NAME
     }
 

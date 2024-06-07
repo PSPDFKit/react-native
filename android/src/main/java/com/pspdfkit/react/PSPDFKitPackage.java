@@ -33,13 +33,14 @@ public class PSPDFKitPackage implements ReactPackage {
         modules.add(new PSPDFKitModule(reactContext));
         modules.add(new TestingModule(reactContext));
         modules.add(new RNProcessor(reactContext));
+        modules.add(new PDFDocumentModule(reactContext));
         return modules;
     }
 
     @Override
     public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
         List<ViewManager> viewManagers = new ArrayList<>();
-        viewManagers.add(new ReactPdfViewManager());
+        viewManagers.add(new ReactPdfViewManager(reactContext));
         return viewManagers;
     }
 }

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Alert, Button, processColor, View } from 'react-native';
 import PSPDFKitView, { Annotation } from 'react-native-pspdfkit';
+import fileSystem from 'react-native-fs';
 
 import { exampleDocumentPath, pspdfkitColor } from '../configuration/Constants';
 import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
@@ -297,22 +298,67 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
               />
             </View>
             <View style={styles.marginLeft}>
-              {/* Change the type of annotations you would like to remove, for full list check in the file: ConversionHelpers.java or RCTConvert+PSPDFAnnotation.m */}
               <Button
-                title={'Remove annotations'}
-                onPress={() => {
+                onPress={async () => {
+                  // Programmatically add a downloaded image annotation.
+                  const filePath = fileSystem.DocumentDirectoryPath + '/pspdfkit.png';
+                  fileSystem.downloadFile({
+                    fromUrl:'https://github.com/PSPDFKit/react-native/blob/master/samples/Catalog/assets/logo-flat.png?raw=true', 
+                    toFile: filePath
+                  }).promise.then(async (_result) => {
+                    const base64ImageData = await fileSystem.readFile(filePath, 'base64');
+                    const annotationsJSON = {
+                    "annotations":[
+                      {
+                          "bbox":[
+                            229,
+                            426,
+                            125,
+                            125
+                          ],
+                          "contentType":"image/png",
+                          "createdAt":"2023-08-30T17:15:13Z",
+                          "creatorName":"Test User",
+                          "description":"Test",
+                          "id":"455f261c88f94294a05ebeb494c96cb9",
+                          "imageAttachmentId":"492adff9842bff7dcb81a20950870be8a0bb665c8d48175680c1e5e1070243ff",
+                          "name":"my-custom-image-annotation",
+                          "opacity":1,
+                          "pageIndex":0,
+                          "rotation":0,
+                          "subject":"Test",
+                          "type":"pspdfkit/image",
+                          "updatedAt":"2024-05-07T17:15:13Z",
+                          "v":2
+                      }
+                    ],
+                    "format":"https://pspdfkit.com/instant-json/v1",
+                    "attachments": {
+                      "492adff9842bff7dcb81a20950870be8a0bb665c8d48175680c1e5e1070243ff": {
+                          "binary" : "" + base64ImageData + "",
+                          "contentType" : "image/png"
+                      }
+                    },
+                  };
                   this.pdfRef.current
-                    ?.getAllAnnotations('all') // other types example: "pspdfkit/ink" or "pspdfkit/stamp"
-                    .then(({ annotations = [] }) => {
-                      if (annotations.length > 1) {
-                        this.pdfRef.current?.removeAnnotations(annotations);
+                    ?.addAnnotations(annotationsJSON)
+                    .then(result => {
+                      if (result) {
+                        Alert.alert(
+                          'PSPDFKit',
+                          'Annotation was successfully added.',
+                        );
+                      } else {
+                        Alert.alert('PSPDFKit', 'Failed to add annotations.');
                       }
                     })
                     .catch(error => {
                       Alert.alert('PSPDFKit', JSON.stringify(error));
                     });
+                  });
                 }}
-              />
+                title="Add Image Annotation"
+              />            
             </View>
           </View>
           <View style={styles.wrapper}>
@@ -366,25 +412,19 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
           <View style={styles.wrapper}>
             <View>
               <Button
-                onPress={async () => {
-                  // Get all unsaved annotations from the document.
-                  await this.pdfRef.current
-                    ?.getAllUnsavedAnnotations()
-                    .then(result => {
-                      if (result) {
-                        Alert.alert('PSPDFKit', JSON.stringify(result));
-                      } else {
-                        Alert.alert(
-                          'PSPDFKit',
-                          'Failed to get unsaved annotations.',
-                        );
+                title={'Remove annotations'}
+                onPress={() => {
+                  this.pdfRef.current
+                    ?.getAllAnnotations('all') // other types example: "pspdfkit/ink" or "pspdfkit/stamp"
+                    .then(({ annotations = [] }) => {
+                      if (annotations.length > 1) {
+                        this.pdfRef.current?.removeAnnotations(annotations);
                       }
                     })
                     .catch(error => {
                       Alert.alert('PSPDFKit', JSON.stringify(error));
                     });
                 }}
-                title="Get Unsaved Annotations"
               />
             </View>
             <View style={styles.marginLeft}>

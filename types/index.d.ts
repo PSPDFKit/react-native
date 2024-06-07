@@ -212,7 +212,7 @@ export class PSPDFKit {
  * @property { boolean } override If ```true```, will override existing document with the same name.
  */
 /**
- * @typedef PDFDocument
+ * @typedef PDFDocumentConfiguration
  * @property { string } documentPath The URI to the existing document.
  * @property { number } pageIndex The index of the page that should be used from the document. Starts at 0.
  */
@@ -220,7 +220,7 @@ export class PSPDFKit {
  * @typedef DocumentPDFConfiguration
  * @property { string } [name] The name of the new document.
  * @property { string } [filePath] The directory where the new document should be stored.
- * @property { Array<PDFDocument> } documents An array of the documents that should be used to construct the new document.
+ * @property { Array<PDFDocumentConfiguration> } documents An array of the documents that should be used to construct the new document.
  * @property { boolean } override If ```true```, will override existing document with the same name.
  */
 /**
@@ -690,7 +690,7 @@ export type ImagePDFConfiguration = {
      */
     override: boolean;
 };
-export type PDFDocument = {
+export type PDFDocumentConfiguration = {
     /**
      * The URI to the existing document.
      */
@@ -712,7 +712,7 @@ export type DocumentPDFConfiguration = {
     /**
      * An array of the documents that should be used to construct the new document.
      */
-    documents: Array<PDFDocument>;
+    documents: Array<PDFDocumentConfiguration>;
     /**
      * If ```true```, will override existing document with the same name.
      */
@@ -766,6 +766,10 @@ declare class PSPDFKitView extends React.Component<Props, any, any> {
      * @ignore
      */
     _requestMap: Map<any, any>;
+    /**
+     * @ignore
+     */
+    _pdfDocument: any;
     render(): React.JSX.Element;
     /**
      * @ignore
@@ -837,6 +841,16 @@ declare class PSPDFKitView extends React.Component<Props, any, any> {
      * @returns { Promise<boolean> } A promise resolving to ```true``` if the document was saved, and ```false``` if not.
      */
     saveCurrentDocument: () => Promise<boolean>;
+    /**
+     * Get the current PDF document.
+     * @method getDocument
+     * @example
+     * const document = this.pdfRef.current?.getDocument();
+     * @see {@link https://pspdfkit.com/api/react-native/PDFDocument.html} for available methods.
+     * @memberof PSPDFKitView
+     * @returns { PDFDocument } A reference to the document that is currently loaded in the PSPDFKitView component.
+     */
+    getDocument: () => PDFDocument;
     /**
      * Gets all annotations of the given type from the specified page.
      *
@@ -1243,6 +1257,7 @@ declare module 'react-native' {
 //@ts-ignore
 import config = require('../src/configuration/PDFConfiguration');
 export import PDFConfiguration = config.PDFConfiguration;
+export import RemoteDocumentConfiguration = config.RemoteDocumentConfiguration;
 //@ts-ignore
 import toolbar = require('../src/toolbar/Toolbar');
 export import Toolbar = toolbar.Toolbar;
@@ -1256,3 +1271,6 @@ import annotation = require('../src/annotations/Annotation');
 export import Annotation = annotation.Annotation;
 export import AnnotationContextualMenu = annotation.AnnotationContextualMenu;
 export import AnnotationContextualMenuItem = annotation.AnnotationContextualMenuItem;
+//@ts-ignore
+import document = require('../src/document/PDFDocument');
+export import PDFDocument = document.PDFDocument;

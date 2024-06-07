@@ -1,6 +1,14 @@
 import { MeasurementValueConfiguration } from './../measurements/Measurements';
 
 /**
+ * The configuration when downloading a document from a remote URL.
+ * @typedef RemoteDocumentConfiguration
+ * @memberof PDFConfiguration
+ * @property { string } [outputFilePath] - The location where the downloaded document should be stored. If not set, the document will be stored in a temporary cache directory.
+ * @property { boolean } [overwriteExisting] - Whether the document should be overwritten if it already exists at the specified location.
+ */
+
+/**
  * @namespace PDFConfiguration
  * @property { PDFConfiguration.ScrollDirection } [scrollDirection] Configures the direction of page scrolling in the document view.
  * @property { PDFConfiguration.PageTransition } [pageTransition] Configures the page scrolling mode. Note that ```curl``` mode is only available for iOS and will be ignored on Android.
@@ -18,7 +26,7 @@ import { MeasurementValueConfiguration } from './../measurements/Measurements';
  * @property { PDFConfiguration.BooleanType } [iOSAllowBackgroundSaving] Determines whether automatic saving should happen on a background thread.
  * @property { number } [iOSMinimumZoomScale] Minimum zoom scale for the scroll view.
  * @property { number } [iOSMaximumZoomScale] Maximum zoom scale for the scroll view.
- * @property { PDFConfiguration.IOSDoubleTapAction } [iOSDoubleTapAction] Maximum zoom scale for the scroll view.
+ * @property { PDFConfiguration.IOSDoubleTapAction } [iOSDoubleTapAction] The action that happens when the user double taps somewhere in the document.
  * @property { PDFConfiguration.IOSTypesShowingColorPresets[] } [iOSTypesShowingColorPresets] Shows a custom cell with configurable color presets for the provided annotation types.
  * @property { PDFConfiguration.PageMode } [pageMode] The document PageMode.
  * @property { PDFConfiguration.BooleanType } [firstPageAlwaysSingle] Option to show the first page separately.
@@ -92,113 +100,381 @@ import { MeasurementValueConfiguration } from './../measurements/Measurements';
  * @property { number } [delay] The delay before syncing with the Instant server.
  * @property { PDFConfiguration.BooleanType } [syncAnnotations] Indicates whether document annotations should be synced with the Instant server.
  * @property { Measurements.MeasurementValueConfiguration[] } [measurementValueConfigurations] The array of ```MeasurementValueConfiguration``` objects that should be applied to the document.
+ * @property { PDFConfiguration.RemoteDocumentConfiguration } [remoteDocumentConfiguration] The configuration when downloading a document from a remote URL.
  */
 
 export class PDFConfiguration {
 
-    // Document Interaction Options
+    /**
+     * Configures the direction of page scrolling in the document view.
+     */
     scrollDirection?: PDFConfiguration.ScrollDirection;
+    /**
+     * Configures the page scrolling mode. Note that ```curl``` mode is only available for iOS and will be ignored on Android.
+     */
     pageTransition?: PDFConfiguration.PageTransition;
+    /**
+     * The password to unlock the document.
+     */
     documentPassword?: string;
+    /**
+     * Allow / disallow text selection.
+     */
     enableTextSelection?: PDFConfiguration.BooleanType;
+    /**
+     * Determines whether PSPDFKit should save automatically in response to [certain UI triggers][], such as the app entering the background or the view disappearing.
+     */
     autosaveEnabled?: PDFConfiguration.BooleanType;
+    /**
+     * Determines whether PSPDFKit should save automatically in response to certain UI triggers, such as the app entering the background or the view disappearing.
+     */
     disableAutomaticSaving?: PDFConfiguration.BooleanType;
+    /**
+     * Determines whether signatures should be saved after creation.
+     */
     signatureSavingStrategy?: PDFConfiguration.SignatureSavingStrategy;
+    /**
+     * Scrolls to the affected page during an undo / redo operation.
+     */
     iOSShouldScrollToChangedPage?: PDFConfiguration.BooleanType;
+    /**
+     * Option to automatically focus on selected form elements.
+     */
     iOSFormElementZoomEnabled?: PDFConfiguration.BooleanType;
+    /**
+     * Allow / disallow image selection.
+     */
     iOSImageSelectionEnabled?: PDFConfiguration.BooleanType;
+    /**
+     * Configure if text selection should snap to words.
+     */
     iOSTextSelectionShouldSnapToWord?: PDFConfiguration.BooleanType;
+    /**
+     * Shows a toolbar with text editing options above the keyboard while editing free text annotations.
+     */
     iOSFreeTextAccessoryViewEnabled?: PDFConfiguration.BooleanType;
+    /**
+     * Enable / disable all internal gesture recognizers.
+     */
     iOSInternalTapGesturesEnabled?: PDFConfiguration.BooleanType;
+    /**
+     * Determines whether automatic saving should happen on a background thread.
+     */
     iOSAllowBackgroundSaving?: PDFConfiguration.BooleanType;
+    /**
+     * Minimum zoom scale for the scroll view.
+     */
     iOSMinimumZoomScale?: number;
+    /**
+     * Maximum zoom scale for the scroll view.
+     */
     iOSMaximumZoomScale?: number;
+    /**
+     * The action that happens when the user double taps somewhere in the document.
+     */
     iOSDoubleTapAction?: PDFConfiguration.IOSDoubleTapAction;
+    /**
+     * Shows a custom cell with configurable color presets for the provided annotation types.
+     */
     iOSTypesShowingColorPresets?: AnyCase<PDFConfiguration.IOSTypesShowingColorPresets>[];
     
-    // Document Presentation Options
+    /**
+     * The document PageMode.
+     */
     pageMode?: PDFConfiguration.PageMode;
+    /**
+     * Option to show the first page separately.
+     */
     firstPageAlwaysSingle?: PDFConfiguration.BooleanType;
+    /**
+     * Displays the current page number.
+     */
     showPageLabels?: PDFConfiguration.BooleanType;
+    /**
+     * Shows an overlay displaying the document name.
+     */
     documentLabelEnabled?: PDFConfiguration.BooleanType;
+    /**
+     * Controls the page fitting mode. ```adaptive``` mode only works on iOS and has no effect on Android.
+     */
     spreadFitting?: PDFConfiguration.SpreadFitting;
+    /**
+     * Inverts the document color if ```true```.
+     */
     invertColors?: PDFConfiguration.BooleanType;
+    /**
+     * Converts the document colors to grayscale.
+     */
     androidGrayScale?: PDFConfiguration.BooleanType;
+    /**
+     * Option to clip content to page boundaries.
+     */
     iOSClipToPageBoundaries?: PDFConfiguration.BooleanType;
+    /**
+     * Background color behind the page view.
+     */
     iOSBackgroundColor?: any;
+    /**
+     * Shows a ```UIActivityIndicatorView``` in the top-right corner while the page is rendering.
+     */
     iOSRenderAnimationEnabled?: PDFConfiguration.BooleanType;
+    /**
+     * Position of the render status view.
+     */
     iOSRenderStatusViewPosition?: PDFConfiguration.IOSRenderStatusViewPosition;
+    /**
+     * Allowed appearance modes for ```BrightnessViewController```.
+     */
     iOSAllowedAppearanceModes?: PDFConfiguration.IOSAllowedAppearanceModes;
-
-    // User Interface Options
+    /**
+     * Configures the user interface visibility.
+     */
     userInterfaceViewMode?: PDFConfiguration.UserInterfaceViewMode;
+    /**
+     * Sets the type of search bar to be inline or modular.
+     */
     inlineSearch?: PDFConfiguration.BooleanType;
+    /**
+     * Hides the user interface if set to ```true```.
+     */
     immersiveMode?: PDFConfiguration.BooleanType;
+    /**
+     * Sets the title of the toolbar. Note: For iOS, you need to set ```documentLabelEnabled```, ```iOSUseParentNavigationBar```, and ```iOSAllowToolbarTitleChange``` to false in your configuration before setting the custom title.
+     */
     toolbarTitle?: string;
+    /**
+     * Enables / disables document search functionality.
+     */
     androidShowSearchAction?: PDFConfiguration.BooleanType;
+    /**
+     * Enables an outline menu in the activity.
+     */
     androidShowOutlineAction?: PDFConfiguration.BooleanType;
+    /**
+     * Enables the display of bookmarks.
+     */
     androidShowBookmarksAction?: PDFConfiguration.BooleanType;
+    /**
+     * Enables the display of share features.
+     */
     androidShowShareAction?: PDFConfiguration.BooleanType;
+    /**
+     * Enables the printing option in the menu (if applicable) for the document and the device.
+     */
     androidShowPrintAction?: PDFConfiguration.BooleanType;
+    /**
+     * Enables the display of document information.
+     */
     androidShowDocumentInfoView?: PDFConfiguration.BooleanType;
+    /**
+     * Enables the display of the settings menu.
+     */
     androidShowSettingsMenu?: PDFConfiguration.BooleanType;
+    /**
+     * Option to hide / show the user interface when changing pages.
+     */
     iOSShouldHideUserInterfaceOnPageChange?: PDFConfiguration.BooleanType;
+    /**
+     * Option to hide / show the user interface when the page appears.
+     */
     iOSShouldShowUserInterfaceOnViewWillAppear?: PDFConfiguration.BooleanType;
+    /**
+     * Option to hide / show the status bar with the user interface.
+     */
     iOSShouldHideStatusBarWithUserInterface?: PDFConfiguration.BooleanType;
+    /**
+     * Option to hide / show the navigation bar with the user interface.
+     */
     iOSShouldHideNavigationBarWithUserInterface?: PDFConfiguration.BooleanType;
+    /**
+     * Sets the type of search bar to be inline or modal.
+     */
     iOSSearchMode?: PDFConfiguration.IOSSearchMode;
+    /**
+     * Determines whether tapping on leading / trailing edges of the document view should trigger changing to the previous / next page.
+     */
     iOSScrollOnEdgeTapEnabled?: PDFConfiguration.BooleanType;
+    /**
+     * The margin in points from the view’s sides in which tapping should trigger scrolling to the previous / next page.
+     */
     iOSScrollOnEdgeTapMargin?: number;
+    /**
+     * Set this to true to allow this controller to access the parent ```navigationBar``` / ```navigationController``` to add custom buttons.
+     */
     iOSUseParentNavigationBar?: PDFConfiguration.BooleanType;
+    /**
+     * Allow PSPDFKit to change the title of this view controller.
+     */
     iOSAllowToolbarTitleChange?: PDFConfiguration.BooleanType;
+    /**
+     * If ```true```, the status bar will always remain hidden (regardless of the ```shouldHideStatusBarWithUserInterface``` setting).
+     */
     iOSShouldHideStatusBar?: PDFConfiguration.BooleanType;
+    /**
+     * Shows a floating back button in the lower part of the screen.
+     */
     iOSShowBackActionButton?: PDFConfiguration.BooleanType;
+    /**
+     * Shows a floating forward button in the lower part of the screen.
+     */
     iOSShowForwardActionButton?: PDFConfiguration.BooleanType;
+    /**
+     * Adds text labels representing the destination name to the back and forward buttons.
+     */
     iOSShowBackForwardActionButtonLabels?: PDFConfiguration.BooleanType;
+    /**
+     * Increase this to zoom to the search result.
+     */
     iOSSearchResultZoomScale?: number;
+    /**
+     * Additional insets to apply to the document scroll view's frame.
+     */
     iOSAdditionalScrollViewFrameInsets?: any
+    /**
+     * Additional insets to apply to the layout's content.
+     */
     iOSAdditionalContentInsets?: any
+    /**
+     * May be used to customize other displayed menu actions when text is selected.
+     */
     iOSAllowedMenuActions?: PDFConfiguration.IOSAllowedMenuActions;
+    /**
+     * Options that will be presented by ```PDFSettingsViewController```. Defaults to ```.default```.
+     */
     iOSSettingsOptions?: PDFConfiguration.IOSSettingsOptions[];
+    /**
+     * Enable / disable page shadow.
+     */
     iOSShadowEnabled?: PDFConfiguration.BooleanType
+    /**
+     * Set the default ```shadowOpacity```.
+     */
     iOSShadowOpacity?: number;
 
-    // Thumbnail Options
+    /**
+     * Thumbnail bar mode controls the display of page thumbnails viewing a document.
+     */
     showThumbnailBar?: PDFConfiguration.ShowThumbnailBar;
+    /**
+     * Displays an action bar icon to show a grid of thumbnail pages.
+     */
     androidShowThumbnailGridAction?: PDFConfiguration.BooleanType;
+    /**
+     * Controls the placement of the scrubber bar.
+     */
     iOSScrubberBarType?: PDFConfiguration.IOSScrubberBarType;
+    /**
+     * Option to set the grouping of thumbnails.
+     */
     iOSThumbnailGrouping?: PDFConfiguration.IOSThumbnailGrouping;
+    /**
+     * Configure the size of the thumbnail.
+     */
     iOSThumbnailSize?: any;
+    /**
+     * Configure the spacing between thumbnails.
+     */
     iOSThumbnailInteritemSpacing?: number;
+    /**
+     * Configure the line spacing of thumbnails.
+     */
     iOSThumbnailLineSpacing?: number
+    /**
+     * Configure the margin for thumbnails.
+     */
     iOSThumbnailMargin?: any
+    /**
+     * Option to enable / disable thumbnail caching.
+     */
     iOSShouldCacheThumbnails?: PDFConfiguration.BooleanType;
 
-    // Annotation, Forms, and Bookmark Options
+    /**
+     * Set containing the annotation types that should be editable.
+     */
     editableAnnotationTypes?: AnyCase<PDFConfiguration.EditableAnnotationTypes>[];
+    /**
+     * Configuration to enable / disable editing all annotations. To selectively enable editing for specific types of annotations, use ```editableAnnotationTypes```.
+     */
     enableAnnotationEditing?: PDFConfiguration.BooleanType;
+    /**
+     * Enable / disable editing forms. This can also be accomplished by adding or removing the ```Widget``` annotation type from ```editableAnnotationTypes```.
+     */
     enableFormEditing?: PDFConfiguration.BooleanType;
+    /**
+     * Enables the list of annotations.
+     */
     androidShowAnnotationListAction?: PDFConfiguration.BooleanType;
+    /**
+     * If ```true```, asks the user to specify a custom annotation user name ("author") when creating a new annotation.
+     */
     iOSShouldAskForAnnotationUsername?: PDFConfiguration.BooleanType;
+    /**
+     * Sets the default link action for pressing on a ```LinkAnnotation```.
+     */
     iOSLinkAction?: PDFConfiguration.IOSLinkAction;
+    /**
+     * Determines whether new annotations are created when strokes end.
+     */
     iOSDrawCreateMode?: PDFConfiguration.IOSDrawCreateMode;
+    /**
+     * If set to ```true```, you can group / ungroup annotations with the multi-select tool.
+     */
     iOSAnnotationGroupingEnabled?: PDFConfiguration.BooleanType;
+    /**
+     * Enables natural drawing for ink annotations.
+     */
     iOSNaturalDrawingAnnotationEnabled?: PDFConfiguration.BooleanType;
+    /**
+     * Enables natural drawing for signatures.
+     */
     iOSNaturalSignatureDrawingEnabled?: PDFConfiguration.BooleanType;
+    /**
+     * Controls if a second tap to an annotation that allows inline editing enters edit mode.
+     */
     iOSAnnotationEntersEditModeAfterSecondTapEnabled?: PDFConfiguration.BooleanType;
+    /**
+     * If set to ```true```, a long tap that ends on a page area that isn’t a text / image will show a new menu to create annotations.
+     */
     iOSCreateAnnotationMenuEnabled?: PDFConfiguration.BooleanType;
+    /**
+     * Overlay annotations are faded in. Set the global duration for this fade here.
+     */
     iOSAnnotationAnimationDuration?: number;
+    /**
+     * Describes the time limit for recording sound annotations, in seconds.
+     */
     iOSSoundAnnotationTimeLimit?: number;
+    /**
+     * Controls how bookmarks are displayed and managed.
+     */
     iOSBookmarkSortOrder?: PDFConfiguration.IOSBookmarkSortOrder;
 
-    // Instant Configuration
+    /**
+     * Enable Instant comments.
+     */
     enableInstantComments?: PDFConfiguration.BooleanType;
+    /**
+     * Listen for server changes automatically.
+     */
     listenToServerChanges?: PDFConfiguration.BooleanType;
+    /**
+     * The delay before syncing with the Instant server.
+     */
     delay?: number;
+    /**
+     * Indicates whether document annotations should be synced with the Instant server.
+     */
     syncAnnotations?: PDFConfiguration.BooleanType;
 
-    // Measurement Configuration
+    /**
+     * The array of ```MeasurementValueConfiguration``` objects that should be applied to the document.
+     */
     measurementValueConfigurations?: MeasurementValueConfiguration[];
+
+    /**
+     * The configuration when downloading a document from a remote URL.
+     */
+    remoteDocumentConfiguration?: RemoteDocumentConfiguration;
 }
 
 export namespace PDFConfiguration {
@@ -747,6 +1023,20 @@ export namespace PDFConfiguration {
     export type IOSLinkAction = ValueOf<typeof IOSLinkAction>;
     export type IOSDrawCreateMode = ValueOf<typeof IOSDrawCreateMode>;
     export type IOSBookmarkSortOrder = ValueOf<typeof IOSBookmarkSortOrder>;
+}
+
+/**
+ * The configuration when downloading a document from a remote URL.
+ */
+export interface RemoteDocumentConfiguration {
+    /**
+     * The location where the downloaded document should be stored. If not set, the document will be stored in a temporary cache directory.
+     */
+    outputFilePath?: string;
+    /**
+     * Whether the document should be overwritten if it already exists at the specified location.
+     */
+    overwriteExisting?: boolean;
 }
 
 export type AnyCase<T extends string> =

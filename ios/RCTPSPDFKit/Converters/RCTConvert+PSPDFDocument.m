@@ -8,8 +8,32 @@
 //
 
 #import "RCTConvert+PSPDFDocument.h"
+#import "RCTPSPDFKitView.h"
+#if __has_include("PSPDFKitReactNativeiOS-Swift.h")
+#import "PSPDFKitReactNativeiOS-Swift.h"
+#else
+#import <PSPDFKitReactNativeiOS/PSPDFKitReactNativeiOS-Swift.h>
+#endif
 
 @implementation RCTConvert (PSPDFDocument)
+
++ (PSPDFDocument *)PSPDFDocument:(NSString *)urlString remoteDocumentConfig:(NSDictionary *)remoteDocumentConfig {
+    NSURL* url = [RCTConvert parseURL:urlString];
+    
+    PSPDFDocument *document = nil;
+    NSString *outputFilePath = remoteDocumentConfig[@"outputFilePath"];
+    BOOL overwriteExisting = [remoteDocumentConfig[@"overwriteExisting"] boolValue];
+    
+    if ([[url scheme] containsString:@"http"] && outputFilePath != nil) {
+        NSURL *destination = [RCTConvert parseURL:outputFilePath];
+        RemoteDocumentDownloader *downloader = [[RemoteDocumentDownloader alloc] initWithRemoteURL:url destinationFileURL:destination cleanup:overwriteExisting];
+        PSPDFCoordinatedFileDataProvider *provider = [[PSPDFCoordinatedFileDataProvider alloc] initWithFileURL:destination progress:downloader.progress];
+        document = [[PSPDFDocument alloc] initWithDataProviders:@[provider]];
+    } else {
+        document = [RCTConvert PSPDFDocument:urlString];
+    }
+    return document;
+}
 
 + (PSPDFDocument *)PSPDFDocument: (NSString *)urlString {
     NSURL* url = [self parseURL: urlString];
@@ -43,6 +67,10 @@
 
     if (url == nil && [urlString containsString: @".pdf"]) {
         url = [[NSBundle mainBundle] URLForResource: urlString withExtension: @"pdf"];
+    }
+    
+    if (url == nil && [urlString containsString:@"http"]) {
+        url = [NSURL URLWithString:urlString];
     }
 
     return url;

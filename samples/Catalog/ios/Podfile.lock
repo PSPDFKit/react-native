@@ -948,7 +948,7 @@ PODS:
   - React-Mapbuffer (0.73.6):
     - glog
     - React-debug
-  - react-native-pspdfkit (2.10.0):
+  - react-native-pspdfkit (2.11.0):
     - Instant (= 13.5.0)
     - PSPDFKit (= 13.5.0)
     - React
@@ -1393,7 +1393,7 @@ SPEC CHECKSUMS:
   React-jsinspector: 85583ef014ce53d731a98c66a0e24496f7a83066
   React-logger: 3eb80a977f0d9669468ef641a5e1fabbc50a09ec
   React-Mapbuffer: 84ea43c6c6232049135b1550b8c60b2faac19fab
-  react-native-pspdfkit: e46c6cc86a62d4b8a275d7cc645203a217242c90
+  react-native-pspdfkit: 843f3735589f137353f21657b963695b7c748c19
   react-native-safe-area: e8230b0017d76c00de6b01e2412dcf86b127c6a3
   react-native-safe-area-context: b97eb6f9e3b7f437806c2ce5983f479f8eb5de4b
   React-nativeconfig: b4d4e9901d4cabb57be63053fd2aa6086eb3c85f

@@ -140,7 +140,10 @@
 }
 
 - (BOOL)exitCurrentlyActiveMode {
-  return [self.pdfController.annotationToolbarController hideToolbarAnimated:YES completion:NULL];
+  if ([self.pdfController.annotationToolbarController isToolbarVisible]) {
+    return [self.pdfController.annotationToolbarController hideToolbarAnimated:YES completion:NULL];
+  }
+  return true;
 }
 
 - (BOOL)saveCurrentDocumentWithError:(NSError *_Nullable *)error {
@@ -168,7 +171,9 @@
     NSData *annotationData = [annotation generateInstantJSONWithError:NULL];
     if (annotationData != nil) {
         NSDictionary *annotationDictionary = [NSJSONSerialization JSONObjectWithData:annotationData options:kNilOptions error:NULL];
-        self.onAnnotationTapped(annotationDictionary);
+        NSMutableDictionary *updatedDictionary = [[NSMutableDictionary alloc] initWithDictionary:annotationDictionary];
+        [updatedDictionary setObject:annotation.uuid forKey:@"uuid"];
+        self.onAnnotationTapped(updatedDictionary);
     }
   }
   return self.disableDefaultActionForTappedAnnotations;
@@ -348,7 +353,9 @@
     
     NSArray<PSPDFAnnotation *> *allAnnotations = [[document allAnnotationsOfType:PSPDFAnnotationTypeAll].allValues valueForKeyPath:@"@unionOfArrays.self"];
     for (PSPDFAnnotation *annotation in allAnnotations) {
-      if ([annotation.uuid isEqualToString:uuid]) {
+      if ([annotation.uuid isEqualToString:uuid] ||
+          (![annotation.name isEqual:[NSNull null]] &&
+           [annotation.name isEqualToString:uuid])) {
           NSUInteger convertedFlags = [RCTConvert parseAnnotationFlags:flags];
           [annotation setFlags:convertedFlags];
           [document.documentProviders.firstObject.annotationManager updateAnnotations:@[annotation] animated:YES];
@@ -365,7 +372,9 @@
     
     NSArray<PSPDFAnnotation *> *allAnnotations = [[document allAnnotationsOfType:PSPDFAnnotationTypeAll].allValues valueForKeyPath:@"@unionOfArrays.self"];
     for (PSPDFAnnotation *annotation in allAnnotations) {
-      if ([annotation.uuid isEqualToString:uuid]) {
+        if ([annotation.uuid isEqualToString:uuid] ||
+            (![annotation.name isEqual:[NSNull null]] &&
+             [annotation.name isEqualToString:uuid])) {
           PSPDFAnnotationFlags flags = annotation.flags;
           NSArray <NSString *>* convertedFlags = [RCTConvert convertAnnotationFlags:flags];
           return convertedFlags;

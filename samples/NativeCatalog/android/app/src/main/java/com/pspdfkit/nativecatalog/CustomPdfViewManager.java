@@ -150,7 +150,7 @@ public class CustomPdfViewManager extends SimpleViewManager<PdfView> {
                     applyWatermark(view, pdfDocument);
                 });
         } else {
-            view.setDocument(document);
+            view.setDocument(document, null);
         }
 
         view.getPdfFragment()

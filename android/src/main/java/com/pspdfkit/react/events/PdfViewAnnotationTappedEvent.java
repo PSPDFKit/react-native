@@ -55,6 +55,7 @@ public class PdfViewAnnotationTappedEvent extends Event<PdfViewAnnotationTappedE
             if (rawInstantJson != null && !rawInstantJson.equals("null")) {
                 JSONObject instantJson = new JSONObject(rawInstantJson);
                 Map<String, Object> map = JsonUtilities.jsonObjectToMap(instantJson);
+                map.put("uuid", annotation.getUuid());
                 WritableMap eventData = Arguments.makeNativeMap(map);
                 rctEventEmitter.receiveEvent(getViewTag(), getEventName(), eventData);
             }

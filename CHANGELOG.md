@@ -1,5 +1,16 @@
 ## Newest Release
 
+### 2.11.0 - 07 Jun 2024
+
+- Adds the ability to clear the document cache. (J#HYB-347)
+- Adds support for opening PDF documents from a remote URL. (J#HYB-354)
+- Updates `setAnnotationFlags` and `getAnnotationFlags` APIs to support using annotation `name` as an identifier. (J#HYB-372)
+- Fixes an issue where calling `exitCurrentlyActiveMode` while not in annotation editing mode generates an exception on iOS. (J#HYB-373)
+- Fixes an issue where the annotation `uuid` isn't included in `onAnnotationTapped` callbacks. (J#HYB-374)
+- Fixes an issue where Instant configuration wasn't applied when using the `presentInstant` API on iOS. (J#HYB-375)
+
+## Previous Releases
+
 ### 2.10.0 - 06 May 2024
 
 - Adds the ability to define annotation behavior using flags. (J#HYB-283)
@@ -8,8 +19,6 @@
 - Updates for PSPDFKit 13.5.0 for iOS.
 - Fixes an issue where selecting a measurement annotation without the Measurement Tools license causes a crash. (J#HYB-318)
 - Fixes an issue where the `removeAnnotation` API sometimes failed to remove an annotation on iOS. (J#HYB-43)
-
-## Previous Releases
 
 ### 2.9.1 - 12 Apr 2024
 

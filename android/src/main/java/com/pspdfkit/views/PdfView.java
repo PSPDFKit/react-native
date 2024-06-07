@@ -36,6 +36,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.FragmentManager;
 
+import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.common.MapBuilder;
@@ -66,6 +67,7 @@ import com.pspdfkit.forms.TextFormElement;
 import com.pspdfkit.internal.model.ImageDocumentImpl;
 import com.pspdfkit.listeners.OnVisibilityChangedListener;
 import com.pspdfkit.listeners.SimpleDocumentListener;
+import com.pspdfkit.react.PDFDocumentModule;
 import com.pspdfkit.react.R;
 import com.pspdfkit.react.events.CustomAnnotationContextualMenuItemTappedEvent;
 import com.pspdfkit.react.events.PdfViewAnnotationChangedEvent;
@@ -82,6 +84,7 @@ import com.pspdfkit.react.events.PdfViewStateChangedEvent;
 import com.pspdfkit.react.helper.ConversionHelpers;
 import com.pspdfkit.react.helper.DocumentJsonDataProvider;
 import com.pspdfkit.react.helper.MeasurementsHelper;
+import com.pspdfkit.react.helper.RemoteDocumentDownloader;
 import com.pspdfkit.react.menu.ContextualToolbarMenuItemConfig;
 import com.pspdfkit.signatures.storage.DatabaseSignatureStorage;
 import com.pspdfkit.signatures.storage.SignatureStorage;
@@ -110,6 +113,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -125,6 +129,7 @@ import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.functions.Function;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import io.reactivex.rxjava3.subjects.BehaviorSubject;
+import kotlin.Unit;
 
 /**
  * This view displays a {@link com.pspdfkit.ui.PdfFragment} and all associated toolbars.
@@ -146,6 +151,7 @@ public class PdfView extends FrameLayout {
     private PdfDocument document;
     private String documentPath;
     private String documentPassword;
+    private ReadableMap remoteDocumentConfiguration;
     private int pageIndex = 0;
     private PdfActivityConfiguration initialConfiguration;
     private ReadableArray pendingToolbarItems;
@@ -300,7 +306,11 @@ public class PdfView extends FrameLayout {
         this.documentPassword = documentPassword;
     }
 
-    public void setDocument(@Nullable String documentPath) {
+    public void setRemoteDocumentConfiguration(@Nullable ReadableMap remoteDocumentConfig) {
+        this.remoteDocumentConfiguration = remoteDocumentConfig;
+    }
+
+    public void setDocument(@Nullable String documentPath, ReactApplicationContext reactApplicationContext) {
         if (documentPath == null) {
             this.document = null;
             removeFragment(false);
@@ -322,34 +332,68 @@ public class PdfView extends FrameLayout {
         this.documentPath = documentPath;
         updateState();
 
-        File documentFile = new File(documentPath);
-        if (PSPDFKitUtils.isValidImage(documentFile)) {
-            documentOpeningDisposable = ImageDocumentLoader.openDocumentAsync(getContext(), Uri.parse(documentPath))
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(imageDocument -> {
-                        PdfView.this.document = imageDocument.getDocument();
-                        setupFragment(false);
-                    }, throwable -> {
-                        PdfView.this.document = null;
-                        setupFragment(false);
-                        eventDispatcher.dispatchEvent(new PdfViewDocumentLoadFailedEvent(getId(), throwable.getMessage()));
-                    });
+        if (Uri.parse(documentPath).getScheme().toLowerCase(Locale.getDefault()).contains("http")) {
+            String outputFilePath = this.remoteDocumentConfiguration != null &&
+                    this.remoteDocumentConfiguration.hasKey("outputFilePath") ?
+                    this.remoteDocumentConfiguration.getString("outputFilePath") : null;
+
+            // If no output file was specified, the temporary file location should always be overwritten
+            Boolean overwriteExisting = this.remoteDocumentConfiguration != null &&
+                    this.remoteDocumentConfiguration.hasKey("overwriteExisting") ?
+                    this.remoteDocumentConfiguration.getBoolean("overwriteExisting") : (outputFilePath == null ? true : false);
+
+            RemoteDocumentDownloader downloader = new RemoteDocumentDownloader(documentPath, outputFilePath, overwriteExisting, getContext(), fragmentManager);
+            downloader.startDownload(fileLocation -> {
+                if (fileLocation != null) {
+                    documentOpeningDisposable = PdfDocumentLoader.openDocumentAsync(getContext(), Uri.fromFile(fileLocation), documentPassword)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(pdfDocument -> {
+                                PdfView.this.document = pdfDocument;
+                                reactApplicationContext.getNativeModule(PDFDocumentModule.class).setDocument(pdfDocument, this.getId());
+                                setupFragment(false);
+                            }, throwable -> {
+                                // The Android SDK will present password UI, do not emit an error.
+                                if (!(throwable instanceof InvalidPasswordException)) {
+                                    PdfView.this.document = null;
+                                    eventDispatcher.dispatchEvent(new PdfViewDocumentLoadFailedEvent(getId(), throwable.getMessage()));
+                                }
+                                setupFragment(true);
+                            });
+                }
+                return Unit.INSTANCE;
+            });
         } else {
-            documentOpeningDisposable = PdfDocumentLoader.openDocumentAsync(getContext(), Uri.parse(documentPath), documentPassword)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(pdfDocument -> {
-                        PdfView.this.document = pdfDocument;
-                        setupFragment(false);
-                    }, throwable -> {
-                        // The Android SDK will present password UI, do not emit an error.
-                        if (!(throwable instanceof InvalidPasswordException)) {
+            if (PSPDFKitUtils.isValidImage(documentPath)) {
+                documentOpeningDisposable = ImageDocumentLoader.openDocumentAsync(getContext(), Uri.parse(documentPath))
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(imageDocument -> {
+                            PdfView.this.document = imageDocument.getDocument();
+                            reactApplicationContext.getNativeModule(PDFDocumentModule.class).setDocument(imageDocument.getDocument(), this.getId());
+                            setupFragment(false);
+                        }, throwable -> {
                             PdfView.this.document = null;
+                            setupFragment(false);
                             eventDispatcher.dispatchEvent(new PdfViewDocumentLoadFailedEvent(getId(), throwable.getMessage()));
-                        }
-                        setupFragment(true);
-                    });
+                        });
+            } else {
+                documentOpeningDisposable = PdfDocumentLoader.openDocumentAsync(getContext(), Uri.parse(documentPath), documentPassword)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(pdfDocument -> {
+                            PdfView.this.document = pdfDocument;
+                            reactApplicationContext.getNativeModule(PDFDocumentModule.class).setDocument(pdfDocument, this.getId());
+                            setupFragment(false);
+                        }, throwable -> {
+                            // The Android SDK will present password UI, do not emit an error.
+                            if (!(throwable instanceof InvalidPasswordException)) {
+                                PdfView.this.document = null;
+                                eventDispatcher.dispatchEvent(new PdfViewDocumentLoadFailedEvent(getId(), throwable.getMessage()));
+                            }
+                            setupFragment(true);
+                        });
+                }
         }
     }
 
@@ -484,7 +528,7 @@ public class PdfView extends FrameLayout {
 
             if (pdfFragment == null) {
                 if (recreate == true) {
-                    pdfFragment = PdfUiFragmentBuilder.fromUri(getContext(), Uri.parse(documentPath)).fragmentClass(ReactPdfUiFragment.class).build();
+                    pdfFragment = PdfUiFragmentBuilder.fromUri(getContext(), Uri.parse(this.documentPath)).fragmentClass(ReactPdfUiFragment.class).build();
                 } else if (document != null) {
                     pdfFragment = PdfUiFragmentBuilder.fromDocumentDescriptor(getContext(), DocumentDescriptor.fromDocument(document))
                         .configuration(configuration)
@@ -832,7 +876,8 @@ public class PdfView extends FrameLayout {
                     List<Annotation> allAnnotations = currentDocument.getAnnotationProvider().getAllAnnotationsOfType(AnnotationProvider.ALL_ANNOTATION_TYPES);
                     for (int i = 0; i < allAnnotations.size(); i++) {
                         Annotation annotation = allAnnotations.get(i);
-                        if (annotation.getUuid().equals(uuid)) {
+                        if (annotation.getUuid().equals(uuid) || 
+                           (annotation.getName() != null && annotation.getName().equals(uuid))) {
                             EnumSet<AnnotationFlags> convertedFlags = ConversionHelpers.getAnnotationFlags(flags);
                             annotation.setFlags(convertedFlags);
                             getCurrentPdfFragment().subscribe(pdfFragment -> {
@@ -855,7 +900,8 @@ public class PdfView extends FrameLayout {
                     ArrayList<String> convertedFlags = new ArrayList<>();
                     for (int i = 0; i < allAnnotations.size(); i++) {
                         Annotation annotation = allAnnotations.get(i);
-                        if (annotation.getUuid().equals(uuid)) {
+                        if (annotation.getUuid().equals(uuid) || 
+                           (annotation.getName() != null && annotation.getName().equals(uuid))) {
                             EnumSet<AnnotationFlags> flags = annotation.getFlags();
                             convertedFlags = ConversionHelpers.convertAnnotationFlags(flags);
                             break;

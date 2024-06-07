@@ -1,6 +1,6 @@
 {
   "name": "react-native-pspdfkit",
-  "version": "2.10.0",
+  "version": "2.11.0",
   "description": "React Native PDF Library by PSPDFKit",
   "keywords": [
     "react native",
@@ -21,12 +21,14 @@
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "format": "prettier \"{samples/**/*.{md,js},*.{md,js}}\" --write",
     "lint": "eslint --ext .js,.jsx,.ts,.tsx ./*.js",
-    "docs": "jsdoc -c jsdoc.json",
+    "docs": "rm -rf jsdoc && jsdoc -c jsdoc.json",
     "postdocs": "node types-scripts/fix-code-tags.js",
     "generate-types": "npx -p typescript tsc --build  tsconfig-types.json",
     "append": "node types-scripts/append.js",
     "build": "npx -p typescript tsc --build tsconfig.json",
-    "build-and-generate-types": "rm -rf types lib && npm run build && npm run generate-types && npm run append"
+    "build-and-generate-types": "rm -rf types lib && npm run build && npm run generate-types && npm run append",
+    "copy-types-and-lib": "cd samples/Catalog/node_modules/react-native-pspdfkit && rm -rf index.js lib src types && cd ../../../../ && cp -rf index.js lib src types samples/Catalog/node_modules/react-native-pspdfkit/",
+    "dev-build": "npm run build-and-generate-types && npm run docs && npm run copy-types-and-lib"
   },
   "peerDependencies": {
     "@types/react": "^18.2.28",
@@ -56,5 +58,20 @@
   },
   "engines": {
     "node": ">=16"
-  }
+  },
+  "files": [
+    "ios/",
+    "android/",
+    "lib/",
+    "src/",
+    "types/",
+    "windows/",
+    "babel.config.js",
+    "index.js",
+    "react-native-pspdfkit.podspec",
+    "tsconfig-types.json",
+    "tsconfig.json",
+    "package.json",
+    "License-Evaluation.pdf"
+  ]
 }

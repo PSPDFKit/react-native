@@ -22,12 +22,12 @@ RCT_CUSTOM_VIEW_PROPERTY(document, PSPDFDocument, CustomPdfView) {
       NSString *path = json;
       if ([path hasSuffix:@"|ADD_WATERMARK"]) {
         path = [path stringByReplacingOccurrencesOfString:@"|ADD_WATERMARK" withString:@""];
-        view.pdfController.document = [RCTConvert PSPDFDocument:path];
+        view.pdfController.document = [RCTConvert PSPDFDocument:path remoteDocumentConfig:nil];
         [view createWatermarkAndReloadData:NO];
         return;
       }
     }
-    view.pdfController.document = [RCTConvert PSPDFDocument:json];
+    view.pdfController.document = [RCTConvert PSPDFDocument:json remoteDocumentConfig:nil];
   }
 }
 
