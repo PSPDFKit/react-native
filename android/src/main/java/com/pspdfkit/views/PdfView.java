@@ -298,6 +298,7 @@ public class PdfView extends FrameLayout {
 
     public void setDocumentPassword(@Nullable String documentPassword) {
         this.documentPassword = documentPassword;
+        setupFragment();
     }
 
     public void setDocument(@Nullable String documentPath) {
