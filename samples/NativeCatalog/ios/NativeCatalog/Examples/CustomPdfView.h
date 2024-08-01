@@ -20,7 +20,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) PSPDFViewController *pdfController;
 @property (nonatomic, copy) RCTBubblingEventBlock onDocumentDigitallySigned;
 
-- (BOOL)startSigning;
 - (BOOL)createWatermarkAndReloadData:(BOOL)reloadData;
 - (BOOL)presentInstantExample;
 

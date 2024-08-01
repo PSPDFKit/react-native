@@ -42,8 +42,7 @@ export class ManualSave extends BaseExampleAutoHidingHeaderComponent {
               testID={'Save Button'}
               onPress={() => {
                 // Manual Save
-                this.pdfRef?.current
-                  ?.saveCurrentDocument()
+                this.pdfRef?.current?.getDocument().save()
                   .then(saved => {
                     if (saved) {
                       Alert.alert(

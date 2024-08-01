@@ -178,7 +178,19 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
             ConfigurationAdapter configurationAdapter = new ConfigurationAdapter(getCurrentActivity(), configuration);
 
             lastPresentPromise = promise;
-            RNInstantPdfActivity.showInstantDocument(getCurrentActivity(), serverUrl, jwt, configurationAdapter.build());
+
+            Handler mainHandler = new Handler(getReactApplicationContext().getMainLooper());
+            Runnable myRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        RNInstantPdfActivity.showInstantDocument(getCurrentActivity(), serverUrl, jwt, configurationAdapter.build());
+                    } catch (Exception e) {
+                        // Could not start instant
+                    }
+                }
+            };
+            mainHandler.post(myRunnable);
         }
     }
     

@@ -15,6 +15,25 @@
 @interface RCT_EXTERN_MODULE(PDFDocumentManager, NSObject)
 
 RCT_EXTERN_METHOD(getDocumentId:(NSNumber _Nonnull)reference onSuccess:(RCTPromiseResolveBlock)resolve onError:(RCTPromiseRejectBlock)reject);
+
 RCT_EXTERN_METHOD(invalidateCache:(NSNumber _Nonnull)reference onSuccess:(RCTPromiseResolveBlock)resolve onError:(RCTPromiseRejectBlock)reject);
+
 RCT_EXTERN_METHOD(invalidateCacheForPage:(NSNumber _Nonnull)reference pageIndex:(NSInteger)pageIndex onSuccess:(RCTPromiseResolveBlock)resolve onError:(RCTPromiseRejectBlock)reject);
+
+RCT_EXTERN_METHOD(save:(NSNumber _Nonnull)reference onSuccess:(RCTPromiseResolveBlock)resolve onError:(RCTPromiseRejectBlock)reject);
+
+RCT_EXTERN_METHOD(getAllUnsavedAnnotations:(NSNumber _Nonnull)reference onSuccess:(RCTPromiseResolveBlock)resolve onError:(RCTPromiseRejectBlock)reject);
+
+RCT_EXTERN_METHOD(getAnnotations:(NSNumber _Nonnull)reference type:(NSString *)type onSuccess:(RCTPromiseResolveBlock)resolve onError:(RCTPromiseRejectBlock)reject);
+
+RCT_EXTERN_METHOD(getAnnotationsForPage:(NSNumber _Nonnull)reference pageIndex:(NSInteger)pageIndex type:(NSString *)type onSuccess:(RCTPromiseResolveBlock)resolve onError:(RCTPromiseRejectBlock)reject);
+
+RCT_EXTERN_METHOD(removeAnnotations:(NSNumber _Nonnull)reference instantJSON:(NSArray<NSDictionary *> *)instantJSON onSuccess:(RCTPromiseResolveBlock)resolve onError:(RCTPromiseRejectBlock)reject);
+
+RCT_EXTERN_METHOD(addAnnotations:(NSNumber _Nonnull)reference instantJSON:(NSDictionary *)instantJSON onSuccess:(RCTPromiseResolveBlock)resolve onError:(RCTPromiseRejectBlock)reject);
+
+RCT_EXTERN_METHOD(importXFDF:(NSNumber _Nonnull)reference filePath:(NSString *)filePath onSuccess:(RCTPromiseResolveBlock)resolve onError:(RCTPromiseRejectBlock)reject);
+
+RCT_EXTERN_METHOD(exportXFDF:(NSNumber _Nonnull)reference filePath:(NSString *)filePath onSuccess:(RCTPromiseResolveBlock)resolve onError:(RCTPromiseRejectBlock)reject);
+
 @end

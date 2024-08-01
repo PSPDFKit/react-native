@@ -12,15 +12,6 @@ const { RNProcessor: Processor, PSPDFKit } = NativeModules;
 
 const examples = [
   {
-    key: 'item1',
-    name: 'Manual Signing',
-    description:
-      'Show how to start the signing flow using a react-native button linked to CustomPdfView.',
-    action: component => {
-      component.props.navigation.navigate('ManualSigning');
-    },
-  },
-  {
     key: 'item2',
     name: 'Watermark',
     description: 'Show how to watermark a PDF that is loaded in CustomPdfView.',

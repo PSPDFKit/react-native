@@ -46,41 +46,30 @@ RCT_EXPORT_MODULE()
 
 RCT_CUSTOM_VIEW_PROPERTY(document, PSPDFDocument, RCTPSPDFKitView) {
   if (json) {
-    view.pdfController.document = [RCTConvert PSPDFDocument:json 
-                                       remoteDocumentConfig:[_configuration objectForKey:@"remoteDocumentConfiguration"]];
+    view.pdfController.document = [RCTConvert PSPDFDocument:json
+                                       remoteDocumentConfig:[view.configurationJSON objectForKey:@"remoteDocumentConfiguration"]];
     view.pdfController.document.delegate = (id<PSPDFDocumentDelegate>)view;
       
     PDFDocumentManager *documentManager = [self.bridge moduleForClass:[PDFDocumentManager class]];
     [documentManager setDocument:view.pdfController.document reference:view.reactTag];
+    [documentManager setDelegate:(id<PDFDocumentManagerDelegate>)view];
 
     // The following properties need to be set after the document is set.
     // We set them again here when we're certain the document exists.
     if (view.annotationAuthorName) {
       view.pdfController.document.defaultAnnotationUsername = view.annotationAuthorName;
     }
-
+      
     view.pdfController.pageIndex = view.pageIndex;
-    if ([_configuration objectForKey:@"documentPassword"]) {
-        [view.pdfController.document unlockWithPassword:[_configuration objectForKey:@"documentPassword"]];
-    }
       
     if ([view.pdfController.document isKindOfClass:[PSPDFImageDocument class]]) {
         PSPDFImageDocument *imageDocument = (PSPDFImageDocument *)view.pdfController.document;
         imageDocument.imageSaveMode = view.imageSaveMode;
     }
-
-    // Apply any measurementValueConfigurations once the document is loaded
-    if ([_configuration objectForKey:@"measurementValueConfigurations"]) {
-        NSArray *configs = [_configuration objectForKey:@"measurementValueConfigurations"];
-        for (NSDictionary *config in configs) {
-            [PspdfkitMeasurementConvertor addMeasurementValueConfigurationWithDocument:view.pdfController.document
-                                                                           configuration:config];
-        }
-    }
-    _configuration = nil;
-    if(view.onDocumentLoaded) {
-        view.onDocumentLoaded(@{});
-    }
+      
+    [view.pdfController updateConfigurationWithBuilder:^(PSPDFConfigurationBuilder *builder) {
+        [builder overrideClass:PSPDFFontPickerViewController.class withClass:CustomFontPickerViewController.class];
+    }];
   }
 }
 
@@ -94,13 +83,7 @@ RCT_CUSTOM_VIEW_PROPERTY(pageIndex, PSPDFPageIndex, RCTPSPDFKitView) {
 
 RCT_CUSTOM_VIEW_PROPERTY(configuration, PSPDFConfiguration, RCTPSPDFKitView) {
     if (json) {
-        [view.pdfController updateConfigurationWithBuilder:^(PSPDFConfigurationBuilder *builder) {
-            [builder overrideClass:PSPDFFontPickerViewController.class withClass:CustomFontPickerViewController.class];
-            [builder setupFromJSON:json];
-            _configuration = json;
-        }];
-
-        [self postProcessConfigurationOptionsWithJSON: json forPDFViewController: view.pdfController];
+        view.configurationJSON = json;
     }
 }
 
@@ -109,22 +92,6 @@ RCT_CUSTOM_VIEW_PROPERTY(annotationPresets, Dictionary , RCTPSPDFKitView) {
    if (json) {
        [AnnotationsConfigurationsConvertor convertAnnotationConfigurationsWithAnnotationPreset:json];
    }
-}
-
-// These options are configuration options in Android, but not on iOS, so we apply them
-// after we update the actual configuration.
-- (void)postProcessConfigurationOptionsWithJSON:(id)json forPDFViewController:(PSPDFViewController *)controller {
-  if (json) {
-    NSDictionary *dictionary = [RCTConvert processConfigurationOptionsDictionaryForPrefix:[RCTConvert NSDictionary:json]];
-    if (dictionary[@"toolbarTitle"]) {
-      NSString *title = [RCTConvert NSString:dictionary[@"toolbarTitle"]];
-      controller.title = title;
-    }
-    if (dictionary[@"invertColors"]) {
-      BOOL shouldInvertColors = [RCTConvert BOOL:dictionary[@"invertColors"]];
-      controller.appearanceModeManager.appearanceMode = shouldInvertColors ? PSPDFAppearanceModeNight : PSPDFAppearanceModeDefault;
-    }
-  }
 }
 
 RCT_CUSTOM_VIEW_PROPERTY(annotationAuthorName, NSString, RCTPSPDFKitView) {

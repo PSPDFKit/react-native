@@ -36,7 +36,7 @@ class WebExamplesAPIClient: NSObject, URLSessionTaskDelegate {
 
     /// Starts a new collaboration group. The completion handler may be called on a background thread.
     func createNewSession(completion: @escaping CompletionHandler) {
-        var request = URLRequest(url: URL(string: "https://web-examples.pspdfkit.com/api/instant-landing-page")!)
+        var request = URLRequest(url: URL(string: "https://web-examples.services.demo.pspdfkit.com/api/instant-landing-page")!)
         request.httpMethod = "POST"
 
         startDataTask(with: request, completion: completion)

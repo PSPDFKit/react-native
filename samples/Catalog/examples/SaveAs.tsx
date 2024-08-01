@@ -31,7 +31,7 @@ export class SaveAs extends BaseExampleAutoHidingHeaderComponent {
           showNavigationButtonInToolbar={true}
           onNavigationButtonClicked={() => navigation.goBack()}
           configuration={{
-            iOSBackgroundColor: processColor('lightgrey'),
+            iOSBackgroundColor: processColor('lightgrey')
           }}
           pageIndex={3}
           style={styles.colorView(pspdfkitColor)}
@@ -54,8 +54,7 @@ export class SaveAs extends BaseExampleAutoHidingHeaderComponent {
                   })
                   // First, save all annotations in the current document.
                   .then(() => {
-                    this.pdfRef.current
-                      ?.saveCurrentDocument()
+                    this.pdfRef?.current?.getDocument().save()
                       .then(_saved => {
                         // Then, embed all the annotations
                         PSPDFKit.processAnnotations(

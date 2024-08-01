@@ -6,17 +6,6 @@ require Pod::Executable.execute_command("node", ["-p", "require.resolve('react-n
 platform :ios, "15.0"
 prepare_react_native_project!
 
-# If you are using a `react-native-flipper` your iOS build will fail when `NO_FLIPPER=1` is set.
-# because `react-native-flipper` depends on (FlipperKit,...) that will be excluded
-#
-# To fix this you can also exclude `react-native-flipper` using a `react-native.config.js`
-# ```js
-# module.exports = {
-#   dependencies: {
-#     ...(process.env.NO_FLIPPER ? { 'react-native-flipper': { platforms: { ios: null } } } : {}),
-# ```
-flipper_config = ENV["NO_FLIPPER"] == "1" ? FlipperConfiguration.disabled : FlipperConfiguration.enabled
-
 linkage = ENV.fetch("USE_FRAMEWORKS", nil)
 unless linkage.nil?
   Pod::UI.puts "Configuring Pod with #{linkage}ally linked Frameworks".green
@@ -37,11 +26,6 @@ target "NativeCatalog" do
     # we make it explicit here to aid in the React Native upgrade process.
     hermes_enabled: flags[:hermes_enabled],
     fabric_enabled: flags[:fabric_enabled],
-    # Enables Flipper.
-    #
-    # Note that if you have use_frameworks! enabled, Flipper will not work and
-    # you should disable the next line.
-    flipper_configuration: flipper_config,
     # An absolute path to your application root.
     app_path: "#{Pod::Config.instance.installation_root}/.."
   )
@@ -58,7 +42,6 @@ target "NativeCatalog" do
     installer.aggregate_targets.each do |aggregate_target|
       aggregate_target.user_project.native_targets.each do |target|
         target.build_configurations.each do |target_config|
-          target_config.build_settings["LIBRARY_SEARCH_PATHS"] = ["$(SDKROOT)/usr/lib/swift", "$(inherited)"]
           if host_cpu.eql?("x86_64")
             target_config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
           end
@@ -74,20 +57,8 @@ target "NativeCatalog" do
       excl_config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = "15.0"
     end
     installer.pods_project.targets.each do |target|
-      # Flipper issue, see https://github.com/facebook/react-native/issues/43335
-      if target.name == "Flipper"
-        file_path = "Pods/Flipper/xplat/Flipper/FlipperTransportTypes.h"
-        contents = File.read(file_path)
-        unless contents.include?("#include <functional>")
-          File.open(file_path, "w") do |file|
-            file.puts("#include <functional>")
-            file.puts(contents)
-          end
-        end
-      end
       target.build_configurations.each do |target_config|
         target_config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = "15.0"
-        target_config.build_settings["OTHER_CFLAGS"] = "$(inherited) -Qunused-arguments -Xanalyzer -analyzer-disable-all-checks"
       end
     end
     react_native_post_install(

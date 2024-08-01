@@ -36,10 +36,6 @@ This second Catalog example serves to show you how you can leverage `PdfView` (A
 
 ### Examples
 
-#### Manual Signing
-
-This example shows you how to use the `SignaturePickerFragment` and `SignatureSignerDialog` on Android and `PSPDFSignatureViewController` on iOS to digitally sign a document after a react button was pressed. The relevant part is the `performInkSigning` method in the `CustomPdfViewManager` on Android and `-[CustomPDFView startSigning]` on iOS.
-
 #### Watermark
 
 This example shows you how to use the `PdfProcessor` on Android and `PSPDFRenderDrawBlock` on iOS to put a watermark on the currently displayed document, save it to a new path, and display it. The relevant part is the `performWatermarking` method in the `CustomPdfViewManager` and `-[CustomPDFViewcreateWatermarkAndReloadData:]` on iOS.

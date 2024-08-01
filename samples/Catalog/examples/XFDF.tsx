@@ -5,7 +5,6 @@ import PSPDFKitView from 'react-native-pspdfkit';
 import { pspdfkitColor, exampleReportPath, writableXFDFPath } from '../configuration/Constants';
 import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
 import { hideToolbar } from '../helpers/NavigationHelper';
-import { getOutputPath } from '../helpers/FileHelper';
 import RNFS from 'react-native-fs';
 
 export class XFDF extends BaseExampleAutoHidingHeaderComponent {
@@ -42,17 +41,17 @@ export class XFDF extends BaseExampleAutoHidingHeaderComponent {
             <View>
               <View style={styles.horizontalContainer}>
                 <TouchableOpacity onPress={ async () => {
-                  const result = await this.pdfRef.current?.importXFDF(writableXFDFPath);
+                  const result = await this.pdfRef.current?.getDocument().importXFDF(writableXFDFPath);
                   Alert.alert('PSPDFKit', 'Import XFDF result: ' + JSON.stringify(result));
-                  console.log('Import XFDF result:', result);
+                  console.log('Import XFDF result: ', result);
                 }}>
                   <Text style={styles.button}>{'Import XFDF'}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={ async () => {
                   const outputFile = RNFS.TemporaryDirectoryPath + '/test.xfdf';
-                  const result = await this.pdfRef.current?.exportXFDF(outputFile);
-                  Alert.alert('PSPDFKit', 'Export XFDF result:' + JSON.stringify(result));
-                  console.log('Export XFDF result:', result);
+                  const result = await this.pdfRef.current?.getDocument().exportXFDF(outputFile);
+                  Alert.alert('PSPDFKit', 'Export XFDF result: ' + JSON.stringify(result));
+                  console.log('Export XFDF result: ', result);
                 }}>
                   <Text style={styles.button}>{'Export XFDF'}</Text>
                 </TouchableOpacity>

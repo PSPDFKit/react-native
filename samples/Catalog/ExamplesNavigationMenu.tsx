@@ -4,7 +4,6 @@ import {
   exampleDocumentName,
   exampleDocumentPath,
   exampleImagePath,
-  exampleReportName,
   exampleXFDFName,
   tiffImagePath,
 } from './configuration/Constants';

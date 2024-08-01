@@ -31,21 +31,6 @@ RCT_CUSTOM_VIEW_PROPERTY(document, PSPDFDocument, CustomPdfView) {
   }
 }
 
-RCT_EXPORT_VIEW_PROPERTY(onDocumentDigitallySigned, RCTBubblingEventBlock)
-
-RCT_EXPORT_METHOD(startSigning:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-  dispatch_async(dispatch_get_main_queue(), ^{
-    CustomPdfView *component = (CustomPdfView *)[self.bridge.uiManager viewForReactTag:reactTag];
-    NSError *error;
-    BOOL success = [component startSigning];
-    if (success) {
-      resolve(@(success));
-    } else {
-      reject(@"error", @"Failed to start signing document.", error);
-    }
-  });
-}
-
 RCT_EXPORT_METHOD(createWatermark:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   dispatch_async(dispatch_get_main_queue(), ^{
     CustomPdfView *component = (CustomPdfView *)[self.bridge.uiManager viewForReactTag:reactTag];

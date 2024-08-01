@@ -59,12 +59,6 @@ class NativeCatalog extends BaseExampleAutoHidingHeaderComponent {
             component={HomeScreen}
             initial={true}
           />
-          <Stack.Screen
-            name="ManualSigning"
-            component={ManualSigning}
-            initial={true}
-            options={{ title: 'Manual Signing' }}
-          />
           <Stack.Screen name="Watermark" component={Watermark} initial={true} />
           <Stack.Screen
             name="WatermarkStartup"

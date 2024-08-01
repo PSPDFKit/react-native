@@ -24,9 +24,9 @@ import com.pspdfkit.annotations.AnnotationType;
 import com.pspdfkit.annotations.InkAnnotation;
 import com.pspdfkit.annotations.WidgetAnnotation;
 import com.pspdfkit.annotations.configuration.InkAnnotationConfiguration;
+import com.pspdfkit.configuration.PdfConfiguration;
 import com.pspdfkit.configuration.activity.PdfActivityConfiguration;
 import com.pspdfkit.configuration.forms.SignaturePickerOrientation;
-import com.pspdfkit.configuration.signatures.SignatureCertificateSelectionMode;
 import com.pspdfkit.configuration.signatures.SignatureSavingStrategy;
 import com.pspdfkit.document.PdfDocument;
 import com.pspdfkit.document.PdfDocumentLoader;
@@ -34,30 +34,29 @@ import com.pspdfkit.document.processor.PageCanvas;
 import com.pspdfkit.document.processor.PdfProcessor;
 import com.pspdfkit.document.processor.PdfProcessorTask;
 import com.pspdfkit.forms.SignatureFormElement;
-import com.pspdfkit.listeners.DocumentSigningListener;
 import com.pspdfkit.listeners.SimpleDocumentListener;
 import com.pspdfkit.nativecatalog.events.DocumentDigitallySignedEvent;
 import com.pspdfkit.nativecatalog.events.DocumentWatermarkedEvent;
 import com.pspdfkit.react.menu.ReactGroupingRule;
 import com.pspdfkit.signatures.Signature;
-import com.pspdfkit.signatures.SignatureManager;
+import com.pspdfkit.signatures.SigningManager;
+import com.pspdfkit.signatures.TrustedKeyStore;
 import com.pspdfkit.signatures.listeners.OnSignaturePickedListener;
-import com.pspdfkit.signatures.signers.InteractiveSigner;
-import com.pspdfkit.signatures.signers.Pkcs12Signer;
-import com.pspdfkit.signatures.signers.Signer;
 import com.pspdfkit.ui.PdfFragment;
 import com.pspdfkit.ui.signatures.SignatureOptions;
 import com.pspdfkit.ui.signatures.SignaturePickerFragment;
-import com.pspdfkit.ui.signatures.SignatureSignerDialog;
 import com.pspdfkit.utils.Size;
 import com.pspdfkit.views.PdfView;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
+import java.util.Enumeration;
+import java.util.List;
 import java.util.Map;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -79,11 +78,17 @@ public class CustomPdfViewManager extends SimpleViewManager<PdfView> {
         InputStream keystoreFile = null;
         try {
             keystoreFile = context.getAssets().open("JohnAppleseed.p12");
+
+            KeyStore key = KeyStore.getInstance("pkcs12");
+            key.load(new FileInputStream("JohnAppleseed.p12"), null);
             // Inside a p12 we have both the certificate and private key used for signing. We just need the certificate here.
             // Proper signatures should have a root CA approved certificate making this step unnecessary.
-            KeyStore.PrivateKeyEntry key = SignatureManager.loadPrivateKeyPairFromStream(keystoreFile, "test", null, null);
-            if (key.getCertificate().getType().equals("X.509")) {
-                SignatureManager.addTrustedCertificate((X509Certificate) key.getCertificate());
+            Enumeration e = key.aliases();
+            while (e.hasMoreElements()) {
+                String alias = (String) e.nextElement();
+                if (key.getCertificate(alias).getType().equals("X.509")) {
+                    TrustedKeyStore.INSTANCE.addTrustedCertificates(List.of((X509Certificate) key.getCertificate(alias)));
+                }
             }
         } catch (IOException | GeneralSecurityException e) {
             Log.e("PSPDFKit", "Couldn't load and add John Appleseed certificate to trusted certificate list!");
@@ -150,7 +155,7 @@ public class CustomPdfViewManager extends SimpleViewManager<PdfView> {
                     applyWatermark(view, pdfDocument);
                 });
         } else {
-            view.setDocument(document, null);
+            view.setDocument(document, this.reactApplicationContext);
         }
 
         view.getPdfFragment()
@@ -218,106 +223,10 @@ public class CustomPdfViewManager extends SimpleViewManager<PdfView> {
     public void receiveCommand(@NonNull PdfView root, String commandId, @Nullable ReadableArray args) {
         super.receiveCommand(root, commandId, args);
         switch (commandId) {
-            case "startSigning":
-                // The user clicked the signing button in react-native, start the native signing flow.
-                performInkSigning(root);
-                break;
             case "createWatermark":
                 // The user clicked the create watermark button, start our watermarking process.
                 performWatermarking(root);
                 break;
-        }
-    }
-
-    private void performInkSigning(@NonNull PdfView pdfView) {
-        pdfView.getActivePdfFragment()
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(pdfFragment -> {
-                // We got our fragment.
-                PdfDocument document = pdfFragment.getDocument();
-                // We have an element with the name EMPLOYEE SIGNATURE in the document. Grab a reference here.
-                SignatureFormElement signatureFormElement = (SignatureFormElement) document.getFormProvider().getFormElementWithName("EMPLOYEE SIGNATURE");
-                // Now we can display the signature picker.
-                SignaturePickerFragment.show(pdfFragment.getParentFragmentManager(), new OnSignaturePickedListener() {
-                        @Override
-                        public void onSignaturePicked(@NonNull Signature signature) {
-                            // We want to place the ink annotation on top of the signature field. We retrieve the widget annotation to access its position.
-                            final WidgetAnnotation formFieldAnnotation = signatureFormElement.getAnnotation();
-                            // The signature object provides convenient conversion to ink annotations.
-                            final InkAnnotation inkSignature = signature.toInkAnnotation(document, formFieldAnnotation.getPageIndex(), formFieldAnnotation.getBoundingBox());
-
-                            // Add the annotation to the document.
-                            pdfFragment.addAnnotationToPage(inkSignature, false);
-                            try {
-                                pdfFragment.getDocument().saveIfModified();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-
-                            // Now digitally sign the document.
-                            performDigitalSigning(pdfView, pdfFragment, signatureFormElement);
-                        }
-
-                        @Override
-                        public void onDismiss() {
-                            // User cancelled the picking.
-                        }
-                    }, new SignatureOptions.Builder()
-                        // Keep the orientation the same as before.
-                        .signaturePickerOrientation(SignaturePickerOrientation.UNLOCKED)
-                        // Don't select a signature here, we'll manually digitally sign the document right afterwards.
-                        .signatureCertificateSelectionMode(SignatureCertificateSelectionMode.NEVER)
-                        .build(),
-                    null);
-            });
-    }
-
-    private void performDigitalSigning(@NonNull PdfView pdfView, @NonNull PdfFragment pdfFragment, @NonNull SignatureFormElement signatureFormElement) {
-
-        // Our test certificate is self-signed, so we need to add it to trusted certificate store for it to validate. Otherwise
-        // the new signature won't validate. Since PSPDFKit and other readers (like Acrobat) will warn when using self-signed certificates
-        // your app should use a CA issued certificate instead.
-        addJohnAppleseedCertificateToTrustedCertificates(reactApplicationContext.getApplicationContext());
-
-        // The signer is a named entity holding a certificate (usually a person) and has a display name shown in the app. Registration of the Signer instance
-        // has to happen using a unique string identifier. The signer can be associated with a signature for signing the document.
-        final Signer signer = new Pkcs12Signer("John Appleseed", Uri.parse("file:///android_asset/JohnAppleseed.p12"));
-        SignatureManager.addSigner("john_appleseed", signer);
-        if (signer != null) {
-            // Provide a password to the signer, which will be used to unlock its private key.
-            if (signer instanceof InteractiveSigner) {
-                ((InteractiveSigner) signer).unlockPrivateKeyWithPassword("test");
-            }
-
-            // Show the signer dialog that handles the signing process.
-            SignatureSignerDialog.show(
-                pdfFragment.getParentFragmentManager(),
-                new SignatureSignerDialog.Options.Builder(
-                    pdfFragment.getDocument(),
-                    signatureFormElement.getFormField(),
-                    signer
-                ).build(),
-                new DocumentSigningListener() {
-                    @Override
-                    public void onDocumentSigned(@NonNull Uri uri) {
-                        // We successfully digitally signed the document, report the new URI to react-native.
-                        reactApplicationContext
-                            .getNativeModule(UIManagerModule.class)
-                            .getEventDispatcher()
-                            .dispatchEvent(new DocumentDigitallySignedEvent(pdfView.getId(), uri));
-                    }
-
-                    @Override
-                    public void onDocumentSigningError(@Nullable Throwable throwable) {
-                        // The signing failed.
-                    }
-
-                    @Override
-                    public void onSigningCancelled() {
-                        // User cancelled the signing.
-                    }
-                }
-            );
         }
     }
 

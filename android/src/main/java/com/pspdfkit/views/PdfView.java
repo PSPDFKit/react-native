@@ -22,10 +22,12 @@ import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.Pair;
 import android.view.Choreographer;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
@@ -34,6 +36,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.fragment.app.FragmentContainerView;
 import androidx.fragment.app.FragmentManager;
 
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -202,6 +205,10 @@ public class PdfView extends FrameLayout {
     @Nullable
     private ReadableArray measurementValueConfigurations;
 
+    private FragmentContainerView fragmentContainerView;
+
+    private ReactApplicationContext reactApplicationContext;
+
     public PdfView(@NonNull Context context) {
         super(context);
         init();
@@ -223,6 +230,7 @@ public class PdfView extends FrameLayout {
     }
 
     private void init() {
+        fragmentContainerView = (FragmentContainerView) LayoutInflater.from(getContext()).inflate(R.layout.pspdf__fragment_container, null);
         pdfViewModeController = new PdfViewModeController(this);
 
         Choreographer.getInstance().postFrameCallback(new Choreographer.FrameCallback() {
@@ -317,6 +325,8 @@ public class PdfView extends FrameLayout {
             return;
         }
 
+        this.reactApplicationContext = reactApplicationContext;
+
         if (Uri.parse(documentPath).getScheme() == null) {
             // If there is no scheme it might be a raw path.
             try {
@@ -330,7 +340,6 @@ public class PdfView extends FrameLayout {
             documentOpeningDisposable.dispose();
         }
         this.documentPath = documentPath;
-        updateState();
 
         if (Uri.parse(documentPath).getScheme().toLowerCase(Locale.getDefault()).contains("http")) {
             String outputFilePath = this.remoteDocumentConfiguration != null &&
@@ -351,6 +360,7 @@ public class PdfView extends FrameLayout {
                             .subscribe(pdfDocument -> {
                                 PdfView.this.document = pdfDocument;
                                 reactApplicationContext.getNativeModule(PDFDocumentModule.class).setDocument(pdfDocument, this.getId());
+                                reactApplicationContext.getNativeModule(PDFDocumentModule.class).updateDocumentConfiguration("imageSaveMode", imageSaveMode, this.getId());
                                 setupFragment(false);
                             }, throwable -> {
                                 // The Android SDK will present password UI, do not emit an error.
@@ -371,6 +381,7 @@ public class PdfView extends FrameLayout {
                         .subscribe(imageDocument -> {
                             PdfView.this.document = imageDocument.getDocument();
                             reactApplicationContext.getNativeModule(PDFDocumentModule.class).setDocument(imageDocument.getDocument(), this.getId());
+                            reactApplicationContext.getNativeModule(PDFDocumentModule.class).updateDocumentConfiguration("imageSaveMode", imageSaveMode, this.getId());
                             setupFragment(false);
                         }, throwable -> {
                             PdfView.this.document = null;
@@ -384,6 +395,7 @@ public class PdfView extends FrameLayout {
                         .subscribe(pdfDocument -> {
                             PdfView.this.document = pdfDocument;
                             reactApplicationContext.getNativeModule(PDFDocumentModule.class).setDocument(pdfDocument, this.getId());
+                            reactApplicationContext.getNativeModule(PDFDocumentModule.class).updateDocumentConfiguration("imageSaveMode", imageSaveMode, this.getId());
                             setupFragment(false);
                         }, throwable -> {
                             // The Android SDK will present password UI, do not emit an error.
@@ -560,50 +572,70 @@ public class PdfView extends FrameLayout {
                     prepareFragment(pdfFragment, true);
                 }
             }
-
-            if (pdfFragment.getDocument() != null) {
-                if (pageIndex <= document.getPageCount()-1) {
-                    pdfFragment.setPageIndex(pageIndex, true);
-                }
-            }
-
             fragment = pdfFragment;
-            pdfUiFragmentGetter.onNext(Collections.singletonList(pdfFragment));
         }
+    }
+
+    private void postFragmentSetup(PdfUiFragment pdfFragment) {
+        updateState();
+        attachPdfFragmentListeners(pdfFragment);
+        updateAnnotationConfiguration();
+        if (pdfFragment.getDocument() != null) {
+            if (pageIndex <= document.getPageCount()-1) {
+                pdfFragment.setPageIndex(pageIndex, true);
+            }
+        }
+        pdfUiFragmentGetter.onNext(Collections.singletonList(pdfFragment));
     }
 
     private void prepareFragment(final PdfUiFragment pdfUiFragment, final boolean attachFragment) {
         if (attachFragment) {
-
-            getRootView().getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            fragmentContainerView.addOnAttachStateChangeListener(new OnAttachStateChangeListener() {
                 @Override
-                public void onGlobalLayout() {
-                    // Reattach the fragment if running on API >= 34, there is a compatibility issue with React Native StackScreen fragments.
-                    if (Build.VERSION.SDK_INT >= 34) {
-                        fragmentManager.beginTransaction()
-                                .detach(pdfUiFragment)
-                                .commitNow();
+                public void onViewAttachedToWindow(@NonNull View view) {
+                    Handler mainHandler = new Handler(getContext().getMainLooper());
+                    Runnable myRunnable = new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                fragmentManager
+                                        .beginTransaction()
+                                        .add(R.id.pspdf__fragment_container
+                                                , pdfUiFragment)
+                                        .commitNowAllowingStateLoss();
+                                postFragmentSetup(pdfUiFragment);
+                            } catch (Exception e) {
+                                // Could not add fragment
+                            }
+                        }
+                    };
+                    mainHandler.post(myRunnable);
+                }
 
-                        fragmentManager.beginTransaction()
-                                .attach(pdfUiFragment)
-                                .commitNow();
-
-                        addView(pdfUiFragment.getView(), LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-                        attachPdfFragmentListeners(pdfUiFragment);
-                        updateAnnotationConfiguration();
-                    }
-                    getRootView().getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                @Override
+                public void onViewDetachedFromWindow(@NonNull View view) {
+                    Handler mainHandler = new Handler(getContext().getMainLooper());
+                    Runnable myRunnable = new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                fragmentManager
+                                        .beginTransaction()
+                                        .remove(pdfUiFragment)
+                                        .commitNowAllowingStateLoss();
+                            } catch (Exception e) {
+                                // Could not remove fragment
+                            }
+                        }
+                    };
+                    mainHandler.post(myRunnable);
                 }
             });
-
-            fragmentManager.beginTransaction()
-                .add(pdfUiFragment, fragmentTag)
-                .commitNow();
-
-            View fragmentView = pdfUiFragment.getView();
-            addView(fragmentView, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+            removeAllViews();
+            addView(fragmentContainerView);
+        } else {
+            attachPdfFragmentListeners(pdfUiFragment);
         }
-        attachPdfFragmentListeners(pdfUiFragment);
     }
 
     private void attachPdfFragmentListeners(final PdfUiFragment pdfUiFragment) {
@@ -648,6 +680,9 @@ public class PdfView extends FrameLayout {
         pdfFragment.addDocumentListener(new SimpleDocumentListener() {
             @Override
             public void onDocumentLoaded(@NonNull PdfDocument document) {
+                if (reactApplicationContext != null) {
+                    reactApplicationContext.getNativeModule(PDFDocumentModule.class).setDocument(document, getId());
+                }
                 manuallyLayoutChildren();
                 if (pageIndex <= document.getPageCount()-1) {
                     pdfFragment.setPageIndex(pageIndex, false);
@@ -758,16 +793,16 @@ public class PdfView extends FrameLayout {
     public boolean saveCurrentDocument() throws Exception {
         if (fragment != null) {
             try {
-                if (document instanceof ImageDocumentImpl.ImagePdfDocumentWrapper) {
+                if (fragment.getDocument() instanceof ImageDocumentImpl.ImagePdfDocumentWrapper) {
                     boolean metadata = this.imageSaveMode.equals("flattenAndEmbed") ? true : false;
-                    if (((ImageDocumentImpl.ImagePdfDocumentWrapper) document).getImageDocument().saveIfModified(metadata)) {
+                    if (((ImageDocumentImpl.ImagePdfDocumentWrapper) fragment.getDocument()).getImageDocument().saveIfModified(metadata)) {
                         // Since the document listeners won't be called when manually saving we also dispatch this event here.
                         eventDispatcher.dispatchEvent(new PdfViewDocumentSavedEvent(getId()));
                         return true;
                     }
                 }
                 else {
-                    if (document.saveIfModified()) {
+                    if (fragment.getDocument().saveIfModified()) {
                         // Since the document listeners won't be called when manually saving we also dispatch this event here.
                         eventDispatcher.dispatchEvent(new PdfViewDocumentSavedEvent(getId()));
                         return true;

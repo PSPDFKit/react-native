@@ -1,5 +1,5 @@
 import React from 'react';
-import { processColor, View } from 'react-native';
+import { Alert, Button, processColor, View } from 'react-native';
 import PSPDFKitView from 'react-native-pspdfkit';
 
 import { pspdfkitColor, tiffImagePath } from '../configuration/Constants';
@@ -35,6 +35,22 @@ export class OpenImageDocument extends BaseExampleAutoHidingHeaderComponent {
           onNavigationButtonClicked={() => navigation.goBack()}
           style={styles.pdfColor}
         />
+        <View style={styles.wrapper}>
+          <View style={styles.flex}>
+            <Button
+              accessibilityLabel={'Get Document Info'}
+              testID={'Get Document Info'}
+              onPress={ async () => {
+                const document = this.pdfRef.current?.getDocument();
+                Alert.alert(
+                  'PSPDFKit',
+                  'Document ID: ' + await document?.getDocumentId(),
+                );
+              }}
+              title="Get Document Info"
+            />
+          </View>
+        </View>
       </View>
     );
   }
@@ -43,4 +59,9 @@ export class OpenImageDocument extends BaseExampleAutoHidingHeaderComponent {
 const styles = {
   flex: { flex: 1 },
   pdfColor: { flex: 1, color: pspdfkitColor },
+  wrapper: {
+    flexDirection: 'row' as 'row',
+    alignItems: 'center' as 'center',
+    padding: 10,
+  },
 };

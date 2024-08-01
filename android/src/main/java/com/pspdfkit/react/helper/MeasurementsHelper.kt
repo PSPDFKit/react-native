@@ -34,6 +34,7 @@ class MeasurementsHelper {
          */
         @JvmStatic
         fun removeMeasurementConfiguration(pdfFragment: PdfFragment, configurations :Map<String, Any>) {
+            @Suppress("UNCHECKED_CAST")
             val measurementValueConfiguration = convertMeasurementConfiguration(configurations["configuration"] as Map<String, Any>)
             val deleteAssociatedAnnotations = configurations["deleteAssociatedAnnotations"] as Boolean
             val addToUndoStack = configurations["addToUndo"] as Boolean
@@ -57,6 +58,7 @@ class MeasurementsHelper {
          * @param pdfFragment The [PdfFragment] in which the measurement configuration should be modified.
          * @param args The arguments for the modification.
          */
+        @Suppress("UNCHECKED_CAST")
         @JvmStatic
         fun modifyMeasurementConfiguration(pdfFragment: PdfFragment, args : Map<String, Any>) {
             val newMeasurementValueConfiguration = convertMeasurementConfiguration(args["newConfiguration"] as Map<String, Any>?)
@@ -73,6 +75,7 @@ class MeasurementsHelper {
          * @param measurementConfigurations The map representation of the measurement configuration.
          * @return The [MeasurementValueConfiguration] representation of the measurement configuration.
          */
+        @Suppress("UNCHECKED_CAST")
         @JvmStatic
         fun convertMeasurementConfiguration(measurementConfigurations: Map<String, Any>?): MeasurementValueConfiguration {
             val scale =

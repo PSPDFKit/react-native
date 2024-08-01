@@ -46,6 +46,10 @@ class PSPDFKitView extends React.Component {
    * @ignore
    */
   _pdfDocument = null;
+  /**
+   * @ignore
+   */
+  _componentRef = React.createRef(this);
 
   render() {
     if (Platform.OS === 'ios' || Platform.OS === 'android') {
@@ -56,7 +60,7 @@ class PSPDFKitView extends React.Component {
         : null;
       return (
         <RCTPSPDFKitView
-          ref="pdfView"
+          ref={this._componentRef}
           fragmentTag="PSPDFKitView.FragmentTag"
           {...this.props}
           onCloseButtonPressed={onCloseButtonPressedHandler}
@@ -192,14 +196,14 @@ class PSPDFKitView extends React.Component {
   enterAnnotationCreationMode = function () {
     if (Platform.OS === 'android') {
       UIManager.dispatchViewManagerCommand(
-        findNodeHandle(this.refs.pdfView),
+        findNodeHandle(this._componentRef.current),
         this._getViewManagerConfig('RCTPSPDFKitView').Commands
           .enterAnnotationCreationMode,
         [],
       );
     } else if (Platform.OS === 'ios') {
       return NativeModules.PSPDFKitViewManager.enterAnnotationCreationMode(
-        findNodeHandle(this.refs.pdfView),
+        findNodeHandle(this._componentRef.current),
       );
     }
   };
@@ -214,20 +218,22 @@ class PSPDFKitView extends React.Component {
   exitCurrentlyActiveMode = function () {
     if (Platform.OS === 'android') {
       UIManager.dispatchViewManagerCommand(
-        findNodeHandle(this.refs.pdfView),
+        findNodeHandle(this._componentRef.current),
         this._getViewManagerConfig('RCTPSPDFKitView').Commands
           .exitCurrentlyActiveMode,
         [],
       );
     } else if (Platform.OS === 'ios') {
       return NativeModules.PSPDFKitViewManager.exitCurrentlyActiveMode(
-        findNodeHandle(this.refs.pdfView),
+        findNodeHandle(this._componentRef.current),
       );
     }
   };
 
   /**
    * Saves the document that’s currently open.
+   * @deprecated Since PSPDFKit for React Native 2.12. Use ```this.pdfRef.current?.getDocument()?.save()``` instead.
+   * See {@link https://pspdfkit.com/api/react-native/PDFDocument.html#.save|save()}.
    * @method saveCurrentDocument
    * @memberof PSPDFKitView
    * @example
@@ -246,7 +252,7 @@ class PSPDFKitView extends React.Component {
       });
 
       UIManager.dispatchViewManagerCommand(
-        findNodeHandle(this.refs.pdfView),
+        findNodeHandle(this._componentRef.current),
         this._getViewManagerConfig('RCTPSPDFKitView').Commands
           .saveCurrentDocument,
         [requestId],
@@ -255,7 +261,7 @@ class PSPDFKitView extends React.Component {
       return promise;
     } else if (Platform.OS === 'ios') {
       return NativeModules.PSPDFKitViewManager.saveCurrentDocument(
-        findNodeHandle(this.refs.pdfView),
+        findNodeHandle(this._componentRef.current),
       );
     }
   };
@@ -270,13 +276,15 @@ class PSPDFKitView extends React.Component {
    * @returns { PDFDocument } A reference to the document that is currently loaded in the PSPDFKitView component.
    */
     getDocument = function () {
-      return this._pdfDocument == null ? new PDFDocument(this.refs.pdfView) : this._pdfDocument;
+      return this._pdfDocument == null ? new PDFDocument(this._componentRef.current) : this._pdfDocument;
     };
 
   /**
    * Gets all annotations of the given type from the specified page.
    *
    * @method getAnnotations
+   * @deprecated Since PSPDFKit for React Native 2.12. Use ```this.pdfRef.current?.getDocument()?.getAnnotations()``` or ```getAnnotationsForPage()``` instead.
+   * See {@link https://pspdfkit.com/api/react-native/PDFDocument.html#.getAnnotations|getAnnotations()} and {@link https://pspdfkit.com/api/react-native/PDFDocument.html#.getAnnotationsForPage|getAnnotationsForPage()}.
    * @memberof PSPDFKitView
    * @param { number } pageIndex The page index to get the annotations for, starting at 0.
    * @param { string } [type] The type of annotations to get. If not specified or ```null```, all annotation types will be returned.
@@ -297,7 +305,7 @@ class PSPDFKitView extends React.Component {
       });
 
       UIManager.dispatchViewManagerCommand(
-        findNodeHandle(this.refs.pdfView),
+        findNodeHandle(this._componentRef.current),
         this._getViewManagerConfig('RCTPSPDFKitView').Commands.getAnnotations,
         [requestId, pageIndex, type],
       );
@@ -307,7 +315,7 @@ class PSPDFKitView extends React.Component {
       return NativeModules.PSPDFKitViewManager.getAnnotations(
         pageIndex,
         type,
-        findNodeHandle(this.refs.pdfView),
+        findNodeHandle(this._componentRef.current),
       );
     }
   };
@@ -335,7 +343,7 @@ class PSPDFKitView extends React.Component {
       });
 
       UIManager.dispatchViewManagerCommand(
-        findNodeHandle(this.refs.pdfView),
+        findNodeHandle(this._componentRef.current),
         this._getViewManagerConfig('RCTPSPDFKitView').Commands.addAnnotation,
         [requestId, annotation],
       );
@@ -344,7 +352,7 @@ class PSPDFKitView extends React.Component {
     } else if (Platform.OS === 'ios') {
       return NativeModules.PSPDFKitViewManager.addAnnotation(
         annotation,
-        findNodeHandle(this.refs.pdfView),
+        findNodeHandle(this._componentRef.current),
       );
     }
   };
@@ -353,6 +361,8 @@ class PSPDFKitView extends React.Component {
    * Removes an existing annotation from the current document.
    *
    * @method removeAnnotation
+   * @deprecated Since PSPDFKit for React Native 2.12. Use ```this.pdfRef.current?.getDocument()?.removeAnnotations()``` instead.
+   * See {@link https://pspdfkit.com/api/react-native/PDFDocument.html#.removeAnnotations|removeAnnotations()}.
    * @memberof PSPDFKitView
    * @param { object } annotation The InstantJSON of the annotation to remove.
    * @example
@@ -371,7 +381,7 @@ class PSPDFKitView extends React.Component {
       });
 
       UIManager.dispatchViewManagerCommand(
-        findNodeHandle(this.refs.pdfView),
+        findNodeHandle(this._componentRef.current),
         this._getViewManagerConfig('RCTPSPDFKitView').Commands.removeAnnotation,
         [requestId, annotation],
       );
@@ -380,7 +390,7 @@ class PSPDFKitView extends React.Component {
     } else if (Platform.OS === 'ios') {
       return NativeModules.PSPDFKitViewManager.removeAnnotation(
         annotation,
-        findNodeHandle(this.refs.pdfView),
+        findNodeHandle(this._componentRef.current),
       );
     }
   };
@@ -389,6 +399,8 @@ class PSPDFKitView extends React.Component {
    * Removes the supplied document InstantJSON from the current document.
    *
    * @method removeAnnotations
+   * @deprecated Since PSPDFKit for React Native 2.12. Use ```this.pdfRef.current?.getDocument()?.removeAnnotations()``` instead.
+   * See {@link https://pspdfkit.com/api/react-native/PDFDocument.html#.removeAnnotations|removeAnnotations()}.
    * @memberof PSPDFKitView
    * @param { object } annotation The InstantJSON of the annotations to remove.
    * @example
@@ -406,7 +418,7 @@ class PSPDFKitView extends React.Component {
       });
 
       UIManager.dispatchViewManagerCommand(
-        findNodeHandle(this.refs.pdfView),
+        findNodeHandle(this._componentRef.current),
         this._getViewManagerConfig('RCTPSPDFKitView').Commands
           .removeAnnotations,
         [requestId, annotations],
@@ -416,7 +428,7 @@ class PSPDFKitView extends React.Component {
     } else if (Platform.OS === 'ios') {
       return NativeModules.PSPDFKitViewManager.removeAnnotations(
         annotations,
-        findNodeHandle(this.refs.pdfView),
+        findNodeHandle(this._componentRef.current),
       );
     }
   };
@@ -425,6 +437,8 @@ class PSPDFKitView extends React.Component {
    * Gets all unsaved changes to annotations.
    *
    * @method getAllUnsavedAnnotations
+   * @deprecated Since PSPDFKit for React Native 2.12. Use ```this.pdfRef.current?.getDocument()?.getAllUnsavedAnnotations()``` instead.
+   * See {@link https://pspdfkit.com/api/react-native/PDFDocument.html#.getAllUnsavedAnnotations|getAllUnsavedAnnotations()}.
    * @memberof PSPDFKitView
    * @returns { Promise } A promise containing document InstantJSON.
    * @see {@link https://pspdfkit.com/guides/android/current/importing-exporting/instant-json/#instant-document-json-api-a56628} for more information.
@@ -440,7 +454,7 @@ class PSPDFKitView extends React.Component {
       });
 
       UIManager.dispatchViewManagerCommand(
-        findNodeHandle(this.refs.pdfView),
+        findNodeHandle(this._componentRef.current),
         this._getViewManagerConfig('RCTPSPDFKitView').Commands
           .getAllUnsavedAnnotations,
         [requestId],
@@ -449,7 +463,7 @@ class PSPDFKitView extends React.Component {
       return promise;
     } else if (Platform.OS === 'ios') {
       return NativeModules.PSPDFKitViewManager.getAllUnsavedAnnotations(
-        findNodeHandle(this.refs.pdfView),
+        findNodeHandle(this._componentRef.current),
       );
     }
   };
@@ -458,6 +472,8 @@ class PSPDFKitView extends React.Component {
    * Gets all annotations of the given type.
    *
    * @method getAllAnnotations
+   * @deprecated Since PSPDFKit for React Native 2.12. Use ```this.pdfRef.current?.getDocument()?.getAnnotations()``` instead.
+   * See {@link https://pspdfkit.com/api/react-native/PDFDocument.html#.getAnnotations|getAnnotations()}.
    * @memberof PSPDFKitView
    * @param { string } [type] The type of annotations to get. If not specified or ```null```, all annotation types will be returned.
    * @see {@link https://pspdfkit.com/guides/web/json/schema/annotations/} for supported types.
@@ -478,7 +494,7 @@ class PSPDFKitView extends React.Component {
       });
 
       UIManager.dispatchViewManagerCommand(
-        findNodeHandle(this.refs.pdfView),
+        findNodeHandle(this._componentRef.current),
         this._getViewManagerConfig('RCTPSPDFKitView').Commands
           .getAllAnnotations,
         [requestId, type],
@@ -488,7 +504,7 @@ class PSPDFKitView extends React.Component {
     } else if (Platform.OS === 'ios') {
       return NativeModules.PSPDFKitViewManager.getAllAnnotations(
         type,
-        findNodeHandle(this.refs.pdfView),
+        findNodeHandle(this._componentRef.current),
       );
     }
   };
@@ -497,6 +513,8 @@ class PSPDFKitView extends React.Component {
    * Applies the supplied document InstantJSON to the current document.
    *
    * @method addAnnotations
+   * @deprecated Since PSPDFKit for React Native 2.12. Use ```this.pdfRef.current?.getDocument()?.addAnnotations()``` instead.
+   * See {@link https://pspdfkit.com/api/react-native/PDFDocument.html#.addAnnotations|addAnnotations()}.
    * @memberof PSPDFKitView
    * @param { object } annotations The document InstantJSON to apply to the current document.
    * @example
@@ -516,7 +534,7 @@ class PSPDFKitView extends React.Component {
       });
 
       UIManager.dispatchViewManagerCommand(
-        findNodeHandle(this.refs.pdfView),
+        findNodeHandle(this._componentRef.current),
         this._getViewManagerConfig('RCTPSPDFKitView').Commands.addAnnotations,
         [requestId, annotations],
       );
@@ -525,7 +543,7 @@ class PSPDFKitView extends React.Component {
     } else if (Platform.OS === 'ios') {
       return NativeModules.PSPDFKitViewManager.addAnnotations(
         annotations,
-        findNodeHandle(this.refs.pdfView),
+        findNodeHandle(this._componentRef.current),
       );
     }
   };
@@ -553,7 +571,7 @@ class PSPDFKitView extends React.Component {
       });
 
       UIManager.dispatchViewManagerCommand(
-        findNodeHandle(this.refs.pdfView),
+        findNodeHandle(this._componentRef.current),
         this._getViewManagerConfig('RCTPSPDFKitView').Commands.setAnnotationFlags,
         [requestId, uuid, flags],
       );
@@ -563,7 +581,7 @@ class PSPDFKitView extends React.Component {
       return NativeModules.PSPDFKitViewManager.setAnnotationFlags(
         uuid,
         flags,
-        findNodeHandle(this.refs.pdfView),
+        findNodeHandle(this._componentRef.current),
       );
     }
   };
@@ -590,7 +608,7 @@ class PSPDFKitView extends React.Component {
       });
 
       UIManager.dispatchViewManagerCommand(
-        findNodeHandle(this.refs.pdfView),
+        findNodeHandle(this._componentRef.current),
         this._getViewManagerConfig('RCTPSPDFKitView').Commands.getAnnotationFlags,
         [requestId, uuid],
       );
@@ -599,7 +617,7 @@ class PSPDFKitView extends React.Component {
     } else if (Platform.OS === 'ios') {
       return NativeModules.PSPDFKitViewManager.getAnnotationFlags(
         uuid,
-        findNodeHandle(this.refs.pdfView),
+        findNodeHandle(this._componentRef.current),
       );
     }
   };
@@ -608,6 +626,8 @@ class PSPDFKitView extends React.Component {
    * Imports the supplied XFDF file into the current document.
    *
    * @method importXFDF
+   * @deprecated Since PSPDFKit for React Native 2.12. Use ```this.pdfRef.current?.getDocument()?.importXFDF()``` instead.
+   * See {@link https://pspdfkit.com/api/react-native/PDFDocument.html#.importXFDF|importXFDF()}.
    * @memberof PSPDFKitView
    * @param { string } filePath The path to the XFDF file to import.
    * @example
@@ -626,7 +646,7 @@ class PSPDFKitView extends React.Component {
       });
 
       UIManager.dispatchViewManagerCommand(
-        findNodeHandle(this.refs.pdfView),
+        findNodeHandle(this._componentRef.current),
         this._getViewManagerConfig('RCTPSPDFKitView').Commands.importXFDF,
         [requestId, filePath],
       );
@@ -635,7 +655,7 @@ class PSPDFKitView extends React.Component {
     } else if (Platform.OS === 'ios') {
       return NativeModules.PSPDFKitViewManager.importXFDF(
         filePath,
-        findNodeHandle(this.refs.pdfView),
+        findNodeHandle(this._componentRef.current),
       );
     }
   };
@@ -644,6 +664,8 @@ class PSPDFKitView extends React.Component {
    * Exports the annotations from the current document to a XFDF file.
    *
    * @method exportXFDF
+   * @deprecated Since PSPDFKit for React Native 2.12. Use ```this.pdfRef.current?.getDocument()?.exportXFDF()``` instead.
+   * See {@link https://pspdfkit.com/api/react-native/PDFDocument.html#.exportXFDF|exportXFDF()}.
    * @memberof PSPDFKitView
    * @param { string } filePath The path where the XFDF file should be exported to.
    * @example
@@ -662,7 +684,7 @@ class PSPDFKitView extends React.Component {
       });
 
       UIManager.dispatchViewManagerCommand(
-        findNodeHandle(this.refs.pdfView),
+        findNodeHandle(this._componentRef.current),
         this._getViewManagerConfig('RCTPSPDFKitView').Commands.exportXFDF,
         [requestId, filePath],
       );
@@ -671,7 +693,7 @@ class PSPDFKitView extends React.Component {
     } else if (Platform.OS === 'ios') {
       return NativeModules.PSPDFKitViewManager.exportXFDF(
         filePath,
-        findNodeHandle(this.refs.pdfView),
+        findNodeHandle(this._componentRef.current),
       );
     }
   };
@@ -707,7 +729,7 @@ class PSPDFKitView extends React.Component {
       });
 
       UIManager.dispatchViewManagerCommand(
-        findNodeHandle(this.refs.pdfView),
+        findNodeHandle(this._componentRef.current),
         this._getViewManagerConfig('RCTPSPDFKitView').Commands
           .getFormFieldValue,
         [requestId, fullyQualifiedName],
@@ -717,7 +739,7 @@ class PSPDFKitView extends React.Component {
     } else if (Platform.OS === 'ios') {
       return NativeModules.PSPDFKitViewManager.getFormFieldValue(
         fullyQualifiedName,
-        findNodeHandle(this.refs.pdfView),
+        findNodeHandle(this._componentRef.current),
       );
     }
   };
@@ -727,7 +749,7 @@ class PSPDFKitView extends React.Component {
    *
    * @method setFormFieldValue
    * @memberof PSPDFKitView
-   * @param { string } fullyQualifiedName The fully qualified name of the form element.
+   * @param { string } fullyQualifiedName The fully qualified name of the form element. When using form elements such as radio buttons, the individual elements can be accessed by appending the index to the fully qualified name, for example ```choiceElement.0``` and ```choiceElement.1```.
    * @param { string } value The new string value of the form element. For button form elements, pass ```selected``` or ```deselected```. For choice form elements, pass the index of the choice to select, for example ```1```.
    * @example
    * const result = await this.pdfRef.current.setFormFieldValue('Name_Last', 'Appleseed');
@@ -745,7 +767,7 @@ class PSPDFKitView extends React.Component {
       });
 
       UIManager.dispatchViewManagerCommand(
-        findNodeHandle(this.refs.pdfView),
+        findNodeHandle(this._componentRef.current),
         this._getViewManagerConfig('RCTPSPDFKitView').Commands
           .setFormFieldValue,
         [requestId, fullyQualifiedName, value],
@@ -756,7 +778,7 @@ class PSPDFKitView extends React.Component {
       return NativeModules.PSPDFKitViewManager.setFormFieldValue(
         value,
         fullyQualifiedName,
-        findNodeHandle(this.refs.pdfView),
+        findNodeHandle(this._componentRef.current),
       );
     }
   };
@@ -784,7 +806,7 @@ class PSPDFKitView extends React.Component {
         items,
         viewMode,
         animated,
-        findNodeHandle(this.refs.pdfView),
+        findNodeHandle(this._componentRef.current),
       );
     }
   };
@@ -808,7 +830,7 @@ class PSPDFKitView extends React.Component {
     if (Platform.OS === 'ios') {
       return NativeModules.PSPDFKitViewManager.getLeftBarButtonItemsForViewMode(
         viewMode,
-        findNodeHandle(this.refs.pdfView),
+        findNodeHandle(this._componentRef.current),
       );
     }
   };
@@ -836,7 +858,7 @@ class PSPDFKitView extends React.Component {
         items,
         viewMode,
         animated,
-        findNodeHandle(this.refs.pdfView),
+        findNodeHandle(this._componentRef.current),
       );
     }
   };
@@ -860,7 +882,7 @@ class PSPDFKitView extends React.Component {
     if (Platform.OS === 'ios') {
       return NativeModules.PSPDFKitViewManager.getRightBarButtonItemsForViewMode(
         viewMode,
-        findNodeHandle(this.refs.pdfView),
+        findNodeHandle(this._componentRef.current),
       );
     }
   };
@@ -891,11 +913,11 @@ class PSPDFKitView extends React.Component {
       if (Platform.OS === 'ios') {
         NativeModules.PSPDFKitViewManager.setToolbar(
           toolbar,
-          findNodeHandle(this.refs.pdfView),
+          findNodeHandle(this._componentRef.current),
         );
       } else if (Platform.OS === 'android') {
         UIManager.dispatchViewManagerCommand(
-          findNodeHandle(this.refs.pdfView),
+          findNodeHandle(this._componentRef.current),
           this._getViewManagerConfig('RCTPSPDFKitView').Commands
           .setToolbar,
           [toolbar],
@@ -919,7 +941,7 @@ class PSPDFKitView extends React.Component {
       if (Platform.OS === 'ios') {
         return NativeModules.PSPDFKitViewManager.getToolbar(
           viewMode,
-          findNodeHandle(this.refs.pdfView),
+          findNodeHandle(this._componentRef.current),
         );
       }
     };
@@ -958,7 +980,7 @@ class PSPDFKitView extends React.Component {
       });
 
       UIManager.dispatchViewManagerCommand(
-        findNodeHandle(this.refs.pdfView),
+        findNodeHandle(this._componentRef.current),
         this._getViewManagerConfig(
           'RCTPSPDFKitView',
         ).Commands.setMeasurementValueConfigurations,
@@ -970,7 +992,7 @@ class PSPDFKitView extends React.Component {
 
     NativeModules.PSPDFKitViewManager.setMeasurementValueConfigurations(
       configurations,
-      findNodeHandle(this.refs.pdfView),
+      findNodeHandle(this._componentRef.current),
     );
   };
 
@@ -995,7 +1017,7 @@ class PSPDFKitView extends React.Component {
       });
 
       UIManager.dispatchViewManagerCommand(
-        findNodeHandle(this.refs.pdfView),
+        findNodeHandle(this._componentRef.current),
         this._getViewManagerConfig('RCTPSPDFKitView').Commands
           .getMeasurementValueConfigurations,
         [requestId],
@@ -1005,7 +1027,7 @@ class PSPDFKitView extends React.Component {
     }
     else if (Platform.OS === 'ios') {
       return NativeModules.PSPDFKitViewManager.getMeasurementValueConfigurations(
-        findNodeHandle(this.refs.pdfView),
+        findNodeHandle(this._componentRef.current),
       );
     }
   };
@@ -1024,7 +1046,7 @@ class PSPDFKitView extends React.Component {
   setToolbarMenuItems = function (toolbarMenuItems) {
     if (Platform.OS === 'android') {
       UIManager.dispatchViewManagerCommand(
-        findNodeHandle(this.refs.pdfView),
+        findNodeHandle(this._componentRef.current),
         this._getViewManagerConfig('RCTPSPDFKitView').Commands
           .setToolbarMenuItems,
         [toolbarMenuItems],
@@ -1053,7 +1075,7 @@ class PSPDFKitView extends React.Component {
       });
 
       UIManager.dispatchViewManagerCommand(
-        findNodeHandle(this.refs.pdfView),
+        findNodeHandle(this._componentRef.current),
         this._getViewManagerConfig('RCTPSPDFKitView').Commands
           .getConfiguration,
         [requestId],
@@ -1063,7 +1085,7 @@ class PSPDFKitView extends React.Component {
     }
     else if (Platform.OS === 'ios') {
       return NativeModules.PSPDFKitViewManager.getConfiguration(
-        findNodeHandle(this.refs.pdfView),
+        findNodeHandle(this._componentRef.current),
       );
     }
   };
@@ -1081,7 +1103,7 @@ class PSPDFKitView extends React.Component {
   destroyView = function () {
     if (Platform.OS === 'android') {
       UIManager.dispatchViewManagerCommand(
-        findNodeHandle(this.refs.pdfView),
+        findNodeHandle(this._componentRef.current),
         this._getViewManagerConfig('RCTPSPDFKitView').Commands.removeFragment,
         [],
       );
@@ -1130,10 +1152,11 @@ if (Platform.OS === 'ios' || Platform.OS === 'android') {
  * @property {boolean} [showCloseButton] Specifies whether the close button should be shown in the navigation bar. Disabled by default (```false```). Only applies when the ```PSPDFKitView``` is presented modally. Will call ```onCloseButtonPressed``` when tapped if a callback was provided. If ```onCloseButtonPressed``` wasn’t provided, ```PSPDFKitView``` will automatically be dismissed when modally presented.
  * @property {boolean} [disableDefaultActionForTappedAnnotations] Controls whether or not the default action for tapped annotations is processed. Defaults to processing the action (```false```).
  * @property {boolean} [disableAutomaticSaving] Controls whether or not the document will automatically be saved. Defaults to automatically saving (```false```).
- * @property {boolean} [annotationAuthorName] Controls the author name that’s set for new annotations. If not set and the user hasn’t specified it before, the user will be asked and the result will be saved. The value set here will be persisted and the user won’t be asked, even if this isn’t set the next time.
+ * @property {string} [annotationAuthorName] Controls the author name that’s set for new annotations. If not set and the user hasn’t specified it before, the user will be asked and the result will be saved. The value set here will be persisted and the user won’t be asked, even if this isn’t set the next time.
  * @property {string} [imageSaveMode] Specifies what is written back to the original image URL when the receiver is saved. If this property is ```flattenAndEmbed```, then this allows for changes made to the image to be saved as metadata in the original file. If the same file is reopened, all previous changes made will remain editable. If this property is ```flatten```, the changes are simply written to the image, and will not be editable when reopened. Available options are: ```flatten``` or ```flattenAndEmbed```.
  * @property {function} [onCloseButtonPressed] Callback that’s called when the user tapped the close button. If you provide this function, you need to handle dismissal yourself. If you don't provide this function, ```PSPDFKitView``` will be automatically dismissed. Only applies when the ```PSPDFKitView``` is presented modally.
  * @property {function} [onDocumentLoaded] Callback that’s called when the document is loaded in the ```PSPDFKitView```.
+ * @property {function} [onDocumentLoadFailed] Callback that’s called when the document failed to load.
  * @property {function} [onDocumentSaved] Callback that’s called when the document is saved.
  * @property {function} [onDocumentSaveFailed] Callback that’s called when the document fails to save.
  * @property {function} [onAnnotationTapped] Callback that’s called when an annotation is tapped.
@@ -1261,6 +1284,16 @@ PSPDFKitView.propTypes = {
    * }}
    */
   onDocumentLoaded: PropTypes.func,
+  /**
+   * Callback that’s called when the document failed to load.
+   * @type {function}
+   * @memberof PSPDFKitView
+   * @example
+   * onDocumentLoadFailed={() => {
+   *     // Document load failed event.
+   * }}
+   */
+  onDocumentLoadFailed: PropTypes.func,
   /**
    * Callback that’s called when the document is saved.
    * @type {function}

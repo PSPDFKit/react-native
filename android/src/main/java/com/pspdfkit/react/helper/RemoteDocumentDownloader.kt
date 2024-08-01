@@ -33,9 +33,11 @@ class RemoteDocumentDownloader(private val remoteURL: String,
         }
 
         if (overwriteExisting && destinationFileURL != null) {
-            val delete = File(destinationFileURL)
-            if (delete.exists()) {
-                delete.delete()
+            val delete = destinationFileURL?.let { File(it) }
+            if (delete != null) {
+                if (delete.exists()) {
+                    delete.delete()
+                }
             }
         }
 
@@ -43,7 +45,7 @@ class RemoteDocumentDownloader(private val remoteURL: String,
                 .source(source)
                 .outputFile(if (destinationFileURL == null)
                     File(context.getDir("documents", Context.MODE_PRIVATE), "temp.pdf") else
-                    File(destinationFileURL))
+                    destinationFileURL?.let { File(it) })
                 .overwriteExisting(overwriteExisting)
                 .useTemporaryOutputFile(false)
                 .build()

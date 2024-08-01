@@ -38,6 +38,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSArray<NSString *> *availableFontNames;
 @property (nonatomic, copy, nullable) NSString *selectedFontName;
 @property (nonatomic) BOOL showDownloadableFonts;
+@property (nonatomic) id configurationJSON;
 
 /// Annotation Toolbar
 - (BOOL)enterAnnotationCreationMode;

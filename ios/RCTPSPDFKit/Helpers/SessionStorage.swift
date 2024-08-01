@@ -14,14 +14,20 @@ import Foundation
 
 @objc public class SessionStorage: NSObject {
     
+    @objc public enum CallbackType: Int {
+        case onDocumentLoaded
+    }
+    
     var annotationContextualMenuItems: NSDictionary!
     var barButtonItems: NSMutableDictionary!
     var closeButtonAttributes: NSDictionary!
+    var pendingCallbacks: NSMutableArray!
 
     override public init() {
         annotationContextualMenuItems = [:]
         barButtonItems = [:]
         closeButtonAttributes = [:]
+        pendingCallbacks = []
         super .init()
     }
     
@@ -47,5 +53,17 @@ import Foundation
     
     @objc public func getCloseButtonAttributes() -> NSDictionary {
         return closeButtonAttributes
+    }
+    
+    @objc public func addPendingCallback(_ type: CallbackType) {
+        pendingCallbacks.add(type.rawValue)
+    }
+    
+    @objc public func removePendingCallback(_ type: CallbackType) {
+        pendingCallbacks.remove(type.rawValue)
+    }
+    
+    @objc public func getPendingCallbacks() -> NSArray {
+        return pendingCallbacks
     }
 }

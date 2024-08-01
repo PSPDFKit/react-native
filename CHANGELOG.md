@@ -1,5 +1,18 @@
 ## Newest Release
 
+### 2.12.0 - 01 Aug 2024
+
+- Adds APIs belonging to the `PDFDocument` interface, moving them away from the global namespace. (J#HYB-406)
+- Adds support for using `React.RefObject` as `PSPDFKitView` ref property. (J#HYB-444)
+- Updates for PSPDFKit 2024.3.1 for Android.
+- Updates for PSPDFKit 13.8.0 for iOS.
+- Fixes an issue where the `PSPDFKitView` sometimes failed to load the document on React Native Android. (J#HYB-397)
+- Fixes an issue where Instant JSON containing widgets was not applied using the `addAnnotations` API on iOS. (J#HYB-413)
+- Fixes an issue where password protected documents could not be saved after annotation changes were made. (J#HYB-454)
+- Fixes an issue where the `onDocumentLoaded` callback was not called reliably on iOS. (J#HYB-480)
+
+## Previous Releases
+
 ### 2.11.0 - 07 Jun 2024
 
 - Adds the ability to clear the document cache. (J#HYB-347)
@@ -8,8 +21,6 @@
 - Fixes an issue where calling `exitCurrentlyActiveMode` while not in annotation editing mode generates an exception on iOS. (J#HYB-373)
 - Fixes an issue where the annotation `uuid` isn't included in `onAnnotationTapped` callbacks. (J#HYB-374)
 - Fixes an issue where Instant configuration wasn't applied when using the `presentInstant` API on iOS. (J#HYB-375)
-
-## Previous Releases
 
 ### 2.10.0 - 06 May 2024
 

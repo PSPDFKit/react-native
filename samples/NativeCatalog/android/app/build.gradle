@@ -182,7 +182,6 @@ dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     //noinspection GradleDynamicVersion
     implementation "com.facebook.react:react-native:+"  // From node_modules
-    implementation("com.facebook.react:flipper-integration")
 
     if (enableHermes) {
         def hermesPath = "../../node_modules/hermes-engine/android/";
