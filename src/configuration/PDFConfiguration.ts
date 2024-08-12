@@ -102,7 +102,8 @@ import { MeasurementValueConfiguration } from './../measurements/Measurements';
  * @property { Measurements.MeasurementValueConfiguration[] } [measurementValueConfigurations] The array of ```MeasurementValueConfiguration``` objects that should be applied to the document.
  * @property { PDFConfiguration.RemoteDocumentConfiguration } [remoteDocumentConfiguration] The configuration when downloading a document from a remote URL.
  * @property { PDFConfiguration.SignatureCreationModes[] } [signatureCreationModes] The signature creation modes that should be available in the signature picker.
- */
+ * @property { PDFConfiguration.SignatureColorOptions[] } [signatureColorOptions] The color options that should be available in the signature picker, max of 3 colors are supported. If all 3 colors are not provided, defaults will be used in their place.
+*/
 
 export class PDFConfiguration {
 
@@ -481,6 +482,11 @@ export class PDFConfiguration {
      * The signature creation modes that should be available in the signature picker.
      */
     signatureCreationModes?: PDFConfiguration.SignatureCreationModes[];
+
+    /**
+     * The signature color options that should be available in the signature picker, max of 3 colors are supported. If all 3 colors are not provided, defaults will be used in their place.
+     */
+    signatureColorOptions?: PDFConfiguration.SignatureColorOptions[];
 }
 
 export namespace PDFConfiguration {
@@ -1027,6 +1033,16 @@ export namespace PDFConfiguration {
        */
       TYPE: 'type'
     } as const;
+
+    /**
+     * Color defined by a hex string of RGB values.
+     */
+    export type HexColor = `#${string}`;
+
+    /**
+     * Color defined by RGB values.
+     */
+    export type RGBColor = `rgb(${number},${number},${number})`;
     
     export type BooleanType = ValueOf<typeof BooleanType>;
     export type ScrollDirection = ValueOf<typeof ScrollDirection>;
@@ -1051,6 +1067,7 @@ export namespace PDFConfiguration {
     export type IOSDrawCreateMode = ValueOf<typeof IOSDrawCreateMode>;
     export type IOSBookmarkSortOrder = ValueOf<typeof IOSBookmarkSortOrder>;
     export type SignatureCreationModes = ValueOf<typeof SignatureCreationModes>;
+    export type SignatureColorOptions = HexColor | RGBColor | string;
 }
 
 /**

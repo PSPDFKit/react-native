@@ -571,6 +571,16 @@ RCT_MULTI_ENUM_CONVERTER(PSPDFDocumentSharingPagesOptions,
                                                        inDictionary:SignatureCreationModeMap]
                                forKey:@"signatureCreationModes"];
     
+    NSMutableArray *signatureCreationColors = [NSMutableArray array];
+    [configuration.signatureCreationConfiguration.colors enumerateObjectsUsingBlock:^(UIColor * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        
+        // remove alpha
+        NSString *hexColor = [NSString stringWithFormat:@"#%02lX", [obj hex]];
+        
+        [signatureCreationColors addObject:hexColor];
+    }];
+    [convertedConfiguration setObject:signatureCreationColors forKey:@"signatureCreationColors"];
+    
     return convertedConfiguration;
 }
 
@@ -758,8 +768,8 @@ RCT_MULTI_ENUM_CONVERTER(PSPDFDocumentSharingPagesOptions,
     if (configuration[@"signatureCreationModes"]) {
         NSSet *selectedModes = [NSSet setWithArray:[RCTConvert NSArray:configuration[@"signatureCreationModes"]]];
         
-        NSMutableArray *mappedValues = [NSMutableArray new];
-        for (NSString* signatureCreationModeString in selectedModes) {
+        NSMutableArray *mappedValues = [NSMutableArray array];
+        for (NSString *signatureCreationModeString in selectedModes) {
             NSNumber *value = [SignatureCreationModeMap valueForKey:signatureCreationModeString];
             if (value != nil) {
                 [mappedValues addObject:value];
@@ -767,6 +777,25 @@ RCT_MULTI_ENUM_CONVERTER(PSPDFDocumentSharingPagesOptions,
         }
         
         builder.availableModes = mappedValues;
+    }
+    
+    if (configuration[@"signatureColorOptions"]) {
+        NSArray *signatureColors = [RCTConvert NSArray:configuration[@"signatureColorOptions"]];
+        
+        NSMutableArray *resolvedColors = [NSMutableArray array];
+        for (NSString *colorString in signatureColors) {
+            if ([colorString hasPrefix:@"rgb("]) {
+                [resolvedColors addObject: [UIColor rgb:colorString]];
+            }
+            else if ([colorString hasPrefix:@"#"]){
+                [resolvedColors addObject: [[UIColor new] initWithHexString:colorString]];
+            }
+            else {
+                [resolvedColors addObject: [UIColor colorFromName:colorString]];
+            }
+        }
+        
+        builder.colors = resolvedColors;
     }
     
     self.signatureCreationConfiguration = [builder build];
