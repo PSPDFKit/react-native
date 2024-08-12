@@ -15,7 +15,6 @@ package com.pspdfkit.react;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.os.Parcel;
 import android.util.Log;
 
 import androidx.annotation.NonNull;

@@ -574,7 +574,6 @@ RCT_MULTI_ENUM_CONVERTER(PSPDFDocumentSharingPagesOptions,
     NSMutableArray *signatureCreationColors = [NSMutableArray array];
     [configuration.signatureCreationConfiguration.colors enumerateObjectsUsingBlock:^(UIColor * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         
-        // remove alpha
         NSString *hexColor = [NSString stringWithFormat:@"#%02lX", [obj hex]];
         
         [signatureCreationColors addObject:hexColor];
