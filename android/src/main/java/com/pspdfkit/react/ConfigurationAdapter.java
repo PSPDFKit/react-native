@@ -31,6 +31,7 @@ import com.pspdfkit.configuration.page.PageLayoutMode;
 import com.pspdfkit.configuration.page.PageScrollDirection;
 import com.pspdfkit.configuration.page.PageScrollMode;
 import com.pspdfkit.configuration.sharing.ShareFeatures;
+import com.pspdfkit.configuration.signatures.SignatureCreationMode;
 import com.pspdfkit.configuration.signatures.SignatureSavingStrategy;
 import com.pspdfkit.preferences.PSPDFKitPreferences;
 
@@ -114,6 +115,9 @@ public class ConfigurationAdapter {
     private static final String ENABLE_MAGNIFIER = "enableMagnifier";
     private static final String ENABLED_MEASUREMENT_TOOL_SNAPPING = "enableMeasurementToolSnapping";
 
+    // Signature presentation options
+    private static final String SIGNATURE_CREATION_MODES = "signatureCreationModes";
+    
     // Deprecated Options
     /**
      * @deprecated This key word was deprecated with PSPDFKit for React Native 2.1.
@@ -321,6 +325,10 @@ public class ConfigurationAdapter {
             key = getKeyOrNull(configuration, ENABLED_MEASUREMENT_TOOL_SNAPPING);
             if (key != null) {
                 configureMeasurementToolSnappingEnabled(context, configuration.getBoolean(key));
+            }
+            key = getKeyOrNull(configuration, SIGNATURE_CREATION_MODES);
+            if (key != null) {
+                configureSignatureCreationModes(configuration.getArray(key));
             }
         }
     }
@@ -702,6 +710,29 @@ public class ConfigurationAdapter {
 
     private void configureMeasurementToolSnappingEnabled(Context context, final Boolean snappingEnabled) {
         PSPDFKitPreferences.get(context).setMeasurementSnappingEnabled(snappingEnabled);
+    }
+
+    private void configureSignatureCreationModes(@Nullable final ReadableArray signatureCreationModes) {
+        if (signatureCreationModes == null) {
+          // If explicit null is passed we disable all signature modes.
+          configuration.signatureCreationModes(new ArrayList<>());
+          return;
+        }
+        List<Object> sigCreationModesList = signatureCreationModes.toArrayList();
+
+        // Finally create the actual list of enabled signature creation modes.
+        List<SignatureCreationMode> parsedTypes = new ArrayList<>();
+        for (Object item : sigCreationModesList) {
+          String signatureCreationMode = item.toString();
+          try {
+            parsedTypes.add(SignatureCreationMode.valueOf(signatureCreationMode.toUpperCase(Locale.ENGLISH)));
+          } catch (IllegalArgumentException ex) {
+            Log.e(LOG_TAG,
+              String.format("Illegal option %s provided for configuration option %s. Skipping this %s.", signatureCreationMode, SIGNATURE_CREATION_MODES, signatureCreationMode),
+              ex);
+          }
+        }
+        configuration.signatureCreationModes(parsedTypes);
     }
 
     public PdfActivityConfiguration build() {

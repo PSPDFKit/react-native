@@ -132,6 +132,10 @@
 #define BookmarkSortOrderMap @{@"custom" : @(PSPDFBookmarkManagerSortOrderCustom), \
                                @"pageBased" : @(PSPDFBookmarkManagerSortOrderPageBased)} \
 
+#define SignatureCreationModeMap @{@"draw": @(PSPDFSignatureCreationModeDraw), \
+                                   @"image": @(PSPDFSignatureCreationModeImage), \
+                                   @"type": @(PSPDFSignatureCreationModeType)} \
+
 @implementation RCTConvert (PSPDFConfiguration)
 
 + (PSPDFConfiguration *)PSPDFConfiguration:(id)json {
@@ -563,6 +567,10 @@ RCT_MULTI_ENUM_CONVERTER(PSPDFDocumentSharingPagesOptions,
     [convertedConfiguration setObject:[RCTConvert findKeyForValue:configuration.bookmarkSortOrder
                                                      inDictionary:BookmarkSortOrderMap] forKey:@"iOSBookmarkSortOrder"];
     
+    [convertedConfiguration setObject:[RCTConvert findKeysForValues:[NSSet setWithArray:configuration.signatureCreationConfiguration.availableModes]
+                                                       inDictionary:SignatureCreationModeMap]
+                               forKey:@"signatureCreationModes"];
+    
     return convertedConfiguration;
 }
 
@@ -694,6 +702,8 @@ RCT_MULTI_ENUM_CONVERTER(PSPDFDocumentSharingPagesOptions,
     self.editableAnnotationTypes = [editableTypes copy];
   }
 
+  [self setRCTSignatureCreationConfiguration:dictionary];
+
   // Deprecated Options
 
   // Use `scrollDirection` instead.
@@ -737,6 +747,29 @@ RCT_MULTI_ENUM_CONVERTER(PSPDFDocumentSharingPagesOptions,
   }];
 
   self.sharingConfigurations = rnSharingConfigurations;
+}
+
+- (void)setRCTSignatureCreationConfiguration:(NSDictionary *)configuration {
+    PSPDFSignatureCreationConfigurationBuilder *builder = [PSPDFSignatureCreationConfigurationBuilder alloc];
+    
+    // important: set all default values
+    [builder reset];
+    
+    if (configuration[@"signatureCreationModes"]) {
+        NSSet *selectedModes = [NSSet setWithArray:[RCTConvert NSArray:configuration[@"signatureCreationModes"]]];
+        
+        NSMutableArray *mappedValues = [NSMutableArray new];
+        for (NSString* signatureCreationModeString in selectedModes) {
+            NSNumber *value = [SignatureCreationModeMap valueForKey:signatureCreationModeString];
+            if (value != nil) {
+                [mappedValues addObject:value];
+            }
+        }
+        
+        builder.availableModes = mappedValues;
+    }
+    
+    self.signatureCreationConfiguration = [builder build];
 }
 
 @end
