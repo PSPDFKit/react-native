@@ -4,9 +4,12 @@ import { View } from 'react-native';
 import React from 'react';
 
 export class GeneratePDF extends BaseExampleAutoHidingHeaderComponent {
+  pdfRef: React.RefObject;
+
   constructor(props) {
     super(props);
 
+    this.pdfRef = React.createRef();
     this.state = {
       shouldReturn: false,
     };
@@ -21,7 +24,7 @@ export class GeneratePDF extends BaseExampleAutoHidingHeaderComponent {
       <View style={styles.flex}>
         {!shouldReturn && (
           <CustomPdfView
-            ref="pdfView"
+            ref={this.pdfRef}
             document={fullPath}
             style={styles.flex}
           />

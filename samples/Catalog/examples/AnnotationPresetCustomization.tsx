@@ -48,16 +48,52 @@ export class AnnotationPresetCustomization extends BaseExampleAutoHidingHeaderCo
             }
           }
           annotationPresets={{
+            arrow: {
+              defaultColor: '#000000',
+              defaultBorderStyle: 'dashed_1_3'
+            },
             inkPen: {
               defaultThickness: 50,
-              minimumThickness: 1,
-              maximumThickness: 60,
               defaultColor: '#99cc00',
+              availableColors: ['#99cc00', '#ffcc00', '#ff9900', '#ff0000', '#000000'],
+              minimumAlpha: 0.5
             },
             freeText: {
-              defaultTextSize: 20,
+              defaultTextSize: 40,
               defaultColor: '#FF0000',
             },
+            line: {
+              defaultColor: '#99cc00',
+              defaultLineEnd: 'openArrow,openArrow',
+              defaultBorderStyle: Annotation.BorderStyle.DASHED_3_3,
+            },
+            measurementAreaRect: {
+              defaultColor: '#99cc00',
+              defaultBorderStyle: 'dashed_1_3',
+            },
+            square: {
+              defaultColor: '#99cc00',
+              defaultBorderStyle: 'dashed_1_3'
+            },
+            measurementAreaEllipse: {
+              defaultColor: '#99cc00',
+              defaultBorderStyle: 'dashed_1_3',
+            },
+            measurementAreaPolygon: {
+              defaultColor: '#99cc00',
+              defaultBorderStyle: 'dashed_1_3',
+            },
+            measurementDistance: {
+              defaultLineEnd: 'circle,circle',
+              defaultColor: '#99cc00',
+              defaultThickness: 5,
+              defaultBorderStyle: 'dashed_1_3',
+            },
+            measurementPerimeter: {
+              defaultLineEnd: 'circle,circle',
+              defaultColor: '#99cc00',
+              defaultBorderStyle: 'dashed_1_3',
+            }
           }}
           fragmentTag="PDF1"
           showNavigationButtonInToolbar={true}

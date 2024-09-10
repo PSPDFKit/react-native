@@ -15,11 +15,11 @@
  *   Contains gradle configuration constants
  */
 ext {
-    PSPDFKIT_VERSION = '2024.3.1'
+    PSPDFKIT_VERSION = '2024.5.1'
 }
 
 buildscript {
-    ext.kotlin_version = '1.8.10'
+    ext.kotlin_version = '1.9.24'
 
     repositories {
         mavenCentral()
@@ -32,7 +32,7 @@ buildscript {
     }
 
     dependencies {
-        classpath("com.android.tools.build:gradle:8.1.0")
+        classpath("com.android.tools.build:gradle:8.5.0")
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
@@ -45,6 +45,7 @@ android {
     buildToolsVersion "34.0.0"
 
     namespace "com.pspdfkit.react"
+
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 34
@@ -63,7 +64,16 @@ android {
 
     buildFeatures {
         buildConfig true
-  }
+        compose true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion "1.5.14"
+    }
+
+    kotlin {
+        jvmToolchain(17)
+    }
 }
 
 dependencies {

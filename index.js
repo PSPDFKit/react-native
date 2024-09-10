@@ -275,9 +275,82 @@ class PSPDFKitView extends React.Component {
    * @memberof PSPDFKitView
    * @returns { PDFDocument } A reference to the document that is currently loaded in the PSPDFKitView component.
    */
-    getDocument = function () {
-      return this._pdfDocument == null ? new PDFDocument(this._componentRef.current) : this._pdfDocument;
-    };
+  getDocument = function () {
+    if (this._pdfDocument == null) {
+      this._pdfDocument = new PDFDocument(this._componentRef.current);
+      return this._pdfDocument;
+    } else {
+      return this._pdfDocument;
+    }
+  };
+
+  /**
+   * @method clearSelectedAnnotations
+   * @memberof PDFDocument
+   * @description Clears all currently selected Annotations.
+   * @example
+   * const result = await this.pdfRef.current?.clearSelectedAnnotations();
+   * @returns { Promise<any> } A promise containing the result of the operation. ```true``` if the annotations selection were cleared, ```false``` otherwise.
+   */
+  clearSelectedAnnotations = function () {
+    if (Platform.OS === 'android') {
+      let requestId = this._nextRequestId++;
+      let requestMap = this._requestMap;
+
+      // We create a promise here that will be resolved once onDataReturned is called.
+      let promise = new Promise(function (resolve, reject) {
+        requestMap[requestId] = { resolve: resolve, reject: reject };
+      });
+
+      UIManager.dispatchViewManagerCommand(
+        findNodeHandle(this._componentRef.current),
+        this._getViewManagerConfig('RCTPSPDFKitView').Commands
+          .clearSelectedAnnotations,
+        [requestId],
+      );
+
+      return promise;
+    } else if (Platform.OS === 'ios') {
+      return NativeModules.PSPDFKitViewManager.clearSelectedAnnotations(
+        findNodeHandle(this._componentRef.current),
+      );
+    }
+  };
+
+ /**
+  * @method selectAnnotations
+  * @memberof PDFDocument
+  * @param { object } annotations An array of the annotations to select in Instant JSON format.
+  * @description Select one or more annotations.
+  * @example
+  * const result = await this.pdfRef.current?.selectAnnotations(annotations);
+  * @returns { Promise<any> } A promise containing the result of the operation. ```true``` if the annotations were selected, ```false``` otherwise.
+  */
+  selectAnnotations = function (annotations) {
+    if (Platform.OS === 'android') {
+      let requestId = this._nextRequestId++;
+      let requestMap = this._requestMap;
+
+      // We create a promise here that will be resolved once onDataReturned is called.
+      let promise = new Promise(function (resolve, reject) {
+        requestMap[requestId] = { resolve: resolve, reject: reject };
+      });
+
+      UIManager.dispatchViewManagerCommand(
+        findNodeHandle(this._componentRef.current),
+        this._getViewManagerConfig('RCTPSPDFKitView').Commands
+          .selectAnnotations,
+        [requestId, annotations],
+      );
+
+      return promise;
+    } else if (Platform.OS === 'ios') {
+      return NativeModules.PSPDFKitViewManager.selectAnnotations(
+        annotations,
+        findNodeHandle(this._componentRef.current),
+      );
+    }
+  };
 
   /**
    * Gets all annotations of the given type from the specified page.
@@ -324,6 +397,7 @@ class PSPDFKitView extends React.Component {
    * Adds a new annotation to the current document.
    *
    * @method addAnnotation
+   * @deprecated Since PSPDFKit for React Native 2.12. Use ```this.pdfRef.current?.getDocument()?.addAnnotations()``` instead.
    * @memberof PSPDFKitView
    * @param { object } annotation The InstantJSON of the annotation to add.
    * @example
@@ -1175,7 +1249,7 @@ if (Platform.OS === 'ios' || Platform.OS === 'android') {
  * @property {Array<string>} [availableFontNames] Used to specify the available font names in the font picker. Note on iOS: You need to set the desired font family names as ```UIFontDescriptor```. See {@link https://developer.apple.com/documentation/uikit/uifontdescriptor?language=objc} for more information. See {@link https://github.com/PSPDFKit/react-native/blob/master/samples/Catalog/examples/CustomFontPicker.tsx}
  * @property {string} [selectedFontName] Used to specify the current selected font in the font picker. Note on iOS: You need to set the desired font family names as ```UIFontDescriptor```. See {@link https://developer.apple.com/documentation/uikit/uifontdescriptor?language=objc} for more information. See {@link https://github.com/PSPDFKit/react-native/blob/master/samples/Catalog/examples/CustomFontPicker.tsx}
  * @property {boolean} [showDownloadableFonts] Used to show or hide the downloadable fonts section in the font picker. Defaults to ```true```, showing the downloadable fonts. See {@link https://developer.apple.com/documentation/uikit/uifontdescriptor?language=objc} for more information. See {@link https://github.com/PSPDFKit/react-native/blob/master/samples/Catalog/examples/CustomFontPicker.tsx}
- * @property {object} [annotationPresets] The annotation preset configuration. See {@link https://github.com/PSPDFKit/react-native/blob/5b2716a3f3cd3732c0e5845cc39e28d19b618aa4/ios/RCTPSPDFKit/Converters/AnnotationConfigurationsConvertor.swift#L31} for a list of the supported preset types and {@link https://github.com/PSPDFKit/react-native/blob/5b2716a3f3cd3732c0e5845cc39e28d19b618aa4/ios/RCTPSPDFKit/Converters/AnnotationConfigurationsConvertor.swift#L13} for the supported configuration options.
+ * @property {AnnotationPresetConfiguration} [annotationPresets] The annotation preset configuration. See {@link https://pspdfkit.com/api/react-native/Annotation.html#.AnnotationPresetConfiguration} for available options.
  * @property {boolean} [hideDefaultToolbar] Used to show or hide the annotation toolbar on Android.
  * @property {any} [style] Used to style the React Native component.
  *
@@ -1495,10 +1569,9 @@ PSPDFKitView.propTypes = {
   style: PropTypes.any,
   /**
    * The annotation preset configuration.
-   * @type {object}
+   * @type {AnnotationPresetConfiguration}
    * @memberof PSPDFKitView
-   * @see {@link https://github.com/PSPDFKit/react-native/blob/5b2716a3f3cd3732c0e5845cc39e28d19b618aa4/ios/RCTPSPDFKit/Converters/AnnotationConfigurationsConvertor.swift#L31} for a list of the supported preset types.
-   * @see {@link https://github.com/PSPDFKit/react-native/blob/5b2716a3f3cd3732c0e5845cc39e28d19b618aa4/ios/RCTPSPDFKit/Converters/AnnotationConfigurationsConvertor.swift#L13} for the supported configuration options.
+   * @see {@link https://pspdfkit.com/api/react-native/Annotation.html#.AnnotationPresetConfiguration} for available options.
    * @example
    * annotationPresets={{
    *   inkPen: {
@@ -1630,27 +1703,30 @@ export class PSPDFKit {
   setPageIndex = function (pageIndex, animated) {};
 
   /**
-   * Used to create a new document with processed annotations.
+   * Used to create a new document with processed annotations, allowing a password to unlock the source document.
    * @method processAnnotations
    * @memberof PSPDFKit
-   * @param { string } annotationChange Specifies how an annotation should be included in the resulting document. Available options are: ```flatten```, ```remove```, ```embed```, and ```print```.
-   * @param { string } annotationType Specifies the annotation type that should be flattened. See {@link https://pspdfkit.com/guides/web/json/schema/annotations/} for supported types. Use ```all``` to include all annotation types.
+   * @param { Annotation.Change } annotationChange Specifies how an annotation should be included in the resulting document. See {@link https://pspdfkit.com/api/react-native/Annotation.html#.Change} for supported options.
+   * @param { Array<Annotation.Type> } annotationTypes Specifies the annotation types that should be flattened. See {@link https://pspdfkit.com/api/react-native/Annotation.html#.Type} for supported types. Use ```Annotation.Type.ALL``` to include all annotation types.
    * @param { string } sourceDocumentPath The source document to use as input.
    * @param { string } processedDocumentPath The path where the output document should be written to.
+   * @param { string | null } [password] The password to unlock the source document, if required.
    * @returns { Promise<boolean> } A promise returning ```true``` if the document annotations were successfully flattened, and ```false``` if not.
    * @example
    * const result = await PSPDFKit.processAnnotations(
    *                      'flatten',
    *                      'all',
    *                      sourceDocumentPath,
-   *                      processedDocumentPath);
+   *                      processedDocumentPath,
+   *                      password);
    */
   processAnnotations = function (
-    annotationChange,
-    annotationType,
-    sourceDocumentPath,
-    processedDocumentPath,
-  ) {};
+      annotationChange,
+      annotationTypes,
+      sourceDocumentPath,
+      processedDocumentPath,
+      password
+    ) {};
 
   /**
    * Used to present an Instant PDF document for collaboration.
@@ -1988,6 +2064,38 @@ export { AnnotationContextualMenu } from "./lib/annotations/Annotation";
 import { AnnotationContextualMenuItem } from "./lib/annotations/Annotation";
 export { AnnotationContextualMenuItem } from "./lib/annotations/Annotation";
 
+import { AnnotationPresetConfiguration } from "./lib/annotations/Annotation";
+export { AnnotationPresetConfiguration } from "./lib/annotations/Annotation";
+
+import { AnnotationPresetInk,
+  AnnotationPresetFreeText,
+  AnnotationPresetStamp,
+  AnnotationPresetNote,
+  AnnotationPresetMarkup,
+  AnnotationPresetShape,
+  AnnotationPresetLine,
+  AnnotationPresetEraser,
+  AnnotationPresetFile,
+  AnnotationPresetSound,
+  AnnotationPresetRedact,
+  AnnotationPresetMeasurementArea,
+  AnnotationPresetMeasurementPerimeter,
+  AnnotationPresetMeasurementDistance } from "./lib/annotations/Annotation";
+export { AnnotationPresetInk,
+  AnnotationPresetFreeText,
+  AnnotationPresetStamp,
+  AnnotationPresetNote,
+  AnnotationPresetMarkup,
+  AnnotationPresetShape,
+  AnnotationPresetLine,
+  AnnotationPresetEraser,
+  AnnotationPresetFile,
+  AnnotationPresetSound,
+  AnnotationPresetRedact,
+  AnnotationPresetMeasurementArea,
+  AnnotationPresetMeasurementPerimeter,
+  AnnotationPresetMeasurementDistance } from "./lib/annotations/Annotation";
+
 import { PDFDocument } from "./lib/document/PDFDocument";
 export { PDFDocument } from "./lib/document/PDFDocument";
 
@@ -2000,4 +2108,21 @@ module.exports.MeasurementValueConfiguration = MeasurementValueConfiguration;
 module.exports.Annotation = Annotation;
 module.exports.AnnotationContextualMenu = AnnotationContextualMenu;
 module.exports.AnnotationContextualMenuItem = AnnotationContextualMenuItem;
+module.exports.AnnotationPresetConfiguration = AnnotationPresetConfiguration;
+
+module.exports.AnnotationPresetInk = AnnotationPresetInk
+module.exports.AnnotationPresetFreeText = AnnotationPresetInk
+module.exports.AnnotationPresetStamp = AnnotationPresetStamp
+module.exports.AnnotationPresetNote = AnnotationPresetNote
+module.exports.AnnotationPresetMarkup = AnnotationPresetMarkup
+module.exports.AnnotationPresetShape = AnnotationPresetShape
+module.exports.AnnotationPresetLine = AnnotationPresetLine
+module.exports.AnnotationPresetEraser = AnnotationPresetEraser
+module.exports.AnnotationPresetFile = AnnotationPresetFile
+module.exports.AnnotationPresetSound = AnnotationPresetSound
+module.exports.AnnotationPresetRedact = AnnotationPresetRedact
+module.exports.AnnotationPresetMeasurementArea = AnnotationPresetMeasurementArea
+module.exports.AnnotationPresetMeasurementPerimeter = AnnotationPresetMeasurementPerimeter
+module.exports.AnnotationPresetMeasurementDistance = AnnotationPresetMeasurementDistance
+
 module.exports.PDFDocument = PDFDocument;

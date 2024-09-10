@@ -7,10 +7,10 @@ PODS:
   - hermes-engine (0.74.2):
     - hermes-engine/Pre-built (= 0.74.2)
   - hermes-engine/Pre-built (0.74.2)
-  - Instant (13.7.0-dev)
-  - PSPDFKit (13.7.0-dev):
-    - PSPDFKit/Core (= 13.7.0-dev)
-  - PSPDFKit/Core (13.7.0-dev)
+  - Instant (13.9.1)
+  - PSPDFKit (13.9.1):
+    - PSPDFKit/Core (= 13.9.1)
+  - PSPDFKit/Core (13.9.1)
   - RCT-Folly (2024.01.01.00):
     - boost
     - DoubleConversion
@@ -939,9 +939,9 @@ PODS:
   - React-Mapbuffer (0.74.2):
     - glog
     - React-debug
-  - react-native-pspdfkit (2.11.0):
-    - Instant
-    - PSPDFKit
+  - react-native-pspdfkit (2.13.0):
+    - Instant (= 13.9.1)
+    - PSPDFKit (= 13.9.1)
     - React
   - react-native-safe-area (0.5.1):
     - React
@@ -1233,8 +1233,6 @@ DEPENDENCIES:
   - fmt (from `../node_modules/react-native/third-party-podspecs/fmt.podspec`)
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
   - hermes-engine (from `../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec`)
-  - Instant (from `https://customers.pspdfkit.com/instant/nightly.podspec`)
-  - PSPDFKit (from `https://customers.pspdfkit.com/pspdfkit-ios/nightly.podspec`)
   - RCT-Folly (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCT-Folly/Fabric (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCTDeprecation (from `../node_modules/react-native/ReactApple/Libraries/RCTFoundation/RCTDeprecation`)
@@ -1295,6 +1293,8 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
+    - Instant
+    - PSPDFKit
     - SocketRocket
 
 EXTERNAL SOURCES:
@@ -1311,10 +1311,6 @@ EXTERNAL SOURCES:
   hermes-engine:
     :podspec: "../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec"
     :tag: hermes-2024-06-03-RNv0.74.2-bb1e74fe1e95c2b5a2f4f9311152da052badc2bc
-  Instant:
-    :podspec: https://customers.pspdfkit.com/instant/nightly.podspec
-  PSPDFKit:
-    :podspec: https://customers.pspdfkit.com/pspdfkit-ios/nightly.podspec
   RCT-Folly:
     :podspec: "../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec"
   RCTDeprecation:
@@ -1433,8 +1429,8 @@ SPEC CHECKSUMS:
   fmt: 4c2741a687cc09f0634a2e2c72a838b99f1ff120
   glog: fdfdfe5479092de0c4bdbebedd9056951f092c4f
   hermes-engine: 01d3e052018c2a13937aca1860fbedbccd4a41b7
-  Instant: 9f854a3041e960400029498fa6041f72fc401ae1
-  PSPDFKit: 3d6420adc785e864e16cde08b673ab54a73d1d11
+  Instant: 0cb33931bf7c9f0bff4448d8d56f0466537eb762
+  PSPDFKit: 5a182f3f3f0eaaef5ce86b58a44cf9db09ff4a36
   RCT-Folly: 02617c592a293bd6d418e0a88ff4ee1f88329b47
   RCTDeprecation: b03c35057846b685b3ccadc9bfe43e349989cdb2
   RCTRequired: 194626909cfa8d39ca6663138c417bc6c431648c
@@ -1459,7 +1455,7 @@ SPEC CHECKSUMS:
   React-jsitracing: 0fa7f78d8fdda794667cb2e6f19c874c1cf31d7e
   React-logger: 29fa3e048f5f67fe396bc08af7606426d9bd7b5d
   React-Mapbuffer: bf56147c9775491e53122a94c423ac201417e326
-  react-native-pspdfkit: 8b353c9f8d604234d1885ceac1e5da0cdd1a108b
+  react-native-pspdfkit: e2e1f6c74816d5c3f4d2e395e724522b39706323
   react-native-safe-area: e8230b0017d76c00de6b01e2412dcf86b127c6a3
   react-native-safe-area-context: a240ad4b683349e48b1d51fed1611138d1bdad97
   React-nativeconfig: 9f223cd321823afdecf59ed00861ab2d69ee0fc1
@@ -1492,6 +1488,6 @@ SPEC CHECKSUMS:
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
   Yoga: ae3c32c514802d30f687a04a6a35b348506d411f
 
-PODFILE CHECKSUM: 06320ad15c5143b64838473b937e13cc62ee43c5
+PODFILE CHECKSUM: 37d8142f07993f060172c65a3802ae806d55508c
 
 COCOAPODS: 1.14.3

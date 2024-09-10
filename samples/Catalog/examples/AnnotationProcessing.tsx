@@ -1,7 +1,7 @@
 import React from 'react';
 import { Alert, Button, processColor, View } from 'react-native';
 import fileSystem from 'react-native-fs';
-import PSPDFKitView from 'react-native-pspdfkit';
+import PSPDFKitView, { Annotation } from 'react-native-pspdfkit';
 
 import {
   pspdfkitColor,
@@ -50,15 +50,16 @@ export class AnnotationProcessing extends BaseExampleAutoHidingHeaderComponent {
                     })
                     // First, save all annotations in the current document.
                     .then(() => {
-                      this.pdfRef.current
-                        ?.saveCurrentDocument()
+                      this.pdfRef.current?.getDocument()
+                        ?.save()
                         .then(_saved => {
                           // Then, embed all the annotations
                           PSPDFKit.processAnnotations(
-                            'embed',
-                            'all',
+                            Annotation.Change.EMBED,
+                            [Annotation.Type.ALL],
                             writableDocumentPath,
                             processedDocumentPath,
+                            null
                           )
                             .then(success => {
                               if (success) {
@@ -98,15 +99,16 @@ export class AnnotationProcessing extends BaseExampleAutoHidingHeaderComponent {
                     })
                     .then(() => {
                       // First, save all annotations in the current document.
-                      this.pdfRef.current
-                        ?.saveCurrentDocument()
+                      this.pdfRef.current?.getDocument()
+                        ?.save()
                         .then(_saved => {
                           // Then, flatten all the annotations
                           PSPDFKit.processAnnotations(
-                            'flatten',
-                            'all',
+                            Annotation.Change.FLATTEN,
+                            [Annotation.Type.INK, Annotation.Type.STAMP],
                             writableDocumentPath,
                             processedDocumentPath,
+                            null
                           )
                             .then(success => {
                               if (success) {
@@ -148,15 +150,16 @@ export class AnnotationProcessing extends BaseExampleAutoHidingHeaderComponent {
                     })
                     .then(() => {
                       // First, save all annotations in the current document.
-                      this.pdfRef.current
-                        ?.saveCurrentDocument()
+                      this.pdfRef.current?.getDocument()
+                        ?.save()
                         .then(_saved => {
                           // Then, remove all the annotations
                           PSPDFKit.processAnnotations(
-                            'remove',
-                            'all',
+                            Annotation.Change.REMOVE,
+                            [Annotation.Type.ALL],
                             writableDocumentPath,
                             processedDocumentPath,
+                            null
                           )
                             .then(success => {
                               if (success) {
@@ -193,15 +196,16 @@ export class AnnotationProcessing extends BaseExampleAutoHidingHeaderComponent {
                     })
                     .then(() => {
                       // First, save all annotations in the current document.
-                      this.pdfRef.current
-                        ?.saveCurrentDocument()
+                      this.pdfRef.current?.getDocument()
+                        ?.save()
                         .then(_success => {
                           // Then, print all the annotations
                           PSPDFKit.processAnnotations(
-                            'print',
-                            'all',
+                            Annotation.Change.PRINT,
+                            [Annotation.Type.ALL],
                             writableDocumentPath,
                             processedDocumentPath,
+                            null
                           )
                             .then(successResult => {
                               if (successResult) {

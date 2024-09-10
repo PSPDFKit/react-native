@@ -31,12 +31,10 @@ import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.pspdfkit.PSPDFKit;
-import com.pspdfkit.annotations.Annotation;
 import com.pspdfkit.annotations.AnnotationType;
-import com.pspdfkit.annotations.measurements.MeasurementPrecision;
-import com.pspdfkit.annotations.measurements.Scale;
 import com.pspdfkit.document.PdfDocument;
 import com.pspdfkit.document.PdfDocumentLoader;
 import com.pspdfkit.document.image.CameraImagePickerFragment;
@@ -44,7 +42,6 @@ import com.pspdfkit.document.image.GalleryImagePickerFragment;
 import com.pspdfkit.document.processor.PdfProcessor;
 import com.pspdfkit.document.processor.PdfProcessorTask;
 import com.pspdfkit.exceptions.InvalidPSPDFKitLicenseException;
-import com.pspdfkit.react.RNInstantPdfActivity;
 import com.pspdfkit.listeners.SimpleDocumentListener;
 import com.pspdfkit.react.helper.ConversionHelpers;
 import com.pspdfkit.react.helper.PSPDFKitUtils;
@@ -92,12 +89,6 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
     public void initialize() {
         super.initialize();
         getReactApplicationContext().addActivityEventListener(this);
-    }
-
-    @Override
-    public void onCatalystInstanceDestroy() {
-        super.onCatalystInstanceDestroy();
-        getReactApplicationContext().removeActivityEventListener(this);
     }
 
     @Override
@@ -249,33 +240,54 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
         }
     }
 
+    private PdfProcessorTask setupProcessAnnotations(@NonNull final PdfDocument document,
+                                                @NonNull final String processingMode,
+                                                @Nullable final ReadableArray annotationTypes) {
+
+        PdfProcessorTask task = PdfProcessorTask.fromDocument(document);
+        final EnumSet<AnnotationType> types = ConversionHelpers.getAnnotationTypes(annotationTypes);
+        final PdfProcessorTask.AnnotationProcessingMode mode = getProcessingModeFromString(processingMode);
+        for (AnnotationType type : types) {
+            task.changeAnnotationsOfType(type, mode);
+        }
+        return task;
+    }
+
     @ReactMethod
     public void processAnnotations(@NonNull final String processingMode,
-                                   @Nullable final String annotationType,
+                                   @Nullable final ReadableArray annotationTypes,
                                    @NonNull final String sourceDocumentPath,
                                    @NonNull final String targetDocumentPath,
+                                   @Nullable final String password,
                                    @NonNull final Promise promise) {
 
-       // This is an edge case where file scheme is missing.
+        // This is an edge case where file scheme is missing.
         String documentPath = Uri.parse(sourceDocumentPath).getScheme() == null
                 ? FILE_SCHEME + sourceDocumentPath : sourceDocumentPath;
 
-        PdfDocumentLoader.openDocumentAsync(getReactApplicationContext(), Uri.parse(documentPath))
-            .flatMapCompletable(document -> {
-                PdfProcessorTask task = PdfProcessorTask.fromDocument(document);
-                final EnumSet<AnnotationType> types = ConversionHelpers.getAnnotationTypeFromString(annotationType);
-                final PdfProcessorTask.AnnotationProcessingMode mode = getProcessingModeFromString(processingMode);
-                for (AnnotationType type : types) {
-                    task.changeAnnotationsOfType(type, mode);
-                }
-
-                return PdfProcessor.processDocumentAsync(task, new File(targetDocumentPath)).ignoreElements();
-            })
-            .subscribe(() -> {
-                promise.resolve(Boolean.TRUE);
-            }, throwable -> {
-                promise.reject(throwable);
-            });
+        if (password != null) {
+            PdfDocumentLoader.openDocumentAsync(getReactApplicationContext(), Uri.parse(documentPath), password)
+                    .flatMapCompletable(document -> {
+                        PdfProcessorTask task = this.setupProcessAnnotations(document, processingMode, annotationTypes);
+                        return PdfProcessor.processDocumentAsync(task, new File(targetDocumentPath)).ignoreElements();
+                    })
+                    .subscribe(() -> {
+                        promise.resolve(Boolean.TRUE);
+                    }, throwable -> {
+                        promise.reject(throwable);
+                    });
+        } else {
+            PdfDocumentLoader.openDocumentAsync(getReactApplicationContext(), Uri.parse(documentPath))
+                    .flatMapCompletable(document -> {
+                        PdfProcessorTask task = this.setupProcessAnnotations(document, processingMode, annotationTypes);
+                        return PdfProcessor.processDocumentAsync(task, new File(targetDocumentPath)).ignoreElements();
+                    })
+                    .subscribe(() -> {
+                        promise.resolve(Boolean.TRUE);
+                    }, throwable -> {
+                        promise.reject(throwable);
+                    });
+        }
     }
 
     private static PdfProcessorTask.AnnotationProcessingMode getProcessingModeFromString(@NonNull final String mode) {

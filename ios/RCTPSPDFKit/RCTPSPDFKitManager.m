@@ -95,24 +95,29 @@ RCT_REMAP_METHOD(setPageIndex, setPageIndex:(NSUInteger)pageIndex animated:(BOOL
 
 // MARK: - Annotation Processing
 
-RCT_REMAP_METHOD(processAnnotations, processAnnotations:(PSPDFAnnotationChange)annotationChange annotationType:(PSPDFAnnotationType)annotationType sourceDocument:(PSPDFDocument *)sourceDocument processedDocumentPath:(nonnull NSString *)processedDocumentPath resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-  NSError *error;
-  NSURL *processedDocumentURL = [NSURL fileURLWithPath:processedDocumentPath];
+RCT_EXPORT_METHOD(processAnnotations:(PSPDFAnnotationChange)annotationChange annotationTypes:(NSArray *)annotationTypes sourceDocument:(nonnull PSPDFDocument *)sourceDocument processedDocumentPath:(nonnull NSString *)processedDocumentPath password:(NSString *)password resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
 
-  // Create a processor configuration with the current document.
-  PSPDFProcessorConfiguration *configuration = [[PSPDFProcessorConfiguration alloc] initWithDocument:sourceDocument];
+    if (password != nil) {
+      [sourceDocument unlockWithPassword:password];
+    }
+    NSError *error;
+    NSURL *processedDocumentURL = [NSURL fileURLWithPath:processedDocumentPath];
+    // Create a processor configuration with the current document.
+    PSPDFProcessorConfiguration *configuration = [[PSPDFProcessorConfiguration alloc] initWithDocument:sourceDocument];
 
-  // Modify annotations.
-  [configuration modifyAnnotationsOfTypes:annotationType change:annotationChange];
+    PSPDFAnnotationType types = [RCTConvert parseAnnotationTypes:annotationTypes];
+    // Modify annotations.
+    [configuration modifyAnnotationsOfTypes:types change:annotationChange];
 
-  // Create the PDF processor and write the processed file.
-  PSPDFProcessor *processor = [[PSPDFProcessor alloc] initWithConfiguration:configuration securityOptions:nil];
-  BOOL success = [processor writeToFileURL:processedDocumentURL error:&error];
-  if (success) {
-    resolve(@(success));
-  } else {
-    reject(@"error", @"Failed to process annotations.", error);
-  }
+    // Create the PDF processor and write the processed file.
+    PSPDFProcessor *processor = [[PSPDFProcessor alloc] initWithConfiguration:configuration securityOptions:nil];
+    BOOL success = [processor writeToFileURL:processedDocumentURL error:&error];
+    
+    if (success) {
+        resolve(@(success));
+    } else {
+        reject(@"error", @"Failed to process annotations.", error);
+    }
 }
 
 RCT_EXPORT_METHOD(presentInstant: (NSDictionary*)documentData configuration: (NSDictionary*)configuration resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {

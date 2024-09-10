@@ -13,9 +13,12 @@ import React from 'react';
 import { hideToolbar } from '../helpers/NavigationHelper';
 
 export class Watermark extends BaseExampleAutoHidingHeaderComponent {
+  pdfRef: React.RefObject;
+
   constructor(props) {
     super(props);
     const { navigation } = props;
+    this.pdfRef = React.createRef();
     this.state = {
       shouldReturn: false,
       documentPath: formDocumentPath,
@@ -30,7 +33,7 @@ export class Watermark extends BaseExampleAutoHidingHeaderComponent {
       <View style={styles.flex}>
         {!shouldReturn && (
           <CustomPdfView
-            ref="pdfView"
+            ref={this.pdfRef}
             document={this.state.documentPath}
             style={styles.flex}
             onDocumentWatermarked={event => {
@@ -47,13 +50,13 @@ export class Watermark extends BaseExampleAutoHidingHeaderComponent {
                 // This will create a watermark in native code.
                 if (Platform.OS === 'android') {
                   UIManager.dispatchViewManagerCommand(
-                    findNodeHandle(this.refs.pdfView),
+                    findNodeHandle(this.pdfRef.current),
                     'createWatermark',
                     [],
                   );
                 } else {
                   NativeModules.CustomPdfViewManager.createWatermark(
-                    findNodeHandle(this.refs.pdfView),
+                    findNodeHandle(this.pdfRef.current),
                   );
                 }
               }}

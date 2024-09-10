@@ -23,6 +23,7 @@
 		48A73FC82BD8283A00BDD8FD /* RCTConvert+PSPDFEditMenuAppearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48A73FC72BD8283A00BDD8FD /* RCTConvert+PSPDFEditMenuAppearance.swift */; };
 		48A73FD52BD8363A00BDD8FD /* SessionStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48A73FD42BD8363A00BDD8FD /* SessionStorage.swift */; };
 		48A73FDB2BDF828B00BDD8FD /* RCTConvert+PSPDFImageSaveMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48A73FDA2BDF828B00BDD8FD /* RCTConvert+PSPDFImageSaveMode.swift */; };
+		48A892EC2C78C90F00B49A25 /* RCTConvert+PSPDFAnnotationType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48A892EB2C78C90F00B49A25 /* RCTConvert+PSPDFAnnotationType.swift */; };
 		6540D1841D89D22E00B8F94F /* RCTPSPDFKitManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 6540D1831D89D22E00B8F94F /* RCTPSPDFKitManager.m */; };
 		6572780C1D86AE7300A5E1A8 /* RCTConvert+PSPDFConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 657278071D86AE7300A5E1A8 /* RCTConvert+PSPDFConfiguration.m */; };
 		657278111D86AEC600A5E1A8 /* RCTConvert+PSPDFDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 657278101D86AEC600A5E1A8 /* RCTConvert+PSPDFDocument.m */; };
@@ -65,6 +66,7 @@
 		48A73FC72BD8283A00BDD8FD /* RCTConvert+PSPDFEditMenuAppearance.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "RCTConvert+PSPDFEditMenuAppearance.swift"; sourceTree = "<group>"; };
 		48A73FD42BD8363A00BDD8FD /* SessionStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SessionStorage.swift; sourceTree = "<group>"; };
 		48A73FDA2BDF828B00BDD8FD /* RCTConvert+PSPDFImageSaveMode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "RCTConvert+PSPDFImageSaveMode.swift"; path = "../../../samples/Catalog/node_modules/react-native-pspdfkit/ios/RCTPSPDFKit/Converters/RCTConvert+PSPDFImageSaveMode.swift"; sourceTree = "<group>"; };
+		48A892EB2C78C90F00B49A25 /* RCTConvert+PSPDFAnnotationType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "RCTConvert+PSPDFAnnotationType.swift"; sourceTree = "<group>"; };
 		6540D1821D89D22E00B8F94F /* RCTPSPDFKitManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RCTPSPDFKitManager.h; sourceTree = "<group>"; };
 		6540D1831D89D22E00B8F94F /* RCTPSPDFKitManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RCTPSPDFKitManager.m; sourceTree = "<group>"; };
 		657277151D8312EA00A5E1A8 /* libRCTPSPDFKit.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRCTPSPDFKit.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -137,6 +139,7 @@
 			isa = PBXGroup;
 			children = (
 				48A73FC32BD8281500BDD8FD /* AnnotationConfigurationsConvertor.swift */,
+				48A892EB2C78C90F00B49A25 /* RCTConvert+PSPDFAnnotationType.swift */,
 				48A73FC52BD8283100BDD8FD /* RCTConvert+PSPDFAnnotationFlags.swift */,
 				48A73FC72BD8283A00BDD8FD /* RCTConvert+PSPDFEditMenuAppearance.swift */,
 				48A73FDA2BDF828B00BDD8FD /* RCTConvert+PSPDFImageSaveMode.swift */,
@@ -262,6 +265,7 @@
 				48A73FC42BD8281500BDD8FD /* AnnotationConfigurationsConvertor.swift in Sources */,
 				4856D2FD2BEC037E00EA03C6 /* PDFDocumentManager.m in Sources */,
 				84BC2EAD229EE9FF00A386C6 /* RCTConvert+PSPDFViewMode.m in Sources */,
+				48A892EC2C78C90F00B49A25 /* RCTConvert+PSPDFAnnotationType.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

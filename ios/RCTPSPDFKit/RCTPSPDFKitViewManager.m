@@ -258,6 +258,36 @@ RCT_EXPORT_METHOD(exitCurrentlyActiveMode:(nonnull NSNumber *)reactTag resolver:
   });
 }
 
+RCT_EXPORT_METHOD(clearSelectedAnnotations:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+  dispatch_async(dispatch_get_main_queue(), ^{
+      RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
+      BOOL success = [component clearSelectedAnnotations];
+    if (success) {
+      resolve(@(success));
+    } else {
+      reject(@"error", @"Failed to clear selected annotations.", nil);
+    }
+  });
+}
+
+RCT_EXPORT_METHOD(selectAnnotations:(id)jsonAnnotations reactTag:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+    
+    if(![jsonAnnotations isKindOfClass: [NSArray class]]) {
+        reject(@"error", @"Please provide list of annotation objects", nil);
+        return;
+    }
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
+        BOOL success = [component selectAnnotations:jsonAnnotations];
+        if (success) {
+          resolve(@(success));
+        } else {
+          reject(@"error", @"Failed to select annotations", nil);
+        }
+    });
+}
+
 RCT_EXPORT_METHOD(saveCurrentDocument:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   dispatch_async(dispatch_get_main_queue(), ^{
     RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];

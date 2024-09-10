@@ -34,9 +34,11 @@ import com.pspdfkit.annotations.configuration.SoundAnnotationConfiguration
 import com.pspdfkit.annotations.configuration.StampAnnotationConfiguration
 import com.pspdfkit.annotations.stamps.StampPickerItem
 import com.pspdfkit.configuration.annotations.AnnotationAggregationStrategy
+import com.pspdfkit.react.annotations.ReactAnnotationPresetConfiguration
 import com.pspdfkit.ui.fonts.Font
 import com.pspdfkit.ui.inspector.views.BorderStylePreset
 import com.pspdfkit.ui.special_mode.controller.AnnotationTool
+import com.pspdfkit.ui.special_mode.controller.AnnotationToolVariant
 import java.util.EnumSet
 
 const val DEFAULT_COLOR = "defaultColor"
@@ -104,12 +106,12 @@ class AnnotationConfigurationAdaptor {
 
     companion object {
 
-        private val configurations = mutableMapOf<AnnotationType, AnnotationConfiguration>()
+        private val configurationsList:MutableList<ReactAnnotationPresetConfiguration> = mutableListOf()
 
         @JvmStatic
         fun convertAnnotationConfigurations(
             context: Context, annotationConfigurations: ReadableMap
-        ): Map<AnnotationType, AnnotationConfiguration> {
+        ): List<ReactAnnotationPresetConfiguration> {
 
             val iterator = annotationConfigurations.keySetIterator()
 
@@ -118,158 +120,199 @@ class AnnotationConfigurationAdaptor {
                 val configuration = annotationConfigurations.getMap(key) ?: continue
                 when (key) {
                     ANNOTATION_INK_PEN -> {
-                        configurations[INK] =
-                            parseInkAnnotationConfiguration(context, configuration)
+                        configurationsList.add(ReactAnnotationPresetConfiguration(INK,
+                                AnnotationTool.INK,
+                                AnnotationToolVariant.fromPreset(AnnotationToolVariant.Preset.PEN),
+                                parseInkAnnotationConfiguration(context, configuration)))
                     }
 
                     ANNOTATION_INK_HIGHLIGHTER -> {
-                        configurations[AnnotationTool.INK.toAnnotationType()] =
-                            parseInkAnnotationConfiguration(context, configuration)
+                        configurationsList.add(ReactAnnotationPresetConfiguration(INK,
+                                AnnotationTool.INK,
+                                AnnotationToolVariant.fromPreset(AnnotationToolVariant.Preset.HIGHLIGHTER),
+                                parseInkAnnotationConfiguration(context, configuration)))
                     }
 
                     ANNOTATION_INK_MAGIC -> {
-                        configurations[AnnotationTool.MAGIC_INK.toAnnotationType()] =
-                            parseInkAnnotationConfiguration(context, configuration)
+                        configurationsList.add(ReactAnnotationPresetConfiguration(INK,
+                                AnnotationTool.MAGIC_INK,
+                                AnnotationToolVariant.fromPreset(AnnotationToolVariant.Preset.MAGIC),
+                                parseInkAnnotationConfiguration(context, configuration)))
                     }
 
                     ANNOTATION_UNDERLINE -> {
-                        configurations[UNDERLINE] =
-                            parseMarkupAnnotationConfiguration(context, configuration, UNDERLINE)
+                        configurationsList.add(ReactAnnotationPresetConfiguration(UNDERLINE,
+                                AnnotationTool.UNDERLINE,
+                                null,
+                                parseMarkupAnnotationConfiguration(context, configuration, UNDERLINE)))
                     }
 
                     ANNOTATION_FREE_TEXT -> {
-                        configurations[FREETEXT] =
-                            parserFreeTextAnnotationConfiguration(context, configuration)
+                        configurationsList.add(ReactAnnotationPresetConfiguration(FREETEXT,
+                                AnnotationTool.FREETEXT,
+                                null,
+                                parserFreeTextAnnotationConfiguration(context, configuration)))
                     }
 
                     ANNOTATION_LINE -> {
-                        configurations[LINE] =
-                            parseLineAnnotationConfiguration(
-                                context,
-                                configuration,
-                                LINE,
-                                AnnotationTool.LINE
-                            )
+                        configurationsList.add(ReactAnnotationPresetConfiguration(LINE,
+                                AnnotationTool.LINE,
+                                null,
+                                parseLineAnnotationConfiguration(context, configuration, LINE, AnnotationTool.LINE)))
                     }
 
                     ANNOTATION_NOTE -> {
-                        configurations[NOTE] =
-                            parseNoteAnnotationConfiguration(context, configuration)
+                        configurationsList.add(ReactAnnotationPresetConfiguration(NOTE,
+                                AnnotationTool.NOTE,
+                                null,
+                                parseNoteAnnotationConfiguration(context, configuration)))
                     }
 
                     ANNOTATION_STAMP -> {
-                        configurations[STAMP] =
-                            parseStampAnnotationConfiguration(context, configuration)
+                        configurationsList.add(ReactAnnotationPresetConfiguration(STAMP,
+                                AnnotationTool.STAMP,
+                                null,
+                                parseStampAnnotationConfiguration(context, configuration)))
                     }
 
                     ANNOTATION_FILE -> {
-                        configurations[FILE] =
-                            parseFileAnnotationConfiguration(configuration)
+                        configurationsList.add(ReactAnnotationPresetConfiguration(FILE,
+                                null,
+                                null,
+                                parseFileAnnotationConfiguration(configuration)))
                     }
 
                     ANNOTATION_REDACTION -> {
-                        configurations[REDACT] =
-                            parseRedactAnnotationConfiguration(context, configuration)
+                        configurationsList.add(ReactAnnotationPresetConfiguration(REDACT,
+                                null,
+                                null,
+                                parseRedactAnnotationConfiguration(context, configuration)))
                     }
 
                     ANNOTATION_SOUND -> {
-                        configurations[SOUND] =
-                            parseSoundAnnotationConfiguration(configuration)
+                        configurationsList.add(ReactAnnotationPresetConfiguration(SOUND,
+                                null,
+                                null,
+                                parseSoundAnnotationConfiguration(configuration)))
                     }
 
                     ANNOTATION_HIGHLIGHT -> {
-                        configurations[HIGHLIGHT] =
-                            parseMarkupAnnotationConfiguration(context, configuration, HIGHLIGHT)
+                        configurationsList.add(ReactAnnotationPresetConfiguration(HIGHLIGHT,
+                                AnnotationTool.HIGHLIGHT,
+                                null,
+                                parseMarkupAnnotationConfiguration(context, configuration, HIGHLIGHT)))
                     }
 
                     ANNOTATION_SQUARE -> {
-                        configurations[SQUARE] =
-                            parseShapeAnnotationConfiguration(context, configuration, SQUARE)
+                        configurationsList.add(ReactAnnotationPresetConfiguration(SQUARE,
+                                AnnotationTool.SQUARE,
+                                null,
+                                parseShapeAnnotationConfiguration(context, configuration, SQUARE)))
                     }
 
                     ANNOTATION_CIRCLE -> {
-                        configurations[CIRCLE] =
-                            parseShapeAnnotationConfiguration(context, configuration, CIRCLE)
+                        configurationsList.add(ReactAnnotationPresetConfiguration(CIRCLE,
+                                AnnotationTool.CIRCLE,
+                                null,
+                                parseShapeAnnotationConfiguration(context, configuration, CIRCLE)))
                     }
 
                     ANNOTATION_POLYGON -> {
-                        configurations[POLYGON] =
-                            parseShapeAnnotationConfiguration(context, configuration, POLYGON)
+                        configurationsList.add(ReactAnnotationPresetConfiguration(POLYGON,
+                                AnnotationTool.POLYGON,
+                                null,
+                                parseShapeAnnotationConfiguration(context, configuration, POLYGON)))
                     }
 
                     ANNOTATION_POLYLINE -> {
-                        configurations[POLYLINE] =
-                            parseLineAnnotationConfiguration(
-                                context,
-                                configuration,
-                                POLYLINE,
-                                AnnotationTool.POLYLINE
-                            )
+                        configurationsList.add(ReactAnnotationPresetConfiguration(POLYLINE,
+                                AnnotationTool.POLYLINE,
+                                null,
+                                parseLineAnnotationConfiguration(context, configuration, POLYLINE, AnnotationTool.POLYLINE)))
                     }
 
                     ANNOTATION_IMAGE -> {
-                        configurations[AnnotationTool.IMAGE.toAnnotationType()] =
-                            parseStampAnnotationConfiguration(context, configuration)
+                        configurationsList.add(ReactAnnotationPresetConfiguration(STAMP,
+                                AnnotationTool.IMAGE,
+                                null,
+                                parseStampAnnotationConfiguration(context, configuration)))
                     }
 
                     ANNOTATION_ARROW -> {
-                        configurations[LINE] =
-                            parseLineAnnotationConfiguration(
-                                context,
-                                configuration,
-                                LINE,
-                                AnnotationTool.LINE
-                            )
+                        configurationsList.add(ReactAnnotationPresetConfiguration(LINE,
+                                AnnotationTool.LINE,
+                                AnnotationToolVariant.fromPreset(AnnotationToolVariant.Preset.ARROW),
+                                parseLineAnnotationConfiguration(context, configuration, LINE, AnnotationTool.LINE)))
                     }
 
                     ANNOTATION_SQUIGGLY -> {
-                        configurations[SQUIGGLY] =
-                            parseMarkupAnnotationConfiguration(context, configuration, SQUIGGLY)
+                        configurationsList.add(ReactAnnotationPresetConfiguration(SQUIGGLY,
+                                AnnotationTool.SQUIGGLY,
+                                null,
+                                parseMarkupAnnotationConfiguration(context, configuration, SQUIGGLY)))
                     }
 
                     ANNOTATION_STRIKE_OUT -> {
-                        configurations[STRIKEOUT] =
-                            parseMarkupAnnotationConfiguration(context, configuration, STRIKEOUT)
+                        configurationsList.add(ReactAnnotationPresetConfiguration(STRIKEOUT,
+                                AnnotationTool.STRIKEOUT,
+                                null,
+                                parseMarkupAnnotationConfiguration(context, configuration, STRIKEOUT)))
                     }
 
                     ANNOTATION_ERASER -> {
-                        configurations[AnnotationTool.ERASER.toAnnotationType()] =
-                            parseEraserAnnotationConfiguration(configuration)
+                        configurationsList.add(ReactAnnotationPresetConfiguration(null,
+                                AnnotationTool.ERASER,
+                                null,
+                                parseEraserAnnotationConfiguration(configuration)))
                     }
 
                     ANNOTATION_AUDIO -> {
-                        configurations[SOUND] =
-                            parseSoundAnnotationConfiguration(configuration)
+                        configurationsList.add(ReactAnnotationPresetConfiguration(SOUND,
+                                null,
+                                null,
+                                parseSoundAnnotationConfiguration(configuration)))
                     }
 
                     ANNOTATION_FREE_TEXT_CALL_OUT -> {
-                        configurations[AnnotationTool.FREETEXT_CALLOUT.toAnnotationType()] =
-                            parserFreeTextAnnotationConfiguration(context, configuration)
+                        configurationsList.add(ReactAnnotationPresetConfiguration(FREETEXT,
+                                AnnotationTool.FREETEXT_CALLOUT,
+                                null,
+                                parserFreeTextAnnotationConfiguration(context, configuration)))
                     }
 
                     ANNOTATION_MEASUREMENT_AREA_RECT -> {
-                        configurations[AnnotationTool.MEASUREMENT_AREA_RECT.toAnnotationType()] =
-                            parserMeasurementAreaAnnotationConfiguration(context, configuration)
+                        configurationsList.add(ReactAnnotationPresetConfiguration(null,
+                                AnnotationTool.MEASUREMENT_AREA_RECT,
+                                null,
+                                parserMeasurementAreaAnnotationConfiguration(context, configuration)))
                     }
 
                     ANNOTATION_MEASUREMENT_AREA_POLYGON -> {
-                        configurations[AnnotationTool.MEASUREMENT_AREA_POLYGON.toAnnotationType()] =
-                            parserMeasurementAreaAnnotationConfiguration(context, configuration)
+                        configurationsList.add(ReactAnnotationPresetConfiguration(null,
+                                AnnotationTool.MEASUREMENT_AREA_POLYGON,
+                                null,
+                                parserMeasurementAreaAnnotationConfiguration(context, configuration)))
                     }
 
                     ANNOTATION_MEASUREMENT_AREA_ELLIPSE -> {
-                        configurations[AnnotationTool.MEASUREMENT_AREA_ELLIPSE.toAnnotationType()] =
-                            parserMeasurementAreaAnnotationConfiguration(context, configuration)
+                        configurationsList.add(ReactAnnotationPresetConfiguration(null,
+                                AnnotationTool.MEASUREMENT_AREA_ELLIPSE,
+                                null,
+                                parserMeasurementAreaAnnotationConfiguration(context, configuration)))
                     }
 
                     ANNOTATION_MEASUREMENT_PERIMETER -> {
-                        configurations[AnnotationTool.MEASUREMENT_PERIMETER.toAnnotationType()] =
-                            parseMeasurementPerimeterAnnotationConfiguration(context, configuration)
+                        configurationsList.add(ReactAnnotationPresetConfiguration(null,
+                                AnnotationTool.MEASUREMENT_PERIMETER,
+                                null,
+                                parseMeasurementPerimeterAnnotationConfiguration(context, configuration)))
                     }
 
                     ANNOTATION_MEASUREMENT_DISTANCE -> {
-                        configurations[AnnotationTool.MEASUREMENT_DISTANCE.toAnnotationType()] =
-                            parseMeasurementDistanceConfiguration(context, configuration)
+                        configurationsList.add(ReactAnnotationPresetConfiguration(null,
+                                AnnotationTool.MEASUREMENT_DISTANCE,
+                                null,
+                                parseMeasurementDistanceConfiguration(context, configuration)))
                     }
 
                     else -> {
@@ -277,7 +320,7 @@ class AnnotationConfigurationAdaptor {
                     }
                 }
             }
-            return configurations
+            return configurationsList
         }
 
         private fun parserMeasurementAreaAnnotationConfiguration(
@@ -293,8 +336,15 @@ class AnnotationConfigurationAdaptor {
                     )
 
                     DEFAULT_ALPHA -> builder.setDefaultAlpha(configuration.getDouble(key).toFloat())
+
                     DEFAULT_THICKNESS -> builder.setDefaultThickness(
                         configuration.getDouble(key).toFloat()
+                    )
+
+                    DEFAULT_BORDER_STYLE -> builder.setDefaultBorderStylePreset(
+                            extractBorderStyles(
+                                    listOf(configuration.getString(key) ?: "")
+                            ).first()
                     )
 
                     AVAILABLE_COLORS -> configuration.getArray(key)?.let { colors ->
@@ -353,6 +403,10 @@ class AnnotationConfigurationAdaptor {
                         builder.setAvailableColors(extractColors(colors.toArrayList().map { it as String }))
                     }
 
+                    DEFAULT_LINE_END -> configuration.getString(key)?.let { lineEndPair ->
+                        builder.setDefaultLineEnds(extractLineEndPair(lineEndPair))
+                    }
+
                     MAX_ALPHA -> builder.setMaxAlpha(configuration.getDouble(key).toFloat())
                     MIN_ALPHA -> builder.setMinAlpha(configuration.getDouble(key).toFloat())
                     MAX_THICKNESS -> builder.setMaxThickness(configuration.getDouble(key).toFloat())
@@ -364,6 +418,12 @@ class AnnotationConfigurationAdaptor {
                     PREVIEW_ENABLED -> builder.setPreviewEnabled(configuration.getBoolean(key))
                     Z_INDEX_EDITING_ENABLED -> builder.setZIndexEditingEnabled(
                         configuration.getBoolean(key)
+                    )
+
+                    DEFAULT_BORDER_STYLE -> builder.setDefaultBorderStylePreset(
+                        extractBorderStyles(
+                            listOf(configuration.getString(key) ?: "")
+                        ).first()
                     )
 
                     SUPPORTED_PROPERTIES -> configuration.getArray(key)?.let { properties ->
@@ -428,6 +488,12 @@ class AnnotationConfigurationAdaptor {
                     PREVIEW_ENABLED -> builder.setPreviewEnabled(configuration.getBoolean(key))
                     Z_INDEX_EDITING_ENABLED -> builder.setZIndexEditingEnabled(
                         configuration.getBoolean(key)
+                    )
+
+                    DEFAULT_BORDER_STYLE -> builder.setDefaultBorderStylePreset(
+                        extractBorderStyles(
+                            listOf(configuration.getString(key) ?: "")
+                        ).first()
                     )
 
                     SUPPORTED_PROPERTIES -> configuration.getArray(key)?.let { properties ->

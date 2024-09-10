@@ -96,22 +96,24 @@ export class PSPDFKit {
      */
     setPageIndex: (pageIndex: number, animated: boolean) => Promise<boolean>;
     /**
-     * Used to create a new document with processed annotations.
+     * Used to create a new document with processed annotations, allowing a password to unlock the source document.
      * @method processAnnotations
      * @memberof PSPDFKit
-     * @param { string } annotationChange Specifies how an annotation should be included in the resulting document. Available options are: ```flatten```, ```remove```, ```embed```, and ```print```.
-     * @param { string } annotationType Specifies the annotation type that should be flattened. See {@link https://pspdfkit.com/guides/web/json/schema/annotations/} for supported types. Use ```all``` to include all annotation types.
+     * @param { Annotation.Change } annotationChange Specifies how an annotation should be included in the resulting document. See {@link https://pspdfkit.com/api/react-native/Annotation.html#.Change} for supported options.
+     * @param { Array<Annotation.Type> } annotationTypes Specifies the annotation types that should be flattened. See {@link https://pspdfkit.com/api/react-native/Annotation.html#.Type} for supported types. Use ```Annotation.Type.ALL``` to include all annotation types.
      * @param { string } sourceDocumentPath The source document to use as input.
      * @param { string } processedDocumentPath The path where the output document should be written to.
+     * @param { string | null } [password] The password to unlock the source document, if required.
      * @returns { Promise<boolean> } A promise returning ```true``` if the document annotations were successfully flattened, and ```false``` if not.
      * @example
      * const result = await PSPDFKit.processAnnotations(
      *                      'flatten',
      *                      'all',
      *                      sourceDocumentPath,
-     *                      processedDocumentPath);
+     *                      processedDocumentPath,
+     *                      password);
      */
-    processAnnotations: (annotationChange: string, annotationType: string, sourceDocumentPath: string, processedDocumentPath: string) => Promise<boolean>;
+    processAnnotations: (annotationChange: Annotation.Change, annotationTypes: Array<Annotation.Type>, sourceDocumentPath: string, processedDocumentPath: string, password?: string | null) => Promise<boolean>;
     /**
      * Used to present an Instant PDF document for collaboration.
      * @method presentInstant
@@ -528,9 +530,9 @@ export type Props = {
      */
     showDownloadableFonts?: boolean;
     /**
-     * The annotation preset configuration. See {@link https://github.com/PSPDFKit/react-native/blob/5b2716a3f3cd3732c0e5845cc39e28d19b618aa4/ios/RCTPSPDFKit/Converters/AnnotationConfigurationsConvertor.swift#L31} for a list of the supported preset types and {@link https://github.com/PSPDFKit/react-native/blob/5b2716a3f3cd3732c0e5845cc39e28d19b618aa4/ios/RCTPSPDFKit/Converters/AnnotationConfigurationsConvertor.swift#L13} for the supported configuration options.
+     * The annotation preset configuration. See {@link https://pspdfkit.com/api/react-native/Annotation.html#.AnnotationPresetConfiguration} for available options.
      */
-    annotationPresets?: object;
+    annotationPresets?: AnnotationPresetConfiguration;
     /**
      * Used to show or hide the annotation toolbar on Android.
      */
@@ -862,6 +864,25 @@ declare class PSPDFKitView extends React.Component<Props, any, any> {
      */
     getDocument: () => PDFDocument;
     /**
+     * @method clearSelectedAnnotations
+     * @memberof PDFDocument
+     * @description Clears all currently selected Annotations.
+     * @example
+     * const result = await this.pdfRef.current?.clearSelectedAnnotations();
+     * @returns { Promise<any> } A promise containing the result of the operation. ```true``` if the annotations selection were cleared, ```false``` otherwise.
+     */
+    clearSelectedAnnotations: () => Promise<any>;
+    /**
+     * @method selectAnnotations
+     * @memberof PDFDocument
+     * @param { object } annotations An array of the annotations to select in Instant JSON format.
+     * @description Select one or more annotations.
+     * @example
+     * const result = await this.pdfRef.current?.selectAnnotations(annotations);
+     * @returns { Promise<any> } A promise containing the result of the operation. ```true``` if the annotations were selected, ```false``` otherwise.
+     */
+    selectAnnotations: (annotations: object) => Promise<any>;
+    /**
      * Gets all annotations of the given type from the specified page.
      *
      * @method getAnnotations
@@ -881,6 +902,7 @@ declare class PSPDFKitView extends React.Component<Props, any, any> {
      * Adds a new annotation to the current document.
      *
      * @method addAnnotation
+     * @deprecated Since PSPDFKit for React Native 2.12. Use ```this.pdfRef.current?.getDocument()?.addAnnotations()``` instead.
      * @memberof PSPDFKitView
      * @param { object } annotation The InstantJSON of the annotation to add.
      * @example
@@ -1265,7 +1287,7 @@ declare namespace PSPDFKitView {
         let selectedFontName: string;
         let showDownloadableFonts: boolean;
         let style: any;
-        let annotationPresets: object;
+        let annotationPresets: AnnotationPresetConfiguration;
         let hideDefaultToolbar: boolean;
     }
 }
@@ -1298,6 +1320,23 @@ import annotation = require('../src/annotations/Annotation');
 export import Annotation = annotation.Annotation;
 export import AnnotationContextualMenu = annotation.AnnotationContextualMenu;
 export import AnnotationContextualMenuItem = annotation.AnnotationContextualMenuItem;
+export import AnnotationPresetConfiguration = annotation.AnnotationPresetConfiguration;
+
+export import AnnotationPresetInk = annotation.AnnotationPresetInk
+export import AnnotationPresetFreeText = annotation.AnnotationPresetInk
+export import AnnotationPresetStamp = annotation.AnnotationPresetStamp
+export import AnnotationPresetNote = annotation.AnnotationPresetNote
+export import AnnotationPresetMarkup = annotation.AnnotationPresetMarkup
+export import AnnotationPresetShape = annotation.AnnotationPresetShape
+export import AnnotationPresetLine = annotation.AnnotationPresetLine
+export import AnnotationPresetEraser = annotation.AnnotationPresetEraser
+export import AnnotationPresetFile = annotation.AnnotationPresetFile
+export import AnnotationPresetSound = annotation.AnnotationPresetSound
+export import AnnotationPresetRedact = annotation.AnnotationPresetRedact
+export import AnnotationPresetMeasurementArea = annotation.AnnotationPresetMeasurementArea
+export import AnnotationPresetMeasurementPerimeter = annotation.AnnotationPresetMeasurementPerimeter
+export import AnnotationPresetMeasurementDistance = annotation.AnnotationPresetMeasurementDistance
+
 //@ts-ignore
 import document = require('../src/document/PDFDocument');
 export import PDFDocument = document.PDFDocument;

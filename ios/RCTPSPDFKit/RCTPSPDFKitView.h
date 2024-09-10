@@ -56,6 +56,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)addAnnotations:(NSString *)jsonAnnotations error:(NSError *_Nullable *)error;
 - (BOOL)setAnnotationFlags:(NSString *)uuid flags:(NSArray<NSString *> *)flags;
 - (NSArray <NSString *> *)getAnnotationFlags:(NSString *)uuid;
+- (BOOL)clearSelectedAnnotations;
+- (BOOL)selectAnnotations:(NSArray *)annotations;
 
 /// Forms
 - (NSDictionary<NSString *, NSString *> *)getFormFieldValue:(NSString *)fullyQualifiedName;

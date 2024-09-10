@@ -18,7 +18,7 @@ import com.pspdfkit.document.formatters.XfdfFormatter
 import com.pspdfkit.document.providers.ContentResolverDataProvider
 import com.pspdfkit.document.providers.DataProvider
 import com.pspdfkit.internal.model.ImageDocumentImpl
-import com.pspdfkit.react.helper.ConversionHelpers.getAnnotationTypeFromString
+import com.pspdfkit.react.helper.ConversionHelpers.getAnnotationTypes
 import com.pspdfkit.react.helper.DocumentJsonDataProvider
 import com.pspdfkit.react.helper.JsonUtilities
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -93,7 +93,6 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
                     promise.resolve(true)
                 }
             }
-            promise.reject("save error", RuntimeException("Could not save document"))
         } catch (e: Throwable) {
             promise.reject("save error", e)
         }
@@ -125,7 +124,7 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
     @ReactMethod fun getAnnotations(reference: Int, type: String?, promise: Promise) {
         try {
             this.getDocument(reference)?.let {
-                it.annotationProvider.getAllAnnotationsOfTypeAsync(if (type == null) ALL_ANNOTATION_TYPES else getAnnotationTypeFromString(type))
+                it.annotationProvider.getAllAnnotationsOfTypeAsync(if (type == null) ALL_ANNOTATION_TYPES else getAnnotationTypes(Arguments.makeNativeArray<String>(arrayOf(type))))
                         .toList()
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
@@ -163,7 +162,7 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
                 }
 
                 it.annotationProvider.getAllAnnotationsOfTypeAsync(if (type == null) EnumSet.allOf(AnnotationType::class.java) else
-                    getAnnotationTypeFromString(type), pageIndex, 1)
+                    getAnnotationTypes(Arguments.makeNativeArray<String>(arrayOf(type))), pageIndex, 1)
                         .toList()
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
@@ -229,7 +228,7 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
     @ReactMethod fun addAnnotations(reference: Int, instantJSON: ReadableMap, promise: Promise) {
         try {
             this.getDocument(reference)?.let {
-                val json = JSONObject(instantJSON.toHashMap())
+                val json = JSONObject(instantJSON.toHashMap() as Map<*, *>?)
                 val dataProvider: DataProvider = DocumentJsonDataProvider(json)
                 DocumentJsonFormatter.importDocumentJsonAsync(it, dataProvider)
                         .subscribeOn(Schedulers.io())

@@ -68,6 +68,7 @@ class Measurement extends BaseExampleAutoHidingHeaderComponent {
                   valueTo: 3.0,
                 },
                 precision: Measurements.Precision.TWO_DP,
+                isSelected: true, 
               },
               {
                 name: 'Custom Scale 2',

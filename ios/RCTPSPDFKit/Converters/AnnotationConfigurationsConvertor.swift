@@ -237,12 +237,17 @@ public class AnnotationsConfigurationsConvertor: NSObject {
                 
             case DEFAULT_BORDER_STYLE:
                 if let borderStyle = presets[key] as? String {
-                    styleManager.setLastUsedValue(parseBorderStyle(borderStyle: borderStyle), forProperty: #keyPath(Annotation.borderStyle), forKey: annotationTool)
+                    let annotationBorderStyle = parseBorderStyle(borderStyle: borderStyle)
+                    styleManager.setLastUsedValue(annotationBorderStyle, forProperty: #keyPath(Annotation.borderStyle), forKey: annotationTool)
+                    
+                    if (annotationBorderStyle == .dashed) {
+                        styleManager.setLastUsedValue(parseBorderDashArray(borderStyle: borderStyle), forProperty: #keyPath(LineAnnotation.__dashArray), forKey: annotationTool)
+                    }
                 }
                 break
             case DEFAULT_BORDER_EFFECT:
                 if  let borderEffect = presets[key] as? String {
-                styleManager.setLastUsedValue(parseBorderEffect(borderEffect: borderEffect), forProperty: #keyPath(Annotation.borderEffect), forKey: annotationTool)
+                    styleManager.setLastUsedValue(parseBorderEffect(borderEffect: borderEffect), forProperty: #keyPath(Annotation.borderEffect), forKey: annotationTool)
                 }
                 break
             case BLEND_MODE:
@@ -256,8 +261,8 @@ public class AnnotationsConfigurationsConvertor: NSObject {
                     if lineEndArray.count < 2 {
                         break
                     }
-                    styleManager.setLastUsedValue(parseLineEnd(lineEnd: lineEndArray[0]), forProperty: #keyPath(LineAnnotation.lineEnd1), forKey: annotationTool)
-                    styleManager.setLastUsedValue(parseLineEnd(lineEnd: lineEndArray[1]), forProperty: #keyPath(LineAnnotation.lineEnd2), forKey: annotationTool)
+                    styleManager.setLastUsedValue(NSNumber(integerLiteral:parseLineEnd(lineEnd: lineEndArray[0]).rawValue), forProperty: #keyPath(LineAnnotation.lineEnd1), forKey: annotationTool)
+                    styleManager.setLastUsedValue(NSNumber(integerLiteral:parseLineEnd(lineEnd: lineEndArray[1]).rawValue), forProperty: #keyPath(LineAnnotation.lineEnd2), forKey: annotationTool)
                     break
                 }
                 break
@@ -293,7 +298,13 @@ public class AnnotationsConfigurationsConvertor: NSObject {
     }
 
     private class func parseBorderStyle(borderStyle: String) -> Annotation.BorderStyle {
-        switch borderStyle {
+        var parsedBorderStyle = borderStyle
+
+        if parsedBorderStyle.contains("dashed_") {
+            parsedBorderStyle = parsedBorderStyle.components(separatedBy: "_")[0]
+        }
+        
+        switch parsedBorderStyle {
         case "solid":
             return .solid
         case "dashed":
@@ -307,6 +318,28 @@ public class AnnotationsConfigurationsConvertor: NSObject {
         default:
             return .solid
         }
+    }
+    
+    private class func parseBorderDashArray(borderStyle: String) -> Array<Int> {
+        var dashArray = [Int]()
+        
+        // Example format: dashed_1_3
+        if borderStyle.contains("dashed_") {
+            let parsedBorderArray = borderStyle.split(separator: "_", maxSplits: 1)[1]
+            // Example format: 1_3
+            if parsedBorderArray.contains("_") {
+                let parsedDashArray = parsedBorderArray.components(separatedBy: "_")
+                if (parsedDashArray.count == 2) {
+                    dashArray.append(Int(parsedDashArray[0]) ?? 1)
+                    dashArray.append(Int(parsedDashArray[1]) ?? 1)
+                }
+            }
+        } else {
+            dashArray.append(1)
+            dashArray.append(1)
+        }
+        
+        return dashArray
     }
 
     private class func parseTextAlignment(textAlignment: String) -> NSTextAlignment {

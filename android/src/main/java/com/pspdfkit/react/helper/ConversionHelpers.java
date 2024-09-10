@@ -22,70 +22,123 @@ import com.pspdfkit.ui.toolbar.ContextualToolbarMenuItem;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.List;
 
 public class ConversionHelpers {
 
-    public static EnumSet<AnnotationType> getAnnotationTypeFromString(@Nullable final String type) {
-        if (type == null || "all".equalsIgnoreCase(type)) {
+    public static EnumSet<AnnotationType> getAnnotationTypes(@Nullable final ReadableArray types) {
+        if (types == null) {
             return EnumSet.allOf(AnnotationType.class);
         }
 
-        switch (type.toLowerCase()) {
-            case "pspdfkit/link":
-                return EnumSet.of(AnnotationType.LINK);
-            case "pspdfkit/ink":
-                return EnumSet.of(AnnotationType.INK);
-            case "pspdfkit/markup/highlight":
-                return EnumSet.of(AnnotationType.HIGHLIGHT);
-            case "pspdfkit/image":
-            case "pspdfkit/stamp":
-                return EnumSet.of(AnnotationType.STAMP);
-            case "pspdfkit/markup/squiggly":
-                return EnumSet.of(AnnotationType.SQUIGGLY);
-            case "pspdfkit/markup/strikeout":
-                return EnumSet.of(AnnotationType.STRIKEOUT);
-            case "pspdfkit/markup/underline":
-                return EnumSet.of(AnnotationType.UNDERLINE);
-            case "pspdfkit/note":
-                return EnumSet.of(AnnotationType.NOTE);
-            case "pspdfkit/shape/ellipse":
-                return EnumSet.of(AnnotationType.CIRCLE);
-            case "pspdfkit/shape/line":
-                return EnumSet.of(AnnotationType.LINE);
-            case "pspdfkit/shape/polygon":
-                return EnumSet.of(AnnotationType.POLYGON);
-            case "pspdfkit/shape/polyline":
-                return EnumSet.of(AnnotationType.POLYLINE);
-            case "pspdfkit/shape/rectangle":
-                return EnumSet.of(AnnotationType.SQUARE);
-            case "pspdfkit/caret":
-                return EnumSet.of(AnnotationType.CARET);
-            case "pspdfkit/text":
-                return EnumSet.of(AnnotationType.FREETEXT);
-            case "pspdfkit/richmedia":
-                return EnumSet.of(AnnotationType.RICHMEDIA);
-            case "pspdfkit/widget":
-                return EnumSet.of(AnnotationType.WIDGET);
-            case "pspdfkit/watermark":
-                return EnumSet.of(AnnotationType.WATERMARK);
-            case "pspdfkit/file":
-                return EnumSet.of(AnnotationType.FILE);
-            case "pspdfkit/sound":
-                return EnumSet.of(AnnotationType.SOUND);
-            case "pspdfkit/popup":
-                return EnumSet.of(AnnotationType.POPUP);
-            case "pspdfkit/trapnet":
-                return EnumSet.of(AnnotationType.TRAPNET);
-            case "pspdfkit/type3d":
-                return EnumSet.of(AnnotationType.TYPE3D);
-            case "pspdfkit/redact":
-                return EnumSet.of(AnnotationType.REDACT);
+        EnumSet<AnnotationType> convertedTypes = EnumSet.noneOf(AnnotationType.class);
 
-            case "all":
-            default:
-                return EnumSet.allOf(AnnotationType.class);
+        for (int i = 0; i < types.size(); i++) {
+            String type = types.getString(i);
+            switch (type.toLowerCase()) {
+                case "pspdfkit/link":
+                case "link":
+                    convertedTypes.add(AnnotationType.LINK);
+                    break;
+                case "pspdfkit/ink":
+                case "ink":
+                    convertedTypes.add(AnnotationType.INK);
+                    break;
+                case "pspdfkit/markup/highlight":
+                case "highlight":
+                    convertedTypes.add(AnnotationType.HIGHLIGHT);
+                    break;
+                case "pspdfkit/image":
+                case "image":
+                case "pspdfkit/stamp":
+                case "stamp":
+                    convertedTypes.add(AnnotationType.STAMP);
+                    break;
+                case "pspdfkit/markup/squiggly":
+                case "squiggly":
+                    convertedTypes.add(AnnotationType.SQUIGGLY);
+                    break;
+                case "pspdfkit/markup/strikeout":
+                case "strikeout":
+                    convertedTypes.add(AnnotationType.STRIKEOUT);
+                    break;
+                case "pspdfkit/markup/underline":
+                case "underline":
+                    convertedTypes.add(AnnotationType.UNDERLINE);
+                    break;
+                case "pspdfkit/note":
+                case "note":
+                    convertedTypes.add(AnnotationType.NOTE);
+                    break;
+                case "pspdfkit/shape/ellipse":
+                case "ellipse":
+                    convertedTypes.add(AnnotationType.CIRCLE);
+                    break;
+                case "pspdfkit/shape/line":
+                case "line":
+                    convertedTypes.add(AnnotationType.LINE);
+                    break;
+                case "pspdfkit/shape/polygon":
+                case "polygon":
+                    convertedTypes.add(AnnotationType.POLYGON);
+                    break;
+                case "pspdfkit/shape/polyline":
+                case "polyline":
+                    convertedTypes.add(AnnotationType.POLYLINE);
+                    break;
+                case "pspdfkit/shape/rectangle":
+                case "square":
+                    convertedTypes.add(AnnotationType.SQUARE);
+                    break;
+                case "pspdfkit/caret":
+                case "caret":
+                    convertedTypes.add(AnnotationType.CARET);
+                    break;
+                case "pspdfkit/text":
+                case "freetext":
+                    convertedTypes.add(AnnotationType.FREETEXT);
+                    break;
+                case "pspdfkit/richmedia":
+                case "richmedia":
+                    convertedTypes.add(AnnotationType.RICHMEDIA);
+                    break;
+                case "pspdfkit/widget":
+                case "widget":
+                    convertedTypes.add(AnnotationType.WIDGET);
+                    break;
+                case "pspdfkit/watermark":
+                case "watermark":
+                    convertedTypes.add(AnnotationType.WATERMARK);
+                    break;
+                case "pspdfkit/file":
+                case "file":
+                    convertedTypes.add(AnnotationType.FILE);
+                    break;
+                case "pspdfkit/sound":
+                case "sound":
+                    convertedTypes.add(AnnotationType.SOUND);
+                    break;
+                case "pspdfkit/popup":
+                case "popup":
+                    convertedTypes.add(AnnotationType.POPUP);
+                    break;
+                case "pspdfkit/trapnet":
+                case "trapnet":
+                    convertedTypes.add(AnnotationType.TRAPNET);
+                    break;
+                case "pspdfkit/type3d":
+                case "threedimensional":
+                    convertedTypes.add(AnnotationType.TYPE3D);
+                    break;
+                case "pspdfkit/redact":
+                case "redaction":
+                    convertedTypes.add(AnnotationType.REDACT);
+                    break;
+                case "all":
+                default:
+                    return EnumSet.allOf(AnnotationType.class);
+            }
         }
+        return convertedTypes;
     }
 
     public static EnumSet<AnnotationFlags> getAnnotationFlags(final ReadableArray flags) {
@@ -122,7 +175,6 @@ public class ConversionHelpers {
                 default:
                     break;
             }
-
         }
         return convertedFlags;
     }

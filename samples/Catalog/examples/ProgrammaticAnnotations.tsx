@@ -252,7 +252,6 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
             <View>
               <Button
                 onPress={() => {
-
                   // Programmatically add an ink annotation.
                   this.pdfRef.current?.getDocument().addAnnotations(ProgrammaticAnnotations.inkAnnotation)
                     .then(result => {
@@ -301,7 +300,6 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
             <View style={styles.marginLeft}>
               <Button
                 onPress={async () => {
-                  
                   // For certain type of widget annotations, the document cache needs to be cleared before adding them.
                   await this.pdfRef.current?.getDocument().invalidateCache();
                   // Programmatically add multiple annotations.
@@ -329,7 +327,6 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
             <View>
               <Button
                 onPress={() => {
-
                   // Programmatically add multiple annotations.
                   this.pdfRef.current?.getDocument().addAnnotations(ProgrammaticAnnotations.multipleAnnotations)
                     .then(result => {
@@ -352,7 +349,6 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
             <View style={styles.marginLeft}>
               <Button
                 onPress={async () => {
-
                   // Programmatically add a downloaded image annotation.
                   const filePath = fileSystem.DocumentDirectoryPath + '/pspdfkit.png';
                   fileSystem.downloadFile({
@@ -417,7 +413,6 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
             <View>
               <Button
                 onPress={() => {
-
                   // Get ink annotations from the current page.
                   this.pdfRef.current?.getDocument().getAnnotationsForPage(
                       this.state.currentPageIndex,
@@ -440,33 +435,25 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
             <View style={styles.marginLeft}>
               <Button
                 onPress={() => {
-
-                  // Get stamp annotations from the current page.
-                  this.pdfRef.current?.getDocument().getAnnotationsForPage(
-                      this.state.currentPageIndex,
-                      'pspdfkit/stamp',
-                    )
-                    .then(result => {
-                      if (result) {
-                        Alert.alert('PSPDFKit', JSON.stringify(result));
-                      } else {
-                        Alert.alert('PSPDFKit', 'Failed to get annotations.');
-                      }
+                  // Select all the Ink annotations on page 0.
+                  const document = this.pdfRef.current?.getDocument();
+                  document?.getAnnotationsForPage(0, 'pspdfkit/ink')
+                    .then( async annotations => {
+                      await this.pdfRef.current?.selectAnnotations(annotations);
                     })
                     .catch(error => {
                       Alert.alert('PSPDFKit', JSON.stringify(error));
                     });
                 }}
-                title="Get Image Annotations"
+                title="Select Ink Annotations"
               />
             </View>
           </View>
           <View style={styles.wrapper}>
             <View>
               <Button
-                title={'Remove annotations'}
+              // Remove all the annotations from the document.
                 onPress={() => {
-
                   const document = this.pdfRef.current?.getDocument();
                   document?.getAnnotations() // No parameter returns all annotations
                     .then( annotations => {
@@ -476,12 +463,12 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
                       Alert.alert('PSPDFKit', JSON.stringify(error));
                     });
                 }}
+                title={'Remove annotations'}
               />
             </View>
             <View style={styles.marginLeft}>
               <Button
                 onPress={() => {
-
                   // Get all annotations annotations from the document.
                   this.pdfRef.current?.getDocument().getAnnotations()
                     .then(result => {

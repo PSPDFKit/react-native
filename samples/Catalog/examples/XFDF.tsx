@@ -49,6 +49,9 @@ export class XFDF extends BaseExampleAutoHidingHeaderComponent {
                 </TouchableOpacity>
                 <TouchableOpacity onPress={ async () => {
                   const outputFile = RNFS.TemporaryDirectoryPath + '/test.xfdf';
+                  if (await RNFS.exists(outputFile)) {
+                    await RNFS.unlink(outputFile);
+                  }
                   const result = await this.pdfRef.current?.getDocument().exportXFDF(outputFile);
                   Alert.alert('PSPDFKit', 'Export XFDF result: ' + JSON.stringify(result));
                   console.log('Export XFDF result: ', result);

@@ -155,6 +155,46 @@
   return true;
 }
 
+- (BOOL)clearSelectedAnnotations {
+    if (self.pdfController.visiblePageViews.count >= 1) {
+        PSPDFPageView * pageView = self.pdfController.visiblePageViews[0];
+        pageView.selectedAnnotations = @[];
+        return YES;
+    } else {
+        return NO;
+    }
+}
+
+- (BOOL)selectAnnotations:(NSArray<NSDictionary *> *)annotationsJSON {
+    if (self.pdfController.visiblePageViews.count >= 1 && annotationsJSON.count > 0) {
+        PSPDFDocument *document = self.pdfController.document;
+        VALIDATE_DOCUMENT(document, NO)
+        
+        NSMutableArray *annotationsToSelect = [NSMutableArray new];
+        NSArray<PSPDFAnnotation *> *allAnnotations = [[document allAnnotationsOfType:PSPDFAnnotationTypeAll].allValues valueForKeyPath:@"@unionOfArrays.self"];
+        for (PSPDFAnnotation *annotation in allAnnotations) {
+            for (NSDictionary *annotationJSON in annotationsJSON) {
+                // Try to find the annotation according to either uuid or name
+                if ((![annotationJSON[@"uuid"] isEqual:[NSNull null]] &&
+                     ![annotation.uuid isEqual:[NSNull null]] &&
+                     [annotation.uuid isEqualToString:annotationJSON[@"uuid"]]) ||
+                    (![annotationJSON[@"name"] isEqual:[NSNull null]] &&
+                     ![annotation.name isEqual:[NSNull null]] &&
+                     [annotation.name isEqualToString:annotationJSON[@"name"]])) {
+                          [annotationsToSelect addObject:annotation];
+                          break;
+                     }
+              }
+        }
+        
+        PSPDFPageView * pageView = self.pdfController.visiblePageViews[0];
+        pageView.selectedAnnotations = annotationsToSelect;
+        return YES;
+    } else {
+        return NO;
+    }
+}
+
 - (BOOL)saveCurrentDocumentWithError:(NSError *_Nullable *)error {
   return [self.pdfController.document saveWithOptions:nil error:error];
 }
