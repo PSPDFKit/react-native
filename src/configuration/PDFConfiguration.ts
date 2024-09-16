@@ -101,7 +101,9 @@ import { MeasurementValueConfiguration } from './../measurements/Measurements';
  * @property { PDFConfiguration.BooleanType } [syncAnnotations] Indicates whether document annotations should be synced with the Instant server.
  * @property { Measurements.MeasurementValueConfiguration[] } [measurementValueConfigurations] The array of ```MeasurementValueConfiguration``` objects that should be applied to the document.
  * @property { PDFConfiguration.RemoteDocumentConfiguration } [remoteDocumentConfiguration] The configuration when downloading a document from a remote URL.
- */
+ * @property { PDFConfiguration.SignatureCreationModes[] } [signatureCreationModes] The signature creation modes that should be available in the signature picker.
+ * @property { PDFConfiguration.SignatureColorOptions[] } [signatureColorOptions] The color options that should be available in the signature picker, max of 3 colors are supported. If all 3 colors are not provided, defaults will be used in their place.
+*/
 
 export class PDFConfiguration {
 
@@ -475,6 +477,16 @@ export class PDFConfiguration {
      * The configuration when downloading a document from a remote URL.
      */
     remoteDocumentConfiguration?: RemoteDocumentConfiguration;
+
+    /**
+     * The signature creation modes that should be available in the signature picker.
+     */
+    signatureCreationModes?: PDFConfiguration.SignatureCreationModes[];
+
+    /**
+     * The signature color options that should be available in the signature picker, max of 3 colors are supported. If all 3 colors are not provided, defaults will be used in their place.
+     */
+    signatureColorOptions?: PDFConfiguration.SignatureColorOptions[];
 }
 
 export namespace PDFConfiguration {
@@ -1000,6 +1012,37 @@ export namespace PDFConfiguration {
         */
         PAGE_BASED: 'pageBased'
     } as const;
+
+    /**
+     * The possible ways in which the user can input their signature.
+     * @readonly
+     * @enum {string} SignatureCreationModes
+     */
+    export const SignatureCreationModes = {
+      /**
+       * The user draws their signature. For example using a finger or stylus.
+       */
+      DRAW: 'draw',
+      /**
+       * The user selects an existing image of their signature from their photo library or files, or takes
+       * a photo of their signature written on a piece of paper.
+       */
+      IMAGE: 'image',
+      /**
+       * The user types their name and selects a style for their signature from a small number of fonts.
+       */
+      TYPE: 'type'
+    } as const;
+
+    /**
+     * Color defined by a hex string of RGB values.
+     */
+    export type HexColor = `#${string}`;
+
+    /**
+     * Color defined by RGB values.
+     */
+    export type RGBColor = `rgb(${number},${number},${number})`;
     
     export type BooleanType = ValueOf<typeof BooleanType>;
     export type ScrollDirection = ValueOf<typeof ScrollDirection>;
@@ -1023,6 +1066,8 @@ export namespace PDFConfiguration {
     export type IOSLinkAction = ValueOf<typeof IOSLinkAction>;
     export type IOSDrawCreateMode = ValueOf<typeof IOSDrawCreateMode>;
     export type IOSBookmarkSortOrder = ValueOf<typeof IOSBookmarkSortOrder>;
+    export type SignatureCreationModes = ValueOf<typeof SignatureCreationModes>;
+    export type SignatureColorOptions = HexColor | RGBColor | string;
 }
 
 /**

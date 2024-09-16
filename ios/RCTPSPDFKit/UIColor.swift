@@ -11,7 +11,7 @@
 import UIKit
 
 extension UIColor {
-    public convenience init?(hexString: String) {
+    @objc public convenience init?(hexString: String) {
         let r, g, b, a: CGFloat
 
         if hexString.hasPrefix("#") {
@@ -51,7 +51,7 @@ extension UIColor {
     }
 
 
-    public static func colorFromName(_ name: String) -> UIColor? {
+    @objc public static func colorFromName(_ name: String) -> UIColor? {
         let selector = Selector("\(name)Color")
         if UIColor.self.responds(to: selector) {
             let color = UIColor.self.perform(selector).takeUnretainedValue()
@@ -61,7 +61,7 @@ extension UIColor {
         return nil
     }
 
-    public static func rgb(_ colorValue: String) -> UIColor? {
+    @objc public static func rgb(_ colorValue: String) -> UIColor? {
         let colorsComponentString: String = colorValue.replacingOccurrences(of: "rgb(", with: "").replacingOccurrences(of: ")", with: "").replacingOccurrences(of: " ", with: "")
         let colorComponents = colorsComponentString.components(separatedBy: ",")
 
@@ -101,6 +101,14 @@ extension UIColor {
         getRed(&red, green: &green, blue: &blue, alpha: &alpha)
         return Int(alpha * 255) << 24
              + Int(red   * 255) << 16
+             + Int(green * 255) << 8
+             + Int(blue  * 255)
+    }
+
+    @objc public var hex: Int {
+        var red: CGFloat = 0, green: CGFloat = 0, blue: CGFloat = 0, alpha: CGFloat = 0
+        getRed(&red, green: &green, blue: &blue, alpha: &alpha)
+        return Int(red   * 255) << 16
              + Int(green * 255) << 8
              + Int(blue  * 255)
     }

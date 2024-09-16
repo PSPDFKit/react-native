@@ -14,6 +14,7 @@
 package com.pspdfkit.react;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -31,8 +32,11 @@ import com.pspdfkit.configuration.page.PageLayoutMode;
 import com.pspdfkit.configuration.page.PageScrollDirection;
 import com.pspdfkit.configuration.page.PageScrollMode;
 import com.pspdfkit.configuration.sharing.ShareFeatures;
+import com.pspdfkit.configuration.signatures.SignatureColorOptions;
+import com.pspdfkit.configuration.signatures.SignatureCreationMode;
 import com.pspdfkit.configuration.signatures.SignatureSavingStrategy;
 import com.pspdfkit.preferences.PSPDFKitPreferences;
+import com.pspdfkit.react.helper.ColorHelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -113,6 +117,10 @@ public class ConfigurationAdapter {
     private static final String ENABLED_MEASUREMENT_TOOLS = "enableMeasurementTools";
     private static final String ENABLE_MAGNIFIER = "enableMagnifier";
     private static final String ENABLED_MEASUREMENT_TOOL_SNAPPING = "enableMeasurementToolSnapping";
+
+    // Signature presentation options
+    private static final String SIGNATURE_CREATION_MODES = "signatureCreationModes";
+    private static final String SIGNATURE_COLOR_OPTIONS = "signatureColorOptions";
 
     // Deprecated Options
     /**
@@ -321,6 +329,14 @@ public class ConfigurationAdapter {
             key = getKeyOrNull(configuration, ENABLED_MEASUREMENT_TOOL_SNAPPING);
             if (key != null) {
                 configureMeasurementToolSnappingEnabled(context, configuration.getBoolean(key));
+            }
+            key = getKeyOrNull(configuration, SIGNATURE_CREATION_MODES);
+            if (key != null) {
+                configureSignatureCreationModes(configuration.getArray(key));
+            }
+            key = getKeyOrNull(configuration, SIGNATURE_COLOR_OPTIONS);
+            if (key != null) {
+                configureSignatureColorOptions(context, configuration.getArray(key));
             }
         }
     }
@@ -702,6 +718,66 @@ public class ConfigurationAdapter {
 
     private void configureMeasurementToolSnappingEnabled(Context context, final Boolean snappingEnabled) {
         PSPDFKitPreferences.get(context).setMeasurementSnappingEnabled(snappingEnabled);
+    }
+
+    private void configureSignatureCreationModes(@Nullable final ReadableArray signatureCreationModes) {
+        if (signatureCreationModes == null) {
+          // If explicit null is passed we disable all signature modes.
+          configuration.signatureCreationModes(new ArrayList<>());
+          return;
+        }
+        List<Object> sigCreationModesList = signatureCreationModes.toArrayList();
+
+        // Finally create the actual list of enabled signature creation modes.
+        List<SignatureCreationMode> parsedTypes = new ArrayList<>();
+        for (Object item : sigCreationModesList) {
+          String signatureCreationMode = item.toString();
+          try {
+            parsedTypes.add(SignatureCreationMode.valueOf(signatureCreationMode.toUpperCase(Locale.ENGLISH)));
+          } catch (IllegalArgumentException ex) {
+            Log.e(LOG_TAG,
+              String.format("Illegal option %s provided for configuration option %s. Skipping this %s.", signatureCreationMode, SIGNATURE_CREATION_MODES, signatureCreationMode),
+              ex);
+          }
+        }
+        configuration.signatureCreationModes(parsedTypes);
+    }
+
+    private void configureSignatureColorOptions(final Context context, @Nullable final ReadableArray signatureCreationColors) {
+      if (signatureCreationColors == null) {
+          return;
+      }
+
+      List<Object> sigCreationColors = signatureCreationColors.toArrayList();
+
+      SignatureColorOptions defaultColors = SignatureColorOptions.fromDefaults();
+      int[] configuredColors = new int[] { defaultColors.option1(context),
+        defaultColors.option2(context), defaultColors.option3(context) };
+
+      int i = 0;
+      for (Object rgbaColorOrName : sigCreationColors) {
+        // only 3 colors are supported
+        if (i == 3) break;
+
+        String color = rgbaColorOrName.toString();
+
+        // attempt to resolve colors, if no match
+        // we'll use the default value at this index
+        if (color.contains("rgb(")) {
+          configuredColors[i] = ColorHelper.rgb(color);
+        }
+        else {
+          // hex or named colors
+          configuredColors[i] = Color.parseColor(color);
+        }
+
+        i++;
+      }
+
+      configuration.signatureColorOptions(SignatureColorOptions.fromColorInt(
+        configuredColors[0],
+        configuredColors[1],
+        configuredColors[2]));
     }
 
     public PdfActivityConfiguration build() {
