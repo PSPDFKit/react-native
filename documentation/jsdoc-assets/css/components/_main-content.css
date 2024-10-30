@@ -2,14 +2,14 @@
   background: #fff;
   padding-bottom: 20px;
   border-radius: 0.3rem;
-  overflow-y: auto;
+  overflow-y: hidden;
   overflow-x: hidden;
 }
 
 @media (min-width: 992px) {
   .main-content {
     height: calc(100vh - 150px);
-    border: 1px solid #e2e2e2;
+    border-radius: 25px;
   }
 }
 
@@ -50,11 +50,14 @@
 
 .section {
   padding: 0 20px;
+  overflow: auto;
+  height: 100%;
 }
 
 @media (min-width: 768px) {
   .section {
     padding: 20px 40px;
+    overflow: auto;
   }
 }
 

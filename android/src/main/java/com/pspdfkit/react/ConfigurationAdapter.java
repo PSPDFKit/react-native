@@ -24,6 +24,7 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableMapKeySetIterator;
 import com.pspdfkit.annotations.AnnotationType;
 import com.pspdfkit.configuration.activity.PdfActivityConfiguration;
+import com.pspdfkit.configuration.activity.TabBarHidingMode;
 import com.pspdfkit.configuration.activity.ThumbnailBarMode;
 import com.pspdfkit.configuration.activity.UserInterfaceViewMode;
 import com.pspdfkit.configuration.page.PageFitMode;
@@ -91,6 +92,7 @@ public class ConfigurationAdapter {
     private static final String SHOW_PRINT_ACTION = "showPrintAction";
     private static final String SHOW_DOCUMENT_INFO_VIEW = "showDocumentInfoView";
     private static final String SHOW_SETTINGS_MENU = "showSettingsMenu";
+    private static final String SHOW_DEFAULT_TOOLBAR = "showDefaultToolbar";
 
     // Thumbnail Options
     private static final String SHOW_THUMBNAIL_BAR = "showThumbnailBar";
@@ -321,6 +323,10 @@ public class ConfigurationAdapter {
             key = getKeyOrNull(configuration, ENABLED_MEASUREMENT_TOOL_SNAPPING);
             if (key != null) {
                 configureMeasurementToolSnappingEnabled(context, configuration.getBoolean(key));
+            }
+            key = getKeyOrNull(configuration, SHOW_DEFAULT_TOOLBAR);
+            if (key != null) {
+                configureShowDefaultToolbar(configuration.getBoolean(key));
             }
         }
     }
@@ -702,6 +708,17 @@ public class ConfigurationAdapter {
 
     private void configureMeasurementToolSnappingEnabled(Context context, final Boolean snappingEnabled) {
         PSPDFKitPreferences.get(context).setMeasurementSnappingEnabled(snappingEnabled);
+    }
+
+    private void configureShowDefaultToolbar(final boolean showDefaultToolbar) {
+        if (showDefaultToolbar) {
+            // Set it back to the default, which is AUTOMATIC_HIDE_SINGLE
+            configuration.setTabBarHidingMode(TabBarHidingMode.AUTOMATIC_HIDE_SINGLE);
+            configuration.enableDefaultToolbar();
+        } else {
+            configuration.setTabBarHidingMode(TabBarHidingMode.HIDE);
+            configuration.disableDefaultToolbar();
+        }
     }
 
     public PdfActivityConfiguration build() {

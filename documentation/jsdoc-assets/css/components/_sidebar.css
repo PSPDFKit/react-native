@@ -10,7 +10,7 @@
 @media (min-width: 992px) {
   .sidebar {
     height: calc(100vh - 150px);
-    border: 1px solid #e2e2e2;
+    border-radius: 25px;
   }
 }
 

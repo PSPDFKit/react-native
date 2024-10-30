@@ -1,4 +1,15 @@
-## Newest Release
+## Newest release
+
+### 2.14.0 - 30 Oct 2024
+
+- Adds the ability to hide the main toolbar on Android using a combination of configuration and style properties. (J#HYB-431)
+- Updates to Nutrient Android SDK 2024.6.1.
+- Updates to Nutrient iOS SDK 14.1.1.
+- Fixes an issue where the correct items weren't rendered when using the `menuItemGrouping` configuration property. (J#HYB-432)
+- Fixes an issue where a crash occurred when using the `toolbar.toolbarMenuItems` property and `enterAnnotationCreationMode` API on Android. (J#HYB-517)
+- Fixes an issue where some annotations would not be deleted on iOS when using the `removeAnnotations` API. (J#HYB-518)
+
+## Previous releases
 
 ### 2.13.0 - 10 Sep 2024
 
@@ -12,8 +23,6 @@
 - Fixes an issue where the `annotationTypes` parameter wasn't honored by the `processAnnotations` API. (J#HYB-495)
 - Fixes an issue where the `onDocumentLoadFailed` callback was not triggered when an incorrect document password was specified on Android. (J#HYB-491)
 - Fixes an issue where some measurement annotation presets were not applied when specified. (J#HYB-492)
-
-## Previous Releases
 
 ### 2.12.0 - 01 Aug 2024
 

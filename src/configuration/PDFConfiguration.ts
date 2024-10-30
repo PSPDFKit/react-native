@@ -101,6 +101,8 @@ import { MeasurementValueConfiguration } from './../measurements/Measurements';
  * @property { PDFConfiguration.BooleanType } [syncAnnotations] Indicates whether document annotations should be synced with the Instant server.
  * @property { Measurements.MeasurementValueConfiguration[] } [measurementValueConfigurations] The array of ```MeasurementValueConfiguration``` objects that should be applied to the document.
  * @property { PDFConfiguration.RemoteDocumentConfiguration } [remoteDocumentConfiguration] The configuration when downloading a document from a remote URL.
+ * @property { PDFConfiguration.BooleanType } [androidShowDefaultToolbar] Used to show or hide the main toolbar.
+ * 
  */
 
 export class PDFConfiguration {
@@ -475,6 +477,11 @@ export class PDFConfiguration {
      * The configuration when downloading a document from a remote URL.
      */
     remoteDocumentConfiguration?: RemoteDocumentConfiguration;
+
+    /**
+     * Used to show or hide the main toolbar.
+     */
+    androidShowDefaultToolbar?: PDFConfiguration.BooleanType;
 }
 
 export namespace PDFConfiguration {

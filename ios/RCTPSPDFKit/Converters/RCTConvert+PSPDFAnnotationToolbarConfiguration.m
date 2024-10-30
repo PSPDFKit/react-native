@@ -41,6 +41,8 @@ NSString *const annotationLineArrow = @"arrow";
 NSString *const annotationFreeTextCallout = @"freetext_callout";
 NSString *const annotationPolygonCloud = @"cloudy_polygon";
 NSString *const annotationTextHighlighter = @"highlight";
+NSString *const annotationMultimedia = @"multimedia";
+NSString *const annotationFile = @"file";
 
 + (PSPDFAnnotationToolbarConfiguration *)PSPDFAnnotationToolbarConfiguration:(id)json {
   NSArray *itemsToParse = [RCTConvert NSArray:json];
@@ -102,7 +104,9 @@ NSString *const annotationTextHighlighter = @"highlight";
       annotationLineArrow: PSPDFAnnotationStringLine,
       annotationFreeTextCallout: PSPDFAnnotationStringFreeText,
       annotationPolygonCloud: PSPDFAnnotationStringPolygon,
-      annotationTextHighlighter: PSPDFAnnotationStringHighlight
+      annotationTextHighlighter: PSPDFAnnotationStringHighlight,
+      annotationMultimedia: PSPDFAnnotationStringRichMedia,
+      annotationFile: PSPDFAnnotationStringFile
     };
 
   return nameToAnnotationStringMapping[name];

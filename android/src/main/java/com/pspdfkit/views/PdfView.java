@@ -183,6 +183,8 @@ public class PdfView extends FrameLayout {
     /** We keep track if the inline search view is shown since we don't want to add a second navigation button while it is shown. */
     private boolean isSearchViewShown = false;
 
+    private boolean isDefaultToolbarHidden = false;
+
     /** Indicates whether the image document annotations should be flattened only or flattened and embedded. */
     private String imageSaveMode = "flatten";
 
@@ -282,34 +284,30 @@ public class PdfView extends FrameLayout {
 
     public void setConfiguration(PdfActivityConfiguration configuration) {
         this.configuration = configuration;
-        if (fragment != null && fragment.getPdfFragment() != null) {
+        if (fragment != null) {
             fragment.setConfiguration(configuration);
-            // If the same stock toolbar buttons are supplied (with new custom button(s))
-            // the SDK will not reload the toolbar as it thinks no changes occurred.
-            // Reattach the fragment to force the configuration change.
-            fragmentManager.beginTransaction()
-                    .detach(fragment)
-                    .attach(fragment)
-                    .commitNowAllowingStateLoss();
         }
+        setShowNavigationButtonInToolbar(this.isNavigationButtonShown);
+        setHideDefaultToolbar(this.isDefaultToolbarHidden);
     }
 
     public PdfActivityConfiguration getConfiguration() {
         return configuration;
     }
 
-    public void setCustomToolbarItems(final ArrayList toolbarItems) {
+    public void setAllToolbarItems(final ArrayList stockToolbarItems, final ArrayList customToolbarItems) {
         pendingFragmentActions.add(getCurrentPdfUiFragment()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(pdfUiFragment -> {
-                        ((ReactPdfUiFragment) pdfUiFragment).setCustomToolbarItems(toolbarItems, menuItemListener);
-
+                        ((ReactPdfUiFragment) pdfUiFragment).setCustomToolbarItems(stockToolbarItems, customToolbarItems, menuItemListener);
+                        if (reactApplicationContext != null && reactApplicationContext.getCurrentActivity() != null) {
+                            reactApplicationContext.getCurrentActivity().invalidateOptionsMenu();
+                        }
         }));
     }
 
     public void setAnnotationConfiguration(final List<ReactAnnotationPresetConfiguration> annotationsConfigurations) {
         this.annotationsConfigurations = annotationsConfigurations;
-        setupFragment(false);
     }
 
     public void setDocumentPassword(@Nullable String documentPassword) {
@@ -508,6 +506,7 @@ public class PdfView extends FrameLayout {
     }
 
     public void setHideDefaultToolbar(boolean hideDefaultToolbar) {
+        isDefaultToolbarHidden = hideDefaultToolbar;
         pendingFragmentActions.add(getCurrentPdfUiFragment()
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(pdfUiFragment -> {
@@ -591,7 +590,7 @@ public class PdfView extends FrameLayout {
 
     private void prepareFragment(final PdfUiFragment pdfUiFragment, final boolean attachFragment) {
         if (attachFragment) {
-            fragmentContainerView.addOnAttachStateChangeListener(new OnAttachStateChangeListener() {
+            OnAttachStateChangeListener stateChangeListener = new OnAttachStateChangeListener() {
                 @Override
                 public void onViewAttachedToWindow(@NonNull View view) {
 
@@ -601,6 +600,7 @@ public class PdfView extends FrameLayout {
                         public void run() {
                             try {
                                 PdfUiFragment currentPdfUiFragment = (PdfUiFragment) fragmentManager.findFragmentByTag(fragmentTag);
+
                                 if (currentPdfUiFragment != null) {
                                     // There is already a fragment inside the FragmentContainer, replace it with the latest one.
                                     fragmentManager
@@ -623,11 +623,14 @@ public class PdfView extends FrameLayout {
                         }
                     };
                     mainHandler.post(myRunnable);
+                    fragmentContainerView.removeOnAttachStateChangeListener(this);
                 }
 
                 @Override
                 public void onViewDetachedFromWindow(@NonNull View view) {}
-            });
+            };
+
+            fragmentContainerView.addOnAttachStateChangeListener(stateChangeListener);
             removeAllViews();
             addView(fragmentContainerView);
         } else {

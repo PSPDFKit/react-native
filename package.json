@@ -1,6 +1,6 @@
 {
   "name": "react-native-pspdfkit",
-  "version": "2.13.0",
+  "version": "2.14.0",
   "description": "React Native PDF Library by PSPDFKit",
   "keywords": [
     "react native",
@@ -20,10 +20,10 @@
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "format": "prettier \"{samples/**/*.{md,js},*.{md,js}}\" --write",
-    "lint": "eslint --ext .js,.jsx,.ts,.tsx ./*.js",
+    "lint": "npx eslint --ext *.js",
     "docs": "rm -rf jsdoc && jsdoc -c jsdoc.json",
     "postdocs": "node types-scripts/fix-code-tags.js",
-    "generate-types": "npx -p typescript tsc --build  tsconfig-types.json",
+    "generate-types": "npx -p typescript tsc --build tsconfig-types.json",
     "append": "node types-scripts/append.js",
     "build": "npx -p typescript tsc --build tsconfig.json",
     "build-and-generate-types": "rm -rf types lib && npm run build && npm run generate-types && npm run append",

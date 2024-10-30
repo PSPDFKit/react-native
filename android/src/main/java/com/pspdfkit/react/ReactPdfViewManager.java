@@ -201,6 +201,7 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
                 customToolbarItems.add(item);
             }
         }
+
         if (stockToolbarItems != null) {
             PdfActivityConfiguration currentConfiguration = view.getConfiguration();
             ToolbarMenuItemsAdapter newConfigurations = new ToolbarMenuItemsAdapter(currentConfiguration, stockToolbarItems, view.getInitialConfiguration());
@@ -211,9 +212,7 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
                 view.setConfiguration(newConfigurations.build());
             }
         }
-        if (customToolbarItems != null) {
-            view.setCustomToolbarItems(customToolbarItems);
-        }
+        view.setAllToolbarItems(stockToolbarItems.toArrayList(), customToolbarItems);
     }
 
     @ReactProp(name = "disableDefaultActionForTappedAnnotations")

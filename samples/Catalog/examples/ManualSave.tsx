@@ -27,10 +27,13 @@ export class ManualSave extends BaseExampleAutoHidingHeaderComponent {
             iOSBackgroundColor: processColor('lightgrey'),
           }}
           menuItemGrouping={[
-            'pen',
-            'freetext',
-            { key: 'markup', items: ['highlight', 'underline'] },
-            'image',
+            'note',
+            { key: 'markup', items: ['freetext', 'freetext_callout'] },
+            { key: 'markup', items: ['pen', 'magic_ink', 'highlighter'] },
+            { key: 'drawing', items: ['arrow', 'line', 'square', 'circle', 'polygon', 'polyline', 'cloudy_polygon'] },
+            { key: 'measurement', items: ['distance', 'perimeter', 'area_polygon', 'area_square', 'area_circle'] },
+            { key: 'multimedia', items: ['image', 'stamp', 'signature', 'link', 'camera'] },
+            'eraser'
           ]}
           pageIndex={3}
           style={styles.pdfColor}

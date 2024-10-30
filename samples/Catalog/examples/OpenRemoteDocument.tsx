@@ -52,8 +52,6 @@ export class OpenRemoteDocument extends BaseExampleAutoHidingHeaderComponent {
                   'PSPDFKit',
                   'Document ID: ' + await document?.getDocumentId(),
                 );
-                const result = await this.pdfRef.current?.saveCurrentDocument();
-                console.log(result);
               }}
               title="Get Document Info"
             />

@@ -73,9 +73,9 @@ export class HiddenToolbar extends Component<IProps, IState> {
             // We want to keep the thumbnail bar always visible, but the automatic mode is also supported with hideDefaultToolbar.
             userInterfaceViewMode: 'alwaysVisible',
             iOSUseParentNavigationBar: true,
+            // This will hide the main toolbar. A change to the application's styles.xml is required to fully hide the Android tabBar.
+            androidShowDefaultToolbar: false
           }}
-          // This will just hide the toolbar, keeping the thumbnail bar visible.
-          hideDefaultToolbar={true}
           disableAutomaticSaving={true}
           fragmentTag="PDF1"
           onStateChanged={(event: {

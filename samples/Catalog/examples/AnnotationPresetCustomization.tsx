@@ -56,7 +56,8 @@ export class AnnotationPresetCustomization extends BaseExampleAutoHidingHeaderCo
               defaultThickness: 50,
               defaultColor: '#99cc00',
               availableColors: ['#99cc00', '#ffcc00', '#ff9900', '#ff0000', '#000000'],
-              minimumAlpha: 0.5
+              minimumAlpha: 0.5,
+              forceDefaults: true
             },
             freeText: {
               defaultTextSize: 40,

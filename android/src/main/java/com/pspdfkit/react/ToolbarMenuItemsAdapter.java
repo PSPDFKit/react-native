@@ -24,18 +24,10 @@ import io.reactivex.rxjava3.annotations.NonNull;
  */
 public class ToolbarMenuItemsAdapter {
 
-    // Toolbar customization items.
-    private static final String TOOLBAR_ITEM_SEARCH = "searchButtonItem";
-    private static final String TOOLBAR_ITEM_READER_VIEW = "readerViewButtonItem";
-    private static final String TOOLBAR_ITEM_ANNOTATIONS = "annotationButtonItem";
-    private static final String TOOLBAR_ITEM_THUMBNAILS = "thumbnailsButtonItem";
-    private static final String TOOLBAR_ITEM_SHARE = "shareButtonItem";
-    private static final String TOOLBAR_ITEM_SETTINGS = "settingsButtonItem";
-    private static final String TOOLBAR_ITEM_OUTLINE = "outlineButtonItem";
+    // Toolbar customization items that should be set in configuration
     private static final String TOOLBAR_ITEM_BOOKMARKS = "bookmarkButtonItem";
     private static final String TOOLBAR_ITEM_PRINT = "printButtonItem";
     private static final String TOOLBAR_ITEM_ANNOTATION_LIST = "annotationListButtonItem";
-    private static final String TOOLBAR_ITEM_DOCUMENT_INFO_VIEW = "documentInfoViewButtonItem";
 
     private final PdfActivityConfiguration.Builder newConfigurations;
 
@@ -54,41 +46,6 @@ public class ToolbarMenuItemsAdapter {
         for (int i = 0; i < toolbarItems.size(); i++) {
             String toolbarItem = toolbarItems.getString(i);
             switch (toolbarItem) {
-                case TOOLBAR_ITEM_SEARCH:
-                    if (initialConfiguration.isSearchEnabled()) {
-                        configuration.enableSearch();
-                    }
-                    break;
-                case TOOLBAR_ITEM_READER_VIEW:
-                    if (initialConfiguration.isReaderViewEnabled()) {
-                        configuration.enableReaderView(true);
-                    }
-                    break;
-                case TOOLBAR_ITEM_ANNOTATIONS:
-                    if (initialConfiguration.getConfiguration().isAnnotationEditingEnabled()) {
-                        configuration.enableAnnotationEditing();
-                    }
-                    break;
-                case TOOLBAR_ITEM_THUMBNAILS:
-                    if (initialConfiguration.isThumbnailGridEnabled()) {
-                        configuration.showThumbnailGrid();
-                    }
-                    break;
-                case TOOLBAR_ITEM_SHARE:
-                    if (!initialConfiguration.getConfiguration().getEnabledShareFeatures().isEmpty()) {
-                        configuration.setEnabledShareFeatures(ShareFeatures.all());
-                    }
-                    break;
-                case TOOLBAR_ITEM_SETTINGS:
-                    if (initialConfiguration.isSettingsItemEnabled()) {
-                        configuration.showSettingsMenu();
-                    }
-                    break;
-                case TOOLBAR_ITEM_OUTLINE:
-                    if (initialConfiguration.isOutlineEnabled()) {
-                        configuration.enableOutline();
-                    }
-                    break;
                 case TOOLBAR_ITEM_BOOKMARKS:
                     if (initialConfiguration.isBookmarkListEnabled()) {
                         configuration.enableBookmarkList();
@@ -104,29 +61,15 @@ public class ToolbarMenuItemsAdapter {
                         configuration.enableAnnotationList();
                     }
                     break;
-                case TOOLBAR_ITEM_DOCUMENT_INFO_VIEW:
-                    if (initialConfiguration.isDocumentInfoViewEnabled()) {
-                        configuration.enableDocumentInfoView();
-                    }
-                    break;
             }
         }
         newConfigurations = configuration;
     }
 
     private PdfActivityConfiguration.Builder disableDefaultToolbarItems(final PdfActivityConfiguration.Builder configuration) {
-        configuration.disableSearch()
-                .enableReaderView(false)
-                .disableAnnotationEditing()
-                .hideThumbnailGrid()
-                .setEnabledShareFeatures(ShareFeatures.none())
-                .hideSettingsMenu()
-                .hideThumbnailGrid()
-                .disableOutline()
-                .disableAnnotationList()
+        configuration.disableAnnotationList()
                 .disablePrinting()
-                .disableBookmarkList()
-                .disableDocumentInfoView();
+                .disableBookmarkList();
         return configuration;
     }
 

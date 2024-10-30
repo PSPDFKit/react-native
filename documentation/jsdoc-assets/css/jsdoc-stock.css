@@ -43,7 +43,7 @@ body {
 a,
 a:visited,
 a:active {
-  color: #0095dd;
+  color: #1A1414;
   text-decoration: none;
 }
 
@@ -189,15 +189,15 @@ th {
 }
 
 thead tr {
-  background-color: #ddd;
+  background-color: #F0EBE7;
   font-weight: bold;
 }
 
 th {
-  border-right: 1px solid #aaa;
+  border-right: 1px solid #F0EBE7;
 }
 tr > th:last-child {
-  border-right: 1px solid #ddd;
+  border-right: 1px solid #F0EBE7;
 }
 
 .ancestors,
@@ -289,7 +289,7 @@ tr > th:last-child {
   display: block;
   padding: 4px 12px;
   margin: 0;
-  background-color: #fff;
+  background-color: #F0EBE7;
   color: #4d4e53;
 }
 

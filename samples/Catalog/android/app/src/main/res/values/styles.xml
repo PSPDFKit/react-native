@@ -6,6 +6,11 @@
         <item name="colorPrimary">@color/color_primary</item>
         <item name="colorPrimaryDark">@color/color_primary_dark</item>
         <item name="pspdf__settingsModePickerItemStyle">@style/AppTheme.SettingsModePickerItemStyle</item>
+        <item name="pspdf__tabBarStyle">@style/AppTheme.TabbarStyle</item>
+    </style>
+
+    <style name="AppTheme.TabbarStyle">
+        <item name="pspdf__backgroundColor">@android:color/transparent</item>
     </style>
 
     <style name="AppTheme.SettingsModePickerItemStyle">

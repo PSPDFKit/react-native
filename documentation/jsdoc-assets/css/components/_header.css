@@ -1,31 +1,30 @@
 .header {
-  background: #fff;
+  background: #EFEBE7;
 }
 
 .nav-bar {
   font-family: 'Canal Medium', Helvetica, Arial, sans-serif;
-  background: #fff;
+  background: #EFEBE7;
   font-weight: 400;
   line-height: 29.05px;
-  color: #495057;
-  text-align: left;
-  max-width: 1140px;
+  color: #000000;
+  text-align: center;
+  max-width: 1700px;
   margin: 0 auto;
-  padding: 0 15px;
   display: flex;
-  justify-content: space-around;
+
   height: 62px;
+  justify-content: center;
 }
 
 .nav-bar .nav-brand {
-  padding: 0.4em 0;
-  margin-right: 2vw;
+  margin: auto;
 }
 
 .nav-bar .nav-block {
   display: flex;
   list-style: none;
-  margin: 0;
+  margin-right: 0;
   padding: 0;
 }
 
@@ -49,25 +48,24 @@
 }
 
 .nav-bar .nav-item.active {
-  border-top-color: #3d73d3;
+  border-top-color: #C2B8AE;
 }
 
 .nav-bar .nav-item.active > .nav-link {
-  color: #3d73d3;
+  color: #C2B8AE;
 }
 
 .nav-bar .nav-link {
   white-space: nowrap;
-  text-transform: uppercase;
   font-size: 14.3px;
-  color: #495057;
+  color: #000000;
   margin: 0;
   padding: 0;
 }
 
 .nav-bar .nav-link:hover {
   text-decoration: none;
-  color: #495057;
+  color: #C2B8AE;
 }
 
 .nav-bar .nav-form {
@@ -85,7 +83,7 @@
 }
 
 .nav-bar .nav-btn {
-  background: #3d73d3;
+  background: #C2B8AE;
   color: #fff;
 }
 

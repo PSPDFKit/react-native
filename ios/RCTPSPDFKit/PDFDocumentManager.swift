@@ -141,11 +141,13 @@ import PSPDFKit
                 if let instantJSONName = instantJSONAnnotation["name"] as? String {
                     if (annotation.name == instantJSONName) {
                         annotationsToDelete.append(annotation)
+                        break
                     }
                 }
-                else if let instantJSONUUID = instantJSONAnnotation["uuid"] as? String {
+                if let instantJSONUUID = instantJSONAnnotation["uuid"] as? String {
                     if (annotation.uuid == instantJSONUUID) {
                         annotationsToDelete.append(annotation)
+                        break
                     }
                 }
             }

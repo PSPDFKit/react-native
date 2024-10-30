@@ -31,10 +31,12 @@ import androidx.fragment.app.FragmentManager;
 
 import com.pspdfkit.react.R;
 import com.pspdfkit.react.helper.PSPDFKitUtils;
+import com.pspdfkit.ui.PdfActivity;
 import com.pspdfkit.ui.PdfFragment;
 import com.pspdfkit.ui.PdfUiFragment;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -48,8 +50,28 @@ import java.util.List;
  */
 public class ReactPdfUiFragment extends PdfUiFragment {
 
+    private static final String TOOLBAR_ITEM_SEARCH = "searchButtonItem";
+    private static final String TOOLBAR_ITEM_READER_VIEW = "readerViewButtonItem";
+    private static final String TOOLBAR_ITEM_ANNOTATIONS = "annotationButtonItem";
+    private static final String TOOLBAR_ITEM_THUMBNAILS = "thumbnailsButtonItem";
+    private static final String TOOLBAR_ITEM_SHARE = "shareButtonItem";
+    private static final String TOOLBAR_ITEM_SETTINGS = "settingsButtonItem";
+    private static final String TOOLBAR_ITEM_OUTLINE = "outlineButtonItem";
+    private static final String TOOLBAR_ITEM_DOCUMENT_INFO_VIEW = "documentInfoViewButtonItem";
+
+    private ArrayList<String> stockToolbarItems = new ArrayList<>();
     private ArrayList<HashMap> customToolbarItems = new ArrayList<>();
     private MenuItemListener menuItemListener;
+    private ArrayList<String> staticStockToolbarItems = new ArrayList<>(
+            Arrays.asList(
+                    TOOLBAR_ITEM_SEARCH,
+                    TOOLBAR_ITEM_READER_VIEW,
+                    TOOLBAR_ITEM_ANNOTATIONS,
+                    TOOLBAR_ITEM_THUMBNAILS,
+                    TOOLBAR_ITEM_SHARE,
+                    TOOLBAR_ITEM_SETTINGS,
+                    TOOLBAR_ITEM_OUTLINE,
+                    TOOLBAR_ITEM_DOCUMENT_INFO_VIEW));
 
     @Nullable private ReactPdfUiFragmentListener reactPdfUiFragmentListener;
 
@@ -114,14 +136,59 @@ public class ReactPdfUiFragment extends PdfUiFragment {
         void onNavigationButtonClicked(@NonNull PdfUiFragment pdfUiFragment);
     }
 
-    void setCustomToolbarItems(@NonNull ArrayList<HashMap> customToolbarItems, MenuItemListener listener) {
+    void setCustomToolbarItems(@NonNull ArrayList<String> stockToolbarItems, @NonNull ArrayList<HashMap> customToolbarItems, MenuItemListener listener) {
+        this.stockToolbarItems = stockToolbarItems;
         this.customToolbarItems = customToolbarItems;
         this.menuItemListener = listener;
     }
 
-    @NonNull
     @Override
     public List<Integer> onGenerateMenuItemIds(@NonNull List<Integer> menuItems) {
+
+        // No items should be removed / added
+        if (this.stockToolbarItems.size() == 0 && this.customToolbarItems.size() == 0) {
+            return menuItems;
+        }
+
+        ArrayList<String> itemsToRemove = new ArrayList<>(this.staticStockToolbarItems);
+        itemsToRemove.removeAll(this.stockToolbarItems);
+
+        for (String item : itemsToRemove) {
+            switch (item) {
+                case TOOLBAR_ITEM_SEARCH:
+                    menuItems.remove(Integer.valueOf(PdfActivity.MENU_OPTION_SEARCH));
+                    break;
+
+                case TOOLBAR_ITEM_READER_VIEW:
+                    menuItems.remove(Integer.valueOf(PdfActivity.MENU_OPTION_READER_VIEW));
+                    break;
+
+                case TOOLBAR_ITEM_ANNOTATIONS:
+                    menuItems.remove(Integer.valueOf(PdfActivity.MENU_OPTION_EDIT_ANNOTATIONS));
+                    break;
+
+                case TOOLBAR_ITEM_THUMBNAILS:
+                    menuItems.remove(Integer.valueOf(PdfActivity.MENU_OPTION_THUMBNAIL_GRID));
+                    break;
+
+                case TOOLBAR_ITEM_SHARE:
+                    menuItems.remove(Integer.valueOf(PdfActivity.MENU_OPTION_SHARE));
+                    break;
+
+                case TOOLBAR_ITEM_SETTINGS:
+                    menuItems.remove(Integer.valueOf(PdfActivity.MENU_OPTION_SETTINGS));
+                    break;
+
+                case TOOLBAR_ITEM_OUTLINE:
+                    menuItems.remove(Integer.valueOf(PdfActivity.MENU_OPTION_OUTLINE));
+                    break;
+
+                case TOOLBAR_ITEM_DOCUMENT_INFO_VIEW:
+                    menuItems.remove(Integer.valueOf(PdfActivity.MENU_OPTION_DOCUMENT_INFO));
+                    break;
+            }
+        }
+
         for (HashMap item : customToolbarItems) {
             String customId = item.get("id").toString();
             int index = (Integer) item.get("index");

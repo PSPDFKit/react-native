@@ -23,7 +23,6 @@ import com.facebook.react.bridge.Dynamic;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableType;
-import com.pspdfkit.react.R;
 import com.pspdfkit.ui.toolbar.ContextualToolbar;
 import com.pspdfkit.ui.toolbar.grouping.presets.MenuItem;
 import com.pspdfkit.ui.toolbar.grouping.presets.PresetMenuItemGroupingRule;
@@ -109,6 +108,12 @@ public class ReactGroupingRule extends PresetMenuItemGroupingRule {
                 return com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_item_signature;
             case "pen":
                 return com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_item_ink_pen;
+            case "arrow":
+                return com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_item_line_arrow;
+            case "sound":
+                return com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_item_sound;
+            case "cloudy_polygon":
+                return com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_item_cloudy_polygon;
             case "highlighter":
                 return com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_item_ink_highlighter;
             case "note":
