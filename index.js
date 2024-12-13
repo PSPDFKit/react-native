@@ -49,6 +49,10 @@ class PSPDFKitView extends React.Component {
   /**
    * @ignore
    */
+  _notificationCenter = null;
+  /**
+   * @ignore
+   */
   _componentRef = React.createRef(this);
 
   render() {
@@ -283,6 +287,24 @@ class PSPDFKitView extends React.Component {
       return this._pdfDocument;
     } else {
       return this._pdfDocument;
+    }
+  };
+
+  /**
+   * Get the current Notification Center.
+   * @method getNotificationCenter
+   * @example
+   * const document = this.pdfRef.current?.getNotificationCenter();
+   * @see {@link https://pspdfkit.com/api/react-native/NotificationCenter.html} for available methods.
+   * @memberof PSPDFKitView
+   * @returns { NotificationCenter } A reference to the Notification Center that can be used to subscribe and unsubscribe from events.
+   */
+  getNotificationCenter () {
+    if (this._notificationCenter == null) {
+      this._notificationCenter = new NotificationCenter(this._componentRef.current);
+      return this._notificationCenter;
+    } else {
+      return this._notificationCenter;
     }
   };
 
@@ -2104,6 +2126,9 @@ export {
 import { PDFDocument } from './lib/document/PDFDocument';
 export { PDFDocument } from './lib/document/PDFDocument';
 
+import { NotificationCenter } from './lib/notification-center/NotificationCenter';
+export { NotificationCenter } from './lib/notification-center/NotificationCenter';
+
 module.exports.PDFConfiguration = PDFConfiguration;
 module.exports.RemoteDocumentConfiguration = RemoteDocumentConfiguration;
 module.exports.Toolbar = Toolbar;
@@ -2133,4 +2158,5 @@ module.exports.AnnotationPresetMeasurementPerimeter =
 module.exports.AnnotationPresetMeasurementDistance =
   AnnotationPresetMeasurementDistance;
 
-module.exports.PDFDocument = PDFDocument;
+module.exports.NotificationCenter = NotificationCenter;
+module.exports.NotificationCenter = NotificationCenter;

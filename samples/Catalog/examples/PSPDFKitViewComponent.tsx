@@ -1,6 +1,7 @@
 import React from 'react';
 import { Alert, Button, processColor, View } from 'react-native';
 import PSPDFKitView from 'react-native-pspdfkit';
+import RNFS from 'react-native-fs';
 
 import { exampleDocumentPath, pspdfkitColor } from '../configuration/Constants';
 import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
@@ -15,7 +16,7 @@ export class PSPDFKitViewComponent extends BaseExampleAutoHidingHeaderComponent 
     this.pdfRef = React.createRef();
     hideToolbar(navigation);
   }
-
+  
   override render() {
     const { navigation } = this.props;
 

@@ -648,6 +648,10 @@ RCT_MULTI_ENUM_CONVERTER(PSPDFDocumentSharingPagesOptions,
   if (dictionary[@"inlineSearch"]) {
     self.searchMode = [RCTConvert BOOL:dictionary[@"inlineSearch"]] ? PSPDFSearchModeInline : PSPDFSearchModeModal;
   }
+  if (dictionary[@"showActionButtons"]) {
+      self.showBackActionButton = [RCTConvert BOOL:dictionary[@"showActionButtons"]];
+      self.showForwardActionButton = [RCTConvert BOOL:dictionary[@"showActionButtons"]];
+  }
 
   // Thumbnail Options
   SET(thumbnailBarMode, PSPDFThumbnailBarMode)

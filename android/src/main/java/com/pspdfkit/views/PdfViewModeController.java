@@ -13,8 +13,12 @@
 
 package com.pspdfkit.views;
 
+import android.annotation.SuppressLint;
+
 import androidx.annotation.NonNull;
 
+import com.pspdfkit.datastructures.TextSelection;
+import com.pspdfkit.react.NutrientNotificationCenter;
 import com.pspdfkit.react.menu.AnnotationContextualToolbarGroupingRule;
 import com.pspdfkit.react.menu.ContextualToolbarMenuItemConfig;
 import com.pspdfkit.ui.forms.FormEditingBar;
@@ -36,7 +40,7 @@ import javax.annotation.Nullable;
  * Keeps track of the currently active mode and handles updating the toolbar states.
  */
 class PdfViewModeController implements
-    TextSelectionManager.OnTextSelectionModeChangeListener,
+    TextSelectionManager.OnTextSelectionModeChangeListener, TextSelectionManager.OnTextSelectionChangeListener,
     ToolbarCoordinatorLayout.OnContextualToolbarLifecycleListener, FormEditingBar.OnFormEditingBarLifecycleListener {
 
     private final PdfView parent;
@@ -160,5 +164,23 @@ class PdfViewModeController implements
         formEditingActive = false;
 
         parent.updateState();
+    }
+
+    @Override
+    public boolean onBeforeTextSelectionChange(@androidx.annotation.Nullable TextSelection textSelection, @androidx.annotation.Nullable TextSelection textSelection1) {
+        return true;
+    }
+
+    @SuppressLint("CheckResult")
+    @Override
+    public void onAfterTextSelectionChange(@androidx.annotation.Nullable TextSelection textSelection, @androidx.annotation.Nullable TextSelection textSelection1) {
+        if (textSelection != null && textSelection.text != null) {
+            if (NutrientNotificationCenter.INSTANCE.getIsNotificationCenterInUse()) {
+                parent.getPdfFragment().subscribe(pdfFragment -> {
+                    String documentID = pdfFragment.getDocument().getDocumentIdString();
+                    NutrientNotificationCenter.INSTANCE.didSelectText(textSelection.text, documentID);
+                });
+            }
+        }
     }
 }

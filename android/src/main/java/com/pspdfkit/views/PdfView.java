@@ -44,14 +44,16 @@ import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.events.EventDispatcher;
+import com.pspdfkit.LicenseFeature;
 import com.pspdfkit.PSPDFKit;
 import com.pspdfkit.annotations.Annotation;
 import com.pspdfkit.annotations.AnnotationFlags;
-import com.pspdfkit.annotations.AnnotationProvider;
 import com.pspdfkit.annotations.AnnotationType;
 import com.pspdfkit.annotations.configuration.FreeTextAnnotationConfiguration;
 import com.pspdfkit.configuration.activity.PdfActivityConfiguration;
+import com.pspdfkit.configuration.search.SearchType;
 import com.pspdfkit.configuration.sharing.ShareFeatures;
+import com.pspdfkit.document.DocumentSource;
 import com.pspdfkit.document.ImageDocumentLoader;
 import com.pspdfkit.document.PdfDocument;
 import com.pspdfkit.document.PdfDocumentLoader;
@@ -65,7 +67,6 @@ import com.pspdfkit.forms.ComboBoxFormElement;
 import com.pspdfkit.forms.EditableButtonFormElement;
 import com.pspdfkit.forms.FormField;
 import com.pspdfkit.forms.TextFormElement;
-import com.pspdfkit.internal.model.ImageDocumentImpl;
 import com.pspdfkit.listeners.OnVisibilityChangedListener;
 import com.pspdfkit.listeners.SimpleDocumentListener;
 import com.pspdfkit.react.PDFDocumentModule;
@@ -359,7 +360,7 @@ public class PdfView extends FrameLayout {
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(pdfDocument -> {
                                 PdfView.this.document = pdfDocument;
-                                reactApplicationContext.getNativeModule(PDFDocumentModule.class).setDocument(pdfDocument, this.getId());
+                                reactApplicationContext.getNativeModule(PDFDocumentModule.class).setDocument(pdfDocument, null, this.getId());
                                 reactApplicationContext.getNativeModule(PDFDocumentModule.class).updateDocumentConfiguration("imageSaveMode", imageSaveMode, this.getId());
                                 setupFragment(false);
                             }, throwable -> {
@@ -375,12 +376,12 @@ public class PdfView extends FrameLayout {
             });
         } else {
             if (PSPDFKitUtils.isValidImage(documentPath)) {
-                documentOpeningDisposable = ImageDocumentLoader.openDocumentAsync(getContext(), Uri.parse(documentPath))
+                documentOpeningDisposable = ImageDocumentLoader.openDocumentAsync(getContext(), new DocumentSource(Uri.parse(documentPath)))
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(imageDocument -> {
                             PdfView.this.document = imageDocument.getDocument();
-                            reactApplicationContext.getNativeModule(PDFDocumentModule.class).setDocument(imageDocument.getDocument(), this.getId());
+                            reactApplicationContext.getNativeModule(PDFDocumentModule.class).setDocument(imageDocument.getDocument(), imageDocument, this.getId());
                             reactApplicationContext.getNativeModule(PDFDocumentModule.class).updateDocumentConfiguration("imageSaveMode", imageSaveMode, this.getId());
                             setupFragment(false);
                         }, throwable -> {
@@ -394,7 +395,7 @@ public class PdfView extends FrameLayout {
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(pdfDocument -> {
                             PdfView.this.document = pdfDocument;
-                            reactApplicationContext.getNativeModule(PDFDocumentModule.class).setDocument(pdfDocument, this.getId());
+                            reactApplicationContext.getNativeModule(PDFDocumentModule.class).setDocument(pdfDocument, null, this.getId());
                             reactApplicationContext.getNativeModule(PDFDocumentModule.class).updateDocumentConfiguration("imageSaveMode", imageSaveMode, this.getId());
                             setupFragment(false);
                         }, throwable -> {
@@ -681,7 +682,7 @@ public class PdfView extends FrameLayout {
             @Override
             public void onDocumentLoaded(@NonNull PdfDocument document) {
                 if (reactApplicationContext != null) {
-                    reactApplicationContext.getNativeModule(PDFDocumentModule.class).setDocument(document, getId());
+                    reactApplicationContext.getNativeModule(PDFDocumentModule.class).setDocument(document, null, getId());
                 }
                 manuallyLayoutChildren();
                 if (pageIndex <= document.getPageCount()-1) {
@@ -692,8 +693,12 @@ public class PdfView extends FrameLayout {
         });
 
         pdfFragment.addOnTextSelectionModeChangeListener(pdfViewModeController);
+        pdfFragment.addOnTextSelectionChangeListener(pdfViewModeController);
         pdfFragment.addDocumentListener(pdfViewDocumentListener);
+        pdfFragment.addOnFormElementSelectedListener(pdfViewDocumentListener);
+        pdfFragment.addOnFormElementDeselectedListener(pdfViewDocumentListener);
         pdfFragment.addOnAnnotationSelectedListener(pdfViewDocumentListener);
+        pdfFragment.addOnAnnotationDeselectedListener(pdfViewDocumentListener);
         pdfFragment.addOnAnnotationUpdatedListener(pdfViewDocumentListener);
         if (pdfFragment.getDocument() != null) {
             pdfFragment.getDocument().getFormProvider().addOnFormFieldUpdatedListener(pdfViewDocumentListener);
@@ -856,15 +861,14 @@ public class PdfView extends FrameLayout {
     public boolean saveCurrentDocument() throws Exception {
         if (fragment != null) {
             try {
-                if (fragment.getDocument() instanceof ImageDocumentImpl.ImagePdfDocumentWrapper) {
-                    boolean metadata = this.imageSaveMode.equals("flattenAndEmbed") ? true : false;
-                    if (((ImageDocumentImpl.ImagePdfDocumentWrapper) fragment.getDocument()).getImageDocument().saveIfModified(metadata)) {
+                if (fragment.getPdfFragment() != null && fragment.getPdfFragment().getImageDocument() != null) {
+                    boolean metadata = this.imageSaveMode.equals("flattenAndEmbed");
+                    if ((fragment.getPdfFragment().getImageDocument().saveIfModified(metadata))) {
                         // Since the document listeners won't be called when manually saving we also dispatch this event here.
                         eventDispatcher.dispatchEvent(new PdfViewDocumentSavedEvent(getId()));
                         return true;
                     }
-                }
-                else {
+                } else {
                     if (fragment.getDocument().saveIfModified()) {
                         // Since the document listeners won't be called when manually saving we also dispatch this event here.
                         eventDispatcher.dispatchEvent(new PdfViewDocumentSavedEvent(getId()));
@@ -1146,7 +1150,11 @@ public class PdfView extends FrameLayout {
             if (outputStream == null) return null;
 
             List<Annotation> annotations = fragment.getDocument().getAnnotationProvider().getAllAnnotationsOfType(ALL_ANNOTATION_TYPES);
-            List<FormField> formFields = fragment.getDocument().getFormProvider().getFormFields();
+
+            List<FormField> formFields  = Collections.emptyList();
+            if (PSPDFKit.getLicenseFeatures().contains(LicenseFeature.FORMS)) {
+                formFields = fragment.getDocument().getFormProvider().getFormFields();
+            }
 
             String finalFilePath = filePath;
             return XfdfFormatter.writeXfdfAsync(fragment.getDocument(), annotations, formFields, outputStream)
@@ -1186,7 +1194,7 @@ public class PdfView extends FrameLayout {
             config.put("androidGrayScale", configuration.getConfiguration().isToGrayscale());
 
             config.put("userInterfaceViewMode", ConfigurationAdapter.getStringValueForConfigurationItem(configuration.getUserInterfaceViewMode()));
-            config.put("inlineSearch", configuration.getSearchType() == PdfActivityConfiguration.SEARCH_INLINE ? true : false);
+            config.put("inlineSearch", configuration.getSearchType() == SearchType.INLINE ? true : false);
             config.put("immersiveMode", configuration.isImmersiveMode());
             config.put("toolbarTitle", configuration.getActivityTitle());
             config.put("androidShowSearchAction", configuration.isSearchEnabled());

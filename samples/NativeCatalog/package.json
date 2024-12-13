@@ -1,13 +1,13 @@
 {
   "name": "native-catalog",
-  "version": "2.14.0",
+  "version": "2.15.0",
   "private": true,
   "scripts": {
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "start": "react-native start",
     "test": "jest",
-    "lint": "eslint --ext .js,.jsx,.ts,.tsx ./*.js __tests__/*.js ./helpers ./examples ./configuration",
+    "lint": "eslint --ignore-pattern .js,.jsx,.ts,.tsx ./*.js __tests__/*.js ./helpers ./examples ./configuration",
     "postinstall": "rm -rf ./node_modules/react-native-pspdfkit/samples/*/node_modules",
     "preinstall": "rm -rf ./node_modules && rm -rf ios/Pods",
     "refresh": "yarn upgrade react-native-pspdfkit"
@@ -27,8 +27,7 @@
     "react-native-pspdfkit": "file:../..",
     "react-native-safe-area": "^0.5.1",
     "react-native-safe-area-context": "^4.8.0",
-    "react-native-screens": "^3.29.0",
-    "react-native-windows": "^0.73.1"
+    "react-native-screens": "^3.29.0"
   },
   "devDependencies": {
     "@babel/core": "^7.23.2",
@@ -42,7 +41,7 @@
     "@types/react": "^18.2.8",
     "@types/react-test-renderer": "^18.0.0",
     "babel-jest": "^29.6.3",
-    "eslint": "^8.41.0",
+    "eslint": "^9.16.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-ft-flow": "^2.0.3",
     "eslint-plugin-prettier": "^4.2.1",

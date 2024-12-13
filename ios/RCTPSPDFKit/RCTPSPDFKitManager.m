@@ -31,8 +31,6 @@
 
 PSPDFSettingKey const PSPDFSettingKeyHybridEnvironment = @"com.pspdfkit.hybrid-environment";
 
-BOOL hasListeners = NO;
-
 RCT_EXPORT_MODULE(PSPDFKit)
 
 RCT_REMAP_METHOD(setLicenseKey, setLicenseKey:(nullable NSString *)licenseKey resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
@@ -180,24 +178,48 @@ RCT_EXPORT_METHOD(setDelayForSyncingLocalChanges: (NSNumber*)delay resolver:(RCT
     reject(@"error", @"Delay can only be set for Instant documents", nil);
 }
 
+RCT_EXPORT_METHOD(handleListenerAdded:(nonnull NSString* )event
+                  resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+    if ([event isEqualToString:@"analytics"]) {
+        [NutrientNotificationCenter.shared analyticsEnabled];
+    }
+    resolve(@1);
+}
+
+RCT_EXPORT_METHOD(handleListenerRemoved:(nonnull NSString* )event isLast:(BOOL)isLast
+                  resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+    if ([event isEqualToString:@"analytics"]) {
+        [NutrientNotificationCenter.shared analyticsDisabled];
+    }
+    resolve(@1);
+}
+
 - (NSArray<NSString*> *)supportedEvents {
-    return @[@"didFinishDownloadFor", @"didFailDownloadWithError", @"didFailAuthenticationFor", @"didFinishReauthenticationWithJWT", @"didFailReauthenticationWithError"];
+    [NutrientNotificationCenter.shared setEventEmitter:self];
+    return @[@"documentLoaded",
+             @"documentLoadFailed",
+             @"documentPageChanged",
+             @"annotationsAdded",
+             @"annotationChanged",
+             @"annotationsRemoved",
+             @"annotationsSelected",
+             @"annotationsDeselected",
+             @"annotationTapped",
+             @"textSelected",
+             @"formFieldValuesUpdated",
+             @"formFieldSelected",
+             @"formFieldDeselected",
+             @"analytics"];
 }
 
-// Will be called when this module's first listener is added.
--(void)startObserving {
-    hasListeners = YES;
-    // Set up any upstream listeners or background tasks as necessary
+// Called by React Native when the first event is registered
+- (void)startObserving {
+    [NutrientNotificationCenter.shared setIsInUse:YES];
 }
 
-// Will be called when this module's last listener is removed, or on dealloc.
--(void)stopObserving {
-    hasListeners = NO;
-    // Remove upstream listeners, stop unnecessary background tasks
-}
-
--(void) sendEventWithName:(NSString *)name body:(id)body {
-    [self sendEventWithName: name body:body];
+// Called by React Native when the last event is unregistered
+- (void)stopObserving {
+    [NutrientNotificationCenter.shared setIsInUse:NO];
 }
 
 - (dispatch_queue_t)methodQueue {

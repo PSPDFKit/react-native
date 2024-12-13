@@ -44,3 +44,7 @@ export import AnnotationPresetMeasurementDistance = annotation.AnnotationPresetM
 //@ts-ignore
 import document = require('../src/document/PDFDocument');
 export import PDFDocument = document.PDFDocument;
+
+//@ts-ignore
+import notificationCenter = require('../src/notification-center/NotificationCenter');
+export import NotificationCenter = notificationCenter.NotificationCenter;

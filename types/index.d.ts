@@ -781,6 +781,10 @@ declare class PSPDFKitView extends React.Component<Props, any, any> {
     /**
      * @ignore
      */
+    _notificationCenter: any;
+    /**
+     * @ignore
+     */
     _componentRef: React.RefObject<any>;
     render(): React.JSX.Element;
     /**
@@ -865,6 +869,16 @@ declare class PSPDFKitView extends React.Component<Props, any, any> {
      * @returns { PDFDocument } A reference to the document that is currently loaded in the PSPDFKitView component.
      */
     getDocument(): PDFDocument;
+    /**
+     * Get the current Notification Center.
+     * @method getNotificationCenter
+     * @example
+     * const document = this.pdfRef.current?.getNotificationCenter();
+     * @see {@link https://pspdfkit.com/api/react-native/NotificationCenter.html} for available methods.
+     * @memberof PSPDFKitView
+     * @returns { NotificationCenter } A reference to the Notification Center that can be used to subscribe and unsubscribe from events.
+     */
+    getNotificationCenter(): NotificationCenter;
     /**
      * @method clearSelectedAnnotations
      * @memberof PSPDFKitView
@@ -1342,3 +1356,7 @@ export import AnnotationPresetMeasurementDistance = annotation.AnnotationPresetM
 //@ts-ignore
 import document = require('../src/document/PDFDocument');
 export import PDFDocument = document.PDFDocument;
+
+//@ts-ignore
+import notificationCenter = require('../src/notification-center/NotificationCenter');
+export import NotificationCenter = notificationCenter.NotificationCenter;

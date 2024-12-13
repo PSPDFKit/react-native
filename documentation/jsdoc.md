@@ -16,7 +16,7 @@ PSPDFKit offers support for customers with an active SDK license via <https://su
 
 Are you evaluating our SDK? That's great, we're happy to help out! PSPDFKit is a commercial product and requires the purchase of a license key when used in production. By default, this library will initialize in demo mode, placing a watermark on each PDF and limiting usage to 60 minutes.
 
-To purchase a license for production use, please reach out to us via <https://www.nutrient.io/contact-sales>.
+To purchase a license for production use, please reach out to us via <https://www.nutrient.io/sdk/contact-sales>.
 
 ## Troubleshooting
 

@@ -31,6 +31,25 @@
   return [annotationsJSON copy];
 }
 
++ (NSDictionary *)instantJSONFromFormElement:(PSPDFFormElement *)formElement error:(NSError **)error {
+    NSMutableDictionary *formElementJSON = [NSMutableDictionary new];
+
+    NSMutableDictionary *additionalInfo = [NSMutableDictionary dictionaryWithObject:formElement.uuid forKey:@"uuid"];
+    if (formElement.value != nil) {
+        [additionalInfo setObject:formElement.value forKey:@"value"];
+    }
+    NSData *formElementData = [formElement generateInstantJSONWithError:error];
+    if (formElementData) {
+        NSMutableDictionary *formElementDictionary = [[NSJSONSerialization JSONObjectWithData:formElementData options:kNilOptions error:error] mutableCopy];
+        [formElementJSON addEntriesFromDictionary:additionalInfo];
+        if (formElementDictionary) {
+            [formElementJSON addEntriesFromDictionary:formElementDictionary];
+        }
+    }
+
+  return [formElementJSON copy];
+}
+
 + (PSPDFAnnotationType)annotationTypeFromInstantJSONType:(NSString *)type {
 
     if (!type) {

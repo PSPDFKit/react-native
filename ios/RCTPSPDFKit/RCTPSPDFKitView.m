@@ -20,7 +20,7 @@
 #import <PSPDFKitReactNativeiOS/PSPDFKitReactNativeiOS-Swift.h>
 #endif
 
-#define VALIDATE_DOCUMENT(document, ...) { if (!document.isValid) { NSLog(@"Document is invalid."); if (self.onDocumentLoadFailed) { self.onDocumentLoadFailed(@{@"error": @"Document is invalid."}); } return __VA_ARGS__; }}
+#define VALIDATE_DOCUMENT(document, ...) { if (!document.isValid) { NSLog(@"Document is invalid."); [NutrientNotificationCenter.shared documentLoadFailed]; if (self.onDocumentLoadFailed) { self.onDocumentLoadFailed(@{@"error": @"Document is invalid."}); } return __VA_ARGS__; }}
 
 @interface RCTPSPDFKitViewController : PSPDFViewController
 @end
@@ -216,6 +216,8 @@
 // MARK: - PSPDFViewControllerDelegate
 
 - (BOOL)pdfViewController:(PSPDFViewController *)pdfController didTapOnAnnotation:(PSPDFAnnotation *)annotation annotationPoint:(CGPoint)annotationPoint annotationView:(UIView<PSPDFAnnotationPresenting> *)annotationView pageView:(PSPDFPageView *)pageView viewPoint:(CGPoint)viewPoint {
+    [NutrientNotificationCenter.shared didTapAnnotationWithAnnotation:annotation annotationPoint:annotationPoint documentID:pdfController.document.documentIdString];
+    
   if (self.onAnnotationTapped) {
     NSData *annotationData = [annotation generateInstantJSONWithError:NULL];
     if (annotationData != nil) {
@@ -238,6 +240,8 @@
 
 - (void)pdfViewController:(PSPDFViewController *)pdfController willBeginDisplayingPageView:(PSPDFPageView *)pageView forPageAtIndex:(NSInteger)pageIndex {
   [self onStateChangedForPDFViewController:pdfController pageView:pageView pageAtIndex:pageIndex];
+    [NutrientNotificationCenter.shared documentPageChangedWithPageIndex:pageIndex
+                                                             documentID:pdfController.document.documentIdString];
 }
 
 - (void)pdfViewController:(PSPDFViewController *)pdfController didChangeDocument:(nullable PSPDFDocument *)document {
@@ -271,6 +275,18 @@
     } else {
         return suggestedMenu;
     }
+}
+
+- (void)pdfViewController:(PSPDFViewController *)pdfController didSelectAnnotations:(NSArray<PSPDFAnnotation *> *)annotations onPageView:(PSPDFPageView *)pageView {
+    [NutrientNotificationCenter.shared didSelectAnnotationsWithAnnotations:annotations documentID:pdfController.document.documentIdString];
+}
+
+- (void)pdfViewController:(PSPDFViewController *)pdfController didDeselectAnnotations:(NSArray<PSPDFAnnotation *> *)annotations onPageView:(PSPDFPageView *)pageView {
+    [NutrientNotificationCenter.shared didDeselectAnnotationsWithAnnotations:annotations documentID:pdfController.document.documentIdString];
+}
+
+- (void)pdfViewController:(PSPDFViewController *)pdfController didSelectText:(NSString *)text withGlyphs:(NSArray<PSPDFGlyph *> *)glyphs atRect:(CGRect)rect onPageView:(PSPDFPageView *)pageView {
+    [NutrientNotificationCenter.shared didSelectTextWithText:text rect:rect documentID:pdfController.document.documentIdString];
 }
 
 // MARK: - PSPDFFlexibleToolbarContainerDelegate
@@ -534,6 +550,8 @@
 // MARK: - Notifications
 
 - (void)annotationChangedNotification:(NSNotification *)notification {
+    [NutrientNotificationCenter.shared annotationsChangedWithNotification:notification
+                                                               documentID:self.pdfController.document.documentIdString];
   id object = notification.object;
   NSArray <PSPDFAnnotation *> *annotations;
   if ([object isKindOfClass:NSArray.class]) {
@@ -572,6 +590,7 @@
 }
 
 - (void)documentDidFinishRendering {
+    [NutrientNotificationCenter.shared documentLoadedWithDocumentID:_pdfController.document.documentIdString];
     // Remove observer after the initial notification
     [NSNotificationCenter.defaultCenter removeObserver:self
                                                   name:PSPDFDocumentViewControllerDidConfigureSpreadViewNotification
@@ -836,11 +855,18 @@
 
 // MARK - Delegates
 
-- (void)didGenerateCallbackEventWithName:(NSString *)name data:(NSDictionary<NSString *,id> *)data {
-    if ([name isEqualToString:@"onAnnotationsChanged"]) {
-        if (self.onAnnotationsChanged) {
-            self.onAnnotationsChanged(data);
-        }
+- (void)didReceiveAnnotationChangeWithChange:(NSString *)change annotations:(NSArray<PSPDFAnnotation *> *)annotations {
+    
+    NSArray <NSDictionary *> *annotationsJSON = [RCTConvert instantJSONFromAnnotations:annotations error:NULL];
+    NSDictionary<NSString *,id> *data = @{@"change" : change, @"annotations" : annotationsJSON};
+    NSNotification *notification = [[NSNotification alloc] initWithName:PSPDFAnnotationsAddedNotification
+                                                                 object:annotations
+                                                               userInfo:nil];
+    [NutrientNotificationCenter.shared annotationsChangedWithNotification:notification
+                                                               documentID:self.pdfController.document.documentIdString];
+    
+    if (self.onAnnotationsChanged) {
+        self.onAnnotationsChanged(data);
     }
 }
 

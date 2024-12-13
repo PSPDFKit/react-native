@@ -9,15 +9,17 @@ import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.ReadableArray
 import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.module.annotations.ReactModule
+import com.pspdfkit.LicenseFeature
+import com.pspdfkit.PSPDFKit
 import com.pspdfkit.annotations.Annotation
 import com.pspdfkit.annotations.AnnotationProvider.ALL_ANNOTATION_TYPES
 import com.pspdfkit.annotations.AnnotationType
+import com.pspdfkit.document.ImageDocument
 import com.pspdfkit.document.PdfDocument
 import com.pspdfkit.document.formatters.DocumentJsonFormatter
 import com.pspdfkit.document.formatters.XfdfFormatter
 import com.pspdfkit.document.providers.ContentResolverDataProvider
 import com.pspdfkit.document.providers.DataProvider
-import com.pspdfkit.internal.model.ImageDocumentImpl
 import com.pspdfkit.react.helper.ConversionHelpers.getAnnotationTypes
 import com.pspdfkit.react.helper.DocumentJsonDataProvider
 import com.pspdfkit.react.helper.JsonUtilities
@@ -27,17 +29,19 @@ import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 import java.util.EnumSet
 
+data class DocumentData(val document: PdfDocument, var imageDocument: ImageDocument?)
+
 @ReactModule(name = PDFDocumentModule.NAME)
 class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
 
-    private var documents = mutableMapOf<Int, PdfDocument>()
+    private var documents = mutableMapOf<Int, DocumentData>()
     private var documentConfigurations = mutableMapOf<Int, MutableMap<String, Any>>()
 
     override fun getName(): String {
         return NAME
     }
-
-    private fun getDocument(reference: Int): PdfDocument? {
+    
+    private fun getDocument(reference: Int): DocumentData? {
         return this.documents[reference]
     }
 
@@ -45,18 +49,29 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
         return this.documentConfigurations[reference]
     }
 
-    fun setDocument(document: PdfDocument, reference: Int) {
-        this.documents[reference] = document
+    fun setDocument(document: PdfDocument, imageDocument: ImageDocument?, reference: Int) {
+        val docData = DocumentData(document, imageDocument)
+        // If this document has already been set and contained an imageDocument, retain the imageDocument
+        this.getDocument(reference)?.imageDocument?.let {
+            if (docData.imageDocument == null) {
+                docData.imageDocument = it
+            }
+        }
+        this.documents[reference] = docData
     }
 
     fun updateDocumentConfiguration(key: String, value: Any, reference: Int) {
-        val currentConfiguration = documentConfigurations[reference]
-        currentConfiguration?.set(key, value)
+        var currentConfiguration = documentConfigurations[reference]
+        if (currentConfiguration == null) {
+            currentConfiguration = mutableMapOf()
+        }
+        currentConfiguration[key] = value
+        documentConfigurations[reference] = currentConfiguration
     }
 
     @ReactMethod fun getDocumentId(reference: Int, promise: Promise) {
         try {
-            promise.resolve(this.getDocument(reference)?.documentIdString)
+            promise.resolve(this.getDocument(reference)?.document?.documentIdString)
         } catch (e: Throwable) {
             promise.reject("getDocumentId error", e)
         }
@@ -64,7 +79,7 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
 
     @ReactMethod fun invalidateCacheForPage(reference: Int, pageIndex: Int, promise: Promise) {
         try {
-            this.getDocument(reference)?.invalidateCacheForPage(pageIndex)
+            this.getDocument(reference)?.document?.invalidateCacheForPage(pageIndex)
             promise.resolve(true)
         } catch (e: Throwable) {
             promise.reject("invalidateCacheForPage error", e)
@@ -73,7 +88,7 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
 
     @ReactMethod fun invalidateCache(reference: Int, promise: Promise) {
         try {
-            this.getDocument(reference)?.invalidateCache()
+            this.getDocument(reference)?.document?.invalidateCache()
             promise.resolve(true)
         } catch (e: Throwable) {
             promise.reject("invalidateCache error", e)
@@ -82,16 +97,15 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
 
     @ReactMethod fun save(reference: Int, promise: Promise) {
         try {
-            this.getDocument(reference)?.let {
-                if (it is ImageDocumentImpl.ImagePdfDocumentWrapper) {
-                    val metadata = this.getDocumentConfiguration(reference)?.get("imageSaveMode")?.equals("flattenAndEmbed") == true
-                    if (it.imageDocument.saveIfModified(metadata)) {
-                        promise.resolve(true)
-                    }
-                } else {
-                    it.saveIfModified()
-                    promise.resolve(true)
-                }
+            this.getDocument(reference)?.imageDocument?.let {
+                val metadata = this.getDocumentConfiguration(reference)?.get("imageSaveMode")?.equals("flattenAndEmbed") == true
+                promise.resolve(it.saveIfModified(metadata))
+                return
+            }
+            this.getDocument(reference)?.document?.let {
+                it.saveIfModified()
+                promise.resolve(true)
+                return
             }
         } catch (e: Throwable) {
             promise.reject("save error", e)
@@ -100,7 +114,7 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
 
     @ReactMethod fun getAllUnsavedAnnotations(reference: Int, promise: Promise) {
         try {
-            this.getDocument(reference)?.let {
+            this.getDocument(reference)?.document?.let {
                 val outputStream = ByteArrayOutputStream()
                 DocumentJsonFormatter.exportDocumentJsonAsync(it, outputStream)
                         .subscribeOn(Schedulers.io())
@@ -123,7 +137,7 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
 
     @ReactMethod fun getAnnotations(reference: Int, type: String?, promise: Promise) {
         try {
-            this.getDocument(reference)?.let {
+            this.getDocument(reference)?.document?.let {
                 it.annotationProvider.getAllAnnotationsOfTypeAsync(if (type == null) ALL_ANNOTATION_TYPES else getAnnotationTypes(Arguments.makeNativeArray<String>(arrayOf(type))))
                         .toList()
                         .subscribeOn(Schedulers.io())
@@ -154,7 +168,7 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
 
     @ReactMethod fun getAnnotationsForPage(reference: Int, pageIndex: Int, type: String?, promise: Promise) {
         try {
-            this.getDocument(reference)?.let {
+            this.getDocument(reference)?.document?.let {
 
                 if (pageIndex > it.pageCount-1) {
                     promise.reject(RuntimeException("Specified page index is out of bounds"))
@@ -192,7 +206,7 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
 
     @ReactMethod fun removeAnnotations(reference: Int, instantJSON: ReadableArray, promise: Promise) {
         try {
-            this.getDocument(reference)?.let {
+            this.getDocument(reference)?.document?.let {
 
                 val instantJSONArray: List<Map<String, Any>> = instantJSON.toArrayList().filterIsInstance<Map<String, Any>>()
                 var annotationsToDelete: ArrayList<Annotation> = ArrayList()
@@ -227,7 +241,7 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
 
     @ReactMethod fun addAnnotations(reference: Int, instantJSON: ReadableMap, promise: Promise) {
         try {
-            this.getDocument(reference)?.let {
+            this.getDocument(reference)?.document?.let {
                 val json = JSONObject(instantJSON.toHashMap() as Map<*, *>?)
                 val dataProvider: DataProvider = DocumentJsonDataProvider(json)
                 DocumentJsonFormatter.importDocumentJsonAsync(it, dataProvider)
@@ -246,7 +260,7 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
 
     @ReactMethod fun importXFDF(reference: Int, filePath: String, promise: Promise) {
         try {
-            this.getDocument(reference)?.let {
+            this.getDocument(reference)?.document?.let {
                 var importPath = filePath;
                 if (Uri.parse(importPath).scheme == null) {
                     importPath = "file:///$filePath";
@@ -276,7 +290,7 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
 
     @ReactMethod fun exportXFDF(reference: Int, filePath: String, promise: Promise) {
         try {
-            this.getDocument(reference)?.let {
+            this.getDocument(reference)?.document?.let {
                 var exportPath = filePath;
                 if (Uri.parse(exportPath).scheme == null) {
                     exportPath = "file:///$filePath";
@@ -289,17 +303,16 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
                 }
 
                 val allAnnotations = it.annotationProvider.getAllAnnotationsOfType(ALL_ANNOTATION_TYPES)
-                val allFormFields = it.formProvider.formFields
+                var allFormFields: List<com.pspdfkit.forms.FormField> = emptyList()
+                if (PSPDFKit.getLicenseFeatures().contains(LicenseFeature.FORMS)) {
+                    allFormFields = it.formProvider.formFields
+                }
 
                 XfdfFormatter.writeXfdfAsync(it, allAnnotations, allFormFields, outputStream)
-                XfdfFormatter.parseXfdfAsync(it, ContentResolverDataProvider((Uri.parse(exportPath))))
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
-                                { annotations ->
-                                    for (annotation in annotations) {
-                                        it.annotationProvider.addAnnotationToPage(annotation)
-                                    }
+                                {
                                     val result = JSONObject()
                                     result.put("success", true)
                                     result.put("filePath", filePath)

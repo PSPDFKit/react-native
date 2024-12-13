@@ -12,7 +12,7 @@ import React
 import PSPDFKit
 
 @objc public protocol PDFDocumentManagerDelegate {
-    @objc optional func didGenerateCallbackEvent(name: String, data: Dictionary<String, Any>)
+    @objc optional func didReceiveAnnotationChange(change: String, annotations: Array<Annotation>)
     @objc optional func reloadControllerData()
 }
 
@@ -166,7 +166,7 @@ import PSPDFKit
             onError("addAnnotations", "Document is nil", nil)
             return
         }
-        
+    
         do {
             let data = try JSONSerialization.data(withJSONObject: instantJSON)
             let dataContainerProvider = DataContainerProvider(data: data)
@@ -199,9 +199,7 @@ import PSPDFKit
                 delegate?.reloadControllerData?()
                 onSuccess(true)
                 // Emit the onAnnotationsChanged event since document.applyInstantJSON doesn't trigger the event on iOS
-                if let annotationInstantJSONArray = try? RCTConvert.instantJSON(from: annotationArray) {
-                    delegate?.didGenerateCallbackEvent?(name: "onAnnotationsChanged", data: ["change" : "added", "annotations" : annotationInstantJSONArray])
-                }
+                delegate?.didReceiveAnnotationChange?(change: "added", annotations: annotationArray)
                 return
             }
             catch {
