@@ -152,6 +152,12 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
                                         val annotationInstantJSON = JSONObject(annotation.toInstantJson())
                                         val annotationMap = JsonUtilities.jsonObjectToMap(annotationInstantJSON)
                                         annotationMap["uuid"] = annotation.uuid
+                                        if (annotation.type == AnnotationType.WIDGET) {
+                                          val widgetAnnotation : WidgetAnnotation = annotation as WidgetAnnotation
+
+                                            // TODO: Other flags that may be important
+                                          annotationMap["isRequired"] = widgetAnnotation.formElement?.isRequired
+                                        }
                                         annotationsSerialized.add(annotationMap)
                                     }
                                     val nativeList = Arguments.makeNativeArray(annotationsSerialized)
@@ -190,6 +196,12 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
                                         val annotationInstantJSON = JSONObject(annotation.toInstantJson())
                                         val annotationMap = JsonUtilities.jsonObjectToMap(annotationInstantJSON)
                                         annotationMap["uuid"] = annotation.uuid
+                                        if (annotation.type == AnnotationType.WIDGET) {
+                                          val widgetAnnotation : WidgetAnnotation = annotation as WidgetAnnotation
+
+                                            // TODO: Other flags that may be important
+                                          annotationMap["isRequired"] = widgetAnnotation.formElement?.isRequired
+                                        }
                                         annotationsSerialized.add(annotationMap)
                                     }
                                     val nativeList = Arguments.makeNativeArray(annotationsSerialized)
