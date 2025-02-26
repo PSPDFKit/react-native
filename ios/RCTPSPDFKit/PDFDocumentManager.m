@@ -1,5 +1,5 @@
 //
-//  Copyright © 2018-2024 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2018-2025 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -16,6 +16,10 @@
 
 RCT_EXTERN_METHOD(getDocumentId:(NSNumber _Nonnull)reference onSuccess:(RCTPromiseResolveBlock)resolve onError:(RCTPromiseRejectBlock)reject);
 
+RCT_EXTERN_METHOD(getPageCount:(NSNumber _Nonnull)reference onSuccess:(RCTPromiseResolveBlock)resolve onError:(RCTPromiseRejectBlock)reject);
+
+RCT_EXTERN_METHOD(isEncrypted:(NSNumber _Nonnull)reference onSuccess:(RCTPromiseResolveBlock)resolve onError:(RCTPromiseRejectBlock)reject);
+
 RCT_EXTERN_METHOD(invalidateCache:(NSNumber _Nonnull)reference onSuccess:(RCTPromiseResolveBlock)resolve onError:(RCTPromiseRejectBlock)reject);
 
 RCT_EXTERN_METHOD(invalidateCacheForPage:(NSNumber _Nonnull)reference pageIndex:(NSInteger)pageIndex onSuccess:(RCTPromiseResolveBlock)resolve onError:(RCTPromiseRejectBlock)reject);
@@ -30,7 +34,9 @@ RCT_EXTERN_METHOD(getAnnotationsForPage:(NSNumber _Nonnull)reference pageIndex:(
 
 RCT_EXTERN_METHOD(removeAnnotations:(NSNumber _Nonnull)reference instantJSON:(NSArray<NSDictionary *> *)instantJSON onSuccess:(RCTPromiseResolveBlock)resolve onError:(RCTPromiseRejectBlock)reject);
 
-RCT_EXTERN_METHOD(addAnnotations:(NSNumber _Nonnull)reference instantJSON:(NSDictionary *)instantJSON onSuccess:(RCTPromiseResolveBlock)resolve onError:(RCTPromiseRejectBlock)reject);
+RCT_EXTERN_METHOD(addAnnotations:(NSNumber _Nonnull)reference instantJSON:(id)instantJSON onSuccess:(RCTPromiseResolveBlock)resolve onError:(RCTPromiseRejectBlock)reject);
+
+RCT_EXTERN_METHOD(applyInstantJSON:(NSNumber _Nonnull)reference instantJSON:(NSDictionary *)instantJSON onSuccess:(RCTPromiseResolveBlock)resolve onError:(RCTPromiseRejectBlock)reject);
 
 RCT_EXTERN_METHOD(importXFDF:(NSNumber _Nonnull)reference filePath:(NSString *)filePath onSuccess:(RCTPromiseResolveBlock)resolve onError:(RCTPromiseRejectBlock)reject);
 

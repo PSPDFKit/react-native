@@ -1,11 +1,12 @@
 import React from 'react';
-import { Alert, Button, processColor, View } from 'react-native';
+import { Alert, Button, processColor, SafeAreaView, Text, TouchableOpacity, View } from 'react-native';
 import PSPDFKitView from 'react-native-pspdfkit';
 import RNFS from 'react-native-fs';
 
-import { exampleDocumentPath, pspdfkitColor } from '../configuration/Constants';
+import { exampleDocumentPath, pspdfkitColor, writableXFDFPath } from '../configuration/Constants';
 import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
 import { hideToolbar } from '../helpers/NavigationHelper';
+import { PSPDFKit } from '../helpers/PSPDFKit';
 
 export class PSPDFKitViewComponent extends BaseExampleAutoHidingHeaderComponent {
   pdfRef: React.RefObject<PSPDFKitView>;
@@ -36,22 +37,31 @@ export class PSPDFKitViewComponent extends BaseExampleAutoHidingHeaderComponent 
           onNavigationButtonClicked={() => navigation.goBack()}
           style={styles.pdfColor}
         />
-        <View style={styles.wrapper}>
-          <View style={styles.flex}>
-            <Button
-              accessibilityLabel={'Get Document Info'}
-              testID={'Get Document Info'}
-              onPress={ async () => {
-                const document = this.pdfRef.current?.getDocument();
-                Alert.alert(
-                  'PSPDFKit',
-                  'Document ID: ' + await document?.getDocumentId(),
-                );
-              }}
-              title="Get Document Info"
-            />
+        <SafeAreaView>
+          <View style={styles.column}>
+            <View>
+              <View style={styles.horizontalContainer}>
+                <TouchableOpacity onPress={ async () => {
+                  const document = this.pdfRef.current?.getDocument();
+                  Alert.alert(
+                    'PSPDFKit',
+                    'Document ID: ' + await document?.getDocumentId(),
+                  );
+                }}>
+                  <Text style={styles.button}>{'Get Document ID'}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={ async () => {
+                  const documentProperties = await PSPDFKit.getDocumentProperties(exampleDocumentPath);
+                  Alert.alert('PSPDFKit', 
+                    'Document Properties: ' + JSON.stringify(documentProperties));
+                    console.log('Document Properties: ', documentProperties);
+                }}>
+                  <Text style={styles.button}>{'Get Document Props'}</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
           </View>
-        </View>
+        </SafeAreaView>
       </View>
     );
   }
@@ -59,9 +69,22 @@ export class PSPDFKitViewComponent extends BaseExampleAutoHidingHeaderComponent 
 const styles = {
   flex: { flex: 1 },
   pdfColor: { flex: 1, color: pspdfkitColor },
-  wrapper: {
-    flexDirection: 'row' as 'row',
+  column: {
+    flexDirection: 'column' as 'column',
     alignItems: 'center' as 'center',
-    padding: 10,
+  },
+  horizontalContainer: {
+    flexDirection: 'row' as 'row',
+    minWidth: '70%' as '70%',
+    height: 50,
+    justifyContent: 'space-between' as 'space-between',
+    alignItems: 'center' as 'center',
+  },
+  button: {
+    padding: 15,
+    flex: 1,
+    fontSize: 16,
+    color: pspdfkitColor,
+    textAlign: 'center' as 'center',
   },
 };

@@ -1,5 +1,5 @@
 //
-//  Copyright © 2018-2024 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2018-2025 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -25,7 +25,7 @@
 @interface RCTPSPDFKitViewController : PSPDFViewController
 @end
 
-@interface RCTPSPDFKitView ()<PSPDFDocumentDelegate, PSPDFViewControllerDelegate, PSPDFFlexibleToolbarContainerDelegate, PDFDocumentManagerDelegate>
+@interface RCTPSPDFKitView ()<PSPDFDocumentDelegate, PSPDFViewControllerDelegate, PSPDFFlexibleToolbarContainerDelegate, PDFDocumentManagerDelegate, PSPDFDocumentViewControllerDelegate>
 
 @property (nonatomic, nullable) UIViewController *topController;
 @property (nonatomic, strong) SessionStorage *sessionStorage;
@@ -142,9 +142,12 @@
   return nil;
 }
 
-- (BOOL)enterAnnotationCreationMode {
+- (BOOL)enterAnnotationCreationMode:(PSPDFAnnotationString)annotationType {
   [self.pdfController setViewMode:PSPDFViewModeDocument animated:YES];
   [self.pdfController.annotationToolbarController updateHostView:self container:nil viewController:self.pdfController];
+    if (annotationType != nil) {
+        [self.pdfController.annotationStateManager setState:annotationType];
+    }
   return [self.pdfController.annotationToolbarController showToolbarAnimated:YES completion:NULL];
 }
 
@@ -165,7 +168,7 @@
     }
 }
 
-- (BOOL)selectAnnotations:(NSArray<NSDictionary *> *)annotationsJSON {
+- (BOOL)selectAnnotations:(NSArray<NSDictionary *> *)annotationsJSON showContextualMenu:(BOOL)showContextualMenu {
     if (self.pdfController.visiblePageViews.count >= 1 && annotationsJSON.count > 0) {
         PSPDFDocument *document = self.pdfController.document;
         VALIDATE_DOCUMENT(document, NO)
@@ -188,7 +191,7 @@
         }
         
         PSPDFPageView * pageView = self.pdfController.visiblePageViews[0];
-        pageView.selectedAnnotations = annotationsToSelect;
+        [pageView selectAnnotations:annotationsToSelect presentMenu:showContextualMenu animated:YES];
         return YES;
     } else {
         return NO;
@@ -240,8 +243,6 @@
 
 - (void)pdfViewController:(PSPDFViewController *)pdfController willBeginDisplayingPageView:(PSPDFPageView *)pageView forPageAtIndex:(NSInteger)pageIndex {
   [self onStateChangedForPDFViewController:pdfController pageView:pageView pageAtIndex:pageIndex];
-    [NutrientNotificationCenter.shared documentPageChangedWithPageIndex:pageIndex
-                                                             documentID:pdfController.document.documentIdString];
 }
 
 - (void)pdfViewController:(PSPDFViewController *)pdfController didChangeDocument:(nullable PSPDFDocument *)document {
@@ -287,6 +288,14 @@
 
 - (void)pdfViewController:(PSPDFViewController *)pdfController didSelectText:(NSString *)text withGlyphs:(NSArray<PSPDFGlyph *> *)glyphs atRect:(CGRect)rect onPageView:(PSPDFPageView *)pageView {
     [NutrientNotificationCenter.shared didSelectTextWithText:text rect:rect documentID:pdfController.document.documentIdString];
+}
+
+// MARK: - PSPDFDocumentViewControllerDelegate
+
+- (void)documentViewController:(PSPDFDocumentViewController *)documentViewController didChangeContinuousSpreadIndex:(CGFloat)oldContinuousSpreadIndex {
+    [NutrientNotificationCenter.shared documentScrolledWithSpreadIndex:oldContinuousSpreadIndex
+                                                       scrollDirection:_pdfController.configuration.scrollDirection
+                                                            documentID:_pdfController.document.documentIdString];
 }
 
 // MARK: - PSPDFFlexibleToolbarContainerDelegate
@@ -587,9 +596,12 @@
     PSPDFPageIndex pageIndex = [documentViewController.layout pageRangeForSpreadAtIndex:documentViewController.spreadIndex].location;
     PSPDFPageView *pageView = [self.pdfController pageViewForPageAtIndex:pageIndex];
     [self onStateChangedForPDFViewController:self.pdfController pageView:pageView pageAtIndex:pageIndex];
+    [NutrientNotificationCenter.shared documentPageChangedWithPageIndex:pageIndex
+                                                             documentID:self.pdfController.document.documentIdString];
 }
 
 - (void)documentDidFinishRendering {
+    _pdfController.documentViewController.delegate = self;
     [NutrientNotificationCenter.shared documentLoadedWithDocumentID:_pdfController.document.documentIdString];
     // Remove observer after the initial notification
     [NSNotificationCenter.defaultCenter removeObserver:self

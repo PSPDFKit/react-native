@@ -3,7 +3,7 @@
  *
  *   PSPDFKit
  *
- *   Copyright © 2021-2024 PSPDFKit GmbH. All rights reserved.
+ *   Copyright © 2021-2025 PSPDFKit GmbH. All rights reserved.
  *
  *   THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
  *   AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -29,6 +29,8 @@ import com.pspdfkit.forms.FormElement;
 import com.pspdfkit.forms.FormField;
 import com.pspdfkit.forms.FormListeners;
 import com.pspdfkit.listeners.DocumentListener;
+import com.pspdfkit.listeners.scrolling.DocumentScrollListener;
+import com.pspdfkit.listeners.scrolling.ScrollState;
 import com.pspdfkit.react.NutrientNotificationCenter;
 import com.pspdfkit.react.events.PdfViewAnnotationChangedEvent;
 import com.pspdfkit.react.events.PdfViewAnnotationTappedEvent;
@@ -40,8 +42,9 @@ import com.pspdfkit.ui.special_mode.manager.AnnotationManager;
 import com.pspdfkit.ui.special_mode.manager.FormManager;
 
 import java.util.List;
+import java.util.Map;
 
-class PdfViewDocumentListener implements DocumentListener, AnnotationManager.OnAnnotationSelectedListener, AnnotationManager.OnAnnotationDeselectedListener, AnnotationProvider.OnAnnotationUpdatedListener, FormListeners.OnFormFieldUpdatedListener, FormManager.OnFormElementSelectedListener, FormManager.OnFormElementDeselectedListener {
+class PdfViewDocumentListener implements DocumentListener, AnnotationManager.OnAnnotationSelectedListener, AnnotationManager.OnAnnotationDeselectedListener, AnnotationProvider.OnAnnotationUpdatedListener, FormListeners.OnFormFieldUpdatedListener, FormManager.OnFormElementSelectedListener, FormManager.OnFormElementDeselectedListener, DocumentScrollListener {
 
     @NonNull
     private final PdfView parent;
@@ -96,6 +99,7 @@ class PdfViewDocumentListener implements DocumentListener, AnnotationManager.OnA
 
     }
 
+    @SuppressLint("CheckResult")
     @Override
     public boolean onPageClick(@NonNull PdfDocument pdfDocument, int pageIndex, @Nullable MotionEvent motionEvent, @Nullable PointF pointF, @Nullable Annotation annotation) {
         if (annotation != null) {
@@ -243,6 +247,22 @@ class PdfViewDocumentListener implements DocumentListener, AnnotationManager.OnA
             parent.getPdfFragment().subscribe(pdfFragment -> {
                 String documentID = pdfFragment.getDocument().getDocumentIdString();
                 NutrientNotificationCenter.INSTANCE.didDeSelectFormField(formElement, documentID);
+            });
+        }
+    }
+
+    @Override
+    public void onScrollStateChanged(@NonNull ScrollState scrollState) {
+        // Nothing to do here
+    }
+
+    @SuppressLint("CheckResult")
+    @Override
+    public void onDocumentScrolled(int currX, int currY, int maxX, int maxY, int extendX, int extendY) {
+        if (NutrientNotificationCenter.INSTANCE.getIsNotificationCenterInUse()) {
+            parent.getPdfFragment().subscribe(pdfFragment -> {
+                String documentID = pdfFragment.getDocument().getDocumentIdString();
+                NutrientNotificationCenter.INSTANCE.documentScrolled(Map.of("currX", currX, "currY", currY, "maxX", maxX, "maxY", maxY, "extendX", extendX, "extendY", extendY), documentID);
             });
         }
     }

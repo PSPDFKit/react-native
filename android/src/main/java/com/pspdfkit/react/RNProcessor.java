@@ -3,7 +3,7 @@
  *
  *   PSPDFKit
  *
- *   Copyright © 2017-2024 PSPDFKit GmbH. All rights reserved.
+ *   Copyright © 2017-2025 PSPDFKit GmbH. All rights reserved.
  *
  *   THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
  *   AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -39,6 +39,7 @@ import com.pspdfkit.react.helper.RNFileHelper;
 import com.pspdfkit.utils.Size;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class RNProcessor extends ReactContextBaseJavaModule {
@@ -221,7 +222,7 @@ public class RNProcessor extends ReactContextBaseJavaModule {
 
             for (int i = 0; i < images.size(); i++) {
                 RNConfigurationHelper configHelper = new RNConfigurationHelper(configuration, context);
-                NewPage newPage = configHelper.parseConfiguration("image", configuration.getArray("images").getMap(i));
+                NewPage newPage = configHelper.parseConfiguration("image", configuration.getArray("images").getMap(i)).get(0);
                 if (newPage != null) {
                     pdfProcessorTask.addNewPage(newPage, i);
                 }
@@ -258,11 +259,13 @@ public class RNProcessor extends ReactContextBaseJavaModule {
                 return;
             }
 
+            int totalPageCount = 0;
             for (int i = 0; i < documents.size(); i++) {
                 RNConfigurationHelper configHelper = new RNConfigurationHelper(configuration, context);
-                NewPage newPage = configHelper.parseConfiguration("document", documents.getMap(i));
-                if (newPage != null) {
-                    pdfProcessorTask.addNewPage(newPage, i);
+                ArrayList<NewPage> newPages = configHelper.parseConfiguration("document", documents.getMap(i));
+                for (int j = 0; j < newPages.size(); j++) {
+                    pdfProcessorTask.addNewPage(newPages.get(j), totalPageCount);
+                    totalPageCount++;
                 }
             }
 

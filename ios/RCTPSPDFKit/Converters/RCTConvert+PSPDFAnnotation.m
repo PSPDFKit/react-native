@@ -1,5 +1,5 @@
 //
-//  Copyright © 2018-2024 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2018-2025 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -19,6 +19,12 @@
     if (annotationData) {
       NSMutableDictionary *annotationDictionary = [[NSJSONSerialization JSONObjectWithData:annotationData options:kNilOptions error:error] mutableCopy];
       [annotationDictionary addEntriesFromDictionary:uuidDict];
+      
+      // Add isRequired property for form elements
+      if ([annotation isKindOfClass:[PSPDFFormElement class]]) {
+          PSPDFFormElement *formElement = (PSPDFFormElement *)annotation;
+          annotationDictionary[@"isRequired"] = @(formElement.isRequired);
+      }
       if (annotationDictionary) {
         [annotationsJSON addObject:annotationDictionary];
       }
@@ -51,102 +57,67 @@
 }
 
 + (PSPDFAnnotationType)annotationTypeFromInstantJSONType:(NSString *)type {
-
     if (!type) {
         return PSPDFAnnotationTypeAll;
     }
 
-    NSArray* keys = @[
-        @"all",
-        @"pspdfkit/ink",
-        @"pspdfkit/link",
-        @"pspdfkit/markup/highlight",
-        @"pspdfkit/markup/squiggly",
-        @"pspdfkit/markup/strikeout",
-        @"pspdfkit/markup/underline",
-        @"pspdfkit/note",
-        @"pspdfkit/shape/ellipse",
-        @"pspdfkit/shape/line",
-        @"pspdfkit/shape/polygon",
-        @"pspdfkit/shape/polyline",
-        @"pspdfkit/shape/rectangle",
-        @"pspdfkit/text",
-        @"pspdfkit/stamp",
-        @"pspdfkit/image",
-        @"pspdfkit/caret",
-        @"pspdfkit/richmedia",
-        @"pspdfkit/widget",
-        @"pspdfkit/watermark",
-        @"pspdfkit/file",
-        @"pspdfkit/sound",
-        @"pspdfkit/popup",
-        @"pspdfkit/trapnet",
-        @"pspdfkit/type3d",
-        @"pspdfkit/redact",
-    ];
-
-    // Return undefined type, if submitted type is not supported
-    if(![keys containsObject: type.lowercaseString]) {
-        return PSPDFAnnotationTypeUndefined;
+    NSString *normalizedType = [type.lowercaseString stringByReplacingOccurrencesOfString:@"pspdfkit/" withString:@""];
+    
+        if ([normalizedType isEqualToString:@"all"]) {
+        return PSPDFAnnotationTypeAll;
+    } else if ([normalizedType isEqualToString:@"ink"]) {
+        return PSPDFAnnotationTypeInk;
+    } else if ([normalizedType isEqualToString:@"link"]) {
+        return PSPDFAnnotationTypeLink;
+    } else if ([normalizedType isEqualToString:@"markup/highlight"] || [normalizedType isEqualToString:@"highlight"]) {
+        return PSPDFAnnotationTypeHighlight;
+    } else if ([normalizedType isEqualToString:@"markup/squiggly"] || [normalizedType isEqualToString:@"squiggly"]) {
+        return PSPDFAnnotationTypeSquiggly;
+    } else if ([normalizedType isEqualToString:@"markup/strikeout"] || [normalizedType isEqualToString:@"strikeout"]) {
+        return PSPDFAnnotationTypeStrikeOut;
+    } else if ([normalizedType isEqualToString:@"markup/underline"] || [normalizedType isEqualToString:@"underline"]) {
+        return PSPDFAnnotationTypeUnderline;
+    } else if ([normalizedType isEqualToString:@"note"]) {
+        return PSPDFAnnotationTypeNote;
+    } else if ([normalizedType isEqualToString:@"shape/ellipse"] || [normalizedType isEqualToString:@"ellipse"]) {
+        return PSPDFAnnotationTypeCircle;
+    } else if ([normalizedType isEqualToString:@"shape/line"] || [normalizedType isEqualToString:@"line"]) {
+        return PSPDFAnnotationTypeLine;
+    } else if ([normalizedType isEqualToString:@"shape/polygon"] || [normalizedType isEqualToString:@"polygon"]) {
+        return PSPDFAnnotationTypePolygon;
+    } else if ([normalizedType isEqualToString:@"shape/polyline"] || [normalizedType isEqualToString:@"polyline"]) {
+        return PSPDFAnnotationTypePolyLine;
+    } else if ([normalizedType isEqualToString:@"shape/rectangle"] || [normalizedType isEqualToString:@"rectangle"]) {
+        return PSPDFAnnotationTypeSquare;
+    } else if ([normalizedType isEqualToString:@"text"] || [normalizedType isEqualToString:@"freetext"]) {
+        return PSPDFAnnotationTypeFreeText;
+    } else if ([normalizedType isEqualToString:@"stamp"]) {
+        return PSPDFAnnotationTypeStamp;
+    } else if ([normalizedType isEqualToString:@"image"]) {
+        return PSPDFAnnotationTypeStamp;
+    } else if ([normalizedType isEqualToString:@"caret"]) {
+        return PSPDFAnnotationTypeCaret;
+    } else if ([normalizedType isEqualToString:@"richmedia"]) {
+        return PSPDFAnnotationTypeRichMedia;
+    } else if ([normalizedType isEqualToString:@"widget"]) {
+        return PSPDFAnnotationTypeWidget;
+    } else if ([normalizedType isEqualToString:@"watermark"]) {
+        return PSPDFAnnotationTypeWatermark;
+    } else if ([normalizedType isEqualToString:@"file"]) {
+        return PSPDFAnnotationTypeFile;
+    } else if ([normalizedType isEqualToString:@"sound"]) {
+        return PSPDFAnnotationTypeSound;
+    } else if ([normalizedType isEqualToString:@"popup"]) {
+        return PSPDFAnnotationTypePopup;
+    } else if ([normalizedType isEqualToString:@"trapnet"]) {
+        return PSPDFAnnotationTypeTrapNet;
+    } else if ([normalizedType isEqualToString:@"type3d"] || [normalizedType isEqualToString:@"threedimensional"]) {
+        return PSPDFAnnotationTypeThreeDimensional;
+    } else if ([normalizedType isEqualToString:@"redact"] || [normalizedType isEqualToString:@"redaction"]) {
+        return PSPDFAnnotationTypeRedaction;
     }
-
-    switch([keys indexOfObject: type.lowercaseString]) {
-        case 0:
-            return PSPDFAnnotationTypeAll;
-        case 1:
-            return PSPDFAnnotationTypeInk;
-        case 2:
-            return PSPDFAnnotationTypeLink;
-        case 3:
-            return PSPDFAnnotationTypeHighlight;
-        case 4:
-            return PSPDFAnnotationTypeSquiggly;
-        case 5:
-            return PSPDFAnnotationTypeStrikeOut;
-        case 6:
-            return PSPDFAnnotationTypeUnderline;
-        case 7:
-            return PSPDFAnnotationTypeNote;
-        case 8:
-            return PSPDFAnnotationTypeCircle;
-        case 9:
-            return PSPDFAnnotationTypeLine;
-        case 10:
-            return PSPDFAnnotationTypePolygon;
-        case 11:
-            return PSPDFAnnotationTypePolyLine;
-        case 12:
-            return PSPDFAnnotationTypeSquare;
-        case 13:
-            return PSPDFAnnotationTypeFreeText;
-        case 14:
-            return PSPDFAnnotationTypeStamp;
-        case 15:
-            return PSPDFAnnotationTypeStamp;
-        case 16:
-            return PSPDFAnnotationTypeCaret;
-        case 17:
-            return PSPDFAnnotationTypeRichMedia;
-        case 18:
-            return PSPDFAnnotationTypeWidget;
-        case 19:
-            return PSPDFAnnotationTypeWatermark;
-        case 20:
-            return PSPDFAnnotationTypeFile;
-        case 21:
-            return PSPDFAnnotationTypeSound;
-        case 22:
-            return PSPDFAnnotationTypePopup;
-        case 23:
-            return PSPDFAnnotationTypeTrapNet;
-        case 24:
-            return PSPDFAnnotationTypeThreeDimensional;
-        case 25:
-            return PSPDFAnnotationTypeRedaction;
-
-        default:
-            return PSPDFAnnotationTypeAll;
-    }
+    
+    return PSPDFAnnotationTypeUndefined;
 }
 
 @end

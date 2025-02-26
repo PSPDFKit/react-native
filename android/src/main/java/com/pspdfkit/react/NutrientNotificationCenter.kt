@@ -8,6 +8,8 @@ import com.facebook.react.bridge.WritableMap
 import com.pspdfkit.PSPDFKit
 import com.pspdfkit.analytics.AnalyticsClient
 import com.pspdfkit.annotations.Annotation
+import com.pspdfkit.annotations.AnnotationType
+import com.pspdfkit.annotations.WidgetAnnotation
 import com.pspdfkit.forms.ChoiceFormElement
 import com.pspdfkit.forms.ComboBoxFormElement
 import com.pspdfkit.forms.EditableButtonFormElement
@@ -27,6 +29,7 @@ enum class NotificationEvent(val value: String) {
     DOCUMENT_LOADED("documentLoaded"),
     DOCUMENT_LOAD_FAILED("documentLoadFailed"),
     DOCUMENT_PAGE_CHANGED("documentPageChanged"),
+    DOCUMENT_SCROLLED("documentScrolled"),
     ANNOTATIONS_ADDED("annotationsAdded"),
     ANNOTATION_CHANGED("annotationChanged"),
     ANNOTATIONS_REMOVED("annotationsRemoved"),
@@ -87,6 +90,18 @@ object NutrientNotificationCenter {
         sendEvent(NotificationEvent.DOCUMENT_PAGE_CHANGED.value, jsonData)
     }
 
+    fun documentScrolled(scrollData: Map<String, Int>, documentID: String) {
+        val jsonData = Arguments.createMap()
+        val scrollDataMap = Arguments.createMap()
+        scrollData.forEach { (key, value) ->
+            scrollDataMap.putInt(key, value)
+        }
+        jsonData.putString("event", NotificationEvent.DOCUMENT_SCROLLED.value)
+        jsonData.putMap("scrollData", scrollDataMap)
+        jsonData.putString("documentID", documentID)
+        sendEvent(NotificationEvent.DOCUMENT_SCROLLED.value, jsonData)
+    }
+
     fun annotationsChanged(changeType: String, annotation: Annotation, documentID: String) {
         when (changeType) {
             "changed" -> {
@@ -95,6 +110,10 @@ object NutrientNotificationCenter {
                     val annotationsList = mutableListOf<Map<String, Any>>()
                     val annotationMap = JsonUtilities.jsonObjectToMap(instantJson)
                     annotationMap["uuid"] = annotation.uuid
+                    if (annotation.type == AnnotationType.WIDGET) {
+                        val widgetAnnotation : WidgetAnnotation = annotation as WidgetAnnotation
+                        annotationMap["isRequired"] = widgetAnnotation.formElement?.isRequired
+                    }
                     annotationsList.add(annotationMap)
                     val nativeAnnotationsList = Arguments.makeNativeArray(annotationsList)
 
@@ -128,6 +147,10 @@ object NutrientNotificationCenter {
                     val annotationsList = mutableListOf<Map<String, Any>>()
                     val annotationMap = JsonUtilities.jsonObjectToMap(instantJson)
                     annotationMap["uuid"] = annotation.uuid
+                    if (annotation.type == AnnotationType.WIDGET) {
+                        val widgetAnnotation : WidgetAnnotation = annotation as WidgetAnnotation
+                        annotationMap["isRequired"] = widgetAnnotation.formElement?.isRequired
+                    }
                     annotationsList.add(annotationMap)
                     val nativeAnnotationsList = Arguments.makeNativeArray(annotationsList)
 
@@ -149,6 +172,10 @@ object NutrientNotificationCenter {
             val annotationsList = mutableListOf<Map<String, Any>>()
             val annotationMap = JsonUtilities.jsonObjectToMap(instantJson)
             annotationMap["uuid"] = annotation.uuid
+            if (annotation.type == AnnotationType.WIDGET) {
+                val widgetAnnotation : WidgetAnnotation = annotation as WidgetAnnotation
+                annotationMap["isRequired"] = widgetAnnotation.formElement?.isRequired
+            }
             annotationsList.add(annotationMap)
             val nativeAnnotationsList = Arguments.makeNativeArray(annotationsList)
 
@@ -168,6 +195,10 @@ object NutrientNotificationCenter {
             val annotationsList = mutableListOf<Map<String, Any>>()
             val annotationMap = JsonUtilities.jsonObjectToMap(instantJson)
             annotationMap["uuid"] = annotation.uuid
+            if (annotation.type == AnnotationType.WIDGET) {
+                val widgetAnnotation : WidgetAnnotation = annotation as WidgetAnnotation
+                annotationMap["isRequired"] = widgetAnnotation.formElement?.isRequired
+            }
             annotationsList.add(annotationMap)
             val nativeAnnotationsList = Arguments.makeNativeArray(annotationsList)
 
@@ -186,6 +217,10 @@ object NutrientNotificationCenter {
             val instantJson = JSONObject(annotation.toInstantJson())
             val annotationMap = JsonUtilities.jsonObjectToMap(instantJson)
             annotationMap["uuid"] = annotation.uuid
+            if (annotation.type == AnnotationType.WIDGET) {
+                val widgetAnnotation : WidgetAnnotation = annotation as WidgetAnnotation
+                annotationMap["isRequired"] = widgetAnnotation.formElement?.isRequired
+            }
             val nativeAnnotationMap = Arguments.makeNativeMap(annotationMap)
 
             val pointMap = mapOf("x" to pointF.x, "y" to pointF.y)
@@ -217,6 +252,10 @@ object NutrientNotificationCenter {
             val annotationsList = mutableListOf<Map<String, Any>>()
             val annotationMap = JsonUtilities.jsonObjectToMap(instantJson)
             annotationMap["uuid"] = annotation.uuid
+            if (annotation.type == AnnotationType.WIDGET) {
+                val widgetAnnotation : WidgetAnnotation = annotation as WidgetAnnotation
+                annotationMap["isRequired"] = widgetAnnotation.formElement?.isRequired
+            }
 
             (formField.formElement as? TextFormElement).let { textFormElement ->
                 if (textFormElement != null) {
@@ -258,6 +297,10 @@ object NutrientNotificationCenter {
             val instantJson = JSONObject(annotation.toInstantJson())
             val annotationMap = JsonUtilities.jsonObjectToMap(instantJson)
             annotationMap["uuid"] = annotation.uuid
+            if (annotation.type == AnnotationType.WIDGET) {
+                val widgetAnnotation : WidgetAnnotation = annotation as WidgetAnnotation
+                annotationMap["isRequired"] = widgetAnnotation.formElement?.isRequired
+            }
 
             (formElement as? TextFormElement).let { textFormElement ->
                 if (textFormElement != null) {
@@ -297,6 +340,10 @@ object NutrientNotificationCenter {
             val instantJson = JSONObject(annotation.toInstantJson())
             val annotationMap = JsonUtilities.jsonObjectToMap(instantJson)
             annotationMap["uuid"] = annotation.uuid
+            if (annotation.type == AnnotationType.WIDGET) {
+                val widgetAnnotation : WidgetAnnotation = annotation as WidgetAnnotation
+                annotationMap["isRequired"] = widgetAnnotation.formElement?.isRequired
+            }
 
             (formElement as? TextFormElement).let { textFormElement ->
                 if (textFormElement != null) {

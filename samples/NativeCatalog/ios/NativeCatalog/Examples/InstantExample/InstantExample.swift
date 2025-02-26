@@ -1,5 +1,5 @@
 //
-//  Copyright © 2017-2024 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2017-2025 PSPDFKit GmbH. All rights reserved.
 //
 //  The PSPDFKit Sample applications are licensed with a modified BSD license.
 //  Please see License for details. This notice may not be removed from this file.
@@ -19,7 +19,7 @@ import Instant
  Other supported clients include:
 
  - PSPDFKit Instant Live Demo: https://pspdfkit.com/instant/demo/
- - PSPDFKit for Web examples: https://web-examples.services.demo.pspdfkit.com
+ - PSPDFKit for Web examples: https://web-examples.our.services.nutrient-powered.io
  - PDF Viewer for iOS and Android: https://pdfviewer.io
  - PSPDFKit Catalog example app for Android
 
@@ -93,9 +93,9 @@ import Instant
 
     /// Data to show in the table view.
     private let sections: [Section] = [
-        Section(header: "Seamless collaboration for PSPDFKit-powered apps", rows: [], footer: "The PSPDFKit SDKs support Instant out of the box. Just connect your app to an Instant Server (PSPDFKit Document Engine) and document management and syncing is taken care of."),
+        Section(header: "Seamless collaboration for PSPDFKit-powered apps", rows: [], footer: "The PSPDFKit SDKs support Instant out of the box. Just connect your app to an Instant Server (Nutrient Document Engine) and document management and syncing is taken care of."),
         Section(header: "Start a new group", rows: [Row(identifier: .newGroup, allowsHighlight: true)], footer: "Get a new document link, then collaborate by entering it in PSPDFKit Catalog on another device, or opening the document link in a web browser."),
-        Section(header: "Join a group", rows: [Row(identifier: .scanCode, allowsHighlight: true), Row(identifier: .urlField, allowsHighlight: false)], footer: "Scan or enter a document link from PDF Viewer or PSPDFKit Catalog on another device, or from a web browser showing pspdfkit.com/instant/demo or web-examples.services.demo.pspdfkit.com."),
+        Section(header: "Join a group", rows: [Row(identifier: .scanCode, allowsHighlight: true), Row(identifier: .urlField, allowsHighlight: false)], footer: "Scan or enter a document link from PDF Viewer or PSPDFKit Catalog on another device, or from a web browser showing pspdfkit.com/instant/demo or web-examples.our.services.nutrient-powered.io."),
     ]
 
     override func numberOfSections(in tableView: UITableView) -> Int {

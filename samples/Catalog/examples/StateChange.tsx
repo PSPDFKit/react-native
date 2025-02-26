@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button, processColor, Text, View } from 'react-native';
-import PSPDFKitView from 'react-native-pspdfkit';
+import PSPDFKitView, { Annotation } from 'react-native-pspdfkit';
 
 import { exampleDocumentPath, pspdfkitColor } from '../configuration/Constants';
 import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
@@ -38,10 +38,7 @@ export class StateChange extends BaseExampleAutoHidingHeaderComponent {
             showPageLabels: true,
           }}
           menuItemGrouping={[
-            'freetext',
-            { key: 'markup', items: ['highlight', 'underline'] },
             'ink',
-            'image',
           ]}
           pageIndex={this.state.currentPageIndex}
           style={styles.pdfColor}
@@ -68,7 +65,6 @@ export class StateChange extends BaseExampleAutoHidingHeaderComponent {
             <Button
               accessibilityLabel="Change state"
               testID="Change state"
-              // nativeID="change_state"
               onPress={() => {
                 if (
                   this.state.annotationCreationActive ||
@@ -76,7 +72,7 @@ export class StateChange extends BaseExampleAutoHidingHeaderComponent {
                 ) {
                   this.pdfRef.current?.exitCurrentlyActiveMode();
                 } else {
-                  this.pdfRef.current?.enterAnnotationCreationMode();
+                  this.pdfRef.current?.enterAnnotationCreationMode(Annotation.Type.INK);
                 }
               }}
               title={buttonTitle}

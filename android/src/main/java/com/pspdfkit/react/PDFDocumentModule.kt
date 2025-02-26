@@ -2,18 +2,21 @@ package com.pspdfkit.react
 
 import android.net.Uri
 import com.facebook.react.bridge.Arguments
+import com.facebook.react.bridge.Dynamic
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.ReadableArray
 import com.facebook.react.bridge.ReadableMap
+import com.facebook.react.bridge.ReadableType
 import com.facebook.react.module.annotations.ReactModule
 import com.pspdfkit.LicenseFeature
 import com.pspdfkit.PSPDFKit
 import com.pspdfkit.annotations.Annotation
 import com.pspdfkit.annotations.AnnotationProvider.ALL_ANNOTATION_TYPES
 import com.pspdfkit.annotations.AnnotationType
+import com.pspdfkit.annotations.WidgetAnnotation
 import com.pspdfkit.document.ImageDocument
 import com.pspdfkit.document.PdfDocument
 import com.pspdfkit.document.formatters.DocumentJsonFormatter
@@ -74,6 +77,22 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
             promise.resolve(this.getDocument(reference)?.document?.documentIdString)
         } catch (e: Throwable) {
             promise.reject("getDocumentId error", e)
+        }
+    }
+
+    @ReactMethod fun getPageCount(reference: Int, promise: Promise) {
+        try {
+            promise.resolve(this.getDocument(reference)?.document?.pageCount)
+        } catch (e: Throwable) {
+            promise.reject("getPageCount error", e)
+        }
+    }
+
+    @ReactMethod fun isEncrypted(reference: Int, promise: Promise) {
+        try {
+            promise.resolve(this.getDocument(reference)?.document?.isEncrypted)
+        } catch (e: Throwable) {
+            promise.reject("isEncrypted error", e)
         }
     }
 
@@ -152,6 +171,10 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
                                         val annotationInstantJSON = JSONObject(annotation.toInstantJson())
                                         val annotationMap = JsonUtilities.jsonObjectToMap(annotationInstantJSON)
                                         annotationMap["uuid"] = annotation.uuid
+                                        if (annotation.type == AnnotationType.WIDGET) {
+                                            val widgetAnnotation : WidgetAnnotation = annotation as WidgetAnnotation
+                                            annotationMap["isRequired"] = widgetAnnotation.formElement?.isRequired
+                                        }
                                         annotationsSerialized.add(annotationMap)
                                     }
                                     val nativeList = Arguments.makeNativeArray(annotationsSerialized)
@@ -190,6 +213,10 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
                                         val annotationInstantJSON = JSONObject(annotation.toInstantJson())
                                         val annotationMap = JsonUtilities.jsonObjectToMap(annotationInstantJSON)
                                         annotationMap["uuid"] = annotation.uuid
+                                        if (annotation.type == AnnotationType.WIDGET) {
+                                            val widgetAnnotation : WidgetAnnotation = annotation as WidgetAnnotation
+                                            annotationMap["isRequired"] = widgetAnnotation.formElement?.isRequired
+                                        }
                                         annotationsSerialized.add(annotationMap)
                                     }
                                     val nativeList = Arguments.makeNativeArray(annotationsSerialized)
@@ -239,22 +266,56 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
         }
     }
 
-    @ReactMethod fun addAnnotations(reference: Int, instantJSON: ReadableMap, promise: Promise) {
+    @ReactMethod fun addAnnotations(reference: Int, instantJSON: Dynamic, promise: Promise) {
+
+        // This API is now used to add ONLY annotation objects to a document - the old functionality to apply document JSON has moved to the more aptly named applyInstantJSON.
+        // For backwards compatibility, first check whether the API is being called with a full Document JSON object, and then redirect the call to applyInstantJSON.
+        // Can be removed after customer migration is complete.
+
+        if (instantJSON.type == ReadableType.Map) {
+            applyInstantJSON(reference, instantJSON.asMap(), promise)
+            return
+        }
+
+        try {
+            this.getDocument(reference)?.document?.let {
+                if (instantJSON.type == ReadableType.Array) {
+                    val instantJSONArray = instantJSON.asArray()
+                    for (i in 0 until instantJSONArray.size()) {
+                        try {
+                            val annotation = instantJSONArray.getMap(i)
+                            val hashMap = annotation!!.toHashMap() as Map<String, Any>
+                            it.annotationProvider.createAnnotationFromInstantJson(JSONObject(hashMap).toString());
+                        } catch (e: Exception) {
+                            promise.reject("addAnnotations error", e)
+                        }
+                    }
+                    promise.resolve(true)
+                } else {
+                    promise.reject("addAnnotations error", "Cannot parse annotation data")
+                }
+            }
+        } catch (e: Throwable) {
+            promise.reject("addAnnotations error", e)
+        }
+    }
+
+    @ReactMethod fun applyInstantJSON(reference: Int, instantJSON: ReadableMap, promise: Promise) {
         try {
             this.getDocument(reference)?.document?.let {
                 val json = JSONObject(instantJSON.toHashMap() as Map<*, *>?)
                 val dataProvider: DataProvider = DocumentJsonDataProvider(json)
                 DocumentJsonFormatter.importDocumentJsonAsync(it, dataProvider)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe({
-                    promise.resolve(true)
-                }, { e ->
-                    promise.reject(RuntimeException(e))
-                })
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({
+                        promise.resolve(true)
+                    }, { e ->
+                        promise.reject(RuntimeException(e))
+                    })
             }
         } catch (e: Throwable) {
-            promise.reject("addAnnotations error", e)
+            promise.reject("applyInstantJSON error", e)
         }
     }
 

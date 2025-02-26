@@ -1,5 +1,5 @@
 //
-//  Copyright © 2018-2024 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2018-2025 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -234,10 +234,10 @@ RCT_CUSTOM_VIEW_PROPERTY(annotationContextualMenu, NSDictionary, RCTPSPDFKitView
   }
 }
 
-RCT_EXPORT_METHOD(enterAnnotationCreationMode:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+RCT_EXPORT_METHOD(enterAnnotationCreationMode:(NSString *)annotationType reactTag:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   dispatch_async(dispatch_get_main_queue(), ^{
     RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
-    BOOL success = [component enterAnnotationCreationMode];
+    BOOL success = [component enterAnnotationCreationMode:[RCTConvert PSPDFAnnotationStringFromName:annotationType]];
     if (success) {
       resolve(@(success));
     } else {
@@ -270,7 +270,7 @@ RCT_EXPORT_METHOD(clearSelectedAnnotations:(nonnull NSNumber *)reactTag resolver
   });
 }
 
-RCT_EXPORT_METHOD(selectAnnotations:(id)jsonAnnotations reactTag:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+RCT_EXPORT_METHOD(selectAnnotations:(id)jsonAnnotations showContextualMenu:(BOOL)showContextualMenu reactTag:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
     
     if(![jsonAnnotations isKindOfClass: [NSArray class]]) {
         reject(@"error", @"Please provide list of annotation objects", nil);
@@ -279,7 +279,7 @@ RCT_EXPORT_METHOD(selectAnnotations:(id)jsonAnnotations reactTag:(nonnull NSNumb
     
     dispatch_async(dispatch_get_main_queue(), ^{
         RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
-        BOOL success = [component selectAnnotations:jsonAnnotations];
+        BOOL success = [component selectAnnotations:jsonAnnotations showContextualMenu:showContextualMenu];
         if (success) {
           resolve(@(success));
         } else {

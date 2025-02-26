@@ -1,5 +1,5 @@
 //
-//  Copyright © 2017-2024 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2017-2025 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -20,53 +20,55 @@ import React
             switch (type.lowercased()) {
             case "all":
                 updatedTypes |= Annotation.Kind.all.rawValue
-            case "ink":
+            case "ink", "pspdfkit/ink":
                 updatedTypes |= Annotation.Kind.ink.rawValue
-            case "link":
+            case "link", "pspdfkit/link":
                 updatedTypes |= Annotation.Kind.link.rawValue
-            case "highlight":
+            case "highlight", "pspdfkit/markup/highlight":
                 updatedTypes |= Annotation.Kind.highlight.rawValue
-            case "squiggly":
+            case "squiggly", "pspdfkit/markup/squiggly":
                 updatedTypes |= Annotation.Kind.squiggly.rawValue
-            case "strikeout":
+            case "strikeout", "pspdfkit/markup/strikeout":
                 updatedTypes |= Annotation.Kind.strikeOut.rawValue
-            case "underline":
+            case "underline", "pspdfkit/markup/underline":
                 updatedTypes |= Annotation.Kind.underline.rawValue
-            case "note":
+            case "note", "pspdfkit/note":
                 updatedTypes |= Annotation.Kind.note.rawValue
-            case "line":
+            case "line", "pspdfkit/shape/line":
                 updatedTypes |= Annotation.Kind.line.rawValue
-            case "polygon":
+            case "polygon", "pspdfkit/shape/polygon":
                 updatedTypes |= Annotation.Kind.polygon.rawValue
-            case "polyline":
+            case "polyline", "pspdfkit/shape/polyline":
                 updatedTypes |= Annotation.Kind.polyLine.rawValue
-            case "square":
+            case "square", "pspdfkit/shape/square", "pspdfkit/shape/rectangle":
                 updatedTypes |= Annotation.Kind.square.rawValue
-            case "freetext":
+            case "circle", "pspdfkit/shape/circle", "pspdfkit/shape/ellipse":
+                updatedTypes |= Annotation.Kind.circle.rawValue
+            case "freetext", "pspdfkit/freetext", "pspdfkit/text":
                 updatedTypes |= Annotation.Kind.freeText.rawValue
-            case "stamp":
+            case "stamp", "pspdfkit/stamp":
                 updatedTypes |= Annotation.Kind.stamp.rawValue
-            case "image":
+            case "image", "pspdfkit/image":
                 updatedTypes |= Annotation.Kind.stamp.rawValue
-            case "caret":
+            case "caret", "pspdfkit/caret":
                 updatedTypes |= Annotation.Kind.caret.rawValue
-            case "richmedia":
+            case "richmedia", "pspdfkit/richmedia":
                 updatedTypes |= Annotation.Kind.richMedia.rawValue
-            case "widget":
+            case "widget", "pspdfkit/widget":
                 updatedTypes |= Annotation.Kind.widget.rawValue
-            case "watermark":
+            case "watermark", "pspdfkit/watermark":
                 updatedTypes |= Annotation.Kind.watermark.rawValue
-            case "file":
+            case "file", "pspdfkit/file":
                 updatedTypes |= Annotation.Kind.file.rawValue
-            case "sound":
+            case "sound", "pspdfkit/sound":
                 updatedTypes |= Annotation.Kind.sound.rawValue
-            case "popup":
+            case "popup", "pspdfkit/popup":
                 updatedTypes |= Annotation.Kind.popup.rawValue
-            case "trapnet":
+            case "trapnet", "pspdfkit/trapnet":
                 updatedTypes |= Annotation.Kind.trapNet.rawValue
-            case "threedimensional":
+            case "threedimensional", "pspdfkit/threedimensional":
                 updatedTypes |= Annotation.Kind.threeDimensional.rawValue
-            case "redaction":
+            case "redaction", "pspdfkit/markup/redaction":
                 updatedTypes |= Annotation.Kind.redaction.rawValue
             default:
                 updatedTypes |= Annotation.Kind.all.rawValue

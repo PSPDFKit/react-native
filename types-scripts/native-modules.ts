@@ -48,3 +48,31 @@ export import PDFDocument = document.PDFDocument;
 //@ts-ignore
 import notificationCenter = require('../src/notification-center/NotificationCenter');
 export import NotificationCenter = notificationCenter.NotificationCenter;
+
+//@ts-ignore
+import annotationModels = require('../src/annotations/AnnotationModels');
+export import AnnotationType = annotationModels.AnnotationType;
+export import DocumentJSON = annotationModels.DocumentJSON;
+export import AnnotationAttachment = annotationModels.AnnotationAttachment;
+export import BaseAnnotation = annotationModels.BaseAnnotation;
+export import CommentMarkerAnnotation = annotationModels.CommentMarkerAnnotation;
+export import EllipseShapeAnnotation = annotationModels.EllipseShapeAnnotation;
+export import HighlightMarkupAnnotation = annotationModels.HighlightMarkupAnnotation;
+export import ImageAnnotation = annotationModels.ImageAnnotation;
+export import InkAnnotation = annotationModels.InkAnnotation;
+export import LineShapeAnnotation = annotationModels.LineShapeAnnotation;
+export import LinkAnnotation = annotationModels.LinkAnnotation;
+export import MarkupAnnotation = annotationModels.MarkupAnnotation;
+export import MediaAnnotation = annotationModels.MediaAnnotation;
+export import NoteAnnotation = annotationModels.NoteAnnotation;
+export import PolygonShapeAnnotation = annotationModels.PolygonShapeAnnotation;
+export import PolylineShapeAnnotation = annotationModels.PolylineShapeAnnotation;
+export import RectangleShapeAnnotation = annotationModels.RectangleShapeAnnotation;
+export import RedactionMarkupAnnotation = annotationModels.RedactionMarkupAnnotation;
+export import ShapeAnnotation = annotationModels.ShapeAnnotation;
+export import SquigglyMarkupAnnotation = annotationModels.SquigglyMarkupAnnotation;
+export import StampAnnotation = annotationModels.StampAnnotation;
+export import StrikeOutMarkupAnnotation = annotationModels.StrikeOutMarkupAnnotation;
+export import TextAnnotation = annotationModels.TextAnnotation;
+export import UnderlineMarkupAnnotation = annotationModels.UnderlineMarkupAnnotation;
+export import WidgetAnnotation = annotationModels.WidgetAnnotation;

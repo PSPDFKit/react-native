@@ -1,5 +1,5 @@
 //
-//  Copyright © 2018-2024 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2018-2025 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -51,25 +51,40 @@ struct RNConfigurationHelper {
         }
     }
     
-    public func newPageFromDocument(_ configuration: [String: Any]) -> PDFNewPageConfiguration? {
-        guard let documentUri = configuration["documentPath"] as? String,
-        let pageIndex = configuration["pageIndex"] as? UInt else {
-            return nil
-        }
+    public func newPageFromDocument(_ configuration: [String: Any]) -> [PDFNewPageConfiguration]? {
+        guard let documentUri = configuration["documentPath"] as? String else { return nil }
+        var pageArray: [PDFNewPageConfiguration] = []
         
         let documentPath = URL(fileURLWithPath: documentUri)
         let document = Document(url: documentPath, loadCheckpointIfAvailable: false)
-        let validRange = 0...document.pageCount-1
-        if !(validRange ~= pageIndex) {
+        if (!document.isValid) {
             return nil
         }
-        let pageTemplate = PageTemplate(document: document, sourcePageIndex: pageIndex)
-        return PDFNewPageConfiguration(pageTemplate: pageTemplate) { builder in
-            builder.pageSize = self.parseSize()
-            builder.pageRotation = self.parseRotation()
-            builder.pageMargins = self.parseMargins()
-            builder.backgroundColor = self.parseBackgroundColor()
+        if let pageIndex = configuration["pageIndex"] as? UInt {
+            let validRange = 0...document.pageCount-1
+            if !(validRange ~= pageIndex) {
+                return nil
+            }
+            let pageTemplate = PageTemplate(document: document, sourcePageIndex: pageIndex)
+            pageArray.append(contentsOf: [PDFNewPageConfiguration(pageTemplate: pageTemplate) { builder in
+                builder.pageSize = self.parseSize()
+                builder.pageRotation = self.parseRotation()
+                builder.pageMargins = self.parseMargins()
+                builder.backgroundColor = self.parseBackgroundColor()
+            }])
+        } else {
+            for i in 0..<document.pageCount {
+                let pageTemplate = PageTemplate(document: document, sourcePageIndex: i)
+                pageArray.append(contentsOf: [PDFNewPageConfiguration(pageTemplate: pageTemplate) { builder in
+                    builder.pageSize = self.parseSize()
+                    builder.pageRotation = self.parseRotation()
+                    builder.pageMargins = self.parseMargins()
+                    builder.backgroundColor = self.parseBackgroundColor()
+                }])
+            }
         }
+        
+        return pageArray
     }
 
     private func parsePageTemplate() -> PageTemplate.Identifier {

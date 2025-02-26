@@ -2,7 +2,7 @@
 //  NutrientNotificationCenter.swift
 //  PSPDFKit
 //
-//  Copyright © 2017-2024 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2017-2025 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -18,6 +18,7 @@ import PSPDFKit
     case documentLoaded
     case documentLoadFailed
     case documentPageChanged
+    case documentScrolled
     case annotationsAdded
     case annotationChanged
     case annotationsRemoved
@@ -40,6 +41,8 @@ import PSPDFKit
                 return "documentLoadFailed"
             case .documentPageChanged:
                 return "documentPageChanged"
+            case .documentScrolled:
+                return "documentScrolled"
             case .annotationsAdded:
                 return "annotationsAdded"
             case .annotationChanged:
@@ -73,6 +76,8 @@ import PSPDFKit
                 self = .documentLoadFailed
             case "documentPageChanged":
                 self = .documentPageChanged
+            case "documentScrolled":
+                self = .documentScrolled
             case "annotationCreated":
                 self = .annotationsAdded
             case "annotationsAdded":
@@ -144,6 +149,17 @@ import PSPDFKit
         let jsonData = ["event" : NotificationEvent.documentPageChanged.rawValue,
                         "pageIndex" : pageIndex, "documentID" : documentID] as [String : Any]
         eventEmitter?.sendEvent(withName:NotificationEvent.documentPageChanged.rawValue,
+                               body: jsonData)
+    }
+    
+    @objc public func documentScrolled(spreadIndex: CGFloat, scrollDirection: ScrollDirection, documentID: String) {
+        if (!isInUse) { return }
+        
+        let scrollData = scrollDirection == .horizontal ? ["currX" : spreadIndex] : ["currY" : spreadIndex]
+        
+        let jsonData = ["event" : NotificationEvent.documentScrolled.rawValue,
+                        "scrollData" : scrollData, "documentID" : documentID] as [String : Any]
+        eventEmitter?.sendEvent(withName:NotificationEvent.documentScrolled.rawValue,
                                body: jsonData)
     }
         

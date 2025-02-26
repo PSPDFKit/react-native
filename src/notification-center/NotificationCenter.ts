@@ -81,18 +81,22 @@ import {
      * @enum {string} DocumentEvent
      */
     export const DocumentEvent = {
-      /**
+     /**
       * Called when the document has been loaded.
       */
       LOADED: 'documentLoaded',
-      /**
+     /**
       * Called when the document failed to load.
       */
       LOAD_FAILED: 'documentLoadFailed',
-      /**
+     /**
       * Called when the document page changed.
       */
       PAGE_CHANGED: 'documentPageChanged',
+     /**
+      * Called when the document is scrolled.
+      */
+      SCROLLED: 'documentScrolled',
      } as const;
 
      /**

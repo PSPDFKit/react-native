@@ -3,7 +3,7 @@
  *
  *   PSPDFKit
  *
- *   Copyright © 2021-2024 PSPDFKit GmbH. All rights reserved.
+ *   Copyright © 2021-2025 PSPDFKit GmbH. All rights reserved.
  *
  *   THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
  *   AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -21,6 +21,9 @@ import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.uimanager.events.Event;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
 import com.pspdfkit.annotations.Annotation;
+import com.pspdfkit.annotations.AnnotationType;
+import com.pspdfkit.annotations.WidgetAnnotation;
+import com.pspdfkit.forms.FormElement;
 import com.pspdfkit.react.helper.JsonUtilities;
 
 import org.json.JSONException;
@@ -75,6 +78,11 @@ public class PdfViewAnnotationChangedEvent extends Event<PdfViewAnnotationChange
                 JSONObject instantJson = new JSONObject(annotation.toInstantJson());
                 annotationMap = JsonUtilities.jsonObjectToMap(instantJson);
                 annotationMap.put("uuid", annotation.getUuid());
+                if (annotation.getType() == AnnotationType.WIDGET) {
+                    WidgetAnnotation widgetAnnotation = (WidgetAnnotation) annotation;
+                    FormElement formElement = widgetAnnotation.getFormElement();
+                    annotationMap.put("isRequired", formElement != null ? formElement.isRequired() : null);
+                }
             }
 
             List<Map<String, Object>> annotations = new ArrayList<>();

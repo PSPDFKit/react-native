@@ -44,8 +44,8 @@ export class OpenRemoteDocument extends BaseExampleAutoHidingHeaderComponent {
         <View style={styles.wrapper}>
           <View style={styles.flex}>
             <Button
-              accessibilityLabel={'Get Document Info'}
-              testID={'Get Document Info'}
+              accessibilityLabel={'Get Document ID'}
+              testID={'Get Document ID'}
               onPress={ async () => {
                 const document = this.pdfRef.current?.getDocument();
                 Alert.alert(
@@ -53,7 +53,7 @@ export class OpenRemoteDocument extends BaseExampleAutoHidingHeaderComponent {
                   'Document ID: ' + await document?.getDocumentId(),
                 );
               }}
-              title="Get Document Info"
+              title="Get Document ID"
             />
           </View>
         </View>

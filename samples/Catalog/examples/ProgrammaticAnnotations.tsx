@@ -1,6 +1,6 @@
 import React from 'react';
 import { Alert, Button, processColor, View } from 'react-native';
-import PSPDFKitView, { Annotation } from 'react-native-pspdfkit';
+import PSPDFKitView, { Annotation, AnnotationAttachment, AnnotationType, DocumentJSON, InkAnnotation } from 'react-native-pspdfkit';
 import fileSystem from 'react-native-fs';
 
 import { exampleDocumentPath, pspdfkitColor } from '../configuration/Constants';
@@ -11,7 +11,32 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
   pdfRef: React.RefObject<PSPDFKitView>;
   lastAddedAnnotationUUID: string | undefined;
 
-  static inkAnnotation = {"annotations" : [{
+  static basicInkAnnotation: InkAnnotation[] = [new InkAnnotation({
+    type: 'pspdfkit/ink',
+    bbox: [89.586334228515625, 98.5791015625, 143.12948608398438, 207.1583251953125],
+    pageIndex: 0,
+    isDrawnNaturally: false,
+    lines: {
+      intensities: [
+        [0.5, 0.5, 0.5],
+        [0.5, 0.5, 0.5],
+      ],
+      points: [
+        [
+          [92.086334228515625, 101.07916259765625],
+          [92.086334228515625, 202.15826416015625],
+          [138.12950134277344, 303.2374267578125],
+        ],
+        [
+          [184.17266845703125, 101.07916259765625],
+          [184.17266845703125, 202.15826416015625],
+          [230.2158203125, 303.2374267578125],
+        ],
+      ],
+    }
+  })];
+
+  static inkAnnotation: DocumentJSON = {"annotations" : [{
     bbox: [
       89.586334228515625, 98.5791015625, 143.12948608398438,
       207.1583251953125,
@@ -46,7 +71,7 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
     "format": "https://pspdfkit.com/instant-json/v1"
   };
 
-  static multipleAnnotations = {
+  static multipleAnnotations: DocumentJSON = {
     annotations: [
       {
         v: 1,
@@ -81,7 +106,6 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
         pageIndex: 0,
         opacity: 1,
         lineWidth: 5,
-        blendMode: 'normal',
         id: '01CKNX7TVEGWMJDPTS9BN3RH9M',
       },
       {
@@ -143,9 +167,7 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
         pageIndex: 0,
         name: '1F291E11-0696-436B-A8E5-0386371E07B7',
         opacity: 1,
-        note: '',
         lineWidth: 4,
-        blendMode: 'normal',
         type: 'pspdfkit/ink',
         bbox: [
           243.78179931640625, 486.64892578125,
@@ -157,7 +179,33 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
     format: 'https://pspdfkit.com/instant-json/v1',
   };
 
-  static complexAnnotation = {
+  static textAnnotation: DocumentJSON = {"annotations" : [{
+    "v": 2,
+    "pageIndex": 0,
+    "bbox": [150, 275, 120, 70],
+    "opacity": 1,
+    "pdfObjectId": 200,
+    "creatorName": "John Doe",
+    "createdAt": "2012-04-23T18:25:43.511Z",
+    "updatedAt": "2012-04-23T18:28:05.100Z",
+    "id": "01F46S31WM8Q46MP3T0BAJ0F85",
+    "name": "01F46S31WM8Q46MP3T0BAJ0F85",
+    "type": "pspdfkit/text",
+    "text": {
+      "format": "plain",
+      "value": "Content for a text annotation"
+    },
+    "fontSize": 14,
+    "fontStyle": ["bold"],
+    "fontColor": "#000000",
+    "horizontalAlign": "left",
+    "verticalAlign": "center",
+    "rotation": 0
+  }],
+    "format": "https://pspdfkit.com/instant-json/v1"
+  };
+
+  static complexAnnotation: DocumentJSON = {
     "annotations":
     [
         {
@@ -177,7 +225,6 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
             "formFieldName": "First Name",
             "horizontalAlign": "left",
             "id": "01HTHDZ57H9YR7CJCPT3G02NA0",
-            "lineHeightFactor": 1.186000108718872,
             "name": "01HTHDZ57KCSGH2T6XRCC9JKME",
             "opacity": 1,
             "pageIndex": 0,
@@ -212,6 +259,174 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
     ],
     "format": "https://pspdfkit.com/instant-json/v1",
 };
+
+static imageAnnotation: DocumentJSON = {
+    "annotations":[
+      {
+          "bbox":[
+            229,
+            426,
+            125,
+            125
+          ],
+          "contentType":"image/png",
+          "createdAt":"2023-08-30T17:15:13Z",
+          "creatorName":"Test User",
+          "description":"Test",
+          "id":"455f261c88f94294a05ebeb494c96cb9",
+          "imageAttachmentId":"492adff9842bff7dcb81a20950870be8a0bb665c8d48175680c1e5e1070243ff",
+          "name":"my-custom-image-annotation",
+          "opacity":1,
+          "pageIndex":0,
+          "rotation":0,
+          "type":"pspdfkit/image",
+          "updatedAt":"2024-05-07T17:15:13Z",
+          "v":2
+      }
+    ],
+    "format":"https://pspdfkit.com/instant-json/v1",
+    "attachments": {
+      "492adff9842bff7dcb81a20950870be8a0bb665c8d48175680c1e5e1070243ff": {
+          "binary" : "",
+          "contentType" : "image/png"
+      }
+    },
+  };
+
+  static linkAnnotation: DocumentJSON = {
+    "annotations": [{
+      "v": 1,
+      "pageIndex": 0,
+      "bbox": [95, 115, 125, 127],
+      "opacity": 1,
+      "pdfObjectId": 200,
+      "creatorName": "John Doe",
+      "createdAt": "2012-04-23T18:25:43.511Z",
+      "updatedAt": "2012-04-23T18:28:05.100Z",
+      "id": "01F46S31WM8Q46MP3T0BAJ0F86",
+      "name": "01F46S31WM8Q46MP3T0BAJ0F86",
+      "type": "pspdfkit/link",
+      "borderColor": "#000000",
+      "borderWidth": 1,
+      "action": {
+        "type": "goTo",
+        "pageIndex": 10
+      },
+      "note": "Text note for the annotation"
+    }],
+    "format": "https://pspdfkit.com/instant-json/v1"
+  };
+
+  static highlightAnnotation: DocumentJSON = {
+    "annotations": [{
+      "v": 1,
+      "pageIndex": 1,
+      "bbox": [150, 275, 120, 70],
+      "opacity": 1,
+      "pdfObjectId": 200,
+      "creatorName": "John Doe",
+      "createdAt": "2012-04-23T18:25:43.511Z",
+      "updatedAt": "2012-04-23T18:28:05.100Z",
+      "id": "01F46S31WM8Q46MP3T0BAJ0F84",
+      "name": "01F46S31WM8Q46MP3T0BAJ0F84",
+      "type": "pspdfkit/markup/highlight",
+      "rects": [[150, 275, 120, 70]],
+      "blendMode": "multiply",
+      "color": "#ffff00"
+    }],
+    "format": "https://pspdfkit.com/instant-json/v1"
+  };
+
+  static noteAnnotation: DocumentJSON = {
+    "annotations": [{
+      "v": 2,
+      "pageIndex": 0,
+      "bbox": [95, 115, 125, 127],
+      "opacity": 1,
+      "pdfObjectId": 200,
+      "creatorName": "John Doe",
+      "createdAt": "2012-04-23T18:25:43.511Z",
+      "updatedAt": "2012-04-23T18:28:05.100Z",
+      "id": "01F46S31WM8Q46MP3T0BAJ0F87",
+      "name": "01F46S31WM8Q46MP3T0BAJ0F87",
+      "type": "pspdfkit/note",
+      "text": {
+        "format": "plain",
+        "value": "Text for the note annotation"
+      },
+      "icon": "circle",
+      "color": "#80ff80"
+    }],
+    "format": "https://pspdfkit.com/instant-json/v1"
+  };
+
+  static shapeEllipseAnnotation: DocumentJSON = {
+    "annotations": [{
+      "v": 1,
+      "pageIndex": 0,
+      "bbox": [195, 215, 325, 427],
+      "opacity": 1,
+      "pdfObjectId": 120,
+      "creatorName": "John Doe",
+      "createdAt": "2012-05-23T18:25:43.511Z",
+      "updatedAt": "2012-06-23T18:28:05.100Z",
+      "id": "01F46S31WM8Q46MP3T0BAJ0F89",
+      "name": "01F46S31WM8Q46MP3T0BAJ0F89",
+      "type": "pspdfkit/shape/ellipse",
+      "strokeWidth": 5,
+      "strokeColor": "#0000ff",
+      "fillColor": "#ffffff",
+      "cloudyBorderIntensity": 1,
+      "cloudyBorderInset": [10, 10, 10, 10]
+    }],
+    "format": "https://pspdfkit.com/instant-json/v1"
+  };
+
+  static shapeLineAnnotation: DocumentJSON = {
+    "annotations": [{
+      "v": 1,
+      "pageIndex": 0,
+      "bbox": [195, 215, 325, 427],
+      "opacity": 1,
+      "pdfObjectId": 120,
+      "creatorName": "John Doe",
+      "createdAt": "2012-05-23T18:25:43.511Z",
+      "updatedAt": "2012-06-23T18:28:05.100Z",
+      "id": "01F46S31WM8Q46MP3T0BAJ0F8B",
+      "name": "01F46S31WM8Q46MP3T0BAJ0F8B",
+      "strokeWidth": 5,
+      "strokeColor": "#0000ff",
+      "fillColor": "#ffffff",
+      "type": "pspdfkit/shape/line",
+      "startPoint": [40, 60],
+      "endPoint": [100, 200],
+      "lineCaps": {
+        "start": "openArrow"
+      }
+    }],
+    "format": "https://pspdfkit.com/instant-json/v1"
+  };
+
+  static stampAnnotation: DocumentJSON = {
+    "annotations": [{
+      "v": 1,
+      "pageIndex": 0,
+      "bbox": [150, 250, 150, 100],
+      "opacity": 1,
+      "pdfObjectId": 300,
+      "creatorName": "John Doe",
+      "createdAt": "2020-05-23T18:25:43.511Z",
+      "updatedAt": "2020-06-23T18:28:05.100Z",
+      "id": "01F46S31WM8Q46MP3T0BAJ0F8F",
+      "name": "01F46S31WM8Q46MP3T0BAJ0F8F",
+      "type": "pspdfkit/stamp",
+      "stampType": "Approved",
+      "title": "Approved",
+      "color": "#00ff00",
+      "rotation": 0
+    }],
+    "format": "https://pspdfkit.com/instant-json/v1"
+  };
 
   constructor(props: any) {
     super(props);
@@ -253,7 +468,7 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
               <Button
                 onPress={() => {
                   // Programmatically add an ink annotation.
-                  this.pdfRef.current?.getDocument().addAnnotations(ProgrammaticAnnotations.inkAnnotation)
+                  this.pdfRef.current?.getDocument().addAnnotations(ProgrammaticAnnotations.basicInkAnnotation)
                     .then(result => {
                       if (result) {
                         Alert.alert(
@@ -303,7 +518,7 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
                   // For certain type of widget annotations, the document cache needs to be cleared before adding them.
                   await this.pdfRef.current?.getDocument().invalidateCache();
                   // Programmatically add multiple annotations.
-                  this.pdfRef.current?.getDocument().addAnnotations(ProgrammaticAnnotations.complexAnnotation)
+                  this.pdfRef.current?.getDocument().applyInstantJSON(ProgrammaticAnnotations.complexAnnotation)
                     .then(result => {
                       if (result) {
                         Alert.alert(
@@ -328,7 +543,7 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
               <Button
                 onPress={() => {
                   // Programmatically add multiple annotations.
-                  this.pdfRef.current?.getDocument().addAnnotations(ProgrammaticAnnotations.multipleAnnotations)
+                  this.pdfRef.current?.getDocument().applyInstantJSON(ProgrammaticAnnotations.multipleAnnotations)
                     .then(result => {
                       if (result) {
                         Alert.alert(
@@ -356,40 +571,11 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
                     toFile: filePath
                   }).promise.then(async (_result) => {
                     const base64ImageData = await fileSystem.readFile(filePath, 'base64');
-                    const imageAnnotationJSON = {
-                    "annotations":[
-                      {
-                          "bbox":[
-                            229,
-                            426,
-                            125,
-                            125
-                          ],
-                          "contentType":"image/png",
-                          "createdAt":"2023-08-30T17:15:13Z",
-                          "creatorName":"Test User",
-                          "description":"Test",
-                          "id":"455f261c88f94294a05ebeb494c96cb9",
-                          "imageAttachmentId":"492adff9842bff7dcb81a20950870be8a0bb665c8d48175680c1e5e1070243ff",
-                          "name":"my-custom-image-annotation",
-                          "opacity":1,
-                          "pageIndex":0,
-                          "rotation":0,
-                          "subject":"Test",
-                          "type":"pspdfkit/image",
-                          "updatedAt":"2024-05-07T17:15:13Z",
-                          "v":2
-                      }
-                    ],
-                    "format":"https://pspdfkit.com/instant-json/v1",
-                    "attachments": {
-                      "492adff9842bff7dcb81a20950870be8a0bb665c8d48175680c1e5e1070243ff": {
-                          "binary" : "" + base64ImageData + "",
-                          "contentType" : "image/png"
-                      }
-                    },
-                  };
-                  this.pdfRef.current?.getDocument().addAnnotations(imageAnnotationJSON)
+                    const attachment = ProgrammaticAnnotations.imageAnnotation.attachments?.['492adff9842bff7dcb81a20950870be8a0bb665c8d48175680c1e5e1070243ff'] as AnnotationAttachment;
+                    if (attachment) {
+                      attachment.binary = base64ImageData;
+                    }
+                  this.pdfRef.current?.getDocument().applyInstantJSON(ProgrammaticAnnotations.imageAnnotation)
                     .then(result => {
                       if (result) {
                         Alert.alert(
@@ -416,11 +602,16 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
                   // Get ink annotations from the current page.
                   this.pdfRef.current?.getDocument().getAnnotationsForPage(
                       this.state.currentPageIndex,
-                      'pspdfkit/ink',
+                      Annotation.Type.INK,
                     )
-                    .then(result => {
-                      if (result) {
-                        Alert.alert('PSPDFKit', JSON.stringify(result));
+                    .then((annotations: AnnotationType[]) => {
+                      if (annotations) {
+                        if (annotations[0] instanceof InkAnnotation) {
+                            const inkAnnotation = annotations[0] as InkAnnotation;
+                            // Access InkAnnotation specific properties
+                            console.log(inkAnnotation.bbox);
+                        }
+                        Alert.alert('PSPDFKit', 'All Ink Annotations: ' + JSON.stringify(annotations));
                       } else {
                         Alert.alert('PSPDFKit', 'Failed to get annotations.');
                       }
@@ -437,9 +628,9 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
                 onPress={() => {
                   // Select all the Ink annotations on page 0.
                   const document = this.pdfRef.current?.getDocument();
-                  document?.getAnnotationsForPage(0, 'pspdfkit/ink')
-                    .then( async annotations => {
-                      await this.pdfRef.current?.selectAnnotations(annotations);
+                  document?.getAnnotationsForPage(0, Annotation.Type.INK)
+                    .then( async (annotations: AnnotationType[]) => {
+                      await this.pdfRef.current?.selectAnnotations(annotations, false);
                     })
                     .catch(error => {
                       Alert.alert('PSPDFKit', JSON.stringify(error));
@@ -456,14 +647,14 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
                 onPress={() => {
                   const document = this.pdfRef.current?.getDocument();
                   document?.getAnnotations() // No parameter returns all annotations
-                    .then( annotations => {
+                    .then((annotations: AnnotationType[]) => {
                       document?.removeAnnotations(annotations);
                     })
                     .catch(error => {
                       Alert.alert('PSPDFKit', JSON.stringify(error));
                     });
                 }}
-                title={'Remove annotations'}
+                title={'Remove Annotations'}
               />
             </View>
             <View style={styles.marginLeft}>
@@ -471,9 +662,9 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
                 onPress={() => {
                   // Get all annotations annotations from the document.
                   this.pdfRef.current?.getDocument().getAnnotations()
-                    .then(result => {
-                      if (result) {
-                        Alert.alert('PSPDFKit', JSON.stringify(result));
+                    .then((annotations: AnnotationType[]) => {
+                      if (annotations) {
+                        Alert.alert('PSPDFKit', 'All Annotations: ' + JSON.stringify(annotations));
                       } else {
                         Alert.alert(
                           'PSPDFKit',

@@ -1,4 +1,4 @@
-//  Copyright © 2018-2024 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2018-2025 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -195,20 +195,29 @@ class PSPDFKitView extends React.Component {
   /**
    * Enters annotation creation mode, showing the annotation creation toolbar.
    * @method enterAnnotationCreationMode
+   * @param { Annotation.Type } [annotationType] The annotation type that should be pre-selected when entering annotation creation mode.
    * @example
    * this.pdfRef.current.enterAnnotationCreationMode();
    * @memberof PSPDFKitView
    */
-  enterAnnotationCreationMode = function () {
+  enterAnnotationCreationMode = function (annotationType) {
     if (Platform.OS === 'android') {
+      let requestId = this._nextRequestId++;
+      let requestMap = this._requestMap;
+
+      let promise = new Promise(function (resolve, reject) {
+        requestMap[requestId] = { resolve: resolve, reject: reject };
+      });
+
       UIManager.dispatchViewManagerCommand(
         findNodeHandle(this._componentRef.current),
         this._getViewManagerConfig('RCTPSPDFKitView').Commands
           .enterAnnotationCreationMode,
-        [],
+          [requestId, annotationType],
       );
     } else if (Platform.OS === 'ios') {
       return NativeModules.PSPDFKitViewManager.enterAnnotationCreationMode(
+        annotationType,
         findNodeHandle(this._componentRef.current),
       );
     }
@@ -238,7 +247,7 @@ class PSPDFKitView extends React.Component {
 
   /**
    * Saves the document that’s currently open.
-   * @deprecated Since PSPDFKit for React Native 2.12. Use ```this.pdfRef.current?.getDocument().save()``` instead.
+   * @deprecated Since Nutrient React Native SDK 2.12. Use ```this.pdfRef.current?.getDocument().save()``` instead.
    * See {@link https://pspdfkit.com/api/react-native/PDFDocument.html#.save|save()}.
    * @method saveCurrentDocument
    * @memberof PSPDFKitView
@@ -345,12 +354,14 @@ class PSPDFKitView extends React.Component {
    * @method selectAnnotations
    * @memberof PSPDFKitView
    * @param { object } annotations An array of the annotations to select in Instant JSON format.
+   * @param { boolean } [showContextualMenu] Whether the annotation contextual menu should be shown after selection.
    * @description Select one or more annotations.
    * @example
    * const result = await this.pdfRef.current?.selectAnnotations(annotations);
    * @returns { Promise<any> } A promise containing the result of the operation. ```true``` if the annotations were selected, ```false``` otherwise.
    */
-  selectAnnotations = function (annotations) {
+  selectAnnotations = function (annotations, showContextualMenu = false) {
+
     if (Platform.OS === 'android') {
       let requestId = this._nextRequestId++;
       let requestMap = this._requestMap;
@@ -364,13 +375,14 @@ class PSPDFKitView extends React.Component {
         findNodeHandle(this._componentRef.current),
         this._getViewManagerConfig('RCTPSPDFKitView').Commands
           .selectAnnotations,
-        [requestId, annotations],
+        [requestId, annotations, showContextualMenu],
       );
 
       return promise;
     } else if (Platform.OS === 'ios') {
       return NativeModules.PSPDFKitViewManager.selectAnnotations(
         annotations,
+        showContextualMenu,
         findNodeHandle(this._componentRef.current),
       );
     }
@@ -380,7 +392,7 @@ class PSPDFKitView extends React.Component {
    * Gets all annotations of the given type from the specified page.
    *
    * @method getAnnotations
-   * @deprecated Since PSPDFKit for React Native 2.12. Use ```this.pdfRef.current?.getDocument().getAnnotations()``` or ```getAnnotationsForPage()``` instead.
+   * @deprecated Since Nutrient React Native SDK 2.12. Use ```this.pdfRef.current?.getDocument().getAnnotations()``` or ```getAnnotationsForPage()``` instead.
    * See {@link https://pspdfkit.com/api/react-native/PDFDocument.html#.getAnnotations|getAnnotations()} and {@link https://pspdfkit.com/api/react-native/PDFDocument.html#.getAnnotationsForPage|getAnnotationsForPage()}.
    * @memberof PSPDFKitView
    * @param { number } pageIndex The page index to get the annotations for, starting at 0.
@@ -421,7 +433,7 @@ class PSPDFKitView extends React.Component {
    * Adds a new annotation to the current document.
    *
    * @method addAnnotation
-   * @deprecated Since PSPDFKit for React Native 2.12. Use ```this.pdfRef.current?.getDocument().addAnnotations()``` instead.
+   * @deprecated Since Nutrient React Native SDK 2.12. Use ```this.pdfRef.current?.getDocument().addAnnotations()``` instead.
    * @memberof PSPDFKitView
    * @param { object } annotation The InstantJSON of the annotation to add.
    * @example
@@ -459,7 +471,7 @@ class PSPDFKitView extends React.Component {
    * Removes an existing annotation from the current document.
    *
    * @method removeAnnotation
-   * @deprecated Since PSPDFKit for React Native 2.12. Use ```this.pdfRef.current?.getDocument().removeAnnotations()``` instead.
+   * @deprecated Since Nutrient React Native SDK 2.12. Use ```this.pdfRef.current?.getDocument().removeAnnotations()``` instead.
    * See {@link https://pspdfkit.com/api/react-native/PDFDocument.html#.removeAnnotations|removeAnnotations()}.
    * @memberof PSPDFKitView
    * @param { object } annotation The InstantJSON of the annotation to remove.
@@ -497,7 +509,7 @@ class PSPDFKitView extends React.Component {
    * Removes the supplied document InstantJSON from the current document.
    *
    * @method removeAnnotations
-   * @deprecated Since PSPDFKit for React Native 2.12. Use ```this.pdfRef.current?.getDocument().removeAnnotations()``` instead.
+   * @deprecated Since Nutrient React Native SDK 2.12. Use ```this.pdfRef.current?.getDocument().removeAnnotations()``` instead.
    * See {@link https://pspdfkit.com/api/react-native/PDFDocument.html#.removeAnnotations|removeAnnotations()}.
    * @memberof PSPDFKitView
    * @param { object } annotation The InstantJSON of the annotations to remove.
@@ -535,7 +547,7 @@ class PSPDFKitView extends React.Component {
    * Gets all unsaved changes to annotations.
    *
    * @method getAllUnsavedAnnotations
-   * @deprecated Since PSPDFKit for React Native 2.12. Use ```this.pdfRef.current?.getDocument().getAllUnsavedAnnotations()``` instead.
+   * @deprecated Since Nutrient React Native SDK 2.12. Use ```this.pdfRef.current?.getDocument().getAllUnsavedAnnotations()``` instead.
    * See {@link https://pspdfkit.com/api/react-native/PDFDocument.html#.getAllUnsavedAnnotations|getAllUnsavedAnnotations()}.
    * @memberof PSPDFKitView
    * @returns { Promise } A promise containing document InstantJSON.
@@ -570,7 +582,7 @@ class PSPDFKitView extends React.Component {
    * Gets all annotations of the given type.
    *
    * @method getAllAnnotations
-   * @deprecated Since PSPDFKit for React Native 2.12. Use ```this.pdfRef.current?.getDocument().getAnnotations()``` instead.
+   * @deprecated Since Nutrient React Native SDK 2.12. Use ```this.pdfRef.current?.getDocument().getAnnotations()``` instead.
    * See {@link https://pspdfkit.com/api/react-native/PDFDocument.html#.getAnnotations|getAnnotations()}.
    * @memberof PSPDFKitView
    * @param { string } [type] The type of annotations to get. If not specified or ```null```, all annotation types will be returned.
@@ -611,7 +623,7 @@ class PSPDFKitView extends React.Component {
    * Applies the supplied document InstantJSON to the current document.
    *
    * @method addAnnotations
-   * @deprecated Since PSPDFKit for React Native 2.12. Use ```this.pdfRef.current?.getDocument().addAnnotations()``` instead.
+   * @deprecated Since Nutrient React Native SDK 2.12. Use ```this.pdfRef.current?.getDocument().addAnnotations()``` instead.
    * See {@link https://pspdfkit.com/api/react-native/PDFDocument.html#.addAnnotations|addAnnotations()}.
    * @memberof PSPDFKitView
    * @param { object } annotations The document InstantJSON to apply to the current document.
@@ -726,7 +738,7 @@ class PSPDFKitView extends React.Component {
    * Imports the supplied XFDF file into the current document.
    *
    * @method importXFDF
-   * @deprecated Since PSPDFKit for React Native 2.12. Use ```this.pdfRef.current?.getDocument().importXFDF()``` instead.
+   * @deprecated Since Nutrient React Native SDK 2.12. Use ```this.pdfRef.current?.getDocument().importXFDF()``` instead.
    * See {@link https://pspdfkit.com/api/react-native/PDFDocument.html#.importXFDF|importXFDF()}.
    * @memberof PSPDFKitView
    * @param { string } filePath The path to the XFDF file to import.
@@ -764,7 +776,7 @@ class PSPDFKitView extends React.Component {
    * Exports the annotations from the current document to a XFDF file.
    *
    * @method exportXFDF
-   * @deprecated Since PSPDFKit for React Native 2.12. Use ```this.pdfRef.current?.getDocument().exportXFDF()``` instead.
+   * @deprecated Since Nutrient React Native SDK 2.12. Use ```this.pdfRef.current?.getDocument().exportXFDF()``` instead.
    * See {@link https://pspdfkit.com/api/react-native/PDFDocument.html#.exportXFDF|exportXFDF()}.
    * @memberof PSPDFKitView
    * @param { string } filePath The path where the XFDF file should be exported to.
@@ -1322,6 +1334,7 @@ PSPDFKitView.propTypes = {
    * Only applies when the ```PSPDFKitView``` is presented modally.
    * Will call ```onCloseButtonPressed``` when tapped if a callback was provided.
    * If ```onCloseButtonPressed``` wasn’t provided, ```PSPDFKitView``` will automatically be dismissed when modally presented.
+   * @deprecated Since Nutrient React Native SDK 2.16. Use the ```toolbar``` property to add the ```Toolbar.DefaultToolbarButton.CLOSE_BUTTON_ITEM``` button item when setting up the ```PSPDFKitView``` instead.
    * @type {boolean}
    * @memberof PSPDFKitView
    */
@@ -1634,6 +1647,12 @@ export default PSPDFKitView;
  */
 
 /**
+ * @typedef PDFDocumentProperties
+ * @property { number } pageCount The number of pages in the document.
+ * @property { boolean } isEncrypted Indicates if the PDF document is encrypted (password protected).
+ */
+
+/**
  * PSPDFKit is a React Native {@link https://reactnative.dev/docs/native-modules-intro|Native Module} implementation used to call iOS and Android methods directly.
  * @hideconstructor
  * @example
@@ -1651,10 +1670,21 @@ export class PSPDFKit {
   versionString;
 
   /**
+   * Used to get the document properties of the specified document.
+   * @method getDocumentProperties
+   * @memberof PSPDFKit
+   * @param { string } documentPath The path to the document.
+   * @returns { Promise<PDFDocumentProperties> } A promise returning the document properties.
+   * @example
+   * const properties = await PSPDFKit.getDocumentProperties('path/to/document.pdf');
+   */
+  getDocumentProperties = function (documentPath) {};
+
+  /**
    * Used to set your PSPDFKit license key for the active platform only, either iOS or Android.
    * PSPDFKit is commercial software.
    * Each PSPDFKit license is bound to a specific app bundle ID.
-   * Visit {@link https://customers.pspdfkit.com} to get your demo or commercial license key.
+   * Visit {@link https://my.nutrient.io} to get your demo or commercial license key.
    * @method setLicenseKey
    * @memberof PSPDFKit
    * @param { string | null } [key] Your PSPDFKit for React Native iOS or PSPDFKit for React Native Android license key.
@@ -1668,7 +1698,7 @@ export class PSPDFKit {
    * Used to set the your PSPDFKit license keys for both platforms.
    * PSPDFKit is commercial software.
    * Each PSPDFKit license is bound to a specific app bundle ID.
-   * Visit {@link https://customers.pspdfkit.com} to get your demo or commercial license key.
+   * Visit {@link https://my.nutrient.io} to get your demo or commercial license key.
    * @method setLicenseKeys
    * @memberof PSPDFKit
    * @param { string | null } [androidKey] Your PSPDFKit for React Native Android license key.
@@ -1865,7 +1895,7 @@ export class PSPDFKit {
 /**
  * @typedef PDFDocumentConfiguration
  * @property { string } documentPath The URI to the existing document.
- * @property { number } pageIndex The index of the page that should be used from the document. Starts at 0.
+ * @property { number } [pageIndex] The index of the page that should be used from the document. Starts at 0. If not specified, the entire document will be used.
  */
 
 /**
@@ -2129,6 +2159,61 @@ export { PDFDocument } from './lib/document/PDFDocument';
 import { NotificationCenter } from './lib/notification-center/NotificationCenter';
 export { NotificationCenter } from './lib/notification-center/NotificationCenter';
 
+import {
+  AnnotationType,
+  DocumentJSON,
+  AnnotationAttachment,
+  BaseAnnotation,
+  CommentMarkerAnnotation,
+  EllipseShapeAnnotation,
+  HighlightMarkupAnnotation,
+  ImageAnnotation,
+  InkAnnotation,
+  LineShapeAnnotation,
+  LinkAnnotation,
+  MarkupAnnotation,
+  MediaAnnotation,
+  NoteAnnotation,
+  PolygonShapeAnnotation,
+  PolylineShapeAnnotation,
+  RectangleShapeAnnotation,
+  RedactionMarkupAnnotation,
+  ShapeAnnotation,
+  SquigglyMarkupAnnotation,
+  StampAnnotation,
+  StrikeOutMarkupAnnotation,
+  TextAnnotation,
+  UnderlineMarkupAnnotation,
+  WidgetAnnotation
+} from './lib/annotations/AnnotationModels';
+export {
+  AnnotationType,
+  DocumentJSON,
+  AnnotationAttachment,
+  BaseAnnotation,
+  CommentMarkerAnnotation,
+  EllipseShapeAnnotation,
+  HighlightMarkupAnnotation,
+  ImageAnnotation,
+  InkAnnotation,
+  LineShapeAnnotation,
+  LinkAnnotation,
+  MarkupAnnotation,
+  MediaAnnotation,
+  NoteAnnotation,
+  PolygonShapeAnnotation,
+  PolylineShapeAnnotation,
+  RectangleShapeAnnotation,
+  RedactionMarkupAnnotation,
+  ShapeAnnotation,
+  SquigglyMarkupAnnotation,
+  StampAnnotation,
+  StrikeOutMarkupAnnotation,
+  TextAnnotation,
+  UnderlineMarkupAnnotation,
+  WidgetAnnotation
+} from './lib/annotations/AnnotationModels';
+
 module.exports.PDFConfiguration = PDFConfiguration;
 module.exports.RemoteDocumentConfiguration = RemoteDocumentConfiguration;
 module.exports.Toolbar = Toolbar;
@@ -2159,4 +2244,32 @@ module.exports.AnnotationPresetMeasurementDistance =
   AnnotationPresetMeasurementDistance;
 
 module.exports.NotificationCenter = NotificationCenter;
-module.exports.NotificationCenter = NotificationCenter;
+
+module.exports.AnnotationType = AnnotationType;
+module.exports.DocumentJSON = DocumentJSON;
+module.exports.AnnotationAttachment = AnnotationAttachment;
+module.exports.BaseAnnotation = BaseAnnotation;
+module.exports.CommentMarkerAnnotation = CommentMarkerAnnotation;
+module.exports.EllipseShapeAnnotation = EllipseShapeAnnotation;
+module.exports.HighlightMarkupAnnotation = HighlightMarkupAnnotation;
+module.exports.ImageAnnotation = ImageAnnotation;
+module.exports.InkAnnotation = InkAnnotation;
+module.exports.LineShapeAnnotation = LineShapeAnnotation;
+module.exports.LinkAnnotation = LinkAnnotation;
+module.exports.MarkupAnnotation = MarkupAnnotation;
+module.exports.MediaAnnotation = MediaAnnotation;
+module.exports.NoteAnnotation = NoteAnnotation;
+module.exports.PolygonShapeAnnotation = PolygonShapeAnnotation;
+module.exports.PolylineShapeAnnotation = PolylineShapeAnnotation;
+module.exports.RectangleShapeAnnotation = RectangleShapeAnnotation;
+module.exports.RedactionMarkupAnnotation = RedactionMarkupAnnotation;
+module.exports.ShapeAnnotation = ShapeAnnotation;
+module.exports.SquigglyMarkupAnnotation = SquigglyMarkupAnnotation;
+module.exports.StampAnnotation = StampAnnotation;
+module.exports.StrikeOutMarkupAnnotation = StrikeOutMarkupAnnotation;
+module.exports.TextAnnotation = TextAnnotation;
+module.exports.UnderlineMarkupAnnotation = UnderlineMarkupAnnotation;
+module.exports.WidgetAnnotation = WidgetAnnotation;
+
+
+

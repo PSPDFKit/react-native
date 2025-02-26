@@ -1,5 +1,5 @@
 //
-//  Copyright © 2018-2024 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2018-2025 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -53,7 +53,7 @@ struct RNFileHelper {
                 try fileManager.removeItem(at: filePathURL)
 
             } catch {
-                print("Could not delete file, probably does not exists")
+                print("E_NO_DOCUMENT_FOUND: Could not delete file, probably didn't exist")
             }
         }
     }

@@ -3,7 +3,7 @@
  *
  *   PSPDFKit
  *
- *   Copyright © 2021-2024 PSPDFKit GmbH. All rights reserved.
+ *   Copyright © 2021-2025 PSPDFKit GmbH. All rights reserved.
  *
  *   THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
  *   AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -19,11 +19,34 @@ import com.facebook.react.bridge.ReadableArray;
 import com.pspdfkit.annotations.AnnotationFlags;
 import com.pspdfkit.annotations.AnnotationType;
 import com.pspdfkit.ui.toolbar.ContextualToolbarMenuItem;
+import com.pspdfkit.ui.special_mode.controller.AnnotationTool;
+import com.pspdfkit.ui.special_mode.controller.AnnotationToolVariant;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
 
 public class ConversionHelpers {
+
+    /**
+     * Result class for annotation tool conversion containing the tool and its optional variant.
+     */
+    public static class AnnotationToolResult {
+        private final AnnotationTool annotationTool;
+        private final @Nullable AnnotationToolVariant annotationToolVariant;
+
+        public AnnotationToolResult(AnnotationTool annotationTool, @Nullable AnnotationToolVariant annotationToolVariant) {
+            this.annotationTool = annotationTool;
+            this.annotationToolVariant = annotationToolVariant;
+        }
+
+        public AnnotationTool getAnnotationTool() {
+            return annotationTool;
+        }
+
+        public @Nullable AnnotationToolVariant getAnnotationToolVariant() {
+            return annotationToolVariant;
+        }
+    }
 
     public static EnumSet<AnnotationType> getAnnotationTypes(@Nullable final ReadableArray types) {
         if (types == null) {
@@ -220,5 +243,69 @@ public class ConversionHelpers {
             default:
                 return ContextualToolbarMenuItem.Position.END;
         }
+    }
+
+    public static AnnotationToolResult convertAnnotationTool(String tool) {
+        if (tool == null) {
+            return new AnnotationToolResult(AnnotationTool.NONE, null);
+        }
+
+        return switch (tool.toLowerCase()) {
+            case "highlight" ->
+                    new AnnotationToolResult(AnnotationTool.HIGHLIGHT, null);
+            case "highlighter" ->
+                    new AnnotationToolResult(AnnotationTool.HIGHLIGHT, AnnotationToolVariant.fromPreset(AnnotationToolVariant.Preset.HIGHLIGHTER));
+            case "ink", "pen" ->
+                    new AnnotationToolResult(AnnotationTool.INK, AnnotationToolVariant.fromPreset(AnnotationToolVariant.Preset.PEN));
+            case "magic_ink" ->
+                    new AnnotationToolResult(AnnotationTool.INK, AnnotationToolVariant.fromPreset(AnnotationToolVariant.Preset.MAGIC));
+            case "text", "freetext" ->
+                    new AnnotationToolResult(AnnotationTool.FREETEXT, null);
+            case "freetext_callout" ->
+                    new AnnotationToolResult(AnnotationTool.FREETEXT, AnnotationToolVariant.fromPreset(AnnotationToolVariant.Preset.CALLOUT));
+            case "note" ->
+                    new AnnotationToolResult(AnnotationTool.NOTE, null);
+            case "line" ->
+                    new AnnotationToolResult(AnnotationTool.LINE, null);
+            case "arrow" ->
+                    new AnnotationToolResult(AnnotationTool.LINE, AnnotationToolVariant.fromPreset(AnnotationToolVariant.Preset.ARROW));
+            case "square", "rectangle", "area_square" ->
+                    new AnnotationToolResult(AnnotationTool.SQUARE, null);
+            case "circle", "ellipse", "area_circle" ->
+                    new AnnotationToolResult(AnnotationTool.CIRCLE, null);
+            case "polygon", "area_polygon" ->
+                    new AnnotationToolResult(AnnotationTool.POLYGON, null);
+            case "cloudy_polygon" ->
+                    new AnnotationToolResult(AnnotationTool.POLYGON, AnnotationToolVariant.fromPreset(AnnotationToolVariant.Preset.CLOUDY));
+            case "polyline" ->
+                    new AnnotationToolResult(AnnotationTool.POLYLINE, null);
+            case "strikeout" ->
+                    new AnnotationToolResult(AnnotationTool.STRIKEOUT, null);
+            case "underline" ->
+                    new AnnotationToolResult(AnnotationTool.UNDERLINE, null);
+            case "squiggly" ->
+                    new AnnotationToolResult(AnnotationTool.SQUIGGLY, null);
+            case "redaction"->
+                    new AnnotationToolResult(AnnotationTool.REDACTION, null);
+            case "stamp" ->
+                    new AnnotationToolResult(AnnotationTool.STAMP, null);
+            case "signature" ->
+                    new AnnotationToolResult(AnnotationTool.SIGNATURE, null);
+            case "image" ->
+                    new AnnotationToolResult(AnnotationTool.IMAGE, null);
+            case "sound" ->
+                    new AnnotationToolResult(AnnotationTool.SOUND, null);
+            case "distance" ->
+                    new AnnotationToolResult(AnnotationTool.MEASUREMENT_DISTANCE, null);
+            case "perimeter" ->
+                    new AnnotationToolResult(AnnotationTool.MEASUREMENT_PERIMETER, null);
+            case "eraser" ->
+                    new AnnotationToolResult(AnnotationTool.ERASER, null);
+            case "comment-marker" ->
+                    new AnnotationToolResult(AnnotationTool.INSTANT_COMMENT_MARKER, null);
+            case "selection_tool" ->
+                    new AnnotationToolResult(AnnotationTool.ANNOTATION_MULTI_SELECTION, null);
+            default -> new AnnotationToolResult(AnnotationTool.NONE, null);
+        };
     }
 }

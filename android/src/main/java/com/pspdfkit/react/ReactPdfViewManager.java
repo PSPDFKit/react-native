@@ -3,7 +3,7 @@
  *
  *   PSPDFKit
  *
- *   Copyright © 2021-2024 PSPDFKit GmbH. All rights reserved.
+ *   Copyright © 2021-2025 PSPDFKit GmbH. All rights reserved.
  *
  *   THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
  *   AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -299,7 +299,16 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
     public void receiveCommand(@NonNull final PdfView root, int commandId, @Nullable ReadableArray args) {
         switch (commandId) {
             case COMMAND_ENTER_ANNOTATION_CREATION_MODE:
-                root.enterAnnotationCreationMode();
+                if (args != null) {
+                    final int requestId = args.getInt(0);
+                    if (args.size() == 2) {
+                        final String annotationType = args.getString(1);
+                        root.enterAnnotationCreationMode(annotationType);
+                    } else {
+                        root.enterAnnotationCreationMode(null);
+                    }
+                    root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, true));
+                }
                 break;
             case COMMAND_EXIT_CURRENTLY_ACTIVE_MODE:
                 root.exitCurrentlyActiveMode();
@@ -488,10 +497,10 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
                 }
                 break;
             case COMMAND_SELECT_ANNOTATIONS:
-                if (args != null && args.size() == 2) {
+                if (args != null && args.size() == 3) {
                     final int requestId = args.getInt(0);
                     try {
-                        root.selectAnnotations(requestId, args.getArray(1));
+                        root.selectAnnotations(requestId, args.getArray(1), args.getBoolean(2));
                     } catch (Exception e) {
                         root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, e));
                     }

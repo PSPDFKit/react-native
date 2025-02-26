@@ -3,7 +3,7 @@
  *
  *   PSPDFKit
  *
- *   Copyright © 2021-2024 PSPDFKit GmbH. All rights reserved.
+ *   Copyright © 2021-2025 PSPDFKit GmbH. All rights reserved.
  *
  *   THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
  *   AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -108,6 +108,8 @@ public class ReactGroupingRule extends PresetMenuItemGroupingRule {
                 return com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_item_signature;
             case "pen":
                 return com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_item_ink_pen;
+            case "ink":
+                return com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_item_ink_pen;
             case "arrow":
                 return com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_item_line_arrow;
             case "sound":
@@ -162,6 +164,8 @@ public class ReactGroupingRule extends PresetMenuItemGroupingRule {
                 return com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_item_measurement_area_rect;
             case "area_circle":
                 return com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_item_measurement_area_ellipse;
+            case "selection_tool":
+                return com.pspdfkit.R.id.pspdf__annotation_creation_toolbar_item_multi_selection;
         }
 
         Log.i(TAG, String.format("Received unknown menu item %s.", name));

@@ -67,7 +67,6 @@ import { MeasurementValueConfiguration } from './../measurements/Measurements';
  * @property { number } [iOSSearchResultZoomScale] Increase this to zoom to the search result.
  * @property { any } [iOSAdditionalScrollViewFrameInsets] Additional insets to apply to the document scroll view's frame.
  * @property { any } [iOSAdditionalContentInsets] Additional insets to apply to the layout's content.
- * @property { PDFConfiguration.IOSAllowedMenuActions } [iOSAllowedMenuActions] May be used to customize other displayed menu actions when text is selected.
  * @property { PDFConfiguration.IOSSettingsOptions[] } [iOSSettingsOptions] Options that will be presented by ```PDFSettingsViewController```. Defaults to ```.default```.
  * @property { PDFConfiguration.BooleanType } [iOSShadowEnabled] Enable / disable page shadow.
  * @property { number } [iOSShadowOpacity] Set the default ```shadowOpacity```.
@@ -337,10 +336,6 @@ export class PDFConfiguration {
      * Additional insets to apply to the layout's content.
      */
     iOSAdditionalContentInsets?: any
-    /**
-     * May be used to customize other displayed menu actions when text is selected.
-     */
-    iOSAllowedMenuActions?: PDFConfiguration.IOSAllowedMenuActions;
     /**
      * Options that will be presented by ```PDFSettingsViewController```. Defaults to ```.default```.
      */
@@ -776,38 +771,6 @@ export namespace PDFConfiguration {
     } as const;
 
    /**
-    * The IOSAllowedMenuActions options.
-    * @readonly
-    * @enum {string} IOSAllowedMenuActions
-    */  
-    export const IOSAllowedMenuActions = {
-       /**
-        * Allow no action.
-        */
-        NONE: 'none',
-       /**
-        * Allow searching the document with selected text.
-        */
-        SEARCH: 'search',
-       /**
-        * Allow presenting the definition for selected text.
-        */
-        DEFINE: 'define',
-       /**
-        * Allow searching Wikipedia with selected text.
-        */
-        WIKIPEDIA: 'wikipedia',
-       /**
-        * Allow accessibility text-to-speech.
-        */
-        SPEAK: 'speak',
-       /**
-        * Allow all actions.
-        */
-        ALL: 'all'
-    } as const;
-
-   /**
     * The IOSSettingsOptions options.
     * @readonly
     * @enum {string} IOSSettingsOptions
@@ -1027,7 +990,6 @@ export namespace PDFConfiguration {
     export type IOSAllowedAppearanceModes = ValueOf<typeof IOSAllowedAppearanceModes>;
     export type UserInterfaceViewMode = ValueOf<typeof UserInterfaceViewMode>;
     export type IOSSearchMode = ValueOf<typeof IOSSearchMode>;
-    export type IOSAllowedMenuActions = ValueOf<typeof IOSAllowedMenuActions>;
     export type IOSSettingsOptions = ValueOf<typeof IOSSettingsOptions>;
     export type ShowThumbnailBar = ValueOf<typeof ShowThumbnailBar>;
     export type IOSScrubberBarType = ValueOf<typeof IOSScrubberBarType>;

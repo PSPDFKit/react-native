@@ -1,5 +1,5 @@
 //
-//  Copyright © 2018-2024 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2018-2025 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -245,10 +245,15 @@ class RNProcessor: RCTEventEmitter {
             return
         }
 
-        for (index, documentConfig) in documents.enumerated() {
+        var totalPageCount = 0;
+        for (_, documentConfig) in documents.enumerated() {
             let pageConfigurationHelper = RNConfigurationHelper(documentConfig)
             guard let documentPageConfig = pageConfigurationHelper.newPageFromDocument(documentConfig) else { continue }
-            pageConfiguration.addNewPage(at: PageIndex(index), configuration: documentPageConfig)
+            
+            for j in 0..<documentPageConfig.count {
+                pageConfiguration.addNewPage(at: PageIndex(totalPageCount), configuration: documentPageConfig[j])
+                totalPageCount += 1
+            }
         }
 
         let processor = Processor(configuration: pageConfiguration, securityOptions: nil)

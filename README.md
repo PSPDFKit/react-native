@@ -114,7 +114,7 @@ See our [Getting Started on React Native guide](https://www.nutrient.io/getting-
     ...
       android {
     -  compileSdkVersion rootProject.ext.compileSdkVersion
-    +  compileSdkVersion 34
+    +  compileSdkVersion 35
     ...
       defaultConfig {
         applicationId "com.pspdfkitdemo"
@@ -139,7 +139,7 @@ See our [Getting Started on React Native guide](https://www.nutrient.io/getting-
     ```diff
     ...
     - platform :ios, min_ios_version_supported
-    + platform :ios, '15.0'
+    + platform :ios, '16.0'
     ...
     ```
 
@@ -161,7 +161,7 @@ See our [Getting Started on React Native guide](https://www.nutrient.io/getting-
    open PSPDFKitDemo.xcworkspace
    ```
 
-1. Make sure the deployment target is set to 15.0 or higher:
+1. Make sure the deployment target is set to 16.0 or higher:
 
    ![deployment-target](./screenshots/deployment-target.png)
 
@@ -268,6 +268,6 @@ For Troubleshooting common issues you might encounter when setting up the Nutrie
 ## License
 
 This project can be used for evaluation or if you have a valid Nutrient license.
-All items and source code Copyright © 2010-2024 PSPDFKit GmbH.
+All items and source code Copyright © 2010-2025 PSPDFKit GmbH.
 
 See [LICENSE](./LICENSE) for details.

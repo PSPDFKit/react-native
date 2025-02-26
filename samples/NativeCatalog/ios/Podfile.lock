@@ -7,10 +7,10 @@ PODS:
   - hermes-engine (0.75.3):
     - hermes-engine/Pre-built (= 0.75.3)
   - hermes-engine/Pre-built (0.75.3)
-  - Instant (14.1.1)
-  - PSPDFKit (14.1.1):
-    - PSPDFKit/Core (= 14.1.1)
-  - PSPDFKit/Core (14.1.1)
+  - Instant (14.3.0)
+  - PSPDFKit (14.3.0):
+    - PSPDFKit/Core (= 14.3.0)
+  - PSPDFKit/Core (14.3.0)
   - RCT-Folly (2024.01.01.00):
     - boost
     - DoubleConversion
@@ -1242,8 +1242,8 @@ PODS:
     - ReactCommon/turbomodule/core
     - Yoga
   - react-native-pspdfkit (2.15.0):
-    - Instant (= 14.1.1)
-    - PSPDFKit (= 14.1.1)
+    - Instant
+    - PSPDFKit
     - React
   - react-native-safe-area (0.5.1):
     - React
@@ -1805,8 +1805,8 @@ SPEC CHECKSUMS:
   fmt: 4c2741a687cc09f0634a2e2c72a838b99f1ff120
   glog: 69ef571f3de08433d766d614c73a9838a06bf7eb
   hermes-engine: 8d2103d6c0176779aea4e25df6bb1410f9946680
-  Instant: 9de40591d4c736a7c2276a102ae112db506bd6d6
-  PSPDFKit: 308759bdc2c73c5eec76bb3e0528d298646040d5
+  Instant: 5f2fb1938e5608647b8d32610369ccd80c49948d
+  PSPDFKit: f93e969baa1309ccd5030ea35ea1bb6a9d2d6083
   RCT-Folly: 4464f4d875961fce86008d45f4ecf6cef6de0740
   RCTDeprecation: 4191f6e64b72d9743f6fe1a8a16e89e868f5e9e7
   RCTRequired: 9bb589570f2bb3abc6518761e3fd1ad9b7f7f06c
@@ -1836,7 +1836,7 @@ SPEC CHECKSUMS:
   React-logger: 4072f39df335ca443932e0ccece41fbeb5ca8404
   React-Mapbuffer: 714f2fae68edcabfc332b754e9fbaa8cfc68fdd4
   React-microtasksnativemodule: 4943ad8f99be8ccf5a63329fa7d269816609df9e
-  react-native-pspdfkit: 2e9fdd39973cae5ba6790e78e9824fdd8ec6d6b3
+  react-native-pspdfkit: 7f27527e4873d3517d19a878d5549f93bfdf5488
   react-native-safe-area: e8230b0017d76c00de6b01e2412dcf86b127c6a3
   react-native-safe-area-context: 141eca0fd4e4191288dfc8b96a7c7e1c2983447a
   React-nativeconfig: 4a9543185905fe41014c06776bf126083795aed9
@@ -1872,6 +1872,6 @@ SPEC CHECKSUMS:
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
   Yoga: 4ef80d96a5534f0e01b3055f17d1e19a9fc61b63
 
-PODFILE CHECKSUM: 37d8142f07993f060172c65a3802ae806d55508c
+PODFILE CHECKSUM: 93380e1b6877931f6a9c6a198940c40cd20de9d8
 
 COCOAPODS: 1.15.2

@@ -3,7 +3,7 @@
  *
  *   PSPDFKit
  *
- *   Copyright © 2021-2024 PSPDFKit GmbH. All rights reserved.
+ *   Copyright © 2021-2025 PSPDFKit GmbH. All rights reserved.
  *
  *   THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
  *   AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -101,6 +101,7 @@ import com.pspdfkit.ui.fonts.FontManager;
 import com.pspdfkit.ui.search.PdfSearchView;
 import com.pspdfkit.ui.search.PdfSearchViewInline;
 import com.pspdfkit.ui.special_mode.controller.AnnotationTool;
+import com.pspdfkit.ui.special_mode.controller.AnnotationToolVariant;
 import com.pspdfkit.ui.toolbar.ContextualToolbarMenuItem;
 import com.pspdfkit.ui.toolbar.grouping.MenuItemGroupingRule;
 
@@ -700,6 +701,7 @@ public class PdfView extends FrameLayout {
         pdfFragment.addOnAnnotationSelectedListener(pdfViewDocumentListener);
         pdfFragment.addOnAnnotationDeselectedListener(pdfViewDocumentListener);
         pdfFragment.addOnAnnotationUpdatedListener(pdfViewDocumentListener);
+        pdfFragment.addDocumentScrollListener(pdfViewDocumentListener);
         if (pdfFragment.getDocument() != null) {
             pdfFragment.getDocument().getFormProvider().addOnFormFieldUpdatedListener(pdfViewDocumentListener);
         }
@@ -798,10 +800,23 @@ public class PdfView extends FrameLayout {
         return eventDispatcher;
     }
 
-    public void enterAnnotationCreationMode() {
-        pendingFragmentActions.add(getCurrentPdfFragment()
-            .observeOn(Schedulers.io())
-            .subscribe(PdfFragment::enterAnnotationCreationMode));
+    public void enterAnnotationCreationMode(@Nullable final String annotationType) {
+        if (annotationType == null) {
+            pendingFragmentActions.add(getCurrentPdfFragment()
+                    .observeOn(Schedulers.io())
+                    .subscribe(PdfFragment::enterAnnotationCreationMode));
+        } else {
+            ConversionHelpers.AnnotationToolResult annotationTool = ConversionHelpers.convertAnnotationTool(annotationType);
+            if (annotationTool.getAnnotationToolVariant() == null) {
+                pendingFragmentActions.add(getCurrentPdfFragment()
+                        .observeOn(Schedulers.io())
+                        .subscribe(fragment -> fragment.enterAnnotationCreationMode(annotationTool.getAnnotationTool())));
+            } else {
+                pendingFragmentActions.add(getCurrentPdfFragment()
+                        .observeOn(Schedulers.io())
+                        .subscribe(fragment -> fragment.enterAnnotationCreationMode(annotationTool.getAnnotationTool(), annotationTool.getAnnotationToolVariant())));
+            }
+        }
     }
 
     public void exitCurrentlyActiveMode() {
@@ -816,7 +831,7 @@ public class PdfView extends FrameLayout {
                 .subscribe(PdfFragment::clearSelectedAnnotations));
     }
 
-    public Disposable selectAnnotations(final int requestId, ReadableArray jsonAnnotations) throws Exception {
+    public Disposable selectAnnotations(final int requestId, ReadableArray jsonAnnotations, Boolean showContextualMenu) throws Exception {
 
         if (fragment == null || fragment.getDocument() == null) {
             return null;
@@ -846,6 +861,9 @@ public class PdfView extends FrameLayout {
 
                             try {
                                 fragment.getPdfFragment().setSelectedAnnotations(annotationsToSelect);
+                                if (showContextualMenu) {
+                                    fragment.getPdfFragment().enterAnnotationEditingMode(annotationsToSelect);
+                                }
                                 JSONObject result = new JSONObject();
                                 result.put("success", true);
                                 eventDispatcher.dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, result));
@@ -1178,40 +1196,40 @@ public class PdfView extends FrameLayout {
     public JSONObject convertConfiguration() {
         try {
             JSONObject config = new JSONObject();
-            config.put("scrollDirection", ConfigurationAdapter.getStringValueForConfigurationItem(configuration.getConfiguration().getScrollDirection()));
-            config.put("pageTransition", ConfigurationAdapter.getStringValueForConfigurationItem(configuration.getConfiguration().getScrollMode()));
-            config.put("enableTextSelection", configuration.getConfiguration().isTextSelectionEnabled());
-            config.put("autosaveEnabled", configuration.getConfiguration().isAutosaveEnabled());
-            config.put("disableAutomaticSaving", !configuration.getConfiguration().isAutosaveEnabled());
-            config.put("signatureSavingStrategy", ConfigurationAdapter.getStringValueForConfigurationItem(configuration.getConfiguration().getSignatureSavingStrategy()));
+            config.put("scrollDirection", ConfigurationAdapter.getStringValueForConfigurationItem(fragment.getConfiguration().getConfiguration().getScrollDirection()));
+            config.put("pageTransition", ConfigurationAdapter.getStringValueForConfigurationItem(fragment.getConfiguration().getConfiguration().getScrollMode()));
+            config.put("enableTextSelection", fragment.getConfiguration().getConfiguration().isTextSelectionEnabled());
+            config.put("autosaveEnabled", fragment.getConfiguration().getConfiguration().isAutosaveEnabled());
+            config.put("disableAutomaticSaving", !fragment.getConfiguration().getConfiguration().isAutosaveEnabled());
+            config.put("signatureSavingStrategy", ConfigurationAdapter.getStringValueForConfigurationItem(fragment.getConfiguration().getConfiguration().getSignatureSavingStrategy()));
 
-            config.put("pageMode", ConfigurationAdapter.getStringValueForConfigurationItem(configuration.getConfiguration().getLayoutMode()));
-            config.put("firstPageAlwaysSingle", configuration.getConfiguration().isFirstPageAlwaysSingle());
-            config.put("showPageLabels", configuration.isShowPageLabels());
-            config.put("documentLabelEnabled", configuration.isShowDocumentTitleOverlayEnabled());
-            config.put("spreadFitting", ConfigurationAdapter.getStringValueForConfigurationItem(configuration.getConfiguration().getFitMode()));
-            config.put("invertColors", configuration.getConfiguration().isInvertColors());
-            config.put("androidGrayScale", configuration.getConfiguration().isToGrayscale());
+            config.put("pageMode", ConfigurationAdapter.getStringValueForConfigurationItem(fragment.getConfiguration().getConfiguration().getLayoutMode()));
+            config.put("firstPageAlwaysSingle", fragment.getConfiguration().getConfiguration().isFirstPageAlwaysSingle());
+            config.put("showPageLabels", fragment.getConfiguration().isShowPageLabels());
+            config.put("documentLabelEnabled", fragment.getConfiguration().isShowDocumentTitleOverlayEnabled());
+            config.put("spreadFitting", ConfigurationAdapter.getStringValueForConfigurationItem(fragment.getConfiguration().getConfiguration().getFitMode()));
+            config.put("invertColors", fragment.getConfiguration().getConfiguration().isInvertColors());
+            config.put("androidGrayScale", fragment.getConfiguration().getConfiguration().isToGrayscale());
 
-            config.put("userInterfaceViewMode", ConfigurationAdapter.getStringValueForConfigurationItem(configuration.getUserInterfaceViewMode()));
-            config.put("inlineSearch", configuration.getSearchType() == SearchType.INLINE ? true : false);
-            config.put("immersiveMode", configuration.isImmersiveMode());
-            config.put("toolbarTitle", configuration.getActivityTitle());
-            config.put("androidShowSearchAction", configuration.isSearchEnabled());
-            config.put("androidShowOutlineAction", configuration.isOutlineEnabled());
-            config.put("androidShowBookmarksAction", configuration.isBookmarkListEnabled());
-            config.put("androidShowShareAction", configuration.getConfiguration().getEnabledShareFeatures() == ShareFeatures.all() ? true : false);
-            config.put("androidShowPrintAction", configuration.isPrintingEnabled());
-            config.put("androidShowDocumentInfoView", configuration.isDocumentInfoViewEnabled());
-            config.put("androidShowSettingsMenu", configuration.isSettingsItemEnabled());
+            config.put("userInterfaceViewMode", ConfigurationAdapter.getStringValueForConfigurationItem(fragment.getConfiguration().getUserInterfaceViewMode()));
+            config.put("inlineSearch", fragment.getConfiguration().getSearchType() == SearchType.INLINE ? true : false);
+            config.put("immersiveMode", fragment.getConfiguration().isImmersiveMode());
+            config.put("toolbarTitle", fragment.getConfiguration().getActivityTitle());
+            config.put("androidShowSearchAction", fragment.getConfiguration().isSearchEnabled());
+            config.put("androidShowOutlineAction", fragment.getConfiguration().isOutlineEnabled());
+            config.put("androidShowBookmarksAction", fragment.getConfiguration().isBookmarkListEnabled());
+            config.put("androidShowShareAction", fragment.getConfiguration().getConfiguration().getEnabledShareFeatures() == ShareFeatures.all() ? true : false);
+            config.put("androidShowPrintAction", fragment.getConfiguration().isPrintingEnabled());
+            config.put("androidShowDocumentInfoView", fragment.getConfiguration().isDocumentInfoViewEnabled());
+            config.put("androidShowSettingsMenu", fragment.getConfiguration().isSettingsItemEnabled());
 
-            config.put("showThumbnailBar", ConfigurationAdapter.getStringValueForConfigurationItem(configuration.getThumbnailBarMode()));
-            config.put("androidShowThumbnailGridAction", configuration.isThumbnailGridEnabled());
+            config.put("showThumbnailBar", ConfigurationAdapter.getStringValueForConfigurationItem(fragment.getConfiguration().getThumbnailBarMode()));
+            config.put("androidShowThumbnailGridAction", fragment.getConfiguration().isThumbnailGridEnabled());
 
-            config.put("editableAnnotationTypes", ConfigurationAdapter.getStringValuesForConfigurationItems(configuration.getConfiguration().getEditableAnnotationTypes()));
-            config.put("enableAnnotationEditing", configuration.getConfiguration().isAnnotationEditingEnabled());
-            config.put("enableFormEditing", configuration.getConfiguration().isFormEditingEnabled());
-            config.put("androidShowAnnotationListAction", configuration.isAnnotationListEnabled());
+            config.put("editableAnnotationTypes", ConfigurationAdapter.getStringValuesForConfigurationItems(fragment.getConfiguration().getConfiguration().getEditableAnnotationTypes()));
+            config.put("enableAnnotationEditing", fragment.getConfiguration().getConfiguration().isAnnotationEditingEnabled());
+            config.put("enableFormEditing", fragment.getConfiguration().getConfiguration().isFormEditingEnabled());
+            config.put("androidShowAnnotationListAction", fragment.getConfiguration().isAnnotationListEnabled());
 
             return config;
         } catch (Exception e) {

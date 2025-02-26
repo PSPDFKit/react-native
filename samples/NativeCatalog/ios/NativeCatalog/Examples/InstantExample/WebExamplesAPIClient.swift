@@ -1,5 +1,5 @@
 //
-//  Copyright © 2017-2024 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2017-2025 PSPDFKit GmbH. All rights reserved.
 //
 //  The PSPDFKit Sample applications are licensed with a modified BSD license.
 //  Please see License for details. This notice may not be removed from this file.
@@ -36,7 +36,7 @@ class WebExamplesAPIClient: NSObject, URLSessionTaskDelegate {
 
     /// Starts a new collaboration group. The completion handler may be called on a background thread.
     func createNewSession(completion: @escaping CompletionHandler) {
-        var request = URLRequest(url: URL(string: "https://web-examples.services.demo.pspdfkit.com/api/instant-landing-page")!)
+        var request = URLRequest(url: URL(string: "https://web-examples.our.services.nutrient-powered.io/api/instant-landing-page")!)
         request.httpMethod = "POST"
 
         startDataTask(with: request, completion: completion)

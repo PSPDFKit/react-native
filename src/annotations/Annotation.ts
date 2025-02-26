@@ -861,7 +861,25 @@ export namespace Annotation {
         POPUP: 'popup',
         TRAP_NET: 'trapNet',
         THREE_DIMENSIONAL: 'threeDimensional',
-        REDACTION: 'redaction'
+        REDACTION: 'redaction',
+        CIRCLE: 'circle',
+        SIGNATURE: 'signature',
+        ERASER: 'eraser',
+        DISTANCE: 'distance',
+        PERIMETER: 'perimeter',
+        AREA: 'area',
+        RECTANGLE: 'rectangle',
+        ELLIPSE: 'ellipse',
+        AREA_POLYGON: 'area_polygon',
+        AREA_CIRCLE: 'area_circle',
+        AREA_SQUARE: 'area_square',
+        MAGIC_INK: 'magic_ink',
+        HIGHLIGHTER: 'highlighter',
+        LINE_ARROW: 'arrow',
+        FREE_TEXT_CALLOUT: 'free_text_callout',
+        CLOUDY_POLYGON: 'cloudy_polygon',
+        MULTIMEDIA: 'multimedia',
+        SELECTION_TOOL: 'selection_tool',
     } as const;
 
     /**

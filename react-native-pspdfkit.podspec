@@ -15,12 +15,12 @@ Pod::Spec.new do |s|
   DESC
   s.authors           = { "PSPDFKit GmbH" => "support@pspdfkit.com" }
   s.homepage          = "https://pspdfkit.com/guides/react-native/"
-  s.platform          = :ios, "15.0"
+  s.platform          = :ios, "16.0"
   s.module_name       = "PSPDFKitReactNativeiOS"
   s.source            = { git: "https://github.com/PSPDFKit/react-native" }
   s.source_files      = "ios/*.{xcodeproj}", "ios/RCTPSPDFKit/*.{h,m,swift}", "ios/RCTPSPDFKit/Converters/*.{h,m,swift}", "ios/RCTPSPDFKit/Helpers/*.{h,m,swift}"
   s.dependency("React")
-  s.dependency("PSPDFKit", "14.1.1")
-  s.dependency("Instant", "14.1.1")
+  s.dependency("PSPDFKit", "14.5.0")
+  s.dependency("Instant", "14.5.0")
   s.frameworks = "UIKit"
 end

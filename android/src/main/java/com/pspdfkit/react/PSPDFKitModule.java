@@ -3,7 +3,7 @@
  *
  *   PSPDFKit
  *
- *   Copyright © 2017-2024 PSPDFKit GmbH. All rights reserved.
+ *   Copyright © 2017-2025 PSPDFKit GmbH. All rights reserved.
  *
  *   THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
  *   AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -29,12 +29,14 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
 import com.facebook.react.bridge.ActivityEventListener;
+import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.WritableMap;
 import com.pspdfkit.PSPDFKit;
 import com.pspdfkit.annotations.AnnotationType;
 import com.pspdfkit.document.PdfDocument;
@@ -43,7 +45,8 @@ import com.pspdfkit.document.image.CameraImagePickerFragment;
 import com.pspdfkit.document.image.GalleryImagePickerFragment;
 import com.pspdfkit.document.processor.PdfProcessor;
 import com.pspdfkit.document.processor.PdfProcessorTask;
-import com.pspdfkit.exceptions.InvalidPSPDFKitLicenseException;
+import com.pspdfkit.exceptions.InvalidNutrientLicenseException;
+import com.pspdfkit.exceptions.InvalidPasswordException;
 import com.pspdfkit.listeners.SimpleDocumentListener;
 import com.pspdfkit.react.helper.ConversionHelpers;
 import com.pspdfkit.react.helper.PSPDFKitUtils;
@@ -54,6 +57,7 @@ import com.pspdfkit.ui.search.PdfSearchViewInline;
 import com.pspdfkit.views.ReactMainToolbar;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -240,8 +244,40 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
          try {
             PSPDFKit.initialize(getCurrentActivity(), licenseKey, new ArrayList<>(), HYBRID_TECHNOLOGY);
             promise.resolve("Initialised PSPDFKit");
-        } catch (InvalidPSPDFKitLicenseException e) {
+        } catch (InvalidNutrientLicenseException e) {
             promise.reject(e);
+        }
+    }
+
+    @ReactMethod
+    public void getDocumentProperties(@Nullable String documentPath, @Nullable Promise promise) {
+        try {
+            if (Uri.parse(documentPath).getScheme() == null) {
+                // If there is no scheme it might be a raw path.
+                try {
+                    File file = new File(documentPath);
+                    documentPath = Uri.fromFile(file).toString();
+                } catch (Exception e) {
+                    documentPath = FILE_SCHEME + documentPath;
+                }
+            }
+
+            PdfDocument document = PdfDocumentLoader.openDocument(getReactApplicationContext(), Uri.parse(documentPath));
+            WritableMap properties = Arguments.createMap();
+            properties.putInt("pageCount", document.getPageCount());
+            properties.putBoolean("isEncrypted", document.isEncrypted());
+
+            promise.resolve(properties);
+        } catch (IOException e) {
+            // If the document is password protected, return this information to the caller.
+            if (e instanceof InvalidPasswordException) {
+                WritableMap properties = Arguments.createMap();
+                properties.putInt("pageCount", 0);
+                properties.putBoolean("isEncrypted", true);
+                promise.resolve(properties);
+            } else {
+                promise.reject(e);
+            }
         }
     }
 
@@ -252,7 +288,7 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
         try {
             PSPDFKit.initialize(getCurrentActivity(), androidLicenseKey, new ArrayList<>(), HYBRID_TECHNOLOGY);
             promise.resolve("Initialised PSPDFKit");
-        } catch (InvalidPSPDFKitLicenseException e) {
+        } catch (InvalidNutrientLicenseException e) {
             promise.reject(e);
         }
     }

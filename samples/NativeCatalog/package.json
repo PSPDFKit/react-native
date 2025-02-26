@@ -1,6 +1,6 @@
 {
   "name": "native-catalog",
-  "version": "2.15.0",
+  "version": "2.16.0",
   "private": true,
   "scripts": {
     "android": "react-native run-android",
@@ -22,7 +22,7 @@
     "prop-types": "^15.8.1",
     "react": "18.3.1",
     "react-native": "0.75.3",
-    "react-native-fs": "https://github.com/1nspir3d/react-native-fs.git",
+    "react-native-fs": "^2.20.0",
     "react-native-gesture-handler": "^2.14.0",
     "react-native-pspdfkit": "file:../..",
     "react-native-safe-area": "^0.5.1",

@@ -1,5 +1,5 @@
 //
-//  Copyright © 2016-2024 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2016-2025 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -14,6 +14,7 @@
 #import <React/RCTConvert.h>
 #import "RCTConvert+PSPDFAnnotation.h"
 #import "RCTConvert+PSPDFAnnotationChange.h"
+#import "RCTConvert+PSPDFDocument.h"
 #if __has_include("PSPDFKitReactNativeiOS-Swift.h")
 #import "PSPDFKitReactNativeiOS-Swift.h"
 #else
@@ -89,6 +90,18 @@ RCT_REMAP_METHOD(setPageIndex, setPageIndex:(NSUInteger)pageIndex animated:(BOOL
   } else {
     reject(@"error", @"Failed to set page index: The page index is out of bounds", nil);
   }
+}
+
+RCT_REMAP_METHOD(getDocumentProperties, getDocumentProperties:(NSString *)documentPath resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+    NSURL *url = [RCTConvert parseURL:documentPath];
+    PSPDFDocument *document = [[PSPDFDocument alloc] initWithURL:url];
+    if (document != nil) {
+        NSDictionary *properties = @{@"pageCount" : @(document.pageCount),
+                                     @"isEncrypted" : @(document.isEncrypted)};
+        resolve(properties);
+    } else {
+      reject(@"error", @"Failed to load document properties", nil);
+    }
 }
 
 // MARK: - Annotation Processing
@@ -199,6 +212,7 @@ RCT_EXPORT_METHOD(handleListenerRemoved:(nonnull NSString* )event isLast:(BOOL)i
     return @[@"documentLoaded",
              @"documentLoadFailed",
              @"documentPageChanged",
+             @"documentScrolled",
              @"annotationsAdded",
              @"annotationChanged",
              @"annotationsRemoved",

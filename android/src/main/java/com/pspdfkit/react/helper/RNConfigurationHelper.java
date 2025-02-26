@@ -3,7 +3,7 @@
  *
  *   PSPDFKit
  *
- *   Copyright © 2017-2024 PSPDFKit GmbH. All rights reserved.
+ *   Copyright © 2017-2025 PSPDFKit GmbH. All rights reserved.
  *
  *   THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
  *   AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -33,6 +33,7 @@ import com.pspdfkit.document.processor.PagePosition;
 import com.pspdfkit.utils.Size;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -49,61 +50,76 @@ public class RNConfigurationHelper {
         this.context = context;
     }
 
-    public NewPage parseConfiguration(final String type, ReadableMap configuration) {
-        NewPage.Builder pageBuilder;
+    public NewPage.Builder applyPageConfiguration(NewPage.Builder pageBuilder) {
+        pageBuilder.rotation(parseRotation());
+        pageBuilder.withMargins(parseMargins());
+        pageBuilder.backgroundColor(parseBackgroundColor());
+        return pageBuilder;
+    }
+    
+    public ArrayList<NewPage> parseConfiguration(final String type, ReadableMap configuration) {
+        ArrayList<NewPage> newPages = new ArrayList<>();
         this.configuration = configuration;
 
         switch (type) {
             case "template":
-                pageBuilder = newPageFromTemplate(configuration);
+                newPages = newPageFromTemplate(configuration);
                 break;
             case "image":
-                pageBuilder = newPageFromImage(configuration);
+                newPages = newPageFromImage(configuration);
                 break;
             case "document":
-                pageBuilder = newPageFromDocument(configuration);
+                newPages = newPageFromDocument(configuration);
                 break;
             default:
                 return null;
         }
 
-        pageBuilder.rotation(parseRotation());
-        pageBuilder.withMargins(parseMargins());
-        pageBuilder.backgroundColor(parseBackgroundColor());
-        return pageBuilder.build();
+        return newPages;
     }
 
-    private NewPage.Builder newPageFromDocument(ReadableMap configuration) {
+    private ArrayList<NewPage> newPageFromDocument(ReadableMap configuration) {
         String documentPath = configuration.getString("documentPath");
-        int pageIndex = configuration.getInt("pageIndex");
+        ArrayList<NewPage> newPages = new ArrayList<>();
 
-        try {
-            PdfDocument sourceDocument = PdfDocumentLoader.openDocument(context, Uri.parse(documentPath));
-            assert (pageIndex >= 0 && pageIndex <= sourceDocument.getPageCount()-1);
-            return NewPage.fromPage(sourceDocument, pageIndex);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        if (configuration.hasKey("pageIndex")) {
+            // Specific page specified
+            int pageIndex = configuration.getInt("pageIndex");
+            try {
+                PdfDocument sourceDocument = PdfDocumentLoader.openDocument(context, Uri.parse(documentPath));
+                assert (pageIndex >= 0 && pageIndex <= sourceDocument.getPageCount() - 1);
+                newPages.add(applyPageConfiguration(NewPage.fromPage(sourceDocument, pageIndex)).build());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            // Add the entire document
+            try {
+                PdfDocument sourceDocument = PdfDocumentLoader.openDocument(context, Uri.parse(documentPath));
+                for (int i = 0; i < sourceDocument.getPageCount(); i++) {
+                    newPages.add(applyPageConfiguration(NewPage.fromPage(sourceDocument, i)).build());
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
+        return newPages;
     }
 
     public NewPage parseConfiguration() {
 
-        NewPage.Builder pageBuilder = newPageFromTemplate(configuration);
-        pageBuilder.rotation(parseRotation());
-        pageBuilder.withMargins(parseMargins());
-        pageBuilder.backgroundColor(parseBackgroundColor());
-
-        return pageBuilder.build();
+        ArrayList<NewPage> pages = newPageFromTemplate(configuration);
+        return pages.get(0);
     }
 
-    private NewPage.Builder newPageFromImage(ReadableMap configuration) {
+    private ArrayList<NewPage> newPageFromImage(ReadableMap configuration) {
         this.configuration = configuration;
         String imagePath = configuration.getString("imageUri");
         Size size = parseSize();
         PagePosition position = parsePosition(configuration);
         PageImage pageImage = new PageImage(this.context, Uri.parse(imagePath), position);
         pageImage.setJpegQuality(80);
-        return NewPage.emptyPage(size).withPageItem(pageImage);
+        return new ArrayList<>(List.of(applyPageConfiguration(NewPage.emptyPage(size).withPageItem(pageImage)).build()));
     }
 
     private PagePosition parsePosition(ReadableMap configuration) {
@@ -161,8 +177,7 @@ public class RNConfigurationHelper {
         return new Size((float) width, (float) height);
     }
 
-    private NewPage.Builder newPageFromTemplate(ReadableMap configuration) {
-        NewPage.Builder page;
+    private ArrayList<NewPage> newPageFromTemplate(ReadableMap configuration) {
         String[] templates = {"dot5mm", "grid5mm", "lines5mm", "lines7mm"};
         PagePattern[] availablePatterns = {PagePattern.DOTS_5MM, PagePattern.GRID_5MM, PagePattern.LINES_5MM, PagePattern.LINES_7MM};
 
@@ -173,15 +188,19 @@ public class RNConfigurationHelper {
             if (Arrays.asList(templates).contains(template)) {
                 int index = Arrays.asList(templates).indexOf(template);
                 pattern = availablePatterns[index];
-                return NewPage.patternPage(parseSize(), pattern);
+                return new ArrayList<>(List.of(applyPageConfiguration(NewPage.patternPage(parseSize(), pattern)).build()));
             }
         }
-        return NewPage.emptyPage(parseSize());
+        return new ArrayList<>(List.of(applyPageConfiguration(NewPage.emptyPage(parseSize())).build()));
     }
 
     private RectF parseMargins() {
         RectF edgeInsets = new RectF();
+        // Support both "margins" and "pageMargins" keys for backwards compatibility
         ReadableMap margins = configuration.getMap("margins");
+        if (margins == null) {
+            margins = configuration.getMap("pageMargins");
+        }
         if (margins == null) {
             return new RectF(30, 15, 30, 15);
         }

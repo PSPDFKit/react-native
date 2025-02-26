@@ -2,8 +2,8 @@
 
 buildscript {
     ext {
-        minSdkVersion = 23
-        compileSdkVersion = 34
+        minSdkVersion = 24
+        compileSdkVersion = 35
         targetSdkVersion = 34
         ndkVersion = "26.1.10909125"
         kotlin_version = '1.9.24'
@@ -12,11 +12,11 @@ buildscript {
         google()
         mavenCentral()
              maven {
-            url 'https://customers.pspdfkit.com/maven/'
+            url 'https://my.nutrient.io/maven/'
         }
     }
     dependencies {
-        classpath('com.android.tools.build:gradle:8.5.0')
+        classpath('com.android.tools.build:gradle:8.6.0')
         classpath("com.facebook.react:react-native-gradle-plugin")
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         // NOTE: Do not place your application dependencies here; they belong
@@ -29,7 +29,7 @@ allprojects {
         mavenCentral()
         google()
         maven {
-            url 'https://customers.pspdfkit.com/maven/'
+            url 'https://my.nutrient.io/maven/'
         }
     }
 }

@@ -3,7 +3,7 @@
 # Resolve react_native_pods.rb with node to allow for hoisting
 require Pod::Executable.execute_command("node", ["-p", "require.resolve('react-native/scripts/react_native_pods.rb',{paths: [process.argv[1]]},)", __dir__]).strip
 
-platform :ios, "15.0"
+platform :ios, "16.0"
 prepare_react_native_project!
 
 linkage = ENV.fetch("USE_FRAMEWORKS", nil)
@@ -42,7 +42,7 @@ target "Catalog" do
           if host_cpu.eql?("x86_64")
             target_config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
           end
-          target_config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = "15.0"
+          target_config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = "16.0"
         end
       end
       aggregate_target.user_project.save
@@ -51,11 +51,11 @@ target "Catalog" do
       if host_cpu.eql?("x86_64")
         excl_config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
       end
-      excl_config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = "15.0"
+      excl_config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = "16.0"
     end
     installer.pods_project.targets.each do |target|
       target.build_configurations.each do |target_config|
-        target_config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = "15.0"
+        target_config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = "16.0"
       end
     end
     react_native_post_install(

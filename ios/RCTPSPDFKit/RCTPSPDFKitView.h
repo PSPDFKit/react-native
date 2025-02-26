@@ -1,5 +1,5 @@
 //
-//  Copyright © 2018-2024 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2018-2025 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -41,7 +41,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) id configurationJSON;
 
 /// Annotation Toolbar
-- (BOOL)enterAnnotationCreationMode;
+- (BOOL)enterAnnotationCreationMode:(PSPDFAnnotationString)annotationType;
 - (BOOL)exitCurrentlyActiveMode;
 
 /// Document
@@ -57,7 +57,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)setAnnotationFlags:(NSString *)uuid flags:(NSArray<NSString *> *)flags;
 - (NSArray <NSString *> *)getAnnotationFlags:(NSString *)uuid;
 - (BOOL)clearSelectedAnnotations;
-- (BOOL)selectAnnotations:(NSArray<NSDictionary *> *)annotationsJSON;
+- (BOOL)selectAnnotations:(NSArray<NSDictionary *> *)annotationsJSON showContextualMenu:(BOOL)showContextualMenu;
 
 /// Forms
 - (NSDictionary<NSString *, NSString *> *)getFormFieldValue:(NSString *)fullyQualifiedName;

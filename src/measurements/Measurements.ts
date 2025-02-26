@@ -83,10 +83,6 @@ export namespace Measurements {
         * Centimeters
         */
         CM: 'cm',
-       /**
-        * PDF points. A PDF point is 1/72 inch. All values in a PDF page coordinate space (e.g. an annotation’s bounding box) are specified in PDF points.
-        */
-        PT: 'pt',
      } as const;
 
     /**
@@ -107,10 +103,6 @@ export namespace Measurements {
         * Centimeters
         */
         CM: 'cm',
-       /**
-        * PDF points. You probably don’t want to use this for real world distances.
-        */
-        PT: 'pt',
        /**
         * Feet
         */

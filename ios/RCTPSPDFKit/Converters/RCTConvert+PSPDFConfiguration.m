@@ -1,5 +1,5 @@
 //
-//  Copyright © 2016-2024 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2016-2025 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -88,13 +88,6 @@
 
 #define SearchModeMap @{@"modal" : @(PSPDFSearchModeModal), \
                         @"inline" : @(PSPDFSearchModeInline)} \
-
-#define AllowedMenuActionsMap @{@"none" : @(PSPDFTextSelectionMenuActionNone), \
-                                @"search" : @(PSPDFTextSelectionMenuActionSearch), \
-                                @"define" : @(PSPDFTextSelectionMenuActionDefine), \
-                                @"wikipedia" : @(PSPDFTextSelectionMenuActionWikipedia), \
-                                @"speak" : @(PSPDFTextSelectionMenuActionSpeak), \
-                                @"all" : @(PSPDFTextSelectionMenuActionAll)} \
 
 #define SettingsOptionsMap @{@"scrollDirection" : @(PSPDFSettingsOptionScrollDirection), \
                              @"pageTransition" : @(PSPDFSettingsOptionPageTransition), \
@@ -499,9 +492,6 @@ RCT_MULTI_ENUM_CONVERTER(PSPDFDocumentSharingPagesOptions,
     [convertedConfiguration setObject:[RCTConvert translateSize:NSStringFromUIEdgeInsets(configuration.additionalScrollViewFrameInsets)] forKey:@"iOSAdditionalScrollViewFrameInsets"];
     [convertedConfiguration setObject:[RCTConvert translateSize:NSStringFromUIEdgeInsets(configuration.additionalContentInsets)] forKey:@"iOSAdditionalContentInsets"];
     
-    [convertedConfiguration setObject:[RCTConvert findKeyForValue:configuration.allowedMenuActions
-                                                     inDictionary:AllowedMenuActionsMap] forKey:@"iOSAllowedMenuActions"];
-    
     [convertedConfiguration setObject:[RCTConvert findKeyForValue:configuration.settingsOptions
                                                      inDictionary:SettingsOptionsMap] forKey:@"iOSSettingsOptions"];
     
@@ -562,6 +552,9 @@ RCT_MULTI_ENUM_CONVERTER(PSPDFDocumentSharingPagesOptions,
     
     [convertedConfiguration setObject:[RCTConvert findKeyForValue:configuration.bookmarkSortOrder
                                                      inDictionary:BookmarkSortOrderMap] forKey:@"iOSBookmarkSortOrder"];
+
+    [convertedConfiguration setObject:[RCTConvert findKeyForValue:viewController.appearanceModeManager.appearanceMode 
+                         inDictionary:AppearanceModeMap] forKey:@"appearanceMode"];
     
     return convertedConfiguration;
 }

@@ -1,5 +1,5 @@
 //
-//  Copyright © 2018-2024 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2018-2025 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -111,8 +111,6 @@ public class PspdfkitMeasurementConvertor :NSObject{
             return .centimeter
         case "mm":
             return .millimeter
-        case "pt":
-            return .point
         default:
             return .centimeter
         }
@@ -192,8 +190,6 @@ public class PspdfkitMeasurementConvertor :NSObject{
             return "cm"
         case .millimeter:
             return "mm"
-        case .point:
-            return "pt"
         case .meter:
             return "m"
         case .kilometer:
