@@ -54,7 +54,11 @@
 + (NSURL*)parseURL:(NSString*)urlString {
     NSURL* url;
 
-    if ([urlString hasPrefix: @"/"] || [urlString containsString: @"file:/"]) {
+    if ([urlString hasPrefix: @"http"]) {
+        url = [NSURL URLWithString:urlString];
+    }
+
+    if (url == nil && ([urlString hasPrefix: @"/"] || [urlString containsString: @"file:/"])) {
         if ([urlString hasPrefix:@"file:///"]) {
             urlString = [urlString substringFromIndex:7];
         }
