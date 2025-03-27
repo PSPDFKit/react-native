@@ -37,6 +37,10 @@ class PSPDFKitView extends React.Component {
   /**
    * @ignore
    */
+  refs;
+  /**
+   * @ignore
+   */
   _nextRequestId = 1;
   /**
    * @ignore

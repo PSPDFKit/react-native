@@ -1,6 +1,6 @@
 {
   "name": "react-native-pspdfkit",
-  "version": "2.16.0",
+  "version": "2.16.1",
   "description": "Nutrient React Native SDK",
   "keywords": [
     "react native",
@@ -31,7 +31,7 @@
     "dev-build": "npm run build-and-generate-types && npm run docs && npm run copy-types-and-lib"
   },
   "peerDependencies": {
-    "@types/react": "^18.2.28",
+    "@types/react": ">=17.0.0",
     "prop-types": "^15.8.1",
     "react": ">=17.0.0",
     "react-native": ">=0.66.0"

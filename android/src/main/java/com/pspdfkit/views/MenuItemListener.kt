@@ -22,7 +22,8 @@ class MenuItemListener: MenuItem.OnMenuItemClickListener {
     override fun onMenuItemClick(menuItem: MenuItem): Boolean {
         val resourceName: String? = context?.resources?.getResourceEntryName(menuItem.itemId)
         if (resourceName != null) {
-            eventDispatcher!!.dispatchEvent(parent?.let { CustomToolbarButtonTappedEvent(it.id, resourceName) })
+            parent?.let { CustomToolbarButtonTappedEvent(it.id, resourceName) }
+                ?.let { eventDispatcher!!.dispatchEvent(it) }
         }
         return false
     }

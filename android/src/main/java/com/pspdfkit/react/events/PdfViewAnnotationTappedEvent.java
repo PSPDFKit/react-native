@@ -67,7 +67,7 @@ public class PdfViewAnnotationTappedEvent extends Event<PdfViewAnnotationTappedE
                 WritableMap eventData = Arguments.makeNativeMap(map);
                 rctEventEmitter.receiveEvent(getViewTag(), getEventName(), eventData);
             }
-        } catch (JSONException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

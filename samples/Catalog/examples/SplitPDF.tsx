@@ -10,8 +10,8 @@ import {
 import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
 
 export class SplitPDF extends BaseExampleAutoHidingHeaderComponent {
-  pdfRef1: React.RefObject<PSPDFKitView>;
-  pdfRef2: React.RefObject<PSPDFKitView>;
+  pdfRef1: React.RefObject<PSPDFKitView | null>;
+  pdfRef2: React.RefObject<PSPDFKitView | null>;
 
   constructor(props: any) {
     super(props);

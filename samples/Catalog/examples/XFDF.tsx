@@ -8,7 +8,7 @@ import { hideToolbar } from '../helpers/NavigationHelper';
 import RNFS from 'react-native-fs';
 
 export class XFDF extends BaseExampleAutoHidingHeaderComponent {
-  pdfRef: React.RefObject<PSPDFKitView>;
+  pdfRef: React.RefObject<PSPDFKitView | null>;
 
   constructor(props: any) {
     super(props);

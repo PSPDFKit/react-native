@@ -10,7 +10,7 @@ import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAuto
 import { PSPDFKit } from '../helpers/PSPDFKit';
 
 export class GetConfiguration extends BaseExampleAutoHidingHeaderComponent {
-  pdfRef: React.RefObject<PSPDFKitView>;
+  pdfRef: React.RefObject<PSPDFKitView | null>;
 
   constructor(props: any) {
     super(props);

@@ -16,7 +16,7 @@ import {
 import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
 
 class Measurement extends BaseExampleAutoHidingHeaderComponent {
-  pdfRef: React.RefObject<PSPDFKitView>;
+  pdfRef: React.RefObject<PSPDFKitView | null>;
 
   constructor(props: any) {
     super(props);

@@ -7,7 +7,7 @@ import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAuto
 import { hideToolbar } from '../helpers/NavigationHelper';
 
 export class AnnotationPresetCustomization extends BaseExampleAutoHidingHeaderComponent {
-  pdfRef: React.RefObject<PSPDFKitView>;
+  pdfRef: React.RefObject<PSPDFKitView | null>;
   constructor(props: any) {
     super(props);
     const { navigation } = this.props;

@@ -9,7 +9,7 @@ import { hideToolbar } from '../helpers/NavigationHelper';
 import { PSPDFKit } from '../helpers/PSPDFKit';
 
 export class PSPDFKitViewComponent extends BaseExampleAutoHidingHeaderComponent {
-  pdfRef: React.RefObject<PSPDFKitView>;
+  pdfRef: React.RefObject<PSPDFKitView | null>;
 
   constructor(props: any) {
     super(props);

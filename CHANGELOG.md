@@ -1,3 +1,8 @@
+## 2.16.1 - 27 Mar 2025
+
+- Adds support for React Native 0.78. (J#HYB-737)
+- Fixes an issue where a crash could occur during `onAnnotationChanged` event callbacks on Android. (J#HYB-738)
+
 ## 2.16.0 - 26 Feb 2025
 
 - Adds the ability to merge entire PDF documents using the `generatePDFFromDocuments` Processor API. (J#HYB-579)

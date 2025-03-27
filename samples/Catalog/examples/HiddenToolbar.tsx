@@ -12,7 +12,7 @@ interface IState {
 }
 
 export class HiddenToolbar extends Component<IProps, IState> {
-  pdfRef: React.RefObject<PSPDFKitView>;
+  pdfRef: React.RefObject<PSPDFKitView | null>;
 
   static headerRight(params: { handleAnnotationButtonPress: () => void }) {
     return (

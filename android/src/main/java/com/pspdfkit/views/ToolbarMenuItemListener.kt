@@ -28,7 +28,8 @@ class ToolbarMenuItemListener: ContextualToolbar.OnMenuItemClickListener {
         if (this.resourceIds.contains(menuItem.id)) {
             val resourceName: String? = context?.resources?.getResourceEntryName(menuItem.id)
             if (resourceName != null) {
-                eventDispatcher!!.dispatchEvent(parent?.let { CustomAnnotationContextualMenuItemTappedEvent(it.id, resourceName) })
+                parent?.let { CustomAnnotationContextualMenuItemTappedEvent(it.id, resourceName) }
+                    ?.let { eventDispatcher!!.dispatchEvent(it) }
             }
             return true
         }

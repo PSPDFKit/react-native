@@ -91,7 +91,14 @@ public class PdfViewAnnotationChangedEvent extends Event<PdfViewAnnotationChange
 
             WritableMap eventData = Arguments.makeNativeMap(map);
             rctEventEmitter.receiveEvent(getViewTag(), getEventName(), eventData);
-        } catch (JSONException e) {
+        } catch (Exception e) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("change", eventType);
+            List<Map<String, Object>> annotations = new ArrayList<>();
+            map.put("annotations", annotations);
+            WritableMap eventData = Arguments.makeNativeMap(map);
+            rctEventEmitter.receiveEvent(getViewTag(), getEventName(), eventData);
+ 
             e.printStackTrace();
         }
     }

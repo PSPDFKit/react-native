@@ -35,14 +35,18 @@ PSPDFSettingKey const PSPDFSettingKeyHybridEnvironment = @"com.pspdfkit.hybrid-e
 RCT_EXPORT_MODULE(PSPDFKit)
 
 RCT_REMAP_METHOD(setLicenseKey, setLicenseKey:(nullable NSString *)licenseKey resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-  [PSPDFKitGlobal setLicenseKey:licenseKey options:@{PSPDFSettingKeyHybridEnvironment: @"ReactNative"}];
+  if (![licenseKey isEqual:[NSNull null]]) {
+    [PSPDFKitGlobal setLicenseKey:licenseKey options:@{PSPDFSettingKeyHybridEnvironment: @"ReactNative"}];
+  }
   resolve(@(YES));
 }
 
 RCT_REMAP_METHOD(setLicenseKeys, setLicenseKeys:(nullable NSString *)androidLicenseKey iOSLicenseKey:(nullable NSString *)iOSLicenseKey resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   // Here, we ignore the `androidLicenseKey` parameter and only care about `iOSLicenseKey`.
   // `androidLicenseKey` will be used to activate the license on Android.
-  [PSPDFKitGlobal setLicenseKey:iOSLicenseKey options:@{PSPDFSettingKeyHybridEnvironment: @"ReactNative"}];
+  if (![iOSLicenseKey isEqual:[NSNull null]]) {
+    [PSPDFKitGlobal setLicenseKey:iOSLicenseKey options:@{PSPDFSettingKeyHybridEnvironment: @"ReactNative"}];
+  }
   resolve(@(YES));
 }
 

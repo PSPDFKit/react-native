@@ -8,7 +8,7 @@ import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAuto
 import { hideToolbar } from '../helpers/NavigationHelper';
 
 export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponent {
-  pdfRef: React.RefObject<PSPDFKitView>;
+  pdfRef: React.RefObject<PSPDFKitView | null>;
   lastAddedAnnotationUUID: string | undefined;
 
   static basicInkAnnotation: InkAnnotation[] = [new InkAnnotation({

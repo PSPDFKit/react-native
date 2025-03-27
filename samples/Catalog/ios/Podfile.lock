@@ -1214,7 +1214,7 @@ PODS:
     - React-jsiexecutor
     - React-RCTFBReactNativeSpec
     - ReactCommon/turbomodule/core
-  - react-native-pspdfkit (2.16.0):
+  - react-native-pspdfkit (2.16.1):
     - Instant (= 14.5.0)
     - PSPDFKit (= 14.5.0)
     - React
@@ -1933,7 +1933,7 @@ SPEC CHECKSUMS:
   React-logger: 1935d6e6461e9c8be4c87af56c56a4876021171e
   React-Mapbuffer: 212171f037e3b22e6c2df839aa826806da480b85
   React-microtasksnativemodule: 72564d5469003687d39bfc4efad281df8efc0684
-  react-native-pspdfkit: 590f727fd34b74276c16f5810b2778c0d3441e8b
+  react-native-pspdfkit: fea523fba6b3ff484bac32b4778cd26d9eebf292
   react-native-safe-area-context: 9c33120e9eac7741a5364cc2d9f74665049b76b3
   React-nativeconfig: cb207ebba7cafce30657c7ad9f1587a8f32e4564
   React-NativeModulesApple: 82a8bee52df9f5b378195a500f22be3a6ef0f890
