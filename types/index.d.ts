@@ -790,7 +790,10 @@ export type GeneratePDFResult = {
  */
 declare class PSPDFKitView extends React.Component<Props, any, any> {
     constructor(props: Props);
-    constructor(props: Props, context: any);
+    /**
+     * @ignore
+     */
+    refs: any;
     /**
      * @ignore
      */
@@ -1089,6 +1092,7 @@ declare class PSPDFKitView extends React.Component<Props, any, any> {
      * @method getFormFieldValue
      * @memberof PSPDFKitView
      * @param { string } fullyQualifiedName The fully qualified name of the form element.
+     * @deprecated Since Nutrient React Native SDK 2.17. Use the ```getFormElements``` API on the ```PDFDocument.forms``` object instead, and filter by ```fullyQualifiedFieldName```.
      * @example
      * const result = await this.pdfRef.current.getFormFieldValue('myFormElement');
      * // result: {'myFormElement' : value}
@@ -1114,6 +1118,7 @@ declare class PSPDFKitView extends React.Component<Props, any, any> {
      * @memberof PSPDFKitView
      * @param { string } fullyQualifiedName The fully qualified name of the form element. When using form elements such as radio buttons, the individual elements can be accessed by appending the index to the fully qualified name, for example ```choiceElement.0``` and ```choiceElement.1```.
      * @param { string } value The new string value of the form element. For button form elements, pass ```selected``` or ```deselected```. For choice form elements, pass the index of the choice to select, for example ```1```.
+     * @deprecated Since Nutrient React Native SDK 2.17. Use one of the ```update``` APIs on the ```PDFDocument.forms``` object instead.
      * @example
      * const result = await this.pdfRef.current.setFormFieldValue('Name_Last', 'Appleseed');
      *
@@ -1415,3 +1420,23 @@ export import StrikeOutMarkupAnnotation = annotationModels.StrikeOutMarkupAnnota
 export import TextAnnotation = annotationModels.TextAnnotation;
 export import UnderlineMarkupAnnotation = annotationModels.UnderlineMarkupAnnotation;
 export import WidgetAnnotation = annotationModels.WidgetAnnotation;
+
+//@ts-ignore
+import formField = require('../src/formfield/FormField');
+export import FormField = formField.FormField;
+export import ButtonFormField = formField.ButtonFormField;
+export import ChoiceFormField = formField.ChoiceFormField;
+export import SignatureFormField = formField.SignatureFormField;
+export import TextFormField = formField.TextFormField;
+
+//@ts-ignore
+import formElement = require('../src/forms/FormElement');
+export import FormElement = formElement.FormElement;
+export import ButtonFormElement = formElement.ButtonFormElement;
+export import ChoiceFormElement = formElement.ChoiceFormElement;
+export import SignatureFormElement = formElement.SignatureFormElement;
+export import TextFieldFormElement = formElement.TextFieldFormElement;
+
+//@ts-ignore
+import forms = require('../src/forms/Forms');
+export import Forms = forms.Forms;

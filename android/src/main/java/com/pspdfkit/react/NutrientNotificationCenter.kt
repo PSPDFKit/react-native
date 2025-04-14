@@ -8,16 +8,13 @@ import com.facebook.react.bridge.WritableMap
 import com.pspdfkit.PSPDFKit
 import com.pspdfkit.analytics.AnalyticsClient
 import com.pspdfkit.annotations.Annotation
-import com.pspdfkit.annotations.AnnotationType
-import com.pspdfkit.annotations.WidgetAnnotation
 import com.pspdfkit.forms.ChoiceFormElement
 import com.pspdfkit.forms.ComboBoxFormElement
 import com.pspdfkit.forms.EditableButtonFormElement
 import com.pspdfkit.forms.FormElement
 import com.pspdfkit.forms.FormField
 import com.pspdfkit.forms.TextFormElement
-import com.pspdfkit.react.helper.JsonUtilities
-import org.json.JSONObject
+import com.pspdfkit.react.helper.AnnotationUtils
 
 class CustomAnalyticsClient: AnalyticsClient {
     override fun onEvent(name: String, data: Bundle?) {
@@ -30,6 +27,7 @@ enum class NotificationEvent(val value: String) {
     DOCUMENT_LOAD_FAILED("documentLoadFailed"),
     DOCUMENT_PAGE_CHANGED("documentPageChanged"),
     DOCUMENT_SCROLLED("documentScrolled"),
+    DOCUMENT_TAPPED("documentTapped"),
     ANNOTATIONS_ADDED("annotationsAdded"),
     ANNOTATION_CHANGED("annotationChanged"),
     ANNOTATIONS_REMOVED("annotationsRemoved"),
@@ -102,18 +100,27 @@ object NutrientNotificationCenter {
         sendEvent(NotificationEvent.DOCUMENT_SCROLLED.value, jsonData)
     }
 
+    fun didTapDocument(pointF: PointF, documentID: String) {
+        try {
+            val pointMap = mapOf("x" to pointF.x, "y" to pointF.y)
+            val nativePointMap = Arguments.makeNativeMap(pointMap)
+
+            val jsonData = Arguments.createMap()
+            jsonData.putString("event", NotificationEvent.DOCUMENT_TAPPED.value)
+            jsonData.putMap("point", nativePointMap)
+            jsonData.putString("documentID", documentID)
+            sendEvent(NotificationEvent.DOCUMENT_TAPPED.value, jsonData)
+        } catch (e: Exception) {
+            // Could not decode point data
+        }
+    }
+
     fun annotationsChanged(changeType: String, annotation: Annotation, documentID: String) {
         when (changeType) {
             "changed" -> {
                 try {
-                    val instantJson = JSONObject(annotation.toInstantJson())
                     val annotationsList = mutableListOf<Map<String, Any>>()
-                    val annotationMap = JsonUtilities.jsonObjectToMap(instantJson)
-                    annotationMap["uuid"] = annotation.uuid
-                    if (annotation.type == AnnotationType.WIDGET) {
-                        val widgetAnnotation : WidgetAnnotation = annotation as WidgetAnnotation
-                        annotationMap["isRequired"] = widgetAnnotation.formElement?.isRequired
-                    }
+                    val annotationMap = AnnotationUtils.processAnnotation(annotation)
                     annotationsList.add(annotationMap)
                     val nativeAnnotationsList = Arguments.makeNativeArray(annotationsList)
 
@@ -139,18 +146,12 @@ object NutrientNotificationCenter {
                 jsonData.putString("event", NotificationEvent.ANNOTATIONS_REMOVED.value)
                 jsonData.putArray("annotations", nativeAnnotationsList)
                 jsonData.putString("documentID", documentID)
-                sendEvent(NotificationEvent.ANNOTATION_CHANGED.value, jsonData)
+                sendEvent(NotificationEvent.ANNOTATIONS_REMOVED.value, jsonData)
             }
             "added" -> {
                 try {
-                    val instantJson = JSONObject(annotation.toInstantJson())
                     val annotationsList = mutableListOf<Map<String, Any>>()
-                    val annotationMap = JsonUtilities.jsonObjectToMap(instantJson)
-                    annotationMap["uuid"] = annotation.uuid
-                    if (annotation.type == AnnotationType.WIDGET) {
-                        val widgetAnnotation : WidgetAnnotation = annotation as WidgetAnnotation
-                        annotationMap["isRequired"] = widgetAnnotation.formElement?.isRequired
-                    }
+                    val annotationMap = AnnotationUtils.processAnnotation(annotation)
                     annotationsList.add(annotationMap)
                     val nativeAnnotationsList = Arguments.makeNativeArray(annotationsList)
 
@@ -168,14 +169,8 @@ object NutrientNotificationCenter {
 
     fun didSelectAnnotations(annotation: Annotation, documentID: String) {
         try {
-            val instantJson = JSONObject(annotation.toInstantJson())
             val annotationsList = mutableListOf<Map<String, Any>>()
-            val annotationMap = JsonUtilities.jsonObjectToMap(instantJson)
-            annotationMap["uuid"] = annotation.uuid
-            if (annotation.type == AnnotationType.WIDGET) {
-                val widgetAnnotation : WidgetAnnotation = annotation as WidgetAnnotation
-                annotationMap["isRequired"] = widgetAnnotation.formElement?.isRequired
-            }
+            val annotationMap = AnnotationUtils.processAnnotation(annotation)
             annotationsList.add(annotationMap)
             val nativeAnnotationsList = Arguments.makeNativeArray(annotationsList)
 
@@ -191,14 +186,8 @@ object NutrientNotificationCenter {
 
     fun didDeselectAnnotations(annotation: Annotation, documentID: String) {
         try {
-            val instantJson = JSONObject(annotation.toInstantJson())
             val annotationsList = mutableListOf<Map<String, Any>>()
-            val annotationMap = JsonUtilities.jsonObjectToMap(instantJson)
-            annotationMap["uuid"] = annotation.uuid
-            if (annotation.type == AnnotationType.WIDGET) {
-                val widgetAnnotation : WidgetAnnotation = annotation as WidgetAnnotation
-                annotationMap["isRequired"] = widgetAnnotation.formElement?.isRequired
-            }
+            val annotationMap = AnnotationUtils.processAnnotation(annotation)
             annotationsList.add(annotationMap)
             val nativeAnnotationsList = Arguments.makeNativeArray(annotationsList)
 
@@ -214,13 +203,7 @@ object NutrientNotificationCenter {
 
     fun didTapAnnotation(annotation: Annotation, pointF: PointF, documentID: String) {
         try {
-            val instantJson = JSONObject(annotation.toInstantJson())
-            val annotationMap = JsonUtilities.jsonObjectToMap(instantJson)
-            annotationMap["uuid"] = annotation.uuid
-            if (annotation.type == AnnotationType.WIDGET) {
-                val widgetAnnotation : WidgetAnnotation = annotation as WidgetAnnotation
-                annotationMap["isRequired"] = widgetAnnotation.formElement?.isRequired
-            }
+            val annotationMap = AnnotationUtils.processAnnotation(annotation)
             val nativeAnnotationMap = Arguments.makeNativeMap(annotationMap)
 
             val pointMap = mapOf("x" to pointF.x, "y" to pointF.y)
@@ -248,35 +231,8 @@ object NutrientNotificationCenter {
     fun formFieldValuesUpdated(formField: FormField, documentID: String) {
         try {
             val annotation = formField.formElement.annotation
-            val instantJson = JSONObject(annotation.toInstantJson())
+            val annotationMap = AnnotationUtils.processAnnotation(annotation).toMutableMap()
             val annotationsList = mutableListOf<Map<String, Any>>()
-            val annotationMap = JsonUtilities.jsonObjectToMap(instantJson)
-            annotationMap["uuid"] = annotation.uuid
-            if (annotation.type == AnnotationType.WIDGET) {
-                val widgetAnnotation : WidgetAnnotation = annotation as WidgetAnnotation
-                annotationMap["isRequired"] = widgetAnnotation.formElement?.isRequired
-            }
-
-            (formField.formElement as? TextFormElement).let { textFormElement ->
-                if (textFormElement != null) {
-                    annotationMap["value"] = textFormElement.text
-                }
-            }
-            (formField.formElement as? EditableButtonFormElement).let { buttonFormElement ->
-                if (buttonFormElement != null) {
-                    annotationMap["value"] = if (buttonFormElement.isSelected) "selected" else "deselected"
-                }
-            }
-            (formField.formElement as? ComboBoxFormElement).let { comboBoxFormElement ->
-                if (comboBoxFormElement != null) {
-                    annotationMap["value"] = if (comboBoxFormElement.isCustomTextSet) comboBoxFormElement.customText else comboBoxFormElement.selectedIndexes
-                }
-            }
-            (formField.formElement as? ChoiceFormElement).let { choiceFormElement ->
-                if (choiceFormElement != null) {
-                    annotationMap["value"] = choiceFormElement.selectedIndexes
-                }
-            }
 
             annotationsList.add(annotationMap)
             val nativeAnnotationsList = Arguments.makeNativeArray(annotationsList)
@@ -294,34 +250,7 @@ object NutrientNotificationCenter {
     fun didSelectFormField(formElement: FormElement, documentID: String) {
         try {
             val annotation = formElement.annotation
-            val instantJson = JSONObject(annotation.toInstantJson())
-            val annotationMap = JsonUtilities.jsonObjectToMap(instantJson)
-            annotationMap["uuid"] = annotation.uuid
-            if (annotation.type == AnnotationType.WIDGET) {
-                val widgetAnnotation : WidgetAnnotation = annotation as WidgetAnnotation
-                annotationMap["isRequired"] = widgetAnnotation.formElement?.isRequired
-            }
-
-            (formElement as? TextFormElement).let { textFormElement ->
-                if (textFormElement != null) {
-                    annotationMap["value"] = textFormElement.text
-                }
-            }
-            (formElement as? EditableButtonFormElement).let { buttonFormElement ->
-                if (buttonFormElement != null) {
-                    annotationMap["value"] = if (buttonFormElement.isSelected) "selected" else "deselected"
-                }
-            }
-            (formElement as? ComboBoxFormElement).let { comboBoxFormElement ->
-                if (comboBoxFormElement != null) {
-                    annotationMap["value"] = if (comboBoxFormElement.isCustomTextSet) comboBoxFormElement.customText else comboBoxFormElement.selectedIndexes
-                }
-            }
-            (formElement as? ChoiceFormElement).let { choiceFormElement ->
-                if (choiceFormElement != null) {
-                    annotationMap["value"] = choiceFormElement.selectedIndexes
-                }
-            }
+            val annotationMap = AnnotationUtils.processAnnotation(annotation).toMutableMap()
 
             val nativeAnnotationMap = Arguments.makeNativeMap(annotationMap)
             val jsonData = Arguments.createMap()
@@ -337,34 +266,7 @@ object NutrientNotificationCenter {
     fun didDeSelectFormField(formElement: FormElement, documentID: String) {
         try {
             val annotation = formElement.annotation
-            val instantJson = JSONObject(annotation.toInstantJson())
-            val annotationMap = JsonUtilities.jsonObjectToMap(instantJson)
-            annotationMap["uuid"] = annotation.uuid
-            if (annotation.type == AnnotationType.WIDGET) {
-                val widgetAnnotation : WidgetAnnotation = annotation as WidgetAnnotation
-                annotationMap["isRequired"] = widgetAnnotation.formElement?.isRequired
-            }
-
-            (formElement as? TextFormElement).let { textFormElement ->
-                if (textFormElement != null) {
-                    annotationMap["value"] = textFormElement.text
-                }
-            }
-            (formElement as? EditableButtonFormElement).let { buttonFormElement ->
-                if (buttonFormElement != null) {
-                    annotationMap["value"] = if (buttonFormElement.isSelected) "selected" else "deselected"
-                }
-            }
-            (formElement as? ComboBoxFormElement).let { comboBoxFormElement ->
-                if (comboBoxFormElement != null) {
-                    annotationMap["value"] = if (comboBoxFormElement.isCustomTextSet) comboBoxFormElement.customText else comboBoxFormElement.selectedIndexes
-                }
-            }
-            (formElement as? ChoiceFormElement).let { choiceFormElement ->
-                if (choiceFormElement != null) {
-                    annotationMap["value"] = choiceFormElement.selectedIndexes
-                }
-            }
+            val annotationMap = AnnotationUtils.processAnnotation(annotation).toMutableMap()
 
             val nativeAnnotationMap = Arguments.makeNativeMap(annotationMap)
             val jsonData = Arguments.createMap()

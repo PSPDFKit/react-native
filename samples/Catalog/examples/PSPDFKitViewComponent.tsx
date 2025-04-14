@@ -1,16 +1,16 @@
 import React from 'react';
-import { Alert, Button, processColor, SafeAreaView, Text, TouchableOpacity, View } from 'react-native';
-import PSPDFKitView from 'react-native-pspdfkit';
-import RNFS from 'react-native-fs';
+import { Alert, processColor, Text, TouchableOpacity, View } from 'react-native';
+import PSPDFKitView, { FormField } from 'react-native-pspdfkit';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { exampleDocumentPath, pspdfkitColor, writableXFDFPath } from '../configuration/Constants';
+import { exampleDocumentPath, pspdfkitColor } from '../configuration/Constants';
 import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
 import { hideToolbar } from '../helpers/NavigationHelper';
 import { PSPDFKit } from '../helpers/PSPDFKit';
 
 export class PSPDFKitViewComponent extends BaseExampleAutoHidingHeaderComponent {
   pdfRef: React.RefObject<PSPDFKitView | null>;
-
+  
   constructor(props: any) {
     super(props);
     const { navigation } = this.props;
@@ -37,8 +37,8 @@ export class PSPDFKitViewComponent extends BaseExampleAutoHidingHeaderComponent 
           onNavigationButtonClicked={() => navigation.goBack()}
           style={styles.pdfColor}
         />
-        <SafeAreaView>
-          <View style={styles.column}>
+        {this.renderWithSafeArea(insets => (
+          <View style={[styles.column, { paddingBottom: insets.bottom }]}>
             <View>
               <View style={styles.horizontalContainer}>
                 <TouchableOpacity onPress={ async () => {
@@ -61,7 +61,7 @@ export class PSPDFKitViewComponent extends BaseExampleAutoHidingHeaderComponent 
               </View>
             </View>
           </View>
-        </SafeAreaView>
+        ))}
       </View>
     );
   }

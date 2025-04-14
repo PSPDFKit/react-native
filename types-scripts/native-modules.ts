@@ -76,3 +76,23 @@ export import StrikeOutMarkupAnnotation = annotationModels.StrikeOutMarkupAnnota
 export import TextAnnotation = annotationModels.TextAnnotation;
 export import UnderlineMarkupAnnotation = annotationModels.UnderlineMarkupAnnotation;
 export import WidgetAnnotation = annotationModels.WidgetAnnotation;
+
+//@ts-ignore
+import formField = require('../src/formfield/FormField');
+export import FormField = formField.FormField;
+export import ButtonFormField = formField.ButtonFormField;
+export import ChoiceFormField = formField.ChoiceFormField;
+export import SignatureFormField = formField.SignatureFormField;
+export import TextFormField = formField.TextFormField;
+
+//@ts-ignore
+import formElement = require('../src/forms/FormElement');
+export import FormElement = formElement.FormElement;
+export import ButtonFormElement = formElement.ButtonFormElement;
+export import ChoiceFormElement = formElement.ChoiceFormElement;
+export import SignatureFormElement = formElement.SignatureFormElement;
+export import TextFieldFormElement = formElement.TextFieldFormElement;
+
+//@ts-ignore
+import forms = require('../src/forms/Forms');
+export import Forms = forms.Forms;

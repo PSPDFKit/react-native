@@ -217,6 +217,7 @@ RCT_EXPORT_METHOD(handleListenerRemoved:(nonnull NSString* )event isLast:(BOOL)i
              @"documentLoadFailed",
              @"documentPageChanged",
              @"documentScrolled",
+             @"documentTapped",
              @"annotationsAdded",
              @"annotationChanged",
              @"annotationsRemoved",

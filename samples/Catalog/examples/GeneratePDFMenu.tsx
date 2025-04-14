@@ -37,8 +37,8 @@ class GeneratePDFMenu extends Component {
     );
   }
 
-  _renderSeparator(sectionId: any, rowId: React.Key | null | undefined) {
-    return <View key={rowId} style={styles.separator} />;
+  _renderSeparator = () => {
+    return <View style={styles.separator} />;
   }
 
   _renderRow = ({ item }: { item: any }) => {

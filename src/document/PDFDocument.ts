@@ -1,6 +1,8 @@
 import {
   findNodeHandle,
   NativeModules,
+  UIManager,
+  Platform
   // @ts-ignore
 } from 'react-native';
 import {
@@ -24,23 +26,34 @@ import {
   StrikeOutMarkupAnnotation,
   TextAnnotation,
   UnderlineMarkupAnnotation,
-  WidgetAnnotation} from '../annotations/AnnotationModels';
+  WidgetAnnotation,
+  AnnotationAttachment} from '../annotations/AnnotationModels';
 import { Annotation } from '../annotations/Annotation';
+import { FormField } from '../forms/FormField';
+import { FormElement } from '../forms/FormElement';
+import { Forms } from '../forms/Forms';
 
 /**
  * @class PDFDocument
  * @description The current document object loaded in the PSPDFKitView.
- *
+ * @hideconstructor
  */
 export class PDFDocument {
 
   pdfViewRef: any;
+   /** 
+    * @property { Forms }
+    * @description  The Forms class provides methods for managing form fields in the document.
+    * @memberof PDFDocument
+    */
+  public forms: Forms;
 
    /**
     * @ignore
     */
     constructor(pdfViewRef: any) {
       this.pdfViewRef = pdfViewRef;
+      this.forms = new Forms(pdfViewRef);
     }
 
    /**
@@ -62,10 +75,10 @@ export class PDFDocument {
     * @memberof PDFDocument
     * @description Returns the number of pages in the document.
     * @example
-    * const documentId = await this.pdfRef.current?.getDocument().getPageCount();
-    * @returns { Promise<string> } A promise containing the document page count.
+    * const pageCount = await this.pdfRef.current?.getDocument().getPageCount();
+    * @returns { Promise<number> } A promise containing the document page count.
     */
-    getPageCount(): Promise<string> {
+    getPageCount(): Promise<number> {
       return NativeModules.PDFDocumentManager.getPageCount(findNodeHandle(this.pdfViewRef));
     }
 
@@ -74,10 +87,10 @@ export class PDFDocument {
     * @memberof PDFDocument
     * @description Indicates if the PDF document is encrypted (password protected).
     * @example
-    * const documentId = await this.pdfRef.current?.getDocument().isEncrypted();
-    * @returns { Promise<string> } A promise containing whether the document is encrypted.
+    * const isEncrypted = await this.pdfRef.current?.getDocument().isEncrypted();
+    * @returns { Promise<boolean> } A promise containing whether the document is encrypted.
     */
-    isEncrypted(): Promise<string> {
+    isEncrypted(): Promise<boolean> {
       return NativeModules.PDFDocumentManager.isEncrypted(findNodeHandle(this.pdfViewRef));
     }
 
@@ -218,7 +231,14 @@ export class PDFDocument {
                   return new UnderlineMarkupAnnotation(annotation);
               case 'pspdfkit/widget':
               case 'widget':
-                  return new WidgetAnnotation(annotation);
+                  const widgetAnnotation = new WidgetAnnotation(annotation);
+                  if (annotation.formElement) {
+                      widgetAnnotation.formElement = new FormElement(annotation.formElement);
+                      if (annotation.formElement.formField) {
+                        widgetAnnotation.formElement.formField = new FormField(annotation.formElement.formField);
+                    }
+                  }
+                  return widgetAnnotation;
               default:
                   return undefined;
           }
@@ -312,7 +332,14 @@ export class PDFDocument {
                     return new UnderlineMarkupAnnotation(annotation);
                 case 'pspdfkit/widget':
                 case 'widget':
-                    return new WidgetAnnotation(annotation);
+                    const widgetAnnotation = new WidgetAnnotation(annotation);
+                    if (annotation.formElement) {
+                        widgetAnnotation.formElement = new FormElement(annotation.formElement);
+                        if (annotation.formElement.formField) {
+                            widgetAnnotation.formElement.formField = new FormField(annotation.formElement.formField);
+                        }
+                    }
+                    return widgetAnnotation;
                 default:
                   return undefined;
             }
@@ -336,13 +363,17 @@ export class PDFDocument {
     * @method addAnnotations
     * @memberof PDFDocument
     * @param {Array<any> | Array<AnnotationType> | Record<string, any>} annotations Array of annotations in Instant JSON format to add to the document.
-    * @description Adds all the specified annotations to the document. For complex annotations or annotations with attachments, use the ```applyInstantJSON``` API.
+    * @param {Record<string, AnnotationAttachment>} [attachments] Map of attachments related to the annotations.
+    * @description Adds all the specified annotations to the document. For complex annotations, use the ```applyInstantJSON``` API.
     * @example
     * const result = await this.pdfRef.current?.getDocument().addAnnotations(annotations);
     * @returns { Promise<boolean> } A promise containing the result of the operation. ```true``` if the annotations were added, and ```false``` if an error occurred.
     */
-    addAnnotations(annotations: Array<any> | Array<AnnotationType> | Record<string, any>): Promise<boolean> {
-      return NativeModules.PDFDocumentManager.addAnnotations(findNodeHandle(this.pdfViewRef), annotations);
+    addAnnotations(annotations: Array<any> | Array<AnnotationType> | Record<string, any>, attachments?: Record<string, AnnotationAttachment>): Promise<boolean> {
+        if (attachments == null) {
+            attachments = {};
+        }
+        return NativeModules.PDFDocumentManager.addAnnotations(findNodeHandle(this.pdfViewRef), annotations, attachments);
     }
 
    /**
@@ -383,4 +414,32 @@ export class PDFDocument {
     exportXFDF(filePath: string): Promise<any> {
       return NativeModules.PDFDocumentManager.exportXFDF(findNodeHandle(this.pdfViewRef), filePath);
     }
+
+   /**
+    * @method setPageIndex
+    * @memberof PDFDocument
+    * @param {number} pageIndex Zero-based page index of the page index to set the document to.
+    * @description Used to set the current page of the document. Starts at 0.
+    * @example
+    * await this.pdfRef.current?.getDocument().setPageIndex(5);
+    * @returns { Promise<void> } A promise returning when done.
+    */
+   async setPageIndex(pageIndex: number): Promise<void> {
+    if (pageIndex < 0 || pageIndex >= (await this.getPageCount())) {
+        return Promise.reject(new Error('Page index out of bounds'));
+    }
+    if (Platform.OS === 'android') {
+        UIManager.dispatchViewManagerCommand(findNodeHandle(this.pdfViewRef),
+        UIManager.getViewManagerConfig('RCTPSPDFKitView').Commands.setPageIndex,
+        [pageIndex],
+    );
+    return Promise.resolve();
+    } else if (Platform.OS === 'ios') {
+        NativeModules.RCTPSPDFKitViewManager.setPageIndex(
+            pageIndex,
+            findNodeHandle(this.pdfViewRef),
+        );
+        return Promise.resolve();
+    }
+}
 }

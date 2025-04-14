@@ -24,6 +24,7 @@ import com.pspdfkit.annotations.Annotation;
 import com.pspdfkit.annotations.AnnotationType;
 import com.pspdfkit.annotations.WidgetAnnotation;
 import com.pspdfkit.forms.FormElement;
+import com.pspdfkit.react.helper.AnnotationUtils;
 import com.pspdfkit.react.helper.JsonUtilities;
 
 import org.json.JSONException;
@@ -56,15 +57,8 @@ public class PdfViewAnnotationTappedEvent extends Event<PdfViewAnnotationTappedE
         try {
             String rawInstantJson = annotation.toInstantJson();
             if (rawInstantJson != null && !rawInstantJson.equals("null")) {
-                JSONObject instantJson = new JSONObject(rawInstantJson);
-                Map<String, Object> map = JsonUtilities.jsonObjectToMap(instantJson);
-                map.put("uuid", annotation.getUuid());
-                if (annotation.getType() == AnnotationType.WIDGET) {
-                    WidgetAnnotation widgetAnnotation = (WidgetAnnotation) annotation;
-                    FormElement formElement = widgetAnnotation.getFormElement();
-                    map.put("isRequired", formElement != null ? formElement.isRequired() : null);
-                }
-                WritableMap eventData = Arguments.makeNativeMap(map);
+                Map<String, Object> annotationMap = AnnotationUtils.processAnnotation(annotation);
+                WritableMap eventData = Arguments.makeNativeMap(annotationMap);
                 rctEventEmitter.receiveEvent(getViewTag(), getEventName(), eventData);
             }
         } catch (Exception e) {

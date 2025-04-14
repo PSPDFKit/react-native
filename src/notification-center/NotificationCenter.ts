@@ -7,7 +7,7 @@ import {
   /**
    * @class NotificationCenter
    * @description The Notification Center for the Nutrient React Native SDK.
-   *
+   * @hideconstructor
    */
   export class NotificationCenter {
   
@@ -97,6 +97,10 @@ import {
       * Called when the document is scrolled.
       */
       SCROLLED: 'documentScrolled',
+     /**
+      * Called when the document is tapped.
+      */
+       TAPPED: 'documentTapped',
      } as const;
 
      /**

@@ -36,60 +36,62 @@ export class SaveAs extends BaseExampleAutoHidingHeaderComponent {
           pageIndex={3}
           style={styles.colorView(pspdfkitColor)}
         />
-        <View style={styles.buttonContainer}>
-          <View style={styles.flex}>
-            <Button
-              onPress={() => {
-                // Ensure that the path to the new document is a writable document path
-                // You can use a React Native package like https://github.com/rnmods/react-native-document-picker to allow users of your application to select the path and the file name for the new document
-                const newDocumentPath =
-                  fileSystem.DocumentDirectoryPath + '/newdocument.pdf';
-                // Delete the document if it already exists in that path.
-                fileSystem
-                  .exists(newDocumentPath)
-                  .then(exists => {
-                    if (exists) {
-                      fileSystem.unlink(newDocumentPath);
-                    }
-                  })
-                  // First, save all annotations in the current document.
-                  .then(() => {
-                    this.pdfRef?.current?.getDocument().save()
-                      .then(_saved => {
-                        // Then, embed all the annotations
-                        PSPDFKit.processAnnotations(
-                          Annotation.Change.EMBED,
-                          ['all'],
-                          writableDocumentPath,
-                          newDocumentPath,
-                          null
-                        )
-                          .then(success => {
-                            if (success) {
-                              Alert.alert(
-                                'PSPDFKit',
-                                `Document saved as ${newDocumentPath}`,
-                              );
-                            } else {
-                              Alert.alert(
-                                'PSPDFKit',
-                                'Failed to save document',
-                              );
-                            }
-                          })
-                          .catch(error => {
-                            Alert.alert('PSPDFKit', JSON.stringify(error));
-                          });
-                      })
-                      .catch(error => {
-                        Alert.alert('PSPDFKit', JSON.stringify(error));
-                      });
-                  });
-              }}
-              title="Save As"
-            />
+        {this.renderWithSafeArea(insets => (
+          <View style={[styles.buttonContainer, { paddingBottom: insets.bottom }]}>
+            <View style={styles.flex}>
+              <Button
+                onPress={() => {
+                  // Ensure that the path to the new document is a writable document path
+                  // You can use a React Native package like https://github.com/rnmods/react-native-document-picker to allow users of your application to select the path and the file name for the new document
+                  const newDocumentPath =
+                    fileSystem.DocumentDirectoryPath + '/newdocument.pdf';
+                  // Delete the document if it already exists in that path.
+                  fileSystem
+                    .exists(newDocumentPath)
+                    .then(exists => {
+                      if (exists) {
+                        fileSystem.unlink(newDocumentPath);
+                      }
+                    })
+                    // First, save all annotations in the current document.
+                    .then(() => {
+                      this.pdfRef?.current?.getDocument().save()
+                        .then(_saved => {
+                          // Then, embed all the annotations
+                          PSPDFKit.processAnnotations(
+                            Annotation.Change.EMBED,
+                            ['all'],
+                            writableDocumentPath,
+                            newDocumentPath,
+                            null
+                          )
+                            .then(success => {
+                              if (success) {
+                                Alert.alert(
+                                  'PSPDFKit',
+                                  `Document saved as ${newDocumentPath}`,
+                                );
+                              } else {
+                                Alert.alert(
+                                  'PSPDFKit',
+                                  'Failed to save document',
+                                );
+                              }
+                            })
+                            .catch(error => {
+                              Alert.alert('PSPDFKit', JSON.stringify(error));
+                            });
+                        })
+                        .catch(error => {
+                          Alert.alert('PSPDFKit', JSON.stringify(error));
+                        });
+                    });
+                }}
+                title="Save As"
+              />
+            </View>
           </View>
-        </View>
+        ))}
       </View>
     );
   }

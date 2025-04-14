@@ -38,35 +38,37 @@ export class ManualSave extends BaseExampleAutoHidingHeaderComponent {
           pageIndex={3}
           style={styles.pdfColor}
         />
-        <View style={styles.wrapper}>
-          <View style={styles.flex}>
-            <Button
-              accessibilityLabel={'Save Button'}
-              testID={'Save Button'}
-              onPress={() => {
-                // Manual Save
-                this.pdfRef?.current?.getDocument().save()
-                  .then(saved => {
-                    if (saved) {
-                      Alert.alert(
-                        'PSPDFKit',
-                        'Successfully saved current document.',
-                      );
-                    } else {
-                      Alert.alert(
-                        'PSPDFKit',
-                        'Document was not saved as it was not modified.',
-                      );
-                    }
-                  })
-                  .catch(error => {
-                    Alert.alert('PSPDFKit', JSON.stringify(error));
-                  });
-              }}
-              title="Save"
-            />
+        {this.renderWithSafeArea(insets => (
+          <View style={[styles.wrapper, { paddingBottom: insets.bottom }]}>
+            <View style={styles.flex}>
+              <Button
+                accessibilityLabel={'Save Button'}
+                testID={'Save Button'}
+                onPress={() => {
+                  // Manual Save
+                  this.pdfRef?.current?.getDocument().save()
+                    .then(saved => {
+                      if (saved) {
+                        Alert.alert(
+                          'PSPDFKit',
+                          'Successfully saved current document.',
+                        );
+                      } else {
+                        Alert.alert(
+                          'PSPDFKit',
+                          'Document was not saved as it was not modified.',
+                        );
+                      }
+                    })
+                    .catch(error => {
+                      Alert.alert('PSPDFKit', JSON.stringify(error));
+                    });
+                }}
+                title="Save"
+              />
+            </View>
           </View>
-        </View>
+        ))}
       </View>
     );
   }

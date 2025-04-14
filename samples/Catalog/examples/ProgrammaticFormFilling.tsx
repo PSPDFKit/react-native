@@ -1,6 +1,6 @@
 import React from 'react';
 import { Alert, Button, processColor, View } from 'react-native';
-import PSPDFKitView, { PDFConfiguration } from 'react-native-pspdfkit';
+import PSPDFKitView from 'react-native-pspdfkit';
 
 import {
   formDocumentName,
@@ -10,7 +10,6 @@ import {
 } from '../configuration/Constants';
 import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
 import { extractFromAssetsIfMissing } from '../helpers/FileSystemHelpers';
-import { PSPDFKit } from '../helpers/PSPDFKit';
 
 export class ProgrammaticFormFilling extends BaseExampleAutoHidingHeaderComponent {
   pdfRef: React.RefObject<PSPDFKitView | null>;
@@ -69,10 +68,25 @@ export class ProgrammaticFormFilling extends BaseExampleAutoHidingHeaderComponen
         <View style={styles.wrapperView}>
           <View style={styles.marginLeft}>
             <Button
-              onPress={() => {
+              onPress={async () => {
+                const forms = this.pdfRef.current?.getDocument().forms;
+                if (!forms) {
+                  Alert.alert('PSPDFKit', 'Failed to get forms instance');
+                  return;
+                }
+
                 // Fill Text Form Fields.
-                this.pdfRef.current
-                  ?.setFormFieldValue('Name_Last', 'Appleseed')
+                forms.updateTextFormFieldValue('Name_Last', 'Appleseed').then(result => {
+                  if (result) {
+                    console.log('Successfully set the form field value.');
+                  } else {
+                    Alert.alert('PSPDFKit', 'Failed to set form field value.');
+                  }
+                }).catch(error => {
+                  Alert.alert('PSPDFKit', JSON.stringify(error));
+                });
+
+                forms.updateTextFormFieldValue('Name_First', 'John')
                   .then(result => {
                     if (result) {
                       console.log('Successfully set the form field value.');
@@ -86,8 +100,7 @@ export class ProgrammaticFormFilling extends BaseExampleAutoHidingHeaderComponen
                   .catch(error => {
                     Alert.alert('PSPDFKit', JSON.stringify(error));
                   });
-                this.pdfRef.current
-                  ?.setFormFieldValue('Name_First', 'John')
+                forms.updateTextFormFieldValue('Address_1', '1 Infinite Loop')
                   .then(result => {
                     if (result) {
                       console.log('Successfully set the form field value.');
@@ -101,8 +114,7 @@ export class ProgrammaticFormFilling extends BaseExampleAutoHidingHeaderComponen
                   .catch(error => {
                     Alert.alert('PSPDFKit', JSON.stringify(error));
                   });
-                this.pdfRef.current
-                  ?.setFormFieldValue('Address_1', '1 Infinite Loop')
+                forms.updateTextFormFieldValue('City', 'Cupertino')
                   .then(result => {
                     if (result) {
                       console.log('Successfully set the form field value.');
@@ -116,8 +128,7 @@ export class ProgrammaticFormFilling extends BaseExampleAutoHidingHeaderComponen
                   .catch(error => {
                     Alert.alert('PSPDFKit', JSON.stringify(error));
                   });
-                this.pdfRef.current
-                  ?.setFormFieldValue('City', 'Cupertino')
+                forms.updateTextFormFieldValue('STATE', 'CA')
                   .then(result => {
                     if (result) {
                       console.log('Successfully set the form field value.');
@@ -131,8 +142,7 @@ export class ProgrammaticFormFilling extends BaseExampleAutoHidingHeaderComponen
                   .catch(error => {
                     Alert.alert('PSPDFKit', JSON.stringify(error));
                   });
-                this.pdfRef.current
-                  ?.setFormFieldValue('STATE', 'CA')
+                forms.updateTextFormFieldValue('SSN', '123456789')
                   .then(result => {
                     if (result) {
                       console.log('Successfully set the form field value.');
@@ -146,8 +156,7 @@ export class ProgrammaticFormFilling extends BaseExampleAutoHidingHeaderComponen
                   .catch(error => {
                     Alert.alert('PSPDFKit', JSON.stringify(error));
                   });
-                this.pdfRef.current
-                  ?.setFormFieldValue('SSN', '123456789')
+                forms.updateTextFormFieldValue('Telephone_Home', '(123) 456-7890')
                   .then(result => {
                     if (result) {
                       console.log('Successfully set the form field value.');
@@ -161,23 +170,7 @@ export class ProgrammaticFormFilling extends BaseExampleAutoHidingHeaderComponen
                   .catch(error => {
                     Alert.alert('PSPDFKit', JSON.stringify(error));
                   });
-                this.pdfRef.current
-                  ?.setFormFieldValue('Telephone_Home', '(123) 456-7890')
-                  .then(result => {
-                    if (result) {
-                      console.log('Successfully set the form field value.');
-                    } else {
-                      Alert.alert(
-                        'PSPDFKit',
-                        'Failed to set form field value.',
-                      );
-                    }
-                  })
-                  .catch(error => {
-                    Alert.alert('PSPDFKit', JSON.stringify(error));
-                  });
-                this.pdfRef.current
-                  ?.setFormFieldValue('Birthdate', '1/1/1983')
+                forms.updateTextFormFieldValue('Birthdate', '1/1/1983')
                   .then(result => {
                     if (result) {
                       console.log('Successfully set the form field value.');
@@ -193,8 +186,7 @@ export class ProgrammaticFormFilling extends BaseExampleAutoHidingHeaderComponen
                   });
 
                 // Select a button form elements.
-                this.pdfRef.current
-                  ?.setFormFieldValue('Sex.0', 'selected')
+                forms.updateButtonFormFieldValue('Sex.0', true)
                   .then(result => {
                     if (result) {
                       console.log('Successfully set the form field value.');
@@ -208,8 +200,7 @@ export class ProgrammaticFormFilling extends BaseExampleAutoHidingHeaderComponen
                   .catch(error => {
                     Alert.alert('PSPDFKit', JSON.stringify(error));
                   });
-                this.pdfRef.current
-                  ?.setFormFieldValue('PHD', 'selected')
+                forms.updateButtonFormFieldValue('PHD', true)
                   .then(result => {
                     if (result) {
                       console.log('Successfully set the form field value.');
@@ -231,10 +222,11 @@ export class ProgrammaticFormFilling extends BaseExampleAutoHidingHeaderComponen
           <View style={styles.marginLeft}>
             <Button
               onPress={async () => {
-                // Get the First Name Value.
-                const firstNameValue =
-                  await this.pdfRef.current?.getFormFieldValue('Name_Last');
-                Alert.alert('PSPDFKit', JSON.stringify(firstNameValue));
+                // Get all form elements and filter out the 'Name_Last' element
+                const document = this.pdfRef.current?.getDocument();
+                const formElements = await document?.forms.getFormElements();
+                const formElement = formElements?.find(element => element.fullyQualifiedFieldName === 'Name_Last');
+                Alert.alert('PSPDFKit', JSON.stringify(formElement?.formField?.value));
               }}
               title="Get Last Name Value"
               accessibilityLabel="Get Last Name Value"

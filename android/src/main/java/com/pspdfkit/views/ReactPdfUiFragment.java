@@ -208,6 +208,7 @@ public class ReactPdfUiFragment extends PdfUiFragment {
             String title = item.get("title") != null ? item.get("title").toString() : "";
             int resId = PSPDFKitUtils.getCustomResourceId(customId, "id", getContext());
             Boolean showAsAction = item.get("showAsAction") != null ? (Boolean) item.get("showAsAction") : true;
+            Boolean applyTemplate = item.get("applyTemplate") != null ? (Boolean) item.get("applyTemplate") : true;
             MenuItem customMenuItem = menu.findItem(resId);
             customMenuItem.setTitle(title);
             int iconId = PSPDFKitUtils.getCustomResourceId(image, "drawable", getContext());
@@ -226,7 +227,11 @@ public class ReactPdfUiFragment extends PdfUiFragment {
             int mainToolbarIconsColor = a.getColor(com.pspdfkit.R.styleable.pspdf__ActionBarIcons_pspdf__iconsColor, ContextCompat.getColor(getContext(), android.R.color.white));
             a.recycle();
             try {
-                DrawableCompat.setTint(customIcon, mainToolbarIconsColor);
+                if (applyTemplate) {
+                    DrawableCompat.setTint(customIcon, mainToolbarIconsColor);
+                } else {
+                    DrawableCompat.setTintList(customIcon, null);
+                }
                 customMenuItem.setIcon(customIcon);
             } catch (Exception e) {
                 // Omit the icon if the image is missing

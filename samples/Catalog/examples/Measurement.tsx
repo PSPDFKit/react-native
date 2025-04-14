@@ -2,7 +2,6 @@ import React from 'react';
 import {
   Alert,
   processColor,
-  SafeAreaView,
   Text,
   TouchableOpacity,
   View,
@@ -85,8 +84,8 @@ class Measurement extends BaseExampleAutoHidingHeaderComponent {
           fragmentTag="PDF1"
           style={styles.pdfColor}
         />
-        <SafeAreaView>
-          <View style={styles.column}>
+        {this.renderWithSafeArea(insets => (
+          <View style={[styles.column, { paddingBottom: insets.bottom }]}>
             <View>
               <View style={styles.horizontalContainer}>
                 <TouchableOpacity onPress={this.onChangeMeasurement}>
@@ -98,7 +97,7 @@ class Measurement extends BaseExampleAutoHidingHeaderComponent {
               </View>
             </View>
           </View>
-        </SafeAreaView>
+        ))}
       </View>
     );
   }

@@ -30,6 +30,7 @@ export class SplitPDF extends BaseExampleAutoHidingHeaderComponent {
           configuration={{
             iOSBackgroundColor: processColor('lightgrey'),
           }}
+          fragmentTag='fragmentTag1'
           style={styles.pdfView}
         />
         <PSPDFKitView
@@ -40,6 +41,7 @@ export class SplitPDF extends BaseExampleAutoHidingHeaderComponent {
             scrollDirection: 'vertical',
             pageMode: 'single',
           }}
+          fragmentTag='fragmentTag2'
           style={styles.pdfColor}
         />
       </View>

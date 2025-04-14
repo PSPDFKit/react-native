@@ -266,7 +266,10 @@
  * @property {Object} [additionalActions] Form field actions
  * @property {boolean} [isBold] Whether text is bold. Default: false
  * @property {boolean} [isItalic] Whether text is italic. Default: false
+ * @property {FormElement} [formElement] The form element associated with this widget annotation.
  */
+
+import { FormElement } from "../forms/FormElement";
 
 /**
  * Document JSON wrapper used to construct Document JSON objects.
@@ -1486,6 +1489,7 @@ export class WidgetAnnotation extends BaseAnnotation {
   };
   isBold?: boolean;
   isItalic?: boolean;
+  formElement?: FormElement;
 
   constructor(params: {
     pageIndex: number;
@@ -1520,6 +1524,7 @@ export class WidgetAnnotation extends BaseAnnotation {
     };
     isBold?: boolean;
     isItalic?: boolean;
+    formElement?: FormElement;
   }) {
     super(params);
     this.type = params.type;
@@ -1548,6 +1553,7 @@ export class WidgetAnnotation extends BaseAnnotation {
     this.additionalActions = params.additionalActions;
     this.isBold = params.isBold ?? false;
     this.isItalic = params.isItalic ?? false;
+    this.formElement = params.formElement;
   }
 }
 

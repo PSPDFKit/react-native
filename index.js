@@ -826,6 +826,7 @@ class PSPDFKitView extends React.Component {
    * @method getFormFieldValue
    * @memberof PSPDFKitView
    * @param { string } fullyQualifiedName The fully qualified name of the form element.
+   * @deprecated Since Nutrient React Native SDK 2.17. Use the ```getFormElements``` API on the ```PDFDocument.forms``` object instead, and filter by ```fullyQualifiedFieldName```.
    * @example
    * const result = await this.pdfRef.current.getFormFieldValue('myFormElement');
    * // result: {'myFormElement' : value}
@@ -867,6 +868,7 @@ class PSPDFKitView extends React.Component {
    * @memberof PSPDFKitView
    * @param { string } fullyQualifiedName The fully qualified name of the form element. When using form elements such as radio buttons, the individual elements can be accessed by appending the index to the fully qualified name, for example ```choiceElement.0``` and ```choiceElement.1```.
    * @param { string } value The new string value of the form element. For button form elements, pass ```selected``` or ```deselected```. For choice form elements, pass the index of the choice to select, for example ```1```.
+   * @deprecated Since Nutrient React Native SDK 2.17. Use one of the ```update``` APIs on the ```PDFDocument.forms``` object instead.
    * @example
    * const result = await this.pdfRef.current.setFormFieldValue('Name_Last', 'Appleseed');
    *
@@ -1222,12 +1224,7 @@ class PSPDFKitView extends React.Component {
   };
 
   _getViewManagerConfig = viewManagerName => {
-    const version = NativeModules.PlatformConstants.reactNativeVersion.minor;
-    if (version >= 58) {
-      return UIManager.getViewManagerConfig(viewManagerName);
-    } else {
-      return UIManager[viewManagerName];
-    }
+    return UIManager.getViewManagerConfig(viewManagerName);
   };
 }
 
@@ -2218,6 +2215,15 @@ export {
   WidgetAnnotation
 } from './lib/annotations/AnnotationModels';
 
+import { FormField, ButtonFormField, ChoiceFormField, SignatureFormField, TextFormField } from './lib/forms/FormField';
+export { FormField, ButtonFormField, ChoiceFormField, SignatureFormField, TextFormField } from './lib/forms/FormField';
+
+import { FormElement, ButtonFormElement, ChoiceFormElement, SignatureFormElement, TextFieldFormElement } from './lib/forms/FormElement';
+export { FormElement, ButtonFormElement, ChoiceFormElement, SignatureFormElement, TextFieldFormElement } from './lib/forms/FormElement';
+
+import { Forms } from './lib/forms/Forms';
+export { Forms } from './lib/forms/Forms';
+
 module.exports.PDFConfiguration = PDFConfiguration;
 module.exports.RemoteDocumentConfiguration = RemoteDocumentConfiguration;
 module.exports.Toolbar = Toolbar;
@@ -2275,5 +2281,17 @@ module.exports.TextAnnotation = TextAnnotation;
 module.exports.UnderlineMarkupAnnotation = UnderlineMarkupAnnotation;
 module.exports.WidgetAnnotation = WidgetAnnotation;
 
+module.exports.FormField = FormField;
+module.exports.ButtonFormField = ButtonFormField;
+module.exports.ChoiceFormField = ChoiceFormField;
+module.exports.SignatureFormField = SignatureFormField;
+module.exports.TextFormField = TextFormField;
 
+module.exports.FormElement = FormElement;
+module.exports.ButtonFormElement = ButtonFormElement;
+module.exports.ChoiceFormElement = ChoiceFormElement;
+module.exports.SignatureFormElement = SignatureFormElement;
+module.exports.TextFieldFormElement = TextFieldFormElement;
+
+module.exports.Forms = Forms;
 

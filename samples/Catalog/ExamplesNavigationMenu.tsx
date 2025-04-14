@@ -123,7 +123,7 @@ export default [
       component.props.navigation.push('ProgrammaticFormFilling');
     },
   },
-  Platform.OS === 'ios' && {
+  {
     key: 'item11',
     name: 'Split PDF',
     description:

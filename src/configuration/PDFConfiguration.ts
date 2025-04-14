@@ -915,6 +915,7 @@ export namespace PDFConfiguration {
         TRAP_NET: 'trapNet',
         '3D': '3D',
         REDACT: 'redact',
+        SELECTION_TOOL: 'selection_tool',
     } as const;
 
    /**

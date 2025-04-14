@@ -4,6 +4,7 @@
     ],
     "compilerOptions": {
         "rootDir": "src",
+        "skipLibCheck": true,
         "outDir": "./lib",
     }
 }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Alert, Button, Platform, processColor, SafeAreaView, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, processColor, Text, TouchableOpacity, View } from 'react-native';
 import PSPDFKitView from 'react-native-pspdfkit';
 
 import { pspdfkitColor, exampleReportPath, writableXFDFPath } from '../configuration/Constants';
@@ -36,18 +36,18 @@ export class XFDF extends BaseExampleAutoHidingHeaderComponent {
           onNavigationButtonClicked={() => navigation.goBack()}
           style={styles.pdfColor}
         />
-        <SafeAreaView>
-          <View style={styles.column}>
+        {this.renderWithSafeArea(insets => (
+          <View style={[styles.column, { paddingBottom: insets.bottom }]}>
             <View>
               <View style={styles.horizontalContainer}>
-                <TouchableOpacity onPress={ async () => {
+                <TouchableOpacity onPress={async () => {
                   const result = await this.pdfRef.current?.getDocument().importXFDF(writableXFDFPath);
                   Alert.alert('PSPDFKit', 'Import XFDF result: ' + JSON.stringify(result));
                   console.log('Import XFDF result: ', result);
                 }}>
                   <Text style={styles.button}>{'Import XFDF'}</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={ async () => {
+                <TouchableOpacity onPress={async () => {
                   const outputFile = RNFS.TemporaryDirectoryPath + '/test.xfdf';
                   if (await RNFS.exists(outputFile)) {
                     await RNFS.unlink(outputFile);
@@ -61,8 +61,8 @@ export class XFDF extends BaseExampleAutoHidingHeaderComponent {
               </View>
             </View>
           </View>
-        </SafeAreaView>
-        </View>
+        ))}
+      </View>
     );
   }
 }

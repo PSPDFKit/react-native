@@ -13,6 +13,8 @@
 
 package com.pspdfkit.react;
 
+import static java.util.Collections.emptyList;
+
 import android.app.Activity;
 import android.app.Application;
 import android.content.Intent;
@@ -37,6 +39,7 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
+import com.pspdfkit.Nutrient;
 import com.pspdfkit.PSPDFKit;
 import com.pspdfkit.annotations.AnnotationType;
 import com.pspdfkit.document.PdfDocument;
@@ -47,6 +50,8 @@ import com.pspdfkit.document.processor.PdfProcessor;
 import com.pspdfkit.document.processor.PdfProcessorTask;
 import com.pspdfkit.exceptions.InvalidNutrientLicenseException;
 import com.pspdfkit.exceptions.InvalidPasswordException;
+import com.pspdfkit.initialization.CrossPlatformTechnology;
+import com.pspdfkit.initialization.InitializationOptions;
 import com.pspdfkit.listeners.SimpleDocumentListener;
 import com.pspdfkit.react.helper.ConversionHelpers;
 import com.pspdfkit.react.helper.PSPDFKitUtils;
@@ -242,8 +247,9 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
     @ReactMethod
     public void setLicenseKey(@Nullable String licenseKey, @Nullable Promise promise) {
          try {
-            PSPDFKit.initialize(getCurrentActivity(), licenseKey, new ArrayList<>(), HYBRID_TECHNOLOGY);
-            promise.resolve("Initialised PSPDFKit");
+             InitializationOptions options = new InitializationOptions(licenseKey, emptyList(), CrossPlatformTechnology.ReactNative, null);
+             Nutrient.initialize(getCurrentActivity(), options);
+             promise.resolve("Initialised Nutrient");
         } catch (InvalidNutrientLicenseException e) {
             promise.reject(e);
         }
@@ -286,8 +292,9 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
         // Here, we ignore the `iOSLicenseKey` parameter and only care about `androidLicenseKey`.
         // `iOSLicenseKey` will be used to activate the license on iOS.
         try {
-            PSPDFKit.initialize(getCurrentActivity(), androidLicenseKey, new ArrayList<>(), HYBRID_TECHNOLOGY);
-            promise.resolve("Initialised PSPDFKit");
+            InitializationOptions options = new InitializationOptions(androidLicenseKey, emptyList(), CrossPlatformTechnology.ReactNative, null);
+            Nutrient.initialize(getCurrentActivity(), options);
+            promise.resolve("Initialised Nutrient");
         } catch (InvalidNutrientLicenseException e) {
             promise.reject(e);
         }

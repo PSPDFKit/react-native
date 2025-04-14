@@ -1,5 +1,5 @@
 import React from 'react';
-import { Alert, Button, processColor, View } from 'react-native';
+import { Alert, processColor, Text, TouchableOpacity, View } from 'react-native';
 import PSPDFKitView, { RemoteDocumentConfiguration } from 'react-native-pspdfkit';
 
 import { exampleDocumentPath, pspdfkitColor } from '../configuration/Constants';
@@ -8,7 +8,7 @@ import { hideToolbar } from '../helpers/NavigationHelper';
 import RNFS from 'react-native-fs';
 
 export class OpenRemoteDocument extends BaseExampleAutoHidingHeaderComponent {
-  pdfRef: React.RefObject<PSPDFKitView>;
+  pdfRef: React.RefObject<PSPDFKitView | null>;
 
   constructor(props: any) {
     super(props);
@@ -41,32 +41,47 @@ export class OpenRemoteDocument extends BaseExampleAutoHidingHeaderComponent {
           onNavigationButtonClicked={() => navigation.goBack()}
           style={styles.pdfColor}
         />
-        <View style={styles.wrapper}>
-          <View style={styles.flex}>
-            <Button
-              accessibilityLabel={'Get Document ID'}
-              testID={'Get Document ID'}
-              onPress={ async () => {
-                const document = this.pdfRef.current?.getDocument();
-                Alert.alert(
-                  'PSPDFKit',
-                  'Document ID: ' + await document?.getDocumentId(),
-                );
-              }}
-              title="Get Document ID"
-            />
+        {this.renderWithSafeArea(insets => (
+          <View style={[styles.column, { paddingBottom: insets.bottom }]}>
+            <View>
+              <View style={styles.horizontalContainer}>
+                <TouchableOpacity onPress={async () => {
+                  const document = this.pdfRef.current?.getDocument();
+                  Alert.alert(
+                    'PSPDFKit',
+                    'Document ID: ' + await document?.getDocumentId(),
+                  );
+                }}>
+                  <Text style={styles.button}>{'Get Document ID'}</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
           </View>
-        </View>
+        ))}
       </View>
     );
   }
 }
+
 const styles = {
   flex: { flex: 1 },
   pdfColor: { flex: 1, color: pspdfkitColor },
-  wrapper: {
-    flexDirection: 'row' as 'row',
+  column: {
+    flexDirection: 'column' as 'column',
     alignItems: 'center' as 'center',
-    padding: 10,
+  },
+  horizontalContainer: {
+    flexDirection: 'row' as 'row',
+    minWidth: '70%' as '70%',
+    height: 50,
+    justifyContent: 'center' as 'center',
+    alignItems: 'center' as 'center',
+  },
+  button: {
+    padding: 15,
+    flex: 1,
+    fontSize: 16,
+    color: pspdfkitColor,
+    textAlign: 'center' as 'center',
   },
 };

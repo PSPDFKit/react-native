@@ -33,6 +33,10 @@ export class EventListeners extends BaseExampleAutoHidingHeaderComponent {
       console.log(event);
     });
 
+    this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.DocumentEvent.TAPPED, (event: any) => {
+      console.log(event);
+    });
+
     this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.AnnotationsEvent.ADDED, (event: any) => {
       Alert.alert('PSPDFKit', JSON.stringify(event));
     });

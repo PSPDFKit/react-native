@@ -12,9 +12,6 @@ buildscript {
     repositories {
         google()
         mavenCentral()
-        maven {
-            url 'https://my.nutrient.io/maven/'
-        }
     }
     
     dependencies {

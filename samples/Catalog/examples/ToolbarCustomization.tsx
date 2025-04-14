@@ -14,8 +14,8 @@ export class ToolbarCustomization extends BaseExampleAutoHidingHeaderComponent {
   }
 
   override render() {
-    return (
-      <View style={styles.fullScreen}>
+    return this.renderWithSafeArea(insets => (
+      <View style={[styles.fullScreen, { paddingBottom: insets.bottom }]}>
         <PSPDFKitView
           ref={this.pdfRef}
           document={exampleDocumentPath}
@@ -145,7 +145,7 @@ export class ToolbarCustomization extends BaseExampleAutoHidingHeaderComponent {
           </View>
         </View>
       </View>
-    );
+    ));
   }
 }
 

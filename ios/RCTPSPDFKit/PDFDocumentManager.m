@@ -28,13 +28,17 @@ RCT_EXTERN_METHOD(save:(NSNumber _Nonnull)reference onSuccess:(RCTPromiseResolve
 
 RCT_EXTERN_METHOD(getAllUnsavedAnnotations:(NSNumber _Nonnull)reference onSuccess:(RCTPromiseResolveBlock)resolve onError:(RCTPromiseRejectBlock)reject);
 
+RCT_EXTERN_METHOD(getFormElements:(NSNumber _Nonnull)reference onSuccess:(RCTPromiseResolveBlock)resolve onError:(RCTPromiseRejectBlock)reject);
+
+RCT_EXTERN_METHOD(updateFormFieldValue:(NSNumber _Nonnull)reference fullyQualifiedName:(NSString *)fullyQualifiedName value:(id)value onSuccess:(RCTPromiseResolveBlock)resolve onError:(RCTPromiseRejectBlock)reject);
+
 RCT_EXTERN_METHOD(getAnnotations:(NSNumber _Nonnull)reference type:(NSString *)type onSuccess:(RCTPromiseResolveBlock)resolve onError:(RCTPromiseRejectBlock)reject);
 
 RCT_EXTERN_METHOD(getAnnotationsForPage:(NSNumber _Nonnull)reference pageIndex:(NSInteger)pageIndex type:(NSString *)type onSuccess:(RCTPromiseResolveBlock)resolve onError:(RCTPromiseRejectBlock)reject);
 
 RCT_EXTERN_METHOD(removeAnnotations:(NSNumber _Nonnull)reference instantJSON:(NSArray<NSDictionary *> *)instantJSON onSuccess:(RCTPromiseResolveBlock)resolve onError:(RCTPromiseRejectBlock)reject);
 
-RCT_EXTERN_METHOD(addAnnotations:(NSNumber _Nonnull)reference instantJSON:(id)instantJSON onSuccess:(RCTPromiseResolveBlock)resolve onError:(RCTPromiseRejectBlock)reject);
+RCT_EXTERN_METHOD(addAnnotations:(NSNumber _Nonnull)reference instantJSON:(id)instantJSON attachments:(NSDictionary *)attachments onSuccess:(RCTPromiseResolveBlock)resolve onError:(RCTPromiseRejectBlock)reject);
 
 RCT_EXTERN_METHOD(applyInstantJSON:(NSNumber _Nonnull)reference instantJSON:(NSDictionary *)instantJSON onSuccess:(RCTPromiseResolveBlock)resolve onError:(RCTPromiseRejectBlock)reject);
 

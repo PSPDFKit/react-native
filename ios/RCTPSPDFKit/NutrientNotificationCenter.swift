@@ -19,6 +19,7 @@ import PSPDFKit
     case documentLoadFailed
     case documentPageChanged
     case documentScrolled
+    case documentTapped
     case annotationsAdded
     case annotationChanged
     case annotationsRemoved
@@ -43,6 +44,8 @@ import PSPDFKit
                 return "documentPageChanged"
             case .documentScrolled:
                 return "documentScrolled"
+            case .documentTapped:
+                return "documentTapped"
             case .annotationsAdded:
                 return "annotationsAdded"
             case .annotationChanged:
@@ -78,6 +81,8 @@ import PSPDFKit
                 self = .documentPageChanged
             case "documentScrolled":
                 self = .documentScrolled
+            case "documentTapped":
+                self = .documentTapped
             case "annotationCreated":
                 self = .annotationsAdded
             case "annotationsAdded":
@@ -160,6 +165,17 @@ import PSPDFKit
         let jsonData = ["event" : NotificationEvent.documentScrolled.rawValue,
                         "scrollData" : scrollData, "documentID" : documentID] as [String : Any]
         eventEmitter?.sendEvent(withName:NotificationEvent.documentScrolled.rawValue,
+                               body: jsonData)
+    }
+    
+    @objc public func didTapDocument(tapPoint: CGPoint, documentID: String) {
+        if (!isInUse) { return }
+
+        let pointDictionary = ["x" : tapPoint.x , "y" : tapPoint.y]
+        let jsonData = ["event" : NotificationEvent.documentTapped.rawValue,
+                        "point" : pointDictionary,
+                        "documentID" : documentID] as [String : Any]
+        eventEmitter?.sendEvent(withName:NotificationEvent.documentTapped.rawValue,
                                body: jsonData)
     }
         

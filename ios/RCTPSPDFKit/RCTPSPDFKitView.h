@@ -46,6 +46,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// Document
 - (BOOL)saveCurrentDocumentWithError:(NSError *_Nullable *)error;
+- (void)updatePageIndex:(PSPDFPageIndex)pageIndex;
 
 /// Anotations
 - (NSDictionary<NSString *, NSArray<NSDictionary *> *> *)getAnnotations:(PSPDFPageIndex)pageIndex type:(PSPDFAnnotationType)type error:(NSError *_Nullable *)error;

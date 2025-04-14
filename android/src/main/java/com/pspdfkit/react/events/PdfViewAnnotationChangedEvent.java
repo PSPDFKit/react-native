@@ -24,6 +24,7 @@ import com.pspdfkit.annotations.Annotation;
 import com.pspdfkit.annotations.AnnotationType;
 import com.pspdfkit.annotations.WidgetAnnotation;
 import com.pspdfkit.forms.FormElement;
+import com.pspdfkit.react.helper.AnnotationUtils;
 import com.pspdfkit.react.helper.JsonUtilities;
 
 import org.json.JSONException;
@@ -75,14 +76,7 @@ public class PdfViewAnnotationChangedEvent extends Event<PdfViewAnnotationChange
                 annotationMap.put("creatorName", annotation.getCreator());
                 annotationMap.put("uuid", annotation.getUuid());
             } else {
-                JSONObject instantJson = new JSONObject(annotation.toInstantJson());
-                annotationMap = JsonUtilities.jsonObjectToMap(instantJson);
-                annotationMap.put("uuid", annotation.getUuid());
-                if (annotation.getType() == AnnotationType.WIDGET) {
-                    WidgetAnnotation widgetAnnotation = (WidgetAnnotation) annotation;
-                    FormElement formElement = widgetAnnotation.getFormElement();
-                    annotationMap.put("isRequired", formElement != null ? formElement.isRequired() : null);
-                }
+                annotationMap = AnnotationUtils.processAnnotation(annotation);
             }
 
             List<Map<String, Object>> annotations = new ArrayList<>();

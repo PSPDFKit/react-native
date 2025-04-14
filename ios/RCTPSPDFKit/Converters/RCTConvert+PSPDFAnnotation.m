@@ -8,23 +8,58 @@
 //
 
 #import "RCTConvert+PSPDFDocument.h"
+#if __has_include("PSPDFKitReactNativeiOS-Swift.h")
+#import "PSPDFKitReactNativeiOS-Swift.h"
+#else
+#import <PSPDFKitReactNativeiOS/PSPDFKitReactNativeiOS-Swift.h>
+#endif
 
 @implementation RCTConvert (PSPDFAnnotation)
 
 + (NSArray <NSDictionary *> *)instantJSONFromAnnotations:(NSArray <PSPDFAnnotation *> *) annotations error:(NSError **)error {
   NSMutableArray <NSDictionary *> *annotationsJSON = [NSMutableArray new];
   for (PSPDFAnnotation *annotation in annotations) {
+    // Keeping the uuid and isRequired props for backwards compatibility
     NSDictionary <NSString *, NSString *> *uuidDict = @{@"uuid" : annotation.uuid};
     NSData *annotationData = [annotation generateInstantJSONWithError:error];
     if (annotationData) {
       NSMutableDictionary *annotationDictionary = [[NSJSONSerialization JSONObjectWithData:annotationData options:kNilOptions error:error] mutableCopy];
       [annotationDictionary addEntriesFromDictionary:uuidDict];
       
-      // Add isRequired property for form elements
+      // If this is a Widget annotation, add the FormElement
       if ([annotation isKindOfClass:[PSPDFFormElement class]]) {
           PSPDFFormElement *formElement = (PSPDFFormElement *)annotation;
           annotationDictionary[@"isRequired"] = @(formElement.isRequired);
+          NSDictionary *formElementJSON;
+          
+          if ([formElement isKindOfClass:[PSPDFButtonFormElement class]]) {
+              formElementJSON = [RCTConvert buttonFormElementToJSON:(PSPDFButtonFormElement *)formElement];
+              NSMutableDictionary *mutableJSON = [formElementJSON mutableCopy];
+              mutableJSON[@"type"] = @"button";
+              formElementJSON = [mutableJSON copy];
+          } else if ([formElement isKindOfClass:[PSPDFChoiceFormElement class]]) {
+              formElementJSON = [RCTConvert choiceFormElementToJSON:(PSPDFChoiceFormElement *)formElement];
+              NSMutableDictionary *mutableJSON = [formElementJSON mutableCopy];
+              mutableJSON[@"type"] = @"choice";
+              formElementJSON = [mutableJSON copy];
+          } else if ([formElement isKindOfClass:[PSPDFSignatureFormElement class]]) {
+              formElementJSON = [RCTConvert signatureFormElementToJSON:(PSPDFSignatureFormElement *)formElement];
+              NSMutableDictionary *mutableJSON = [formElementJSON mutableCopy];
+              mutableJSON[@"type"] = @"signature";
+              formElementJSON = [mutableJSON copy];
+          } else if ([formElement isKindOfClass:[PSPDFTextFieldFormElement class]]) {
+              formElementJSON = [RCTConvert textFieldFormElementToJSON:(PSPDFTextFieldFormElement *)formElement];
+              NSMutableDictionary *mutableJSON = [formElementJSON mutableCopy];
+              mutableJSON[@"type"] = @"textField";
+              formElementJSON = [mutableJSON copy];
+          } else {
+              // Skip unknown form element types
+              continue;
+          }
+          
+          annotationDictionary[@"formElement"] = formElementJSON;
       }
+        
       if (annotationDictionary) {
         [annotationsJSON addObject:annotationDictionary];
       }

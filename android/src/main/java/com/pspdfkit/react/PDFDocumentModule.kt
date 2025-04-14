@@ -10,21 +10,27 @@ import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.ReadableArray
 import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.bridge.ReadableType
+import com.facebook.react.bridge.WritableMap
 import com.facebook.react.module.annotations.ReactModule
 import com.pspdfkit.LicenseFeature
 import com.pspdfkit.PSPDFKit
 import com.pspdfkit.annotations.Annotation
 import com.pspdfkit.annotations.AnnotationProvider.ALL_ANNOTATION_TYPES
 import com.pspdfkit.annotations.AnnotationType
-import com.pspdfkit.annotations.WidgetAnnotation
 import com.pspdfkit.document.ImageDocument
 import com.pspdfkit.document.PdfDocument
 import com.pspdfkit.document.formatters.DocumentJsonFormatter
 import com.pspdfkit.document.formatters.XfdfFormatter
 import com.pspdfkit.document.providers.ContentResolverDataProvider
 import com.pspdfkit.document.providers.DataProvider
+import com.pspdfkit.forms.ChoiceFormElement
+import com.pspdfkit.forms.ComboBoxFormElement
+import com.pspdfkit.forms.EditableButtonFormElement
+import com.pspdfkit.forms.TextFormElement
+import com.pspdfkit.react.helper.AnnotationUtils
 import com.pspdfkit.react.helper.ConversionHelpers.getAnnotationTypes
 import com.pspdfkit.react.helper.DocumentJsonDataProvider
+import com.pspdfkit.react.helper.FormUtils
 import com.pspdfkit.react.helper.JsonUtilities
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -168,13 +174,7 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
                                         if (annotation.type == AnnotationType.POPUP) {
                                             continue
                                         }
-                                        val annotationInstantJSON = JSONObject(annotation.toInstantJson())
-                                        val annotationMap = JsonUtilities.jsonObjectToMap(annotationInstantJSON)
-                                        annotationMap["uuid"] = annotation.uuid
-                                        if (annotation.type == AnnotationType.WIDGET) {
-                                            val widgetAnnotation : WidgetAnnotation = annotation as WidgetAnnotation
-                                            annotationMap["isRequired"] = widgetAnnotation.formElement?.isRequired
-                                        }
+                                        val annotationMap = AnnotationUtils.processAnnotation(annotation)
                                         annotationsSerialized.add(annotationMap)
                                     }
                                     val nativeList = Arguments.makeNativeArray(annotationsSerialized)
@@ -210,13 +210,7 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
                                         if (annotation.type == AnnotationType.POPUP) {
                                             continue
                                         }
-                                        val annotationInstantJSON = JSONObject(annotation.toInstantJson())
-                                        val annotationMap = JsonUtilities.jsonObjectToMap(annotationInstantJSON)
-                                        annotationMap["uuid"] = annotation.uuid
-                                        if (annotation.type == AnnotationType.WIDGET) {
-                                            val widgetAnnotation : WidgetAnnotation = annotation as WidgetAnnotation
-                                            annotationMap["isRequired"] = widgetAnnotation.formElement?.isRequired
-                                        }
+                                        val annotationMap = AnnotationUtils.processAnnotation(annotation)
                                         annotationsSerialized.add(annotationMap)
                                     }
                                     val nativeList = Arguments.makeNativeArray(annotationsSerialized)
@@ -266,7 +260,15 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
         }
     }
 
-    @ReactMethod fun addAnnotations(reference: Int, instantJSON: Dynamic, promise: Promise) {
+    private fun createInstantObject(annotations: ReadableArray, attachments: ReadableMap): WritableMap? {
+        val result = Arguments.createMap()
+        result.putString("format", "https://pspdfkit.com/instant-json/v1")
+        result.putArray("annotations", annotations)
+        result.putMap("attachments", attachments)
+        return result
+    }
+
+    @ReactMethod fun addAnnotations(reference: Int, instantJSON: Dynamic, attachments: Dynamic, promise: Promise) {
 
         // This API is now used to add ONLY annotation objects to a document - the old functionality to apply document JSON has moved to the more aptly named applyInstantJSON.
         // For backwards compatibility, first check whether the API is being called with a full Document JSON object, and then redirect the call to applyInstantJSON.
@@ -278,19 +280,39 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
         }
 
         try {
-            this.getDocument(reference)?.document?.let {
+            this.getDocument(reference)?.document?.let { document ->
                 if (instantJSON.type == ReadableType.Array) {
                     val instantJSONArray = instantJSON.asArray()
-                    for (i in 0 until instantJSONArray.size()) {
-                        try {
-                            val annotation = instantJSONArray.getMap(i)
-                            val hashMap = annotation!!.toHashMap() as Map<String, Any>
-                            it.annotationProvider.createAnnotationFromInstantJson(JSONObject(hashMap).toString());
-                        } catch (e: Exception) {
-                            promise.reject("addAnnotations error", e)
-                        }
+                    val hasImageAnnotations = (0 until instantJSONArray.size()).any { i ->
+                        val annotation = instantJSONArray.getMap(i)
+                        val hashMap = annotation?.toHashMap() as? Map<String, Any>
+                        hashMap?.containsKey("imageAttachmentId") == true
                     }
-                    promise.resolve(true)
+
+                    if (hasImageAnnotations) {
+                        // If there are any image annotations, process them all at once
+                        val attachmentsJSONMap = attachments.asMap()
+                        val instantData = createInstantObject(instantJSONArray, attachmentsJSONMap)
+                        if (instantData != null) {
+                            applyInstantJSON(reference, instantData, promise)
+                            return
+                        }
+                    } else {
+                        // Process non-image annotations directly
+                        for (i in 0 until instantJSONArray.size()) {
+                            try {
+                                val annotation = instantJSONArray.getMap(i)
+                                val hashMap = annotation!!.toHashMap() as Map<String, Any>
+                                document.annotationProvider.createAnnotationFromInstantJson(
+                                    JSONObject(hashMap).toString()
+                                )
+                            } catch (e: Exception) {
+                                promise.reject("addAnnotations error", e)
+                                return
+                            }
+                        }
+                        promise.resolve(true)
+                    }
                 } else {
                     promise.reject("addAnnotations error", "Cannot parse annotation data")
                 }
@@ -386,6 +408,90 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
             }
         } catch (e: Throwable) {
             promise.reject("exportXFDF error", e)
+        }
+    }
+
+    @ReactMethod fun getFormElements(reference: Int, promise: Promise) {
+        try {
+            this.getDocument(reference)?.document?.let {
+
+                val formElements = it.formProvider.formElements
+                val formElementsJSON = ArrayList<Map<String, Any>>()
+
+                for (formElement in formElements) {
+                    val elementJSON = FormUtils.formElementToJSON(formElement)
+                    formElementsJSON.add(elementJSON)
+                }
+
+                promise.resolve(Arguments.makeNativeArray(formElementsJSON))
+            }
+        } catch (e: Throwable) {
+            promise.reject("getFormElements", e)
+        }
+    }
+
+    @ReactMethod fun updateFormFieldValue(reference: Int, fullyQualifiedName: String, value: Dynamic, promise: Promise) {
+        try {
+            this.getDocument(reference)?.document?.let {
+
+                it.formProvider.getFormElementWithNameAsync(fullyQualifiedName)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(
+                        { formElement ->
+                            var success = false
+                            
+                            when (formElement) {
+                                is EditableButtonFormElement -> {
+                                    if (value.type == ReadableType.Boolean) {
+                                        if (value.asBoolean()) {
+                                            formElement.select()
+                                        } else {
+                                            formElement.deselect()
+                                        }
+                                        success = true
+                                    }
+                                }
+                                is ChoiceFormElement -> {
+                                    if (value.type == ReadableType.Array) {
+                                        val indices = value.asArray().toArrayList().filterIsInstance<Int>()
+                                        formElement.selectedIndexes = indices
+                                        success = true
+                                    } else if (value.type == ReadableType.String) {
+                                        try {
+                                            val index = value.asString().toInt()
+                                            formElement.selectedIndexes = listOf(index)
+                                            success = true
+                                        } catch (e: NumberFormatException) {
+                                            // Handle custom text for combo box
+                                            if (formElement is ComboBoxFormElement) {
+                                                formElement.customText = value.asString()
+                                                success = true
+                                            }
+                                        }
+                                    }
+                                }
+                                is TextFormElement -> {
+                                    if (value.type == ReadableType.String) {
+                                        formElement.setText(value.asString())
+                                        success = true
+                                    }
+                                }
+                            }
+
+                            if (success) {
+                                promise.resolve(true)
+                            } else {
+                                promise.reject("updateFormFieldValue", "Could not update form field value")
+                            }
+                        },
+                        { e ->
+                            promise.reject("updateFormFieldValue", e)
+                        }
+                    )
+            }
+        } catch (e: Throwable) {
+            promise.reject("updateFormFieldValue", e)
         }
     }
 

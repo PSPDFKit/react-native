@@ -5,7 +5,8 @@
  * @property {string} id - The unique identifier for the custom toolbar button. This will be used to identify the button in the ```onCustomToolbarButtonTapped``` callback. On Android the ID needs to be specified as a resource item inside your application's ```ids.xml``` file.
  * @property {string} image - The image name (iOS) or resource ID (Android) for the toolbar button. Images must be included in the application bundle on iOS and specified as a drawable resource on Android.
  * @property {string} [title] - The title of the toolbar button (Android only).
- * @property {boolean} [showAsAction] - Whether the toolbar button should be displayed on the main toolbar (not in the drop down menu) (Android only).
+ * @property {boolean} [showAsAction] - Whether the toolbar button should be displayed on the main toolbar, and not in the drop down menu (Android only).
+ * @property {boolean} [applyTemplate] - Whether the icon should be rendered using the system's tint color to match the color scheme of other toolbar buttons. Set this to false if your icon already contains color information that should be preserved. 
  */
 /**
  * The toolbar buttons that should be displayed on the toolbar.
@@ -50,9 +51,13 @@ export interface ToolbarItem {
   */
     title?: string;
  /**
-  * Whether the toolbar button should be displayed on the main toolbar (not in the drop down menu) (Android only).
+  * Whether the toolbar button should be displayed on the main toolbar, and not in the drop down menu (Android only).
   */
     showAsAction?: boolean;
+ /**
+  * Whether the icon should be rendered using the system's tint color to match the color scheme of other toolbar buttons. Set this to false if your icon already contains color information that should be preserved. 
+  */
+    applyTemplate?: boolean;
 }
 
 export interface ToolbarItems {

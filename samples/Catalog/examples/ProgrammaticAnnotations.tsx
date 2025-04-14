@@ -1,6 +1,6 @@
 import React from 'react';
-import { Alert, Button, processColor, View } from 'react-native';
-import PSPDFKitView, { Annotation, AnnotationAttachment, AnnotationType, DocumentJSON, InkAnnotation } from 'react-native-pspdfkit';
+import { Alert, processColor, Text, TouchableOpacity, View } from 'react-native';
+import PSPDFKitView, { Annotation, AnnotationAttachment, AnnotationType, DocumentJSON, ImageAnnotation, InkAnnotation, WidgetAnnotation } from 'react-native-pspdfkit';
 import fileSystem from 'react-native-fs';
 
 import { exampleDocumentPath, pspdfkitColor } from '../configuration/Constants';
@@ -260,38 +260,23 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
     "format": "https://pspdfkit.com/instant-json/v1",
 };
 
-static imageAnnotation: DocumentJSON = {
-    "annotations":[
-      {
-          "bbox":[
-            229,
-            426,
-            125,
-            125
-          ],
-          "contentType":"image/png",
-          "createdAt":"2023-08-30T17:15:13Z",
-          "creatorName":"Test User",
-          "description":"Test",
-          "id":"455f261c88f94294a05ebeb494c96cb9",
-          "imageAttachmentId":"492adff9842bff7dcb81a20950870be8a0bb665c8d48175680c1e5e1070243ff",
-          "name":"my-custom-image-annotation",
-          "opacity":1,
-          "pageIndex":0,
-          "rotation":0,
-          "type":"pspdfkit/image",
-          "updatedAt":"2024-05-07T17:15:13Z",
-          "v":2
-      }
-    ],
-    "format":"https://pspdfkit.com/instant-json/v1",
-    "attachments": {
-      "492adff9842bff7dcb81a20950870be8a0bb665c8d48175680c1e5e1070243ff": {
-          "binary" : "",
-          "contentType" : "image/png"
-      }
-    },
-  };
+static imageAnnotation: ImageAnnotation = {
+  bbox: [229, 426, 125, 125],
+  contentType: "image/png",
+  createdAt: new Date().toISOString(),
+  creatorName: "Test User",
+  description: "Test",
+  id: "455f261c88f94294a05ebeb494c96cb9",
+  imageAttachmentId: "492adff9842bff7dcb81a20950870be8a0bb665c8d48175680c1e5e1070243ff",
+  name: "my-custom-image-annotation",
+  opacity: 1,
+  pageIndex: 0,
+  rotation: 0,
+  subject: "Test",
+  type: "pspdfkit/image",
+  updatedAt: new Date().toISOString(),
+  v: 2,
+};
 
   static linkAnnotation: DocumentJSON = {
     "annotations": [{
@@ -432,7 +417,6 @@ static imageAnnotation: DocumentJSON = {
     super(props);
     const { navigation } = this.props;
     this.pdfRef = React.createRef();
-
     hideToolbar(navigation);
 
     this.state = {
@@ -462,11 +446,11 @@ static imageAnnotation: DocumentJSON = {
             this.lastAddedAnnotationUUID = event.annotations[0]?.uuid;
           }}
         />
-        <View style={styles.column}>
-          <View style={styles.wrapper}>
+        {this.renderWithSafeArea(insets => (
+          <View style={[styles.column, { paddingBottom: insets.bottom }]}>
             <View>
-              <Button
-                onPress={() => {
+              <View style={styles.horizontalContainer}>
+                <TouchableOpacity onPress={() => {
                   // Programmatically add an ink annotation.
                   this.pdfRef.current?.getDocument().addAnnotations(ProgrammaticAnnotations.basicInkAnnotation)
                     .then(result => {
@@ -478,7 +462,6 @@ static imageAnnotation: DocumentJSON = {
                             {
                               text: 'Set readOnly flag',
                               onPress: async () => {
-
                                 // Get the existing annotation flags
                                 const flags = await this.pdfRef.current?.getAnnotationFlags(
                                   this.lastAddedAnnotationUUID!);
@@ -507,14 +490,10 @@ static imageAnnotation: DocumentJSON = {
                     .catch(error => {
                       Alert.alert('PSPDFKit', JSON.stringify(error));
                     });
-                }}
-                title="Add Ink Annotation"
-                accessibilityLabel="Add Ink Annotation"
-              />
-            </View>
-            <View style={styles.marginLeft}>
-              <Button
-                onPress={async () => {
+                }}>
+                  <Text style={styles.button}>{'Add Ink Annotation'}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={async () => {
                   // For certain type of widget annotations, the document cache needs to be cleared before adding them.
                   await this.pdfRef.current?.getDocument().invalidateCache();
                   // Programmatically add multiple annotations.
@@ -532,16 +511,12 @@ static imageAnnotation: DocumentJSON = {
                     .catch(error => {
                       Alert.alert('PSPDFKit', JSON.stringify(error));
                     });
-                }}
-                title="Add Complex Annotation"
-                accessibilityLabel="Add Complex Annotation"
-              />
-            </View>
-          </View>
-          <View style={styles.wrapper}>
-            <View>
-              <Button
-                onPress={() => {
+                }}>
+                  <Text style={styles.button}>{'Add Complex Annotation'}</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.horizontalContainer}>
+                <TouchableOpacity onPress={() => {
                   // Programmatically add multiple annotations.
                   this.pdfRef.current?.getDocument().applyInstantJSON(ProgrammaticAnnotations.multipleAnnotations)
                     .then(result => {
@@ -557,13 +532,10 @@ static imageAnnotation: DocumentJSON = {
                     .catch(error => {
                       Alert.alert('PSPDFKit', JSON.stringify(error));
                     });
-                }}
-                title="Add Multiple Annotations"
-              />
-            </View>
-            <View style={styles.marginLeft}>
-              <Button
-                onPress={async () => {
+                }}>
+                  <Text style={styles.button}>{'Add Multiple Annotations'}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={async () => {
                   // Programmatically add a downloaded image annotation.
                   const filePath = fileSystem.DocumentDirectoryPath + '/pspdfkit.png';
                   fileSystem.downloadFile({
@@ -571,11 +543,14 @@ static imageAnnotation: DocumentJSON = {
                     toFile: filePath
                   }).promise.then(async (_result) => {
                     const base64ImageData = await fileSystem.readFile(filePath, 'base64');
-                    const attachment = ProgrammaticAnnotations.imageAnnotation.attachments?.['492adff9842bff7dcb81a20950870be8a0bb665c8d48175680c1e5e1070243ff'] as AnnotationAttachment;
-                    if (attachment) {
-                      attachment.binary = base64ImageData;
-                    }
-                  this.pdfRef.current?.getDocument().applyInstantJSON(ProgrammaticAnnotations.imageAnnotation)
+                    const attachments: Record<string, AnnotationAttachment> = {
+                      ["492adff9842bff7dcb81a20950870be8a0bb665c8d48175680c1e5e1070243ff"]: {
+                        binary: base64ImageData,
+                        contentType: "image/png",
+                      },
+                    };
+
+                  this.pdfRef.current?.getDocument().addAnnotations([ProgrammaticAnnotations.imageAnnotation], attachments)
                     .then(result => {
                       if (result) {
                         Alert.alert(
@@ -590,15 +565,12 @@ static imageAnnotation: DocumentJSON = {
                       Alert.alert('PSPDFKit', JSON.stringify(error));
                     });
                   });
-                }}
-                title="Add Image Annotation"
-              />            
-            </View>
-          </View>
-          <View style={styles.wrapper}>
-            <View>
-              <Button
-                onPress={() => {
+                }}>
+                  <Text style={styles.button}>{'Add Image Annotation'}</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.horizontalContainer}>
+                <TouchableOpacity onPress={() => {
                   // Get ink annotations from the current page.
                   this.pdfRef.current?.getDocument().getAnnotationsForPage(
                       this.state.currentPageIndex,
@@ -619,13 +591,10 @@ static imageAnnotation: DocumentJSON = {
                     .catch(error => {
                       Alert.alert('PSPDFKit', JSON.stringify(error));
                     });
-                }}
-                title="Get Ink Annotations"
-              />
-            </View>
-            <View style={styles.marginLeft}>
-              <Button
-                onPress={() => {
+                }}>
+                  <Text style={styles.button}>{'Get Ink Annotations'}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => {
                   // Select all the Ink annotations on page 0.
                   const document = this.pdfRef.current?.getDocument();
                   document?.getAnnotationsForPage(0, Annotation.Type.INK)
@@ -635,16 +604,12 @@ static imageAnnotation: DocumentJSON = {
                     .catch(error => {
                       Alert.alert('PSPDFKit', JSON.stringify(error));
                     });
-                }}
-                title="Select Ink Annotations"
-              />
-            </View>
-          </View>
-          <View style={styles.wrapper}>
-            <View>
-              <Button
-              // Remove all the annotations from the document.
-                onPress={() => {
+                }}>
+                  <Text style={styles.button}>{'Select Ink Annotations'}</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.horizontalContainer}>
+                <TouchableOpacity onPress={() => {
                   const document = this.pdfRef.current?.getDocument();
                   document?.getAnnotations() // No parameter returns all annotations
                     .then((annotations: AnnotationType[]) => {
@@ -653,13 +618,10 @@ static imageAnnotation: DocumentJSON = {
                     .catch(error => {
                       Alert.alert('PSPDFKit', JSON.stringify(error));
                     });
-                }}
-                title={'Remove Annotations'}
-              />
-            </View>
-            <View style={styles.marginLeft}>
-              <Button
-                onPress={() => {
+                }}>
+                  <Text style={styles.button}>{'Remove Annotations'}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => {
                   // Get all annotations annotations from the document.
                   this.pdfRef.current?.getDocument().getAnnotations()
                     .then((annotations: AnnotationType[]) => {
@@ -675,12 +637,13 @@ static imageAnnotation: DocumentJSON = {
                     .catch(error => {
                       Alert.alert('PSPDFKit', JSON.stringify(error));
                     });
-                }}
-                title="Get All Annotations"
-              />
+                }}>
+                  <Text style={styles.button}>{'Get All Annotations'}</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
-        </View>
+        ))}
       </View>
     );
   }
@@ -688,15 +651,23 @@ static imageAnnotation: DocumentJSON = {
 
 const styles = {
   flex: { flex: 1 },
-  marginLeft: { marginLeft: 5 },
-  wrapper: {
-    flexDirection: 'row' as 'row',
-    alignItems: 'center' as 'center',
-    padding: 5,
-  },
   pdfColor: { flex: 1, color: pspdfkitColor },
   column: {
     flexDirection: 'column' as 'column',
     alignItems: 'center' as 'center',
+  },
+  horizontalContainer: {
+    flexDirection: 'row' as 'row',
+    minWidth: '70%' as '70%',
+    height: 50,
+    justifyContent: 'space-between' as 'space-between',
+    alignItems: 'center' as 'center',
+  },
+  button: {
+    padding: 15,
+    flex: 1,
+    fontSize: 16,
+    color: pspdfkitColor,
+    textAlign: 'center' as 'center',
   },
 };

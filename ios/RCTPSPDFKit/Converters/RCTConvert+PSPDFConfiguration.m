@@ -8,6 +8,7 @@
 //
 
 #import "RCTConvert+PSPDFConfiguration.h"
+#import "RCTConvert+PSPDFAnnotationToolbarConfiguration.h"
 #if __has_include("PSPDFKitReactNativeiOS-Swift.h")
 #import "PSPDFKitReactNativeiOS-Swift.h"
 #else
@@ -657,7 +658,6 @@ RCT_MULTI_ENUM_CONVERTER(PSPDFDocumentSharingPagesOptions,
   SET(shouldCacheThumbnails, BOOL)
 
   // Annotation, Forms and Bookmark Options
-  SET(editableAnnotationTypes, NSSet)
   SET(shouldAskForAnnotationUsername, BOOL)
   SET(linkAction, PSPDFLinkAction)
   SET(drawCreateMode, PSPDFDrawCreateMode)
@@ -669,13 +669,23 @@ RCT_MULTI_ENUM_CONVERTER(PSPDFDocumentSharingPagesOptions,
   SET(annotationAnimationDuration, CGFloat)
   SET(soundAnnotationTimeLimit, NSTimeInterval)
   SET(bookmarkSortOrder, PSPDFBookmarkManagerSortOrder)
+  if (dictionary[@"editableAnnotationTypes"]) {
+    NSMutableSet *editableTypesSet = [NSMutableSet new];
+    NSArray *editableTypes = dictionary[@"editableAnnotationTypes"];
+    for (NSString *item in editableTypes) {
+        NSString *converted = [RCTConvert PSPDFAnnotationStringFromName:item];
+        if (converted != nil)
+        [editableTypesSet addObject:converted];
+    }
+    self.editableAnnotationTypes = editableTypesSet;
+  }
   if (dictionary[@"sharingConfigurations"]) {
     [self setRCTSharingConfigurations:[RCTConvert NSArray:dictionary[@"sharingConfigurations"]]];
   }
   if (dictionary[@"enableAnnotationEditing"]) {
     BOOL enable = [RCTConvert BOOL:dictionary[@"enableAnnotationEditing"]];
     if (enable) {
-      self.editableAnnotationTypes = [NSSet setWithArray:@[PSPDFAnnotationStringLink, PSPDFAnnotationStringHighlight, PSPDFAnnotationStringUnderline, PSPDFAnnotationStringSquiggly, PSPDFAnnotationStringStrikeOut, PSPDFAnnotationStringNote, PSPDFAnnotationStringCaret, PSPDFAnnotationStringFreeText, PSPDFAnnotationStringInk, PSPDFAnnotationStringSquare, PSPDFAnnotationStringCircle, PSPDFAnnotationStringLine, PSPDFAnnotationStringSignature, PSPDFAnnotationStringStamp, PSPDFAnnotationStringEraser, PSPDFAnnotationStringImage, PSPDFAnnotationStringWidget, PSPDFAnnotationStringFile, PSPDFAnnotationStringSound, PSPDFAnnotationStringPolygon, PSPDFAnnotationStringPolyLine, PSPDFAnnotationStringRichMedia, PSPDFAnnotationStringScreen, PSPDFAnnotationStringPopup, PSPDFAnnotationStringWatermark, PSPDFAnnotationStringTrapNet, PSPDFAnnotationString3D, PSPDFAnnotationStringRedaction]];
+      self.editableAnnotationTypes = [NSSet setWithArray:@[PSPDFAnnotationStringLink, PSPDFAnnotationStringHighlight, PSPDFAnnotationStringUnderline, PSPDFAnnotationStringSquiggly, PSPDFAnnotationStringStrikeOut, PSPDFAnnotationStringNote, PSPDFAnnotationStringCaret, PSPDFAnnotationStringFreeText, PSPDFAnnotationStringInk, PSPDFAnnotationStringSquare, PSPDFAnnotationStringCircle, PSPDFAnnotationStringLine, PSPDFAnnotationStringSignature, PSPDFAnnotationStringStamp, PSPDFAnnotationStringEraser, PSPDFAnnotationStringImage, PSPDFAnnotationStringWidget, PSPDFAnnotationStringFile, PSPDFAnnotationStringSound, PSPDFAnnotationStringPolygon, PSPDFAnnotationStringPolyLine, PSPDFAnnotationStringRichMedia, PSPDFAnnotationStringScreen, PSPDFAnnotationStringPopup, PSPDFAnnotationStringWatermark, PSPDFAnnotationStringTrapNet, PSPDFAnnotationString3D, PSPDFAnnotationStringRedaction, PSPDFAnnotationStringSelectionTool]];
     } else {
       self.editableAnnotationTypes = nil;
     }

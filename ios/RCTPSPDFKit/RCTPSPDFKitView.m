@@ -57,6 +57,11 @@
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(spreadIndexDidChange:) name:PSPDFDocumentViewControllerSpreadIndexDidChangeNotification object:nil];
       
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(documentDidFinishRendering) name:PSPDFDocumentViewControllerDidConfigureSpreadViewNotification object:nil];
+      
+    UITapGestureRecognizer *tapGestureRecognizer = [[UITapGestureRecognizer alloc] init];
+    [tapGestureRecognizer addTarget:self action:@selector(tapGestureRecognizerDidChangeState:)];
+    [_pdfController.interactions.allInteractions allowSimultaneousRecognitionWithGestureRecognizer:tapGestureRecognizer];
+    [_pdfController.view addGestureRecognizer:tapGestureRecognizer];
   }
   
   return self;
@@ -590,14 +595,23 @@
   }
 }
 
+- (void)tapGestureRecognizerDidChangeState:(UIGestureRecognizer *)gestureRecognizer {
+    if (gestureRecognizer.state == UIGestureRecognizerStateEnded) {
+        CGPoint point = [gestureRecognizer locationInView:gestureRecognizer.view];
+        [NutrientNotificationCenter.shared didTapDocumentWithTapPoint:point
+                                                           documentID:self.pdfController.document.documentIdString];
+    }
+}
+
 - (void)spreadIndexDidChange:(NSNotification *)notification {
     PSPDFDocumentViewController *documentViewController = self.pdfController.documentViewController;
     if (notification.object != documentViewController) { return; }
     PSPDFPageIndex pageIndex = [documentViewController.layout pageRangeForSpreadAtIndex:documentViewController.spreadIndex].location;
     PSPDFPageView *pageView = [self.pdfController pageViewForPageAtIndex:pageIndex];
     [self onStateChangedForPDFViewController:self.pdfController pageView:pageView pageAtIndex:pageIndex];
-    [NutrientNotificationCenter.shared documentPageChangedWithPageIndex:pageIndex
+    [NutrientNotificationCenter.shared documentPageChangedWithPageIndex:pageIndex >= self.pdfController.document.pageCount ? 0 : pageIndex
                                                              documentID:self.pdfController.document.documentIdString];
+    
 }
 
 - (void)documentDidFinishRendering {
@@ -628,7 +642,8 @@
           }
       } else if ([item isKindOfClass:[NSDictionary class]]) {
           UIImage *image = [[UIImage imageNamed:[item objectForKey:@"image"]]
-                            imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+                            imageWithRenderingMode:([item objectForKey:@"applyTemplate"] == nil || [[item objectForKey:@"applyTemplate"] isEqual:@YES]) ?
+                            UIImageRenderingModeAlwaysTemplate : UIImageRenderingModeAlwaysOriginal];
           UIBarButtonItem *barButtonItem = [[UIBarButtonItem alloc] initWithImage:image style:UIBarButtonItemStylePlain target:self action:@selector(handleCustomBarButtonEvent:)];
           [_sessionStorage addBarButtonItem:barButtonItem key:[item objectForKey:@"id"]];
           if (barButtonItem && ![self.pdfController.navigationItem.rightBarButtonItems containsObject:barButtonItem]) {
@@ -654,7 +669,8 @@
             }
         } else if ([item isKindOfClass:[NSDictionary class]]) {
             UIImage *image = [[UIImage imageNamed:[item objectForKey:@"image"]]
-                              imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+                              imageWithRenderingMode:([item objectForKey:@"applyTemplate"] == nil || [[item objectForKey:@"applyTemplate"] isEqual:@YES]) ?
+                              UIImageRenderingModeAlwaysTemplate : UIImageRenderingModeAlwaysOriginal];
             UIBarButtonItem *barButtonItem = [[UIBarButtonItem alloc] initWithImage:image style:UIBarButtonItemStylePlain target:self action:@selector(handleCustomBarButtonEvent:)];
             [_sessionStorage addBarButtonItem:barButtonItem key:[item objectForKey:@"id"]];
             if (barButtonItem && ![self.pdfController.navigationItem.leftBarButtonItems containsObject:barButtonItem]) {
@@ -863,6 +879,12 @@
             self.onCustomAnnotationContextualMenuItemTapped(@{@"id" : customId});
         }
     }
+}
+
+- (void)updatePageIndex:(PSPDFPageIndex)pageIndex {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.pdfController.pageIndex = pageIndex;
+    });
 }
 
 // MARK - Delegates
