@@ -17,7 +17,7 @@
  * @property {string} [animated] - Whether the toolbar button change should be animated when they are set (iOS only).
  */
 /**
- * @namespace Toolbar
+ * @interface Toolbar
  * @property { Toolbar.ToolbarItems } [leftBarButtonItems] The bar buttons to display on the left side of the navigation bar (iOS only).
  * @property { Toolbar.ToolbarItems } [rightBarButtonItems] The bar buttons to display on the right side of the navigation bar (iOS only).
  * @property { Toolbar.ToolbarItems } [toolbarMenuItems] The toolbar buttons to display on the toolbar (Android only).
@@ -99,6 +99,7 @@ export namespace Toolbar {
         READER_VIEW_BUTTON_ITEM: 'readerViewButtonItem',
         ANNOTATION_LIST_BUTTON_ITEM: 'annotationListButtonItem',
         SHARE_BUTTON_ITEM: 'shareButtonItem',
+        AI_ASSISTANT_BUTTON_ITEM: 'aiAssistantButtonItem',
      } as const;
 
     /**

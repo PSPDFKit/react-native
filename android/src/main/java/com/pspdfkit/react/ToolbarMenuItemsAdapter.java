@@ -28,6 +28,7 @@ public class ToolbarMenuItemsAdapter {
     private static final String TOOLBAR_ITEM_BOOKMARKS = "bookmarkButtonItem";
     private static final String TOOLBAR_ITEM_PRINT = "printButtonItem";
     private static final String TOOLBAR_ITEM_ANNOTATION_LIST = "annotationListButtonItem";
+    private static final String TOOLBAR_ITEM_AI_ASSISTANT = "aiAssistantButtonItem";
 
     private final PdfActivityConfiguration.Builder newConfigurations;
 
@@ -48,18 +49,21 @@ public class ToolbarMenuItemsAdapter {
             switch (toolbarItem) {
                 case TOOLBAR_ITEM_BOOKMARKS:
                     if (initialConfiguration.isBookmarkListEnabled()) {
-                        configuration.enableBookmarkList();
+                        configuration.bookmarkListEnabled(true);
                     }
                     break;
                 case TOOLBAR_ITEM_PRINT:
                     if (initialConfiguration.isPrintingEnabled()) {
-                        configuration.enablePrinting();
+                        configuration.printingEnabled(true);
                     }
                     break;
                 case TOOLBAR_ITEM_ANNOTATION_LIST:
                     if (initialConfiguration.isAnnotationListEnabled()) {
-                        configuration.enableAnnotationList();
+                        configuration.annotationListEnabled(true);
                     }
+                    break;
+                case TOOLBAR_ITEM_AI_ASSISTANT:
+                    configuration.setAiAssistantEnabled(true);
                     break;
             }
         }

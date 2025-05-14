@@ -6,6 +6,7 @@ const tiffImageName = 'PSPDFKit_Image_Example.tiff';
 export const formDocumentName = 'Form_example.pdf';
 const measurementsName = 'Measurements.pdf';
 export const exampleDocumentName = 'PSPDFKit_Quickstart_Guide.pdf';
+export const exampleAIName = 'Resource_Depletion.pdf';
 export const examplePasswordDocumentName = 'PSPDFKit_Quickstart_Guide_Password.pdf';
 export const exampleReportName = 'JKHF-AnnualReport.pdf';
 export const exampleXFDFName = 'XFDFTest.xfdf';
@@ -41,6 +42,11 @@ export const exampleXFDFPath =
         Platform.OS === 'ios'
           ? 'PDFs/' + exampleXFDFName
           : 'file:///android_asset/' + exampleXFDFName;
+
+export const exampleAIPath =
+          Platform.OS === 'ios'
+            ? 'PDFs/' + exampleAIName
+            : 'file:///android_asset/' + exampleAIName;
 
 export const tiffImagePath =
   Platform.OS === 'ios'

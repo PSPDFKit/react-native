@@ -34,6 +34,11 @@ PSPDFSettingKey const PSPDFSettingKeyHybridEnvironment = @"com.pspdfkit.hybrid-e
 
 RCT_EXPORT_MODULE(PSPDFKit)
 
+- (void)setBridge:(RCTBridge *)bridge {
+    [super setBridge:bridge];
+    [NutrientNotificationCenter.shared setEventEmitter:self];
+}
+
 RCT_REMAP_METHOD(setLicenseKey, setLicenseKey:(nullable NSString *)licenseKey resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   if (![licenseKey isEqual:[NSNull null]]) {
     [PSPDFKitGlobal setLicenseKey:licenseKey options:@{PSPDFSettingKeyHybridEnvironment: @"ReactNative"}];
@@ -96,16 +101,24 @@ RCT_REMAP_METHOD(setPageIndex, setPageIndex:(NSUInteger)pageIndex animated:(BOOL
   }
 }
 
-RCT_REMAP_METHOD(getDocumentProperties, getDocumentProperties:(NSString *)documentPath resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(getDocumentProperties:(NSString *)documentPath) {
+    
     NSURL *url = [RCTConvert parseURL:documentPath];
     PSPDFDocument *document = [[PSPDFDocument alloc] initWithURL:url];
-    if (document != nil) {
-        NSDictionary *properties = @{@"pageCount" : @(document.pageCount),
-                                     @"isEncrypted" : @(document.isEncrypted)};
-        resolve(properties);
-    } else {
-      reject(@"error", @"Failed to load document properties", nil);
+    
+    if (document == nil) {
+        return @{
+            @"documentId": [NSNull null],
+            @"pageCount": @0,
+            @"isEncrypted": @NO
+        };
     }
+    
+    return @{
+        @"documentId": document.documentIdString,
+        @"pageCount": @(document.pageCount),
+        @"isEncrypted": @(document.isEncrypted)
+    };
 }
 
 // MARK: - Annotation Processing
@@ -212,7 +225,6 @@ RCT_EXPORT_METHOD(handleListenerRemoved:(nonnull NSString* )event isLast:(BOOL)i
 }
 
 - (NSArray<NSString*> *)supportedEvents {
-    [NutrientNotificationCenter.shared setEventEmitter:self];
     return @[@"documentLoaded",
              @"documentLoadFailed",
              @"documentPageChanged",

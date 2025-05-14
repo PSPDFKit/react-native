@@ -55,6 +55,21 @@ import PSPDFKit
         }
         onSuccess(document.isEncrypted);
     }
+    
+    @objc func getPageInfo(_ reference: NSNumber, pageIndex: Int, onSuccess: @escaping RCTPromiseResolveBlock, onError: @escaping RCTPromiseRejectBlock) -> Void {
+        guard let document = getDocument(reference) else {
+            onError("getPageInfo", "Document is nil", nil)
+            return
+        }
+        
+        guard let pageInfo = document.pageInfoForPage(at: PageIndex(pageIndex)) else {
+            onError("getPageInfo", "Could not retrieve page info", nil)
+            return
+        }
+        
+        let pageInfoDictionary = ["savedRotation" : pageInfo.savedRotation.rawValue]
+        onSuccess(pageInfoDictionary);
+    }
 
     @objc func getDocumentId(_ reference: NSNumber, onSuccess: @escaping RCTPromiseResolveBlock, onError: @escaping RCTPromiseRejectBlock) -> Void {
         guard let document = getDocument(reference) else {

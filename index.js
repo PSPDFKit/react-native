@@ -1649,6 +1649,7 @@ export default PSPDFKitView;
 
 /**
  * @typedef PDFDocumentProperties
+ * @property { string } documentId The document ID.
  * @property { number } pageCount The number of pages in the document.
  * @property { boolean } isEncrypted Indicates if the PDF document is encrypted (password protected).
  */
@@ -1675,9 +1676,9 @@ export class PSPDFKit {
    * @method getDocumentProperties
    * @memberof PSPDFKit
    * @param { string } documentPath The path to the document.
-   * @returns { Promise<PDFDocumentProperties> } A promise returning the document properties.
+   * @returns { PDFDocumentProperties } The document properties.
    * @example
-   * const properties = await PSPDFKit.getDocumentProperties('path/to/document.pdf');
+   * const properties = PSPDFKit.getDocumentProperties('path/to/document.pdf');
    */
   getDocumentProperties = function (documentPath) {};
 
@@ -1764,7 +1765,7 @@ export class PSPDFKit {
    * @param { Array<Annotation.Type> } annotationTypes Specifies the annotation types that should be flattened. See {@link https://pspdfkit.com/api/react-native/Annotation.html#.Type} for supported types. Use ```Annotation.Type.ALL``` to include all annotation types.
    * @param { string } sourceDocumentPath The source document to use as input.
    * @param { string } processedDocumentPath The path where the output document should be written to.
-   * @param { string | null } [password] The password to unlock the source document, if required.
+   * @param { string | null } password The password to unlock the source document. Use ```null``` if not required.
    * @returns { Promise<boolean> } A promise returning ```true``` if the document annotations were successfully flattened, and ```false``` if not.
    * @example
    * const result = await PSPDFKit.processAnnotations(
@@ -2094,6 +2095,9 @@ export class Processor {
 import { PDFConfiguration } from './lib/configuration/PDFConfiguration';
 export { PDFConfiguration } from './lib/configuration/PDFConfiguration';
 
+import { AIAssistantConfiguration } from './lib/configuration/AIAssistantConfiguration';
+export { AIAssistantConfiguration } from './lib/configuration/AIAssistantConfiguration';
+
 import { RemoteDocumentConfiguration } from './lib/configuration/PDFConfiguration';
 export { RemoteDocumentConfiguration } from './lib/configuration/PDFConfiguration';
 
@@ -2156,6 +2160,9 @@ export {
 
 import { PDFDocument } from './lib/document/PDFDocument';
 export { PDFDocument } from './lib/document/PDFDocument';
+
+import { PDFPageInfo } from './lib/document/PDFPageInfo';
+export { PDFPageInfo } from './lib/document/PDFPageInfo';
 
 import { NotificationCenter } from './lib/notification-center/NotificationCenter';
 export { NotificationCenter } from './lib/notification-center/NotificationCenter';
@@ -2224,7 +2231,11 @@ export { FormElement, ButtonFormElement, ChoiceFormElement, SignatureFormElement
 import { Forms } from './lib/forms/Forms';
 export { Forms } from './lib/forms/Forms';
 
+module.exports.PDFDocument = PDFDocument;
+module.exports.PDFPageInfo = PDFPageInfo;
+
 module.exports.PDFConfiguration = PDFConfiguration;
+module.exports.AIAssistantConfiguration = AIAssistantConfiguration;
 module.exports.RemoteDocumentConfiguration = RemoteDocumentConfiguration;
 module.exports.Toolbar = Toolbar;
 module.exports.Measurements = Measurements;

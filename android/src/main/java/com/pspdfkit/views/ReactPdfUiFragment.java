@@ -13,13 +13,13 @@
 
 package com.pspdfkit.views;
 
-import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This {@link PdfUiFragment} provides additional callbacks to improve integration into react native.
@@ -59,6 +60,24 @@ public class ReactPdfUiFragment extends PdfUiFragment {
     private static final String TOOLBAR_ITEM_OUTLINE = "outlineButtonItem";
     private static final String TOOLBAR_ITEM_DOCUMENT_INFO_VIEW = "documentInfoViewButtonItem";
 
+    // Static map to store configurations
+    private static final Map<String, ToolbarConfig> configMap = new HashMap<>();
+
+    // Inner class to hold all three properties together
+    private static class ToolbarConfig {
+        final ArrayList<String> stockToolbarItems;
+        final ArrayList<HashMap> customToolbarItems;
+        final MenuItemListener menuItemListener;
+
+        ToolbarConfig(ArrayList<String> stockToolbarItems,
+                      ArrayList<HashMap> customToolbarItems,
+                      MenuItemListener menuItemListener) {
+            this.stockToolbarItems = new ArrayList<>(stockToolbarItems);
+            this.customToolbarItems = new ArrayList<>(customToolbarItems);
+            this.menuItemListener = menuItemListener;
+        }
+    }
+
     private ArrayList<String> stockToolbarItems = new ArrayList<>();
     private ArrayList<HashMap> customToolbarItems = new ArrayList<>();
     private MenuItemListener menuItemListener;
@@ -74,6 +93,8 @@ public class ReactPdfUiFragment extends PdfUiFragment {
                     TOOLBAR_ITEM_DOCUMENT_INFO_VIEW));
 
     @Nullable private ReactPdfUiFragmentListener reactPdfUiFragmentListener;
+
+    @Nullable private int configSaveId;
 
     private final FragmentManager.FragmentLifecycleCallbacks fragmentLifecycleCallbacks = new FragmentManager.FragmentLifecycleCallbacks() {
         @Override
@@ -140,13 +161,36 @@ public class ReactPdfUiFragment extends PdfUiFragment {
         this.stockToolbarItems = stockToolbarItems;
         this.customToolbarItems = customToolbarItems;
         this.menuItemListener = listener;
+
+        int fragmentId = this.configSaveId;
+
+        if (fragmentId != View.NO_ID) {
+            configMap.put(String.valueOf(fragmentId), new ToolbarConfig(stockToolbarItems, customToolbarItems, listener)
+            );
+        }
     }
 
     @Override
-    public List<Integer> onGenerateMenuItemIds(@NonNull List<Integer> menuItems) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        this.configSaveId = getId();
 
+        int viewId = getId();
+        if (viewId != View.NO_ID) {
+            ToolbarConfig config = configMap.get(String.valueOf(viewId));
+            if (config != null) {
+                this.stockToolbarItems = new ArrayList<>(config.stockToolbarItems);
+                this.customToolbarItems = new ArrayList<>(config.customToolbarItems);
+                this.menuItemListener = config.menuItemListener;
+            }
+        }
+    }
+
+    @NonNull
+    @Override
+    public List<Integer> onGenerateMenuItemIds(@NonNull List<Integer> menuItems) {
         // No items should be removed / added
-        if (this.stockToolbarItems.size() == 0 && this.customToolbarItems.size() == 0) {
+        if (this.stockToolbarItems.isEmpty() && this.customToolbarItems.isEmpty()) {
             return menuItems;
         }
 
@@ -198,10 +242,7 @@ public class ReactPdfUiFragment extends PdfUiFragment {
         return menuItems;
     }
 
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-
+    void setupOptionsMenu(@NonNull Menu menu) {
         for (HashMap item : customToolbarItems) {
             String customId = item.get("id").toString();
             String image = item.get("image").toString();
@@ -237,5 +278,17 @@ public class ReactPdfUiFragment extends PdfUiFragment {
                 // Omit the icon if the image is missing
             }
         }
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(@NonNull Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        this.setupOptionsMenu(menu);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        this.setupOptionsMenu(menu);
     }
 }

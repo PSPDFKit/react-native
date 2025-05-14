@@ -276,7 +276,7 @@
  */
 
 /**
- * @namespace Annotation
+ * @interface Annotation
  */
 export class Annotation {}
 

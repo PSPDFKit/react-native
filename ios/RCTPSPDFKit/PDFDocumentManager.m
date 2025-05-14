@@ -16,6 +16,8 @@
 
 RCT_EXTERN_METHOD(getDocumentId:(NSNumber _Nonnull)reference onSuccess:(RCTPromiseResolveBlock)resolve onError:(RCTPromiseRejectBlock)reject);
 
+RCT_EXTERN_METHOD(getPageInfo:(NSNumber _Nonnull)reference pageIndex:(NSInteger)pageIndex onSuccess:(RCTPromiseResolveBlock)resolve onError:(RCTPromiseRejectBlock)reject);
+
 RCT_EXTERN_METHOD(getPageCount:(NSNumber _Nonnull)reference onSuccess:(RCTPromiseResolveBlock)resolve onError:(RCTPromiseRejectBlock)reject);
 
 RCT_EXTERN_METHOD(isEncrypted:(NSNumber _Nonnull)reference onSuccess:(RCTPromiseResolveBlock)resolve onError:(RCTPromiseRejectBlock)reject);

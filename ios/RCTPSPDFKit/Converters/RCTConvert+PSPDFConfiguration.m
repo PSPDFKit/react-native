@@ -725,6 +725,10 @@ RCT_MULTI_ENUM_CONVERTER(PSPDFDocumentSharingPagesOptions,
 
   // Use `thumbnailBarMode` instead.
   SET_PROPERTY(showThumbnailBar, thumbnailBarMode, PSPDFThumbnailBarMode)
+    
+  if (dictionary[@"aiAssistantConfiguration"]) {
+      [AIAConfig processAIAConfig:self aiaConfig:dictionary[@"aiAssistantConfiguration"]];
+  }
 }
 
 - (void)setRCTSharingConfigurations:(NSArray<NSDictionary *> *)sharingConfigurations {

@@ -13,6 +13,7 @@ export default PSPDFKitView;
  */
 /**
  * @typedef PDFDocumentProperties
+ * @property { string } documentId The document ID.
  * @property { number } pageCount The number of pages in the document.
  * @property { boolean } isEncrypted Indicates if the PDF document is encrypted (password protected).
  */
@@ -37,11 +38,11 @@ export class PSPDFKit {
      * @method getDocumentProperties
      * @memberof PSPDFKit
      * @param { string } documentPath The path to the document.
-     * @returns { Promise<PDFDocumentProperties> } A promise returning the document properties.
+     * @returns { PDFDocumentProperties } The document properties.
      * @example
-     * const properties = await PSPDFKit.getDocumentProperties('path/to/document.pdf');
+     * const properties = PSPDFKit.getDocumentProperties('path/to/document.pdf');
      */
-    getDocumentProperties: (documentPath: string) => Promise<PDFDocumentProperties>;
+    getDocumentProperties: (documentPath: string) => PDFDocumentProperties;
     /**
      * Used to set your PSPDFKit license key for the active platform only, either iOS or Android.
      * PSPDFKit is commercial software.
@@ -120,7 +121,7 @@ export class PSPDFKit {
      * @param { Array<Annotation.Type> } annotationTypes Specifies the annotation types that should be flattened. See {@link https://pspdfkit.com/api/react-native/Annotation.html#.Type} for supported types. Use ```Annotation.Type.ALL``` to include all annotation types.
      * @param { string } sourceDocumentPath The source document to use as input.
      * @param { string } processedDocumentPath The path where the output document should be written to.
-     * @param { string | null } [password] The password to unlock the source document, if required.
+     * @param { string | null } password The password to unlock the source document. Use ```null``` if not required.
      * @returns { Promise<boolean> } A promise returning ```true``` if the document annotations were successfully flattened, and ```false``` if not.
      * @example
      * const result = await PSPDFKit.processAnnotations(
@@ -130,7 +131,7 @@ export class PSPDFKit {
      *                      processedDocumentPath,
      *                      password);
      */
-    processAnnotations: (annotationChange: Annotation.Change, annotationTypes: Array<Annotation.Type>, sourceDocumentPath: string, processedDocumentPath: string, password?: string | null) => Promise<boolean>;
+    processAnnotations: (annotationChange: Annotation.Change, annotationTypes: Array<Annotation.Type>, sourceDocumentPath: string, processedDocumentPath: string, password: string | null) => Promise<boolean>;
     /**
      * Used to present an Instant PDF document for collaboration.
      * @method presentInstant
@@ -588,6 +589,10 @@ export type InstantConfiguration = {
     syncAnnotations: boolean;
 };
 export type PDFDocumentProperties = {
+    /**
+     * The document ID.
+     */
+    documentId: string;
     /**
      * The number of pages in the document.
      */
@@ -1440,3 +1445,11 @@ export import TextFieldFormElement = formElement.TextFieldFormElement;
 //@ts-ignore
 import forms = require('../src/forms/Forms');
 export import Forms = forms.Forms;
+
+//@ts-ignore
+import aiConfig = require('../src/configuration/AIAssistantConfiguration');
+export import AIAssistantConfiguration = aiConfig.AIAssistantConfiguration;
+
+//@ts-ignore
+import pageInfo = require('../src/document/PDFPageInfo');
+export import PDFPageInfo = pageInfo.PDFPageInfo;
