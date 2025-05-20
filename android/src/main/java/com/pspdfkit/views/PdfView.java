@@ -117,8 +117,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import io.nutrient.data.models.AiAssistantConfiguration;
+import io.nutrient.domain.ai.AiAssistant;
+import io.nutrient.domain.ai.AiAssistantKt;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Maybe;
@@ -153,6 +157,7 @@ public class PdfView extends FrameLayout {
     private String documentPath;
     private String documentPassword;
     private ReadableMap remoteDocumentConfiguration;
+    private ReadableMap aiaConfiguration;
     private int pageIndex = 0;
     private PdfActivityConfiguration initialConfiguration;
     private ReadableArray pendingToolbarItems;
@@ -314,6 +319,10 @@ public class PdfView extends FrameLayout {
 
     public void setRemoteDocumentConfiguration(@Nullable ReadableMap remoteDocumentConfig) {
         this.remoteDocumentConfiguration = remoteDocumentConfig;
+    }
+
+    public void setAIAConfiguration(@Nullable ReadableMap aiaConfiguration) {
+        this.aiaConfiguration = aiaConfiguration;
     }
 
     public void setDocument(@Nullable String documentPath, ReactApplicationContext reactApplicationContext) {
@@ -583,6 +592,21 @@ public class PdfView extends FrameLayout {
         if (pdfFragment.getDocument() != null) {
             if (pageIndex <= document.getPageCount()-1) {
                 pdfFragment.setPageIndex(pageIndex, true);
+            }
+        }
+        if (aiaConfiguration != null) {
+            try {
+                if (aiaConfiguration.getString("serverURL") != null && aiaConfiguration.getString("jwt") != null && aiaConfiguration.getString("sessionID") != null) {
+                    AiAssistantConfiguration aiaConfig = new AiAssistantConfiguration(
+                            aiaConfiguration.getString("serverURL"),
+                            aiaConfiguration.getString("jwt"),
+                            aiaConfiguration.getString("sessionID"),
+                            aiaConfiguration.getString("userID"));
+                    AiAssistant aiAssistant = AiAssistantKt.standaloneAiAssistant(reactApplicationContext, aiaConfig);
+                    Objects.requireNonNull(pdfFragment.getDocument()).setAiAssistant(aiAssistant);
+                }
+            } catch (Exception e) {
+                Log.w(TAG, "Failed to set AIA Configuration: " + e.getMessage());
             }
         }
         pdfUiFragmentGetter.onNext(Collections.singletonList(pdfFragment));

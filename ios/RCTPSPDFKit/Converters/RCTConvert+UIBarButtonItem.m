@@ -42,6 +42,8 @@
     return @"settingsButtonItem";
   } else if (barButtonItem == pdfController.readerViewButtonItem) {
     return @"readerViewButtonItem";
+  } else if (barButtonItem == pdfController.aiAssistantButtonItem) {
+    return @"aiAssistantButtonItem";
   } else {
     return nil;
   }
@@ -77,7 +79,9 @@
   } else if ([barButtonItem isEqualToString:@"settingsButtonItem"]) {
     return pdfController.settingsButtonItem;
   } else if ([barButtonItem isEqualToString:@"readerViewButtonItem"]) {
-      return pdfController.readerViewButtonItem;
+    return pdfController.readerViewButtonItem;
+  } else if ([barButtonItem isEqualToString:@"aiAssistantButtonItem"]) {
+    return pdfController.aiAssistantButtonItem;
   } else {
     return nil;
   }

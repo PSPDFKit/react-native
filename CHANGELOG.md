@@ -1,14 +1,25 @@
+## 2.18.0 - 20 May 2025
+
+- Adds the new `AIAssistantConfiguration` class to configure AI Assistant and also add new `aiAssistantButtonItem` option to Toolbar configuration. (J#HYB-743)
+- Adds the new `getPageInfo` API to the `PDFDocument` class. (J#HYB-801)
+- Updates to Nutrient Android SDK 10.2.0.
+- Updates to Nutrient iOS SDK 14.8.0.
+- Fixes an issue where the `setLicenseKeys` API could cause a crash on Android if called too early during the application lifecycle. (J#HYB-790)
+- Fixes an issue where `NotificationCenter` events are not always delivered when running Release build configuration on iOS. (J#HYB-793)
+- Fixes an issue where toolbar button customization was not persisted on Android during component reload. (J#HYB-800)
+- Fixes an issue where the `onAnnotationTapped` callback wasn't called reliably on Android. (J#HYB-805)
+
 ## 2.17.0 - 14 Apr 2025
 
-- Adds new `setPageIndex` API to the `PDFDocument` class. (J#HYB-699)
+- Adds the new `setPageIndex` API to the `PDFDocument` class. (J#HYB-699)
 - Adds the `documentTapped` event to `NotificationCenter` to receive document tap events. (J#HYB-771)
 - Adds support for using multiple `PSPDFKitView` components in the same `View`. (J#HYB-692)
-- Adds TypeScript types for `FormElement` and `FormField` objects and also introduce new APIs to retrieve and update Form annotation data. (J#HYB-612)
-- Adds new `applyTemplate` property to `ToolbarItem` to manage toolbar icon color preservation when being displayed. (J#HYB-741)
+- Adds TypeScript types for `FormElement` and `FormField` objects, and introduces new APIs to retrieve and update form annotation data. (J#HYB-612)
+- Adds the new `applyTemplate` property to `ToolbarItem` to manage toolbar icon color preservation when being displayed. (J#HYB-741)
 - Updates the `addAnnotations` API to accept optional annotation attachments. (J#HYB-782)
 - Updates to Nutrient Android SDK 10.1.1.
 - Updates to Nutrient iOS SDK 14.6.0.
-- Fixes an issue where `selection_tool` was not being added to the `menuItemGrouping` configuration on iOS. (J#HYB-705)
+- Fixes an issue where `selection_tool` wasn't being added to the `menuItemGrouping` configuration on iOS. (J#HYB-705)
 
 ## 2.16.1 - 27 Mar 2025
 

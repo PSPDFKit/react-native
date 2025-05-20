@@ -86,6 +86,19 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
         }
     }
 
+    @ReactMethod fun getPageInfo(reference: Int, pageIndex: Int, promise: Promise) {
+        try {
+            val rotation = this.getDocument(reference)?.document?.getPageRotation(pageIndex);
+            val result = Arguments.createMap()
+            if (rotation != null) {
+                result.putInt("savedRotation", rotation)
+            }
+            promise.resolve(result);
+        } catch (e: Throwable) {
+            promise.reject("getPageInfo error", e)
+        }
+    }
+
     @ReactMethod fun getPageCount(reference: Int, promise: Promise) {
         try {
             promise.resolve(this.getDocument(reference)?.document?.pageCount)

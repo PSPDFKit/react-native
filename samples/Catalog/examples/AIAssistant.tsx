@@ -1,14 +1,14 @@
 import React from 'react';
 import { Alert, processColor, Text, TouchableOpacity, View } from 'react-native';
-import PSPDFKitView, { FormField } from 'react-native-pspdfkit';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import PSPDFKitView, { Toolbar, AIAssistantConfiguration } from 'react-native-pspdfkit';
 
-import { exampleDocumentPath, pspdfkitColor } from '../configuration/Constants';
+import { exampleAIPath, pspdfkitColor } from '../configuration/Constants';
 import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
 import { hideToolbar } from '../helpers/NavigationHelper';
 import { PSPDFKit } from '../helpers/PSPDFKit';
+import { createAIAssistantConfig } from '../helpers/AIAssistant/AIAssistantHelper';
 
-export class PSPDFKitViewComponent extends BaseExampleAutoHidingHeaderComponent {
+export class AIAssistant extends BaseExampleAutoHidingHeaderComponent {
   pdfRef: React.RefObject<PSPDFKitView | null>;
   
   constructor(props: any) {
@@ -20,48 +20,50 @@ export class PSPDFKitViewComponent extends BaseExampleAutoHidingHeaderComponent 
   
   override render() {
     const { navigation } = this.props;
+    
+    const documentId = PSPDFKit.getDocumentProperties(exampleAIPath).documentId;
+    const aiAssistantConfig = createAIAssistantConfig(
+      documentId.toLowerCase(),
+      'my-session-id'
+    );
 
     return (
       <View style={styles.flex}>
         <PSPDFKitView
           ref={this.pdfRef}
-          document={exampleDocumentPath}
+          document={exampleAIPath}
           configuration={{
             iOSAllowToolbarTitleChange: false,
             toolbarTitle: 'My Awesome Report',
             iOSBackgroundColor: processColor('lightgrey'),
             iOSUseParentNavigationBar: false,
+            aiAssistantConfiguration: aiAssistantConfig
+          }}
+          toolbar={{
+            // iOS only.
+            rightBarButtonItems: {
+              viewMode: Toolbar.PDFViewMode.VIEW_MODE_DOCUMENT,
+              animated: true,
+              buttons: [
+                Toolbar.DefaultToolbarButton.SEARCH_BUTTON_ITEM,
+                Toolbar.DefaultToolbarButton.ANNOTATION_BUTTON_ITEM,
+                Toolbar.DefaultToolbarButton.AI_ASSISTANT_BUTTON_ITEM,
+              ],
+            },
+            // Android only.
+            toolbarMenuItems: {
+              buttons: [
+                Toolbar.DefaultToolbarButton.SEARCH_BUTTON_ITEM,
+                Toolbar.DefaultToolbarButton.ANNOTATION_BUTTON_ITEM,
+                Toolbar.DefaultToolbarButton.AI_ASSISTANT_BUTTON_ITEM,
+              ],
+            },
           }}
           fragmentTag="PDF1"
           showNavigationButtonInToolbar={true}
           onNavigationButtonClicked={() => navigation.goBack()}
           style={styles.pdfColor}
-        />
-        {this.renderWithSafeArea(insets => (
-          <View style={[styles.column, { paddingBottom: insets.bottom }]}>
-            <View>
-              <View style={styles.horizontalContainer}>
-                <TouchableOpacity onPress={ async () => {
-                  const document = this.pdfRef.current?.getDocument();
-                  Alert.alert(
-                    'PSPDFKit',
-                    'Document ID: ' + await document?.getDocumentId(),
-                  );
-                }}>
-                  <Text style={styles.button}>{'Get Document ID'}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={ async () => {
-                  const documentProperties = PSPDFKit.getDocumentProperties(exampleDocumentPath);
-                  Alert.alert('PSPDFKit', 
-                    'Document Properties: ' + JSON.stringify(documentProperties));
-                    console.log('Document Properties: ', documentProperties);
-                }}>
-                  <Text style={styles.button}>{'Get Document Props'}</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        ))}
+        />  
       </View>
     );
   }

@@ -18,7 +18,7 @@
  * @property {number} valueTo - A real world distance. The unit of this value is given by ```unitTo```.
  */
 /**
- * @namespace Measurements
+ * @interface Measurements
  */
 export class Measurements {}
 

@@ -64,7 +64,7 @@
  */
 
 /**
- * @namespace FormField
+ * @interface FormField
  */
 export class FormField {
     /**

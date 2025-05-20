@@ -15,7 +15,7 @@
  *   Contains gradle configuration constants
  */
 ext {
-    PSPDFKIT_VERSION = '10.1.1'
+    PSPDFKIT_VERSION = '10.2.0'
 }
 
 buildscript {
@@ -109,8 +109,18 @@ dependencies {
 
     implementation "com.facebook.react:react-native:+"
     implementation 'com.squareup.okhttp3:okhttp:4.9.2'
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.12.0'
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation "androidx.compose.material:material:1.7.8"
     implementation "androidx.compose.material3:material3:1.3.1"
     implementation "androidx.recyclerview:recyclerview:1.3.2"
+
+    // AI Assistant
+    implementation("io.noties.markwon:core:4.6.2")
+    implementation("io.noties.markwon:html:4.6.2")
+    implementation("io.noties.markwon:linkify:4.6.2")
+    implementation("io.noties.markwon:ext-tables:4.6.2")
+    implementation("io.noties.markwon:ext-strikethrough:4.6.2")
+    implementation("io.socket:socket.io-client:2.1.1")
+    implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0"
 }

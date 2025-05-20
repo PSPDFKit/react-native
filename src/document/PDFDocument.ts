@@ -32,6 +32,7 @@ import { Annotation } from '../annotations/Annotation';
 import { FormField } from '../forms/FormField';
 import { FormElement } from '../forms/FormElement';
 import { Forms } from '../forms/Forms';
+import { PDFPageInfo } from './PDFPageInfo';
 
 /**
  * @class PDFDocument
@@ -424,22 +425,42 @@ export class PDFDocument {
     * await this.pdfRef.current?.getDocument().setPageIndex(5);
     * @returns { Promise<void> } A promise returning when done.
     */
-   async setPageIndex(pageIndex: number): Promise<void> {
-    if (pageIndex < 0 || pageIndex >= (await this.getPageCount())) {
-        return Promise.reject(new Error('Page index out of bounds'));
-    }
-    if (Platform.OS === 'android') {
-        UIManager.dispatchViewManagerCommand(findNodeHandle(this.pdfViewRef),
-        UIManager.getViewManagerConfig('RCTPSPDFKitView').Commands.setPageIndex,
-        [pageIndex],
-    );
-    return Promise.resolve();
-    } else if (Platform.OS === 'ios') {
-        NativeModules.RCTPSPDFKitViewManager.setPageIndex(
-            pageIndex,
-            findNodeHandle(this.pdfViewRef),
+    async setPageIndex(pageIndex: number): Promise<void> {
+        if (pageIndex < 0 || pageIndex >= (await this.getPageCount())) {
+            return Promise.reject(new Error('Page index out of bounds'));
+        }
+        if (Platform.OS === 'android') {
+            UIManager.dispatchViewManagerCommand(findNodeHandle(this.pdfViewRef),
+            UIManager.getViewManagerConfig('RCTPSPDFKitView').Commands.setPageIndex,
+            [pageIndex],
         );
         return Promise.resolve();
+        } else if (Platform.OS === 'ios') {
+            if (NativeModules.RCTPSPDFKitViewManager != null) {
+                NativeModules.RCTPSPDFKitViewManager.setPageIndex(
+                    pageIndex,
+                    findNodeHandle(this.pdfViewRef),
+                );
+            } else {
+                NativeModules.PSPDFKitViewManager.setPageIndex(
+                pageIndex,
+                findNodeHandle(this.pdfViewRef),
+                );
+            }
+            return Promise.resolve();
+        }
     }
-}
+
+   /**
+    * @method getPageInfo
+    * @memberof PDFDocument
+    * @param {number} pageIndex Page index of the page info to get.
+    * @description Returns cached rotation and aspect ratio data for specific page.
+    * @example
+    * const pageInfo = await this.pdfRef.current?.getDocument().getPageInfo(0);
+    * @returns { Promise<PDFPageInfo> } A promise containing the page info.
+    */
+    getPageInfo(pageIndex: number): Promise<PDFPageInfo> {
+        return NativeModules.PDFDocumentManager.getPageInfo(findNodeHandle(this.pdfViewRef), pageIndex);
+    }
 }

@@ -248,18 +248,19 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
     public void setLicenseKey(@Nullable String licenseKey, @Nullable Promise promise) {
          try {
              InitializationOptions options = new InitializationOptions(licenseKey, emptyList(), CrossPlatformTechnology.ReactNative, null);
-             Nutrient.initialize(getCurrentActivity(), options);
+             Nutrient.initialize(getReactApplicationContext(), options);
              promise.resolve("Initialised Nutrient");
         } catch (InvalidNutrientLicenseException e) {
             promise.reject(e);
         }
     }
 
-    @ReactMethod
-    public void getDocumentProperties(@Nullable String documentPath, @Nullable Promise promise) {
+    @ReactMethod(isBlockingSynchronousMethod = true)
+    public WritableMap getDocumentProperties(@Nullable String documentPath) {
+        WritableMap properties = Arguments.createMap();
+
         try {
             if (Uri.parse(documentPath).getScheme() == null) {
-                // If there is no scheme it might be a raw path.
                 try {
                     File file = new File(documentPath);
                     documentPath = Uri.fromFile(file).toString();
@@ -269,22 +270,22 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
             }
 
             PdfDocument document = PdfDocumentLoader.openDocument(getReactApplicationContext(), Uri.parse(documentPath));
-            WritableMap properties = Arguments.createMap();
+            properties.putString("documentId", document.getDocumentIdString());
             properties.putInt("pageCount", document.getPageCount());
             properties.putBoolean("isEncrypted", document.isEncrypted());
 
-            promise.resolve(properties);
         } catch (IOException e) {
-            // If the document is password protected, return this information to the caller.
             if (e instanceof InvalidPasswordException) {
-                WritableMap properties = Arguments.createMap();
                 properties.putInt("pageCount", 0);
                 properties.putBoolean("isEncrypted", true);
-                promise.resolve(properties);
             } else {
-                promise.reject(e);
+                properties.putString("documentId", null);
+                properties.putInt("pageCount", 0);
+                properties.putBoolean("isEncrypted", false);
             }
         }
+
+        return properties;
     }
 
     @ReactMethod
@@ -293,7 +294,7 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
         // `iOSLicenseKey` will be used to activate the license on iOS.
         try {
             InitializationOptions options = new InitializationOptions(androidLicenseKey, emptyList(), CrossPlatformTechnology.ReactNative, null);
-            Nutrient.initialize(getCurrentActivity(), options);
+            Nutrient.initialize(getReactApplicationContext(), options);
             promise.resolve("Initialised Nutrient");
         } catch (InvalidNutrientLicenseException e) {
             promise.reject(e);

@@ -169,6 +169,9 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
         if (configuration.getArray("measurementValueConfigurations") != null) {
             view.setMeasurementValueConfigurations(configuration.getArray("measurementValueConfigurations"));
         }
+        if (configuration.getMap("aiAssistantConfiguration") != null) {
+            view.setAIAConfiguration(configuration.getMap("aiAssistantConfiguration"));
+        }
     }
 
     @ReactProp(name = "annotationPresets")

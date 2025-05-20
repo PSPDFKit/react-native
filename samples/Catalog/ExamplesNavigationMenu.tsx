@@ -267,6 +267,16 @@ export default [
       });
     },
   },
+  {
+    key: 'item25',
+    name: 'AI Assistant',
+    description: 'AI Assistant example',
+    action: (component: any) => {
+      component.props.navigation.push('AIAssistant', {
+        title: 'AI Assistant',
+      });
+    },
+  }
 ];
 
 const generatePDFMenu = [

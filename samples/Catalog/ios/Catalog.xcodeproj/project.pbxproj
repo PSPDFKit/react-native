@@ -213,7 +213,7 @@
 						TestTargetID = 13B07F861A680F5B00A75B9A;
 					};
 					13B07F861A680F5B00A75B9A = {
-						LastSwiftMigration = 1120;
+						LastSwiftMigration = 1600;
 					};
 				};
 			};
@@ -438,7 +438,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = BB5864BCDD968804A8575FDC /* Pods-Catalog-CatalogTests.debug.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -471,7 +470,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = B5AE657C7E8E553214E77A29 /* Pods-Catalog-CatalogTests.release.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
@@ -522,6 +520,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.pspdfkit.catalog;
 				PRODUCT_NAME = Catalog;
+				SWIFT_OBJC_BRIDGING_HEADER = "Catalog-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -553,6 +552,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.pspdfkit.catalog;
 				PRODUCT_NAME = Catalog;
+				SWIFT_OBJC_BRIDGING_HEADER = "Catalog-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";

@@ -1,5 +1,5 @@
 import { MeasurementValueConfiguration } from './../measurements/Measurements';
-
+import { AIAssistantConfiguration } from './AIAssistantConfiguration';
 /**
  * The configuration when downloading a document from a remote URL.
  * @typedef RemoteDocumentConfiguration
@@ -9,7 +9,7 @@ import { MeasurementValueConfiguration } from './../measurements/Measurements';
  */
 
 /**
- * @namespace PDFConfiguration
+ * @interface PDFConfiguration
  * @property { PDFConfiguration.ScrollDirection } [scrollDirection] Configures the direction of page scrolling in the document view.
  * @property { PDFConfiguration.PageTransition } [pageTransition] Configures the page scrolling mode. Note that ```curl``` mode is only available for iOS and will be ignored on Android.
  * @property { string } [documentPassword] The password to unlock the document.
@@ -102,11 +102,10 @@ import { MeasurementValueConfiguration } from './../measurements/Measurements';
  * @property { PDFConfiguration.RemoteDocumentConfiguration } [remoteDocumentConfiguration] The configuration when downloading a document from a remote URL.
  * @property { PDFConfiguration.BooleanType } [androidShowDefaultToolbar] Used to show or hide the main toolbar.
  * @property { PDFConfiguration.BooleanType } [showActionButtons] Shows floating back and forward buttons in the lower part of the screen.
- * 
+ * @property { AIAssistantConfiguration } [aiAssistantConfiguration] Configuration for AI Assistant. 
  */
 
 export class PDFConfiguration {
-
     /**
      * Configures the direction of page scrolling in the document view.
      */
@@ -179,7 +178,6 @@ export class PDFConfiguration {
      * Shows a custom cell with configurable color presets for the provided annotation types.
      */
     iOSTypesShowingColorPresets?: AnyCase<PDFConfiguration.IOSTypesShowingColorPresets>[];
-    
     /**
      * The document PageMode.
      */
@@ -463,26 +461,26 @@ export class PDFConfiguration {
      * Indicates whether document annotations should be synced with the Instant server.
      */
     syncAnnotations?: PDFConfiguration.BooleanType;
-
     /**
      * The array of ```MeasurementValueConfiguration``` objects that should be applied to the document.
      */
     measurementValueConfigurations?: MeasurementValueConfiguration[];
-
     /**
      * The configuration when downloading a document from a remote URL.
      */
     remoteDocumentConfiguration?: RemoteDocumentConfiguration;
-
     /**
      * Used to show or hide the main toolbar.
      */
     androidShowDefaultToolbar?: PDFConfiguration.BooleanType;
-
     /**
      * Shows floating back and forward buttons in the lower part of the screen.
      */
     showActionButtons?: PDFConfiguration.BooleanType;
+    /**
+     * Configuration for AI Assistant. 
+     */
+    aiAssistantConfiguration?: AIAssistantConfiguration;
 }
 
 export namespace PDFConfiguration {

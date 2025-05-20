@@ -54,7 +54,7 @@ import { FormField } from './FormField';
  */
 
 /**
- * @namespace FormElement
+ * @interface FormElement
  */
 export class FormElement {
     /**

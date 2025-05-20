@@ -102,14 +102,17 @@ class PdfViewDocumentListener implements DocumentListener, AnnotationManager.OnA
     @SuppressLint("CheckResult")
     @Override
     public boolean onPageClick(@NonNull PdfDocument pdfDocument, int pageIndex, @Nullable MotionEvent motionEvent, @Nullable PointF pointF, @Nullable Annotation annotation) {
+        String documentID = pdfDocument.getDocumentIdString();
         if (NutrientNotificationCenter.INSTANCE.getIsNotificationCenterInUse()) {
-            String documentID = pdfDocument.getDocumentIdString();
             NutrientNotificationCenter.INSTANCE.didTapDocument(pointF, documentID);
-            if (annotation != null) {
-                NutrientNotificationCenter.INSTANCE.didTapAnnotation(annotation, pointF, documentID);
-                eventDispatcher.dispatchEvent(new PdfViewAnnotationTappedEvent(parent.getId(), annotation));
-            }
         }
+        if (annotation != null) {
+            if (NutrientNotificationCenter.INSTANCE.getIsNotificationCenterInUse()) {
+                NutrientNotificationCenter.INSTANCE.didTapAnnotation(annotation, pointF, documentID);
+            }
+            eventDispatcher.dispatchEvent(new PdfViewAnnotationTappedEvent(parent.getId(), annotation));
+        }
+        
         return false;
     }
 
