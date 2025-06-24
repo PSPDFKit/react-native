@@ -309,15 +309,26 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
                     final int requestId = args.getInt(0);
                     if (args.size() == 2) {
                         final String annotationType = args.getString(1);
-                        root.enterAnnotationCreationMode(annotationType);
+                        root.enterAnnotationCreationMode(annotationType,
+                                () -> root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, true)),
+                                (Consumer<Throwable>) throwable -> root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, throwable))
+                        );
                     } else {
-                        root.enterAnnotationCreationMode(null);
+                        root.enterAnnotationCreationMode(null,
+                                () -> root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, true)),
+                                (Consumer<Throwable>) throwable -> root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, throwable))
+                        );
                     }
-                    root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, true));
                 }
                 break;
             case COMMAND_EXIT_CURRENTLY_ACTIVE_MODE:
-                root.exitCurrentlyActiveMode();
+                if (args != null) {
+                    final int requestId = args.getInt(0);
+                    root.exitCurrentlyActiveMode(
+                            () -> root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, true)),
+                            (Consumer<Throwable>) throwable -> root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, throwable))
+                    );
+                }
                 break;
             case COMMAND_SAVE_CURRENT_DOCUMENT:
                 if (args != null) {

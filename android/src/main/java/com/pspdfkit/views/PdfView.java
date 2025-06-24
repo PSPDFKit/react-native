@@ -131,6 +131,7 @@ import io.reactivex.rxjava3.core.ObservableSource;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.functions.Consumer;
 import io.reactivex.rxjava3.functions.Function;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import io.reactivex.rxjava3.subjects.BehaviorSubject;
@@ -416,11 +417,16 @@ public class PdfView extends FrameLayout {
         }
     }
 
+    @SuppressLint("CheckResult")
     public void setPageIndex(int pageIndex) {
         this.pageIndex = pageIndex;
-        if (fragment != null && fragment.getPdfFragment() != null) {
-            fragment.setPageIndex(pageIndex);
-        }
+        getCurrentPdfFragment()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(fragment -> {
+                    if (fragment != null) {
+                        fragment.setPageIndex(pageIndex);
+                    }
+                });
     }
 
     public void setDisableDefaultActionForTappedAnnotations(boolean disableDefaultActionForTappedAnnotations) {
@@ -720,7 +726,6 @@ public class PdfView extends FrameLayout {
         pdfFragment.addOnFormElementSelectedListener(pdfViewDocumentListener);
         pdfFragment.addOnFormElementDeselectedListener(pdfViewDocumentListener);
         pdfFragment.addOnAnnotationSelectedListener(pdfViewDocumentListener);
-        pdfFragment.addOnAnnotationDeselectedListener(pdfViewDocumentListener);
         pdfFragment.addOnAnnotationUpdatedListener(pdfViewDocumentListener);
         pdfFragment.addDocumentScrollListener(pdfViewDocumentListener);
         if (pdfFragment.getDocument() != null) {
@@ -792,58 +797,85 @@ public class PdfView extends FrameLayout {
         }
     }
 
+    @SuppressLint("CheckResult")
     void updateState() {
-        if (fragment != null) {
-            updateState(fragment.getPageIndex());
-        } else {
-            updateState(-1);
-        }
+        getCurrentPdfFragment()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(pdfFragment -> {
+                    if (pdfFragment != null) {
+                        updateState(pdfFragment.getPageIndex());
+                    } else {
+                        updateState(-1);
+                    }
+                });
     }
 
+    @SuppressLint("CheckResult")
     void updateState(int pageIndex) {
-        if (fragment != null) {
-            if (fragment.getDocument() != null) {
-                eventDispatcher.dispatchEvent(new PdfViewStateChangedEvent(
-                    getId(),
-                    pageIndex,
-                    fragment.getDocument().getPageCount(),
-                    pdfViewModeController.isAnnotationCreationActive(),
-                    pdfViewModeController.isAnnotationEditingActive(),
-                    pdfViewModeController.isTextSelectionActive(),
-                    pdfViewModeController.isFormEditingActive()));
-            } else {
-                eventDispatcher.dispatchEvent(new PdfViewStateChangedEvent(getId()));
-            }
-        }
+        getCurrentPdfFragment()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(pdfFragment -> {
+                    if (pdfFragment != null) {
+                        if (pdfFragment.getDocument() != null) {
+                            eventDispatcher.dispatchEvent(new PdfViewStateChangedEvent(
+                                    getId(),
+                                    pageIndex,
+                                    pdfFragment.getDocument().getPageCount(),
+                                    pdfViewModeController.isAnnotationCreationActive(),
+                                    pdfViewModeController.isAnnotationEditingActive(),
+                                    pdfViewModeController.isTextSelectionActive(),
+                                    pdfViewModeController.isFormEditingActive()));
+                        } else {
+                            eventDispatcher.dispatchEvent(new PdfViewStateChangedEvent(getId()));
+                        }
+                    }
+                });
     }
 
     public EventDispatcher getEventDispatcher() {
         return eventDispatcher;
     }
 
-    public void enterAnnotationCreationMode(@Nullable final String annotationType) {
+    public Disposable enterAnnotationCreationMode(@Nullable final String annotationType, Runnable onComplete, Consumer<Throwable> onError) {
+        Disposable disposable;
         if (annotationType == null) {
-            pendingFragmentActions.add(getCurrentPdfFragment()
+            disposable = getCurrentPdfFragment()
                     .observeOn(Schedulers.io())
-                    .subscribe(PdfFragment::enterAnnotationCreationMode));
+                    .subscribe(fragment -> {
+                        fragment.enterAnnotationCreationMode();
+                        if (onComplete != null) onComplete.run();
+                    }, onError);
         } else {
             ConversionHelpers.AnnotationToolResult annotationTool = ConversionHelpers.convertAnnotationTool(annotationType);
             if (annotationTool.getAnnotationToolVariant() == null) {
-                pendingFragmentActions.add(getCurrentPdfFragment()
+                disposable = getCurrentPdfFragment()
                         .observeOn(Schedulers.io())
-                        .subscribe(fragment -> fragment.enterAnnotationCreationMode(annotationTool.getAnnotationTool())));
+                        .subscribe(fragment -> {
+                            fragment.enterAnnotationCreationMode(annotationTool.getAnnotationTool());
+                            if (onComplete != null) onComplete.run();
+                        }, onError);
             } else {
-                pendingFragmentActions.add(getCurrentPdfFragment()
+                disposable = getCurrentPdfFragment()
                         .observeOn(Schedulers.io())
-                        .subscribe(fragment -> fragment.enterAnnotationCreationMode(annotationTool.getAnnotationTool(), annotationTool.getAnnotationToolVariant())));
+                        .subscribe(fragment -> {
+                            fragment.enterAnnotationCreationMode(annotationTool.getAnnotationTool(), annotationTool.getAnnotationToolVariant());
+                            if (onComplete != null) onComplete.run();
+                        }, onError);
             }
         }
+        pendingFragmentActions.add(disposable);
+        return disposable;
     }
 
-    public void exitCurrentlyActiveMode() {
-        pendingFragmentActions.add(getCurrentPdfFragment()
-            .observeOn(Schedulers.io())
-            .subscribe(PdfFragment::exitCurrentlyActiveMode));
+    public Disposable exitCurrentlyActiveMode(Runnable onComplete, Consumer<Throwable> onError) {
+        Disposable disposable = getCurrentPdfFragment()
+                .observeOn(Schedulers.io())
+                .subscribe(fragment -> {
+                    fragment.exitCurrentlyActiveMode();
+                    if (onComplete != null) onComplete.run();
+                }, onError);
+        pendingFragmentActions.add(disposable);
+        return disposable;
     }
 
     public void clearSelectedAnnotations() {

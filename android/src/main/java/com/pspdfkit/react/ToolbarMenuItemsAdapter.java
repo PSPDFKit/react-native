@@ -71,9 +71,9 @@ public class ToolbarMenuItemsAdapter {
     }
 
     private PdfActivityConfiguration.Builder disableDefaultToolbarItems(final PdfActivityConfiguration.Builder configuration) {
-        configuration.disableAnnotationList()
-                .disablePrinting()
-                .disableBookmarkList();
+        configuration.annotationListEnabled(false)
+                .printingEnabled(false)
+                .bookmarkListEnabled(false);
         return configuration;
     }
 

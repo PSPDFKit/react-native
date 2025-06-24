@@ -236,11 +236,18 @@ class PSPDFKitView extends React.Component {
    */
   exitCurrentlyActiveMode = function () {
     if (Platform.OS === 'android') {
+      let requestId = this._nextRequestId++;
+      let requestMap = this._requestMap;
+
+      let promise = new Promise(function (resolve, reject) {
+        requestMap[requestId] = { resolve: resolve, reject: reject };
+      });
+
       UIManager.dispatchViewManagerCommand(
         findNodeHandle(this._componentRef.current),
         this._getViewManagerConfig('RCTPSPDFKitView').Commands
           .exitCurrentlyActiveMode,
-        [],
+        [requestId],
       );
     } else if (Platform.OS === 'ios') {
       return NativeModules.PSPDFKitViewManager.exitCurrentlyActiveMode(

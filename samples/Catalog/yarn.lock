@@ -4860,7 +4860,7 @@ react-native-gesture-handler@^2.23.1:
     invariant "^2.2.4"
 
 "react-native-pspdfkit@file:../..":
-  version "2.18.0"
+  version "2.18.1"
 
 react-native-safe-area-context@^5.3.0:
   version "5.3.0"

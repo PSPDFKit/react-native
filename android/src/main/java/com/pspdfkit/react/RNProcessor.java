@@ -103,7 +103,7 @@ public class RNProcessor extends ReactContextBaseJavaModule {
             assert outputFile != null;
             result.putString("fileURL", outputFile.toURI().toString());
 
-            HtmlToPdfConverter.fromHTMLString(getContext(), htmlString)
+            HtmlToPdfConverter.fromHTMLString(getContext(), htmlString, null)
                     .title("Converted document")
                     .convertToPdfAsync(outputFile)
                     .doFinally(() -> callback.resolve(result))

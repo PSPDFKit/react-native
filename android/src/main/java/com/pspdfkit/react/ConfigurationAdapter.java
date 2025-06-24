@@ -162,7 +162,7 @@ public class ConfigurationAdapter {
         ReadableMapKeySetIterator iterator = configuration.keySetIterator();
         boolean hasConfiguration = iterator.hasNextKey();
         this.configuration = new PdfActivityConfiguration.Builder(context);
-        this.configuration.disableContentEditing();
+        this.configuration.contentEditingEnabled(false);
         if (hasConfiguration) {
             String key;
 
@@ -393,11 +393,7 @@ public class ConfigurationAdapter {
     }
 
     private void configureShowPageNumberOverlay(final boolean showPageNumberOverlay) {
-        if (showPageNumberOverlay) {
-            configuration.showPageNumberOverlay();
-        } else {
-            configuration.hidePageNumberOverlay();
-        }
+        configuration.pageNumberOverlayEnabled(showPageNumberOverlay);
     }
 
     private void configurePageScrollDirection(@Nullable final String pageScrollDirection) {
@@ -482,11 +478,7 @@ public class ConfigurationAdapter {
     }
 
     private void configureShowSearchAction(final boolean showSearchAction) {
-        if (showSearchAction) {
-            configuration.enableSearch();
-        } else {
-            configuration.disableSearch();
-        }
+        configuration.searchEnabled(showSearchAction);
     }
 
     private void configureSignatureSavingStrategy(@Nullable final String signatureSavingStrategy) {
@@ -532,45 +524,24 @@ public class ConfigurationAdapter {
     }
 
     private void configureShowThumbnailGridAction(final boolean showThumbnailGridAction) {
-        if (showThumbnailGridAction) {
-            configuration.showThumbnailGrid();
-        } else {
-            configuration.hideThumbnailGrid();
-        }
+        configuration.thumbnailGridEnabled(showThumbnailGridAction);
     }
 
     private void configureShowOutlineAction(final boolean showOutlineAction) {
-        if (showOutlineAction) {
-            configuration.enableOutline();
-        } else {
-            configuration.disableOutline();
-        }
+        configuration.outlineEnabled(showOutlineAction);
     }
 
     private void configureShowBookmarksAction(final boolean showBookmarksAction) {
-        if (showBookmarksAction) {
-            configuration.enableBookmarkList();
-        } else {
-            configuration.disableBookmarkList();
-        }
+        configuration.bookmarkListEnabled(showBookmarksAction);
     }
 
     private void configureShowAnnotationListAction(final boolean showAnnotationListAction) {
-        if (showAnnotationListAction) {
-            configuration.enableAnnotationList();
-        } else {
-            configuration.disableAnnotationList();
-        }
+        configuration.annotationListEnabled(showAnnotationListAction);
     }
 
     private void configureShowPageLabels(final boolean showPageLabels) {
-        if (showPageLabels) {
-            configuration.showPageLabels();
-            configuration.showPageNumberOverlay();
-        } else {
-            configuration.hidePageLabels();
-            configuration.hidePageNumberOverlay();
-        }
+        configuration.pageLabelsEnabled(showPageLabels);
+        configuration.pageNumberOverlayEnabled(showPageLabels);
     }
 
     private void configureGrayScale(final boolean grayScale) {
@@ -582,19 +553,11 @@ public class ConfigurationAdapter {
     }
 
     private void configureEnableAnnotationEditing(final boolean enableAnnotationEditing) {
-        if (enableAnnotationEditing) {
-            configuration.enableAnnotationEditing();
-        } else {
-            configuration.disableAnnotationEditing();
-        }
+        configuration.annotationEditingEnabled(enableAnnotationEditing);
     }
 
     private void configureEnableFormEditing(final boolean enableFormEditing) {
-        if (enableFormEditing) {
-            configuration.enableFormEditing();
-        } else {
-            configuration.disableFormEditing();
-        }
+        configuration.formEditingEnabled(enableFormEditing);
     }
 
     private void configureShowShareAction(final boolean showShareAction) {
@@ -606,11 +569,7 @@ public class ConfigurationAdapter {
     }
 
     private void configureShowPrintAction(final boolean showPrintAction) {
-        if (showPrintAction) {
-            configuration.enablePrinting();
-        } else {
-            configuration.disablePrinting();
-        }
+        configuration.printingEnabled(showPrintAction);
     }
 
     private void configureEnableTextSelection(final boolean enableTextSelection) {
@@ -618,19 +577,11 @@ public class ConfigurationAdapter {
     }
 
     private void configureDocumentInfoView(final boolean enableDocumentInfoView) {
-        if (enableDocumentInfoView) {
-            configuration.enableDocumentInfoView();
-        } else {
-            configuration.disableDocumentInfoView();
-        }
+        configuration.documentInfoViewEnabled(enableDocumentInfoView);
     }
 
     private void configureShowDocumentTitleOverlay(final boolean showDocumentTitleOverlay) {
-        if (showDocumentTitleOverlay) {
-            configuration.showDocumentTitleOverlay();
-        } else {
-            configuration.hideDocumentTitleOverlay();
-        }
+        configuration.documentTitleOverlayEnabled(showDocumentTitleOverlay);
     }
 
     private void configurePageMode(@Nullable final String pageMode) {
@@ -657,11 +608,7 @@ public class ConfigurationAdapter {
     }
 
     private void configureAnnotationEditingEnabled(final boolean annotationEditingEnabled) {
-        if (annotationEditingEnabled) {
-            configuration.enableAnnotationEditing();
-        } else {
-            configuration.disableAnnotationEditing();
-        }
+        configuration.annotationEditingEnabled(annotationEditingEnabled);
     }
 
     private void configureEditableAnnotationTypes(@Nullable final ReadableArray editableAnnotationTypes) {
@@ -693,11 +640,7 @@ public class ConfigurationAdapter {
     }
 
     private void configureSettingsMenuShown(final boolean settingsMenuShown) {
-        if (settingsMenuShown) {
-            configuration.showSettingsMenu();
-        } else {
-            configuration.hideSettingsMenu();
-        }
+        configuration.settingsMenuEnabled(settingsMenuShown);
     }
 
     private void configureToolbarTitle(@Nullable final String customTitle) {
@@ -720,20 +663,15 @@ public class ConfigurationAdapter {
         if (showDefaultToolbar) {
             // Set it back to the default, which is AUTOMATIC_HIDE_SINGLE
             configuration.setTabBarHidingMode(TabBarHidingMode.AUTOMATIC_HIDE_SINGLE);
-            configuration.enableDefaultToolbar();
+            configuration.defaultToolbarEnabled(true);
         } else {
             configuration.setTabBarHidingMode(TabBarHidingMode.HIDE);
-            configuration.disableDefaultToolbar();
+            configuration.defaultToolbarEnabled(false);
         }
     }
 
     private void configureShowActionButtons(final boolean showActionButtons) {
-        if (showActionButtons) {
-            // Set it back to the default, which is AUTOMATIC_HIDE_SINGLE
-            configuration.showNavigationButtons();
-        } else {
-            configuration.hideNavigationButtons();
-        }
+        configuration.navigationButtonsEnabled(showActionButtons);
     }
 
     public PdfActivityConfiguration build() {

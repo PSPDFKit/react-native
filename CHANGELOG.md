@@ -1,3 +1,9 @@
+## 2.18.1 - 24 Jun 2025
+- Updates to Nutrient Android SDK 10.4.0.
+- Fixes an issue where the `enterAnnotationCreationMode` and `exitCurrentlyActiveMode` calls on Android resolved before being complete. (J#HYB-824)
+- Fixes an issue where setting the `pageIndex` property could result in a crash on Android. (J#HYB-817)
+- Fixes an issue where the thumbnail pages could not be selected on iOS. (J#HYB-816)
+
 ## 2.18.0 - 20 May 2025
 
 - Adds the new `AIAssistantConfiguration` class to configure AI Assistant and also add new `aiAssistantButtonItem` option to Toolbar configuration. (J#HYB-743)
