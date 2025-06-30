@@ -74,7 +74,8 @@ export class HiddenToolbar extends Component<IProps, IState> {
             userInterfaceViewMode: 'alwaysVisible',
             iOSUseParentNavigationBar: true,
             // This will hide the main toolbar. A change to the application's styles.xml is required to fully hide the Android tabBar.
-            androidShowDefaultToolbar: false
+            androidShowDefaultToolbar: false,
+            androidRemoveStatusBarOffset: true,
           }}
           disableAutomaticSaving={true}
           fragmentTag="PDF1"

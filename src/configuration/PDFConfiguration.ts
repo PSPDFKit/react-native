@@ -102,7 +102,8 @@ import { AIAssistantConfiguration } from './AIAssistantConfiguration';
  * @property { PDFConfiguration.RemoteDocumentConfiguration } [remoteDocumentConfiguration] The configuration when downloading a document from a remote URL.
  * @property { PDFConfiguration.BooleanType } [androidShowDefaultToolbar] Used to show or hide the main toolbar.
  * @property { PDFConfiguration.BooleanType } [showActionButtons] Shows floating back and forward buttons in the lower part of the screen.
- * @property { AIAssistantConfiguration } [aiAssistantConfiguration] Configuration for AI Assistant. 
+ * @property { AIAssistantConfiguration } [aiAssistantConfiguration] Configuration for AI Assistant.
+ * @property { PDFConfiguration.BooleanType } [androidRemoveStatusBarOffset] Used to remove the Android status bar offset when wrapping the component in custom views.
  */
 
 export class PDFConfiguration {
@@ -481,6 +482,10 @@ export class PDFConfiguration {
      * Configuration for AI Assistant. 
      */
     aiAssistantConfiguration?: AIAssistantConfiguration;
+    /**
+     * Used to remove the Android status bar offset when wrapping the component in custom views.
+     */
+    androidRemoveStatusBarOffset?: PDFConfiguration.BooleanType;
 }
 
 export namespace PDFConfiguration {

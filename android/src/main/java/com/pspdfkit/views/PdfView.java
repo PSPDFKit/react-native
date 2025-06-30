@@ -28,12 +28,16 @@ import android.util.Log;
 import android.util.Pair;
 import android.view.Choreographer;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.Insets;
 import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.FragmentManager;
 
 import com.facebook.react.bridge.Arguments;
@@ -131,7 +135,6 @@ import io.reactivex.rxjava3.core.ObservableSource;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
-import io.reactivex.rxjava3.functions.Consumer;
 import io.reactivex.rxjava3.functions.Function;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import io.reactivex.rxjava3.subjects.BehaviorSubject;
@@ -192,6 +195,8 @@ public class PdfView extends FrameLayout {
     private boolean isSearchViewShown = false;
 
     private boolean isDefaultToolbarHidden = false;
+
+    private boolean isStatusBarHidden = false;
 
     /** Indicates whether the image document annotations should be flattened only or flattened and embedded. */
     private String imageSaveMode = "flatten";
@@ -255,6 +260,27 @@ public class PdfView extends FrameLayout {
 
         // Generate an id to set on all fragments created by the PdfView.
         internalId = View.generateViewId();
+
+        ViewCompat.setOnApplyWindowInsetsListener(this, new androidx.core.view.OnApplyWindowInsetsListener() {
+            @NonNull
+            @Override
+            public WindowInsetsCompat onApplyWindowInsets(@NonNull View v, @NonNull WindowInsetsCompat windowInsets) {
+                if (isStatusBarHidden) {
+                    Insets insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
+                    ViewGroup.LayoutParams layoutParams = v.getLayoutParams();
+                    if (layoutParams instanceof MarginLayoutParams marginParams) {
+                        marginParams.leftMargin = insets.left;
+                        marginParams.topMargin = insets.top;
+                        marginParams.rightMargin = insets.right;
+                        marginParams.bottomMargin = insets.bottom;
+                        v.setLayoutParams(marginParams);
+                    }
+                    return WindowInsetsCompat.CONSUMED;
+                } else {
+                    return windowInsets;
+                }
+            }
+        });
     }
 
     public void inject(FragmentManager fragmentManager, EventDispatcher eventDispatcher) {
@@ -417,16 +443,11 @@ public class PdfView extends FrameLayout {
         }
     }
 
-    @SuppressLint("CheckResult")
     public void setPageIndex(int pageIndex) {
         this.pageIndex = pageIndex;
-        getCurrentPdfFragment()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(fragment -> {
-                    if (fragment != null) {
-                        fragment.setPageIndex(pageIndex);
-                    }
-                });
+        if (fragment != null && fragment.getPdfFragment() != null) {
+            fragment.setPageIndex(pageIndex);
+        }
     }
 
     public void setDisableDefaultActionForTappedAnnotations(boolean disableDefaultActionForTappedAnnotations) {
@@ -516,6 +537,10 @@ public class PdfView extends FrameLayout {
 
     public void setImageSaveMode(final String imageSaveMode) {
         this.imageSaveMode = imageSaveMode;
+    }
+
+    public void setIsStatusBarHidden(final boolean statusBarHidden) {
+        this.isStatusBarHidden = statusBarHidden;
     }
 
     public void setHideDefaultToolbar(boolean hideDefaultToolbar) {
@@ -726,6 +751,7 @@ public class PdfView extends FrameLayout {
         pdfFragment.addOnFormElementSelectedListener(pdfViewDocumentListener);
         pdfFragment.addOnFormElementDeselectedListener(pdfViewDocumentListener);
         pdfFragment.addOnAnnotationSelectedListener(pdfViewDocumentListener);
+        pdfFragment.addOnAnnotationDeselectedListener(pdfViewDocumentListener);
         pdfFragment.addOnAnnotationUpdatedListener(pdfViewDocumentListener);
         pdfFragment.addDocumentScrollListener(pdfViewDocumentListener);
         if (pdfFragment.getDocument() != null) {
@@ -797,85 +823,58 @@ public class PdfView extends FrameLayout {
         }
     }
 
-    @SuppressLint("CheckResult")
     void updateState() {
-        getCurrentPdfFragment()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(pdfFragment -> {
-                    if (pdfFragment != null) {
-                        updateState(pdfFragment.getPageIndex());
-                    } else {
-                        updateState(-1);
-                    }
-                });
+        if (fragment != null) {
+            updateState(fragment.getPageIndex());
+        } else {
+            updateState(-1);
+        }
     }
 
-    @SuppressLint("CheckResult")
     void updateState(int pageIndex) {
-        getCurrentPdfFragment()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(pdfFragment -> {
-                    if (pdfFragment != null) {
-                        if (pdfFragment.getDocument() != null) {
-                            eventDispatcher.dispatchEvent(new PdfViewStateChangedEvent(
-                                    getId(),
-                                    pageIndex,
-                                    pdfFragment.getDocument().getPageCount(),
-                                    pdfViewModeController.isAnnotationCreationActive(),
-                                    pdfViewModeController.isAnnotationEditingActive(),
-                                    pdfViewModeController.isTextSelectionActive(),
-                                    pdfViewModeController.isFormEditingActive()));
-                        } else {
-                            eventDispatcher.dispatchEvent(new PdfViewStateChangedEvent(getId()));
-                        }
-                    }
-                });
+        if (fragment != null) {
+            if (fragment.getDocument() != null) {
+                eventDispatcher.dispatchEvent(new PdfViewStateChangedEvent(
+                    getId(),
+                    pageIndex,
+                    fragment.getDocument().getPageCount(),
+                    pdfViewModeController.isAnnotationCreationActive(),
+                    pdfViewModeController.isAnnotationEditingActive(),
+                    pdfViewModeController.isTextSelectionActive(),
+                    pdfViewModeController.isFormEditingActive()));
+            } else {
+                eventDispatcher.dispatchEvent(new PdfViewStateChangedEvent(getId()));
+            }
+        }
     }
 
     public EventDispatcher getEventDispatcher() {
         return eventDispatcher;
     }
 
-    public Disposable enterAnnotationCreationMode(@Nullable final String annotationType, Runnable onComplete, Consumer<Throwable> onError) {
-        Disposable disposable;
+    public void enterAnnotationCreationMode(@Nullable final String annotationType) {
         if (annotationType == null) {
-            disposable = getCurrentPdfFragment()
+            pendingFragmentActions.add(getCurrentPdfFragment()
                     .observeOn(Schedulers.io())
-                    .subscribe(fragment -> {
-                        fragment.enterAnnotationCreationMode();
-                        if (onComplete != null) onComplete.run();
-                    }, onError);
+                    .subscribe(PdfFragment::enterAnnotationCreationMode));
         } else {
             ConversionHelpers.AnnotationToolResult annotationTool = ConversionHelpers.convertAnnotationTool(annotationType);
             if (annotationTool.getAnnotationToolVariant() == null) {
-                disposable = getCurrentPdfFragment()
+                pendingFragmentActions.add(getCurrentPdfFragment()
                         .observeOn(Schedulers.io())
-                        .subscribe(fragment -> {
-                            fragment.enterAnnotationCreationMode(annotationTool.getAnnotationTool());
-                            if (onComplete != null) onComplete.run();
-                        }, onError);
+                        .subscribe(fragment -> fragment.enterAnnotationCreationMode(annotationTool.getAnnotationTool())));
             } else {
-                disposable = getCurrentPdfFragment()
+                pendingFragmentActions.add(getCurrentPdfFragment()
                         .observeOn(Schedulers.io())
-                        .subscribe(fragment -> {
-                            fragment.enterAnnotationCreationMode(annotationTool.getAnnotationTool(), annotationTool.getAnnotationToolVariant());
-                            if (onComplete != null) onComplete.run();
-                        }, onError);
+                        .subscribe(fragment -> fragment.enterAnnotationCreationMode(annotationTool.getAnnotationTool(), annotationTool.getAnnotationToolVariant())));
             }
         }
-        pendingFragmentActions.add(disposable);
-        return disposable;
     }
 
-    public Disposable exitCurrentlyActiveMode(Runnable onComplete, Consumer<Throwable> onError) {
-        Disposable disposable = getCurrentPdfFragment()
-                .observeOn(Schedulers.io())
-                .subscribe(fragment -> {
-                    fragment.exitCurrentlyActiveMode();
-                    if (onComplete != null) onComplete.run();
-                }, onError);
-        pendingFragmentActions.add(disposable);
-        return disposable;
+    public void exitCurrentlyActiveMode() {
+        pendingFragmentActions.add(getCurrentPdfFragment()
+            .observeOn(Schedulers.io())
+            .subscribe(PdfFragment::exitCurrentlyActiveMode));
     }
 
     public void clearSelectedAnnotations() {

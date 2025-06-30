@@ -172,6 +172,9 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
         if (configuration.getMap("aiAssistantConfiguration") != null) {
             view.setAIAConfiguration(configuration.getMap("aiAssistantConfiguration"));
         }
+        if (configuration.hasKey("androidRemoveStatusBarOffset")) {
+            view.setIsStatusBarHidden(configuration.getBoolean("androidRemoveStatusBarOffset"));
+        }
     }
 
     @ReactProp(name = "annotationPresets")
@@ -309,26 +312,15 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
                     final int requestId = args.getInt(0);
                     if (args.size() == 2) {
                         final String annotationType = args.getString(1);
-                        root.enterAnnotationCreationMode(annotationType,
-                                () -> root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, true)),
-                                (Consumer<Throwable>) throwable -> root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, throwable))
-                        );
+                        root.enterAnnotationCreationMode(annotationType);
                     } else {
-                        root.enterAnnotationCreationMode(null,
-                                () -> root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, true)),
-                                (Consumer<Throwable>) throwable -> root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, throwable))
-                        );
+                        root.enterAnnotationCreationMode(null);
                     }
+                    root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, true));
                 }
                 break;
             case COMMAND_EXIT_CURRENTLY_ACTIVE_MODE:
-                if (args != null) {
-                    final int requestId = args.getInt(0);
-                    root.exitCurrentlyActiveMode(
-                            () -> root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, true)),
-                            (Consumer<Throwable>) throwable -> root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, throwable))
-                    );
-                }
+                root.exitCurrentlyActiveMode();
                 break;
             case COMMAND_SAVE_CURRENT_DOCUMENT:
                 if (args != null) {

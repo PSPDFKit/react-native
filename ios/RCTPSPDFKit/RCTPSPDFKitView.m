@@ -143,13 +143,20 @@
   return nil;
 }
 
-- (BOOL)enterAnnotationCreationMode:(PSPDFAnnotationString)annotationType {
+- (BOOL)enterAnnotationCreationMode:(PSPDFAnnotationString)annotationType withVariant:(PSPDFAnnotationVariantString)annotationVariant {
   [self.pdfController setViewMode:PSPDFViewModeDocument animated:YES];
   [self.pdfController.annotationToolbarController updateHostView:self container:nil viewController:self.pdfController];
     if (annotationType != nil) {
         [self.pdfController.annotationStateManager setState:annotationType];
+        [self.pdfController.annotationStateManager setVariant:annotationVariant];
     }
-  return [self.pdfController.annotationToolbarController showToolbarAnimated:YES completion:NULL];
+    
+    // If already in editing mode, just change the tool
+    if ([self.pdfController.annotationToolbarController isToolbarVisible]) {
+        return YES;
+    } else {
+        return [self.pdfController.annotationToolbarController showToolbarAnimated:YES completion:NULL];
+    }
 }
 
 - (BOOL)exitCurrentlyActiveMode {
@@ -257,7 +264,7 @@
         [_pdfController.interactions.allInteractions allowSimultaneousRecognitionWithGestureRecognizer:tapGestureRecognizer];
         [pageView addGestureRecognizer:tapGestureRecognizer];
     }
-
+    
   [self onStateChangedForPDFViewController:pdfController pageView:pageView pageAtIndex:pageIndex];
 }
 
@@ -608,8 +615,19 @@
 
 - (void)tapGestureRecognizerDidChangeState:(UIGestureRecognizer *)gestureRecognizer {
     if (gestureRecognizer.state == UIGestureRecognizerStateEnded) {
+        // Calculates the CGPoint location on the specific page
+        PSPDFDocumentViewController *documentViewController = self.pdfController.documentViewController;
+        PSPDFPageIndex pageIndex = [documentViewController.layout pageRangeForSpreadAtIndex:documentViewController.spreadIndex].location;
+        PSPDFPageView *pageView = [self.pdfController pageViewForPageAtIndex:pageIndex];
         CGPoint point = [gestureRecognizer locationInView:gestureRecognizer.view];
+        
+        // Uses visiblePageIndex to determine which page was clicked when pageMode is double (side-by-side on iPad)
+        CGPoint visiblePoint = [gestureRecognizer locationInView:pageView];
+        PSPDFPageView *visiblePageView = [documentViewController visiblePageViewAtPoint:visiblePoint];
+        PSPDFPageIndex visiblePageIndex = visiblePageView.pageIndex;
+        
         [NutrientNotificationCenter.shared didTapDocumentWithTapPoint:point
+                                                            pageIndex:visiblePageIndex
                                                            documentID:self.pdfController.document.documentIdString];
     }
 }

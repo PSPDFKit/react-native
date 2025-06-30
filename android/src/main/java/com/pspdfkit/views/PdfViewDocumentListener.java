@@ -40,11 +40,12 @@ import com.pspdfkit.react.events.PdfViewDocumentSavedEvent;
 import com.pspdfkit.ui.special_mode.controller.AnnotationSelectionController;
 import com.pspdfkit.ui.special_mode.manager.AnnotationManager;
 import com.pspdfkit.ui.special_mode.manager.FormManager;
+import com.pspdfkit.utils.Size;
 
 import java.util.List;
 import java.util.Map;
 
-class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annotations.OnAnnotationSelectedListener, AnnotationProvider.OnAnnotationUpdatedListener, FormListeners.OnFormFieldUpdatedListener, FormManager.OnFormElementSelectedListener, FormManager.OnFormElementDeselectedListener, DocumentScrollListener {
+class PdfViewDocumentListener implements DocumentListener, AnnotationManager.OnAnnotationSelectedListener, AnnotationManager.OnAnnotationDeselectedListener, AnnotationProvider.OnAnnotationUpdatedListener, FormListeners.OnFormFieldUpdatedListener, FormManager.OnFormElementSelectedListener, FormManager.OnFormElementDeselectedListener, DocumentScrollListener {
 
     @NonNull
     private final PdfView parent;
@@ -104,10 +105,18 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
     public boolean onPageClick(@NonNull PdfDocument pdfDocument, int pageIndex, @Nullable MotionEvent motionEvent, @Nullable PointF pointF, @Nullable Annotation annotation) {
         String documentID = pdfDocument.getDocumentIdString();
         if (NutrientNotificationCenter.INSTANCE.getIsNotificationCenterInUse()) {
-            NutrientNotificationCenter.INSTANCE.didTapDocument(pointF, documentID);
+            if (pointF != null) {
+                // Calculate the inverted point on the y-axis using page size
+                Size size = pdfDocument.getPageSize(pageIndex);
+                PointF clickedPoint = new PointF(pointF.x, size.height - pointF.y);
+                NutrientNotificationCenter.INSTANCE.didTapDocument(clickedPoint, pageIndex, documentID);
+            }
         }
         if (annotation != null) {
             if (NutrientNotificationCenter.INSTANCE.getIsNotificationCenterInUse()) {
+                if (pointF == null) {
+                    pointF = new PointF(0,0);
+                }
                 NutrientNotificationCenter.INSTANCE.didTapAnnotation(annotation, pointF, documentID);
             }
             eventDispatcher.dispatchEvent(new PdfViewAnnotationTappedEvent(parent.getId(), annotation));

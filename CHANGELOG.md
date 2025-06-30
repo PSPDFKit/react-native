@@ -1,18 +1,16 @@
-## 2.18.1 - 24 Jun 2025
-- Updates to Nutrient Android SDK 10.4.0.
-- Fixes an issue where the `enterAnnotationCreationMode` and `exitCurrentlyActiveMode` calls on Android resolved before being complete. (J#HYB-824)
-- Fixes an issue where setting the `pageIndex` property could result in a crash on Android. (J#HYB-817)
-- Fixes an issue where the thumbnail pages could not be selected on iOS. (J#HYB-816)
+- Adds the `androidRemoveStatusBarOffset` property to the `PDFConfiguration` object on Android. (J#HYB-802)
+- Fixes an issue where the `enterAnnotationCreationMode` API does not honour annotation variant options. (J#HYB-814)
+- Fixes an issue where the `enterAnnotationCreationMode` API on iOS could not change tools when already active. (J#HYB-815)
 
 ## 2.18.0 - 20 May 2025
 
-- Adds the new `AIAssistantConfiguration` class to configure AI Assistant and also add new `aiAssistantButtonItem` option to Toolbar configuration. (J#HYB-743)
+- Adds the new `AIAssistantConfiguration` class to configure AI Assistant, and also adds the new `aiAssistantButtonItem` option to the toolbar configuration. (J#HYB-743)
 - Adds the new `getPageInfo` API to the `PDFDocument` class. (J#HYB-801)
 - Updates to Nutrient Android SDK 10.2.0.
 - Updates to Nutrient iOS SDK 14.8.0.
 - Fixes an issue where the `setLicenseKeys` API could cause a crash on Android if called too early during the application lifecycle. (J#HYB-790)
-- Fixes an issue where `NotificationCenter` events are not always delivered when running Release build configuration on iOS. (J#HYB-793)
-- Fixes an issue where toolbar button customization was not persisted on Android during component reload. (J#HYB-800)
+- Fixes an issue where `NotificationCenter` events aren't always delivered when running the Release build configuration on iOS. (J#HYB-793)
+- Fixes an issue where toolbar button customization wasn't persisted on Android during component reload. (J#HYB-800)
 - Fixes an issue where the `onAnnotationTapped` callback wasn't called reliably on Android. (J#HYB-805)
 
 ## 2.17.0 - 14 Apr 2025

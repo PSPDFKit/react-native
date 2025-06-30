@@ -100,7 +100,7 @@ object NutrientNotificationCenter {
         sendEvent(NotificationEvent.DOCUMENT_SCROLLED.value, jsonData)
     }
 
-    fun didTapDocument(pointF: PointF, documentID: String) {
+    fun didTapDocument(pointF: PointF, pageIndex: Int, documentID: String) {
         try {
             val pointMap = mapOf("x" to pointF.x, "y" to pointF.y)
             val nativePointMap = Arguments.makeNativeMap(pointMap)
@@ -108,6 +108,7 @@ object NutrientNotificationCenter {
             val jsonData = Arguments.createMap()
             jsonData.putString("event", NotificationEvent.DOCUMENT_TAPPED.value)
             jsonData.putMap("point", nativePointMap)
+            jsonData.putInt("pageIndex", pageIndex)
             jsonData.putString("documentID", documentID)
             sendEvent(NotificationEvent.DOCUMENT_TAPPED.value, jsonData)
         } catch (e: Exception) {

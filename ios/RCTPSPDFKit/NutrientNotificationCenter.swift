@@ -168,11 +168,12 @@ import PSPDFKit
                                body: jsonData)
     }
     
-    @objc public func didTapDocument(tapPoint: CGPoint, documentID: String) {
+    @objc public func didTapDocument(tapPoint: CGPoint, pageIndex: Int, documentID: String) {
         if (!isInUse) { return }
 
         let pointDictionary = ["x" : tapPoint.x , "y" : tapPoint.y]
         let jsonData = ["event" : NotificationEvent.documentTapped.rawValue,
+                        "pageIndex" : pageIndex,
                         "point" : pointDictionary,
                         "documentID" : documentID] as [String : Any]
         eventEmitter?.sendEvent(withName:NotificationEvent.documentTapped.rawValue,

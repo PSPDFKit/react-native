@@ -880,6 +880,7 @@ export namespace Annotation {
         CLOUDY_POLYGON: 'cloudy_polygon',
         MULTIMEDIA: 'multimedia',
         SELECTION_TOOL: 'selection_tool',
+        PEN: 'pen'
     } as const;
 
     /**
