@@ -1,10 +1,11 @@
 import React from 'react';
 import { Alert, processColor, View } from 'react-native';
-import PSPDFKitView, { NotificationCenter } from 'react-native-pspdfkit';
+import PSPDFKitView, { NotificationCenter, Toolbar } from 'react-native-pspdfkit';
 
-import { exampleDocumentPath, pspdfkitColor } from '../configuration/Constants';
+import { exampleDocumentPath, formDocumentName, formDocumentPath, pspdfkitColor, writableFormDocumentPath } from '../configuration/Constants';
 import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
 import { hideToolbar } from '../helpers/NavigationHelper';
+import { extractFromAssetsIfMissing } from '../helpers/FileSystemHelpers';
 
 export class EventListeners extends BaseExampleAutoHidingHeaderComponent {
   pdfRef: React.RefObject<PSPDFKitView | null>;
@@ -13,10 +14,18 @@ export class EventListeners extends BaseExampleAutoHidingHeaderComponent {
     super(props);
     const { navigation } = this.props;
     this.pdfRef = React.createRef<PSPDFKitView>();
+    this.state = {
+      documentPath: formDocumentPath,
+    };
     hideToolbar(navigation);
   }
 
   override componentDidMount() {
+
+    extractFromAssetsIfMissing(formDocumentName, () => {
+      this.setState({ documentPath: writableFormDocumentPath });
+    });
+
     this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.TextEvent.SELECTED, (event: any) => {
       console.log(event);
     });
@@ -76,6 +85,10 @@ export class EventListeners extends BaseExampleAutoHidingHeaderComponent {
     this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.AnalyticsEvent.ANALYTICS, (event: any) => {
       console.log(event)
     });
+
+    this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.BookmarksEvent.CHANGED, (event: any) => {
+      Alert.alert('PSPDFKit', 'Bookmarks Changed: ' + JSON.stringify(event));
+    });
   }
 
   override componentWillUnmount () {
@@ -86,10 +99,20 @@ export class EventListeners extends BaseExampleAutoHidingHeaderComponent {
     return (
       <View style={styles.flex}>
         <PSPDFKitView
-          document={exampleDocumentPath}
+          document={this.state.documentPath}
           ref={this.pdfRef}
           configuration={{
             iOSBackgroundColor: processColor('lightgrey'),
+          }}
+          toolbar={{
+            // iOS only.
+            leftBarButtonItems: {
+              viewMode: Toolbar.PDFViewMode.VIEW_MODE_DOCUMENT,
+              animated: true,
+              buttons: [
+                Toolbar.DefaultToolbarButton.BOOKMARK_BUTTON_ITEM,
+              ],
+            },
           }}
           style={styles.pdfColor}
           // Event Listeners

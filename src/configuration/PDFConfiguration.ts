@@ -102,7 +102,10 @@ import { AIAssistantConfiguration } from './AIAssistantConfiguration';
  * @property { PDFConfiguration.RemoteDocumentConfiguration } [remoteDocumentConfiguration] The configuration when downloading a document from a remote URL.
  * @property { PDFConfiguration.BooleanType } [androidShowDefaultToolbar] Used to show or hide the main toolbar.
  * @property { PDFConfiguration.BooleanType } [showActionButtons] Shows floating back and forward buttons in the lower part of the screen.
- * @property { AIAssistantConfiguration } [aiAssistantConfiguration] Configuration for AI Assistant. 
+ * @property { AIAssistantConfiguration } [aiAssistantConfiguration] Configuration for AI Assistant.
+ * @property { PDFConfiguration.BooleanType } [androidRemoveStatusBarOffset] Used to remove the Android status bar offset when wrapping the component in custom views.
+ * @property { PDFConfiguration.IOSFileConflictResolution } [iOSFileConflictResolution] Resolution options for conflicts due to out of process file changes or deletion.
+ * @property { PDFConfiguration.IOSDocumentInfoOption[] } [iOSDocumentInfoOptions] Choose which document-related information to display in the document info controller.
  */
 
 export class PDFConfiguration {
@@ -481,6 +484,18 @@ export class PDFConfiguration {
      * Configuration for AI Assistant. 
      */
     aiAssistantConfiguration?: AIAssistantConfiguration;
+    /**
+     * Used to remove the Android status bar offset when wrapping the component in custom views.
+     */
+    androidRemoveStatusBarOffset?: PDFConfiguration.BooleanType;
+    /**
+     * Resolution options for conflicts due to out of process file changes or deletion.
+     */
+    iOSFileConflictResolution?: PDFConfiguration.IOSFileConflictResolution;
+    /**
+     * Choose which document-related information to display in the document info controller.
+     */
+    iOSDocumentInfoOptions?: PDFConfiguration.IOSDocumentInfoOption[];
 }
 
 export namespace PDFConfiguration {
@@ -975,7 +990,64 @@ export namespace PDFConfiguration {
         */
         PAGE_BASED: 'pageBased'
     } as const;
+
+   /**
+    * Resolution options for conflicts due to out of process file changes or deletion.
+    * @readonly
+    * @enum {string} IOSFileConflictResolution
+    */  
+    export const IOSFileConflictResolution = {
+       /**
+        * The default conflict resolution behaviour. An alert will be shown to the user.
+        */
+        DEFAULT: 'default',
+       /**
+        * Resolve the conflict by closing the document.
+        */
+        CLOSE: 'close',
+       /**
+        * Resolve the conflict by saving the open document and overriding any file changes.
+        * If the file was deleted it will be restored.
+        */
+        SAVE: 'save',
+       /**
+        * Discard local changes and reload from file.
+        */
+        RELOAD: 'reload'
+    } as const;
     
+   /**
+    * The IOSDocumentInfoOption options.
+    * @readonly
+    * @enum {string} IOSDocumentInfoOption
+    */  
+   export const IOSDocumentInfoOption = {
+       /**
+        * The outline (Table of Contents) controller.
+        */
+        OUTLINE: 'outline',
+       /**
+        * Bookmark list controller.
+        */
+        BOOKMARKS: 'bookmarks',
+       /**
+        * Annotation list controller.
+        */
+        ANNOTATIONS: 'annotations',
+       /**
+        * Embedded Files. 
+        */
+        EMBEDDED_FILES: 'embeddedFiles',
+       /**
+        * Document Metadata.
+        */
+        DOCUMENT_INFO: 'documentInfo',
+       /**
+        * Document security options (permissions).
+        */
+        SECURITY: 'security'
+     } as const;
+
     export type BooleanType = ValueOf<typeof BooleanType>;
     export type ScrollDirection = ValueOf<typeof ScrollDirection>;
     export type PageTransition = ValueOf<typeof PageTransition>;
@@ -997,6 +1069,8 @@ export namespace PDFConfiguration {
     export type IOSLinkAction = ValueOf<typeof IOSLinkAction>;
     export type IOSDrawCreateMode = ValueOf<typeof IOSDrawCreateMode>;
     export type IOSBookmarkSortOrder = ValueOf<typeof IOSBookmarkSortOrder>;
+    export type IOSFileConflictResolution = ValueOf<typeof IOSFileConflictResolution>;
+    export type IOSDocumentInfoOption = ValueOf<typeof IOSDocumentInfoOption>;
 }
 
 /**

@@ -73,6 +73,8 @@ export default class InstantSynchronization extends BaseExampleAutoHidingHeaderC
         delay: this.state.delay ?? '1',
         syncAnnotations: this.state.syncAnnotations ?? true,
       }).then(async () => {
+        PSPDFKit.setLicenseKey(null);
+
         // You can change properties after the document is presented programmatically like in this examples:
         await PSPDFKit.setDelayForSyncingLocalChanges(
           parseFloat(this.state.delay),

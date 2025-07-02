@@ -12,19 +12,15 @@ import com.facebook.react.shell.MainReactPackage;
 import com.facebook.react.soloader.OpenSourceMergedSoMapping;
 import com.facebook.soloader.SoLoader;
 import com.rnfs.RNFSPackage;
+import com.facebook.react.ReactHost;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-public class MainApplication extends Application implements ReactApplication {
-    protected List<ReactPackage> getPackages() {
-        return Arrays.<ReactPackage>asList(
-                new MainReactPackage(),
-                new RNFSPackage()
-        );
-    }
+import static com.facebook.react.defaults.DefaultReactHost.getDefaultReactHost;
 
+public class MainApplication extends Application implements ReactApplication {
 
   private final ReactNativeHost mReactNativeHost =
       new DefaultReactNativeHost(this) {
@@ -61,6 +57,11 @@ public class MainApplication extends Application implements ReactApplication {
   @Override
   public ReactNativeHost getReactNativeHost() {
     return mReactNativeHost;
+  }
+
+  @Override
+  public ReactHost getReactHost() {
+    return getDefaultReactHost(getApplicationContext(), getReactNativeHost(), null);
   }
 
   @Override

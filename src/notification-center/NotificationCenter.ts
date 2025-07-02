@@ -168,6 +168,18 @@ import {
     } as const;
 
     /**
+     * Bookmarks events.
+     * @readonly
+     * @enum {string} BookmarksEvent
+     */
+    export const BookmarksEvent = {
+      /**
+       * Called when the bookmarks have been changed.
+       */
+      CHANGED: 'bookmarksChanged',
+    } as const;
+
+    /**
      * Analytics events.
      * @readonly
      * @enum {string} AnalyticsEvent
@@ -184,5 +196,6 @@ import {
     export type TextEvent = ValueOf<typeof TextEvent>;
     export type FormFieldEvent = ValueOf<typeof FormFieldEvent>;
     export type AnalyticsEvent = ValueOf<typeof AnalyticsEvent>;
+    export type BookmarksEvent = ValueOf<typeof BookmarksEvent>;
     type ValueOf<T> = T[keyof T];
 }

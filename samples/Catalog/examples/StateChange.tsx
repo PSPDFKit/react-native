@@ -38,7 +38,12 @@ export class StateChange extends BaseExampleAutoHidingHeaderComponent {
             showPageLabels: true,
           }}
           menuItemGrouping={[
-            'ink',
+            {
+              key: 'drawing',
+              items: [
+                'pen',
+              ],
+            },
           ]}
           pageIndex={this.state.currentPageIndex}
           style={styles.pdfColor}
@@ -72,7 +77,7 @@ export class StateChange extends BaseExampleAutoHidingHeaderComponent {
                 ) {
                   this.pdfRef.current?.exitCurrentlyActiveMode();
                 } else {
-                  this.pdfRef.current?.enterAnnotationCreationMode(Annotation.Type.INK);
+                  this.pdfRef.current?.enterAnnotationCreationMode(Annotation.Type.PEN);
                 }
               }}
               title={buttonTitle}

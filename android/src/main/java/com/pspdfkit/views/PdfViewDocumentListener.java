@@ -20,9 +20,12 @@ import android.view.MotionEvent;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.uimanager.events.EventDispatcher;
 import com.pspdfkit.annotations.Annotation;
 import com.pspdfkit.annotations.AnnotationProvider;
+import com.pspdfkit.bookmarks.Bookmark;
+import com.pspdfkit.bookmarks.BookmarkProvider;
 import com.pspdfkit.document.DocumentSaveOptions;
 import com.pspdfkit.document.PdfDocument;
 import com.pspdfkit.forms.FormElement;
@@ -40,11 +43,12 @@ import com.pspdfkit.react.events.PdfViewDocumentSavedEvent;
 import com.pspdfkit.ui.special_mode.controller.AnnotationSelectionController;
 import com.pspdfkit.ui.special_mode.manager.AnnotationManager;
 import com.pspdfkit.ui.special_mode.manager.FormManager;
+import com.pspdfkit.utils.Size;
 
 import java.util.List;
 import java.util.Map;
 
-class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annotations.OnAnnotationSelectedListener, AnnotationProvider.OnAnnotationUpdatedListener, FormListeners.OnFormFieldUpdatedListener, FormManager.OnFormElementSelectedListener, FormManager.OnFormElementDeselectedListener, DocumentScrollListener {
+class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annotations.OnAnnotationSelectedListener, AnnotationProvider.OnAnnotationUpdatedListener, FormListeners.OnFormFieldUpdatedListener, FormManager.OnFormElementSelectedListener, FormManager.OnFormElementDeselectedListener, DocumentScrollListener, BookmarkProvider.BookmarkListener {
 
     @NonNull
     private final PdfView parent;
@@ -54,6 +58,7 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
 
     private boolean disableDefaultActionForTappedAnnotations = false;
     private boolean disableAutomaticSaving = false;
+    private ReadableArray excludedAnnotations;
 
     PdfViewDocumentListener(@NonNull PdfView parent, @NonNull EventDispatcher eventDispatcher) {
         this.parent = parent;
@@ -66,6 +71,10 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
 
     public void setDisableAutomaticSaving(boolean disableAutomaticSaving) {
         this.disableAutomaticSaving = disableAutomaticSaving;
+    }
+
+    public void setExcludedAnnotations(ReadableArray annotations) {
+        this.excludedAnnotations = annotations;
     }
 
     @Override
@@ -104,10 +113,18 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
     public boolean onPageClick(@NonNull PdfDocument pdfDocument, int pageIndex, @Nullable MotionEvent motionEvent, @Nullable PointF pointF, @Nullable Annotation annotation) {
         String documentID = pdfDocument.getDocumentIdString();
         if (NutrientNotificationCenter.INSTANCE.getIsNotificationCenterInUse()) {
-            NutrientNotificationCenter.INSTANCE.didTapDocument(pointF, documentID);
+            if (pointF != null) {
+                // Calculate the inverted point on the y-axis using page size
+                Size size = pdfDocument.getPageSize(pageIndex);
+                PointF clickedPoint = new PointF(pointF.x, size.height - pointF.y);
+                NutrientNotificationCenter.INSTANCE.didTapDocument(clickedPoint, pageIndex, documentID);
+            }
         }
         if (annotation != null) {
             if (NutrientNotificationCenter.INSTANCE.getIsNotificationCenterInUse()) {
+                if (pointF == null) {
+                    pointF = new PointF(0,0);
+                }
                 NutrientNotificationCenter.INSTANCE.didTapAnnotation(annotation, pointF, documentID);
             }
             eventDispatcher.dispatchEvent(new PdfViewAnnotationTappedEvent(parent.getId(), annotation));
@@ -145,7 +162,28 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
 
     @Override
     public boolean onPrepareAnnotationSelection(@NonNull AnnotationSelectionController annotationSelectionController, @NonNull Annotation annotation, boolean annotationCreated) {
-        return !disableDefaultActionForTappedAnnotations;
+        // First check if default action should be disabled
+        if (disableDefaultActionForTappedAnnotations) {
+            return false;
+        }
+
+        // Check if this annotation should be excluded
+        ReadableArray excludedAnnotations = this.excludedAnnotations;
+        if (excludedAnnotations != null && excludedAnnotations.size() > 0) {
+            String annotationUuid = annotation.getUuid();
+            String annotationName = annotation.getName();
+
+            for (int i = 0; i < excludedAnnotations.size(); i++) {
+                String excludedUuid = excludedAnnotations.getString(i);
+                if (excludedUuid != null &&
+                        (excludedUuid.equals(annotationUuid) ||
+                                (annotationName != null && excludedUuid.equals(annotationName)))) {
+                    return false; // Exclude this annotation
+                }
+            }
+        }
+
+        return true; // Allow selection
     }
 
     @SuppressLint("CheckResult")
@@ -267,5 +305,21 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
                 NutrientNotificationCenter.INSTANCE.documentScrolled(Map.of("currX", currX, "currY", currY, "maxX", maxX, "maxY", maxY, "extendX", extendX, "extendY", extendY), documentID);
             });
         }
+    }
+
+    @SuppressLint("CheckResult")
+    @Override
+    public void onBookmarksChanged(@NonNull List<Bookmark> list) {
+        if (NutrientNotificationCenter.INSTANCE.getIsNotificationCenterInUse()) {
+            parent.getPdfFragment().subscribe(pdfFragment -> {
+                String documentID = pdfFragment.getDocument().getDocumentIdString();
+                NutrientNotificationCenter.INSTANCE.bookmarksChanged(list, documentID);
+            });
+        }
+    }
+
+    @Override
+    public void onBookmarkAdded(@NonNull Bookmark bookmark) {
+        BookmarkProvider.BookmarkListener.super.onBookmarkAdded(bookmark);
     }
 }

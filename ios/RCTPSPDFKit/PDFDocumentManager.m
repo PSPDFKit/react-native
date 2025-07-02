@@ -48,4 +48,10 @@ RCT_EXTERN_METHOD(importXFDF:(NSNumber _Nonnull)reference filePath:(NSString *)f
 
 RCT_EXTERN_METHOD(exportXFDF:(NSNumber _Nonnull)reference filePath:(NSString *)filePath onSuccess:(RCTPromiseResolveBlock)resolve onError:(RCTPromiseRejectBlock)reject);
 
+RCT_EXTERN_METHOD(getBookmarks:(NSNumber _Nonnull)reference onSuccess:(RCTPromiseResolveBlock)resolve onError:(RCTPromiseRejectBlock)reject);
+
+RCT_EXTERN_METHOD(addBookmarks:(NSNumber _Nonnull)reference bookmarks:(NSArray *)bookmarks onSuccess:(RCTPromiseResolveBlock)resolve onError:(RCTPromiseRejectBlock)reject);
+
+RCT_EXTERN_METHOD(removeBookmarks:(NSNumber _Nonnull)reference bookmarks:(NSArray *)bookmarks onSuccess:(RCTPromiseResolveBlock)resolve onError:(RCTPromiseRejectBlock)reject);
+
 @end

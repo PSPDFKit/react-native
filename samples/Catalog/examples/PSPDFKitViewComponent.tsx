@@ -1,6 +1,6 @@
 import React from 'react';
 import { Alert, processColor, Text, TouchableOpacity, View } from 'react-native';
-import PSPDFKitView, { FormField } from 'react-native-pspdfkit';
+import PSPDFKitView, { FormField, PDFConfiguration } from 'react-native-pspdfkit';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { exampleDocumentPath, pspdfkitColor } from '../configuration/Constants';
@@ -31,6 +31,7 @@ export class PSPDFKitViewComponent extends BaseExampleAutoHidingHeaderComponent 
             toolbarTitle: 'My Awesome Report',
             iOSBackgroundColor: processColor('lightgrey'),
             iOSUseParentNavigationBar: false,
+            iOSDocumentInfoOptions: [PDFConfiguration.IOSDocumentInfoOption.OUTLINE, PDFConfiguration.IOSDocumentInfoOption.ANNOTATIONS],
           }}
           fragmentTag="PDF1"
           showNavigationButtonInToolbar={true}

@@ -663,11 +663,10 @@ public class ConfigurationAdapter {
         if (showDefaultToolbar) {
             // Set it back to the default, which is AUTOMATIC_HIDE_SINGLE
             configuration.setTabBarHidingMode(TabBarHidingMode.AUTOMATIC_HIDE_SINGLE);
-            configuration.defaultToolbarEnabled(true);
         } else {
             configuration.setTabBarHidingMode(TabBarHidingMode.HIDE);
-            configuration.defaultToolbarEnabled(false);
         }
+        configuration.defaultToolbarEnabled(showDefaultToolbar);
     }
 
     private void configureShowActionButtons(final boolean showActionButtons) {

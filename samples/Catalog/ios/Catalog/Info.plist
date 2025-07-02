@@ -41,6 +41,8 @@
 	<string>Images from documents and annotations can be saved to the photo library.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Pictures from the photo library can be added to the document as image annotations.</string>
+	<key>RCTNewArchEnabled</key>
+	<true/>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>audio</string>

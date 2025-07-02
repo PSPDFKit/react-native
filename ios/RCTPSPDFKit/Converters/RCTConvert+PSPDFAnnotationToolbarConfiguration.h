@@ -15,5 +15,6 @@
 
 + (PSPDFAnnotationToolbarConfiguration *)PSPDFAnnotationToolbarConfiguration:(id)json;
 + (PSPDFAnnotationString)PSPDFAnnotationStringFromName:(NSString *)name;
++ (PSPDFAnnotationVariantString)PSPDFAnnotationVariantStringFromName:(NSString *)name;
 
 @end

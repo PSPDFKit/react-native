@@ -28,12 +28,16 @@ import android.util.Log;
 import android.util.Pair;
 import android.view.Choreographer;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.Insets;
 import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.FragmentManager;
 
 import com.facebook.react.bridge.Arguments;
@@ -193,6 +197,8 @@ public class PdfView extends FrameLayout {
 
     private boolean isDefaultToolbarHidden = false;
 
+    private boolean isStatusBarHidden = false;
+
     /** Indicates whether the image document annotations should be flattened only or flattened and embedded. */
     private String imageSaveMode = "flatten";
 
@@ -255,6 +261,27 @@ public class PdfView extends FrameLayout {
 
         // Generate an id to set on all fragments created by the PdfView.
         internalId = View.generateViewId();
+
+        ViewCompat.setOnApplyWindowInsetsListener(this, new androidx.core.view.OnApplyWindowInsetsListener() {
+            @NonNull
+            @Override
+            public WindowInsetsCompat onApplyWindowInsets(@NonNull View v, @NonNull WindowInsetsCompat windowInsets) {
+                if (isStatusBarHidden) {
+                    Insets insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
+                    ViewGroup.LayoutParams layoutParams = v.getLayoutParams();
+                    if (layoutParams instanceof MarginLayoutParams marginParams) {
+                        marginParams.leftMargin = insets.left;
+                        marginParams.topMargin = insets.top;
+                        marginParams.rightMargin = insets.right;
+                        marginParams.bottomMargin = insets.bottom;
+                        v.setLayoutParams(marginParams);
+                    }
+                    return WindowInsetsCompat.CONSUMED;
+                } else {
+                    return windowInsets;
+                }
+            }
+        });
     }
 
     public void inject(FragmentManager fragmentManager, EventDispatcher eventDispatcher) {
@@ -424,9 +451,17 @@ public class PdfView extends FrameLayout {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(fragment -> {
                     if (fragment != null) {
-                        fragment.setPageIndex(pageIndex);
+                        try {
+                            fragment.setPageIndex(pageIndex);
+                        } catch (Exception e) {
+                            // Invalid page index
+                        }
                     }
                 });
+    }
+
+    public void setExcludedAnnotations(ReadableArray annotations) {
+        pdfViewDocumentListener.setExcludedAnnotations(annotations);
     }
 
     public void setDisableDefaultActionForTappedAnnotations(boolean disableDefaultActionForTappedAnnotations) {
@@ -516,6 +551,10 @@ public class PdfView extends FrameLayout {
 
     public void setImageSaveMode(final String imageSaveMode) {
         this.imageSaveMode = imageSaveMode;
+    }
+
+    public void setIsStatusBarHidden(final boolean statusBarHidden) {
+        this.isStatusBarHidden = statusBarHidden;
     }
 
     public void setHideDefaultToolbar(boolean hideDefaultToolbar) {
@@ -730,6 +769,7 @@ public class PdfView extends FrameLayout {
         pdfFragment.addDocumentScrollListener(pdfViewDocumentListener);
         if (pdfFragment.getDocument() != null) {
             pdfFragment.getDocument().getFormProvider().addOnFormFieldUpdatedListener(pdfViewDocumentListener);
+            pdfFragment.getDocument().getBookmarkProvider().addBookmarkListener(pdfViewDocumentListener);
         }
 
         // Add annotation configurations.
@@ -802,10 +842,14 @@ public class PdfView extends FrameLayout {
         getCurrentPdfFragment()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(pdfFragment -> {
-                    if (pdfFragment != null) {
-                        updateState(pdfFragment.getPageIndex());
-                    } else {
-                        updateState(-1);
+                    try {
+                        if (pdfFragment != null) {
+                            updateState(pdfFragment.getPageIndex());
+                        } else {
+                            updateState(-1);
+                        }
+                    } catch (Exception e) {
+                        // Could not update state
                     }
                 });
     }

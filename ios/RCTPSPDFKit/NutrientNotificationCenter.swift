@@ -31,6 +31,7 @@ import PSPDFKit
     case formFieldSelected
     case formFieldDeselected
     case analytics
+    case bookmarksChanged
     
     public typealias RawValue = String
 
@@ -68,6 +69,8 @@ import PSPDFKit
                 return "formFieldDeselected"
             case .analytics:
                 return "analytics"
+            case .bookmarksChanged:
+                return "bookmarksChanged"
         }
     }
 
@@ -105,6 +108,8 @@ import PSPDFKit
                 self = .formFieldDeselected
             case "analytics":
                 self = .analytics
+            case "bookmarksChanged":
+                self = .bookmarksChanged
             default:
                 return nil
         }
@@ -168,11 +173,12 @@ import PSPDFKit
                                body: jsonData)
     }
     
-    @objc public func didTapDocument(tapPoint: CGPoint, documentID: String) {
+    @objc public func didTapDocument(tapPoint: CGPoint, pageIndex: Int, documentID: String) {
         if (!isInUse) { return }
 
         let pointDictionary = ["x" : tapPoint.x , "y" : tapPoint.y]
         let jsonData = ["event" : NotificationEvent.documentTapped.rawValue,
+                        "pageIndex" : pageIndex,
                         "point" : pointDictionary,
                         "documentID" : documentID] as [String : Any]
         eventEmitter?.sendEvent(withName:NotificationEvent.documentTapped.rawValue,
@@ -299,6 +305,30 @@ import PSPDFKit
                          "rect" : rectDictionary, "documentID" : documentID] as [String : Any]
         eventEmitter?.sendEvent(withName:NotificationEvent.textSelected.rawValue,
                                body: jsonData)
+    }
+    
+    @objc public func bookmarksChanged(notification: Notification, documentID: String) {
+        if (!isInUse) { return }
+        
+        if let bookmarkManager = notification.object as? BookmarkManager {
+            let bookmarks = bookmarkManager.bookmarks
+            var bookmarksArray: [[String: Any]] = []
+
+            for bookmark in bookmarks {
+                let dict: [String: Any] = [
+                    "identifier": bookmark.identifier,
+                    "pageIndex": bookmark.pageIndex
+                ]
+                bookmarksArray.append(dict)
+            }
+            
+            let jsonData = ["event" : NotificationEvent.bookmarksChanged.rawValue,
+                            "bookmarks" : bookmarksArray,
+                            "documentID" : documentID] as [String : Any]
+            
+            eventEmitter?.sendEvent(withName:NotificationEvent.bookmarksChanged.rawValue,
+                                   body: jsonData)
+        }
     }
     
     @objc public func analyticsEnabled() {

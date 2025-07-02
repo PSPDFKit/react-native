@@ -22,12 +22,16 @@ import Foundation
     var barButtonItems: NSMutableDictionary!
     var closeButtonAttributes: NSDictionary!
     var pendingCallbacks: NSMutableArray!
+    var fileConflictResolution: String!
+    var excludedAnnotations: NSMutableArray!
 
     override public init() {
         annotationContextualMenuItems = [:]
         barButtonItems = [:]
         closeButtonAttributes = [:]
         pendingCallbacks = []
+        fileConflictResolution = "default"
+        excludedAnnotations = []
         super .init()
     }
     
@@ -65,5 +69,21 @@ import Foundation
     
     @objc public func getPendingCallbacks() -> NSArray {
         return pendingCallbacks
+    }
+    
+    @objc public func setFileConflictResolution(_ resolution: String) {
+        fileConflictResolution = resolution
+    }
+    
+    @objc public func getFileConflictResolution() -> String {
+        return fileConflictResolution    
+    }
+  
+    @objc public func setExcludedAnnotations(_ annotations: NSArray) {
+        excludedAnnotations = annotations.mutableCopy() as? NSMutableArray
+    }
+    
+    @objc public func getExcludedAnnotations() -> NSArray {
+        return excludedAnnotations
     }
 }

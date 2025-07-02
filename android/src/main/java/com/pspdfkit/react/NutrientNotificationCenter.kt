@@ -4,10 +4,12 @@ import android.os.Bundle
 import android.graphics.PointF
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.ReactContext
+import com.facebook.react.bridge.WritableArray
 import com.facebook.react.bridge.WritableMap
 import com.pspdfkit.PSPDFKit
 import com.pspdfkit.analytics.AnalyticsClient
 import com.pspdfkit.annotations.Annotation
+import com.pspdfkit.bookmarks.Bookmark
 import com.pspdfkit.forms.ChoiceFormElement
 import com.pspdfkit.forms.ComboBoxFormElement
 import com.pspdfkit.forms.EditableButtonFormElement
@@ -38,7 +40,8 @@ enum class NotificationEvent(val value: String) {
     FORM_FIELD_VALUES_UPDATED("formFieldValuesUpdated"),
     FORM_FIELD_SELECTED("formFieldSelected"),
     FORM_FIELD_DESELECTED("formFieldDeselected"),
-    ANALYTICS("analytics");
+    ANALYTICS("analytics"),
+    BOOKMARKS_CHANGED("bookmarksChanged");
 }
 
 object NutrientNotificationCenter {
@@ -100,7 +103,7 @@ object NutrientNotificationCenter {
         sendEvent(NotificationEvent.DOCUMENT_SCROLLED.value, jsonData)
     }
 
-    fun didTapDocument(pointF: PointF, documentID: String) {
+    fun didTapDocument(pointF: PointF, pageIndex: Int, documentID: String) {
         try {
             val pointMap = mapOf("x" to pointF.x, "y" to pointF.y)
             val nativePointMap = Arguments.makeNativeMap(pointMap)
@@ -108,6 +111,7 @@ object NutrientNotificationCenter {
             val jsonData = Arguments.createMap()
             jsonData.putString("event", NotificationEvent.DOCUMENT_TAPPED.value)
             jsonData.putMap("point", nativePointMap)
+            jsonData.putInt("pageIndex", pageIndex)
             jsonData.putString("documentID", documentID)
             sendEvent(NotificationEvent.DOCUMENT_TAPPED.value, jsonData)
         } catch (e: Exception) {
@@ -134,19 +138,22 @@ object NutrientNotificationCenter {
                 }
             }
             "removed" -> {
-                val annotationsList = mutableListOf<Map<String, Any>>()
-                val annotationMap = HashMap<String, String>()
-                annotation.name?.let { annotationMap["name"] = it }
-                annotation.creator?.let { annotationMap["creatorName"] = it }
-                annotationMap["uuid"] = annotation.uuid
-                annotationsList.add(annotationMap)
-                val nativeAnnotationsList = Arguments.makeNativeArray(annotationsList)
+                // Only emit event if annotation has a name and creator
+                if (annotation.name != null && annotation.creator != null) {
+                    val annotationsList = mutableListOf<Map<String, Any>>()
+                    val annotationMap = HashMap<String, String>()
+                    annotation.name?.let { annotationMap["name"] = it }
+                    annotation.creator?.let { annotationMap["creatorName"] = it }
+                    annotationMap["uuid"] = annotation.uuid
+                    annotationsList.add(annotationMap)
+                    val nativeAnnotationsList = Arguments.makeNativeArray(annotationsList)
 
-                val jsonData = Arguments.createMap()
-                jsonData.putString("event", NotificationEvent.ANNOTATIONS_REMOVED.value)
-                jsonData.putArray("annotations", nativeAnnotationsList)
-                jsonData.putString("documentID", documentID)
-                sendEvent(NotificationEvent.ANNOTATIONS_REMOVED.value, jsonData)
+                    val jsonData = Arguments.createMap()
+                    jsonData.putString("event", NotificationEvent.ANNOTATIONS_REMOVED.value)
+                    jsonData.putArray("annotations", nativeAnnotationsList)
+                    jsonData.putString("documentID", documentID)
+                    sendEvent(NotificationEvent.ANNOTATIONS_REMOVED.value, jsonData)
+                }
             }
             "added" -> {
                 try {
@@ -164,6 +171,28 @@ object NutrientNotificationCenter {
                     // Could not decode annotation data
                 }
             }
+        }
+    }
+
+    fun bookmarksChanged(bookmarks: List<Bookmark>, documentID: String) {
+        try {
+            // Create a WritableArray to hold the bookmark maps
+            val bookmarksArray: WritableArray = Arguments.createArray()
+
+            for (bookmark in bookmarks) {
+                val bookmarkMap: WritableMap = Arguments.createMap()
+                bookmarkMap.putString("identifier", bookmark.uuid)
+                bookmark.pageIndex?.let { bookmarkMap.putInt("pageIndex", it) }
+                bookmarksArray.pushMap(bookmarkMap)
+            }
+
+            val jsonData = Arguments.createMap()
+            jsonData.putString("event", NotificationEvent.BOOKMARKS_CHANGED.value)
+            jsonData.putArray("bookmarks", bookmarksArray)
+            jsonData.putString("documentID", documentID)
+            sendEvent(NotificationEvent.BOOKMARKS_CHANGED.value, jsonData)
+        } catch (e: Exception) {
+            // Could not decode bookmark data
         }
     }
 

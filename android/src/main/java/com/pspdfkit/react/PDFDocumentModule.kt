@@ -28,6 +28,7 @@ import com.pspdfkit.forms.ComboBoxFormElement
 import com.pspdfkit.forms.EditableButtonFormElement
 import com.pspdfkit.forms.TextFormElement
 import com.pspdfkit.react.helper.AnnotationUtils
+import com.pspdfkit.react.helper.BookmarkUtils
 import com.pspdfkit.react.helper.ConversionHelpers.getAnnotationTypes
 import com.pspdfkit.react.helper.DocumentJsonDataProvider
 import com.pspdfkit.react.helper.FormUtils
@@ -288,7 +289,7 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
         // Can be removed after customer migration is complete.
 
         if (instantJSON.type == ReadableType.Map) {
-            applyInstantJSON(reference, instantJSON.asMap(), promise)
+            instantJSON.asMap()?.let { applyInstantJSON(reference, it, promise) }
             return
         }
 
@@ -296,8 +297,8 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
             this.getDocument(reference)?.document?.let { document ->
                 if (instantJSON.type == ReadableType.Array) {
                     val instantJSONArray = instantJSON.asArray()
-                    val hasImageAnnotations = (0 until instantJSONArray.size()).any { i ->
-                        val annotation = instantJSONArray.getMap(i)
+                    val hasImageAnnotations = (0 until (instantJSONArray?.size() ?: 0)).any { i ->
+                        val annotation = instantJSONArray?.getMap(i)
                         val hashMap = annotation?.toHashMap() as? Map<String, Any>
                         hashMap?.containsKey("imageAttachmentId") == true
                     }
@@ -305,23 +306,27 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
                     if (hasImageAnnotations) {
                         // If there are any image annotations, process them all at once
                         val attachmentsJSONMap = attachments.asMap()
-                        val instantData = createInstantObject(instantJSONArray, attachmentsJSONMap)
+                        val instantData = createInstantObject(instantJSONArray!!,
+                            attachmentsJSONMap!!
+                        )
                         if (instantData != null) {
                             applyInstantJSON(reference, instantData, promise)
                             return
                         }
                     } else {
                         // Process non-image annotations directly
-                        for (i in 0 until instantJSONArray.size()) {
-                            try {
-                                val annotation = instantJSONArray.getMap(i)
-                                val hashMap = annotation!!.toHashMap() as Map<String, Any>
-                                document.annotationProvider.createAnnotationFromInstantJson(
-                                    JSONObject(hashMap).toString()
-                                )
-                            } catch (e: Exception) {
-                                promise.reject("addAnnotations error", e)
-                                return
+                        if (instantJSONArray != null) {
+                            for (i in 0 until instantJSONArray.size()) {
+                                try {
+                                    val annotation = instantJSONArray.getMap(i)
+                                    val hashMap = annotation!!.toHashMap() as Map<*, *>
+                                    document.annotationProvider.createAnnotationFromInstantJson(
+                                        JSONObject(hashMap).toString()
+                                    )
+                                } catch (e: Exception) {
+                                    promise.reject("addAnnotations error", e)
+                                    return
+                                }
                             }
                         }
                         promise.resolve(true)
@@ -338,7 +343,7 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
     @ReactMethod fun applyInstantJSON(reference: Int, instantJSON: ReadableMap, promise: Promise) {
         try {
             this.getDocument(reference)?.document?.let {
-                val json = JSONObject(instantJSON.toHashMap() as Map<*, *>?)
+                val json = (instantJSON.toHashMap() as Map<*, *>?)?.let { it1 -> JSONObject(it1) }
                 val dataProvider: DataProvider = DocumentJsonDataProvider(json)
                 DocumentJsonFormatter.importDocumentJsonAsync(it, dataProvider)
                     .subscribeOn(Schedulers.io())
@@ -467,12 +472,15 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
                                 }
                                 is ChoiceFormElement -> {
                                     if (value.type == ReadableType.Array) {
-                                        val indices = value.asArray().toArrayList().filterIsInstance<Int>()
-                                        formElement.selectedIndexes = indices
+                                        val indices = value.asArray()?.toArrayList()
+                                            ?.filterIsInstance<Int>()
+                                        if (indices != null) {
+                                            formElement.selectedIndexes = indices
+                                        }
                                         success = true
                                     } else if (value.type == ReadableType.String) {
                                         try {
-                                            val index = value.asString().toInt()
+                                            val index = value.asString()?.toInt()
                                             formElement.selectedIndexes = listOf(index)
                                             success = true
                                         } catch (e: NumberFormatException) {
@@ -486,7 +494,7 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
                                 }
                                 is TextFormElement -> {
                                     if (value.type == ReadableType.String) {
-                                        formElement.setText(value.asString())
+                                        value.asString()?.let { it1 -> formElement.setText(it1) }
                                         success = true
                                     }
                                 }
@@ -505,6 +513,66 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
             }
         } catch (e: Throwable) {
             promise.reject("updateFormFieldValue", e)
+        }
+    }
+
+    @ReactMethod fun getBookmarks(reference: Int, promise: Promise) {
+        try {
+            this.getDocument(reference)?.document?.let { document ->
+                val bookmarks = document.bookmarkProvider.bookmarks
+                val bookmarksJSON = BookmarkUtils.bookmarksToJSON(bookmarks)
+                promise.resolve(Arguments.makeNativeArray(bookmarksJSON))
+            } ?: run {
+                promise.reject("getBookmarks", "Document is nil", null)
+            }
+        } catch (e: Throwable) {
+            promise.reject("getBookmarks error", e)
+        }
+    }
+
+    @ReactMethod fun addBookmarks(reference: Int, bookmarks: ReadableArray, promise: Promise) {
+        try {
+            val document = this.getDocument(reference)?.document
+            if (document == null) {
+                promise.reject("addBookmarks", "Document is nil", null)
+                return
+            }
+
+            // Convert JSON to Bookmark objects
+            val bookmarkObjects = BookmarkUtils.JSONToBookmarks(bookmarks)
+
+            // Add each bookmark to the document
+            for (bookmark in bookmarkObjects) {
+                document.bookmarkProvider.addBookmark(bookmark)
+            }
+
+            promise.resolve(true)
+
+        } catch (e: Throwable) {
+            promise.reject("addBookmarks error", e)
+        }
+    }
+
+    @ReactMethod fun removeBookmarks(reference: Int, bookmarks: ReadableArray, promise: Promise) {
+        try {
+            val document = this.getDocument(reference)?.document
+            if (document == null) {
+                promise.reject("removeBookmarks", "Document is nil", null)
+                return
+            }
+
+            // Convert JSON to Bookmark objects
+            val bookmarkObjects = BookmarkUtils.JSONToBookmarks(bookmarks)
+
+            // Remove each bookmark from the document
+            for (bookmark in bookmarkObjects) {
+                document.bookmarkProvider.removeBookmark(bookmark)
+            }
+
+            promise.resolve(true)
+
+        } catch (e: Throwable) {
+            promise.reject("removeBookmarks error", e)
         }
     }
 

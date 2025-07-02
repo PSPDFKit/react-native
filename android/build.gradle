@@ -15,7 +15,7 @@
  *   Contains gradle configuration constants
  */
 ext {
-    PSPDFKIT_VERSION = '10.4.0'
+    PSPDFKIT_VERSION = '10.4.1'
 }
 
 buildscript {

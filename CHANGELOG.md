@@ -1,3 +1,15 @@
+## 2.19.0 - 01 Jul 2025
+
+- Adds the `androidRemoveStatusBarOffset` property to the `PDFConfiguration` object on Android. (J#HYB-802)
+- Adds the `iOSFileConflictResolution` option to `PDFConfiguration` to manage file conflict resolution on iOS. (J#HYB-825)
+- Adds the `iOSDocumentInfoOptions` option to `PDFConfiguration` to customize Document Info tabs on iOS. (J#HYB-826)
+- Adds the `setExcludedAnnotations` API to exclude specified annotations completely from selection. (J#HYB-823)
+- Adds the `bookmarksChanged` event to `NotificationCenter` to receive bookmark change events. (J#HYB-818)
+- Adds the `getBookmarks`, `addBookmarks` and `removeBookmarks` APIs to `PDFDocument` for bookmark management. (J#HYB-818)
+- Fixes an issue where the `enterAnnotationCreationMode` API does not honour annotation variant options. (J#HYB-814)
+- Fixes an issue where the `enterAnnotationCreationMode` API on iOS could not change tools when already active. (J#HYB-815)
+- Fixes an issue where `AnnotationsEvent.REMOVED` contained null `name` and `creatorName` properties on Android. (J#HYB-829)
+
 ## 2.18.1 - 24 Jun 2025
 - Updates to Nutrient Android SDK 10.4.0.
 - Fixes an issue where the `enterAnnotationCreationMode` and `exitCurrentlyActiveMode` calls on Android resolved before being complete. (J#HYB-824)
@@ -6,13 +18,13 @@
 
 ## 2.18.0 - 20 May 2025
 
-- Adds the new `AIAssistantConfiguration` class to configure AI Assistant and also add new `aiAssistantButtonItem` option to Toolbar configuration. (J#HYB-743)
+- Adds the new `AIAssistantConfiguration` class to configure AI Assistant, and also adds the new `aiAssistantButtonItem` option to the toolbar configuration. (J#HYB-743)
 - Adds the new `getPageInfo` API to the `PDFDocument` class. (J#HYB-801)
 - Updates to Nutrient Android SDK 10.2.0.
 - Updates to Nutrient iOS SDK 14.8.0.
 - Fixes an issue where the `setLicenseKeys` API could cause a crash on Android if called too early during the application lifecycle. (J#HYB-790)
-- Fixes an issue where `NotificationCenter` events are not always delivered when running Release build configuration on iOS. (J#HYB-793)
-- Fixes an issue where toolbar button customization was not persisted on Android during component reload. (J#HYB-800)
+- Fixes an issue where `NotificationCenter` events aren't always delivered when running the Release build configuration on iOS. (J#HYB-793)
+- Fixes an issue where toolbar button customization wasn't persisted on Android during component reload. (J#HYB-800)
 - Fixes an issue where the `onAnnotationTapped` callback wasn't called reliably on Android. (J#HYB-805)
 
 ## 2.17.0 - 14 Apr 2025

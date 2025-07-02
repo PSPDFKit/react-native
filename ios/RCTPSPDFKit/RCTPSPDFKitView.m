@@ -23,6 +23,7 @@
 #define VALIDATE_DOCUMENT(document, ...) { if (!document.isValid) { NSLog(@"Document is invalid."); [NutrientNotificationCenter.shared documentLoadFailed]; if (self.onDocumentLoadFailed) { self.onDocumentLoadFailed(@{@"error": @"Document is invalid."}); } return __VA_ARGS__; }}
 
 @interface RCTPSPDFKitViewController : PSPDFViewController
+@property (nonatomic, strong) SessionStorage *sessionStorage;
 @end
 
 @interface RCTPSPDFKitView ()<PSPDFDocumentDelegate, PSPDFViewControllerDelegate, PSPDFFlexibleToolbarContainerDelegate, PDFDocumentManagerDelegate, PSPDFDocumentViewControllerDelegate>
@@ -42,10 +43,11 @@
     _pdfController.delegate = self;
     _pdfController.annotationToolbarController.delegate = self;
     _sessionStorage = [SessionStorage new];
+    ((RCTPSPDFKitViewController *)_pdfController).sessionStorage = _sessionStorage;
     
     // Store the closeButton's target and selector in order to call it later.
-    [_sessionStorage setCloseButtonAttributes:@{@"target" : _pdfController.closeButtonItem.target,
-                                                @"action" : NSStringFromSelector(_pdfController.closeButtonItem.action)}];
+      [_sessionStorage setCloseButtonAttributes:@{@"target" : _pdfController.closeButtonItem.target,
+                                                  @"action" : NSStringFromSelector(_pdfController.closeButtonItem.action)}];
       
     [_pdfController.closeButtonItem setTarget:self];
     [_pdfController.closeButtonItem setAction:@selector(closeButtonPressed:)];
@@ -58,6 +60,11 @@
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(spreadIndexDidChange:) name:PSPDFDocumentViewControllerSpreadIndexDidChangeNotification object:nil];
       
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(documentDidFinishRendering) name:PSPDFDocumentViewControllerDidConfigureSpreadViewNotification object:nil];
+      
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(bookmarksDidChange:)
+                                                 name:PSPDFBookmarksChangedNotification
+                                               object:nil];
   }
   
   return self;
@@ -143,13 +150,20 @@
   return nil;
 }
 
-- (BOOL)enterAnnotationCreationMode:(PSPDFAnnotationString)annotationType {
+- (BOOL)enterAnnotationCreationMode:(PSPDFAnnotationString)annotationType withVariant:(PSPDFAnnotationVariantString)annotationVariant {
   [self.pdfController setViewMode:PSPDFViewModeDocument animated:YES];
   [self.pdfController.annotationToolbarController updateHostView:self container:nil viewController:self.pdfController];
     if (annotationType != nil) {
         [self.pdfController.annotationStateManager setState:annotationType];
+        [self.pdfController.annotationStateManager setVariant:annotationVariant];
     }
-  return [self.pdfController.annotationToolbarController showToolbarAnimated:YES completion:NULL];
+    
+    // If already in editing mode, just change the tool
+    if ([self.pdfController.annotationToolbarController isToolbarVisible]) {
+        return YES;
+    } else {
+        return [self.pdfController.annotationToolbarController showToolbarAnimated:YES completion:NULL];
+    }
 }
 
 - (BOOL)exitCurrentlyActiveMode {
@@ -257,7 +271,7 @@
         [_pdfController.interactions.allInteractions allowSimultaneousRecognitionWithGestureRecognizer:tapGestureRecognizer];
         [pageView addGestureRecognizer:tapGestureRecognizer];
     }
-
+    
   [self onStateChangedForPDFViewController:pdfController pageView:pageView pageAtIndex:pageIndex];
 }
 
@@ -304,6 +318,27 @@
 
 - (void)pdfViewController:(PSPDFViewController *)pdfController didSelectText:(NSString *)text withGlyphs:(NSArray<PSPDFGlyph *> *)glyphs atRect:(CGRect)rect onPageView:(PSPDFPageView *)pageView {
     [NutrientNotificationCenter.shared didSelectTextWithText:text rect:rect documentID:pdfController.document.documentIdString];
+}
+
+- (NSArray<PSPDFAnnotation *> *)pdfViewController:(PSPDFViewController *)pdfController shouldSelectAnnotations:(NSArray<PSPDFAnnotation *> *)annotations onPageView:(PSPDFPageView *)pageView {
+    
+    NSArray *excludedAnnotations = [_sessionStorage getExcludedAnnotations];
+    
+    if (excludedAnnotations.count == 0) {
+        return annotations;
+    }
+    
+    NSPredicate *predicate = [NSPredicate predicateWithBlock:^BOOL(PSPDFAnnotation *annotation, NSDictionary *bindings) {
+        for (NSString *excludedUUID in excludedAnnotations) {
+            if ([annotation.uuid isEqualToString:excludedUUID] ||
+                (annotation.name && [annotation.name isEqualToString:excludedUUID])) {
+                return NO; // Exclude this annotation
+            }
+        }
+        return YES; // Include this annotation
+    }];
+    
+    return [annotations filteredArrayUsingPredicate:predicate];
 }
 
 // MARK: - PSPDFDocumentViewControllerDelegate
@@ -606,10 +641,26 @@
   }
 }
 
+- (void)bookmarksDidChange:(NSNotification *)notification {
+    [NutrientNotificationCenter.shared bookmarksChangedWithNotification:notification
+                                                             documentID:self.pdfController.document.documentIdString];
+}
+
 - (void)tapGestureRecognizerDidChangeState:(UIGestureRecognizer *)gestureRecognizer {
     if (gestureRecognizer.state == UIGestureRecognizerStateEnded) {
+        // Calculates the CGPoint location on the specific page
+        PSPDFDocumentViewController *documentViewController = self.pdfController.documentViewController;
+        PSPDFPageIndex pageIndex = [documentViewController.layout pageRangeForSpreadAtIndex:documentViewController.spreadIndex].location;
+        PSPDFPageView *pageView = [self.pdfController pageViewForPageAtIndex:pageIndex];
         CGPoint point = [gestureRecognizer locationInView:gestureRecognizer.view];
+        
+        // Uses visiblePageIndex to determine which page was clicked when pageMode is double (side-by-side on iPad)
+        CGPoint visiblePoint = [gestureRecognizer locationInView:pageView];
+        PSPDFPageView *visiblePageView = [documentViewController visiblePageViewAtPoint:visiblePoint];
+        PSPDFPageIndex visiblePageIndex = visiblePageView.pageIndex;
+        
         [NutrientNotificationCenter.shared didTapDocumentWithTapPoint:point
+                                                            pageIndex:visiblePageIndex
                                                            documentID:self.pdfController.document.documentIdString];
     }
 }
@@ -750,6 +801,12 @@
     [_sessionStorage setAnnotationContextualMenuItems:updatedItems];
 }
 
+// MARK: - Specify Annotations that cannot be selected
+
+- (void)setExcludedAnnotations:(NSArray *)annotations {
+    [_sessionStorage setExcludedAnnotations:annotations];
+}
+
 // MARK: - Helpers
 
 - (void)didSetProps:(NSArray<NSString *> *)changedProps {
@@ -813,6 +870,21 @@
               [PspdfkitMeasurementConvertor addMeasurementValueConfigurationWithDocument:controller.document
                                                                              configuration:config];
           }
+      }
+    
+    if (dictionary[@"fileConflictResolution"]) {
+        [_sessionStorage setFileConflictResolution:dictionary[@"fileConflictResolution"]];
+    }
+      
+    if ([dictionary objectForKey:@"documentInfoOptions"]) {
+      NSArray<NSString *> *iOSDocumentInfoOptions = [dictionary objectForKey:@"documentInfoOptions"];
+      NSMutableArray<NSString *> *availableControllerOptions = [NSMutableArray array];
+
+      for (NSString *optionString in iOSDocumentInfoOptions) {
+          PSPDFDocumentInfoOption option = [RCTConvert PSPDFDocumentInfoOption:optionString];
+          [availableControllerOptions addObject:option];
+      }
+      controller.documentInfoCoordinator.availableControllerOptions = [availableControllerOptions copy];
       }
    }
 }
@@ -941,6 +1013,25 @@
   [coordinator animateAlongsideTransition:NULL completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
     [self applyViewState:self.viewState animateIfPossible:NO];
   }];
+}
+
+- (BOOL)resolutionManager:(PSPDFConflictResolutionManager *)manager shouldPerformAutomaticResolutionForForDocument:(PSPDFDocument *)document dataProvider:(id<PSPDFCoordinatedFileDataProviding>)dataProvider conflictType:(PSPDFFileConflictType)type resolution:(inout PSPDFFileConflictResolution *)resolution {
+        
+    NSString *conflictResolution = [_sessionStorage getFileConflictResolution];
+
+    if ([conflictResolution isEqualToString:@"default"]) {
+        return [super resolutionManager:manager shouldPerformAutomaticResolutionForForDocument:document dataProvider:dataProvider conflictType:type resolution:resolution];
+    } else if ([conflictResolution isEqualToString:@"close"]) {
+        *resolution = PSPDFFileConflictResolutionClose;
+        return YES;
+    } else if ([conflictResolution isEqualToString:@"save"]) {
+        *resolution = PSPDFFileConflictResolutionSave;
+        return YES;
+    } else if ([conflictResolution isEqualToString:@"reload"]) {
+        *resolution = PSPDFFileConflictResolutionReload;
+        return YES;
+    }
+    return NO;
 }
 
 @end

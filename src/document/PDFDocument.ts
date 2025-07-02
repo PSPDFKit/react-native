@@ -33,6 +33,7 @@ import { FormField } from '../forms/FormField';
 import { FormElement } from '../forms/FormElement';
 import { Forms } from '../forms/Forms';
 import { PDFPageInfo } from './PDFPageInfo';
+import { Bookmark } from './Bookmark';
 
 /**
  * @class PDFDocument
@@ -462,5 +463,43 @@ export class PDFDocument {
     */
     getPageInfo(pageIndex: number): Promise<PDFPageInfo> {
         return NativeModules.PDFDocumentManager.getPageInfo(findNodeHandle(this.pdfViewRef), pageIndex);
+    }
+
+   /**
+    * @method addBookmarks
+    * @memberof PDFDocument
+    * @param {Array<Bookmark>} bookmarks The array of bookmarks to add.
+    * @description Used to add bookmarks to the document.
+    * @example
+    * const result = await this.pdfRef.current?.getDocument().addBookmarks(bookmarks);
+    * @returns { Promise<boolean> } Returns a promise containing the result of the operation. ```true``` if the bookmarks were added, and ```false``` if an error occurred.
+    */
+    addBookmarks(bookmarks: Array<Bookmark>): Promise<boolean> {
+        return NativeModules.PDFDocumentManager.addBookmarks(findNodeHandle(this.pdfViewRef), bookmarks);
+    }
+
+   /**
+    * @method removeBookmarks
+    * @memberof PDFDocument
+    * @param {Array<Bookmark>} bookmarks The array of bookmarks to remove.
+    * @description Used to remove bookmarks from the document.
+    * @example
+    * const result = await this.pdfRef.current?.getDocument().removeBookmarks(bookmarks);
+    * @returns { Promise<boolean> } Returns a promise containing the result of the operation. ```true``` if the bookmarks were removed, and ```false``` if an error occurred.
+    */
+    removeBookmarks(bookmarks: Array<Bookmark>): Promise<boolean> {
+        return NativeModules.PDFDocumentManager.removeBookmarks(findNodeHandle(this.pdfViewRef), bookmarks);
+    }
+
+   /**
+    * @method getBookmarks
+    * @memberof PDFDocument
+    * @description Used to get all bookmarks from the document.
+    * @example
+    * const result = await this.pdfRef.current?.getDocument().getBookmarks();
+    * @returns { Promise<Array<Bookmark>> } Returns a promise containing an array of bookmarks.
+    */
+    getBookmarks(): Promise<Array<Bookmark>> {
+        return NativeModules.PDFDocumentManager.getBookmarks(findNodeHandle(this.pdfViewRef));
     }
 }

@@ -245,7 +245,14 @@ RCT_EXPORT_METHOD(setPageIndex:(NSInteger)pageIndex reactTag:(nonnull NSNumber *
 RCT_EXPORT_METHOD(enterAnnotationCreationMode:(NSString *)annotationType reactTag:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   dispatch_async(dispatch_get_main_queue(), ^{
     RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
-    BOOL success = [component enterAnnotationCreationMode:[RCTConvert PSPDFAnnotationStringFromName:annotationType]];
+    PSPDFAnnotationString convertedAnnotationType = [RCTConvert PSPDFAnnotationStringFromName:annotationType];
+    PSPDFAnnotationVariantString convertedAnnotationVariant = nil;
+    // Handle possible variant
+    if (convertedAnnotationType == PSPDFAnnotationStringInk) {
+        convertedAnnotationVariant = [RCTConvert PSPDFAnnotationVariantStringFromName:annotationType];
+    }
+      
+    BOOL success = [component enterAnnotationCreationMode:convertedAnnotationType withVariant:convertedAnnotationVariant];
     if (success) {
       resolve(@(success));
     } else {
@@ -588,6 +595,14 @@ RCT_EXPORT_METHOD(getConfiguration:(nonnull NSNumber *)reactTag resolver:(RCTPro
     } else {
       reject(@"error", @"Failed to retrieve configuration.", nil);
     }
+  });
+}
+
+RCT_EXPORT_METHOD(setExcludedAnnotations:(NSArray *)annotations reactTag:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+  dispatch_async(dispatch_get_main_queue(), ^{
+      RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
+      [component setExcludedAnnotations:annotations];
+      resolve(@YES);
   });
 }
 

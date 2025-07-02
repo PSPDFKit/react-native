@@ -41,7 +41,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) id configurationJSON;
 
 /// Annotation Toolbar
-- (BOOL)enterAnnotationCreationMode:(PSPDFAnnotationString)annotationType;
+- (BOOL)enterAnnotationCreationMode:(PSPDFAnnotationString)annotationType withVariant:(PSPDFAnnotationVariantString)annotationVariant;
 - (BOOL)exitCurrentlyActiveMode;
 
 /// Document
@@ -59,6 +59,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSArray <NSString *> *)getAnnotationFlags:(NSString *)uuid;
 - (BOOL)clearSelectedAnnotations;
 - (BOOL)selectAnnotations:(NSArray<NSDictionary *> *)annotationsJSON showContextualMenu:(BOOL)showContextualMenu;
+- (void)setExcludedAnnotations:(NSArray *)annotations;
 
 /// Forms
 - (NSDictionary<NSString *, NSString *> *)getFormFieldValue:(NSString *)fullyQualifiedName;

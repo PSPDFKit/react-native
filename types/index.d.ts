@@ -1293,6 +1293,17 @@ declare class PSPDFKitView extends React.Component<Props, any, any> {
      */
     getConfiguration: () => Promise<PDFConfiguration>;
     /**
+     * Prevents the specified annotations from being interacted with.
+     *
+     * @method setExcludedAnnotations
+     * @memberof PSPDFKitView
+     * @param {string[]} annotations The list of annotation UUIDs to exclude from annotation interaction.
+     * @example
+     * const result = await this.pdfRef.current?.setExcludedAnnotations(['A1FD2345-1234-1234-1234-123456789012']);
+     * @returns { void }
+     */
+    setExcludedAnnotations: (annotations: string[]) => void;
+    /**
      * Removes the currently displayed Android Native ```PdfUiFragment```.
      * This function should only be used as a workaround for a bug in ```react-native-screen``` that causes a crash when
      * ```navigation.goBack()``` is called or a hardware back button is used to navigate back on Android. Calling this
@@ -1453,3 +1464,7 @@ export import AIAssistantConfiguration = aiConfig.AIAssistantConfiguration;
 //@ts-ignore
 import pageInfo = require('../src/document/PDFPageInfo');
 export import PDFPageInfo = pageInfo.PDFPageInfo;
+
+//@ts-ignore
+import bookmark = require('../src/document/Bookmark');
+export import Bookmark = bookmark.Bookmark;

@@ -461,4 +461,56 @@ import PSPDFKit
         let response = ["success" : true, "filePath" : filePath] as [String : Any]
         onSuccess(response)
     }
+    
+    @objc func getBookmarks(_ reference: NSNumber, onSuccess: @escaping RCTPromiseResolveBlock, onError: @escaping RCTPromiseRejectBlock) -> Void {
+        guard let document = getDocument(reference) else {
+            onError("getBookmarks", "Document is nil", nil)
+            return
+        }
+        
+        if let allBookmarks = document.bookmarkManager?.bookmarks {
+            let allBookmarksJSON = RCTConvert.bookmarksToJSON(allBookmarks)
+            onSuccess(allBookmarksJSON)
+        } else {
+            onError("getBookmarks", "Could not export bookmarks", nil)
+        }
+    }
+    
+    @objc func addBookmarks(_ reference: NSNumber, bookmarks: Array<Dictionary<String, Any>>, onSuccess: @escaping RCTPromiseResolveBlock, onError: @escaping RCTPromiseRejectBlock) -> Void {
+        guard let document = getDocument(reference) else {
+            onError("addBookmarks", "Document is nil", nil)
+            return
+        }
+        
+        guard let bookmarkManager = document.bookmarkManager else {
+            onError("addBookmarks", "Bookmark manager is nil", nil)
+            return
+        }
+        
+        let bookmarkObjects = RCTConvert.JSONToBookmarks(bookmarks)
+        for bookmark in bookmarkObjects {
+            bookmarkManager.addBookmark(bookmark)
+        }
+        
+        onSuccess(true)
+    }
+    
+    @objc func removeBookmarks(_ reference: NSNumber, bookmarks: Array<Dictionary<String, Any>>, onSuccess: @escaping RCTPromiseResolveBlock, onError: @escaping RCTPromiseRejectBlock) -> Void {
+        guard let document = getDocument(reference) else {
+            onError("removeBookmarks", "Document is nil", nil)
+            return
+        }
+        
+        guard let bookmarkManager = document.bookmarkManager else {
+            onError("removeBookmarks", "Bookmark manager is nil", nil)
+            return
+        }
+        
+        let bookmarkObjects = RCTConvert.JSONToBookmarks(bookmarks)
+        for bookmark in bookmarkObjects {
+            bookmarkManager.removeBookmark(bookmark)
+        }
+        
+        onSuccess(true)
+    }
 }

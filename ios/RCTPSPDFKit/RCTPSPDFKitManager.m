@@ -240,7 +240,8 @@ RCT_EXPORT_METHOD(handleListenerRemoved:(nonnull NSString* )event isLast:(BOOL)i
              @"formFieldValuesUpdated",
              @"formFieldSelected",
              @"formFieldDeselected",
-             @"analytics"];
+             @"analytics",
+             @"bookmarksChanged"];
 }
 
 // Called by React Native when the first event is registered

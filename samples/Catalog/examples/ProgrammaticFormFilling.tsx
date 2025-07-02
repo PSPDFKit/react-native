@@ -1,6 +1,6 @@
 import React from 'react';
 import { Alert, Button, processColor, View } from 'react-native';
-import PSPDFKitView from 'react-native-pspdfkit';
+import PSPDFKitView, { PDFConfiguration } from 'react-native-pspdfkit';
 
 import {
   formDocumentName,
@@ -41,6 +41,7 @@ export class ProgrammaticFormFilling extends BaseExampleAutoHidingHeaderComponen
             firstPageAlwaysSingle: false,
             disableAutomaticSaving: true,
             signatureSavingStrategy: 'saveIfSelected',
+            iOSFileConflictResolution: PDFConfiguration.IOSFileConflictResolution.CLOSE,
           }}
           onAnnotationsChanged={(event: { error: any }) => {
             if (event.error) {

@@ -104,3 +104,7 @@ export import AIAssistantConfiguration = aiConfig.AIAssistantConfiguration;
 //@ts-ignore
 import pageInfo = require('../src/document/PDFPageInfo');
 export import PDFPageInfo = pageInfo.PDFPageInfo;
+
+//@ts-ignore
+import bookmark = require('../src/document/Bookmark');
+export import Bookmark = bookmark.Bookmark;
