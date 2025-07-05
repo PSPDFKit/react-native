@@ -26,12 +26,13 @@ export class Forms {
     async getFormElements(): Promise<Array<FormElement>> {
 
         const formElements = await NativeModules.PDFDocumentManager.getFormElements(findNodeHandle(this.pdfViewRef));
+        console.log('formElements:', formElements);
 
-        return formElements.map((element: FormElement) => {
+        return formElements.map(element => {
                 let formElement: FormElement;
                 
                 // Create the appropriate FormElement type based on the element type
-                switch (element.formTypeName) {
+                switch (element.type) {
                     case 'button':
                     case 'checkBox':
                     case 'radioButton':
@@ -54,7 +55,7 @@ export class Forms {
                 
                 // If the element has a formField property, create the appropriate FormField type
                 if (element.formField) {
-                    switch (element.formTypeName) {
+                    switch (element.type) {
                         case 'button':
                         case 'checkBox':
                         case 'radioButton':

@@ -1,5 +1,3 @@
-## 2.19.0 - 01 Jul 2025
-
 - Adds the `androidRemoveStatusBarOffset` property to the `PDFConfiguration` object on Android. (J#HYB-802)
 - Adds the `iOSFileConflictResolution` option to `PDFConfiguration` to manage file conflict resolution on iOS. (J#HYB-825)
 - Adds the `iOSDocumentInfoOptions` option to `PDFConfiguration` to customize Document Info tabs on iOS. (J#HYB-826)
@@ -8,7 +6,6 @@
 - Adds the `getBookmarks`, `addBookmarks` and `removeBookmarks` APIs to `PDFDocument` for bookmark management. (J#HYB-818)
 - Fixes an issue where the `enterAnnotationCreationMode` API does not honour annotation variant options. (J#HYB-814)
 - Fixes an issue where the `enterAnnotationCreationMode` API on iOS could not change tools when already active. (J#HYB-815)
-- Fixes an issue where `AnnotationsEvent.REMOVED` contained null `name` and `creatorName` properties on Android. (J#HYB-829)
 
 ## 2.18.1 - 24 Jun 2025
 - Updates to Nutrient Android SDK 10.4.0.

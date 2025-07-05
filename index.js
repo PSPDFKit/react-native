@@ -66,81 +66,27 @@ class PSPDFKitView extends React.Component {
             this.props.onCloseButtonPressed(event.nativeEvent);
           }
         : null;
-
-      if (Platform.OS === 'android') {
-        // Android: Use combined props approach for proper ordering
-        const { 
-          document, 
-          configuration, 
-          annotationPresets, 
-          fragmentTag, 
-          menuItemGrouping,
-          pageIndex,
-          toolbar,
-          toolbarMenuItems,
-          annotationContextualMenu,
-          // ... other props that need ordering
-          ...otherProps 
-        } = this.props;
-        
-        // Always create combined prop, even if some are undefined
-        const orderedProps = {
-          configuration: configuration || null,
-          annotationPresets: annotationPresets || null,
-          fragmentTag: fragmentTag || "PSPDFKitView.FragmentTag",
-          menuItemGrouping: menuItemGrouping || null,
-          document: document || null,
-          pageIndex: pageIndex || null,
-          toolbar: toolbar || null,
-          toolbarMenuItems: toolbarMenuItems || null,
-          annotationContextualMenu: annotationContextualMenu || null,
-        };
-        
-        return (
-          <RCTPSPDFKitView
-            ref={this._componentRef}
-            documentWithOrderedProps={orderedProps}  // Android only
-            {...otherProps}
-            onCloseButtonPressed={onCloseButtonPressedHandler}
-            onStateChanged={this._onStateChanged}
-            onDocumentSaved={this._onDocumentSaved}
-            onDocumentLoaded={this._onDocumentLoaded}
-            onDocumentSaveFailed={this._onDocumentSaveFailed}
-            onDocumentLoadFailed={this._onDocumentLoadFailed}
-            onAnnotationTapped={this._onAnnotationTapped}
-            onAnnotationsChanged={this._onAnnotationsChanged}
-            onNavigationButtonClicked={this._onNavigationButtonClicked}
-            onDataReturned={this._onDataReturned}
-            onCustomToolbarButtonTapped={this._onCustomToolbarButtonTapped}
-            onCustomAnnotationContextualMenuItemTapped={
-              this._onCustomAnnotationContextualMenuItemTapped
-            }
-          />
-        );
-      } else {
-        // iOS: Use original approach with individual props
-        return (
-          <RCTPSPDFKitView
-            ref={this._componentRef}
-            fragmentTag="PSPDFKitView.FragmentTag"
-            {...this.props}
-            onCloseButtonPressed={onCloseButtonPressedHandler}
-            onStateChanged={this._onStateChanged}
-            onDocumentSaved={this._onDocumentSaved}
-            onDocumentLoaded={this._onDocumentLoaded}
-            onDocumentSaveFailed={this._onDocumentSaveFailed}
-            onDocumentLoadFailed={this._onDocumentLoadFailed}
-            onAnnotationTapped={this._onAnnotationTapped}
-            onAnnotationsChanged={this._onAnnotationsChanged}
-            onNavigationButtonClicked={this._onNavigationButtonClicked}
-            onDataReturned={this._onDataReturned}
-            onCustomToolbarButtonTapped={this._onCustomToolbarButtonTapped}
-            onCustomAnnotationContextualMenuItemTapped={
-              this._onCustomAnnotationContextualMenuItemTapped
-            }
-          />
-        );
-      }
+      return (
+        <RCTPSPDFKitView
+          ref={this._componentRef}
+          fragmentTag="PSPDFKitView.FragmentTag"
+          {...this.props}
+          onCloseButtonPressed={onCloseButtonPressedHandler}
+          onStateChanged={this._onStateChanged}
+          onDocumentSaved={this._onDocumentSaved}
+          onDocumentLoaded={this._onDocumentLoaded}
+          onDocumentSaveFailed={this._onDocumentSaveFailed}
+          onDocumentLoadFailed={this._onDocumentLoadFailed}
+          onAnnotationTapped={this._onAnnotationTapped}
+          onAnnotationsChanged={this._onAnnotationsChanged}
+          onNavigationButtonClicked={this._onNavigationButtonClicked}
+          onDataReturned={this._onDataReturned}
+          onCustomToolbarButtonTapped={this._onCustomToolbarButtonTapped}
+          onCustomAnnotationContextualMenuItemTapped={
+            this._onCustomAnnotationContextualMenuItemTapped
+          }
+        />
+      );
     } else {
       return null;
     }
@@ -2395,3 +2341,4 @@ module.exports.SignatureFormElement = SignatureFormElement;
 module.exports.TextFieldFormElement = TextFieldFormElement;
 
 module.exports.Forms = Forms;
+

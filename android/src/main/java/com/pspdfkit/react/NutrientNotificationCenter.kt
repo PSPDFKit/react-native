@@ -138,22 +138,19 @@ object NutrientNotificationCenter {
                 }
             }
             "removed" -> {
-                // Only emit event if annotation has a name and creator
-                if (annotation.name != null && annotation.creator != null) {
-                    val annotationsList = mutableListOf<Map<String, Any>>()
-                    val annotationMap = HashMap<String, String>()
-                    annotation.name?.let { annotationMap["name"] = it }
-                    annotation.creator?.let { annotationMap["creatorName"] = it }
-                    annotationMap["uuid"] = annotation.uuid
-                    annotationsList.add(annotationMap)
-                    val nativeAnnotationsList = Arguments.makeNativeArray(annotationsList)
+                val annotationsList = mutableListOf<Map<String, Any>>()
+                val annotationMap = HashMap<String, String>()
+                annotation.name?.let { annotationMap["name"] = it }
+                annotation.creator?.let { annotationMap["creatorName"] = it }
+                annotationMap["uuid"] = annotation.uuid
+                annotationsList.add(annotationMap)
+                val nativeAnnotationsList = Arguments.makeNativeArray(annotationsList)
 
-                    val jsonData = Arguments.createMap()
-                    jsonData.putString("event", NotificationEvent.ANNOTATIONS_REMOVED.value)
-                    jsonData.putArray("annotations", nativeAnnotationsList)
-                    jsonData.putString("documentID", documentID)
-                    sendEvent(NotificationEvent.ANNOTATIONS_REMOVED.value, jsonData)
-                }
+                val jsonData = Arguments.createMap()
+                jsonData.putString("event", NotificationEvent.ANNOTATIONS_REMOVED.value)
+                jsonData.putArray("annotations", nativeAnnotationsList)
+                jsonData.putString("documentID", documentID)
+                sendEvent(NotificationEvent.ANNOTATIONS_REMOVED.value, jsonData)
             }
             "added" -> {
                 try {

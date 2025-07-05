@@ -8,10 +8,10 @@ PODS:
   - hermes-engine (0.80.0):
     - hermes-engine/Pre-built (= 0.80.0)
   - hermes-engine/Pre-built (0.80.0)
-  - Instant (14.10.0)
-  - PSPDFKit (14.10.0):
-    - PSPDFKit/Core (= 14.10.0)
-  - PSPDFKit/Core (14.10.0)
+  - Instant (14.11.0-dev)
+  - PSPDFKit (14.11.0-dev):
+    - PSPDFKit/Core (= 14.11.0-dev)
+  - PSPDFKit/Core (14.11.0-dev)
   - RCT-Folly (2024.11.18.00):
     - boost
     - DoubleConversion
@@ -1652,9 +1652,9 @@ PODS:
     - React-RCTFBReactNativeSpec
     - ReactCommon/turbomodule/core
     - SocketRocket
-  - react-native-pspdfkit (2.19.0):
-    - Instant (= 14.10.0)
-    - PSPDFKit (= 14.10.0)
+  - react-native-pspdfkit (2.18.1):
+    - Instant
+    - PSPDFKit
     - React
   - react-native-safe-area-context (5.3.0):
     - boost
@@ -2251,7 +2251,7 @@ PODS:
     - Yoga
   - RNFS (2.20.0):
     - React-Core
-  - RNGestureHandler (2.26.0):
+  - RNGestureHandler (2.25.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -2352,6 +2352,8 @@ DEPENDENCIES:
   - fmt (from `../node_modules/react-native/third-party-podspecs/fmt.podspec`)
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
   - hermes-engine (from `../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec`)
+  - Instant (from `https://my.nutrient.io/instant/nightly.podspec`)
+  - PSPDFKit (from `https://my.nutrient.io/pspdfkit-ios/nightly.podspec`)
   - RCT-Folly (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCTDeprecation (from `../node_modules/react-native/ReactApple/Libraries/RCTFoundation/RCTDeprecation`)
   - RCTRequired (from `../node_modules/react-native/Libraries/Required`)
@@ -2428,8 +2430,6 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
-    - Instant
-    - PSPDFKit
     - SocketRocket
 
 EXTERNAL SOURCES:
@@ -2448,6 +2448,10 @@ EXTERNAL SOURCES:
   hermes-engine:
     :podspec: "../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec"
     :tag: hermes-2025-05-06-RNv0.80.0-4eb6132a5bf0450bf4c6c91987675381d7ac8bca
+  Instant:
+    :podspec: https://my.nutrient.io/instant/nightly.podspec
+  PSPDFKit:
+    :podspec: https://my.nutrient.io/pspdfkit-ios/nightly.podspec
   RCT-Folly:
     :podspec: "../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec"
   RCTDeprecation:
@@ -2599,8 +2603,8 @@ SPEC CHECKSUMS:
   fmt: a40bb5bd0294ea969aaaba240a927bd33d878cdd
   glog: 5683914934d5b6e4240e497e0f4a3b42d1854183
   hermes-engine: 7068e976238b29e97b3bafd09a994542af7d5c0b
-  Instant: 043b6945ebce6fb730922ee82623ed3636db0be2
-  PSPDFKit: c3205ca2cc9aeca1d94bf5f5917f11d58508cb8e
+  Instant: 97a41c0ec9f7964f069d6407090d247f253aaf02
+  PSPDFKit: 698d3a550cb4191ac060ec8a19c779252e3ee7f0
   RCT-Folly: 846fda9475e61ec7bcbf8a3fe81edfcaeb090669
   RCTDeprecation: ff787f6c860a1b97dd1bc27264b61d23ad1994da
   RCTRequired: 664eb8399ed8a83e26ab65af7c2ad390f7e61696
@@ -2634,7 +2638,7 @@ SPEC CHECKSUMS:
   React-logger: dce52a571ba0e0149c3f0fcc6866cbc0c8552c5e
   React-Mapbuffer: f5754c33877eaf36e4c76c613b35615a181c85c5
   React-microtasksnativemodule: 23df6374a3ac422d8c2927839bcaeed61fee3dad
-  react-native-pspdfkit: fb3ebbd14e77bb65bd1045e039b9350b15725022
+  react-native-pspdfkit: 7bf2d6dc53d03157c13b60564e0dc8eca9c450f6
   react-native-safe-area-context: 45d0664c8d0e85394fa26f0af25fd267a03a05bf
   React-NativeModulesApple: e16d5c133019987285f001fbf1461a861e40426f
   React-oscompat: 7c0a341cc31e350da71ddf2e46de0a845d1d1626
@@ -2669,11 +2673,11 @@ SPEC CHECKSUMS:
   ReactCommon: b028d09a66e60ebd83ca59d8cc9a1216360db147
   RNCMaskedView: 7e0ce15656772a939ff0d269100bca3a182163c8
   RNFS: 89de7d7f4c0f6bafa05343c578f61118c8282ed8
-  RNGestureHandler: eeb622199ef1fb3a076243131095df1c797072f0
+  RNGestureHandler: fabb15d507aebf871bf391ec1cdded706c58688b
   RNScreens: ee2abe7e0c548eed14e92742e81ed991165c56aa
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   Yoga: 0c4b7d2aacc910a1f702694fa86be830386f4ceb
 
-PODFILE CHECKSUM: d91a0b2328ac04192f1e2b7c06dd1e9f31c3766e
+PODFILE CHECKSUM: e1d57cf526773e8e4c218e4f434de7b1121bb537
 
 COCOAPODS: 1.16.2

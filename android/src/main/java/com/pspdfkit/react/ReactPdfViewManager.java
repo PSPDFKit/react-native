@@ -148,110 +148,13 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
         return commandMap;
     }
 
-    @ReactProp(name = "documentWithOrderedProps")
-    public void setDocumentWithOrderedProps(PdfView view, @Nullable ReadableMap orderedProps) {
-       if (orderedProps == null) return;
-       
-       // Process in exact order
-       if (orderedProps.hasKey("configuration") && !orderedProps.isNull("configuration")) {
-           ReadableMap configuration = orderedProps.getMap("configuration");
-           setConfiguration(view, configuration);
-       }
-       
-       if (orderedProps.hasKey("annotationPresets") && !orderedProps.isNull("annotationPresets")) {
-           ReadableMap annotationPresets = orderedProps.getMap("annotationPresets");
-           List<ReactAnnotationPresetConfiguration> annotationsConfiguration = AnnotationConfigurationAdaptor.convertAnnotationConfigurations(
-               view.getContext(), annotationPresets
-           );
-           view.setAnnotationConfiguration(annotationsConfiguration);
-       }
-       
-       if (orderedProps.hasKey("fragmentTag") && !orderedProps.isNull("fragmentTag")) {
-           String fragmentTag = orderedProps.getString("fragmentTag");
-           view.setFragmentTag(fragmentTag);
-       }
-       
-       if (orderedProps.hasKey("menuItemGrouping") && !orderedProps.isNull("menuItemGrouping")) {
-           ReadableArray menuItemGrouping = orderedProps.getArray("menuItemGrouping");
-           ReactGroupingRule groupingRule = new ReactGroupingRule(view.getContext(), menuItemGrouping);
-           view.setMenuItemGroupingRule(groupingRule);
-       }
-       
-       // Load document
-       if (orderedProps.hasKey("document") && !orderedProps.isNull("document")) {
-           String document = orderedProps.getString("document");
-           // Always set the document, even if it's the same path, to ensure it loads
-           view.setDocument(document, this.reactApplicationContext);
-       }
-       
-       // Process post-document props
-       if (orderedProps.hasKey("pageIndex") && !orderedProps.isNull("pageIndex")) {
-           int pageIndex = orderedProps.getInt("pageIndex");
-           view.setPageIndex(pageIndex);
-       }
-       
-       if (orderedProps.hasKey("toolbar") && !orderedProps.isNull("toolbar")) {
-           ReadableMap toolbar = orderedProps.getMap("toolbar");
-           setToolbar(view, toolbar);
-       }
-       
-       if (orderedProps.hasKey("toolbarMenuItems") && !orderedProps.isNull("toolbarMenuItems")) {
-           ReadableArray toolbarMenuItems = orderedProps.getArray("toolbarMenuItems");
-           setToolbarMenuItems(view, toolbarMenuItems);
-       }
-       
-       if (orderedProps.hasKey("annotationContextualMenu") && !orderedProps.isNull("annotationContextualMenu")) {
-           ReadableMap annotationContextualMenu = orderedProps.getMap("annotationContextualMenu");
-           setAnnotationContextualMenu(view, annotationContextualMenu);
-       }
-   }
-
-
-
-    @ReactProp(name = "disableDefaultActionForTappedAnnotations")
-    public void setDisableDefaultActionForTappedAnnotations(PdfView view, boolean disableDefaultActionForTappedAnnotations) {
-        view.setDisableDefaultActionForTappedAnnotations(disableDefaultActionForTappedAnnotations);
+    @ReactProp(name = "fragmentTag")
+    public void setFragmentTag(PdfView view, @NonNull String fragmentTag) {
+        view.setFragmentTag(fragmentTag);
     }
 
-    @ReactProp(name = "disableAutomaticSaving")
-    public void setDisableAutomaticSaving(PdfView view, boolean disableAutomaticSaving) {
-        view.setDisableAutomaticSaving(disableAutomaticSaving);
-    }
-
-    @ReactProp(name = "annotationAuthorName")
-    public void setAnnotationAuthorName(PdfView view, String annotationAuthorName) {
-        PSPDFKitPreferences.get(view.getContext()).setAnnotationCreator(annotationAuthorName);
-    }
-
-    @ReactProp(name = "imageSaveMode")
-    public void setImageSaveMode(PdfView view, String imageSaveMode) {
-        view.setImageSaveMode(imageSaveMode);
-    }
-
-
-
-    @ReactProp(name = "showNavigationButtonInToolbar")
-    public void setShowNavigationButtonInToolbar(@NonNull final PdfView view, final boolean showNavigationButtonInToolbar) {
-        view.setShowNavigationButtonInToolbar(showNavigationButtonInToolbar);
-    }
-
-    @ReactProp(name= "hideDefaultToolbar")
-    public void setHideDefaultToolbar(@NonNull final PdfView view, final boolean hideDefaultToolbar) {
-        view.setHideDefaultToolbar(hideDefaultToolbar);
-    }
-
-    @ReactProp(name = "availableFontNames")
-    public void setAvailableFontNames(@NonNull final PdfView view, @Nullable final ReadableArray availableFontNames) {
-        view.setAvailableFontNames(availableFontNames);
-    }
-
-    @ReactProp(name = "selectedFontName")
-    public void setSelectedFontName(@NonNull final PdfView view, @Nullable final String selectedFontName) {
-        view.setSelectedFontName(selectedFontName);
-    }
-
-    // Helper methods for setDocumentWithOrderedProps (not @ReactProp methods)
-    private void setConfiguration(PdfView view, @NonNull ReadableMap configuration) {
+    @ReactProp(name = "configuration")
+    public void setConfiguration(PdfView view, @NonNull ReadableMap configuration) {
         ConfigurationAdapter configurationAdapter = new ConfigurationAdapter(view.getContext(), configuration);
         PdfActivityConfiguration configurationBuild = configurationAdapter.build();
         view.setInitialConfiguration(configurationBuild);
@@ -276,7 +179,26 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
         }
     }
 
-    private void setToolbar(@NonNull final PdfView view, @NonNull ReadableMap toolbar) {
+    @ReactProp(name = "annotationPresets")
+    public void setAnnotationPresets(PdfView view, @NonNull ReadableMap annotationPresets) {
+        List<ReactAnnotationPresetConfiguration> annotationsConfiguration = AnnotationConfigurationAdaptor.convertAnnotationConfigurations(
+                view.getContext(), annotationPresets
+        );
+        view.setAnnotationConfiguration(annotationsConfiguration);
+    }
+
+    @ReactProp(name = "document")
+    public void setDocument(PdfView view, @NonNull String document) {
+        view.setDocument(document, this.reactApplicationContext);
+    }
+
+    @ReactProp(name = "pageIndex")
+    public void setPageIndex(PdfView view, int pageIndex) {
+        view.setPageIndex(pageIndex);
+    }
+
+    @ReactProp(name = "toolbar")
+    public void setToolbar(@NonNull final PdfView view, @NonNull ReadableMap toolbar) {
         if (toolbar.hasKey("toolbarMenuItems")) {
             ReadableMap toolbarMenuItems = toolbar.getMap("toolbarMenuItems");
             ArrayList buttons = toolbarMenuItems.getArray("buttons").toArrayList();
@@ -306,12 +228,54 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
         }
     }
 
-    private void setMenuItemGrouping(PdfView view, @NonNull ReadableArray menuItemGrouping) {
+    @ReactProp(name = "disableDefaultActionForTappedAnnotations")
+    public void setDisableDefaultActionForTappedAnnotations(PdfView view, boolean disableDefaultActionForTappedAnnotations) {
+        view.setDisableDefaultActionForTappedAnnotations(disableDefaultActionForTappedAnnotations);
+    }
+
+    @ReactProp(name = "disableAutomaticSaving")
+    public void setDisableAutomaticSaving(PdfView view, boolean disableAutomaticSaving) {
+        view.setDisableAutomaticSaving(disableAutomaticSaving);
+    }
+
+    @ReactProp(name = "annotationAuthorName")
+    public void setAnnotationAuthorName(PdfView view, String annotationAuthorName) {
+        PSPDFKitPreferences.get(view.getContext()).setAnnotationCreator(annotationAuthorName);
+    }
+
+    @ReactProp(name = "imageSaveMode")
+    public void setImageSaveMode(PdfView view, String imageSaveMode) {
+        view.setImageSaveMode(imageSaveMode);
+    }
+
+    @ReactProp(name = "menuItemGrouping")
+    public void setMenuItemGrouping(PdfView view, @NonNull ReadableArray menuItemGrouping) {
         ReactGroupingRule groupingRule = new ReactGroupingRule(view.getContext(), menuItemGrouping);
         view.setMenuItemGroupingRule(groupingRule);
     }
 
-    private void setToolbarMenuItems(@NonNull final PdfView view, @Nullable final ReadableArray toolbarItems) {
+    @ReactProp(name = "showNavigationButtonInToolbar")
+    public void setShowNavigationButtonInToolbar(@NonNull final PdfView view, final boolean showNavigationButtonInToolbar) {
+        view.setShowNavigationButtonInToolbar(showNavigationButtonInToolbar);
+    }
+
+    @ReactProp(name= "hideDefaultToolbar")
+    public void setHideDefaultToolbar(@NonNull final PdfView view, final boolean hideDefaultToolbar) {
+        view.setHideDefaultToolbar(hideDefaultToolbar);
+    }
+
+    @ReactProp(name = "availableFontNames")
+    public void setAvailableFontNames(@NonNull final PdfView view, @Nullable final ReadableArray availableFontNames) {
+        view.setAvailableFontNames(availableFontNames);
+    }
+
+    @ReactProp(name = "selectedFontName")
+    public void setSelectedFontName(@NonNull final PdfView view, @Nullable final String selectedFontName) {
+        view.setSelectedFontName(selectedFontName);
+    }
+
+    @ReactProp(name = "toolbarMenuItems")
+    public void setToolbarMenuItems(@NonNull final PdfView view, @Nullable final ReadableArray toolbarItems) {
         if (toolbarItems != null) {
             PdfActivityConfiguration currentConfiguration = view.getConfiguration();
             ToolbarMenuItemsAdapter newConfigurations = new ToolbarMenuItemsAdapter(currentConfiguration, toolbarItems, view.getInitialConfiguration());
@@ -324,7 +288,8 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
         }
     }
 
-    private void setAnnotationContextualMenu(@NonNull final PdfView view, @NonNull ReadableMap annotationContextualMenuItems) {
+    @ReactProp(name = "annotationContextualMenu")
+    public void setAnnotationContextualMenu(@NonNull final PdfView view, @NonNull ReadableMap annotationContextualMenuItems) {
         if (annotationContextualMenuItems != null) {
             view.setAnnotationToolbarMenuButtonItems(annotationContextualMenuItems);
         }

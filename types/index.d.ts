@@ -1293,6 +1293,7 @@ declare class PSPDFKitView extends React.Component<Props, any, any> {
      */
     getConfiguration: () => Promise<PDFConfiguration>;
     /**
+     *
      * Prevents the specified annotations from being interacted with.
      *
      * @method setExcludedAnnotations

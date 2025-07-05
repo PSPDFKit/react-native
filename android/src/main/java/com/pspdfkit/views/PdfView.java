@@ -451,11 +451,7 @@ public class PdfView extends FrameLayout {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(fragment -> {
                     if (fragment != null) {
-                        try {
-                            fragment.setPageIndex(pageIndex);
-                        } catch (Exception e) {
-                            // Invalid page index
-                        }
+                        fragment.setPageIndex(pageIndex);
                     }
                 });
     }
@@ -842,14 +838,10 @@ public class PdfView extends FrameLayout {
         getCurrentPdfFragment()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(pdfFragment -> {
-                    try {
-                        if (pdfFragment != null) {
-                            updateState(pdfFragment.getPageIndex());
-                        } else {
-                            updateState(-1);
-                        }
-                    } catch (Exception e) {
-                        // Could not update state
+                    if (pdfFragment != null) {
+                        updateState(pdfFragment.getPageIndex());
+                    } else {
+                        updateState(-1);
                     }
                 });
     }
