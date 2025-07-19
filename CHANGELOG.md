@@ -1,4 +1,6 @@
-## 2.19.0 - 01 Jul 2025
+- Fixes an issue where `PSPDFKitView` component props were not always applied on Android. (J#HYB-836)
+
+## 2.19.0 - 02 Jul 2025
 
 - Adds the `androidRemoveStatusBarOffset` property to the `PDFConfiguration` object on Android. (J#HYB-802)
 - Adds the `iOSFileConflictResolution` option to `PDFConfiguration` to manage file conflict resolution on iOS. (J#HYB-825)
@@ -6,6 +8,8 @@
 - Adds the `setExcludedAnnotations` API to exclude specified annotations completely from selection. (J#HYB-823)
 - Adds the `bookmarksChanged` event to `NotificationCenter` to receive bookmark change events. (J#HYB-818)
 - Adds the `getBookmarks`, `addBookmarks` and `removeBookmarks` APIs to `PDFDocument` for bookmark management. (J#HYB-818)
+- Updates to Nutrient Android SDK 10.4.1.
+- Updates to Nutrient iOS SDK 14.10.0.
 - Fixes an issue where the `enterAnnotationCreationMode` API does not honour annotation variant options. (J#HYB-814)
 - Fixes an issue where the `enterAnnotationCreationMode` API on iOS could not change tools when already active. (J#HYB-815)
 - Fixes an issue where `AnnotationsEvent.REMOVED` contained null `name` and `creatorName` properties on Android. (J#HYB-829)

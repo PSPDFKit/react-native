@@ -68,38 +68,25 @@ class PSPDFKitView extends React.Component {
         : null;
 
       if (Platform.OS === 'android') {
-        // Android: Use combined props approach for proper ordering
+        // Android: Only group document and configuration for proper ordering
         const { 
           document, 
-          configuration, 
-          annotationPresets, 
-          fragmentTag, 
-          menuItemGrouping,
-          pageIndex,
-          toolbar,
-          toolbarMenuItems,
-          annotationContextualMenu,
-          // ... other props that need ordering
+          configuration,
+          // Explicitly exclude document and configuration from otherProps
           ...otherProps 
         } = this.props;
         
-        // Always create combined prop, even if some are undefined
-        const orderedProps = {
-          configuration: configuration || null,
-          annotationPresets: annotationPresets || null,
-          fragmentTag: fragmentTag || "PSPDFKitView.FragmentTag",
-          menuItemGrouping: menuItemGrouping || null,
-          document: document || null,
-          pageIndex: pageIndex || null,
-          toolbar: toolbar || null,
-          toolbarMenuItems: toolbarMenuItems || null,
-          annotationContextualMenu: annotationContextualMenu || null,
+        // Only create combined prop for document and configuration
+        const documentAndConfiguration = {
+          document: document !== undefined ? document : null,
+          configuration: configuration !== undefined ? configuration : null,
         };
         
         return (
           <RCTPSPDFKitView
             ref={this._componentRef}
-            documentWithOrderedProps={orderedProps}  // Android only
+            documentAndConfiguration={documentAndConfiguration}  // Android only
+            fragmentTag="NutrientView.FragmentTag"
             {...otherProps}
             onCloseButtonPressed={onCloseButtonPressedHandler}
             onStateChanged={this._onStateChanged}
