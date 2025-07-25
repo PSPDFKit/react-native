@@ -1,4 +1,8 @@
-## 2.19.0 - 01 Jul 2025
+## 2.19.1 - 24 Jul 2025
+
+- Fixes an issue where `PSPDFKitView` component props were not reliably applied on Android. (J#HYB-836)
+
+## 2.19.0 - 02 Jul 2025
 
 - Adds the `androidRemoveStatusBarOffset` property to the `PDFConfiguration` object on Android. (J#HYB-802)
 - Adds the `iOSFileConflictResolution` option to `PDFConfiguration` to manage file conflict resolution on iOS. (J#HYB-825)

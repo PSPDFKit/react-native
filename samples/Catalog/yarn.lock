@@ -4848,7 +4848,7 @@ react-native-is-edge-to-edge@^1.1.7:
   integrity sha512-EH6i7E8epJGIcu7KpfXYXiV2JFIYITtq+rVS8uEb+92naMRBdxhTuS8Wn2Q7j9sqyO0B+Xbaaf9VdipIAmGW4w==
 
 "react-native-pspdfkit@file:../..":
-  version "2.19.0"
+  version "2.19.1"
 
 react-native-safe-area-context@^5.3.0:
   version "5.3.0"
