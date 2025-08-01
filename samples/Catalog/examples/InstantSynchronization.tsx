@@ -6,7 +6,7 @@ import UrlInput from '../components/urlInput';
 import { pspdfkitColor } from '../configuration/Constants';
 import { loadDocument } from '../helpers/api/ApiClient';
 import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
-import { PSPDFKit } from '../helpers/PSPDFKit';
+import { Nutrient } from '../helpers/Nutrient';
 import defaultStyles from '../styles/styles';
 
 export default class InstantSynchronization extends BaseExampleAutoHidingHeaderComponent {
@@ -27,7 +27,7 @@ export default class InstantSynchronization extends BaseExampleAutoHidingHeaderC
   };
 
   openInstantLink = async () => {
-    await Linking.openURL('https://pspdfkit.com/instant/try');
+    await Linking.openURL('https://www.nutrient.io/demo/instant-collaboration');
   };
 
   toggleOption = (type: string) => {
@@ -67,24 +67,24 @@ export default class InstantSynchronization extends BaseExampleAutoHidingHeaderC
         serverUrl: response.serverUrl,
         jwt: response.jwt,
       };
-      PSPDFKit.presentInstant(documentData, {
+      Nutrient.presentInstant(documentData, {
         enableInstantComments: this.state.areCommentsEnabled,
         listenToServerChanges: this.state.shouldListenForChanges,
         delay: this.state.delay ?? '1',
         syncAnnotations: this.state.syncAnnotations ?? true,
       }).then(async () => {
-        PSPDFKit.setLicenseKey(null);
+        Nutrient.setLicenseKey(null);
 
         // You can change properties after the document is presented programmatically like in this examples:
-        await PSPDFKit.setDelayForSyncingLocalChanges(
+        await Nutrient.setDelayForSyncingLocalChanges(
           parseFloat(this.state.delay),
         );
-        await PSPDFKit.setListenToServerChanges(
+        await Nutrient.setListenToServerChanges(
           this.state.enableListenToServerChanges,
         );
       });
     } catch (error: any) {
-      Alert.alert('PSPDFKit', error.message);
+      Alert.alert('Nutrient', error.message);
     }
   };
 
@@ -102,7 +102,7 @@ export default class InstantSynchronization extends BaseExampleAutoHidingHeaderC
           <Text style={defaultStyles.text}>
             Copy the collaboration URL from{' '}
             <Text style={defaultStyles.linkText} onPress={this.openInstantLink}>
-              pspdfkit.com/instant/try
+              https://www.nutrient.io/demo/instant-collaboration
             </Text>{' '}
             to connect to the document shown in your browser:
           </Text>

@@ -20,6 +20,9 @@
   // You can add your custom initial props in the dictionary below.
   // They will be passed down to the ViewController used by React Native.
   self.initialProps = @{};
+  self.window.tintColor = [UIColor colorWithRed:0.40 green:0.35 blue:0.29 alpha:1.0];
+  [[UINavigationBar appearance] setTintColor:[UIColor colorWithRed:0.40 green:0.35 blue:0.29 alpha:1.0]]; // Back button and bar button items
+  [[UINavigationBar appearance] setTitleTextAttributes:@{NSForegroundColorAttributeName: [UIColor colorWithRed:0.40 green:0.35 blue:0.29 alpha:1.0]}]; // Title color
   return [super application: application didFinishLaunchingWithOptions:launchOptions];
 }
 

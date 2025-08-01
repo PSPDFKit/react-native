@@ -1,7 +1,7 @@
 import examples from '../ExamplesNavigationMenu';
 
 const { View, Image, Text, FlatList } = require('react-native');
-const { PSPDFKit } = require('../helpers/PSPDFKit');
+const { Nutrient } = require('../helpers/Nutrient');
 import React, { Component } from 'react';
 import { TouchableHighlight } from 'react-native';
 
@@ -41,7 +41,7 @@ class HomeScreen extends Component {
             source={require('../assets/logo-flat.png')}
             style={styles.logo}
           />
-          <Text style={styles.version}>{PSPDFKit.versionString}</Text>
+          <Text style={styles.version}>{Nutrient.versionString}</Text>
         </View>
         <FlatList
           nativeID="catalog_list"

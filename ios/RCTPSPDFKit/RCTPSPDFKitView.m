@@ -687,8 +687,12 @@
         if (self.onDocumentLoaded) {
             self.onDocumentLoaded(@{});
         }
+        if (self.onReady) {
+            self.onReady(@{});
+        }
     } else {
         [_sessionStorage addPendingCallback:CallbackTypeOnDocumentLoaded];
+        [_sessionStorage addPendingCallback:CallbackTypeOnReady];
     }
 }
 
@@ -827,6 +831,12 @@
             case CallbackTypeOnDocumentLoaded:
                 if (self.onDocumentLoaded) {
                     self.onDocumentLoaded(@{});
+                }
+                break;
+            
+            case CallbackTypeOnReady:
+                if (self.onReady) {
+                    self.onReady(@{});
                 }
                 break;
                 
@@ -1005,7 +1015,7 @@
    in single page mode and scroll per spread page trasition after device rotation.
 
    We do this because the `PSPDFViewController` is not embedded as recommended in
-   https://pspdfkit.com/guides/ios/current/customizing-the-interface/embedding-the-pdfviewcontroller-inside-a-custom-container-view-controller
+   https://nutrient.io/guides/ios/current/customizing-the-interface/embedding-the-pdfviewcontroller-inside-a-custom-container-view-controller
    and because React Native itself handles the React Native view.
 
    TL;DR: We are adding the `PSPDFViewController` to `RCTPSPDFKitView` and not to the container controller's view.

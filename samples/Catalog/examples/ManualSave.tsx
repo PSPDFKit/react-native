@@ -1,6 +1,6 @@
 import React from 'react';
-import { Alert, Button, processColor, View } from 'react-native';
-import PSPDFKitView from 'react-native-pspdfkit';
+import { Alert, processColor, Text, TouchableOpacity, View, Platform } from 'react-native';
+import NutrientView from '@nutrient-sdk/react-native';
 
 import {
   pspdfkitColor,
@@ -9,7 +9,7 @@ import {
 import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
 
 export class ManualSave extends BaseExampleAutoHidingHeaderComponent {
-  pdfRef: React.RefObject<PSPDFKitView | null>;
+  pdfRef: React.RefObject<NutrientView | null>;
 
   constructor(props: any) {
     super(props);
@@ -19,7 +19,7 @@ export class ManualSave extends BaseExampleAutoHidingHeaderComponent {
   override render() {
     return (
       <View style={styles.flex}>
-        <PSPDFKitView
+        <NutrientView
           ref={this.pdfRef}
           document={writableDocumentPath}
           disableAutomaticSaving={true}
@@ -39,34 +39,33 @@ export class ManualSave extends BaseExampleAutoHidingHeaderComponent {
           style={styles.pdfColor}
         />
         {this.renderWithSafeArea(insets => (
-          <View style={[styles.wrapper, { paddingBottom: insets.bottom }]}>
-            <View style={styles.flex}>
-              <Button
-                accessibilityLabel={'Save Button'}
-                testID={'Save Button'}
-                onPress={() => {
-                  // Manual Save
-                  this.pdfRef?.current?.getDocument().save()
-                    .then(saved => {
-                      if (saved) {
-                        Alert.alert(
-                          'PSPDFKit',
-                          'Successfully saved current document.',
-                        );
-                      } else {
-                        Alert.alert(
-                          'PSPDFKit',
-                          'Document was not saved as it was not modified.',
-                        );
-                      }
-                    })
-                    .catch(error => {
-                      Alert.alert('PSPDFKit', JSON.stringify(error));
-                    });
-                }}
-                title="Save"
-              />
-            </View>
+          <View style={[styles.buttonContainer, { paddingBottom: insets.bottom }]}>
+            <TouchableOpacity
+              style={styles.fullWidthButton}
+              accessibilityLabel={'Save Button'}
+              testID={'Save Button'}
+              onPress={() => {
+                // Manual Save
+                this.pdfRef?.current?.getDocument().save()
+                  .then(saved => {
+                    if (saved) {
+                      Alert.alert(
+                        'Nutrient',
+                        'Successfully saved current document.',
+                      );
+                    } else {
+                      Alert.alert(
+                        'Nutrient',
+                        'Document was not saved as it was not modified.',
+                      );
+                    }
+                  })
+                  .catch(error => {
+                    Alert.alert('Nutrient', JSON.stringify(error));
+                  });
+              }}>
+              <Text style={styles.button}>Save</Text>
+            </TouchableOpacity>
           </View>
         ))}
       </View>
@@ -77,9 +76,25 @@ export class ManualSave extends BaseExampleAutoHidingHeaderComponent {
 const styles = {
   flex: { flex: 1 },
   pdfColor: { flex: 1, color: pspdfkitColor },
-  wrapper: {
-    flexDirection: 'row' as 'row',
+  buttonContainer: {
+    width: '100%' as '100%',
+    height: Platform.OS === 'ios' ? 80 : 60,
+    justifyContent: 'center' as 'center',
     alignItems: 'center' as 'center',
-    padding: 10,
+    backgroundColor: '#f8f8f8',
+    borderTopWidth: 1,
+    borderTopColor: '#e0e0e0',
+  },
+  fullWidthButton: {
+    width: '100%' as '100%',
+    height: '100%' as '100%',
+    justifyContent: 'center' as 'center',
+    alignItems: 'center' as 'center',
+  },
+  button: {
+    padding: 15,
+    fontSize: 16,
+    color: pspdfkitColor,
+    textAlign: 'center' as 'center',
   },
 };

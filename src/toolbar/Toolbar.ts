@@ -77,7 +77,7 @@ export interface ToolbarItems {
 
 export namespace Toolbar {
     /**
-     * The stock toolbar buttons available to display on the PSPDFKit toolbar.
+     * The stock toolbar buttons available to display on the Nutrient toolbar.
      * @readonly
      * @enum {string} DefaultToolbarButton
      */

@@ -1,15 +1,15 @@
 import React from 'react';
 import { Alert, processColor, Text, TouchableOpacity, View } from 'react-native';
-import PSPDFKitView, { Toolbar, AIAssistantConfiguration } from 'react-native-pspdfkit';
+import NutrientView, { Toolbar, AIAssistantConfiguration } from '@nutrient-sdk/react-native';
 
 import { exampleAIPath, pspdfkitColor } from '../configuration/Constants';
 import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
 import { hideToolbar } from '../helpers/NavigationHelper';
-import { PSPDFKit } from '../helpers/PSPDFKit';
+import { Nutrient } from '../helpers/Nutrient';
 import { createAIAssistantConfig } from '../helpers/AIAssistant/AIAssistantHelper';
 
 export class AIAssistant extends BaseExampleAutoHidingHeaderComponent {
-  pdfRef: React.RefObject<PSPDFKitView | null>;
+  pdfRef: React.RefObject<NutrientView | null>;
   
   constructor(props: any) {
     super(props);
@@ -21,7 +21,7 @@ export class AIAssistant extends BaseExampleAutoHidingHeaderComponent {
   override render() {
     const { navigation } = this.props;
     
-    const documentId = PSPDFKit.getDocumentProperties(exampleAIPath).documentId;
+    const documentId = Nutrient.getDocumentProperties(exampleAIPath).documentId;
     const aiAssistantConfig = createAIAssistantConfig(
       documentId.toLowerCase(),
       'my-session-id'
@@ -29,7 +29,7 @@ export class AIAssistant extends BaseExampleAutoHidingHeaderComponent {
 
     return (
       <View style={styles.flex}>
-        <PSPDFKitView
+        <NutrientView
           ref={this.pdfRef}
           document={exampleAIPath}
           configuration={{

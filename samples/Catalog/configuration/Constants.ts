@@ -58,7 +58,7 @@ export const measurementsDocument =
     ? 'PDFs/' + measurementsName
     : 'file:///android_asset/' + measurementsName;
 
-export const pspdfkitColor = '#267AD4';
+export const pspdfkitColor = '#67594B';
 
 export const writableDocumentPath =
   Platform.OS === 'ios'

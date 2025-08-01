@@ -75,6 +75,7 @@ import com.pspdfkit.react.PDFDocumentModule;
 import com.pspdfkit.react.R;
 import com.pspdfkit.react.annotations.ReactAnnotationPresetConfiguration;
 import com.pspdfkit.react.events.CustomAnnotationContextualMenuItemTappedEvent;
+import com.pspdfkit.react.events.OnReadyEvent;
 import com.pspdfkit.react.events.PdfViewAnnotationChangedEvent;
 import com.pspdfkit.react.ConfigurationAdapter;
 import com.pspdfkit.react.events.PdfViewAnnotationTappedEvent;
@@ -1380,6 +1381,7 @@ public class PdfView extends FrameLayout {
         );
        map.put(PdfViewNavigationButtonClickedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onNavigationButtonClicked"));
        map.put(PdfViewDocumentLoadedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onDocumentLoaded"));
+       map.put(OnReadyEvent.EVENT_NAME, MapBuilder.of("registrationName", "onReady"));
        map.put(CustomToolbarButtonTappedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onCustomToolbarButtonTapped"));
        map.put(CustomAnnotationContextualMenuItemTappedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onCustomAnnotationContextualMenuItemTapped"));
        return map;

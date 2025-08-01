@@ -32,7 +32,7 @@
 
 PSPDFSettingKey const PSPDFSettingKeyHybridEnvironment = @"com.pspdfkit.hybrid-environment";
 
-RCT_EXPORT_MODULE(PSPDFKit)
+RCT_EXPORT_MODULE(Nutrient)
 
 - (void)setBridge:(RCTBridge *)bridge {
     [super setBridge:bridge];

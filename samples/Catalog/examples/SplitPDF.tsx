@@ -1,6 +1,6 @@
 import React from 'react';
 import { Dimensions, processColor, View } from 'react-native';
-import PSPDFKitView from 'react-native-pspdfkit';
+import NutrientView from '@nutrient-sdk/react-native';
 
 import {
   exampleDocumentPath,
@@ -10,8 +10,8 @@ import {
 import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
 
 export class SplitPDF extends BaseExampleAutoHidingHeaderComponent {
-  pdfRef1: React.RefObject<PSPDFKitView | null>;
-  pdfRef2: React.RefObject<PSPDFKitView | null>;
+  pdfRef1: React.RefObject<NutrientView | null>;
+  pdfRef2: React.RefObject<NutrientView | null>;
 
   constructor(props: any) {
     super(props);
@@ -24,7 +24,7 @@ export class SplitPDF extends BaseExampleAutoHidingHeaderComponent {
     const layoutDirection = this._getOptimalLayoutDirection();
     return (
       <View style={styles.wrapper(layoutDirection)} onLayout={this._onLayout}>
-        <PSPDFKitView
+        <NutrientView
           ref={this.pdfRef1}
           document={formDocumentPath}
           configuration={{
@@ -33,7 +33,7 @@ export class SplitPDF extends BaseExampleAutoHidingHeaderComponent {
           fragmentTag='fragmentTag1'
           style={styles.pdfView}
         />
-        <PSPDFKitView
+        <NutrientView
           ref={this.pdfRef2}
           document={exampleDocumentPath}
           configuration={{

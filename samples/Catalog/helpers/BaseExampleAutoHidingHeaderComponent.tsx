@@ -22,7 +22,7 @@ export class BaseExampleAutoHidingHeaderComponent extends Component<
     const { navigation } = this.props;
     if (Platform.OS === 'android') {
       navigation.setOptions({
-        // Since the PSPDFKitView provides it's own toolbar and back button we don't need a header in Android.
+        // Since the NutrientView provides it's own toolbar and back button we don't need a header in Android.
         headerShown: false,
       });
     }

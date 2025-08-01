@@ -56,9 +56,8 @@ public class RNProcessor extends ReactContextBaseJavaModule {
     @ReactMethod
     public void getTemporaryDirectory(Promise callback) {
         try {
-            Context context = Objects.requireNonNull(getCurrentActivity()).getApplication().getApplicationContext();
             WritableMap result = Arguments.createMap();
-            result.putString("tempDir", context.getCacheDir().getAbsolutePath());
+            result.putString("tempDir", getReactApplicationContext().getCacheDir().getAbsolutePath());
             callback.resolve(result);
         } catch (Exception e) {
             callback.reject(e);
@@ -68,7 +67,7 @@ public class RNProcessor extends ReactContextBaseJavaModule {
     @ReactMethod
     public void generateBlankPDF(@NonNull ReadableMap configuration, Promise callback) {
         try {
-            File outputFile = RNFileHelper.getFilePath(getContext(), configuration, callback);
+            File outputFile = RNFileHelper.getFilePath(getReactApplicationContext(), configuration, callback);
 
             if (outputFile == null) {
                 callback.reject("E_MISSING_FOLDER", "Cannot create documents folder");
@@ -97,13 +96,13 @@ public class RNProcessor extends ReactContextBaseJavaModule {
     @ReactMethod
     public void generatePDFFromHtmlString(@NonNull ReadableMap configuration, String htmlString, Promise callback) {
         try {
-            File outputFile = RNFileHelper.getFilePath(getContext(), configuration, callback);
+            File outputFile = RNFileHelper.getFilePath(getReactApplicationContext(), configuration, callback);
 
             WritableMap result = Arguments.createMap();
             assert outputFile != null;
             result.putString("fileURL", outputFile.toURI().toString());
 
-            HtmlToPdfConverter.fromHTMLString(getContext(), htmlString, null)
+            HtmlToPdfConverter.fromHTMLString(getReactApplicationContext(), htmlString, null)
                     .title("Converted document")
                     .convertToPdfAsync(outputFile)
                     .doFinally(() -> callback.resolve(result))
@@ -125,7 +124,7 @@ public class RNProcessor extends ReactContextBaseJavaModule {
             }
 
             Uri originURL = Uri.parse(originUri);
-            File outputFile = RNFileHelper.getFilePath(getContext(), configuration, callback);
+            File outputFile = RNFileHelper.getFilePath(getReactApplicationContext(), configuration, callback);
 
             if (outputFile == null) {
                 callback.reject("E_NEW_INVALID_FILE_PATH", "Please provide valid file path.");
@@ -137,9 +136,7 @@ public class RNProcessor extends ReactContextBaseJavaModule {
             WritableMap result = Arguments.createMap();
             result.putString("fileURL", outputFile.getAbsolutePath());
 
-            Context context = Objects.requireNonNull(getCurrentActivity()).getApplication().getApplicationContext();
-
-            final HtmlToPdfConverter converter = HtmlToPdfConverter.fromUri(context, originURL);
+            final HtmlToPdfConverter converter = HtmlToPdfConverter.fromUri(getReactApplicationContext(), originURL);
             boolean isJavascriptEnabled = !configuration.hasKey("enableJavascript") || configuration.getBoolean("enableJavaScript");
             converter.setJavaScriptEnabled(isJavascriptEnabled);
 
@@ -163,7 +160,7 @@ public class RNProcessor extends ReactContextBaseJavaModule {
     @ReactMethod
     public void generatePDFFromTemplate(@NonNull ReadableMap configuration, Promise callback) {
         try {
-            File outputFile = RNFileHelper.getFilePath(getContext(), configuration, callback);
+            File outputFile = RNFileHelper.getFilePath(getReactApplicationContext(), configuration, callback);
 
             if (outputFile == null) {
                 callback.reject("ERROR_NEW_INVALID_FILE_PATH", "Please provide valid file path.");
@@ -173,9 +170,8 @@ public class RNProcessor extends ReactContextBaseJavaModule {
             WritableMap result = Arguments.createMap();
             result.putString("fileURL", outputFile.toURI().toString());
             RNFileHelper.deleteExistingFileIfNeeded(outputFile, configuration, callback);
-            Context context = Objects.requireNonNull(getCurrentActivity()).getApplication().getApplicationContext();
 
-            RNConfigurationHelper configHelper = new RNConfigurationHelper(configuration, context);
+            RNConfigurationHelper configHelper = new RNConfigurationHelper(configuration, getReactApplicationContext());
 
             ReadableArray templates = configuration.getArray("templates");
 
@@ -202,8 +198,7 @@ public class RNProcessor extends ReactContextBaseJavaModule {
     @ReactMethod
     public void generatePDFFromImages(@NonNull ReadableMap configuration, Promise callback) {
         try {
-            File outputFile = RNFileHelper.getFilePath(getContext(), configuration, callback);
-            Context context = Objects.requireNonNull(getCurrentActivity()).getApplication().getApplicationContext();
+            File outputFile = RNFileHelper.getFilePath(getReactApplicationContext(), configuration, callback);
 
             WritableMap result = Arguments.createMap();
             assert outputFile != null;
@@ -221,7 +216,7 @@ public class RNProcessor extends ReactContextBaseJavaModule {
             }
 
             for (int i = 0; i < images.size(); i++) {
-                RNConfigurationHelper configHelper = new RNConfigurationHelper(configuration, context);
+                RNConfigurationHelper configHelper = new RNConfigurationHelper(configuration, getReactApplicationContext());
                 NewPage newPage = configHelper.parseConfiguration("image", configuration.getArray("images").getMap(i)).get(0);
                 if (newPage != null) {
                     pdfProcessorTask.addNewPage(newPage, i);
@@ -241,8 +236,7 @@ public class RNProcessor extends ReactContextBaseJavaModule {
     @ReactMethod
     public void generatePDFFromDocuments(@NonNull ReadableMap configuration, Promise callback) {
         try {
-            File outputFile = RNFileHelper.getFilePath(getContext(), configuration, callback);
-            Context context = Objects.requireNonNull(getCurrentActivity()).getApplication().getApplicationContext();
+            File outputFile = RNFileHelper.getFilePath(getReactApplicationContext(), configuration, callback);
 
             WritableMap result = Arguments.createMap();
             assert outputFile != null;
@@ -261,7 +255,7 @@ public class RNProcessor extends ReactContextBaseJavaModule {
 
             int totalPageCount = 0;
             for (int i = 0; i < documents.size(); i++) {
-                RNConfigurationHelper configHelper = new RNConfigurationHelper(configuration, context);
+                RNConfigurationHelper configHelper = new RNConfigurationHelper(configuration, getReactApplicationContext());
                 ArrayList<NewPage> newPages = configHelper.parseConfiguration("document", documents.getMap(i));
                 for (int j = 0; j < newPages.size(); j++) {
                     pdfProcessorTask.addNewPage(newPages.get(j), totalPageCount);
@@ -277,9 +271,5 @@ public class RNProcessor extends ReactContextBaseJavaModule {
         } catch (Exception e) {
             callback.reject(e);
         }
-    }
-
-    private Context getContext() {
-        return Objects.requireNonNull(getCurrentActivity()).getApplication().getApplicationContext();
     }
 }

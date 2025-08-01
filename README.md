@@ -6,8 +6,6 @@ This library requires a valid license of the Nutrient SDK. Licenses are per plat
 
 The Nutrient React Native SDK exposes the most often used APIs from Nutrient. Many of our partners end up forking this repository and adding some custom code to achieve even greater integration with their products, using native code.
 
-Windows is not currently supported, please use version [1.24.9](https://github.com/PSPDFKit/react-native/releases/tag/1.24.9) instead.
-
 ### Nutrient
 
 The [Nutrient SDK](https://nutrient.io/) is a framework that allows you to view, annotate, sign, and fill PDF forms on iOS, Android, Windows, macOS, and Web.
@@ -18,7 +16,7 @@ The [Nutrient SDK](https://nutrient.io/) is a framework that allows you to view,
 
 Nutrient offers support for customers with an active SDK license via https://support.nutrient.io/hc/en-us/requests/new.
 
-Are you evaluating our SDK? That's great, we're happy to help out! The Nutrient React Native  SDK is a commercial product and requires the purchase of a license key when used in production. By default, this library will initialize in demo mode, placing a watermark on each PDF and limiting usage to 60 minutes.
+Are you evaluating our SDK? That's great, we're happy to help out! The Nutrient React Native SDK is a commercial product and requires the purchase of a license key when used in production. By default, this library will initialize in demo mode, placing a watermark on each PDF and limiting usage to 60 minutes.
 
 To purchase a license for production use, please reach out to us via https://www.nutrient.io/sdk/contact-sales.
 
@@ -53,7 +51,7 @@ PSPDFKit.setLicenseKey('YOUR_REACT_NATIVE_LICENSE_KEY_GOES_HERE');
 
 ### Installation
 
-The Nutrient React Native SDK dependency is installed from the GitHub repository and not the `npm` registry. To install the Nutrient React Native SDK, run `yarn add react-native-pspdfkit@github:PSPDFKit/react-native` in your project directory or `npm install github:PSPDFKit/react-native` if you’re using `npm`.
+The Nutrient React Native SDK dependency is installed from the GitHub repository and not the `npm` registry. To install the Nutrient React Native SDK, run `yarn add @nutrient-sdk/react-native` in your project directory or `npm install @nutrient-sdk/react-native` if you’re using `npm`.
 
 ### Getting Started
 
@@ -68,19 +66,19 @@ See our [Getting Started on React Native guide](https://www.nutrient.io/getting-
 1. Create the React Native project by running the following command:
 
    ```bash
-   npx react-native init PSPDFKitDemo
+   npx react-native init NutrientDemo
    ```
 
 1. In the terminal app, change the location of the current working directory inside the newly created project:
 
    ```bash
-   cd PSPDFKitDemo
+   cd NutrientDemo
    ```
 
 1. Add the Nutrient React Native SDK:
 
    ```bash
-   yarn add react-native-pspdfkit@github:PSPDFKit/react-native
+   yarn add @nutrient-sdk/react-native
    ```
 
 1. Install all the dependencies for the project:
@@ -101,9 +99,9 @@ See our [Getting Started on React Native guide](https://www.nutrient.io/getting-
       allprojects {
         repositories {
           mavenLocal()
-    +       maven {
+    +     maven {
     +         url 'https://my.nutrient.io/maven/'
-    +       }
+    +     }
         }
       }
     ```
@@ -117,7 +115,7 @@ See our [Getting Started on React Native guide](https://www.nutrient.io/getting-
     +  compileSdkVersion 35
     ...
       defaultConfig {
-        applicationId "com.pspdfkitdemo"
+        applicationId "com.nutrientdemo"
     -     minSdkVersion rootProject.ext.minSdkVersion
     +     minSdkVersion 21
           targetSdkVersion rootProject.ext.targetSdkVersion
@@ -158,7 +156,7 @@ See our [Getting Started on React Native guide](https://www.nutrient.io/getting-
 1. Open your project’s Workspace in Xcode:
 
    ```bash
-   open PSPDFKitDemo.xcworkspace
+   open NutrientDemo.xcworkspace
    ```
 
 1. Make sure the deployment target is set to 16.0 or higher:
@@ -202,19 +200,19 @@ See our [Getting Started on React Native guide](https://www.nutrient.io/getting-
     ```typescript
     import React, {Component} from 'react';
     import {Platform} from 'react-native';
-    import PSPDFKitView from 'react-native-pspdfkit';
+    import NutrientView from '@nutrient-sdk/react-native';
     import { NativeModules } from 'react-native';
 
-    const PSPDFKit = NativeModules.PSPDFKit;
-    PSPDFKit.setLicenseKey(null);
+    const Nutrient = NativeModules.Nutrient;
+    Nutrient.setLicenseKey(null);
 
     const DOCUMENT =
       Platform.OS === 'ios' ? 'Document.pdf' : 'file:///android_asset/Document.pdf';
-    export default class PSPDFKitDemo extends Component<{}> {
+    export default class NutrientDemo extends Component<{}> {
       render() {
-        var pdfRef: React.RefObject<PSPDFKitView> = React.createRef();
+        var pdfRef: React.RefObject<NutrientView | null> = React.createRef();
         return (
-          <PSPDFKitView
+          <NutrientView
             document={DOCUMENT}
             configuration={{
               showThumbnailBar: 'scrollable',
@@ -246,7 +244,7 @@ Take a look at the instructions to get started [here](/samples/Catalog/README.md
 
 ### Configuration
 
-The behaviour of the `PSPDFKitView` component can be customized using the configuration object. Refer to the [`PDFConfiguration`](https://www.nutrient.io/api/react-native/PDFConfiguration.html) API documentation. The `PDFConfiguration` object can be passed as parameter in when creating the `PSPDFKitView` component, or when using the `PSPDFKit.present()` Native Module API.
+The behaviour of the `NutrientView` component can be customized using the configuration object. Refer to the [`PDFConfiguration`](https://www.nutrient.io/api/react-native/PDFConfiguration.html) API documentation. The `PDFConfiguration` object can be passed as parameter in when creating the `NutrientView` component, or when using the `Nutrient.present()` Native Module API.
 
 ```typescript
 const configuration: PDFConfiguration = {

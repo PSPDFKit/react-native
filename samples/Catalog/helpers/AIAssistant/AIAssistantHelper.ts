@@ -1,4 +1,4 @@
-import { AIAssistantConfiguration } from 'react-native-pspdfkit';
+import { AIAssistantConfiguration } from '@nutrient-sdk/react-native';
 import { KJUR } from 'jsrsasign';
 import { Platform } from 'react-native';
 

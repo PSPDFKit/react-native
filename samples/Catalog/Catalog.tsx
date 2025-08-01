@@ -1,4 +1,4 @@
-//  Copyright © 2016-2025 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2016-2025 PSPDFKit GmbH d/b/a Nutrient. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -10,6 +10,7 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import React, { Component } from 'react';
+import { Platform } from 'react-native';
 
 import { AnnotationPresetCustomization } from './examples/AnnotationPresetCustomization';
 import { AnnotationProcessing } from './examples/AnnotationProcessing';
@@ -25,7 +26,7 @@ import Measurement from './examples/Measurement';
 import { OpenImageDocument } from './examples/OpenImageDocument';
 import { ProgrammaticAnnotations } from './examples/ProgrammaticAnnotations';
 import { ProgrammaticFormFilling } from './examples/ProgrammaticFormFilling';
-import { PSPDFKitViewComponent } from './examples/PSPDFKitViewComponent';
+import { NutrientViewComponent } from './examples/NutrientViewComponent';
 import { SaveAs } from './examples/SaveAs';
 import { SplitPDF } from './examples/SplitPDF';
 import { StateChange } from './examples/StateChange';
@@ -33,7 +34,7 @@ import { ToolbarCustomization } from './examples/ToolbarCustomization';
 import { GetConfiguration } from './examples/GetConfiguration';
 import { PasswordProtectedDocument } from './examples/PasswordProtectedDocument';
 import { XFDF } from './examples/XFDF';
-import { PSPDFKit } from './helpers/PSPDFKit';
+import { Nutrient } from './helpers/Nutrient';
 import { OpenRemoteDocument } from './examples/OpenRemoteDocument';
 import { AIAssistant } from './examples/AIAssistant';
 
@@ -42,10 +43,10 @@ import { AIAssistant } from './examples/AIAssistant';
 // If you want to use a different license key for evaluation (e.g. a production license), you can set the license key using below methods:
 //
 // To set the license key for both platforms, use:
-// PSPDFKit.setLicenseKeys("YOUR_REACT_NATIVE_ANDROID_LICENSE_KEY_GOES_HERE", "YOUR_REACT_NATIVE_IOS_LICENSE_KEY_GOES_HERE");
+// Nutrient.setLicenseKeys("YOUR_REACT_NATIVE_ANDROID_LICENSE_KEY_GOES_HERE", "YOUR_REACT_NATIVE_IOS_LICENSE_KEY_GOES_HERE");
 //
 // To set the license key for the currently running platform, use:
-// PSPDFKit.setLicenseKey("YOUR_REACT_NATIVE_LICENSE_KEY_GOES_HERE");
+// Nutrient.setLicenseKey("YOUR_REACT_NATIVE_LICENSE_KEY_GOES_HERE");
 
 class Catalog extends React.Component {
   static navigationOptions = {
@@ -53,7 +54,7 @@ class Catalog extends React.Component {
   };
 
   override componentDidMount() {
-    PSPDFKit.setLicenseKey(null);
+    Nutrient.setLicenseKey(null);
   }
 
   override render() {
@@ -61,12 +62,17 @@ class Catalog extends React.Component {
 
     return (
       <NavigationContainer>
-        <Stack.Navigator detachInactiveScreens={false}>
+        <Stack.Navigator
+          detachInactiveScreens={false}
+          screenOptions={{
+            headerTintColor: Platform.select({ ios: '#67594B', android: undefined }),
+          }}
+        >
           <Stack.Screen name="Home" component={HomeScreen} />
           {/*initial={true} />*/}
           <Stack.Screen
-            name="PSPDFKitViewComponent"
-            component={PSPDFKitViewComponent}
+            name="NutrientViewComponent"
+            component={NutrientViewComponent}
           />
           <Stack.Screen
             name="OpenImageDocument"

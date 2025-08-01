@@ -7,6 +7,18 @@
         <item name="colorPrimaryDark">@color/color_primary_dark</item>
         <item name="pspdf__settingsModePickerItemStyle">@style/AppTheme.SettingsModePickerItemStyle</item>
         <item name="pspdf__tabBarStyle">@style/AppTheme.TabbarStyle</item>
+        <item name="pspdf__mainToolbarStyle">@style/AppTheme.MainToolbarStyle</item>
+        <item name="pspdf__actionBarIconsStyle">@style/AppTheme.ActionBarIconsStyle</item>
+    </style>
+
+    <style name="AppTheme.ActionBarIconsStyle">
+        <item name="pspdf__iconsColor">@color/color_primary_dark</item>
+        <item name="pspdf__iconsColorActivated">@color/color_primary</item>
+    </style>
+
+    <style name="AppTheme.MainToolbarStyle">
+        <item name="pspdf__backgroundColor">@color/color_primary</item>
+        <item name="pspdf__textColor">@color/color_primary</item>
     </style>
 
     <style name="AppTheme.TabbarStyle">

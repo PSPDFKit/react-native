@@ -14,8 +14,8 @@ import { AIAssistantConfiguration } from './AIAssistantConfiguration';
  * @property { PDFConfiguration.PageTransition } [pageTransition] Configures the page scrolling mode. Note that ```curl``` mode is only available for iOS and will be ignored on Android.
  * @property { string } [documentPassword] The password to unlock the document.
  * @property { PDFConfiguration.BooleanType } [enableTextSelection] Allow / disallow text selection.
- * @property { PDFConfiguration.BooleanType } [autosaveEnabled] Determines whether PSPDFKit should save automatically in response to [certain UI triggers][], such as the app entering the background or the view disappearing.
- * @property { PDFConfiguration.BooleanType } [disableAutomaticSaving] Determines whether PSPDFKit should save automatically in response to certain UI triggers, such as the app entering the background or the view disappearing.
+ * @property { PDFConfiguration.BooleanType } [autosaveEnabled] Determines whether Nutrient should save automatically in response to [certain UI triggers][], such as the app entering the background or the view disappearing.
+ * @property { PDFConfiguration.BooleanType } [disableAutomaticSaving] Determines whether Nutrient should save automatically in response to certain UI triggers, such as the app entering the background or the view disappearing.
  * @property { PDFConfiguration.SignatureSavingStrategy } [signatureSavingStrategy] Determines whether signatures should be saved after creation.
  * @property { PDFConfiguration.BooleanType } [iOSShouldScrollToChangedPage] Scrolls to the affected page during an undo / redo operation.
  * @property { PDFConfiguration.BooleanType } [iOSFormElementZoomEnabled] Option to automatically focus on selected form elements.
@@ -59,7 +59,7 @@ import { AIAssistantConfiguration } from './AIAssistantConfiguration';
  * @property { PDFConfiguration.BooleanType } [iOSScrollOnEdgeTapEnabled] Determines whether tapping on leading / trailing edges of the document view should trigger changing to the previous / next page.
  * @property { number } [iOSScrollOnEdgeTapMargin] The margin in points from the view’s sides in which tapping should trigger scrolling to the previous / next page.
  * @property { PDFConfiguration.BooleanType } [iOSUseParentNavigationBar] Set this to true to allow this controller to access the parent ```navigationBar``` / ```navigationController``` to add custom buttons.
- * @property { PDFConfiguration.BooleanType } [iOSAllowToolbarTitleChange] Allow PSPDFKit to change the title of this view controller.
+ * @property { PDFConfiguration.BooleanType } [iOSAllowToolbarTitleChange] Allow Nutrient to change the title of this view controller.
  * @property { PDFConfiguration.BooleanType } [iOSShouldHideStatusBar] If ```true```, the status bar will always remain hidden (regardless of the ```shouldHideStatusBarWithUserInterface``` setting).
  * @property { PDFConfiguration.BooleanType } [iOSShowBackActionButton] Shows a floating back button in the lower part of the screen.
  * @property { PDFConfiguration.BooleanType } [iOSShowForwardActionButton] Shows a floating forward button in the lower part of the screen.
@@ -126,11 +126,11 @@ export class PDFConfiguration {
      */
     enableTextSelection?: PDFConfiguration.BooleanType;
     /**
-     * Determines whether PSPDFKit should save automatically in response to [certain UI triggers][], such as the app entering the background or the view disappearing.
+     * Determines whether Nutrient should save automatically in response to [certain UI triggers][], such as the app entering the background or the view disappearing.
      */
     autosaveEnabled?: PDFConfiguration.BooleanType;
     /**
-     * Determines whether PSPDFKit should save automatically in response to certain UI triggers, such as the app entering the background or the view disappearing.
+     * Determines whether Nutrient should save automatically in response to certain UI triggers, such as the app entering the background or the view disappearing.
      */
     disableAutomaticSaving?: PDFConfiguration.BooleanType;
     /**
@@ -306,7 +306,7 @@ export class PDFConfiguration {
      */
     iOSUseParentNavigationBar?: PDFConfiguration.BooleanType;
     /**
-     * Allow PSPDFKit to change the title of this view controller.
+     * Allow Nutrient to change the title of this view controller.
      */
     iOSAllowToolbarTitleChange?: PDFConfiguration.BooleanType;
     /**

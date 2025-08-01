@@ -45,7 +45,6 @@ object FormUtils {
             FormType.SIGNATURE -> "signature"
             FormType.TEXT -> "text"
             FormType.UNDEFINED -> "unknown"
-            else -> "unknown"
         }
     }
 
@@ -97,10 +96,7 @@ object FormUtils {
         // Convert any null values to empty strings
         val sanitizedJSON = HashMap<String, Any>()
         for ((key, value) in elementJSON) {
-            sanitizedJSON[key] = when (value) {
-                null -> ""
-                else -> value
-            }
+            sanitizedJSON[key] = value ?: ""
         }
 
         return sanitizedJSON

@@ -35,6 +35,7 @@ import com.pspdfkit.listeners.DocumentListener;
 import com.pspdfkit.listeners.scrolling.DocumentScrollListener;
 import com.pspdfkit.listeners.scrolling.ScrollState;
 import com.pspdfkit.react.NutrientNotificationCenter;
+import com.pspdfkit.react.events.OnReadyEvent;
 import com.pspdfkit.react.events.PdfViewAnnotationChangedEvent;
 import com.pspdfkit.react.events.PdfViewAnnotationTappedEvent;
 import com.pspdfkit.react.events.PdfViewDocumentLoadedEvent;
@@ -81,6 +82,7 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
     public void onDocumentLoaded(@NonNull PdfDocument pdfDocument) {
         NutrientNotificationCenter.INSTANCE.documentLoaded(pdfDocument.getDocumentIdString());
         eventDispatcher.dispatchEvent(new PdfViewDocumentLoadedEvent(parent.getId()));
+        eventDispatcher.dispatchEvent(new OnReadyEvent(parent.getId()));
     }
 
     @Override

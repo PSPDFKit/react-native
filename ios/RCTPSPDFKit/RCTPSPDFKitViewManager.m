@@ -32,7 +32,7 @@ static NSArray<NSString *>*staticAvailableFontNames;
 
 /** Defaults to YES.
 
- @see https://pspdfkit.com/api/ios/Classes/PSPDFFontPickerViewController.html#/c:objc(cs)PSPDFFontPickerViewController(py)showDownloadableFonts
+ @see https://nutrient.io/api/ios/Classes/PSPDFFontPickerViewController.html#/c:objc(cs)PSPDFFontPickerViewController(py)showDownloadableFonts
  */
 static BOOL staticShowDownloadableFonts = YES;
 
@@ -183,6 +183,8 @@ RCT_EXPORT_VIEW_PROPERTY(onAnnotationsChanged, RCTBubblingEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onStateChanged, RCTBubblingEventBlock)
 
 RCT_EXPORT_VIEW_PROPERTY(onDocumentLoaded, RCTBubblingEventBlock)
+
+RCT_EXPORT_VIEW_PROPERTY(onReady, RCTBubblingEventBlock)
 
 RCT_EXPORT_VIEW_PROPERTY(onCustomToolbarButtonTapped, RCTBubblingEventBlock)
 

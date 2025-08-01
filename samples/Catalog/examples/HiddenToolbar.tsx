@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { Button, processColor, View } from 'react-native';
-import PSPDFKitView from 'react-native-pspdfkit';
+import { processColor, Text, TouchableOpacity, View } from 'react-native';
+import NutrientView from '@nutrient-sdk/react-native';
 
 import { exampleDocumentPath, pspdfkitColor } from '../configuration/Constants';
 
@@ -12,15 +12,16 @@ interface IState {
 }
 
 export class HiddenToolbar extends Component<IProps, IState> {
-  pdfRef: React.RefObject<PSPDFKitView | null>;
+  pdfRef: React.RefObject<NutrientView | null>;
 
   static headerRight(params: { handleAnnotationButtonPress: () => void }) {
     return (
       <View style={styles.marginLeft}>
-        <Button
+        <TouchableOpacity
           onPress={() => params.handleAnnotationButtonPress()}
-          title="Annotations"
-        />
+        >
+          <Text style={styles.button}>Annotations</Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -63,7 +64,7 @@ export class HiddenToolbar extends Component<IProps, IState> {
   override render() {
     return (
       <View style={styles.flex}>
-        <PSPDFKitView
+        <NutrientView
           ref={this.pdfRef}
           document={exampleDocumentPath}
           configuration={{
@@ -99,4 +100,13 @@ const styles = {
   marginLeft: { marginLeft: 10 },
   flex: { flex: 1 },
   pdfColor: { flex: 1, color: pspdfkitColor },
+  button: {
+    padding: 15,
+    fontSize: 16,
+    color: pspdfkitColor,
+    textAlign: 'center' as 'center',
+    backgroundColor: '#f0f0f0',
+    borderRadius: 5,
+    marginHorizontal: 5,
+  },
 };

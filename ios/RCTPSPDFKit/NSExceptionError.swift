@@ -1,6 +1,6 @@
 //
 //  NSExceptionError.swift
-//  react-native-pspdfkit
+//  @nutrient-sdk/react-native
 //
 //  Created by Predrag Jevtic on 10/10/22.
 //

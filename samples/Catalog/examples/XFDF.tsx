@@ -1,6 +1,6 @@
 import React from 'react';
 import { Alert, processColor, Text, TouchableOpacity, View } from 'react-native';
-import PSPDFKitView from 'react-native-pspdfkit';
+import NutrientView from '@nutrient-sdk/react-native';
 
 import { pspdfkitColor, exampleReportPath, writableXFDFPath } from '../configuration/Constants';
 import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
@@ -8,7 +8,7 @@ import { hideToolbar } from '../helpers/NavigationHelper';
 import RNFS from 'react-native-fs';
 
 export class XFDF extends BaseExampleAutoHidingHeaderComponent {
-  pdfRef: React.RefObject<PSPDFKitView | null>;
+  pdfRef: React.RefObject<NutrientView | null>;
 
   constructor(props: any) {
     super(props);
@@ -22,7 +22,7 @@ export class XFDF extends BaseExampleAutoHidingHeaderComponent {
 
     return (
       <View style={styles.flex}>
-        <PSPDFKitView
+        <NutrientView
           ref={this.pdfRef}
           document={exampleReportPath}
           configuration={{
@@ -42,7 +42,7 @@ export class XFDF extends BaseExampleAutoHidingHeaderComponent {
               <View style={styles.horizontalContainer}>
                 <TouchableOpacity onPress={async () => {
                   const result = await this.pdfRef.current?.getDocument().importXFDF(writableXFDFPath);
-                  Alert.alert('PSPDFKit', 'Import XFDF result: ' + JSON.stringify(result));
+                  Alert.alert('Nutrient', 'Import XFDF result: ' + JSON.stringify(result));
                   console.log('Import XFDF result: ', result);
                 }}>
                   <Text style={styles.button}>{'Import XFDF'}</Text>
@@ -53,7 +53,7 @@ export class XFDF extends BaseExampleAutoHidingHeaderComponent {
                     await RNFS.unlink(outputFile);
                   }
                   const result = await this.pdfRef.current?.getDocument().exportXFDF(outputFile);
-                  Alert.alert('PSPDFKit', 'Export XFDF result: ' + JSON.stringify(result));
+                  Alert.alert('Nutrient', 'Export XFDF result: ' + JSON.stringify(result));
                   console.log('Export XFDF result: ', result);
                 }}>
                   <Text style={styles.button}>{'Export XFDF'}</Text>

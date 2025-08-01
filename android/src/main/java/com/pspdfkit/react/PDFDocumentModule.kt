@@ -343,7 +343,7 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
     @ReactMethod fun applyInstantJSON(reference: Int, instantJSON: ReadableMap, promise: Promise) {
         try {
             this.getDocument(reference)?.document?.let {
-                val json = (instantJSON.toHashMap() as Map<*, *>?)?.let { it1 -> JSONObject(it1) }
+                val json = (instantJSON.toHashMap() as? Map<*, *>)?.let { it1 -> JSONObject(it1) }
                 val dataProvider: DataProvider = DocumentJsonDataProvider(json)
                 DocumentJsonFormatter.importDocumentJsonAsync(it, dataProvider)
                     .subscribeOn(Schedulers.io())

@@ -37,7 +37,7 @@ import { Bookmark } from './Bookmark';
 
 /**
  * @class PDFDocument
- * @description The current document object loaded in the PSPDFKitView.
+ * @description The current document object loaded in the NutrientView.
  * @hideconstructor
  */
 export class PDFDocument {

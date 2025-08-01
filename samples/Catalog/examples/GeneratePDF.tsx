@@ -1,16 +1,16 @@
 import React from 'react';
 import { processColor, View } from 'react-native';
-import PSPDFKitView from 'react-native-pspdfkit';
+import NutrientView from '@nutrient-sdk/react-native';
 
 import { pspdfkitColor } from '../configuration/Constants';
 import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
 
 export class GeneratePDF extends BaseExampleAutoHidingHeaderComponent {
-  pdfRef: React.RefObject<PSPDFKitView | null>;
+  pdfRef: React.RefObject<NutrientView | null>;
 
   constructor(props: any) {
     super(props);
-    this.pdfRef = React.createRef<PSPDFKitView>();
+    this.pdfRef = React.createRef<NutrientView>();
   }
 
   override render() {
@@ -19,7 +19,7 @@ export class GeneratePDF extends BaseExampleAutoHidingHeaderComponent {
 
     return (
       <View style={styles.flex}>
-        <PSPDFKitView
+        <NutrientView
           ref={this.pdfRef}
           document={fullPath}
           configuration={{

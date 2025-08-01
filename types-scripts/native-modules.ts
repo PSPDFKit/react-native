@@ -4,7 +4,7 @@ declare module 'react-native' {
       //@ts-ignore
       RNProcessor: Processor;
       //@ts-ignore
-      PSPDFKit: PSPDFKit;
+      Nutrient: Nutrient;
    }
 }
 //@ts-ignore

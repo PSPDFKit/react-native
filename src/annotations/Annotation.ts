@@ -13,7 +13,7 @@
  * @memberof Annotation
  * @property { AnnotationContextualMenuItem[] } buttons The annotation menu items to display when an annotation is selected.
  * @property { Annotation.ContextualMenuType } [menuType] Specifies the type of annotation menu to customize.
- * @property { Boolean } [retainSuggestedMenuItems] Specifies whether the PSPDFKit suggested annotation menu items should be retained when custom annotation menu items are set.
+ * @property { Boolean } [retainSuggestedMenuItems] Specifies whether the Nutrient suggested annotation menu items should be retained when custom annotation menu items are set.
  * @property { Annotation.ContextualMenuAppearance } [appearance] Specifies for which appearance mode this change should apply to (iOS only).
  * @property { Annotation.ContextualMenuItemPosition } [position] The position where the buttons should be added in the menu.
  */
@@ -125,7 +125,7 @@
  * @property { number } defaultAlpha
  * @property { number } minimumAlpha
  * @property { number } maximumAlpha
- * @property { string } defaultLineEnd Comma separated string of line ends. For example: 'openArrow,openArrow'. See {@link https://pspdfkit.com/api/react-native/Annotation.html#.LineEnd} for available options.
+ * @property { string } defaultLineEnd Comma separated string of line ends. For example: 'openArrow,openArrow'. See {@link https://nutrient.io/api/react-native/Annotation.html#.LineEnd} for available options.
  * @property { Annotation.LineEnd[] } availableLineEnds
  * @property { Annotation.BorderStyle } defaultBorderStyle
  * @property { boolean } previewEnabled
@@ -241,7 +241,7 @@
  * @property { number } defaultThickness
  * @property { Annotation.BorderStyle } defaultBorderStyle
  * @property { string[] } availableColors
- * @property { string } defaultLineEnd Comma separated string of line ends. For example: 'openArrow,openArrow'. See {@link https://pspdfkit.com/api/react-native/Annotation.html#.LineEnd} for available options.
+ * @property { string } defaultLineEnd Comma separated string of line ends. For example: 'openArrow,openArrow'. See {@link https://nutrient.io/api/react-native/Annotation.html#.LineEnd} for available options.
  * @property { Annotation.LineEnd[] } availableLineEnds
  * @property { number } minimumAlpha
  * @property { number } maximumAlpha
@@ -261,7 +261,7 @@
  * @property { number } defaultAlpha
  * @property { number } defaultThickness
  * @property { Annotation.BorderStyle } defaultBorderStyle
- * @property { string } defaultLineEnd Comma separated string of line ends. For example: 'openArrow,openArrow'. See {@link https://pspdfkit.com/api/react-native/Annotation.html#.LineEnd} for available options.
+ * @property { string } defaultLineEnd Comma separated string of line ends. For example: 'openArrow,openArrow'. See {@link https://nutrient.io/api/react-native/Annotation.html#.LineEnd} for available options.
  * @property { Annotation.LineEnd[] } availableLineEnds
  * @property { string[] } availableColors
  * @property { number } minimumAlpha
@@ -289,7 +289,7 @@ export interface AnnotationContextualMenu {
   */
   buttons: AnnotationContextualMenuItem[];
  /**
-  * Specifies whether the PSPDFKit suggested annotation menu items should be retained when custom annotation menu items are set.
+  * Specifies whether the Nutrient suggested annotation menu items should be retained when custom annotation menu items are set.
   */
   retainSuggestedMenuItems?: Boolean;
  /**
@@ -407,7 +407,7 @@ export interface AnnotationPresetLine {
   minimumAlpha?: number;
   maximumAlpha?: number;
   /**
-   * Comma separated string of line ends. For example: 'openArrow,openArrow'. See {@link https://pspdfkit.com/api/react-native/Annotation.html#.LineEnd} for available options.
+   * Comma separated string of line ends. For example: 'openArrow,openArrow'. See {@link https://nutrient.io/api/react-native/Annotation.html#.LineEnd} for available options.
    */
   defaultLineEnd?: string;
   availableLineEnds?: Annotation.LineEnd[];
@@ -535,7 +535,7 @@ export interface AnnotationPresetMeasurementPerimeter {
   defaultThickness?: number;
   availableColors?: string[];
   /**
-   * Comma separated string of line ends. For example: 'openArrow,openArrow'. See {@link https://pspdfkit.com/api/react-native/Annotation.html#.LineEnd} for available options.
+   * Comma separated string of line ends. For example: 'openArrow,openArrow'. See {@link https://nutrient.io/api/react-native/Annotation.html#.LineEnd} for available options.
    */
   defaultLineEnd?: string;
   availableLineEnds?: Annotation.LineEnd[];
@@ -555,7 +555,7 @@ export interface AnnotationPresetMeasurementPerimeter {
  */
 export interface AnnotationPresetMeasurementDistance {
   /**
-   * Comma separated string of line ends. For example: 'openArrow,openArrow'. See {@link https://pspdfkit.com/api/react-native/Annotation.html#.LineEnd} for available options.
+   * Comma separated string of line ends. For example: 'openArrow,openArrow'. See {@link https://nutrient.io/api/react-native/Annotation.html#.LineEnd} for available options.
    */
   defaultLineEnd?: string;
   availableLineEnds?: Annotation.LineEnd[];

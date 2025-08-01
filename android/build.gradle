@@ -1,7 +1,7 @@
 /*
  * build.gradle
  *
- *   PSPDFKit
+ *   Nutrient
  *
  *   Copyright © 2021-2025 PSPDFKit GmbH. All rights reserved.
  *
@@ -15,7 +15,7 @@
  *   Contains gradle configuration constants
  */
 ext {
-    PSPDFKIT_VERSION = '10.4.1'
+    NUTRIENT_VERSION = '10.5.0'
 }
 
 buildscript {
@@ -102,7 +102,7 @@ android {
 }
 
 dependencies {
-    api("io.nutrient:nutrient:${PSPDFKIT_VERSION}") {
+    api("io.nutrient:nutrient:${NUTRIENT_VERSION}") {
         exclude group: 'com.google.auto.value', module: 'auto-value'
         exclude group: 'androidx.recyclerview', module: 'recyclerview'
     }

@@ -1,15 +1,15 @@
 import React from 'react';
 import { Alert, processColor, Text, TouchableOpacity, View } from 'react-native';
-import PSPDFKitView, { FormField, PDFConfiguration } from 'react-native-pspdfkit';
+import NutrientView, { PDFConfiguration } from '@nutrient-sdk/react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { exampleDocumentPath, pspdfkitColor } from '../configuration/Constants';
 import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
 import { hideToolbar } from '../helpers/NavigationHelper';
-import { PSPDFKit } from '../helpers/PSPDFKit';
+import { Nutrient } from '../helpers/Nutrient';
 
-export class PSPDFKitViewComponent extends BaseExampleAutoHidingHeaderComponent {
-  pdfRef: React.RefObject<PSPDFKitView | null>;
+export class NutrientViewComponent extends BaseExampleAutoHidingHeaderComponent {
+  pdfRef: React.RefObject<NutrientView | null>;
   
   constructor(props: any) {
     super(props);
@@ -23,7 +23,7 @@ export class PSPDFKitViewComponent extends BaseExampleAutoHidingHeaderComponent 
 
     return (
       <View style={styles.flex}>
-        <PSPDFKitView
+        <NutrientView
           ref={this.pdfRef}
           document={exampleDocumentPath}
           configuration={{
@@ -32,6 +32,9 @@ export class PSPDFKitViewComponent extends BaseExampleAutoHidingHeaderComponent 
             iOSBackgroundColor: processColor('lightgrey'),
             iOSUseParentNavigationBar: false,
             iOSDocumentInfoOptions: [PDFConfiguration.IOSDocumentInfoOption.OUTLINE, PDFConfiguration.IOSDocumentInfoOption.ANNOTATIONS],
+          }}
+          onReady={() => {
+            console.log('NutrientView is ready');
           }}
           fragmentTag="PDF1"
           showNavigationButtonInToolbar={true}
@@ -45,15 +48,15 @@ export class PSPDFKitViewComponent extends BaseExampleAutoHidingHeaderComponent 
                 <TouchableOpacity onPress={ async () => {
                   const document = this.pdfRef.current?.getDocument();
                   Alert.alert(
-                    'PSPDFKit',
+                    'Nutrient',
                     'Document ID: ' + await document?.getDocumentId(),
                   );
                 }}>
                   <Text style={styles.button}>{'Get Document ID'}</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={ async () => {
-                  const documentProperties = PSPDFKit.getDocumentProperties(exampleDocumentPath);
-                  Alert.alert('PSPDFKit', 
+                <TouchableOpacity onPress={ () => {
+                  const documentProperties = Nutrient.getDocumentProperties(exampleDocumentPath);
+                  Alert.alert('Nutrient', 
                     'Document Properties: ' + JSON.stringify(documentProperties));
                     console.log('Document Properties: ', documentProperties);
                 }}>
@@ -87,5 +90,8 @@ const styles = {
     fontSize: 16,
     color: pspdfkitColor,
     textAlign: 'center' as 'center',
+    backgroundColor: '#f0f0f0',
+    borderRadius: 5,
+    marginHorizontal: 5,
   },
 };

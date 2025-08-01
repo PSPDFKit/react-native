@@ -1,14 +1,15 @@
-import React from 'react';
+
 import { Alert, processColor, Text, TouchableOpacity, View } from 'react-native';
-import PSPDFKitView, { Annotation, AnnotationAttachment, AnnotationType, DocumentJSON, ImageAnnotation, InkAnnotation, WidgetAnnotation } from 'react-native-pspdfkit';
+import NutrientView, { Annotation, AnnotationAttachment, AnnotationType, DocumentJSON, ImageAnnotation, InkAnnotation, WidgetAnnotation } from '@nutrient-sdk/react-native';
 import fileSystem from 'react-native-fs';
 
 import { exampleDocumentPath, pspdfkitColor } from '../configuration/Constants';
 import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
 import { hideToolbar } from '../helpers/NavigationHelper';
+import React from 'react';
 
 export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponent {
-  pdfRef: React.RefObject<PSPDFKitView | null>;
+  pdfRef: React.RefObject<NutrientView | null>;
   lastAddedAnnotationUUID: string | undefined;
 
   static basicInkAnnotation: InkAnnotation[] = [new InkAnnotation({
@@ -427,7 +428,7 @@ static imageAnnotation: ImageAnnotation = {
   override render() {
     return (
       <View style={styles.flex}>
-        <PSPDFKitView
+        <NutrientView
           ref={this.pdfRef}
           document={exampleDocumentPath}
           disableAutomaticSaving={true}
@@ -453,10 +454,10 @@ static imageAnnotation: ImageAnnotation = {
                 <TouchableOpacity onPress={() => {
                   // Programmatically add an ink annotation.
                   this.pdfRef.current?.getDocument().addAnnotations(ProgrammaticAnnotations.basicInkAnnotation)
-                    .then(result => {
+                    .then((result: boolean) => {
                       if (result) {
                         Alert.alert(
-                          'PSPDFKit',
+                          'Nutrient',
                           'Annotation was successfully added.',
                           [
                             {
@@ -476,7 +477,7 @@ static imageAnnotation: ImageAnnotation = {
                                 );
                                 this.pdfRef.current?.getAnnotationFlags(
                                   this.lastAddedAnnotationUUID!).then((flags: Annotation.Flags[]): any => {
-                                  Alert.alert('PSPDFKit', `New annotation flags: ${JSON.stringify(flags)}`);
+                                  Alert.alert('Nutrient', `New annotation flags: ${JSON.stringify(flags)}`);
                                 });
                               },
                             },
@@ -484,11 +485,11 @@ static imageAnnotation: ImageAnnotation = {
                           ]
                         );
                       } else {
-                        Alert.alert('PSPDFKit', 'Failed to add annotation.');
+                        Alert.alert('Nutrient', 'Failed to add annotation.');
                       }
                     })
-                    .catch(error => {
-                      Alert.alert('PSPDFKit', JSON.stringify(error));
+                    .catch((error: any) => {
+                      Alert.alert('Nutrient', JSON.stringify(error));
                     });
                 }}>
                   <Text style={styles.button}>{'Add Ink Annotation'}</Text>
@@ -498,18 +499,18 @@ static imageAnnotation: ImageAnnotation = {
                   await this.pdfRef.current?.getDocument().invalidateCache();
                   // Programmatically add multiple annotations.
                   this.pdfRef.current?.getDocument().applyInstantJSON(ProgrammaticAnnotations.complexAnnotation)
-                    .then(result => {
+                    .then((result: any) => {
                       if (result) {
                         Alert.alert(
-                          'PSPDFKit',
+                          'Nutrient',
                           'Annotations were successfully added.',
                         );
                       } else {
-                        Alert.alert('PSPDFKit', 'Failed to add annotations.');
+                        Alert.alert('Nutrient', 'Failed to add annotations.');
                       }
                     })
-                    .catch(error => {
-                      Alert.alert('PSPDFKit', JSON.stringify(error));
+                    .catch((error: any) => {
+                      Alert.alert('Nutrient', JSON.stringify(error));
                     });
                 }}>
                   <Text style={styles.button}>{'Add Complex Annotation'}</Text>
@@ -519,18 +520,18 @@ static imageAnnotation: ImageAnnotation = {
                 <TouchableOpacity onPress={() => {
                   // Programmatically add multiple annotations.
                   this.pdfRef.current?.getDocument().applyInstantJSON(ProgrammaticAnnotations.multipleAnnotations)
-                    .then(result => {
+                    .then((result: any) => {
                       if (result) {
                         Alert.alert(
-                          'PSPDFKit',
+                          'Nutrient',
                           'Annotations were successfully added.',
                         );
                       } else {
-                        Alert.alert('PSPDFKit', 'Failed to add annotations.');
+                        Alert.alert('Nutrient', 'Failed to add annotations.');
                       }
                     })
-                    .catch(error => {
-                      Alert.alert('PSPDFKit', JSON.stringify(error));
+                    .catch((error: any) => {
+                      Alert.alert('Nutrient', JSON.stringify(error));
                     });
                 }}>
                   <Text style={styles.button}>{'Add Multiple Annotations'}</Text>
@@ -551,18 +552,18 @@ static imageAnnotation: ImageAnnotation = {
                     };
 
                   this.pdfRef.current?.getDocument().addAnnotations([ProgrammaticAnnotations.imageAnnotation], attachments)
-                    .then(result => {
+                    .then((result: any) => {
                       if (result) {
                         Alert.alert(
-                          'PSPDFKit',
+                          'Nutrient',
                           'Annotation was successfully added.',
                         );
                       } else {
-                        Alert.alert('PSPDFKit', 'Failed to add annotations.');
+                        Alert.alert('Nutrient', 'Failed to add annotations.');
                       }
                     })
-                    .catch(error => {
-                      Alert.alert('PSPDFKit', JSON.stringify(error));
+                    .catch((error: any) => {
+                      Alert.alert('Nutrient', JSON.stringify(error));
                     });
                   });
                 }}>
@@ -583,13 +584,13 @@ static imageAnnotation: ImageAnnotation = {
                             // Access InkAnnotation specific properties
                             console.log(inkAnnotation.bbox);
                         }
-                        Alert.alert('PSPDFKit', 'All Ink Annotations: ' + JSON.stringify(annotations));
+                        Alert.alert('Nutrient', 'All Ink Annotations: ' + JSON.stringify(annotations));
                       } else {
-                        Alert.alert('PSPDFKit', 'Failed to get annotations.');
+                        Alert.alert('Nutrient', 'Failed to get annotations.');
                       }
                     })
-                    .catch(error => {
-                      Alert.alert('PSPDFKit', JSON.stringify(error));
+                    .catch((error: any) => {
+                      Alert.alert('Nutrient', JSON.stringify(error));
                     });
                 }}>
                   <Text style={styles.button}>{'Get Ink Annotations'}</Text>
@@ -601,8 +602,8 @@ static imageAnnotation: ImageAnnotation = {
                     .then( async (annotations: AnnotationType[]) => {
                       await this.pdfRef.current?.selectAnnotations(annotations, false);
                     })
-                    .catch(error => {
-                      Alert.alert('PSPDFKit', JSON.stringify(error));
+                    .catch((error: any) => {
+                      Alert.alert('Nutrient', JSON.stringify(error));
                     });
                 }}>
                   <Text style={styles.button}>{'Select Ink Annotations'}</Text>
@@ -615,8 +616,8 @@ static imageAnnotation: ImageAnnotation = {
                     .then((annotations: AnnotationType[]) => {
                       document?.removeAnnotations(annotations);
                     })
-                    .catch(error => {
-                      Alert.alert('PSPDFKit', JSON.stringify(error));
+                    .catch((error: any) => {
+                      Alert.alert('Nutrient', JSON.stringify(error));
                     });
                 }}>
                   <Text style={styles.button}>{'Remove Annotations'}</Text>
@@ -626,16 +627,16 @@ static imageAnnotation: ImageAnnotation = {
                   this.pdfRef.current?.getDocument().getAnnotations()
                     .then((annotations: AnnotationType[]) => {
                       if (annotations) {
-                        Alert.alert('PSPDFKit', 'All Annotations: ' + JSON.stringify(annotations));
+                        Alert.alert('Nutrient', 'All Annotations: ' + JSON.stringify(annotations));
                       } else {
                         Alert.alert(
-                          'PSPDFKit',
+                          'Nutrient',
                           'Failed to get all annotations.',
                         );
                       }
                     })
-                    .catch(error => {
-                      Alert.alert('PSPDFKit', JSON.stringify(error));
+                    .catch((error: any) => {
+                      Alert.alert('Nutrient', JSON.stringify(error));
                     });
                 }}>
                   <Text style={styles.button}>{'Get All Annotations'}</Text>

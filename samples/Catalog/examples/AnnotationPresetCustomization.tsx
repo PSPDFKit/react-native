@@ -1,17 +1,17 @@
 import React from 'react';
 import { Alert, processColor, View } from 'react-native';
-import PSPDFKitView, { Annotation } from 'react-native-pspdfkit';
+import NutrientView, { Annotation } from '@nutrient-sdk/react-native';
 
 import { exampleDocumentPath, pspdfkitColor } from '../configuration/Constants';
 import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
 import { hideToolbar } from '../helpers/NavigationHelper';
 
 export class AnnotationPresetCustomization extends BaseExampleAutoHidingHeaderComponent {
-  pdfRef: React.RefObject<PSPDFKitView | null>;
+  pdfRef: React.RefObject<NutrientView | null>;
   constructor(props: any) {
     super(props);
     const { navigation } = this.props;
-    this.pdfRef = React.createRef<PSPDFKitView>();
+    this.pdfRef = React.createRef<NutrientView>();
     hideToolbar(navigation);
   }
 
@@ -20,7 +20,7 @@ export class AnnotationPresetCustomization extends BaseExampleAutoHidingHeaderCo
 
     return (
       <View style={styles.flex}>
-        <PSPDFKitView
+        <NutrientView
           ref={this.pdfRef}
           document={exampleDocumentPath}
           configuration={{
@@ -44,7 +44,7 @@ export class AnnotationPresetCustomization extends BaseExampleAutoHidingHeaderCo
           }
           onCustomAnnotationContextualMenuItemTapped={
             (result: any) => {
-              Alert.alert('PSPDFKit', `Custom annotation contextual menu item tapped: ${JSON.stringify(result)}`);
+              Alert.alert('Nutrient', `Custom annotation contextual menu item tapped: ${JSON.stringify(result)}`);
             }
           }
           annotationPresets={{

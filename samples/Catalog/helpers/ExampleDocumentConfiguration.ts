@@ -1,6 +1,6 @@
 // Configurations
 import { processColor } from 'react-native';
-import { PDFConfiguration } from 'react-native-pspdfkit';
+import { PDFConfiguration } from '@nutrient-sdk/react-native';
 
 const exampleDocumentConfiguration: PDFConfiguration = {
   iOSBackgroundColor: processColor('white'),

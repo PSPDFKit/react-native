@@ -1,16 +1,16 @@
 import React from 'react';
-import { Alert, Button, processColor, View } from 'react-native';
-import PSPDFKitView, { PDFConfiguration } from 'react-native-pspdfkit';
+import { Alert, processColor, Text, TouchableOpacity, View } from 'react-native';
+import NutrientView, { PDFConfiguration } from '@nutrient-sdk/react-native';
 
 import {
   pspdfkitColor,
   exampleDocumentPath,
 } from '../configuration/Constants';
 import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
-import { PSPDFKit } from '../helpers/PSPDFKit';
+import { Nutrient } from '../helpers/Nutrient';
 
 export class GetConfiguration extends BaseExampleAutoHidingHeaderComponent {
-  pdfRef: React.RefObject<PSPDFKitView | null>;
+  pdfRef: React.RefObject<NutrientView | null>;
 
   constructor(props: any) {
     super(props);
@@ -20,7 +20,7 @@ export class GetConfiguration extends BaseExampleAutoHidingHeaderComponent {
   override render() {
     return (
       <View style={styles.flex}>
-        <PSPDFKitView
+        <NutrientView
           ref={this.pdfRef}
           document={exampleDocumentPath}
           configuration={{
@@ -36,34 +36,36 @@ export class GetConfiguration extends BaseExampleAutoHidingHeaderComponent {
           }}
           style={styles.pdfColor}
         />
-        <View style={styles.wrapper}>
-          <View style={styles.flex}>
-            <Button
+        <View style={styles.column}>
+          <View style={styles.horizontalContainer}>
+            <TouchableOpacity
               accessibilityLabel={'Get Configuration'}
               testID={'Get Configuration'}
               onPress={ async () => {
                 const configuration = await this.pdfRef?.current?.getConfiguration().catch(error => {
-                  Alert.alert('PSPDFKit', JSON.stringify(error));
+                  Alert.alert('Nutrient', JSON.stringify(error));
                 });
                 Alert.alert(
-                  'PSPDFKit',
+                  'Nutrient',
                   'Current Configuration: ' + JSON.stringify(configuration),
                 );
               }}
-              title="Get Configuration"
-            />
-            <Button
+            >
+              <Text style={styles.button}>Get Configuration</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
               accessibilityLabel={'Present with Configuration'}
               testID={'Present with Configuration'}
               onPress={ async () => {
                 const configuration = await this.pdfRef?.current?.getConfiguration().catch(error => {
-                  Alert.alert('PSPDFKit', JSON.stringify(error));
+                  Alert.alert('Nutrient', JSON.stringify(error));
                 });
                 // Retrieve and re-apply configuration
-                PSPDFKit.present(exampleDocumentPath, configuration!);
+                Nutrient.present(exampleDocumentPath, configuration!);
               }}
-              title="Present with Configuration"
-            />
+            >
+              <Text style={styles.button}>Present with Configuration</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </View>
@@ -74,9 +76,26 @@ export class GetConfiguration extends BaseExampleAutoHidingHeaderComponent {
 const styles = {
   flex: { flex: 1 },
   pdfColor: { flex: 1, color: pspdfkitColor },
-  wrapper: {
+  column: {
+    flexDirection: 'column' as 'column',
+    alignItems: 'center' as 'center',
+  },
+  horizontalContainer: {
     flexDirection: 'row' as 'row',
+    minWidth: '70%' as '70%',
+    justifyContent: 'space-between' as 'space-between',
     alignItems: 'center' as 'center',
     padding: 10,
+  },
+  button: {
+    padding: 15,
+    fontSize: 16,
+    color: pspdfkitColor,
+    textAlign: 'center' as 'center',
+    backgroundColor: '#f0f0f0',
+    borderRadius: 5,
+    marginHorizontal: 5,
+    minHeight: 44,
+    paddingVertical: 10,
   },
 };

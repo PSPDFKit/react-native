@@ -18,40 +18,40 @@ import {
 } from './helpers/FileHelper';
 import { extractFromAssetsIfMissing } from './helpers/FileSystemHelpers';
 import { getMainBundlePath } from './helpers/ImageHelper';
-import { PSPDFKit } from './helpers/PSPDFKit';
+import { Nutrient } from './helpers/Nutrient';
 import {
   BlankPDFConfiguration,
   DocumentPDFConfiguration,
   GeneratePDFConfiguration,
   TemplatePDFConfiguration,
-} from 'react-native-pspdfkit';
+} from '@nutrient-sdk/react-native';
 
 const Processor = NativeModules.RNProcessor;
 
 export default [
   {
     key: 'item1',
-    name: 'PSPDFKitView Component',
+    name: 'NutrientView Component',
     description:
-      'Show how to use the PSPDFKitView component with react-navigation.',
+      'How to use the NutrientView component with react-navigation.',
     action: (component: any) => {
-      component.props.navigation.push('PSPDFKitViewComponent');
+      component.props.navigation.push('NutrientViewComponent');
     },
   },
   {
     key: 'item2',
-    name: 'Open an Image in a PSPDFKitView Component',
+    name: 'Open an Image in a NutrientView Component',
     description:
-      'Show how to open and annotate an image document inside a PSPDFKitView component.',
+      'How to open and annotate an image document inside a NutrientView component.',
     action: (component: any) => {
       component.props.navigation.push('OpenImageDocument');
     },
   },
   {
     key: 'item3',
-    name: 'Open a Remote Document in a PSPDFKitView Component',
+    name: 'Open a Remote Document in a NutrientView Component',
     description:
-      'Show how to open a remote document via URL inside a PSPDFKitView component.',
+      'How to open a remote document via URL inside a NutrientView component.',
     action: (component: any) => {
       component.props.navigation.push('OpenRemoteDocument');
     },
@@ -70,7 +70,7 @@ export default [
   {
     key: 'item5',
     name: 'Save As',
-    description: 'Save changes to the PDF in a separate file',
+    description: 'Save changes to the PDF in a separate file.',
     action: (component: any) => {
       extractFromAssetsIfMissing(exampleDocumentName, function () {
         component.props.navigation.push('SaveAs');
@@ -81,7 +81,7 @@ export default [
     key: 'item6',
     name: 'Event Listeners',
     description:
-      'Show how to use the listeners exposed by the PSPDFKitView component.',
+      'How to use the listeners exposed by the NutrientView component and NotificationCenter.',
     action: (component: any) => {
       component.props.navigation.push('EventListeners');
     },
@@ -99,7 +99,7 @@ export default [
     key: 'item8',
     name: 'Annotation Processing',
     description:
-      'Show how to embed, flatten, remove, and print annotations; then present the newly processed document.',
+      'How to embed, flatten, remove, and print annotations; then present the newly processed document.',
     action: (component: any) => {
       extractFromAssetsIfMissing(exampleDocumentName, function () {
         component.props.navigation.push('AnnotationProcessing');
@@ -109,7 +109,7 @@ export default [
   {
     key: 'item9',
     name: 'Programmatic Annotations',
-    description: 'Show how to get and add new annotations using Instant JSON.',
+    description: 'How to get and add new annotations using Instant JSON.',
     action: (component: any) => {
       component.props.navigation.push('ProgrammaticAnnotations');
     },
@@ -118,7 +118,7 @@ export default [
     key: 'item10',
     name: 'Programmatic Form Filling',
     description:
-      'Show how to get the value of a form element and how to programmatically fill forms.',
+      'How to get the value of a form element and how to programmatically fill forms.',
     action: (component: any) => {
       component.props.navigation.push('ProgrammaticFormFilling');
     },
@@ -127,7 +127,7 @@ export default [
     key: 'item11',
     name: 'Split PDF',
     description:
-      'Show two PDFs side by side by using multiple PSPDFKitView components.',
+      'Two PDFs side by side using multiple NutrientView components.',
     action: (component: any) => {
       component.props.navigation.navigate('SplitPDF');
     },
@@ -135,7 +135,7 @@ export default [
   {
     key: 'item12',
     name: 'Customize the Toolbar',
-    description: 'Show how to customize buttons in the toolbar.',
+    description: 'How to customize buttons in the toolbar.',
     action: (component: any) => {
       component.props.navigation.push('ToolbarCustomization');
     },
@@ -153,7 +153,7 @@ export default [
     key: 'item14',
     name: 'Custom Font Picker',
     description:
-      'Show how to customize the font picker for free text annotations.',
+      'How to customize the font picker for free text annotations.',
     action: (component: any) => {
       component.props.navigation.push('CustomFontPicker');
     },
@@ -165,7 +165,7 @@ export default [
     description:
       'Open a document using the Native Module API by passing its path.',
     action: () => {
-      PSPDFKit.present(exampleDocumentPath, {})
+      Nutrient.present(exampleDocumentPath, {})
         .then((_loaded: boolean) => {
           console.log('Document was loaded successfully.');
         })
@@ -173,16 +173,16 @@ export default [
           console.log(error.message);
         });
       // This opens the document on the fourth page.
-      PSPDFKit.setPageIndex(3, false);
+      Nutrient.setPageIndex(3, false);
     },
   },
   {
     key: 'item16',
     name: 'Customize Document Configuration',
     description:
-      'Customize various aspects of the document by passing a configuration dictionary.',
+      'Customize various aspects of the document by passing a PDFConfiguration object.',
     action: () => {
-      PSPDFKit.present(exampleDocumentPath, exampleDocumentConfiguration);
+      Nutrient.present(exampleDocumentPath, exampleDocumentConfiguration);
     },
   },
   {
@@ -192,13 +192,13 @@ export default [
       'Open an image document using the Native Module API. Supported filetypes are PNG, JPEG and TIFF.',
     action: () => {
       // PSPDFKit can open PNG, JPEG and TIFF image files directly.
-      PSPDFKit.present(tiffImagePath, tiffImageConfiguration);
+      Nutrient.present(tiffImagePath, tiffImageConfiguration);
     },
   },
   {
     key: 'item18',
     name: 'Generate PDF',
-    description: 'Generate a PDF from a template, images or html',
+    description: 'Generate a PDF from a template, images or HTML.',
     action: (component: any) => {
       component.props.navigation.push('GeneratePDFMenu', {
         title: 'Generate PDF from html, template and more',
@@ -207,8 +207,8 @@ export default [
   },
   {
     key: 'item19',
-    name: 'PSPDFKit Instant',
-    description: 'PSPDFKit Instant synchronisation example',
+    name: 'Nutrient Instant',
+    description: 'Nutrient Instant synchronisation example.',
     action: (component: any) => {
       component.props.navigation.push('InstantSynchronization', {
         title: 'Instant Synchronization',
@@ -218,10 +218,10 @@ export default [
   {
     key: 'item20',
     name: 'PSPDFKit Measurement',
-    description: 'PSPDFKit measurement tools example',
+    description: 'Nutrient measurement tools example.',
     action: (component: any) => {
       component.props.navigation.push('Measurement', {
-        title: 'PSPDFKit Measurement',
+        title: 'Nutrient Measurement',
       });
     },
   },
@@ -231,7 +231,7 @@ export default [
     description: 'Customize default annotation presets and annotation menu',
     action: (component: any) => {
       component.props.navigation.push('AnnotationPresetCustomization', {
-        title: 'PSPDFKit preset customization',
+        title: 'Nutrient preset customization',
       });
     },
   },
@@ -248,17 +248,17 @@ export default [
   {
     key: 'item23',
     name: 'Open Password Protected PDF',
-    description: 'Open a password protected PDF document',
+    description: 'Open a password protected PDF document.',
     action: (component: any) => {
       component.props.navigation.push('PasswordProtectedDocument', {
-        title: 'PSPDFKitView Component',
+        title: 'NutrientView Component',
       });
     },
   },
   {
     key: 'item24',
     name: 'XFDF Import and Export',
-    description: 'Import and export annotations from XFDF files',
+    description: 'Import and export annotations from XFDF files.',
     action: (component: any) => {
       extractFromAssetsIfMissing(exampleXFDFName, function () {
         component.props.navigation.push('XFDF', {
@@ -296,12 +296,12 @@ const generatePDFMenu = [
         const { fileURL } = await Processor.generateBlankPDF(configuration);
 
         if (Platform.OS === 'android') {
-          PSPDFKit.present(fileURL, { toolbarTitle: 'Generate blank PDF' });
+          Nutrient.present(fileURL, { toolbarTitle: 'Generate blank PDF' });
           return;
         }
 
         // Do something with new file
-        console.log('Your new file is stored in: ', fileURL);
+        console.log('Your new file is stored at: ', fileURL);
         await extractAsset(
           fileURL,
           documentName(fileName),
@@ -317,7 +317,7 @@ const generatePDFMenu = [
         );
       } catch (e: any) {
         console.log(e.message, e.code);
-        Alert.alert('PSPDFKit', e.message);
+        Alert.alert('Nutrient', e.message);
       }
     },
   },
@@ -332,7 +332,7 @@ const generatePDFMenu = [
         fileURL = await getOutputPath(fileName);
       } catch (e: any) {
         console.log(e.message, e.code);
-        Alert.alert('PSPDFKit', e.message);
+        Alert.alert('Nutrient', e.message);
       }
 
       const configuration: GeneratePDFConfiguration = {
@@ -374,7 +374,7 @@ body {
         console.log('Your new file is stored in: ', fileURL);
 
         if (Platform.OS === 'android') {
-          PSPDFKit.present(fileURL, {
+          Nutrient.present(fileURL, {
             toolbarTitle: 'Generate PDF from HTML string.',
           });
           return;
@@ -396,14 +396,14 @@ body {
         );
       } catch (e: any) {
         console.log(e.message, e.code);
-        Alert.alert('PSPDFKit', e.message);
+        Alert.alert('Nutrient', e.message);
       }
     },
   },
   {
     key: 'item3',
     name: 'Generate PDF from URL',
-    description: 'Generate PDF from internet link.',
+    description: 'Generate PDF from a https link.',
     action: async (component: any) => {
       let fileURL = null;
       const fileName = 'newPDFFromURL';
@@ -411,14 +411,14 @@ body {
         fileURL = await getOutputPath(fileName);
       } catch (e: any) {
         console.log(e.message, e.code);
-        Alert.alert('PSPDFKit', e.message);
+        Alert.alert('Nutrient', e.message);
       }
 
       const configuration: GeneratePDFConfiguration = {
         filePath: fileURL!,
         override: true,
       };
-      let originURL = 'https://pspdfkit.com';
+      let originURL = 'https://nutrient.io';
 
       try {
         let { fileURL } = await Processor.generatePDFFromHtmlURL(
@@ -428,11 +428,11 @@ body {
         // Do something with new file
 
         if (Platform.OS === 'android') {
-          PSPDFKit.present(fileURL, { toolbarTitle: 'Generate PDF from URL' });
+          Nutrient.present(fileURL, { toolbarTitle: 'Generate PDF from URL' });
           return;
         }
 
-        // In this example, we will open it in PSPDFKit view component from the same location where other pdf documents resides, PDFs folder in the root of the RN app
+        // In this example, we will open it in Nutrient view component from the same location where other pdf documents resides, PDFs folder in the root of the RN app
         await extractAsset(
           fileURL,
           documentName(fileName),
@@ -448,7 +448,7 @@ body {
         );
       } catch (e: any) {
         console.log(e.message, e.code);
-        Alert.alert('PSPDFKit', e.message);
+        Alert.alert('Nutrient', e.message);
       }
     },
   },
@@ -456,7 +456,7 @@ body {
     key: 'item4',
     name: 'Generate PDF from Template multiple configurations',
     description:
-      'Generate PDF from template with custom configuration for each page separately',
+      'Generate PDF from template with custom configuration for each page separately.',
     action: async (component: any) => {
       let fileURL = null;
       const fileName = 'newPDFFromTemplate';
@@ -464,7 +464,7 @@ body {
         fileURL = await getOutputPath(fileName);
       } catch (e: any) {
         console.log(e.message, e.code);
-        Alert.alert('PSPDFKit', e.message);
+        Alert.alert('Nutrient', e.message);
       }
 
       const configuration: TemplatePDFConfiguration = {
@@ -489,9 +489,9 @@ body {
         let { fileURL } =
           await Processor.generatePDFFromTemplate(configuration);
         // Do something with new file
-        // In this example, we will open it in PSPDFKit view component from the same location where other pdf documents resides, PDFs folder in the root of the RN app
+        // In this example, we will open it in Nutrient view component from the same location where other pdf documents resides, PDFs folder in the root of the RN app
         if (Platform.OS === 'android') {
-          PSPDFKit.present(fileURL, {
+          Nutrient.present(fileURL, {
             toolbarTitle: 'Generate PDF from template',
           });
           return;
@@ -513,7 +513,7 @@ body {
         );
       } catch (e: any) {
         console.log(e.message, e.code);
-        Alert.alert('PSPDFKit', e.message);
+        Alert.alert('Nutrient', e.message);
       }
     },
   },
@@ -543,13 +543,13 @@ body {
           await Processor.generatePDFFromImages(configuration);
 
         if (Platform.OS === 'android') {
-          PSPDFKit.present(fileURL, { toolbarTitle: 'Generate PDF from images' });
+          Nutrient.present(fileURL, { toolbarTitle: 'Generate PDF from images' });
           return;
         }
 
         // Do something with new file
         console.log('Your new file is stored in: ', fileURL);
-        // In this example, we will open it in PSPDFKit view component from the same location where other pdf documents resides, PDFs folder in the root of the RN app
+        // In this example, we will open it in Nutrient view component from the same location where other pdf documents resides, PDFs folder in the root of the RN app
         await extractAsset(
           fileURL,
           documentName(fileName),
@@ -565,7 +565,7 @@ body {
         );
       } catch (e: any) {
         console.log(e.message, e.code);
-        Alert.alert('PSPDFKit', e.message);
+        Alert.alert('Nutrient', e.message);
       }
     },
   },
@@ -584,7 +584,7 @@ body {
         outputFile = await getOutputPath(fileName);
       } catch (e: any) {
         console.log(e.message, e.code);
-        Alert.alert('PSPDFKit', e.message);
+        Alert.alert('Nutrient', e.message);
       }
 
       const configuration: DocumentPDFConfiguration = {
@@ -609,7 +609,7 @@ body {
           await Processor.generatePDFFromDocuments(configuration);
 
         if (Platform.OS === 'android') {
-          PSPDFKit.present(fileURL, { toolbarTitle: 'Generate PDF from PDF documents' });
+          Nutrient.present(fileURL, { toolbarTitle: 'Generate PDF from PDF documents' });
           return;
         }
 
@@ -622,7 +622,7 @@ body {
         });
       } catch (e: any) {
         console.log(e.message, e.code);
-        Alert.alert('PSPDFKit', e.message);
+        Alert.alert('Nutrient', e.message);
       }
     },
   },

@@ -109,7 +109,7 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
 
     @Override
     public String getName() {
-        return "PSPDFKit";
+        return "Nutrient";
     }
 
     @ReactMethod
@@ -140,37 +140,37 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
 
     @ReactMethod
     public void presentPdf(@NonNull String document, @NonNull ReadableMap configuration, @Nullable Promise promise) {
-        if (getCurrentActivity() != null) {
+        if (getReactApplicationContext().getCurrentActivity() != null) {
             if (resumedActivity == null) {
                 // We register an activity lifecycle callback so we can get notified of the current activity.
-                getCurrentActivity().getApplication().registerActivityLifecycleCallbacks(this);
+                getReactApplicationContext().getCurrentActivity().getApplication().registerActivityLifecycleCallbacks(this);
             }
-            ConfigurationAdapter configurationAdapter = new ConfigurationAdapter(getCurrentActivity(), configuration);
+            ConfigurationAdapter configurationAdapter = new ConfigurationAdapter(getReactApplicationContext().getCurrentActivity(), configuration);
             // This is an edge case where file scheme is missing.
             if (Uri.parse(document).getScheme() == null) {
                 document = FILE_SCHEME + document;
             }
 
             lastPresentPromise = promise;
-            PdfActivity.showDocument(getCurrentActivity(), Uri.parse(document), configurationAdapter.build());
+            PdfActivity.showDocument(getReactApplicationContext().getCurrentActivity(), Uri.parse(document), configurationAdapter.build());
         }
     }
 
     @ReactMethod
     public void presentImage(@NonNull String imageDocument, @NonNull ReadableMap configuration, @Nullable Promise promise) {
-        if (getCurrentActivity() != null) {
+        if (getReactApplicationContext().getCurrentActivity() != null) {
             if (resumedActivity == null) {
                 // We register an activity lifecycle callback so we can get notified of the current activity.
-                getCurrentActivity().getApplication().registerActivityLifecycleCallbacks(this);
+                getReactApplicationContext().getCurrentActivity().getApplication().registerActivityLifecycleCallbacks(this);
             }
-            ConfigurationAdapter configurationAdapter = new ConfigurationAdapter(getCurrentActivity(), configuration);
+            ConfigurationAdapter configurationAdapter = new ConfigurationAdapter(getReactApplicationContext().getCurrentActivity(), configuration);
             // This is an edge case where file scheme is missing.
             if (Uri.parse(imageDocument).getScheme() == null) {
                 imageDocument = FILE_SCHEME + imageDocument;
             }
 
             lastPresentPromise = promise;
-            PdfActivity.showImage(getCurrentActivity(), Uri.parse(imageDocument), configurationAdapter.build());
+            PdfActivity.showImage(getReactApplicationContext().getCurrentActivity(), Uri.parse(imageDocument), configurationAdapter.build());
         }
     }
 
@@ -187,12 +187,12 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
             return;
         }
 
-        if (getCurrentActivity() != null) {
+        if (getReactApplicationContext().getCurrentActivity() != null) {
             if (resumedActivity == null) {
                 // We register an activity lifecycle callback so we can get notified of the current activity.
-                getCurrentActivity().getApplication().registerActivityLifecycleCallbacks(this);
+                getReactApplicationContext().getCurrentActivity().getApplication().registerActivityLifecycleCallbacks(this);
             }
-            ConfigurationAdapter configurationAdapter = new ConfigurationAdapter(getCurrentActivity(), configuration);
+            ConfigurationAdapter configurationAdapter = new ConfigurationAdapter(getReactApplicationContext().getCurrentActivity(), configuration);
 
             lastPresentPromise = promise;
 
@@ -201,7 +201,7 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
                 @Override
                 public void run() {
                     try {
-                        RNInstantPdfActivity.showInstantDocument(getCurrentActivity(), serverUrl, jwt, configurationAdapter.build());
+                        RNInstantPdfActivity.showInstantDocument(getReactApplicationContext().getCurrentActivity(), serverUrl, jwt, configurationAdapter.build());
                     } catch (Exception e) {
                         // Could not start instant
                     }

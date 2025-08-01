@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import PSPDFKitView, { Measurements, MeasurementScale, MeasurementValueConfiguration } from 'react-native-pspdfkit';
+import NutrientView, { Measurements, MeasurementScale, MeasurementValueConfiguration } from '@nutrient-sdk/react-native';
 
 import {
   measurementsDocument,
@@ -15,7 +15,7 @@ import {
 import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
 
 class Measurement extends BaseExampleAutoHidingHeaderComponent {
-  pdfRef: React.RefObject<PSPDFKitView | null>;
+  pdfRef: React.RefObject<NutrientView | null>;
 
   constructor(props: any) {
     super(props);
@@ -39,19 +39,19 @@ class Measurement extends BaseExampleAutoHidingHeaderComponent {
      
      const configs = [measurementValueConfig];
      await this.pdfRef.current?.setMeasurementValueConfigurations(configs);
-     Alert.alert('PSPDFKit', 'New Measurement Config Added!');
+     Alert.alert('Nutrient', 'New Measurement Config Added!');
   };
 
   onGetMeasurementConfigs = async () => {
     const result = await this.pdfRef.current?.getMeasurementValueConfigurations();
-    Alert.alert('PSPDFKit', 'Measurement Configs: ' + JSON.stringify(result));
+    Alert.alert('Nutrient', 'Measurement Configs: ' + JSON.stringify(result));
     console.log(JSON.stringify(result));
  };
 
   override render() {
     return (
       <View style={styles.flex}>
-        <PSPDFKitView
+        <NutrientView
           ref={this.pdfRef}
           document={measurementsDocument}
           configuration={{

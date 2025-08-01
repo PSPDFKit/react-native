@@ -1,6 +1,6 @@
 ## Catalog
 
-The project contains a large set of sample code, which illustrates how to set up and customize PSPDFKit for various use cases. You can run the Catalog app on Android and iOS.
+The project contains a large set of sample code, which illustrates how to set up and customize Nutrient for various use cases. You can run the Catalog app on Android and iOS.
 
 ### Running the Catalog on Android
 

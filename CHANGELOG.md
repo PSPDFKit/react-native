@@ -1,6 +1,11 @@
+## 3.0.0 - 30 Jul 2025
+
+- Adds the `onReady` callback to `NutrientView` to make functional component integration easier. (J#HYB-809)
+- Updates SDK to Nutrient branding. The new package name is now `@nutrient-sdk/react-native`.
+
 ## 2.19.1 - 24 Jul 2025
 
-- Fixes an issue where `PSPDFKitView` component props were not reliably applied on Android. (J#HYB-836)
+- Fixes an issue where `PSPDFKitView` component props weren’t reliably applied on Android. (J#HYB-836)
 
 ## 2.19.0 - 02 Jul 2025
 
@@ -9,8 +14,10 @@
 - Adds the `iOSDocumentInfoOptions` option to `PDFConfiguration` to customize Document Info tabs on iOS. (J#HYB-826)
 - Adds the `setExcludedAnnotations` API to exclude specified annotations completely from selection. (J#HYB-823)
 - Adds the `bookmarksChanged` event to `NotificationCenter` to receive bookmark change events. (J#HYB-818)
-- Adds the `getBookmarks`, `addBookmarks` and `removeBookmarks` APIs to `PDFDocument` for bookmark management. (J#HYB-818)
-- Fixes an issue where the `enterAnnotationCreationMode` API does not honour annotation variant options. (J#HYB-814)
+- Adds the `getBookmarks`, `addBookmarks`, and `removeBookmarks` APIs to `PDFDocument` for bookmark management. (J#HYB-818)
+- Updates to Nutrient Android SDK 10.4.1.
+- Updates to Nutrient iOS SDK 14.10.0.
+- Fixes an issue where the `enterAnnotationCreationMode` API does not honor annotation variant options. (J#HYB-814)
 - Fixes an issue where the `enterAnnotationCreationMode` API on iOS could not change tools when already active. (J#HYB-815)
 - Fixes an issue where `AnnotationsEvent.REMOVED` contained null `name` and `creatorName` properties on Android. (J#HYB-829)
 

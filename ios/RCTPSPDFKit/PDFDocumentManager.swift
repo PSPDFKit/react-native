@@ -20,7 +20,7 @@ import PSPDFKit
     
     var documents = [NSNumber:Document]()
     @objc public var delegate: PDFDocumentManagerDelegate?
-    private let queue = DispatchQueue(label: "com.nutrient.reactnative.documentmanager")
+    private let queue = DispatchQueue(label: "io.nutrient.reactnative.documentmanager")
     
     private func getDocument(_ reference: NSNumber) -> Document? {
         var result: Document?

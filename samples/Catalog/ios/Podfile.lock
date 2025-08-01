@@ -8,10 +8,14 @@ PODS:
   - hermes-engine (0.80.0):
     - hermes-engine/Pre-built (= 0.80.0)
   - hermes-engine/Pre-built (0.80.0)
-  - Instant (14.10.0)
-  - PSPDFKit (14.10.0):
-    - PSPDFKit/Core (= 14.10.0)
-  - PSPDFKit/Core (14.10.0)
+  - Instant (14.11.0)
+  - nutrient-sdk-react-native (3.0.0):
+    - Instant (= 14.11.0)
+    - PSPDFKit (= 14.11.0)
+    - React
+  - PSPDFKit (14.11.0):
+    - PSPDFKit/Core (= 14.11.0)
+  - PSPDFKit/Core (14.11.0)
   - RCT-Folly (2024.11.18.00):
     - boost
     - DoubleConversion
@@ -1652,11 +1656,7 @@ PODS:
     - React-RCTFBReactNativeSpec
     - ReactCommon/turbomodule/core
     - SocketRocket
-  - react-native-pspdfkit (2.19.0):
-    - Instant (= 14.10.0)
-    - PSPDFKit (= 14.10.0)
-    - React
-  - react-native-safe-area-context (5.3.0):
+  - react-native-safe-area-context (5.5.1):
     - boost
     - DoubleConversion
     - fast_float
@@ -1675,8 +1675,8 @@ PODS:
     - React-hermes
     - React-ImageManager
     - React-jsi
-    - react-native-safe-area-context/common (= 5.3.0)
-    - react-native-safe-area-context/fabric (= 5.3.0)
+    - react-native-safe-area-context/common (= 5.5.1)
+    - react-native-safe-area-context/fabric (= 5.5.1)
     - React-NativeModulesApple
     - React-RCTFabric
     - React-renderercss
@@ -1687,7 +1687,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - react-native-safe-area-context/common (5.3.0):
+  - react-native-safe-area-context/common (5.5.1):
     - boost
     - DoubleConversion
     - fast_float
@@ -1716,7 +1716,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - react-native-safe-area-context/fabric (5.3.0):
+  - react-native-safe-area-context/fabric (5.5.1):
     - boost
     - DoubleConversion
     - fast_float
@@ -2251,7 +2251,7 @@ PODS:
     - Yoga
   - RNFS (2.20.0):
     - React-Core
-  - RNGestureHandler (2.26.0):
+  - RNGestureHandler (2.27.1):
     - boost
     - DoubleConversion
     - fast_float
@@ -2352,6 +2352,7 @@ DEPENDENCIES:
   - fmt (from `../node_modules/react-native/third-party-podspecs/fmt.podspec`)
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
   - hermes-engine (from `../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec`)
+  - "nutrient-sdk-react-native (from `../node_modules/@nutrient-sdk/react-native`)"
   - RCT-Folly (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCTDeprecation (from `../node_modules/react-native/ReactApple/Libraries/RCTFoundation/RCTDeprecation`)
   - RCTRequired (from `../node_modules/react-native/Libraries/Required`)
@@ -2386,7 +2387,6 @@ DEPENDENCIES:
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - React-Mapbuffer (from `../node_modules/react-native/ReactCommon`)
   - React-microtasksnativemodule (from `../node_modules/react-native/ReactCommon/react/nativemodule/microtasks`)
-  - react-native-pspdfkit (from `../node_modules/react-native-pspdfkit`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - React-NativeModulesApple (from `../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios`)
   - React-oscompat (from `../node_modules/react-native/ReactCommon/oscompat`)
@@ -2448,6 +2448,8 @@ EXTERNAL SOURCES:
   hermes-engine:
     :podspec: "../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec"
     :tag: hermes-2025-05-06-RNv0.80.0-4eb6132a5bf0450bf4c6c91987675381d7ac8bca
+  nutrient-sdk-react-native:
+    :path: "../node_modules/@nutrient-sdk/react-native"
   RCT-Folly:
     :podspec: "../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec"
   RCTDeprecation:
@@ -2514,8 +2516,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon"
   React-microtasksnativemodule:
     :path: "../node_modules/react-native/ReactCommon/react/nativemodule/microtasks"
-  react-native-pspdfkit:
-    :path: "../node_modules/react-native-pspdfkit"
   react-native-safe-area-context:
     :path: "../node_modules/react-native-safe-area-context"
   React-NativeModulesApple:
@@ -2599,8 +2599,9 @@ SPEC CHECKSUMS:
   fmt: a40bb5bd0294ea969aaaba240a927bd33d878cdd
   glog: 5683914934d5b6e4240e497e0f4a3b42d1854183
   hermes-engine: 7068e976238b29e97b3bafd09a994542af7d5c0b
-  Instant: 043b6945ebce6fb730922ee82623ed3636db0be2
-  PSPDFKit: c3205ca2cc9aeca1d94bf5f5917f11d58508cb8e
+  Instant: 60e22c8f74905424698cba5874d6f849ee9c726b
+  nutrient-sdk-react-native: 854d558acff81bfbe4fb97d4744b60054a0201c2
+  PSPDFKit: ee712d5e40be2d247fefc1dc89f1e2dac60a905f
   RCT-Folly: 846fda9475e61ec7bcbf8a3fe81edfcaeb090669
   RCTDeprecation: ff787f6c860a1b97dd1bc27264b61d23ad1994da
   RCTRequired: 664eb8399ed8a83e26ab65af7c2ad390f7e61696
@@ -2634,8 +2635,7 @@ SPEC CHECKSUMS:
   React-logger: dce52a571ba0e0149c3f0fcc6866cbc0c8552c5e
   React-Mapbuffer: f5754c33877eaf36e4c76c613b35615a181c85c5
   React-microtasksnativemodule: 23df6374a3ac422d8c2927839bcaeed61fee3dad
-  react-native-pspdfkit: fb3ebbd14e77bb65bd1045e039b9350b15725022
-  react-native-safe-area-context: 45d0664c8d0e85394fa26f0af25fd267a03a05bf
+  react-native-safe-area-context: d3738f0c3b1fcefaed874a45891b0d44306c47c1
   React-NativeModulesApple: e16d5c133019987285f001fbf1461a861e40426f
   React-oscompat: 7c0a341cc31e350da71ddf2e46de0a845d1d1626
   React-perflogger: c91e01612298b74f70d846ae3666d2b078c547e0
@@ -2669,11 +2669,11 @@ SPEC CHECKSUMS:
   ReactCommon: b028d09a66e60ebd83ca59d8cc9a1216360db147
   RNCMaskedView: 7e0ce15656772a939ff0d269100bca3a182163c8
   RNFS: 89de7d7f4c0f6bafa05343c578f61118c8282ed8
-  RNGestureHandler: eeb622199ef1fb3a076243131095df1c797072f0
+  RNGestureHandler: 5e1a1605659c22098719fc2e8aee453fe728f52e
   RNScreens: ee2abe7e0c548eed14e92742e81ed991165c56aa
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   Yoga: 0c4b7d2aacc910a1f702694fa86be830386f4ceb
 
-PODFILE CHECKSUM: d91a0b2328ac04192f1e2b7c06dd1e9f31c3766e
+PODFILE CHECKSUM: 1944314d41d51bf1f04e30c60b7daa8d8e0e62d0
 
 COCOAPODS: 1.16.2

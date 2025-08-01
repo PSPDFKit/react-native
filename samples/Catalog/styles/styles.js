@@ -13,7 +13,7 @@ export default StyleSheet.create({
     alignItems: 'center',
     borderBottomWidth: 0.5,
     borderColor: '#ccc',
-    backgroundColor: '#eee',
+    backgroundColor: '#EFEBE7',
   },
   version: {
     color: '#666666',

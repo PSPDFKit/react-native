@@ -10,7 +10,7 @@ import {
 
 import { pspdfkitColor } from '../configuration/Constants';
 
-const PSPDFKit = NativeModules.PSPDFKit;
+const Nutrient = NativeModules.Nutrient;
 import { generatePDFMenu } from '../ExamplesNavigationMenu';
 import styles from '../styles/styles';
 
@@ -23,7 +23,7 @@ class GeneratePDFMenu extends Component {
             source={require('../assets/logo-flat.png')}
             style={styles.logo}
           />
-          <Text style={styles.version}>{PSPDFKit.versionString}</Text>
+          <Text style={styles.version}>{Nutrient.versionString}</Text>
         </View>
         <FlatList
           data={generatePDFMenu}

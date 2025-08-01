@@ -12,7 +12,7 @@ import {
   export class NotificationCenter {
   
     subscribedEvents = new Map<string, any>();
-    eventEmitter = new NativeEventEmitter(NativeModules.PSPDFKit);
+    eventEmitter = new NativeEventEmitter(NativeModules.Nutrient);
     pdfViewRef: any;
 
     /**
@@ -36,7 +36,7 @@ import {
     subscribe(event: string, callback: any): void {
       const subscription = this.eventEmitter.addListener(event, callback);
       this.subscribedEvents.set(event, subscription);
-      NativeModules.PSPDFKit.handleListenerAdded(event);
+      NativeModules.Nutrient.handleListenerAdded(event);
     }
 
    /**
@@ -53,7 +53,7 @@ import {
         subscription.remove();
         this.subscribedEvents.delete(event);
         const isLast = this.subscribedEvents.size === 0 ? true : false
-        NativeModules.PSPDFKit.handleListenerRemoved(event, isLast);
+        NativeModules.Nutrient.handleListenerRemoved(event, isLast);
       }
     }
 
@@ -69,7 +69,7 @@ import {
       subscription.remove();
       this.subscribedEvents.delete(event);
       const isLast = this.subscribedEvents.size === 0 ? true : false
-      NativeModules.PSPDFKit.handleListenerRemoved(event, isLast);
+      NativeModules.Nutrient.handleListenerRemoved(event, isLast);
     });
   }
   }
@@ -130,7 +130,7 @@ import {
        */
       DESELECTED: 'annotationsDeselected',
       /**
-       * Called when a user taps on an annotation but before the SDK continues handling the touch in the ```annotationsSelected``` callback.
+       * Called when a user taps on an annotation.
        */
       TAPPED: 'annotationTapped', 
     } as const;
