@@ -4,7 +4,7 @@
 
 This library requires a valid license of the Nutrient SDK. Licenses are per platform.
 
-The Nutrient React Native SDK exposes the most often used APIs from Nutrient. Many of our partners end up forking this repository and adding some custom code to achieve even greater integration with their products, using native code.
+Work with a React Native PDF viewer SDK engineered for the best possible user and developer experience. Whether you need high-fidelity PDF rendering, annotation tools, digital signatures, or form filling, our React Native PDF SDK gives you complete control over PDF viewing and editing within your app.
 
 ### Nutrient
 
@@ -25,13 +25,13 @@ To initialize the Nutrient React Native SDK using a license key, call either of 
 To set the license key for both Android and iOS, use:
 
 ```
-PSPDFKit.setLicenseKeys('YOUR_REACT_NATIVE_ANDROID_LICENSE_KEY_GOES_HERE', 'YOUR_REACT_NATIVE_IOS_LICENSE_KEY_GOES_HERE');
+Nutrient.setLicenseKeys('YOUR_REACT_NATIVE_ANDROID_LICENSE_KEY_GOES_HERE', 'YOUR_REACT_NATIVE_IOS_LICENSE_KEY_GOES_HERE');
 ```
 
 To set the license key for the currently running platform, use:
 
 ```
-PSPDFKit.setLicenseKey('YOUR_REACT_NATIVE_LICENSE_KEY_GOES_HERE');
+Nutrient.setLicenseKey('YOUR_REACT_NATIVE_LICENSE_KEY_GOES_HERE');
 ```
 
 ### Requirements

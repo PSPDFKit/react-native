@@ -1,7 +1,13 @@
-## 3.0.0 - 30 Jul 2025
+## 3.0.1 - 01 Aug 2025
+
+- Updates README.md with Nutrient rebranding changes. (J#HG-681)
+
+## 3.0.0 - 01 Aug 2025
 
 - Adds the `onReady` callback to `NutrientView` to make functional component integration easier. (J#HYB-809)
-- Updates SDK to Nutrient branding. The new package name is now `@nutrient-sdk/react-native`.
+- Updates SDK to Nutrient branding. The new package name is now `@nutrient-sdk/react-native`. (J#HG-681)
+- Updates to Nutrient Android SDK 10.5.0.
+- Updates to Nutrient iOS SDK 14.11.0.
 
 ## 2.19.1 - 24 Jul 2025
 
