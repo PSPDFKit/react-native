@@ -326,9 +326,9 @@ export class BaseAnnotation {
   /** Opacity value between 0 and 1 */
   opacity: number = 1;
   /** PDF object identifier */
-  pdfObjectId?: number = null;
+  pdfObjectId?: number;
   /** Annotation type */
-  type: string;
+  type?: string;
   /** Annotation flags */
   flags?: Array<string>;
   /** Version number */
@@ -919,7 +919,7 @@ export class NoteAnnotation extends BaseAnnotation {
     flags?: Array<string>;
     customData?: Object;
     color?: string;
-    icon?: 'comment' | 'rightPointer' | 'rightArrow' | 'check' | 'circle' | 'cross' | 
+    icon?: 'comment' | 'rightPointer' | 'rightArrow' | 'check' | 'circle' | 'cross' |
            'insert' | 'newParagraph' | 'note' | 'paragraph' | 'help' | 'star' | 'key';
     text?: string | { format: string; value: string; };
   }) {

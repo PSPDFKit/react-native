@@ -6,7 +6,7 @@
  * @property {string} image - The image name (iOS) or resource ID (Android) for the toolbar button. Images must be included in the application bundle on iOS and specified as a drawable resource on Android.
  * @property {string} [title] - The title of the toolbar button (Android only).
  * @property {boolean} [showAsAction] - Whether the toolbar button should be displayed on the main toolbar, and not in the drop down menu (Android only).
- * @property {boolean} [applyTemplate] - Whether the icon should be rendered using the system's tint color to match the color scheme of other toolbar buttons. Set this to false if your icon already contains color information that should be preserved. 
+ * @property {boolean} [applyTemplate] - Whether the icon should be rendered using the system's tint color to match the color scheme of other toolbar buttons. Set this to false if your icon already contains color information that should be preserved.
  */
 /**
  * The toolbar buttons that should be displayed on the toolbar.
@@ -22,7 +22,7 @@
  * @property { Toolbar.ToolbarItems } [rightBarButtonItems] The bar buttons to display on the right side of the navigation bar (iOS only).
  * @property { Toolbar.ToolbarItems } [toolbarMenuItems] The toolbar buttons to display on the toolbar (Android only).
  */
-export class Toolbar {
+export interface Toolbar {
  /**
   * The bar buttons to display on the left side of the navigation bar (iOS only).
   */
@@ -55,7 +55,7 @@ export interface ToolbarItem {
   */
     showAsAction?: boolean;
  /**
-  * Whether the icon should be rendered using the system's tint color to match the color scheme of other toolbar buttons. Set this to false if your icon already contains color information that should be preserved. 
+  * Whether the icon should be rendered using the system's tint color to match the color scheme of other toolbar buttons. Set this to false if your icon already contains color information that should be preserved.
   */
     applyTemplate?: boolean;
 }

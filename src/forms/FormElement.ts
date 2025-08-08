@@ -85,7 +85,7 @@ export class FormElement {
     /**
      * The calculation order index.
      */
-    calculationOrderIndex: number;
+    calculationOrderIndex?: number;
 
     /**
      * Whether the form element is read-only.
@@ -115,12 +115,12 @@ export class FormElement {
     /**
      * The type name of the form.
      */
-    formTypeName: string;
+    formTypeName?: string;
 
     /**
      * The maximum length of the form element.
      */
-    maxLength: number;
+    maxLength?: number;
 
     /**
      * Whether scrolling is disabled.
@@ -139,15 +139,15 @@ export class FormElement {
         this.exportValue = data.exportValue;
         this.highlightColor = data.highlightColor;
         this.calculationOrderIndex = data.calculationOrderIndex;
-        this.readOnly = data.readOnly;
-        this.required = data.required;
-        this.noExport = data.noExport;
+        this.readOnly = data.readOnly ?? false;
+        this.required = data.required ?? false;
+        this.noExport = data.noExport ?? false;
         this.fieldName = data.fieldName;
         this.fullyQualifiedFieldName = data.fullyQualifiedFieldName;
         this.formTypeName = data.formTypeName;
         this.maxLength = data.maxLength;
-        this.doNotScroll = data.doNotScroll;
-        this.isMultiline = data.isMultiline;
+        this.doNotScroll = data.doNotScroll ?? false;
+        this.isMultiline = data.isMultiline ?? false;
     }
 }
 
@@ -262,4 +262,4 @@ export class TextFieldFormElement extends FormElement {
         this.fontSize = data.fontSize || 12;
         this.fontName = data.fontName;
     }
-} 
+}

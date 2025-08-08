@@ -17,11 +17,6 @@
  * @property {Measurements.ScaleUnitTo} unitTo - The unit for the real world distance.
  * @property {number} valueTo - A real world distance. The unit of this value is given by ```unitTo```.
  */
-/**
- * @interface Measurements
- */
-export class Measurements {}
-
 export interface MeasurementValueConfiguration {
  /**
   * Names are displayed in user interface and serve to help distinguish different scales.

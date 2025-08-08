@@ -3,6 +3,7 @@
         "./src/**/*",
     ],
     "compilerOptions": {
+        "strict": true,
         "rootDir": "src",
         "skipLibCheck": true,
         "outDir": "./lib",

@@ -7,7 +7,7 @@
  * @property {string} identifier - A string uniquely identifying the bookmark.
  * @property {number} pageIndex - The page index on which the bookmark is located.
  */
-export class Bookmark {
+export interface Bookmark {
     /**
      * The bookmark name. This is optional.
      */

@@ -1,7 +1,7 @@
 /**
  * @interface PDFPageInfo
  */
-export class PDFPageInfo {
+export interface PDFPageInfo {
     /**
      * The angle the PDF page is displayed at in clockwise degrees.
      */
