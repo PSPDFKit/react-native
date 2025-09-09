@@ -1,6 +1,6 @@
 {
   "name": "@nutrient-sdk/react-native",
-  "version": "3.0.1",
+  "version": "3.1.0",
   "description": "Nutrient React Native SDK",
   "keywords": [
     "react native",
@@ -12,7 +12,7 @@
   "bugs": {
     "email": "support@nutrient.io"
   },
-  "license": "SEE LICENSE IN LICENSE.md",
+  "license": "SEE LICENSE IN LICENSE",
   "repository": {
     "type": "git",
     "url": "https://github.com/PSPDFKit/react-native.git"

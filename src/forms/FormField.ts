@@ -182,7 +182,7 @@ export namespace FormField {
        /**
         * Check box form field.
         */
-        CHECK_BOX: 'checkbox',
+        CHECK_BOX: 'checkBox',
        /**
         * Text form field.
         */

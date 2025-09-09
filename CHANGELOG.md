@@ -1,8 +1,23 @@
+## 3.1.0 - 10 Sep 2025
+
+- Adds the `getOverlappingSignature` API to `SignatureFormElement` objects to retrieve overlapping signature annotations. (J#HYB-867)
+- Updates `BookmarksEvent.CHANGED` to include entire `Bookmark` objects. (J#HYB-832)
+- Updates the `SignatureFormElement` object to only include `SignatureInfo` when the Electronic Signatures license feature is present. (J#HYB-862)
+- Updates to Nutrient iOS SDK 14.12.0.
+- Fixes inconsistent behavior between iOS and Android for the `updateChoiceFormFieldValue` API. (J#HYB-873)
+- Fixes an issue where the `updateFormField` APIs on Android used the `fieldName` rather than `fullyQualifiedName` as a reference. (J#HYB-869)
+- Fixes an issue where certain `FormElement` properties were parsed incorrectly during the `getFormElements` API call. (J#HYB-858)
+- Fixes an issue where calling `unsubscribeAllEvents` would result in all `NotificationCenter` listeners being removed on all active `NutrientView` instances. (J#HYB-866)
+- Fixes an issue where `NotificationCenter` would deliver duplicate events if multiple `NutrientView` instances are active. (J#HYB-866)
+- Fixes an issue where the `readerViewButtonItem` wasn’t being applied correctly on Android. (J#HYB-878)
+
 ## 3.0.1 - 01 Aug 2025
 
 - Updates README.md with Nutrient rebranding changes. (J#HG-681)
 
 ## 3.0.0 - 01 Aug 2025
+
+_[Migration guide](https://www.nutrient.io/guides/react-native/migration-guides/react-native-3-migration-guide/)._
 
 - Adds the `onReady` callback to `NutrientView` to make functional component integration easier. (J#HYB-809)
 - Updates SDK to Nutrient branding. The new package name is now `@nutrient-sdk/react-native`. (J#HG-681)
@@ -28,6 +43,7 @@
 - Fixes an issue where `AnnotationsEvent.REMOVED` contained null `name` and `creatorName` properties on Android. (J#HYB-829)
 
 ## 2.18.1 - 24 Jun 2025
+
 - Updates to Nutrient Android SDK 10.4.0.
 - Fixes an issue where the `enterAnnotationCreationMode` and `exitCurrentlyActiveMode` calls on Android resolved before being complete. (J#HYB-824)
 - Fixes an issue where setting the `pageIndex` property could result in a crash on Android. (J#HYB-817)
@@ -40,9 +56,9 @@
 - Updates to Nutrient Android SDK 10.2.0.
 - Updates to Nutrient iOS SDK 14.8.0.
 - Fixes an issue where the `setLicenseKeys` API could cause a crash on Android if called too early during the application lifecycle. (J#HYB-790)
-- Fixes an issue where `NotificationCenter` events aren't always delivered when running the Release build configuration on iOS. (J#HYB-793)
-- Fixes an issue where toolbar button customization wasn't persisted on Android during component reload. (J#HYB-800)
-- Fixes an issue where the `onAnnotationTapped` callback wasn't called reliably on Android. (J#HYB-805)
+- Fixes an issue where `NotificationCenter` events aren’t always delivered when running the Release build configuration on iOS. (J#HYB-793)
+- Fixes an issue where toolbar button customization wasn’t persisted on Android during component reload. (J#HYB-800)
+- Fixes an issue where the `onAnnotationTapped` callback wasn’t called reliably on Android. (J#HYB-805)
 
 ## 2.17.0 - 14 Apr 2025
 

@@ -66,8 +66,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 public class PSPDFKitModule extends ReactContextBaseJavaModule implements Application.ActivityLifecycleCallbacks, ActivityEventListener {
 
@@ -83,6 +85,9 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
     private Activity resumedActivity;
     @Nullable
     private Runnable onPdfActivityOpenedTask;
+
+    private static final Set<String> activeListeners = new HashSet<>();
+    private static final Object lock = new Object();
 
     /**
      * Used to dispatch onActivityResult calls to our fragments.
@@ -352,24 +357,42 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
     }
 
     @ReactMethod
-    public void handleListenerAdded(String event, @Nullable Promise promise) {
-        NutrientNotificationCenter.INSTANCE.setIsNotificationCenterInUse(true);
-        if (event.equals("analytics")) {
-            NutrientNotificationCenter.INSTANCE.analyticsEnabled();
+    public void handleListenerAdded(String event, Integer componentId, @Nullable Promise promise) {
+        synchronized (lock) {
+            String listenerKey = event + "_" + componentId.toString();
+            activeListeners.add(listenerKey);
+
+            // Only enable if this is the first listener globally
+            if (activeListeners.size() == 1) {
+                NutrientNotificationCenter.INSTANCE.setIsNotificationCenterInUse(true);
+            }
+
+            if (event.equals("analytics")) {
+                NutrientNotificationCenter.INSTANCE.analyticsEnabled();
+            }
         }
+
         if (promise != null) {
             promise.resolve(1);
         }
     }
 
     @ReactMethod
-    public void handleListenerRemoved(@Nullable String event, boolean isLast, @Nullable Promise promise) {
-        if (isLast) {
-            NutrientNotificationCenter.INSTANCE.setIsNotificationCenterInUse(false);
+    public void handleListenerRemoved(String event, Integer componentId, @Nullable Promise promise) {
+        synchronized (lock) {
+            String listenerKey = event + "_" + componentId.toString();
+            activeListeners.remove(listenerKey);
+
+            // Only disable if NO listeners remain globally
+            if (activeListeners.isEmpty()) {
+                NutrientNotificationCenter.INSTANCE.setIsNotificationCenterInUse(false);
+            }
+
+            if (event.equals("analytics")) {
+                NutrientNotificationCenter.INSTANCE.analyticsDisabled();
+            }
         }
-        if (event.equals("analytics")) {
-            NutrientNotificationCenter.INSTANCE.analyticsDisabled();
-        }
+
         if (promise != null) {
             promise.resolve(1);
         }

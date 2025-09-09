@@ -52,13 +52,14 @@ import java.util.Map;
 public class ReactPdfUiFragment extends PdfUiFragment {
 
     private static final String TOOLBAR_ITEM_SEARCH = "searchButtonItem";
-    private static final String TOOLBAR_ITEM_READER_VIEW = "readerViewButtonItem";
     private static final String TOOLBAR_ITEM_ANNOTATIONS = "annotationButtonItem";
+    private static final String TOOLBAR_ITEM_READER_VIEW = "readerViewButtonItem";
     private static final String TOOLBAR_ITEM_THUMBNAILS = "thumbnailsButtonItem";
     private static final String TOOLBAR_ITEM_SHARE = "shareButtonItem";
     private static final String TOOLBAR_ITEM_SETTINGS = "settingsButtonItem";
     private static final String TOOLBAR_ITEM_OUTLINE = "outlineButtonItem";
     private static final String TOOLBAR_ITEM_DOCUMENT_INFO_VIEW = "documentInfoViewButtonItem";
+    private static final String TOOLBAR_ITEM_AI_ASSISTANT = "aiAssistantButtonItem";
 
     // Static map to store configurations
     private static final Map<String, ToolbarConfig> configMap = new HashMap<>();
@@ -90,7 +91,8 @@ public class ReactPdfUiFragment extends PdfUiFragment {
                     TOOLBAR_ITEM_SHARE,
                     TOOLBAR_ITEM_SETTINGS,
                     TOOLBAR_ITEM_OUTLINE,
-                    TOOLBAR_ITEM_DOCUMENT_INFO_VIEW));
+                    TOOLBAR_ITEM_DOCUMENT_INFO_VIEW,
+                    TOOLBAR_ITEM_AI_ASSISTANT));
 
     @Nullable private ReactPdfUiFragmentListener reactPdfUiFragmentListener;
 
@@ -229,6 +231,10 @@ public class ReactPdfUiFragment extends PdfUiFragment {
 
                 case TOOLBAR_ITEM_DOCUMENT_INFO_VIEW:
                     menuItems.remove(Integer.valueOf(PdfActivity.MENU_OPTION_DOCUMENT_INFO));
+                    break;
+
+                case TOOLBAR_ITEM_AI_ASSISTANT:
+                    menuItems.remove(Integer.valueOf(PdfActivity.MENU_OPTION_AI_ASSISTANT));
                     break;
             }
         }

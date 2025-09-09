@@ -26,6 +26,7 @@ import com.pspdfkit.document.providers.DataProvider
 import com.pspdfkit.forms.ChoiceFormElement
 import com.pspdfkit.forms.ComboBoxFormElement
 import com.pspdfkit.forms.EditableButtonFormElement
+import com.pspdfkit.forms.SignatureFormElement
 import com.pspdfkit.forms.TextFormElement
 import com.pspdfkit.react.helper.AnnotationUtils
 import com.pspdfkit.react.helper.BookmarkUtils
@@ -452,64 +453,53 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
         try {
             this.getDocument(reference)?.document?.let {
 
-                it.formProvider.getFormElementWithNameAsync(fullyQualifiedName)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                        { formElement ->
-                            var success = false
-                            
-                            when (formElement) {
-                                is EditableButtonFormElement -> {
-                                    if (value.type == ReadableType.Boolean) {
-                                        if (value.asBoolean()) {
-                                            formElement.select()
-                                        } else {
-                                            formElement.deselect()
-                                        }
-                                        success = true
-                                    }
-                                }
-                                is ChoiceFormElement -> {
-                                    if (value.type == ReadableType.Array) {
-                                        val indices = value.asArray()?.toArrayList()
-                                            ?.filterIsInstance<Int>()
-                                        if (indices != null) {
-                                            formElement.selectedIndexes = indices
-                                        }
-                                        success = true
-                                    } else if (value.type == ReadableType.String) {
-                                        try {
-                                            val index = value.asString()?.toInt()
-                                            formElement.selectedIndexes = listOf(index)
-                                            success = true
-                                        } catch (e: NumberFormatException) {
-                                            // Handle custom text for combo box
-                                            if (formElement is ComboBoxFormElement) {
-                                                formElement.customText = value.asString()
-                                                success = true
-                                            }
-                                        }
-                                    }
-                                }
-                                is TextFormElement -> {
-                                    if (value.type == ReadableType.String) {
-                                        value.asString()?.let { it1 -> formElement.setText(it1) }
-                                        success = true
-                                    }
-                                }
-                            }
+                var formElement = it.formProvider.getFormFieldWithFullyQualifiedName(fullyQualifiedName)?.formElement
+                if (formElement == null) {
+                    formElement = it.formProvider.getFormElementWithName(fullyQualifiedName)
+                }
+                var success = false
 
-                            if (success) {
-                                promise.resolve(true)
+                when (formElement) {
+                    is EditableButtonFormElement -> {
+                        if (value.type == ReadableType.Boolean) {
+                            if (value.asBoolean()) {
+                                formElement.select()
                             } else {
-                                promise.reject("updateFormFieldValue", "Could not update form field value")
+                                formElement.deselect()
                             }
-                        },
-                        { e ->
-                            promise.reject("updateFormFieldValue", e)
+                            success = true
                         }
-                    )
+                    }
+                    is ChoiceFormElement -> {
+                        if (value.type == ReadableType.Array) {
+                            val indices: MutableList<Int>? = value.asArray()?.toArrayList()
+                                ?.filterIsInstance<Number>()
+                                ?.map { it.toInt() }
+                                ?.toMutableList()
+                            if (indices != null) {
+                                formElement.selectedIndexes = indices
+                                success = true
+                            }
+                        } else if (value.type == ReadableType.String) {
+                            if (formElement is ComboBoxFormElement) {
+                                formElement.customText = value.asString()
+                                success = true
+                            }
+                        }
+                    }
+                    is TextFormElement -> {
+                        if (value.type == ReadableType.String) {
+                            value.asString()?.let { it1 -> formElement.setText(it1) }
+                            success = true
+                        }
+                    }
+                }
+
+                if (success) {
+                    promise.resolve(true)
+                } else {
+                    promise.reject("updateFormFieldValue", "Could not update form field value")
+                }
             }
         } catch (e: Throwable) {
             promise.reject("updateFormFieldValue", e)
@@ -573,6 +563,43 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
 
         } catch (e: Throwable) {
             promise.reject("removeBookmarks error", e)
+        }
+    }
+
+    @ReactMethod fun getOverlappingSignature(reference: Int, fullyQualifiedName: String, promise: Promise) {
+        try {
+            this.getDocument(reference)?.document?.let { document ->
+
+                val formElement = document.formProvider.getFormFieldWithFullyQualifiedName(fullyQualifiedName)?.formElement
+
+                // Check if formElement was found
+                if (formElement == null) {
+                    promise.reject("getOverlappingSignature", "Form element not found")
+                    return@let
+                }
+
+                // Check if it's a SignatureFormElement and get the overlapping annotation
+                val overlappingAnnotation = if (formElement is SignatureFormElement) {
+                    formElement.getOverlappingSignatures()
+                } else {
+                    null
+                }
+
+                // Check if overlapping annotation was found
+                if (overlappingAnnotation == null || overlappingAnnotation.size == 0) {
+                    promise.reject("getOverlappingSignature", "No overlaps found")
+                    return@let
+                }
+
+                // Convert annotation to map using AnnotationUtils
+                val annotationMap = AnnotationUtils.processAnnotation(overlappingAnnotation.first())
+                val nativeMap = Arguments.makeNativeMap(annotationMap)
+                promise.resolve(nativeMap)
+            } ?: run {
+                promise.reject("getOverlappingSignature", "Document is nil")
+            }
+        } catch (e: Throwable) {
+            promise.reject("getOverlappingSignature", e)
         }
     }
 

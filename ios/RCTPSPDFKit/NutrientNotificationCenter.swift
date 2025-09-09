@@ -140,40 +140,48 @@ import PSPDFKit
         }
     }
     
-    @objc public func documentLoaded(documentID: String) {
+    private func createEventPayload(jsonData: Dictionary<String, Any>, componentID: Int) -> Dictionary<String, Any> {
+        return ["data": jsonData, "componentID": NSNumber(value: componentID)]
+    }
+    
+    @objc public func documentLoaded(documentID: String, componentID: Int) {
         if (!isInUse) { return }
         let jsonData = ["event" : NotificationEvent.documentLoaded.rawValue, "documentID" : documentID]
+        let payload = createEventPayload(jsonData: jsonData, componentID: componentID)
         eventEmitter?.sendEvent(withName:NotificationEvent.documentLoaded.rawValue,
-                               body: jsonData)
+                               body: payload)
     }
     
-    @objc public func documentLoadFailed() {
+    @objc public func documentLoadFailed(componentID: Int) {
         if (!isInUse) { return }
         let jsonData = ["event" : NotificationEvent.documentLoadFailed.rawValue]
+        let payload = createEventPayload(jsonData: jsonData, componentID: componentID)
         eventEmitter?.sendEvent(withName:NotificationEvent.documentLoadFailed.rawValue,
-                               body: jsonData)
+                               body: payload)
     }
     
-    @objc public func documentPageChanged(pageIndex: Int, documentID: String) {
+    @objc public func documentPageChanged(pageIndex: Int, documentID: String, componentID: Int) {
         if (!isInUse) { return }
         let jsonData = ["event" : NotificationEvent.documentPageChanged.rawValue,
                         "pageIndex" : pageIndex, "documentID" : documentID] as [String : Any]
+        let payload = createEventPayload(jsonData: jsonData, componentID: componentID)
         eventEmitter?.sendEvent(withName:NotificationEvent.documentPageChanged.rawValue,
-                               body: jsonData)
+                               body: payload)
     }
     
-    @objc public func documentScrolled(spreadIndex: CGFloat, scrollDirection: ScrollDirection, documentID: String) {
+    @objc public func documentScrolled(spreadIndex: CGFloat, scrollDirection: ScrollDirection, documentID: String, componentID: Int) {
         if (!isInUse) { return }
         
         let scrollData = scrollDirection == .horizontal ? ["currX" : spreadIndex] : ["currY" : spreadIndex]
         
         let jsonData = ["event" : NotificationEvent.documentScrolled.rawValue,
                         "scrollData" : scrollData, "documentID" : documentID] as [String : Any]
+        let payload = createEventPayload(jsonData: jsonData, componentID: componentID)
         eventEmitter?.sendEvent(withName:NotificationEvent.documentScrolled.rawValue,
-                               body: jsonData)
+                               body: payload)
     }
     
-    @objc public func didTapDocument(tapPoint: CGPoint, pageIndex: Int, documentID: String) {
+    @objc public func didTapDocument(tapPoint: CGPoint, pageIndex: Int, documentID: String, componentID: Int) {
         if (!isInUse) { return }
 
         let pointDictionary = ["x" : tapPoint.x , "y" : tapPoint.y]
@@ -181,11 +189,12 @@ import PSPDFKit
                         "pageIndex" : pageIndex,
                         "point" : pointDictionary,
                         "documentID" : documentID] as [String : Any]
+        let payload = createEventPayload(jsonData: jsonData, componentID: componentID)
         eventEmitter?.sendEvent(withName:NotificationEvent.documentTapped.rawValue,
-                               body: jsonData)
+                               body: payload)
     }
         
-    @objc public func annotationsChanged(notification: Notification, documentID: String) {
+    @objc public func annotationsChanged(notification: Notification, documentID: String, componentID: Int) {
         if (!isInUse) { return }
         switch notification.name {
             case NSNotification.Name.PSPDFAnnotationChanged:
@@ -193,15 +202,17 @@ import PSPDFKit
                     if (annotation is FormElement) {
                         if let annotationJSON = try? RCTConvert.instantJSON(from: annotation as? FormElement) {
                             let jsonData = ["event" : NotificationEvent.formFieldValuesUpdated.rawValue, "formField" : annotationJSON, "documentID" : documentID] as [String : Any]
+                            let payload = createEventPayload(jsonData: jsonData, componentID: componentID)
                             eventEmitter?.sendEvent(withName:NotificationEvent.formFieldValuesUpdated.rawValue,
-                                                    body: jsonData)
+                                                    body: payload)
                         } else {
                             // Could not decode annotation data
                         }
                     } else {
                         if let annotationJSON = try? RCTConvert.instantJSON(from: [annotation]) {
                             let jsonData = ["event" : NotificationEvent.annotationChanged.rawValue, "annotations" : annotationJSON, "documentID" : documentID] as [String : Any]
-                            eventEmitter?.sendEvent(withName:NotificationEvent.annotationChanged.rawValue, body: jsonData)
+                            let payload = createEventPayload(jsonData: jsonData, componentID: componentID)
+                            eventEmitter?.sendEvent(withName:NotificationEvent.annotationChanged.rawValue, body: payload)
                         } else {
                             // Could not decode annotation data
                         }
@@ -213,7 +224,8 @@ import PSPDFKit
 
                     if let annotationJSON = try? RCTConvert.instantJSON(from: annotations) {
                         let jsonData = ["event" : NotificationEvent.annotationsAdded.rawValue, "annotations" : annotationJSON, "documentID" : documentID] as [String : Any]
-                        eventEmitter?.sendEvent(withName:NotificationEvent.annotationsAdded.rawValue, body: jsonData)
+                        let payload = createEventPayload(jsonData: jsonData, componentID: componentID)
+                        eventEmitter?.sendEvent(withName:NotificationEvent.annotationsAdded.rawValue, body: payload)
                     } else {
                         // Could not decode annotation data
                     }
@@ -224,7 +236,8 @@ import PSPDFKit
 
                     if let annotationJSON = try? RCTConvert.instantJSON(from: annotations) {
                         let jsonData = ["event" : NotificationEvent.annotationsRemoved.rawValue, "annotations" : annotationJSON, "documentID" : documentID] as [String : Any]
-                        eventEmitter?.sendEvent(withName:NotificationEvent.annotationsRemoved.rawValue, body: jsonData)
+                        let payload = createEventPayload(jsonData: jsonData, componentID: componentID)
+                        eventEmitter?.sendEvent(withName:NotificationEvent.annotationsRemoved.rawValue, body: payload)
                     } else {
                         // Could not decode annotation data
                     }
@@ -236,53 +249,57 @@ import PSPDFKit
         }
     }
     
-    @objc public func didSelectAnnotations(annotations: [Annotation], documentID: String) {
+    @objc public func didSelectAnnotations(annotations: [Annotation], documentID: String, componentID: Int) {
         if (!isInUse) { return }
         let isFormElement = annotations.contains(where: { $0 is FormElement })
         
         if (isFormElement) {
             if let annotationJSON = try? RCTConvert.instantJSON(from: annotations[0] as? FormElement) {
                 let jsonData = ["event" : NotificationEvent.formFieldSelected.rawValue, "formField" : annotationJSON, "documentID" : documentID] as [String : Any]
+                let payload = createEventPayload(jsonData: jsonData, componentID: componentID)
                 eventEmitter?.sendEvent(withName:NotificationEvent.formFieldSelected.rawValue,
-                                       body: jsonData)
+                                       body: payload)
             } else {
                 // Could not decode annotation data
             }
         } else {
             if let annotationJSON = try? RCTConvert.instantJSON(from: annotations) {
                 let jsonData = ["event" : NotificationEvent.annotationsSelected.rawValue, "annotations" : annotationJSON, "documentID" : documentID] as [String : Any]
+                let payload = createEventPayload(jsonData: jsonData, componentID: componentID)
                 eventEmitter?.sendEvent(withName:NotificationEvent.annotationsSelected.rawValue,
-                                        body: jsonData)
+                                        body: payload)
             } else {
                 // Could not decode annotation data
             }
         }
     }
     
-    @objc public func didDeselectAnnotations(annotations: [Annotation], documentID: String) {
+    @objc public func didDeselectAnnotations(annotations: [Annotation], documentID: String, componentID: Int) {
         if (!isInUse) { return }
         let isFormElement = annotations.contains(where: { $0 is FormElement })
         
         if (isFormElement) {
             if let annotationJSON = try? RCTConvert.instantJSON(from: annotations[0] as? FormElement) {
                 let jsonData = ["event" : NotificationEvent.formFieldDeselected.rawValue, "formField" : annotationJSON, "documentID" : documentID] as [String : Any]
+                let payload = createEventPayload(jsonData: jsonData, componentID: componentID)
                 eventEmitter?.sendEvent(withName:NotificationEvent.formFieldDeselected.rawValue,
-                                       body: jsonData)
+                                       body: payload)
             } else {
                 // Could not decode annotation data
             }
         } else {
             if let annotationJSON = try? RCTConvert.instantJSON(from: annotations) {
                 let jsonData = ["event" : NotificationEvent.annotationsDeselected.rawValue, "annotations" : annotationJSON, "documentID" : documentID] as [String : Any]
+                let payload = createEventPayload(jsonData: jsonData, componentID: componentID)
                 eventEmitter?.sendEvent(withName:NotificationEvent.annotationsDeselected.rawValue,
-                                       body: jsonData)
+                                       body: payload)
             } else {
                 // Could not decode annotation data
             }
         }
     }
     
-    @objc public func didTapAnnotation(annotation: Annotation, annotationPoint: CGPoint, documentID: String) {
+    @objc public func didTapAnnotation(annotation: Annotation, annotationPoint: CGPoint, documentID: String, componentID: Int) {
         if (!isInUse) { return }
         if let annotationJSON = try? RCTConvert.instantJSON(from: [annotation]) {
             let pointDictionary = ["x" : annotationPoint.x , "y" : annotationPoint.y]
@@ -290,44 +307,38 @@ import PSPDFKit
                             "annotation" : annotationJSON,
                             "annotationPoint" : pointDictionary,
                             "documentID" : documentID] as [String : Any]
+            let payload = createEventPayload(jsonData: jsonData, componentID: componentID)
             eventEmitter?.sendEvent(withName:NotificationEvent.annotationTapped.rawValue,
-                                   body: jsonData)
+                                   body: payload)
         } else {
             // Could not decode annotation data
         }
     }
     
-    @objc public func didSelectText(text: String, rect: CGRect, documentID: String) {
+    @objc public func didSelectText(text: String, rect: CGRect, documentID: String, componentID: Int) {
         if (!isInUse) { return }
         let rectDictionary = ["x" : rect.minX , "y" : rect.minY, "width" : rect.width, "height" : rect.height]
         let jsonData = ["event" : NotificationEvent.textSelected.rawValue,
                          "text" : text,
                          "rect" : rectDictionary, "documentID" : documentID] as [String : Any]
+        let payload = createEventPayload(jsonData: jsonData, componentID: componentID)
         eventEmitter?.sendEvent(withName:NotificationEvent.textSelected.rawValue,
-                               body: jsonData)
+                               body: payload)
     }
     
-    @objc public func bookmarksChanged(notification: Notification, documentID: String) {
+    @objc public func bookmarksChanged(notification: Notification, documentID: String, componentID: Int) {
         if (!isInUse) { return }
         
         if let bookmarkManager = notification.object as? BookmarkManager {
             let bookmarks = bookmarkManager.bookmarks
-            var bookmarksArray: [[String: Any]] = []
-
-            for bookmark in bookmarks {
-                let dict: [String: Any] = [
-                    "identifier": bookmark.identifier,
-                    "pageIndex": bookmark.pageIndex
-                ]
-                bookmarksArray.append(dict)
-            }
+            let allBookmarksJSON = RCTConvert.bookmarksToJSON(bookmarks)
             
             let jsonData = ["event" : NotificationEvent.bookmarksChanged.rawValue,
-                            "bookmarks" : bookmarksArray,
+                            "bookmarks" : allBookmarksJSON,
                             "documentID" : documentID] as [String : Any]
-            
+            let payload = createEventPayload(jsonData: jsonData, componentID: componentID)
             eventEmitter?.sendEvent(withName:NotificationEvent.bookmarksChanged.rawValue,
-                                   body: jsonData)
+                                   body: payload)
         }
     }
     
@@ -347,7 +358,8 @@ import PSPDFKit
         if let attributes = attributes {
             jsonData["attributes"] = attributes
         }
+        let payload = createEventPayload(jsonData: jsonData, componentID: 0)
         eventEmitter?.sendEvent(withName:NotificationEvent.analytics.rawValue,
-                               body: jsonData)
+                               body: payload)
     }
 }

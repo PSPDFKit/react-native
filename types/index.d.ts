@@ -799,6 +799,7 @@ export type GeneratePDFResult = {
  */
 declare class NutrientView extends React.Component<Props, any, any> {
     constructor(props: Props);
+    constructor(props: Props, context: any);
     /**
      * @ignore
      */

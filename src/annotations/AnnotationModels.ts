@@ -326,9 +326,9 @@ export class BaseAnnotation {
   /** Opacity value between 0 and 1 */
   opacity: number = 1;
   /** PDF object identifier */
-  pdfObjectId?: number = null;
+  pdfObjectId?: number;
   /** Annotation type */
-  type: string;
+  type?: string;
   /** Annotation flags */
   flags?: Array<string>;
   /** Version number */

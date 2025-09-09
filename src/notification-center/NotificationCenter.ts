@@ -1,4 +1,5 @@
 import {
+    findNodeHandle,
     NativeModules,
     NativeEventEmitter
     // @ts-ignore
@@ -34,9 +35,12 @@ import {
     * });
     */
     subscribe(event: string, callback: any): void {
-      const subscription = this.eventEmitter.addListener(event, callback);
+      const subscription = this.eventEmitter.addListener(event, (payload: any) => {
+        // Only deliver events to the specific ref it is subscribed to. Allow any analytics events to be delivered since they are not associated with a specific view.
+        if (payload?.componentID === findNodeHandle(this.pdfViewRef) || event === NotificationCenter.AnalyticsEvent.ANALYTICS) callback(payload.data);
+      });
       this.subscribedEvents.set(event, subscription);
-      NativeModules.Nutrient.handleListenerAdded(event);
+      NativeModules.Nutrient.handleListenerAdded(event, findNodeHandle(this.pdfViewRef));
     }
 
    /**
@@ -52,8 +56,7 @@ import {
       if (subscription) {
         subscription.remove();
         this.subscribedEvents.delete(event);
-        const isLast = this.subscribedEvents.size === 0 ? true : false
-        NativeModules.Nutrient.handleListenerRemoved(event, isLast);
+        NativeModules.Nutrient.handleListenerRemoved(event, findNodeHandle(this.pdfViewRef));
       }
     }
 
@@ -68,8 +71,7 @@ import {
     this.subscribedEvents.forEach((subscription: any, event: string) => {
       subscription.remove();
       this.subscribedEvents.delete(event);
-      const isLast = this.subscribedEvents.size === 0 ? true : false
-      NativeModules.Nutrient.handleListenerRemoved(event, isLast);
+      NativeModules.Nutrient.handleListenerRemoved(event, findNodeHandle(this.pdfViewRef));
     });
   }
   }

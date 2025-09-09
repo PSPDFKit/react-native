@@ -80,14 +80,14 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
 
     @Override
     public void onDocumentLoaded(@NonNull PdfDocument pdfDocument) {
-        NutrientNotificationCenter.INSTANCE.documentLoaded(pdfDocument.getDocumentIdString());
+        NutrientNotificationCenter.INSTANCE.documentLoaded(pdfDocument.getDocumentIdString(), parent.getId());
         eventDispatcher.dispatchEvent(new PdfViewDocumentLoadedEvent(parent.getId()));
         eventDispatcher.dispatchEvent(new OnReadyEvent(parent.getId()));
     }
 
     @Override
     public void onDocumentLoadFailed(@NonNull Throwable throwable) {
-        NutrientNotificationCenter.INSTANCE.documentLoadFailed();
+        NutrientNotificationCenter.INSTANCE.documentLoadFailed(parent.getId());
     }
 
     @Override
@@ -119,7 +119,7 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
                 // Calculate the inverted point on the y-axis using page size
                 Size size = pdfDocument.getPageSize(pageIndex);
                 PointF clickedPoint = new PointF(pointF.x, size.height - pointF.y);
-                NutrientNotificationCenter.INSTANCE.didTapDocument(clickedPoint, pageIndex, documentID);
+                NutrientNotificationCenter.INSTANCE.didTapDocument(clickedPoint, pageIndex, documentID, parent.getId());
             }
         }
         if (annotation != null) {
@@ -127,7 +127,7 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
                 if (pointF == null) {
                     pointF = new PointF(0,0);
                 }
-                NutrientNotificationCenter.INSTANCE.didTapAnnotation(annotation, pointF, documentID);
+                NutrientNotificationCenter.INSTANCE.didTapAnnotation(annotation, pointF, documentID, parent.getId());
             }
             eventDispatcher.dispatchEvent(new PdfViewAnnotationTappedEvent(parent.getId(), annotation));
         }
@@ -147,7 +147,7 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
         if (NutrientNotificationCenter.INSTANCE.getIsNotificationCenterInUse()) {
             parent.getPdfFragment().subscribe(pdfFragment -> {
                 String documentID = pdfFragment.getDocument().getDocumentIdString();
-                NutrientNotificationCenter.INSTANCE.documentPageChanged(pageIndex, documentID);
+                NutrientNotificationCenter.INSTANCE.documentPageChanged(pageIndex, documentID, parent.getId());
             });
         }
     }
@@ -194,7 +194,7 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
         if (NutrientNotificationCenter.INSTANCE.getIsNotificationCenterInUse()) {
             parent.getPdfFragment().subscribe(pdfFragment -> {
                 String documentID = pdfFragment.getDocument().getDocumentIdString();
-                NutrientNotificationCenter.INSTANCE.didSelectAnnotations(annotation, documentID);
+                NutrientNotificationCenter.INSTANCE.didSelectAnnotations(annotation, documentID, parent.getId());
             });
         }
     }
@@ -205,7 +205,7 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
         if (NutrientNotificationCenter.INSTANCE.getIsNotificationCenterInUse()) {
             parent.getPdfFragment().subscribe(pdfFragment -> {
                 String documentID = pdfFragment.getDocument().getDocumentIdString();
-                NutrientNotificationCenter.INSTANCE.annotationsChanged("added", annotation, documentID);
+                NutrientNotificationCenter.INSTANCE.annotationsChanged("added", annotation, documentID, parent.getId());
             });
         }
         eventDispatcher.dispatchEvent(new PdfViewAnnotationChangedEvent(parent.getId(), PdfViewAnnotationChangedEvent.EVENT_TYPE_ADDED, annotation));
@@ -217,7 +217,7 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
         if (NutrientNotificationCenter.INSTANCE.getIsNotificationCenterInUse()) {
             parent.getPdfFragment().subscribe(pdfFragment -> {
                 String documentID = pdfFragment.getDocument().getDocumentIdString();
-                NutrientNotificationCenter.INSTANCE.annotationsChanged("changed", annotation, documentID);
+                NutrientNotificationCenter.INSTANCE.annotationsChanged("changed", annotation, documentID, parent.getId());
             });
         }
         eventDispatcher.dispatchEvent(new PdfViewAnnotationChangedEvent(parent.getId(), PdfViewAnnotationChangedEvent.EVENT_TYPE_CHANGED, annotation));
@@ -229,7 +229,7 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
         if (NutrientNotificationCenter.INSTANCE.getIsNotificationCenterInUse()) {
             parent.getPdfFragment().subscribe(pdfFragment -> {
                 String documentID = pdfFragment.getDocument().getDocumentIdString();
-                NutrientNotificationCenter.INSTANCE.annotationsChanged("removed", annotation, documentID);
+                NutrientNotificationCenter.INSTANCE.annotationsChanged("removed", annotation, documentID, parent.getId());
             });
         }
         eventDispatcher.dispatchEvent(new PdfViewAnnotationChangedEvent(parent.getId(), PdfViewAnnotationChangedEvent.EVENT_TYPE_REMOVED, annotation));
@@ -246,7 +246,7 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
         if (NutrientNotificationCenter.INSTANCE.getIsNotificationCenterInUse()) {
             parent.getPdfFragment().subscribe(pdfFragment -> {
                 String documentID = pdfFragment.getDocument().getDocumentIdString();
-                NutrientNotificationCenter.INSTANCE.formFieldValuesUpdated(formField, documentID);
+                NutrientNotificationCenter.INSTANCE.formFieldValuesUpdated(formField, documentID, parent.getId());
             });
         }
         Annotation annotation = formField.getFormElement().getAnnotation();
@@ -266,7 +266,7 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
         if (NutrientNotificationCenter.INSTANCE.getIsNotificationCenterInUse()) {
             parent.getPdfFragment().subscribe(pdfFragment -> {
                 String documentID = pdfFragment.getDocument().getDocumentIdString();
-                NutrientNotificationCenter.INSTANCE.didDeselectAnnotations(annotation, documentID);
+                NutrientNotificationCenter.INSTANCE.didDeselectAnnotations(annotation, documentID, parent.getId());
             });
         }
     }
@@ -277,7 +277,7 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
         if (NutrientNotificationCenter.INSTANCE.getIsNotificationCenterInUse()) {
             parent.getPdfFragment().subscribe(pdfFragment -> {
                 String documentID = pdfFragment.getDocument().getDocumentIdString();
-                NutrientNotificationCenter.INSTANCE.didSelectFormField(formElement, documentID);
+                NutrientNotificationCenter.INSTANCE.didSelectFormField(formElement, documentID, parent.getId());
             });
         }
     }
@@ -288,7 +288,7 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
         if (NutrientNotificationCenter.INSTANCE.getIsNotificationCenterInUse()) {
             parent.getPdfFragment().subscribe(pdfFragment -> {
                 String documentID = pdfFragment.getDocument().getDocumentIdString();
-                NutrientNotificationCenter.INSTANCE.didDeSelectFormField(formElement, documentID);
+                NutrientNotificationCenter.INSTANCE.didDeSelectFormField(formElement, documentID, parent.getId());
             });
         }
     }
@@ -304,7 +304,7 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
         if (NutrientNotificationCenter.INSTANCE.getIsNotificationCenterInUse()) {
             parent.getPdfFragment().subscribe(pdfFragment -> {
                 String documentID = pdfFragment.getDocument().getDocumentIdString();
-                NutrientNotificationCenter.INSTANCE.documentScrolled(Map.of("currX", currX, "currY", currY, "maxX", maxX, "maxY", maxY, "extendX", extendX, "extendY", extendY), documentID);
+                NutrientNotificationCenter.INSTANCE.documentScrolled(Map.of("currX", currX, "currY", currY, "maxX", maxX, "maxY", maxY, "extendX", extendX, "extendY", extendY), documentID, parent.getId());
             });
         }
     }
@@ -315,7 +315,7 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
         if (NutrientNotificationCenter.INSTANCE.getIsNotificationCenterInUse()) {
             parent.getPdfFragment().subscribe(pdfFragment -> {
                 String documentID = pdfFragment.getDocument().getDocumentIdString();
-                NutrientNotificationCenter.INSTANCE.bookmarksChanged(list, documentID);
+                NutrientNotificationCenter.INSTANCE.bookmarksChanged(list, documentID, parent.getId());
             });
         }
     }

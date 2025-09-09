@@ -13,7 +13,7 @@
 
     <style name="AppTheme.ActionBarIconsStyle">
         <item name="pspdf__iconsColor">@color/color_primary_dark</item>
-        <item name="pspdf__iconsColorActivated">@color/color_primary</item>
+        <item name="pspdf__iconsColorActivated">@color/color_primary_dark</item>
     </style>
 
     <style name="AppTheme.MainToolbarStyle">

@@ -25,7 +25,6 @@ import React
         formElementDictionary["isNoExport"] = formElement.isNoExport
         formElementDictionary["fieldName"] = formElement.fieldName
         formElementDictionary["fullyQualifiedFieldName"] = formElement.fullyQualifiedFieldName
-        formElementDictionary["formTypeName"] = formElement.formTypeName
         formElementDictionary["maxLength"] = formElement.maxLength
         formElementDictionary["doNotScroll"] = formElement.doNotScroll
         formElementDictionary["isMultiline"] = formElement.isMultiline

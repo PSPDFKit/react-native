@@ -153,16 +153,16 @@ import PSPDFKit
             
             if let buttonElement = formElement as? ButtonFormElement {
                 elementJSON = RCTConvert.buttonFormElementToJSON(buttonElement)
-                elementJSON["type"] = "button"
+                elementJSON["formTypeName"] = "button"
             } else if let choiceElement = formElement as? ChoiceFormElement {
                 elementJSON = RCTConvert.choiceFormElementToJSON(choiceElement)
-                elementJSON["type"] = "choice"
+                elementJSON["formTypeName"] = "choice"
             } else if let signatureElement = formElement as? SignatureFormElement {
                 elementJSON = RCTConvert.signatureFormElementToJSON(signatureElement)
-                elementJSON["type"] = "signature"
+                elementJSON["formTypeName"] = "signature"
             } else if let textFieldElement = formElement as? TextFieldFormElement {
                 elementJSON = RCTConvert.textFieldFormElementToJSON(textFieldElement)
-                elementJSON["type"] = "textField"
+                elementJSON["formTypeName"] = "textField"
             } else {
                 // Handle any other form element types or skip them
                 continue
@@ -188,7 +188,8 @@ import PSPDFKit
         var success = false
         
         for formElement in formElements {
-            if formElement.fullyQualifiedFieldName == fullyQualifiedName {
+            if formElement.fullyQualifiedFieldName == fullyQualifiedName ||
+                formElement.formField?.fullyQualifiedName == fullyQualifiedName {
                 if let buttonElement = formElement as? ButtonFormElement {
                     if let boolValue = value as? Bool {
                         if boolValue {
@@ -199,24 +200,16 @@ import PSPDFKit
                         success = true
                     }
                 } else if let choiceElement = formElement as? ChoiceFormElement {
-                    if let arrayValue = value as? [String] {
-                        // For multi-select
+                    if let arrayValue = value as? [Int] {
                         var indices = IndexSet()
-                        if let options = choiceElement.options {
-                            for (index, option) in options.enumerated() {
-                                if arrayValue.contains(option.value) {
-                                    indices.insert(index)
-                                }
-                            }
+                        for index in arrayValue {
+                            indices.insert(index)
                         }
                         choiceElement.selectedIndices = indices
                         success = true
-                    } else if let stringValue = value as? String {
-                        // For single select
-                        if let index = choiceElement.options?.firstIndex(where: { $0.value == stringValue }) {
-                            choiceElement.selectedIndices = IndexSet(integer: index)
-                            success = true
-                        }
+                    } else if let customTextValue = value as? String {
+                        choiceElement.customText = customTextValue
+                        success = true
                     }
                 } else if let textFieldElement = formElement as? TextFieldFormElement {
                     if let stringValue = value as? String {
@@ -512,5 +505,39 @@ import PSPDFKit
         }
         
         onSuccess(true)
+    }
+    
+    @objc func getOverlappingSignature(_ reference: NSNumber, fullyQualifiedName: String, onSuccess: @escaping RCTPromiseResolveBlock, onError: @escaping RCTPromiseRejectBlock) -> Void {
+        guard let document = getDocument(reference) else {
+            onError("getOverlappingSignature", "Document is nil", nil)
+            return
+        }
+        
+        guard let formElements = document.formParser?.forms else {
+            onError("getOverlappingSignature", "No form elements found", nil)
+            return
+        }
+        
+        var overlapping: Annotation?
+        
+        for formElement in formElements {
+            if formElement.fullyQualifiedFieldName == fullyQualifiedName {
+                if let signatureElement = formElement as? SignatureFormElement {
+                    overlapping = signatureElement.overlappingSignatureAnnotation
+                }
+                break
+            }
+        }
+        
+        guard let overlappingAnnotation = overlapping else {
+            onError("getOverlappingSignature", "No overlaps found", nil)
+            return
+        }
+        
+        if let allAnnotationsJSON = try? RCTConvert.instantJSON(from: [overlappingAnnotation]) {
+            onSuccess(allAnnotationsJSON.first)
+        } else {
+            onError("getOverlappingSignature", "Could not export annotations", nil)
+        }
     }
 }

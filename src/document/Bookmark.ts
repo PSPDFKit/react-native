@@ -8,6 +8,15 @@
  * @property {number} pageIndex - The page index on which the bookmark is located.
  */
 export class Bookmark {
+    constructor(params: { displayName: string; identifier: string; pageIndex: number; name?: string }) {
+        const { displayName, identifier, pageIndex, name } = params;
+        
+        this.displayName = displayName;
+        this.identifier = identifier;
+        this.pageIndex = pageIndex;
+        this.name = name;
+    }
+
     /**
      * The bookmark name. This is optional.
      */

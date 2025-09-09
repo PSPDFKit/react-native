@@ -54,4 +54,7 @@ RCT_EXTERN_METHOD(addBookmarks:(NSNumber _Nonnull)reference bookmarks:(NSArray *
 
 RCT_EXTERN_METHOD(removeBookmarks:(NSNumber _Nonnull)reference bookmarks:(NSArray *)bookmarks onSuccess:(RCTPromiseResolveBlock)resolve onError:(RCTPromiseRejectBlock)reject);
 
+RCT_EXTERN_METHOD(getOverlappingSignature:(NSNumber _Nonnull)reference fullyQualifiedName:(NSString *)fullyQualifiedName onSuccess:(RCTPromiseResolveBlock)resolve onError:(RCTPromiseRejectBlock)reject);
+
+
 @end

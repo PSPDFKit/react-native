@@ -236,6 +236,7 @@ export class PDFDocument {
                   const widgetAnnotation = new WidgetAnnotation(annotation);
                   if (annotation.formElement) {
                       widgetAnnotation.formElement = new FormElement(annotation.formElement);
+                      widgetAnnotation.formElement.pdfViewRef = findNodeHandle(this.pdfViewRef);
                       if (annotation.formElement.formField) {
                         widgetAnnotation.formElement.formField = new FormField(annotation.formElement.formField);
                     }
@@ -337,6 +338,7 @@ export class PDFDocument {
                     const widgetAnnotation = new WidgetAnnotation(annotation);
                     if (annotation.formElement) {
                         widgetAnnotation.formElement = new FormElement(annotation.formElement);
+                        widgetAnnotation.formElement.pdfViewRef = findNodeHandle(this.pdfViewRef);
                         if (annotation.formElement.formField) {
                             widgetAnnotation.formElement.formField = new FormField(annotation.formElement.formField);
                         }

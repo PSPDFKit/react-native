@@ -44,6 +44,7 @@ export class Forms {
                         break;
                     case 'signature':
                         formElement = new SignatureFormElement(element);
+                        formElement.pdfViewRef = findNodeHandle(this.pdfViewRef);
                         break;
                     case 'textField':
                         formElement = new TextFieldFormElement(element);
@@ -106,15 +107,15 @@ export class Forms {
      * @method updateChoiceFormFieldValue
      * @memberof Forms
      * @param {string} fullyQualifiedName The fully qualified name of the choice form field to update.
-     * @param {number[]} selectedIndices The indices of the selected options in the choice form field.
+     * @param {number[] | string} selectedIndices An array containing the indices of the selected option(s) in the choice form field. Can also be a string if a custom value needs to be set.
      * @description Updates a choice form field value on the document. This is used for combo boxes and list boxes.
      * @example
-     * const result = await this.pdfRef.current?.getDocument().forms.updateChoiceFormFieldValue(name, [0, 2]);
+     * const result = await this.pdfRef.current?.getDocument().forms.updateChoiceFormFieldValue(name, [2]);
      * @returns { Promise<boolean> } A promise containing the result of the operation.
      */
     updateChoiceFormFieldValue(
         fullyQualifiedName: string,
-        selectedIndices: number[]
+        selectedIndices: number[] | string
     ): Promise<boolean> {
         return NativeModules.PDFDocumentManager.updateFormFieldValue(
             findNodeHandle(this.pdfViewRef),

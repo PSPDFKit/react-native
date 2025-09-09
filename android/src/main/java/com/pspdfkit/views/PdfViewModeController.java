@@ -178,7 +178,7 @@ class PdfViewModeController implements
             if (NutrientNotificationCenter.INSTANCE.getIsNotificationCenterInUse()) {
                 parent.getPdfFragment().subscribe(pdfFragment -> {
                     String documentID = pdfFragment.getDocument().getDocumentIdString();
-                    NutrientNotificationCenter.INSTANCE.didSelectText(textSelection.text, documentID);
+                    NutrientNotificationCenter.INSTANCE.didSelectText(textSelection.text, documentID, parent.getId());
                 });
             }
         }

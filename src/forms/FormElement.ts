@@ -1,4 +1,10 @@
+import {
+    findNodeHandle,
+    NativeModules
+    // @ts-ignore
+  } from 'react-native';
 import { FormField } from './FormField';
+import { AnnotationType } from '../annotations/AnnotationModels';
 
 /**
  * @typedef FormElement
@@ -132,22 +138,28 @@ export class FormElement {
      */
     isMultiline: boolean;
 
+    /**
+     * The reference to the NutrientView instance that this form element belongs to.
+     */
+    pdfViewRef?: any;
+
     constructor(data: Partial<FormElement> = {}) {
         this.formField = data.formField;
         this.resettable = data.resettable;
         this.defaultValue = data.defaultValue;
         this.exportValue = data.exportValue;
         this.highlightColor = data.highlightColor;
-        this.calculationOrderIndex = data.calculationOrderIndex;
-        this.readOnly = data.readOnly;
-        this.required = data.required;
-        this.noExport = data.noExport;
-        this.fieldName = data.fieldName;
-        this.fullyQualifiedFieldName = data.fullyQualifiedFieldName;
-        this.formTypeName = data.formTypeName;
-        this.maxLength = data.maxLength;
-        this.doNotScroll = data.doNotScroll;
-        this.isMultiline = data.isMultiline;
+        this.calculationOrderIndex = data.calculationOrderIndex ?? 0;
+        this.readOnly = data.readOnly ?? false;
+        this.required = data.required ?? false;
+        this.noExport = data.noExport ?? false;
+        this.fieldName = data.fieldName ?? '';
+        this.fullyQualifiedFieldName = data.fullyQualifiedFieldName ?? '';
+        this.formTypeName = data.formTypeName ?? '';
+        this.maxLength = data.maxLength ?? 0;
+        this.doNotScroll = data.doNotScroll ?? false;
+        this.isMultiline = data.isMultiline ?? false;
+        this.pdfViewRef = data.pdfViewRef;
     }
 }
 
@@ -231,6 +243,22 @@ export class SignatureFormElement extends FormElement {
         super(data);
         this.signatureInfo = data.signatureInfo;
         this.isSigned = data.isSigned || false;
+    }
+
+  /**
+   * Gets the overlapping annotation for this specific form element.
+   * Called on the ```SignatureFormElement``` object.
+   *
+   * @method getOverlappingSignature
+   * @memberof FormElement
+   * @example
+   * const result = await signatureFormElement.getOverlappingSignature();
+   *
+   * @returns { Promise<AnnotationType> } A promise containing the annotation, if found.
+   * @throws { Error } If the annotation could not be found.
+   */
+    getOverlappingSignature(): Promise<AnnotationType> {
+        return NativeModules.PDFDocumentManager.getOverlappingSignature(this.pdfViewRef, this.fullyQualifiedFieldName);
     }
 }
 

@@ -29,6 +29,7 @@ public class ToolbarMenuItemsAdapter {
     private static final String TOOLBAR_ITEM_PRINT = "printButtonItem";
     private static final String TOOLBAR_ITEM_ANNOTATION_LIST = "annotationListButtonItem";
     private static final String TOOLBAR_ITEM_AI_ASSISTANT = "aiAssistantButtonItem";
+    private static final String TOOLBAR_ITEM_READER_VIEW = "readerViewButtonItem";
 
     private final PdfActivityConfiguration.Builder newConfigurations;
 
@@ -64,6 +65,9 @@ public class ToolbarMenuItemsAdapter {
                     break;
                 case TOOLBAR_ITEM_AI_ASSISTANT:
                     configuration.setAiAssistantEnabled(true);
+                    break;
+                case TOOLBAR_ITEM_READER_VIEW:
+                    configuration.enableReaderView(true);
                     break;
             }
         }

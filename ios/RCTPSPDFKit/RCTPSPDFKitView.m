@@ -20,7 +20,7 @@
 #import <PSPDFKitReactNativeiOS/PSPDFKitReactNativeiOS-Swift.h>
 #endif
 
-#define VALIDATE_DOCUMENT(document, ...) { if (!document.isValid) { NSLog(@"Document is invalid."); [NutrientNotificationCenter.shared documentLoadFailed]; if (self.onDocumentLoadFailed) { self.onDocumentLoadFailed(@{@"error": @"Document is invalid."}); } return __VA_ARGS__; }}
+#define VALIDATE_DOCUMENT(document, ...) { if (!document.isValid) { NSLog(@"Document is invalid."); [NutrientNotificationCenter.shared documentLoadFailedWithComponentID:self.reactTag]; if (self.onDocumentLoadFailed) { self.onDocumentLoadFailed(@{@"error": @"Document is invalid."}); } return __VA_ARGS__; }}
 
 @interface RCTPSPDFKitViewController : PSPDFViewController
 @property (nonatomic, strong) SessionStorage *sessionStorage;
@@ -66,7 +66,7 @@
                                                  name:PSPDFBookmarksChangedNotification
                                                object:nil];
   }
-  
+    
   return self;
 }
 
@@ -234,7 +234,7 @@
 // MARK: - PSPDFViewControllerDelegate
 
 - (BOOL)pdfViewController:(PSPDFViewController *)pdfController didTapOnAnnotation:(PSPDFAnnotation *)annotation annotationPoint:(CGPoint)annotationPoint annotationView:(UIView<PSPDFAnnotationPresenting> *)annotationView pageView:(PSPDFPageView *)pageView viewPoint:(CGPoint)viewPoint {
-    [NutrientNotificationCenter.shared didTapAnnotationWithAnnotation:annotation annotationPoint:annotationPoint documentID:pdfController.document.documentIdString];
+    [NutrientNotificationCenter.shared didTapAnnotationWithAnnotation:annotation annotationPoint:annotationPoint documentID:pdfController.document.documentIdString componentID:[self.reactTag integerValue]];
     
   if (self.onAnnotationTapped) {
     NSData *annotationData = [annotation generateInstantJSONWithError:NULL];
@@ -309,15 +309,15 @@
 }
 
 - (void)pdfViewController:(PSPDFViewController *)pdfController didSelectAnnotations:(NSArray<PSPDFAnnotation *> *)annotations onPageView:(PSPDFPageView *)pageView {
-    [NutrientNotificationCenter.shared didSelectAnnotationsWithAnnotations:annotations documentID:pdfController.document.documentIdString];
+    [NutrientNotificationCenter.shared didSelectAnnotationsWithAnnotations:annotations documentID:pdfController.document.documentIdString componentID:[self.reactTag integerValue]];
 }
 
 - (void)pdfViewController:(PSPDFViewController *)pdfController didDeselectAnnotations:(NSArray<PSPDFAnnotation *> *)annotations onPageView:(PSPDFPageView *)pageView {
-    [NutrientNotificationCenter.shared didDeselectAnnotationsWithAnnotations:annotations documentID:pdfController.document.documentIdString];
+    [NutrientNotificationCenter.shared didDeselectAnnotationsWithAnnotations:annotations documentID:pdfController.document.documentIdString componentID:[self.reactTag integerValue]];
 }
 
 - (void)pdfViewController:(PSPDFViewController *)pdfController didSelectText:(NSString *)text withGlyphs:(NSArray<PSPDFGlyph *> *)glyphs atRect:(CGRect)rect onPageView:(PSPDFPageView *)pageView {
-    [NutrientNotificationCenter.shared didSelectTextWithText:text rect:rect documentID:pdfController.document.documentIdString];
+    [NutrientNotificationCenter.shared didSelectTextWithText:text rect:rect documentID:pdfController.document.documentIdString componentID:[self.reactTag integerValue]];
 }
 
 - (NSArray<PSPDFAnnotation *> *)pdfViewController:(PSPDFViewController *)pdfController shouldSelectAnnotations:(NSArray<PSPDFAnnotation *> *)annotations onPageView:(PSPDFPageView *)pageView {
@@ -346,7 +346,8 @@
 - (void)documentViewController:(PSPDFDocumentViewController *)documentViewController didChangeContinuousSpreadIndex:(CGFloat)oldContinuousSpreadIndex {
     [NutrientNotificationCenter.shared documentScrolledWithSpreadIndex:oldContinuousSpreadIndex
                                                        scrollDirection:_pdfController.configuration.scrollDirection
-                                                            documentID:_pdfController.document.documentIdString];
+                                                            documentID:_pdfController.document.documentIdString
+                                                            componentID:[self.reactTag integerValue]];
 }
 
 // MARK: - PSPDFFlexibleToolbarContainerDelegate
@@ -611,7 +612,8 @@
 
 - (void)annotationChangedNotification:(NSNotification *)notification {
     [NutrientNotificationCenter.shared annotationsChangedWithNotification:notification
-                                                               documentID:self.pdfController.document.documentIdString];
+                                                               documentID:self.pdfController.document.documentIdString
+                                                              componentID:[self.reactTag integerValue]];
   id object = notification.object;
   NSArray <PSPDFAnnotation *> *annotations;
   if ([object isKindOfClass:NSArray.class]) {
@@ -643,7 +645,8 @@
 
 - (void)bookmarksDidChange:(NSNotification *)notification {
     [NutrientNotificationCenter.shared bookmarksChangedWithNotification:notification
-                                                             documentID:self.pdfController.document.documentIdString];
+                                                             documentID:self.pdfController.document.documentIdString
+                                                            componentID:[self.reactTag integerValue]];
 }
 
 - (void)tapGestureRecognizerDidChangeState:(UIGestureRecognizer *)gestureRecognizer {
@@ -661,7 +664,8 @@
         
         [NutrientNotificationCenter.shared didTapDocumentWithTapPoint:point
                                                             pageIndex:visiblePageIndex
-                                                           documentID:self.pdfController.document.documentIdString];
+                                                           documentID:self.pdfController.document.documentIdString
+                                                          componentID:[self.reactTag integerValue]];
     }
 }
 
@@ -672,13 +676,14 @@
     PSPDFPageView *pageView = [self.pdfController pageViewForPageAtIndex:pageIndex];
     [self onStateChangedForPDFViewController:self.pdfController pageView:pageView pageAtIndex:pageIndex];
     [NutrientNotificationCenter.shared documentPageChangedWithPageIndex:pageIndex >= self.pdfController.document.pageCount ? 0 : pageIndex
-                                                             documentID:self.pdfController.document.documentIdString];
+                                                             documentID:self.pdfController.document.documentIdString
+                                                            componentID:[self.reactTag integerValue]];
     
 }
 
 - (void)documentDidFinishRendering {
     _pdfController.documentViewController.delegate = self;
-    [NutrientNotificationCenter.shared documentLoadedWithDocumentID:_pdfController.document.documentIdString];
+    [NutrientNotificationCenter.shared documentLoadedWithDocumentID:_pdfController.document.documentIdString componentID:[self.reactTag integerValue]];
     // Remove observer after the initial notification
     [NSNotificationCenter.defaultCenter removeObserver:self
                                                   name:PSPDFDocumentViewControllerDidConfigureSpreadViewNotification
@@ -990,7 +995,8 @@
                                                                  object:annotations
                                                                userInfo:nil];
     [NutrientNotificationCenter.shared annotationsChangedWithNotification:notification
-                                                               documentID:self.pdfController.document.documentIdString];
+                                                               documentID:self.pdfController.document.documentIdString
+                                                              componentID:[self.reactTag integerValue]];
     
     if (self.onAnnotationsChanged) {
         self.onAnnotationsChanged(data);

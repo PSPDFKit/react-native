@@ -209,6 +209,7 @@ RCT_EXPORT_METHOD(setDelayForSyncingLocalChanges: (NSNumber*)delay resolver:(RCT
 }
 
 RCT_EXPORT_METHOD(handleListenerAdded:(nonnull NSString* )event
+                  componentID:(NSNumber *)componentID
                   resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
     if ([event isEqualToString:@"analytics"]) {
         [NutrientNotificationCenter.shared analyticsEnabled];
@@ -216,7 +217,8 @@ RCT_EXPORT_METHOD(handleListenerAdded:(nonnull NSString* )event
     resolve(@1);
 }
 
-RCT_EXPORT_METHOD(handleListenerRemoved:(nonnull NSString* )event isLast:(BOOL)isLast
+RCT_EXPORT_METHOD(handleListenerRemoved:(nonnull NSString* )event
+                  componentID:(NSNumber *)componentID
                   resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
     if ([event isEqualToString:@"analytics"]) {
         [NutrientNotificationCenter.shared analyticsDisabled];
