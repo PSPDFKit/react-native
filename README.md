@@ -66,7 +66,7 @@ See our [Getting Started on React Native guide](https://www.nutrient.io/getting-
 1. Create the React Native project by running the following command:
 
    ```bash
-   npx react-native init NutrientDemo
+   npx @react-native-community/cli init NutrientDemo
    ```
 
 1. In the terminal app, change the location of the current working directory inside the newly created project:

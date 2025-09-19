@@ -9,7 +9,7 @@ PODS:
     - hermes-engine/Pre-built (= 0.80.0)
   - hermes-engine/Pre-built (0.80.0)
   - Instant (14.12.0)
-  - nutrient-sdk-react-native (3.1.0):
+  - nutrient-sdk-react-native (3.1.1):
     - Instant (= 14.12.0)
     - PSPDFKit (= 14.12.0)
     - React
@@ -2600,7 +2600,7 @@ SPEC CHECKSUMS:
   glog: 5683914934d5b6e4240e497e0f4a3b42d1854183
   hermes-engine: 7068e976238b29e97b3bafd09a994542af7d5c0b
   Instant: 46f50aaa57f6a954fc3536cc1f0af06dc9688f6e
-  nutrient-sdk-react-native: 73aa2c1c828eef18abeabb00c58df9a9b286226b
+  nutrient-sdk-react-native: 1876f1f40632a70104d8985406d12ac2cfa17228
   PSPDFKit: fca5fc7d56dd977e8d8308ae54aa9fd685a9f67a
   RCT-Folly: 846fda9475e61ec7bcbf8a3fe81edfcaeb090669
   RCTDeprecation: ff787f6c860a1b97dd1bc27264b61d23ad1994da

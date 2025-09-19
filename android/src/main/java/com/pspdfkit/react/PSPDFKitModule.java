@@ -249,14 +249,17 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
         }
     }
 
-    @ReactMethod
-    public void setLicenseKey(@Nullable String licenseKey, @Nullable Promise promise) {
-         try {
-             InitializationOptions options = new InitializationOptions(licenseKey, emptyList(), CrossPlatformTechnology.ReactNative, null);
-             Nutrient.initialize(getReactApplicationContext(), options);
-             promise.resolve("Initialised Nutrient");
+    @ReactMethod(isBlockingSynchronousMethod = true)
+    public boolean setLicenseKey(@Nullable String licenseKey) {
+        try {
+            if (licenseKey == null) {
+                licenseKey = "";
+            }
+            InitializationOptions options = new InitializationOptions(licenseKey, emptyList(), CrossPlatformTechnology.ReactNative, null);
+            Nutrient.initialize(getReactApplicationContext(), options);
+            return true;
         } catch (InvalidNutrientLicenseException e) {
-            promise.reject(e);
+            return false;
         }
     }
 
@@ -293,16 +296,19 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
         return properties;
     }
 
-    @ReactMethod
-    public void setLicenseKeys(@Nullable String androidLicenseKey, @Nullable String iOSLicenseKey, @Nullable Promise promise) {
+    @ReactMethod(isBlockingSynchronousMethod = true)
+    public boolean setLicenseKeys(@Nullable String androidLicenseKey, @Nullable String iOSLicenseKey) {
         // Here, we ignore the `iOSLicenseKey` parameter and only care about `androidLicenseKey`.
         // `iOSLicenseKey` will be used to activate the license on iOS.
         try {
+            if (androidLicenseKey == null) {
+                androidLicenseKey = "";
+            }
             InitializationOptions options = new InitializationOptions(androidLicenseKey, emptyList(), CrossPlatformTechnology.ReactNative, null);
             Nutrient.initialize(getReactApplicationContext(), options);
-            promise.resolve("Initialised Nutrient");
+            return true;
         } catch (InvalidNutrientLicenseException e) {
-            promise.reject(e);
+            return false;
         }
     }
 

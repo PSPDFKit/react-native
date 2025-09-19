@@ -12,7 +12,7 @@ import React
 
 @objc extension RCTConvert {
     
-    @objc public static func formElementToJSON(_ formElement: FormElement) -> Dictionary<String, Any> {
+    @objc public static func baseFormElementToJSON(_ formElement: FormElement) -> Dictionary<String, Any> {
         
         var formElementDictionary = Dictionary<String, Any>()
         
@@ -36,7 +36,7 @@ import React
     }
 
     @objc public static func buttonFormElementToJSON(_ formElement: ButtonFormElement) -> Dictionary<String, Any> {
-        var json = formElementToJSON(formElement)
+        var json = baseFormElementToJSON(formElement)
         
         json["selected"] = formElement.isSelected
         if let options = formElement.options {
@@ -53,7 +53,7 @@ import React
     }
 
     @objc public static func choiceFormElementToJSON(_ formElement: ChoiceFormElement) -> Dictionary<String, Any> {
-        var json = formElementToJSON(formElement)
+        var json = baseFormElementToJSON(formElement)
         
         if let options = formElement.options {
             json["options"] = options.map { option in
@@ -63,14 +63,14 @@ import React
                 ]
             }
         }
-        json["selectedIndices"] = formElement.selectedIndices
+        json["selectedIndices"] = formElement.selectedIndices?.sorted()
         json["isEditable"] = formElement.isEditable
         
         return json
     }
 
     @objc public static func signatureFormElementToJSON(_ formElement: SignatureFormElement) -> Dictionary<String, Any> {
-        var json = formElementToJSON(formElement)
+        var json = baseFormElementToJSON(formElement)
         
         if let signatureInfo = formElement.signatureInfo {
             json["signatureInfo"] = [
@@ -86,7 +86,7 @@ import React
     }
 
     @objc public static func textFieldFormElementToJSON(_ formElement: TextFieldFormElement) -> Dictionary<String, Any> {
-        var json = formElementToJSON(formElement)
+        var json = baseFormElementToJSON(formElement)
         
         json["value"] = formElement.value
         json["isPassword"] = formElement.isPassword

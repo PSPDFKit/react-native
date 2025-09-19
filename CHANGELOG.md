@@ -1,3 +1,8 @@
+## 3.1.1 - 19 Sep 2025
+
+- Fixes an issue where the `setLicenseKey` API does not run synchronously on Android. (J#HYB-881)
+- Fixes an issue where the `FormFieldEvent.VALUES_UPDATED` event returned incomplete objects. (J#HYB-884)
+
 ## 3.1.0 - 10 Sep 2025
 
 - Adds the `getOverlappingSignature` API to `SignatureFormElement` objects to retrieve overlapping signature annotations. (J#HYB-867)

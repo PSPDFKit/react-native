@@ -69,6 +69,14 @@ object FormUtils {
             }
             is ChoiceFormElement -> {
                 elementJSON["formTypeName"] = "choice"
+                formElement.options.let { options ->
+                    elementJSON["options"] = options.map { option ->
+                        mapOf(
+                            "value" to option.value,
+                            "label" to option.label
+                        )
+                    }
+                }
                 elementJSON["selectedIndices"] = formElement.selectedIndexes
                 if (formElement is ComboBoxFormElement && formElement.isCustomTextSet) {
                     elementJSON["value"] = formElement.customText ?: ""

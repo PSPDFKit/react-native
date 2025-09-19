@@ -128,6 +128,7 @@ import PSPDFKit
     private var internalEventEmitter: RCTEventEmitter? = nil
     @objc static public let shared = NutrientNotificationCenter()
     @objc public var isInUse = false
+    private var lastProcessedId: String?
     
     private override init() {}
     
@@ -200,13 +201,20 @@ import PSPDFKit
             case NSNotification.Name.PSPDFAnnotationChanged:
                 if let annotation = notification.object as? Annotation {
                     if (annotation is FormElement) {
-                        if let annotationJSON = try? RCTConvert.instantJSON(from: annotation as? FormElement) {
+                        guard let eventId = annotation.uuid as String? ,
+                                      lastProcessedId != eventId else { return }
+                        if let annotationJSON = try? RCTConvert.instantJSON(from: (annotation as! FormElement)) {
                             let jsonData = ["event" : NotificationEvent.formFieldValuesUpdated.rawValue, "formField" : annotationJSON, "documentID" : documentID] as [String : Any]
                             let payload = createEventPayload(jsonData: jsonData, componentID: componentID)
                             eventEmitter?.sendEvent(withName:NotificationEvent.formFieldValuesUpdated.rawValue,
                                                     body: payload)
                         } else {
                             // Could not decode annotation data
+                        }
+                        lastProcessedId = eventId
+                        // Clear the ID after 100ms
+                        DispatchQueue.global(qos: .background).asyncAfter(deadline: .now() + 0.1) {
+                            self.lastProcessedId = nil
                         }
                     } else {
                         if let annotationJSON = try? RCTConvert.instantJSON(from: [annotation]) {
