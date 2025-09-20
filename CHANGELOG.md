@@ -1,7 +1,4 @@
-## 3.1.1 - 19 Sep 2025
-
-- Fixes an issue where the `setLicenseKey` API does not run synchronously on Android. (J#HYB-881)
-- Fixes an issue where the `FormFieldEvent.VALUES_UPDATED` event returned incomplete objects. (J#HYB-884)
+- Fixes an issue where `setLicenseKey` API does not run synchronously on Android. (J#HYB-881)
 
 ## 3.1.0 - 10 Sep 2025
 
