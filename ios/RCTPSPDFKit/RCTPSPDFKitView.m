@@ -20,7 +20,7 @@
 #import <PSPDFKitReactNativeiOS/PSPDFKitReactNativeiOS-Swift.h>
 #endif
 
-#define VALIDATE_DOCUMENT(document, ...) { if (!document.isValid) { NSLog(@"Document is invalid."); [NutrientNotificationCenter.shared documentLoadFailedWithComponentID:self.reactTag]; if (self.onDocumentLoadFailed) { self.onDocumentLoadFailed(@{@"error": @"Document is invalid."}); } return __VA_ARGS__; }}
+#define VALIDATE_DOCUMENT(document, ...) { if (!document.isValid) { NSLog(@"Document is invalid."); [NutrientNotificationCenter.shared documentLoadFailedWithComponentID:[self.reactTag integerValue]]; if (self.onDocumentLoadFailed) { self.onDocumentLoadFailed(@{@"error": @"Document is invalid."}); } return __VA_ARGS__; }}
 
 @interface RCTPSPDFKitViewController : PSPDFViewController
 @property (nonatomic, strong) SessionStorage *sessionStorage;
@@ -276,7 +276,17 @@
 }
 
 - (void)pdfViewController:(PSPDFViewController *)pdfController didChangeDocument:(nullable PSPDFDocument *)document {
-  VALIDATE_DOCUMENT(document)
+    if (!document.isValid) {
+        [NutrientNotificationCenter.shared documentLoadFailedWithComponentID:[self.reactTag integerValue]];
+        // If component props are not ready, add the callback to pending
+        if ([self isPropsSet] == YES) {
+            if (self.onDocumentLoadFailed) {
+                self.onDocumentLoadFailed(@{});
+            }
+        } else {
+            [_sessionStorage addPendingCallback:CallbackTypeOnDocumentLoadFailed];
+        }
+    }
 }
 
 - (UIMenu *)pdfViewController:(PSPDFViewController *)sender menuForAnnotations:(NSArray<PSPDFAnnotation *> *)annotations onPageView:(PSPDFPageView *)pageView appearance:(PSPDFEditMenuAppearance)appearance suggestedMenu:(UIMenu *)suggestedMenu {
@@ -842,6 +852,12 @@
             case CallbackTypeOnReady:
                 if (self.onReady) {
                     self.onReady(@{});
+                }
+                break;
+                
+            case CallbackTypeOnDocumentLoadFailed:
+                if (self.onDocumentLoadFailed) {
+                    self.onDocumentLoadFailed(@{});
                 }
                 break;
                 

@@ -48,10 +48,12 @@ import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.events.EventDispatcher;
 import com.pspdfkit.LicenseFeature;
 import com.pspdfkit.PSPDFKit;
+import com.pspdfkit.ai.AiAssistantHelpersKt;
 import com.pspdfkit.annotations.Annotation;
 import com.pspdfkit.annotations.AnnotationFlags;
 import com.pspdfkit.annotations.AnnotationType;
 import com.pspdfkit.annotations.configuration.FreeTextAnnotationConfiguration;
+import com.pspdfkit.configuration.PdfConfiguration;
 import com.pspdfkit.configuration.activity.PdfActivityConfiguration;
 import com.pspdfkit.configuration.search.SearchType;
 import com.pspdfkit.configuration.sharing.ShareFeatures;
@@ -126,6 +128,7 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.nutrient.data.models.AiAssistantConfiguration;
+import io.nutrient.data.models.DocumentIdentifiers;
 import io.nutrient.domain.ai.AiAssistant;
 import io.nutrient.domain.ai.AiAssistantKt;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -141,6 +144,7 @@ import io.reactivex.rxjava3.functions.Function;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import io.reactivex.rxjava3.subjects.BehaviorSubject;
 import kotlin.Unit;
+import com.pspdfkit.react.SessionStorage;
 
 /**
  * This view displays a {@link com.pspdfkit.ui.PdfFragment} and all associated toolbars.
@@ -257,8 +261,10 @@ public class PdfView extends FrameLayout {
             }
         });
 
-        // Set a default configuration.
-        configuration = new PdfActivityConfiguration.Builder(getContext()).build();
+        // Set a default configuration. Immersive should be disabled for React Native.
+        configuration = new PdfActivityConfiguration.Builder(getContext())
+                .immersiveModeEnabled(false)
+                .build();
 
         // Generate an id to set on all fragments created by the PdfView.
         internalId = View.generateViewId();
@@ -648,8 +654,16 @@ public class PdfView extends FrameLayout {
                             aiaConfiguration.getString("jwt"),
                             aiaConfiguration.getString("sessionID"),
                             aiaConfiguration.getString("userID"));
-                    AiAssistant aiAssistant = AiAssistantKt.standaloneAiAssistant(reactApplicationContext, aiaConfig);
-                    Objects.requireNonNull(pdfFragment.getDocument()).setAiAssistant(aiAssistant);
+
+                    PdfDocument document = fragment.getDocument();
+                    DocumentIdentifiers documentIdentifiers = new DocumentIdentifiers(document.getDocumentSource().getDataProvider(),
+                            document.getPermanentId().toString(),
+                            null,
+                            document.getPermanentId().toString(),
+                            null);
+
+                    AiAssistant aiAssistant = AiAssistantKt.standaloneAiAssistant(reactApplicationContext, aiaConfig, List.of(documentIdentifiers));
+                    SessionStorage.setAiAssistant(aiAssistant);
                 }
             } catch (Exception e) {
                 Log.w(TAG, "Failed to set AIA Configuration: " + e.getMessage());
@@ -1311,7 +1325,7 @@ public class PdfView extends FrameLayout {
 
             config.put("userInterfaceViewMode", ConfigurationAdapter.getStringValueForConfigurationItem(fragment.getConfiguration().getUserInterfaceViewMode()));
             config.put("inlineSearch", fragment.getConfiguration().getSearchType() == SearchType.INLINE ? true : false);
-            config.put("immersiveMode", fragment.getConfiguration().isImmersiveMode());
+            config.put("immersiveMode", fragment.getConfiguration().isImmersiveModeEnabled());
             config.put("toolbarTitle", fragment.getConfiguration().getActivityTitle());
             config.put("androidShowSearchAction", fragment.getConfiguration().isSearchEnabled());
             config.put("androidShowOutlineAction", fragment.getConfiguration().isOutlineEnabled());
@@ -1320,6 +1334,7 @@ public class PdfView extends FrameLayout {
             config.put("androidShowPrintAction", fragment.getConfiguration().isPrintingEnabled());
             config.put("androidShowDocumentInfoView", fragment.getConfiguration().isDocumentInfoViewEnabled());
             config.put("androidShowSettingsMenu", fragment.getConfiguration().isSettingsItemEnabled());
+            config.put("androidEnableStylusOnDetection", fragment.getConfiguration().getConfiguration().getEnableStylusOnDetection());
 
             config.put("showThumbnailBar", ConfigurationAdapter.getStringValueForConfigurationItem(fragment.getConfiguration().getThumbnailBarMode()));
             config.put("androidShowThumbnailGridAction", fragment.getConfiguration().isThumbnailGridEnabled());

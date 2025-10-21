@@ -32,12 +32,10 @@ public class RNInstantPdfActivity extends InstantPdfActivity {
     @Override
     public void onSyncFinished(@NonNull InstantPdfDocument instantDocument) {
         super.onSyncFinished(instantDocument);
-        Log.d("RNInstant::::::", "onSyncFinished: ");
     }
 
     @Override
     public void onSyncStarted(@NonNull InstantPdfDocument instantDocument) {
         super.onSyncStarted(instantDocument);
-        Log.d("RNInstant::::::", "onSyncStarted: ");
     }
 }

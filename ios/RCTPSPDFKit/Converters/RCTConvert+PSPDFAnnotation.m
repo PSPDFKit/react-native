@@ -72,7 +72,7 @@
         mutableJSON[@"type"] = @"textField";
         formElementJSON = [mutableJSON copy];
     } else {
-        return nil; // Return nil if no conditions match
+        formElementJSON = nil;
     }
     
     return formElementJSON;

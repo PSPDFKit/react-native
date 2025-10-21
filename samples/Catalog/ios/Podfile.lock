@@ -8,14 +8,14 @@ PODS:
   - hermes-engine (0.80.0):
     - hermes-engine/Pre-built (= 0.80.0)
   - hermes-engine/Pre-built (0.80.0)
-  - Instant (14.12.0)
-  - nutrient-sdk-react-native (3.1.1):
-    - Instant (= 14.12.0)
-    - PSPDFKit (= 14.12.0)
+  - Instant (26.1.0)
+  - nutrient-sdk-react-native (3.2.0):
+    - Instant (= 26.1.0)
+    - PSPDFKit (= 26.1.0)
     - React
-  - PSPDFKit (14.12.0):
-    - PSPDFKit/Core (= 14.12.0)
-  - PSPDFKit/Core (14.12.0)
+  - PSPDFKit (26.1.0):
+    - PSPDFKit/Core (= 26.1.0)
+  - PSPDFKit/Core (26.1.0)
   - RCT-Folly (2024.11.18.00):
     - boost
     - DoubleConversion
@@ -2599,9 +2599,9 @@ SPEC CHECKSUMS:
   fmt: a40bb5bd0294ea969aaaba240a927bd33d878cdd
   glog: 5683914934d5b6e4240e497e0f4a3b42d1854183
   hermes-engine: 7068e976238b29e97b3bafd09a994542af7d5c0b
-  Instant: 46f50aaa57f6a954fc3536cc1f0af06dc9688f6e
-  nutrient-sdk-react-native: 1876f1f40632a70104d8985406d12ac2cfa17228
-  PSPDFKit: fca5fc7d56dd977e8d8308ae54aa9fd685a9f67a
+  Instant: bd29791de79cf78318174bb0268395cab0d9d55b
+  nutrient-sdk-react-native: 245a73b358f0c5920bb82a00ac426373ab697515
+  PSPDFKit: c733c2d18cc1f403af1d54c05acf041ce533b55f
   RCT-Folly: 846fda9475e61ec7bcbf8a3fe81edfcaeb090669
   RCTDeprecation: ff787f6c860a1b97dd1bc27264b61d23ad1994da
   RCTRequired: 664eb8399ed8a83e26ab65af7c2ad390f7e61696

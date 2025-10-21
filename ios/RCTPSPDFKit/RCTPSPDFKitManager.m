@@ -183,7 +183,9 @@ RCT_EXPORT_METHOD(presentInstant: (NSDictionary*)documentData configuration: (NS
     UIViewController *presentingViewController = RCTPresentedViewController();
 
     if (presentingViewController) {
-        [presentingViewController showViewController: navigationController sender:self];
+        [presentingViewController presentViewController:navigationController animated:YES completion:^{
+            resolve(@1);
+        }];
     } else {
         NSLog(@"Error presenting instant view controller %@", error.localizedDescription);
         NSString* errorMessage = [NSString stringWithFormat: @"Failed to present instant document. %@", error.localizedDescription];

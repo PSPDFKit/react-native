@@ -32,6 +32,7 @@ export class NutrientViewComponent extends BaseExampleAutoHidingHeaderComponent 
             iOSBackgroundColor: processColor('lightgrey'),
             iOSUseParentNavigationBar: false,
             iOSDocumentInfoOptions: [PDFConfiguration.IOSDocumentInfoOption.OUTLINE, PDFConfiguration.IOSDocumentInfoOption.ANNOTATIONS],
+            androidEnableStylusOnDetection: false,
           }}
           onReady={() => {
             console.log('NutrientView is ready');

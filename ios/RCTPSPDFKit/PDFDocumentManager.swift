@@ -67,7 +67,9 @@ import PSPDFKit
             return
         }
         
-        let pageInfoDictionary = ["savedRotation" : pageInfo.savedRotation.rawValue]
+        let sizeDictionary = ["width" : pageInfo.size.width, "height" : pageInfo.size.height]
+        let pageInfoDictionary = ["savedRotation" : pageInfo.savedRotation.rawValue,
+                                  "size" : sizeDictionary] as [String : Any]
         onSuccess(pageInfoDictionary);
     }
 
@@ -311,34 +313,32 @@ import PSPDFKit
                 return
             }
             
-            var annotationsArray = Array<Annotation>()
-                        
             for annotationDictionary in instantJSONArray {
                 let annotationMutableDictionary = NSMutableDictionary(dictionary: annotationDictionary)
                 annotationMutableDictionary.removeObject(forKey: "constructor")
-                if let annotationData = try? JSONSerialization.data(withJSONObject: annotationMutableDictionary),
-                   let annotation = try? Annotation(fromInstantJSON: annotationData, documentProvider: documentProvider) {
-                    
-                     if let attachmentId = annotationMutableDictionary["imageAttachmentId"] as? String {
-                         guard let attachment = attachments[attachmentId] as? Dictionary<String, Any>,
-                               let base64String = attachment["binary"] as? String,
-                               let base64Data = Data(base64Encoded: base64String) else {
-                             onError("addAnnotations", "Failed to process attachment data", nil)
-                             return
-                         }
-                         
-                         let dataProvider = DataContainerProvider(data: base64Data)
-                         do {
-                             try annotation.attachBinaryInstantJSONAttachment(fromDataProvider: dataProvider)
-                         } catch {
-                             onError("addAnnotations", "DocumentProvider is nil", nil)
-                             return
-                         }
-                     }
-                    annotationsArray.append(annotation)
+                if let annotationData = try? JSONSerialization.data(withJSONObject: annotationMutableDictionary) {
+
+                    let attachmentDataProvider: DataProviding?
+                    if let attachmentId = annotationMutableDictionary["imageAttachmentId"] as? String {
+                        guard let attachment = attachments[attachmentId] as? Dictionary<String, Any>,
+                              let base64String = attachment["binary"] as? String,
+                              let attachmentData = Data(base64Encoded: base64String) else {
+                            onError("addAnnotations", "Failed to process attachment data", nil)
+                            return
+                        }
+                        attachmentDataProvider = DataContainerProvider(data: attachmentData)
+                    } else {
+                        attachmentDataProvider = nil
+                    }
+
+                    do {
+                        try documentProvider.addAnnotation(fromInstantJSON: annotationData, attachmentDataProvider: attachmentDataProvider)
+                    } catch {
+                        onError("addAnnotations", error.localizedDescription, nil)
+                        return
+                    }
                 }
             }
-            document.add(annotations: annotationsArray)
             onSuccess(true)
         } else {
             onError("addAnnotations", "Cannot parse annotation data", nil)

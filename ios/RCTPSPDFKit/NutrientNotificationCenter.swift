@@ -203,13 +203,14 @@ import PSPDFKit
                     if (annotation is FormElement) {
                         guard let eventId = annotation.uuid as String? ,
                                       lastProcessedId != eventId else { return }
-                        if let annotationJSON = try? RCTConvert.instantJSON(from: (annotation as! FormElement)) {
+                        if let formElement = annotation as? FormElement,
+                           let annotationJSON = try? RCTConvert.instantJSON(from: formElement) {
                             let jsonData = ["event" : NotificationEvent.formFieldValuesUpdated.rawValue, "formField" : annotationJSON, "documentID" : documentID] as [String : Any]
                             let payload = createEventPayload(jsonData: jsonData, componentID: componentID)
                             eventEmitter?.sendEvent(withName:NotificationEvent.formFieldValuesUpdated.rawValue,
                                                     body: payload)
                         } else {
-                            // Could not decode annotation data
+                            // Could not decode annotation data or annotation was not a FormElement
                         }
                         lastProcessedId = eventId
                         // Clear the ID after 100ms

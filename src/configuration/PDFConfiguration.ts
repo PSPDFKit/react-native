@@ -106,6 +106,7 @@ import { AIAssistantConfiguration } from './AIAssistantConfiguration';
  * @property { PDFConfiguration.BooleanType } [androidRemoveStatusBarOffset] Used to remove the Android status bar offset when wrapping the component in custom views.
  * @property { PDFConfiguration.IOSFileConflictResolution } [iOSFileConflictResolution] Resolution options for conflicts due to out of process file changes or deletion.
  * @property { PDFConfiguration.IOSDocumentInfoOption[] } [iOSDocumentInfoOptions] Choose which document-related information to display in the document info controller.
+ * @property { PDFConfiguration.BooleanType } [androidEnableStylusOnDetection] Indicates whether we should automatically detect the stylus. Enabling this will automatically disable all other inputs once we detect stylus use. Defaults to true.
  */
 
 export class PDFConfiguration {
@@ -496,6 +497,10 @@ export class PDFConfiguration {
      * Choose which document-related information to display in the document info controller.
      */
     iOSDocumentInfoOptions?: PDFConfiguration.IOSDocumentInfoOption[];
+    /**
+     * Indicates whether we should automatically detect the stylus. Enabling this will automatically disable all other inputs once we detect stylus use. Defaults to true.
+     */
+    androidEnableStylusOnDetection?: PDFConfiguration.BooleanType;
 }
 
 export namespace PDFConfiguration {

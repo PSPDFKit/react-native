@@ -51,11 +51,11 @@ export class Nutrient {
      * @method setLicenseKey
      * @memberof Nutrient
      * @param { string | null } [key] Your Nutrient for React Native iOS or Nutrient for React Native Android license key.
-     * @returns { Promise<boolean> } A promise returning ```true``` if the license key was set, and ```false``` if not.
+     * @returns { boolean } A boolean returning ```true``` if the license key was set, and ```false``` if not.
      * @example
      * Nutrient.setLicenseKey('YOUR_LICENSE_KEY');
      */
-    setLicenseKey: (key?: string | null) => Promise<boolean>;
+    setLicenseKey: (key?: string | null) => boolean;
     /**
      * Used to set the your Nutrient license keys for both platforms.
      * Nutrient is commercial software.
@@ -65,11 +65,11 @@ export class Nutrient {
      * @memberof Nutrient
      * @param { string | null } [androidKey] Your Nutrient for React Native Android license key.
      * @param { string | null } [iosKey] Your Nutrient for React Native iOS license key.
-     * @returns { Promise<boolean> } A promise returning ```true``` if the license keys were set, and ```false``` if not.
+     * @returns { boolean } A boolean returning ```true``` if the license key was set, and ```false``` if not.
      * @example
      * Nutrient.setLicenseKeys('YOUR_ANDROID_LICENSE_KEY', 'YOUR_IOS_LICENSE_KEY');
      */
-    setLicenseKeys: (androidKey?: string | null, iosKey?: string | null) => Promise<boolean>;
+    setLicenseKeys: (androidKey?: string | null, iosKey?: string | null) => boolean;
     /**
      * Used to present a PDF document.
      * @method present

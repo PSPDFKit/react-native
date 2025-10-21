@@ -16,6 +16,7 @@ import Foundation
     
     @objc public enum CallbackType: Int {
         case onDocumentLoaded
+        case onDocumentLoadFailed
         case onReady
     }
     

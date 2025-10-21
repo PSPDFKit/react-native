@@ -1,6 +1,16 @@
+## 3.2.0 - 20 Oct 2025
+
+- Adds the page size to the existing `getPageInfo` API call. (J#HYB-888)
+- Adds the `androidEnableStylusOnDetection` option to the `PDFConfiguration` object to control stylus detection on Android. (J#HYB-893)
+- Updates related to Nutrient Android SDK 10.7.0.
+- Updates related to Nutrient iOS SDK 26.1.0.
+- Fixes image annotations being incorrectly placed when added on pages with a rotation or crop box. (J#IOS-767)
+- Fixes an issue where the `presentInstant` API call would never resolve its promise on iOS. (J#HYB-894)
+- Fixes an issue where the `onDocumentLoadFailed` callback wasn`t triggered for invalid documents on iOS. (J#HYB-885)
+
 ## 3.1.1 - 19 Sep 2025
 
-- Fixes an issue where the `setLicenseKey` API does not run synchronously on Android. (J#HYB-881)
+- Fixes an issue where the `setLicenseKey` API didn’t run synchronously on Android. (J#HYB-881)
 - Fixes an issue where the `FormFieldEvent.VALUES_UPDATED` event returned incomplete objects. (J#HYB-884)
 
 ## 3.1.0 - 10 Sep 2025
@@ -99,11 +109,11 @@ _[Migration guide](https://www.nutrient.io/guides/react-native/migration-guides/
 - Updates to Nutrient iOS SDK 14.5.0.
 - Updates Android `minSdkVersion` to API 24.
 - Updates the iOS deployment target to iOS 16. (#46035)
-- Fixes an issue where the `pageMargins` property used by the PDF generation API wasn't being used by Android. (J#HYB-555)
+- Fixes an issue where the `pageMargins` property used by the PDF generation API wasn’t being used by Android. (J#HYB-555)
 - Fixes an issue where the `documentPageChanged` event fired while the page change was still in progress on iOS. (J#HYB-644)
 - Fixes an issue where the `getConfiguration` API on Android returned inaccurate results. (J#HYB-648)
-- Removes the measurements `point` unit, as it isn't supported anymore. (#46035)
-- Removes the `iOSAllowedMenuAction` configuration property, as it isn't supported anymore. (#46035)
+- Removes the measurements `point` unit, as it isn’t supported anymore. (#46035)
+- Removes the `iOSAllowedMenuAction` configuration property, as it isn’t supported anymore. (#46035)
 
 ## 2.15.0 - 13 Dec 2024
 
@@ -119,7 +129,7 @@ _[Migration guide](https://www.nutrient.io/guides/react-native/migration-guides/
 - Adds the ability to hide the main toolbar on Android using a combination of configuration and style properties. (J#HYB-431)
 - Updates to Nutrient Android SDK 2024.6.1.
 - Updates to Nutrient iOS SDK 14.1.1.
-- Fixes an issue where the correct items weren't rendered when using the `menuItemGrouping` configuration property. (J#HYB-432)
+- Fixes an issue where the correct items weren’t rendered when using the `menuItemGrouping` configuration property. (J#HYB-432)
 - Fixes an issue where a crash occurred when using the `toolbar.toolbarMenuItems` property and `enterAnnotationCreationMode` API on Android. (J#HYB-517)
 - Fixes an issue where some annotations would not be deleted on iOS when using the `removeAnnotations` API. (J#HYB-518)
 
@@ -130,9 +140,9 @@ _[Migration guide](https://www.nutrient.io/guides/react-native/migration-guides/
 - Adds support to select and deselect annotations programmatically. (J#HYB-447)
 - Updates to PSPDFKit 2024.5.1 for Android.
 - Updates to PSPDFKit 13.9.1 for iOS.
-- Fixes an issue where certain annotation presets weren't applied correctly. (J#HYB-395)
+- Fixes an issue where certain annotation presets weren’t applied correctly. (J#HYB-395)
 - Fixes an issue where custom toolbar buttons were not applied on the Android toolbar. (J#HYB-482)
-- Fixes an issue where the `annotationTypes` parameter wasn't honored by the `processAnnotations` API. (J#HYB-495)
+- Fixes an issue where the `annotationTypes` parameter wasn’t honored by the `processAnnotations` API. (J#HYB-495)
 - Fixes an issue where the `onDocumentLoadFailed` callback was not triggered when an incorrect document password was specified on Android. (J#HYB-491)
 - Fixes an issue where some measurement annotation presets were not applied when specified. (J#HYB-492)
 
@@ -153,8 +163,8 @@ _[Migration guide](https://www.nutrient.io/guides/react-native/migration-guides/
 - Adds support for opening PDF documents from a remote URL. (J#HYB-354)
 - Updates `setAnnotationFlags` and `getAnnotationFlags` APIs to support using annotation `name` as an identifier. (J#HYB-372)
 - Fixes an issue where calling `exitCurrentlyActiveMode` while not in annotation editing mode generates an exception on iOS. (J#HYB-373)
-- Fixes an issue where the annotation `uuid` isn't included in `onAnnotationTapped` callbacks. (J#HYB-374)
-- Fixes an issue where Instant configuration wasn't applied when using the `presentInstant` API on iOS. (J#HYB-375)
+- Fixes an issue where the annotation `uuid` isn’t included in `onAnnotationTapped` callbacks. (J#HYB-374)
+- Fixes an issue where Instant configuration wasn’t applied when using the `presentInstant` API on iOS. (J#HYB-375)
 
 ## 2.10.0 - 06 May 2024
 
