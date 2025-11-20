@@ -52,6 +52,7 @@ export class NutrientViewComponent extends BaseExampleAutoHidingHeaderComponent 
                     'Nutrient',
                     'Document ID: ' + await document?.getDocumentId(),
                   );
+                  console.log(await document?.getPageInfo(0));
                 }}>
                   <Text style={styles.button}>{'Get Document ID'}</Text>
                 </TouchableOpacity>

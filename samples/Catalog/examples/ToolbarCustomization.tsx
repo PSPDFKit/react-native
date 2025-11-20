@@ -1,6 +1,6 @@
 import React from 'react';
 import { Alert, Platform, processColor, Text, TouchableOpacity, View } from 'react-native';
-import NutrientView, { Toolbar } from '@nutrient-sdk/react-native';
+import NutrientView, { PDFConfiguration, Toolbar } from '@nutrient-sdk/react-native';
 
 import { exampleDocumentPath, pspdfkitColor } from '../configuration/Constants';
 import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
@@ -19,10 +19,18 @@ export class ToolbarCustomization extends BaseExampleAutoHidingHeaderComponent {
         <NutrientView
           ref={this.pdfRef}
           document={exampleDocumentPath}
+          menuItemGrouping={['ink', 'highlight', 'note', 'signature']}
+          disableAutomaticSaving={true}
           configuration={{
+            iOSFileConflictResolution: PDFConfiguration.IOSFileConflictResolution.CLOSE,
+            userInterfaceViewMode: 'alwaysVisible',
             iOSBackgroundColor: processColor('lightgrey'),
-            iOSUseParentNavigationBar: false,
-          }}
+            enableAnnotationEditing: true,
+            documentLabelEnabled: false,
+            iOSAllowToolbarTitleChange: false,
+            pageMode: 'single',
+            signatureSavingStrategy: 'alwaysSave',
+            }}
           toolbar={{
             // iOS only.
             leftBarButtonItems: {
@@ -61,31 +69,6 @@ export class ToolbarCustomization extends BaseExampleAutoHidingHeaderComponent {
           onCustomToolbarButtonTapped={(event: any) => {
             Alert.alert('Nutrient', `Custom button tapped: ${JSON.stringify(event)}`);
           }}
-          menuItemGrouping={[
-            {
-              key: 'markup',
-              items: ['squiggly', 'strikeout', 'underline'],
-            },
-            {
-              key: 'writing',
-              items: ['freetext', 'note'],
-            },
-            {
-              key: 'drawing',
-              items: [
-                'line',
-                'square',
-                'circle',
-                'polygon',
-                'polyline',
-                'arrow',
-              ],
-            },
-            {
-              key: 'measurement',
-              items: ['area_square', 'perimeter', 'distance', 'area_circle'],
-            },
-          ]}
           style={styles.pdfColor}
         />
         {this.renderWithSafeArea(insets => (

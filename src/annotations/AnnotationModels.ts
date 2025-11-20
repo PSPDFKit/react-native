@@ -422,7 +422,7 @@ export class BaseAnnotation {
  * @ignore
  */
 export class ShapeAnnotation extends BaseAnnotation {
-  type: 'pspdfkit/shape/ellipse' | 'shape/ellipse' | 'ellipse' |
+  override type: 'pspdfkit/shape/ellipse' | 'shape/ellipse' | 'ellipse' |
          'pspdfkit/shape/rectangle' | 'shape/rectangle' | 'rectangle' |
          'pspdfkit/shape/line' | 'shape/line' | 'line' |
          'pspdfkit/shape/polygon' | 'shape/polygon' | 'polygon' |
@@ -502,7 +502,7 @@ export class ShapeAnnotation extends BaseAnnotation {
  * @ignore
  */
 export class MarkupAnnotation extends BaseAnnotation {
-  type: 'pspdfkit/markup/highlight' | 'markup/highlight' | 'highlight' |
+  override type: 'pspdfkit/markup/highlight' | 'markup/highlight' | 'highlight' |
         'pspdfkit/markup/redaction' | 'markup/redaction' | 'redaction' |
         'pspdfkit/markup/squiggly' | 'markup/squiggly' | 'squiggly' |
         'pspdfkit/markup/strikeout' | 'markup/strikeout' | 'strikeout' |
@@ -554,7 +554,7 @@ export class MarkupAnnotation extends BaseAnnotation {
  * @ignore
  */
 export class CommentMarkerAnnotation extends BaseAnnotation {
-  type: 'pspdfkit/comment-marker' | 'comment-marker';
+  override type: 'pspdfkit/comment-marker' | 'comment-marker';
   color?: string;
 
   constructor(params: {
@@ -592,9 +592,9 @@ export class CommentMarkerAnnotation extends BaseAnnotation {
  * @ignore
  */
 export class EllipseShapeAnnotation extends ShapeAnnotation {
-  type: 'pspdfkit/shape/ellipse' | 'shape/ellipse' | 'ellipse';
+  override type: 'pspdfkit/shape/ellipse' | 'shape/ellipse' | 'ellipse';
   cloudyBorderInset?: [number, number, number, number];
-  cloudyBorderIntensity?: number;
+  override cloudyBorderIntensity?: number;
 
   constructor(params: {
     pageIndex: number;
@@ -633,7 +633,7 @@ export class EllipseShapeAnnotation extends ShapeAnnotation {
  * @ignore
  */
 export class HighlightMarkupAnnotation extends MarkupAnnotation {
-  type: 'pspdfkit/markup/highlight' | 'markup/highlight' | 'highlight';
+  override type: 'pspdfkit/markup/highlight' | 'markup/highlight' | 'highlight';
 
   constructor(params: {
     pageIndex: number;
@@ -670,7 +670,7 @@ export class HighlightMarkupAnnotation extends MarkupAnnotation {
  * @ignore
  */
 export class ImageAnnotation extends BaseAnnotation {
-  type: 'pspdfkit/image' | 'image';
+  override type: 'pspdfkit/image' | 'image';
   contentType?: string;
   description?: string;
   fileName?: string;
@@ -723,7 +723,7 @@ export class ImageAnnotation extends BaseAnnotation {
  * @ignore
  */
 export class InkAnnotation extends BaseAnnotation {
-  type: 'pspdfkit/ink' | 'ink';
+  override type: 'pspdfkit/ink' | 'ink';
   lines: {
     points: Array<Array<[number, number]>>;
     intensities: Array<Array<number>>;
@@ -785,7 +785,7 @@ export class InkAnnotation extends BaseAnnotation {
  * @ignore
  */
 export class LineShapeAnnotation extends ShapeAnnotation {
-  type: 'pspdfkit/shape/line' | 'shape/line' | 'line';
+  override type: 'pspdfkit/shape/line' | 'shape/line' | 'line';
   startPoint?: [number, number];
   endPoint?: [number, number];
   lineCaps?: {
@@ -837,7 +837,7 @@ export class LineShapeAnnotation extends ShapeAnnotation {
  * @ignore
  */
 export class LinkAnnotation extends BaseAnnotation {
-  type: 'pspdfkit/link' | 'link';
+  override type: 'pspdfkit/link' | 'link';
   borderColor?: string;
   borderStyle?: string;
   borderWidth?: number;
@@ -888,7 +888,7 @@ export class LinkAnnotation extends BaseAnnotation {
  * @ignore
  */
 export class NoteAnnotation extends BaseAnnotation {
-  type: 'pspdfkit/note' | 'note';
+  override type: 'pspdfkit/note' | 'note';
   color?: string;
   icon?: string;
   text?: string | {
@@ -936,7 +936,7 @@ export class NoteAnnotation extends BaseAnnotation {
  * @ignore
  */
 export class MediaAnnotation extends BaseAnnotation {
-  type: 'pspdfkit/media' | 'media';
+  override type: 'pspdfkit/media' | 'media';
   contentType?: string;
   fileName?: string;
   mediaAttachmentId: string;
@@ -995,7 +995,7 @@ export class MediaAnnotation extends BaseAnnotation {
  * @ignore
  */
 export class PolygonShapeAnnotation extends ShapeAnnotation {
-  type: 'pspdfkit/shape/polygon' | 'shape/polygon' | 'polygon';
+  override type: 'pspdfkit/shape/polygon' | 'shape/polygon' | 'polygon';
   points: Array<[number, number]>;
 
   constructor(params: {
@@ -1036,7 +1036,7 @@ export class PolygonShapeAnnotation extends ShapeAnnotation {
  * @ignore
  */
 export class PolylineShapeAnnotation extends ShapeAnnotation {
-  type: 'pspdfkit/shape/polyline' | 'shape/polyline' | 'polyline';
+  override type: 'pspdfkit/shape/polyline' | 'shape/polyline' | 'polyline';
   points: Array<[number, number]>;
 
   constructor(params: {
@@ -1077,9 +1077,9 @@ export class PolylineShapeAnnotation extends ShapeAnnotation {
  * @ignore
  */
 export class RectangleShapeAnnotation extends ShapeAnnotation {
-  type: 'pspdfkit/shape/rectangle' | 'shape/rectangle' | 'rectangle';
+  override type: 'pspdfkit/shape/rectangle' | 'shape/rectangle' | 'rectangle';
   cloudyBorderInset?: [number, number, number, number];
-  cloudyBorderIntensity?: number;
+  override cloudyBorderIntensity?: number;
 
   constructor(params: {
     pageIndex: number;
@@ -1121,7 +1121,7 @@ export class RectangleShapeAnnotation extends ShapeAnnotation {
  * @ignore
  */
 export class SquigglyMarkupAnnotation extends MarkupAnnotation {
-  type: 'pspdfkit/markup/squiggly' | 'markup/squiggly' | 'squiggly';
+  override type: 'pspdfkit/markup/squiggly' | 'markup/squiggly' | 'squiggly';
 
   constructor(params: {
     pageIndex: number;
@@ -1158,7 +1158,7 @@ export class SquigglyMarkupAnnotation extends MarkupAnnotation {
  * @ignore
  */
 export class RedactionMarkupAnnotation extends MarkupAnnotation {
-  type: 'pspdfkit/markup/redaction' | 'markup/redaction' | 'redaction';
+  override type: 'pspdfkit/markup/redaction' | 'markup/redaction' | 'redaction';
   fillColor?: string;
   overlayText?: string;
   repeatOverlayText?: boolean;
@@ -1210,14 +1210,14 @@ export class RedactionMarkupAnnotation extends MarkupAnnotation {
  * @ignore
  */
 export class StampAnnotation extends BaseAnnotation {
-  type: 'pspdfkit/stamp' | 'stamp';
+  override type: 'pspdfkit/stamp' | 'stamp';
   imageAttachmentId?: string;
   stampType?: string;
   title?: string;
   subtitle?: string;
   color?: string;
   rotation?: number;
-  subject?: string;
+  override subject?: string;
   size?: [number, number];
   scale?: number;
 
@@ -1272,7 +1272,7 @@ export class StampAnnotation extends BaseAnnotation {
  * @ignore
  */
 export class StrikeOutMarkupAnnotation extends MarkupAnnotation {
-  type: 'pspdfkit/markup/strikeout' | 'markup/strikeout' | 'strikeout';
+  override type: 'pspdfkit/markup/strikeout' | 'markup/strikeout' | 'strikeout';
 
   constructor(params: {
     pageIndex: number;
@@ -1309,7 +1309,7 @@ export class StrikeOutMarkupAnnotation extends MarkupAnnotation {
  * @ignore
  */
 export class TextAnnotation extends BaseAnnotation {
-  type: 'pspdfkit/text' | 'text';
+  override type: 'pspdfkit/text' | 'text';
   text: string | { format: string; value: string };
   fontSize: number;
   fontColor: string;
@@ -1423,7 +1423,7 @@ export class TextAnnotation extends BaseAnnotation {
  * @ignore
  */
 export class UnderlineMarkupAnnotation extends MarkupAnnotation {
-  type: 'pspdfkit/markup/underline' | 'markup/underline' | 'underline';
+  override type: 'pspdfkit/markup/underline' | 'markup/underline' | 'underline';
 
   constructor(params: {
     pageIndex: number;
@@ -1460,7 +1460,7 @@ export class UnderlineMarkupAnnotation extends MarkupAnnotation {
  * @ignore
  */
 export class WidgetAnnotation extends BaseAnnotation {
-  type: 'pspdfkit/widget' | 'widget';
+  override type: 'pspdfkit/widget' | 'widget';
   horizontalAlign: 'left' | 'center' | 'right';
   verticalAlign: 'top' | 'center' | 'bottom';
   formFieldName?: string;

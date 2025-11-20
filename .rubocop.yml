@@ -1,4 +1,0 @@
-inherit_from: ../../.rubocop.yml
-
-Naming/FileName:
-  Enabled: false

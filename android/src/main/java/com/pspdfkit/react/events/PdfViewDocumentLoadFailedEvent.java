@@ -40,6 +40,10 @@ public class PdfViewDocumentLoadFailedEvent extends Event<PdfViewDocumentLoadFai
         return EVENT_NAME;
     }
 
+    public String getError() {
+        return error;
+    }
+
     @Override
     public void dispatch(RCTEventEmitter rctEventEmitter) {
         WritableMap eventData = Arguments.createMap();

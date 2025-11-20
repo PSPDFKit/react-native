@@ -12,15 +12,15 @@ Windows is not currently supported, please use the previous version [1.24.9](htt
 
 ## Support, Issues and License Questions
 
-PSPDFKit offers support for customers with an active SDK license via <https://support.nutrient.io/hc/en-us/requests/new>.
+Nutrient offers support for customers with an active SDK license via <https://support.nutrient.io/hc/en-us/requests/new>.
 
-Are you evaluating our SDK? That's great, we're happy to help out! PSPDFKit is a commercial product and requires the purchase of a license key when used in production. By default, this library will initialize in demo mode, placing a watermark on each PDF and limiting usage to 60 minutes.
+Are you evaluating our SDK? That's great, we're happy to help out! Nutrient is a commercial product and requires the purchase of a license key when used in production. By default, this library will initialize in demo mode, placing a watermark on each PDF and limiting usage to 60 minutes.
 
 To purchase a license for production use, please reach out to us via <https://www.nutrient.io/sdk/contact-sales>.
 
 ## Troubleshooting
 
-For Troubleshooting common issues you might encounter when setting up PSPDFKit for React Native, please refer to the [Troubleshooting](https://www.nutrient.io/guides/react-native/troubleshoot/) section.
+For Troubleshooting common issues you might encounter when setting up Nutrient React Native SDK, please refer to the [Troubleshooting](https://www.nutrient.io/guides/react-native/troubleshoot/) section.
 
 ## License
 

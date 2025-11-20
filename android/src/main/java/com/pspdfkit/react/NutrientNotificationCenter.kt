@@ -48,6 +48,11 @@ enum class NotificationEvent(val value: String) {
 object NutrientNotificationCenter {
     private var internalReactContext: ReactContext? = null
     private var isInUse = false
+    private var isNewArchitectureEnabled: Boolean = false
+    interface Delegate {
+        fun onEvent(eventName: String, payload: WritableMap)
+    }
+    private var delegate: Delegate? = null
     private var customAnalyticsClient = CustomAnalyticsClient()
 
     fun setReactContext(ctx: ReactContext) {
@@ -62,13 +67,25 @@ object NutrientNotificationCenter {
         return isInUse
     }
 
+    fun setIsNewArchitectureEnabled(enabled: Boolean) {
+        isNewArchitectureEnabled = enabled
+    }
+
+    fun setDelegate(newDelegate: Delegate?) {
+        delegate = newDelegate
+    }
+
     private fun sendEvent(
         eventName: String,
         params: WritableMap
     ) {
-        internalReactContext
-            ?.getJSModule(ReactContext.RCTDeviceEventEmitter::class.java)
-            ?.emit(eventName, params)
+        if (isNewArchitectureEnabled && delegate != null) {
+            delegate?.onEvent(eventName, params)
+        } else {
+            internalReactContext
+                ?.getJSModule(ReactContext.RCTDeviceEventEmitter::class.java)
+                ?.emit(eventName, params)
+        }
     }
 
     private fun createEventPayload(jsonData: WritableMap, componentID: Int): WritableMap {
@@ -86,9 +103,11 @@ object NutrientNotificationCenter {
         sendEvent(NotificationEvent.DOCUMENT_LOADED.value, payload)
     }
 
-    fun documentLoadFailed(componentID: Int) {
+    fun documentLoadFailed(code: String, message: String, componentID: Int) {
         val jsonData = Arguments.createMap()
         jsonData.putString("event", NotificationEvent.DOCUMENT_LOAD_FAILED.value)
+        jsonData.putString("code", code)
+        jsonData.putString("message", message)
         val payload = createEventPayload(jsonData, componentID)
         sendEvent(NotificationEvent.DOCUMENT_LOAD_FAILED.value, payload)
     }
@@ -334,7 +353,17 @@ object NutrientNotificationCenter {
         val attributesMap = Arguments.createMap()
         if (attributes != null) {
             for (key in attributes.keySet()) {
-                attributesMap.putString(key, attributes.getString(key))
+                val value = attributes.get(key)
+                // Preserve original types to match TypeScript type Record<string, any>
+                when (value) {
+                    is String -> attributesMap.putString(key, value)
+                    is Int -> attributesMap.putInt(key, value)
+                    is Long -> attributesMap.putDouble(key, value.toDouble())
+                    is Double -> attributesMap.putDouble(key, value)
+                    is Float -> attributesMap.putDouble(key, value.toDouble())
+                    is Boolean -> attributesMap.putBoolean(key, value)
+                    else -> attributesMap.putString(key, value?.toString() ?: "")
+                }
             }
         }
         jsonData.putString("analyticsEvent", event)

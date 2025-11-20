@@ -56,14 +56,22 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
 
     @NonNull
     private final EventDispatcher eventDispatcher;
+    private final boolean isFabricMode;
+    private final PdfView.PdfViewDelegate fabricDelegate;
 
     private boolean disableDefaultActionForTappedAnnotations = false;
     private boolean disableAutomaticSaving = false;
     private ReadableArray excludedAnnotations;
 
     PdfViewDocumentListener(@NonNull PdfView parent, @NonNull EventDispatcher eventDispatcher) {
+        this(parent, eventDispatcher, false, null);
+    }
+
+    PdfViewDocumentListener(@NonNull PdfView parent, @NonNull EventDispatcher eventDispatcher, boolean isFabricMode, @Nullable PdfView.PdfViewDelegate fabricDelegate) {
         this.parent = parent;
         this.eventDispatcher = eventDispatcher;
+        this.isFabricMode = isFabricMode;
+        this.fabricDelegate = fabricDelegate;
     }
 
     public void setDisableDefaultActionForTappedAnnotations(boolean disableDefaultActionForTappedAnnotations) {
@@ -78,16 +86,41 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
         this.excludedAnnotations = annotations;
     }
 
+    /**
+     * Routes events to React via EventDispatcher.
+     * Note: Fabric events are dispatched by the Fabric ViewManager; this listener always uses EventDispatcher.
+     */
+    private void dispatchEvent(com.facebook.react.uimanager.events.Event event) {
+        eventDispatcher.dispatchEvent(event);
+    }
+
     @Override
     public void onDocumentLoaded(@NonNull PdfDocument pdfDocument) {
-        NutrientNotificationCenter.INSTANCE.documentLoaded(pdfDocument.getDocumentIdString(), parent.getId());
-        eventDispatcher.dispatchEvent(new PdfViewDocumentLoadedEvent(parent.getId()));
-        eventDispatcher.dispatchEvent(new OnReadyEvent(parent.getId()));
+        int componentId = parent.isFabricMode() ? (parent.getComponentReferenceId() != null ? parent.getComponentReferenceId() : parent.getId()) : parent.getId();
+        NutrientNotificationCenter.INSTANCE.documentLoaded(pdfDocument.getDocumentIdString(), componentId);
+        if (isFabricMode && fabricDelegate != null) {
+            fabricDelegate.onReady();
+            fabricDelegate.onDocumentLoaded();
+        } else {
+            dispatchEvent(new OnReadyEvent(parent.getId()));
+            dispatchEvent(new PdfViewDocumentLoadedEvent(parent.getId()));
+        }
     }
 
     @Override
     public void onDocumentLoadFailed(@NonNull Throwable throwable) {
-        NutrientNotificationCenter.INSTANCE.documentLoadFailed(parent.getId());
+        int componentIdOnFail = parent.isFabricMode() ? (parent.getComponentReferenceId() != null ? parent.getComponentReferenceId() : parent.getId()) : parent.getId();
+        // Determine error code based on exception type
+        String code = (throwable instanceof com.pspdfkit.exceptions.InvalidPasswordException) ? "ENCRYPTED" : "CORRUPTED";
+        String message = throwable.getMessage() != null ? throwable.getMessage() : "Document failed to load";
+        NutrientNotificationCenter.INSTANCE.documentLoadFailed(code, message, componentIdOnFail);
+        if (isFabricMode && fabricDelegate != null) {
+            fabricDelegate.onReady();
+            fabricDelegate.onDocumentLoadFailed(throwable);
+        } else {
+            dispatchEvent(new OnReadyEvent(parent.getId()));
+            dispatchEvent(new com.pspdfkit.react.events.PdfViewDocumentLoadFailedEvent(parent.getId(), throwable.getMessage()));
+        }
     }
 
     @Override
@@ -97,12 +130,20 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
 
     @Override
     public void onDocumentSaved(@NonNull PdfDocument pdfDocument) {
-        eventDispatcher.dispatchEvent(new PdfViewDocumentSavedEvent(parent.getId()));
+        if (isFabricMode && fabricDelegate != null) {
+            fabricDelegate.onDocumentSaved();
+        } else {
+            dispatchEvent(new PdfViewDocumentSavedEvent(parent.getId()));
+        }
     }
 
     @Override
     public void onDocumentSaveFailed(@NonNull PdfDocument pdfDocument, @NonNull Throwable throwable) {
-        eventDispatcher.dispatchEvent(new PdfViewDocumentSaveFailedEvent(parent.getId(), throwable.getMessage()));
+        if (isFabricMode && fabricDelegate != null) {
+            fabricDelegate.onDocumentSaveFailed(throwable.getMessage());
+        } else {
+            dispatchEvent(new PdfViewDocumentSaveFailedEvent(parent.getId(), throwable.getMessage()));
+        }
     }
 
     @Override
@@ -119,7 +160,8 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
                 // Calculate the inverted point on the y-axis using page size
                 Size size = pdfDocument.getPageSize(pageIndex);
                 PointF clickedPoint = new PointF(pointF.x, size.height - pointF.y);
-                NutrientNotificationCenter.INSTANCE.didTapDocument(clickedPoint, pageIndex, documentID, parent.getId());
+                int componentIdTap = parent.isFabricMode() ? (parent.getComponentReferenceId() != null ? parent.getComponentReferenceId() : parent.getId()) : parent.getId();
+                NutrientNotificationCenter.INSTANCE.didTapDocument(clickedPoint, pageIndex, documentID, componentIdTap);
             }
         }
         if (annotation != null) {
@@ -127,9 +169,14 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
                 if (pointF == null) {
                     pointF = new PointF(0,0);
                 }
-                NutrientNotificationCenter.INSTANCE.didTapAnnotation(annotation, pointF, documentID, parent.getId());
+                int componentIdAnn = parent.isFabricMode() ? (parent.getComponentReferenceId() != null ? parent.getComponentReferenceId() : parent.getId()) : parent.getId();
+                NutrientNotificationCenter.INSTANCE.didTapAnnotation(annotation, pointF, documentID, componentIdAnn);
             }
-            eventDispatcher.dispatchEvent(new PdfViewAnnotationTappedEvent(parent.getId(), annotation));
+            if (isFabricMode && fabricDelegate != null) {
+                fabricDelegate.onAnnotationTapped(annotation);
+            } else {
+                dispatchEvent(new PdfViewAnnotationTappedEvent(parent.getId(), annotation));
+            }
         }
         
         return false;
@@ -147,7 +194,8 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
         if (NutrientNotificationCenter.INSTANCE.getIsNotificationCenterInUse()) {
             parent.getPdfFragment().subscribe(pdfFragment -> {
                 String documentID = pdfFragment.getDocument().getDocumentIdString();
-                NutrientNotificationCenter.INSTANCE.documentPageChanged(pageIndex, documentID, parent.getId());
+                int componentIdPg = parent.isFabricMode() ? (parent.getComponentReferenceId() != null ? parent.getComponentReferenceId() : parent.getId()) : parent.getId();
+                NutrientNotificationCenter.INSTANCE.documentPageChanged(pageIndex, documentID, componentIdPg);
             });
         }
     }
@@ -194,7 +242,8 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
         if (NutrientNotificationCenter.INSTANCE.getIsNotificationCenterInUse()) {
             parent.getPdfFragment().subscribe(pdfFragment -> {
                 String documentID = pdfFragment.getDocument().getDocumentIdString();
-                NutrientNotificationCenter.INSTANCE.didSelectAnnotations(annotation, documentID, parent.getId());
+                int componentIdSel = parent.isFabricMode() ? (parent.getComponentReferenceId() != null ? parent.getComponentReferenceId() : parent.getId()) : parent.getId();
+                NutrientNotificationCenter.INSTANCE.didSelectAnnotations(annotation, documentID, componentIdSel);
             });
         }
     }
@@ -205,10 +254,15 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
         if (NutrientNotificationCenter.INSTANCE.getIsNotificationCenterInUse()) {
             parent.getPdfFragment().subscribe(pdfFragment -> {
                 String documentID = pdfFragment.getDocument().getDocumentIdString();
-                NutrientNotificationCenter.INSTANCE.annotationsChanged("added", annotation, documentID, parent.getId());
+                int componentIdAdd = parent.isFabricMode() ? (parent.getComponentReferenceId() != null ? parent.getComponentReferenceId() : parent.getId()) : parent.getId();
+                NutrientNotificationCenter.INSTANCE.annotationsChanged("added", annotation, documentID, componentIdAdd);
             });
         }
-        eventDispatcher.dispatchEvent(new PdfViewAnnotationChangedEvent(parent.getId(), PdfViewAnnotationChangedEvent.EVENT_TYPE_ADDED, annotation));
+        if (isFabricMode && fabricDelegate != null) {
+            fabricDelegate.onAnnotationsChanged("added", annotation);
+        } else {
+            dispatchEvent(new PdfViewAnnotationChangedEvent(parent.getId(), PdfViewAnnotationChangedEvent.EVENT_TYPE_ADDED, annotation));
+        }
     }
 
     @SuppressLint("CheckResult")
@@ -217,10 +271,15 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
         if (NutrientNotificationCenter.INSTANCE.getIsNotificationCenterInUse()) {
             parent.getPdfFragment().subscribe(pdfFragment -> {
                 String documentID = pdfFragment.getDocument().getDocumentIdString();
-                NutrientNotificationCenter.INSTANCE.annotationsChanged("changed", annotation, documentID, parent.getId());
+                int componentIdChg = parent.isFabricMode() ? (parent.getComponentReferenceId() != null ? parent.getComponentReferenceId() : parent.getId()) : parent.getId();
+                NutrientNotificationCenter.INSTANCE.annotationsChanged("changed", annotation, documentID, componentIdChg);
             });
         }
-        eventDispatcher.dispatchEvent(new PdfViewAnnotationChangedEvent(parent.getId(), PdfViewAnnotationChangedEvent.EVENT_TYPE_CHANGED, annotation));
+        if (isFabricMode && fabricDelegate != null) {
+            fabricDelegate.onAnnotationsChanged("changed", annotation);
+        } else {
+            dispatchEvent(new PdfViewAnnotationChangedEvent(parent.getId(), PdfViewAnnotationChangedEvent.EVENT_TYPE_CHANGED, annotation));
+        }
     }
 
     @SuppressLint("CheckResult")
@@ -229,10 +288,15 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
         if (NutrientNotificationCenter.INSTANCE.getIsNotificationCenterInUse()) {
             parent.getPdfFragment().subscribe(pdfFragment -> {
                 String documentID = pdfFragment.getDocument().getDocumentIdString();
-                NutrientNotificationCenter.INSTANCE.annotationsChanged("removed", annotation, documentID, parent.getId());
+                int componentIdRem = parent.isFabricMode() ? (parent.getComponentReferenceId() != null ? parent.getComponentReferenceId() : parent.getId()) : parent.getId();
+                NutrientNotificationCenter.INSTANCE.annotationsChanged("removed", annotation, documentID, componentIdRem);
             });
         }
-        eventDispatcher.dispatchEvent(new PdfViewAnnotationChangedEvent(parent.getId(), PdfViewAnnotationChangedEvent.EVENT_TYPE_REMOVED, annotation));
+        if (isFabricMode && fabricDelegate != null) {
+            fabricDelegate.onAnnotationsChanged("removed", annotation);
+        } else {
+            dispatchEvent(new PdfViewAnnotationChangedEvent(parent.getId(), PdfViewAnnotationChangedEvent.EVENT_TYPE_REMOVED, annotation));
+        }
     }
 
     @Override
@@ -246,12 +310,17 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
         if (NutrientNotificationCenter.INSTANCE.getIsNotificationCenterInUse()) {
             parent.getPdfFragment().subscribe(pdfFragment -> {
                 String documentID = pdfFragment.getDocument().getDocumentIdString();
-                NutrientNotificationCenter.INSTANCE.formFieldValuesUpdated(formField, documentID, parent.getId());
+                int componentIdForm = parent.isFabricMode() ? (parent.getComponentReferenceId() != null ? parent.getComponentReferenceId() : parent.getId()) : parent.getId();
+                NutrientNotificationCenter.INSTANCE.formFieldValuesUpdated(formField, documentID, componentIdForm);
             });
         }
         Annotation annotation = formField.getFormElement().getAnnotation();
         if (annotation != null) {
-            eventDispatcher.dispatchEvent(new PdfViewAnnotationChangedEvent(parent.getId(), PdfViewAnnotationChangedEvent.EVENT_TYPE_CHANGED, annotation));
+            if (isFabricMode && fabricDelegate != null) {
+                fabricDelegate.onAnnotationsChanged("changed", annotation);
+            } else {
+                dispatchEvent(new PdfViewAnnotationChangedEvent(parent.getId(), PdfViewAnnotationChangedEvent.EVENT_TYPE_CHANGED, annotation));
+            }
         }
     }
 
@@ -266,7 +335,8 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
         if (NutrientNotificationCenter.INSTANCE.getIsNotificationCenterInUse()) {
             parent.getPdfFragment().subscribe(pdfFragment -> {
                 String documentID = pdfFragment.getDocument().getDocumentIdString();
-                NutrientNotificationCenter.INSTANCE.didDeselectAnnotations(annotation, documentID, parent.getId());
+                int componentIdDesel = parent.isFabricMode() ? (parent.getComponentReferenceId() != null ? parent.getComponentReferenceId() : parent.getId()) : parent.getId();
+                NutrientNotificationCenter.INSTANCE.didDeselectAnnotations(annotation, documentID, componentIdDesel);
             });
         }
     }
@@ -277,7 +347,8 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
         if (NutrientNotificationCenter.INSTANCE.getIsNotificationCenterInUse()) {
             parent.getPdfFragment().subscribe(pdfFragment -> {
                 String documentID = pdfFragment.getDocument().getDocumentIdString();
-                NutrientNotificationCenter.INSTANCE.didSelectFormField(formElement, documentID, parent.getId());
+                int componentIdFormSel = parent.isFabricMode() ? (parent.getComponentReferenceId() != null ? parent.getComponentReferenceId() : parent.getId()) : parent.getId();
+                NutrientNotificationCenter.INSTANCE.didSelectFormField(formElement, documentID, componentIdFormSel);
             });
         }
     }
@@ -288,7 +359,8 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
         if (NutrientNotificationCenter.INSTANCE.getIsNotificationCenterInUse()) {
             parent.getPdfFragment().subscribe(pdfFragment -> {
                 String documentID = pdfFragment.getDocument().getDocumentIdString();
-                NutrientNotificationCenter.INSTANCE.didDeSelectFormField(formElement, documentID, parent.getId());
+                int componentIdFormDesel = parent.isFabricMode() ? (parent.getComponentReferenceId() != null ? parent.getComponentReferenceId() : parent.getId()) : parent.getId();
+                NutrientNotificationCenter.INSTANCE.didDeSelectFormField(formElement, documentID, componentIdFormDesel);
             });
         }
     }
@@ -304,7 +376,8 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
         if (NutrientNotificationCenter.INSTANCE.getIsNotificationCenterInUse()) {
             parent.getPdfFragment().subscribe(pdfFragment -> {
                 String documentID = pdfFragment.getDocument().getDocumentIdString();
-                NutrientNotificationCenter.INSTANCE.documentScrolled(Map.of("currX", currX, "currY", currY, "maxX", maxX, "maxY", maxY, "extendX", extendX, "extendY", extendY), documentID, parent.getId());
+                int componentIdScroll = parent.isFabricMode() ? (parent.getComponentReferenceId() != null ? parent.getComponentReferenceId() : parent.getId()) : parent.getId();
+                NutrientNotificationCenter.INSTANCE.documentScrolled(Map.of("currX", currX, "currY", currY, "maxX", maxX, "maxY", maxY, "extendX", extendX, "extendY", extendY), documentID, componentIdScroll);
             });
         }
     }
@@ -315,7 +388,8 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
         if (NutrientNotificationCenter.INSTANCE.getIsNotificationCenterInUse()) {
             parent.getPdfFragment().subscribe(pdfFragment -> {
                 String documentID = pdfFragment.getDocument().getDocumentIdString();
-                NutrientNotificationCenter.INSTANCE.bookmarksChanged(list, documentID, parent.getId());
+                int componentIdBm = parent.isFabricMode() ? (parent.getComponentReferenceId() != null ? parent.getComponentReferenceId() : parent.getId()) : parent.getId();
+                NutrientNotificationCenter.INSTANCE.bookmarksChanged(list, documentID, componentIdBm);
             });
         }
     }

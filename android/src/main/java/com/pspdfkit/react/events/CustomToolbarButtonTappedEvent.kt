@@ -17,6 +17,14 @@ class CustomToolbarButtonTappedEvent: Event<CustomToolbarButtonTappedEvent> {
         return EVENT_NAME
     }
 
+    fun getButtonId(): String? {
+        return buttonId
+    }
+
+    fun getId(): String? {
+        return buttonId // id is same as buttonId
+    }
+
     override fun dispatch(rctEventEmitter: RCTEventEmitter) {
         val eventData = Arguments.createMap()
         eventData.putString("id", buttonId)

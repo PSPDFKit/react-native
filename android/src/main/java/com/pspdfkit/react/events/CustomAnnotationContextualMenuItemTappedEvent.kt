@@ -17,6 +17,10 @@ class CustomAnnotationContextualMenuItemTappedEvent: Event<CustomAnnotationConte
         return EVENT_NAME
     }
 
+    fun getId(): String? {
+        return buttonId
+    }
+
     override fun dispatch(rctEventEmitter: RCTEventEmitter) {
         val eventData = Arguments.createMap()
         eventData.putString("id", buttonId)

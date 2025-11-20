@@ -25,7 +25,7 @@ import com.facebook.react.uimanager.events.RCTEventEmitter;
  */
 public class PdfViewNavigationButtonClickedEvent extends Event<PdfViewNavigationButtonClickedEvent> {
 
-    public static final String EVENT_NAME = "pdfViewNavgigationButtonClicked";
+    public static final String EVENT_NAME = "pdfViewNavigationButtonClicked";
 
     public PdfViewNavigationButtonClickedEvent(@IdRes int viewId) {
         super(viewId);

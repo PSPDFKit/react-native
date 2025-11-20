@@ -68,6 +68,39 @@ public class PdfViewStateChangedEvent extends Event<PdfViewStateChangedEvent> {
         return EVENT_NAME;
     }
 
+    // Getter methods for accessing private fields
+    public boolean isDocumentLoaded() {
+        return documentIsLoaded;
+    }
+
+    public int getCurrentPageIndex() {
+        return currentPageIndex;
+    }
+
+    public int getPageCount() {
+        return pageCount;
+    }
+
+    public boolean isAnnotationCreationActive() {
+        return annotationCreationActive;
+    }
+
+    public int getAffectedPageIndex() {
+        return currentPageIndex; // affectedPageIndex is same as currentPageIndex
+    }
+
+    public boolean isAnnotationEditingActive() {
+        return annotationEditingActive;
+    }
+
+    public boolean isTextSelectionActive() {
+        return textSelectionActive;
+    }
+
+    public boolean isFormEditingActive() {
+        return formEditingActive;
+    }
+
     @Override
     public void dispatch(RCTEventEmitter rctEventEmitter) {
         WritableMap eventData = Arguments.createMap();

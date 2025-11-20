@@ -23,6 +23,7 @@ import {
   BlankPDFConfiguration,
   DocumentPDFConfiguration,
   GeneratePDFConfiguration,
+  ImagePDFConfiguration,
   TemplatePDFConfiguration,
 } from '@nutrient-sdk/react-native';
 
@@ -527,7 +528,7 @@ body {
       // In case you took image from the camera, you can use local path, instead.
       // Remote images from web URL will need to be downloaded first and then used as local path.
       let globalPath = getMainBundlePath(exampleImagePath.toString());
-      const configuration = {
+      const configuration: ImagePDFConfiguration = {
         name: fileName,
         images: [
           {

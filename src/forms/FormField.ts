@@ -271,7 +271,7 @@ export class ChoiceFormField extends FormField {
     /**
      * Whether the field is editable.
      */
-    isEditable: boolean;
+    override isEditable: boolean;
 
     /**
      * The top index of visible options.
@@ -328,7 +328,7 @@ export class TextFormField extends FormField {
     /**
      * The current value of the text field.
      */
-    value: string;
+    override value: string;
 
     /**
      * The placeholder text.

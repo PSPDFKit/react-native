@@ -1,6 +1,6 @@
 
 import { Alert, processColor, Text, TouchableOpacity, View } from 'react-native';
-import NutrientView, { Annotation, AnnotationAttachment, AnnotationType, DocumentJSON, ImageAnnotation, InkAnnotation, WidgetAnnotation } from '@nutrient-sdk/react-native';
+import NutrientView, { Annotation, AnnotationAttachment, AnnotationType, DocumentJSON, ImageAnnotation, InkAnnotation, NotificationCenter, WidgetAnnotation } from '@nutrient-sdk/react-native';
 import fileSystem from 'react-native-fs';
 
 import { exampleDocumentPath, pspdfkitColor } from '../configuration/Constants';
@@ -425,6 +425,17 @@ static imageAnnotation: ImageAnnotation = {
     };
   }
 
+  override componentDidMount(): void {
+    this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.AnnotationsEvent.ADDED, (event: any) => {
+      console.log(JSON.stringify(event));
+      this.lastAddedAnnotationUUID = event.annotations[0]?.uuid;
+    });
+
+    this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.AnnotationsEvent.CHANGED, (event: any) => {
+      console.log(JSON.stringify(event));
+    });
+  }
+
   override render() {
     return (
       <View style={styles.flex}>
@@ -433,10 +444,10 @@ static imageAnnotation: ImageAnnotation = {
           document={exampleDocumentPath}
           disableAutomaticSaving={true}
           configuration={{
-            editableAnnotationTypes: ['ink', 'freeText', 'eraser', 'signature'],
+            editableAnnotationTypes: ['ink', 'image'],
             iOSBackgroundColor: processColor('lightgrey'),
           }}
-          menuItemGrouping={['ink', 'freetext', 'eraser', 'signature']}
+          // menuItemGrouping={['ink', 'freetext', 'image']}
           style={styles.pdfColor}
           onAnnotationsChanged={(event: {
             error: any;
@@ -464,18 +475,18 @@ static imageAnnotation: ImageAnnotation = {
                               text: 'Set readOnly flag',
                               onPress: async () => {
                                 // Get the existing annotation flags
-                                const flags = await this.pdfRef.current?.getAnnotationFlags(
+                                const flags = await this.pdfRef.current?.getDocument().getAnnotationFlags(
                                   this.lastAddedAnnotationUUID!);
-                                
+
                                 // Add the READ_ONLY flag
                                 flags?.push(Annotation.Flags.READ_ONLY);
 
                                 // Set the new flags
-                                await this.pdfRef.current?.setAnnotationFlags(
+                                await this.pdfRef.current?.getDocument().setAnnotationFlags(
                                   this.lastAddedAnnotationUUID!,
                                   flags!,
                                 );
-                                this.pdfRef.current?.getAnnotationFlags(
+                                this.pdfRef.current?.getDocument().getAnnotationFlags(
                                   this.lastAddedAnnotationUUID!).then((flags: Annotation.Flags[]): any => {
                                   Alert.alert('Nutrient', `New annotation flags: ${JSON.stringify(flags)}`);
                                 });

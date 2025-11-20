@@ -74,13 +74,6 @@ export default class InstantSynchronization extends BaseExampleAutoHidingHeaderC
         syncAnnotations: this.state.syncAnnotations ?? true,
       }).then(async () => {
         console.log('Presented Instant Document');
-        // You can change properties after the document is presented programmatically like in this examples:
-        await Nutrient.setDelayForSyncingLocalChanges(
-          parseFloat(this.state.delay),
-        );
-        await Nutrient.setListenToServerChanges(
-          this.state.enableListenToServerChanges,
-        );
       });
     } catch (error: any) {
       Alert.alert('Nutrient', error.message);

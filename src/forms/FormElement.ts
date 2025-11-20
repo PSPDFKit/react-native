@@ -1,5 +1,4 @@
 import {
-    findNodeHandle,
     NativeModules
     // @ts-ignore
   } from 'react-native';

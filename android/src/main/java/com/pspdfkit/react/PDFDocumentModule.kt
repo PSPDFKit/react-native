@@ -56,6 +56,49 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
         return this.documents[reference]
     }
 
+    @ReactMethod fun setAnnotationFlags(reference: Int, uuid: String, flags: ReadableArray, promise: Promise) {
+        try {
+            this.getDocument(reference)?.document?.let { document ->
+                val allAnnotations = document.annotationProvider.getAllAnnotationsOfType(ALL_ANNOTATION_TYPES)
+                var found = false
+                for (annotation in allAnnotations) {
+                    if (annotation.uuid == uuid || (annotation.name != null && annotation.name == uuid)) {
+                        val convertedFlags = com.pspdfkit.react.helper.ConversionHelpers.getAnnotationFlags(flags)
+                        annotation.flags = convertedFlags
+                        found = true
+                        break
+                    }
+                }
+                promise.resolve(found)
+            } ?: run {
+                promise.reject("setAnnotationFlags", "Document is nil")
+            }
+        } catch (e: Throwable) {
+            promise.reject("setAnnotationFlags", e)
+        }
+    }
+
+    @ReactMethod fun getAnnotationFlags(reference: Int, uuid: String, promise: Promise) {
+        try {
+            this.getDocument(reference)?.document?.let { document ->
+                val allAnnotations = document.annotationProvider.getAllAnnotationsOfType(ALL_ANNOTATION_TYPES)
+                var convertedFlags = ArrayList<String>()
+                for (annotation in allAnnotations) {
+                    if (annotation.uuid == uuid || (annotation.name != null && annotation.name == uuid)) {
+                        val flags = annotation.flags
+                        convertedFlags = com.pspdfkit.react.helper.ConversionHelpers.convertAnnotationFlags(flags)
+                        break
+                    }
+                }
+                promise.resolve(Arguments.makeNativeArray(convertedFlags))
+            } ?: run {
+                promise.reject("getAnnotationFlags", "Document is nil")
+            }
+        } catch (e: Throwable) {
+            promise.reject("getAnnotationFlags", e)
+        }
+    }
+
     private fun getDocumentConfiguration(reference: Int): MutableMap<String, Any>? {
         return this.documentConfigurations[reference]
     }

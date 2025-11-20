@@ -5,6 +5,7 @@ import {
   Platform
   // @ts-ignore
 } from 'react-native';
+import { isNewArchitectureEnabled } from '../ArchitectureDetector';
 import {
   DocumentJSON,
   AnnotationType,
@@ -59,6 +60,22 @@ export class PDFDocument {
     }
 
    /**
+    * @private
+    * @method getRef
+    * @description Helper method to get the appropriate ref for native module calls.
+    * In Paper architecture, this uses findNodeHandle. In Fabric, this uses the pdfViewRef directly.
+    * @returns {any} The ref to use for native module calls
+    */
+    private getRef(): any {
+      var ref = findNodeHandle(this.pdfViewRef);
+      if (ref == null) {
+        // In fabric the pdfViewRef is a generated number and should be used directly
+        ref = this.pdfViewRef;
+      }
+      return ref;
+    }
+
+   /**
     * @method getDocumentId
     * @memberof PDFDocument
     * @description Returns a document identifier (inferred from a document provider if possible).
@@ -69,7 +86,7 @@ export class PDFDocument {
     * @returns { Promise<string> } A promise containing the document identifier.
     */
     getDocumentId(): Promise<string> {
-      return NativeModules.PDFDocumentManager.getDocumentId(findNodeHandle(this.pdfViewRef));
+      return NativeModules.PDFDocumentManager.getDocumentId(this.getRef());
     }
 
    /**
@@ -81,7 +98,7 @@ export class PDFDocument {
     * @returns { Promise<number> } A promise containing the document page count.
     */
     getPageCount(): Promise<number> {
-      return NativeModules.PDFDocumentManager.getPageCount(findNodeHandle(this.pdfViewRef));
+      return NativeModules.PDFDocumentManager.getPageCount(this.getRef());
     }
 
    /**
@@ -93,7 +110,7 @@ export class PDFDocument {
     * @returns { Promise<boolean> } A promise containing whether the document is encrypted.
     */
     isEncrypted(): Promise<boolean> {
-      return NativeModules.PDFDocumentManager.isEncrypted(findNodeHandle(this.pdfViewRef));
+      return NativeModules.PDFDocumentManager.isEncrypted(this.getRef());
     }
 
    /**
@@ -107,7 +124,7 @@ export class PDFDocument {
     * @returns { Promise<boolean> } A promise containing the result of the operation. ```true``` if the cache was invalidated, ```false``` otherwise.
     */
     invalidateCacheForPage(pageIndex: number): Promise<boolean> {
-      return NativeModules.PDFDocumentManager.invalidateCacheForPage(findNodeHandle(this.pdfViewRef), pageIndex);
+      return NativeModules.PDFDocumentManager.invalidateCacheForPage(this.getRef(), pageIndex);
     }
 
    /**
@@ -120,7 +137,7 @@ export class PDFDocument {
     * @returns { Promise<boolean> } A promise containing the result of the operation. ```true``` if the cache was invalidated, ```false``` otherwise.
     */
     invalidateCache(): Promise<boolean> {
-      return NativeModules.PDFDocumentManager.invalidateCache(findNodeHandle(this.pdfViewRef));
+      return NativeModules.PDFDocumentManager.invalidateCache(this.getRef());
     }
 
    /**
@@ -132,7 +149,7 @@ export class PDFDocument {
     * @returns { Promise<boolean> } A promise containing the result of the operation. ```true``` if the document was saved, ```false``` otherwise.
     */
     save(): Promise<boolean> {
-      return NativeModules.PDFDocumentManager.save(findNodeHandle(this.pdfViewRef));
+      return NativeModules.PDFDocumentManager.save(this.getRef());
     }
 
    /**
@@ -144,7 +161,7 @@ export class PDFDocument {
     * @returns { Promise<Record<string, any> | DocumentJSON> } A promise containing the unsaved annotations as an array, wrapped in a DocumentJSON object.
     */
     getAllUnsavedAnnotations(): Promise<DocumentJSON> {
-      return NativeModules.PDFDocumentManager.getAllUnsavedAnnotations(findNodeHandle(this.pdfViewRef));
+      return NativeModules.PDFDocumentManager.getAllUnsavedAnnotations(this.getRef());
     }
 
    /**
@@ -157,7 +174,7 @@ export class PDFDocument {
     * @returns { Promise<Array<AnnotationType | any>> } A promise containing the annotations of the document as an array of Annotation objects.
     */
     async getAnnotations(type?: string | Annotation.Type): Promise<Array<AnnotationType | any>> {
-      const annotations = await NativeModules.PDFDocumentManager.getAnnotations(findNodeHandle(this.pdfViewRef), type);
+      const annotations = await NativeModules.PDFDocumentManager.getAnnotations(this.getRef(), type);
       
       // For backwards compatibility, return raw results if type is not an Annotation.Type value
       if (type && !Object.values(Annotation.Type).includes(type as Annotation.Type)) {
@@ -259,7 +276,7 @@ export class PDFDocument {
     * @returns { Promise<Array<AnnotationType | any>> } A promise containing the annotations for the specified page of the document as an array.
     */
     async getAnnotationsForPage(pageIndex: number, type?: string | Annotation.Type): Promise<Array<AnnotationType | any>> {
-        const annotations = await NativeModules.PDFDocumentManager.getAnnotationsForPage(findNodeHandle(this.pdfViewRef), pageIndex, type);
+        const annotations = await NativeModules.PDFDocumentManager.getAnnotationsForPage(this.getRef(), pageIndex, type);
         
         // For backwards compatibility, return raw results if type is not an Annotation.Type value
         if (type && !Object.values(Annotation.Type).includes(type as Annotation.Type)) {
@@ -360,7 +377,7 @@ export class PDFDocument {
     * @returns { Promise<boolean> } A promise containing the result of the operation.
     */
     removeAnnotations(annotations: Array<any> | Array<AnnotationType>): Promise<boolean> {
-      return NativeModules.PDFDocumentManager.removeAnnotations(findNodeHandle(this.pdfViewRef), annotations);
+      return NativeModules.PDFDocumentManager.removeAnnotations(this.getRef(), annotations);
     }
 
    /**
@@ -377,7 +394,7 @@ export class PDFDocument {
         if (attachments == null) {
             attachments = {};
         }
-        return NativeModules.PDFDocumentManager.addAnnotations(findNodeHandle(this.pdfViewRef), annotations, attachments);
+        return NativeModules.PDFDocumentManager.addAnnotations(this.getRef(), annotations, attachments);
     }
 
    /**
@@ -390,7 +407,7 @@ export class PDFDocument {
     * @returns { Promise<boolean> } A promise containing the result of the operation. ```true``` if the document JSON was applied, and ```false``` if an error occurred.
     */
     applyInstantJSON(documentJSON: DocumentJSON): Promise<boolean> {
-      return NativeModules.PDFDocumentManager.applyInstantJSON(findNodeHandle(this.pdfViewRef), documentJSON);
+      return NativeModules.PDFDocumentManager.applyInstantJSON(this.getRef(), documentJSON);
     }
 
    /**
@@ -403,7 +420,7 @@ export class PDFDocument {
     * @returns { Promise<any> } A promise containing an object with the result. ```true``` if the xfdf file was imported successfully, and ```false``` if an error occurred.
     */
     importXFDF(filePath: string): Promise<boolean> {
-      return NativeModules.PDFDocumentManager.importXFDF(findNodeHandle(this.pdfViewRef), filePath);
+      return NativeModules.PDFDocumentManager.importXFDF(this.getRef(), filePath);
     }
 
    /**
@@ -416,7 +433,7 @@ export class PDFDocument {
     * @returns { Promise<any> } A promise containing an object with the exported file path and result. ```true``` if the xfdf file was exported successfully, and ```false``` if an error occurred.
     */
     exportXFDF(filePath: string): Promise<any> {
-      return NativeModules.PDFDocumentManager.exportXFDF(findNodeHandle(this.pdfViewRef), filePath);
+      return NativeModules.PDFDocumentManager.exportXFDF(this.getRef(), filePath);
     }
 
    /**
@@ -426,28 +443,53 @@ export class PDFDocument {
     * @description Used to set the current page of the document. Starts at 0.
     * @example
     * await this.pdfRef.current?.getDocument().setPageIndex(5);
-    * @returns { Promise<void> } A promise returning when done.
+  * @returns { Promise<void> } A promise returning when done.
     */
-    async setPageIndex(pageIndex: number): Promise<void> {
+  async setPageIndex(pageIndex: number): Promise<void> {
         if (pageIndex < 0 || pageIndex >= (await this.getPageCount())) {
             return Promise.reject(new Error('Page index out of bounds'));
         }
-        if (Platform.OS === 'android') {
-            UIManager.dispatchViewManagerCommand(findNodeHandle(this.pdfViewRef),
-            UIManager.getViewManagerConfig('RCTPSPDFKitView').Commands.setPageIndex,
-            [pageIndex],
-        );
+    // New Architecture (Fabric): call TurboModule API for iOS/Android
+    if (isNewArchitectureEnabled()) {
+      try {
+        // @ts-ignore - dynamically require to avoid import errors in Paper architecture
+        const NativeNutrientViewTurboModule = require('../specs/NativeNutrientViewTurboModule').default;
+        const ref = this.getRef();
+        const reference = String(ref);
+        await NativeNutrientViewTurboModule.setPageIndex(reference, pageIndex, true);
+        return;
+      } catch (_) {
+        // Fallback to legacy flow below if TurboModule fails
+      }
+    }
+
+    if (Platform.OS === 'android') {
+            const ref = this.getRef();
+            if (ref == null) {
+                return Promise.reject(new Error('PDF view reference is not available'));
+            }
+            // getRef() returns number in both old and new architecture for Android
+            const nodeHandle = typeof ref === 'number' ? ref : findNodeHandle(this.pdfViewRef);
+            if (nodeHandle == null) {
+                return Promise.reject(new Error('PDF view reference is not available'));
+            }
+            const viewManagerConfig = UIManager.getViewManagerConfig('RCTPSPDFKitView');
+            const command = viewManagerConfig?.Commands?.setPageIndex;
+            if (command == null) {
+                return Promise.reject(new Error('setPageIndex command is not available'));
+            }
+            UIManager.dispatchViewManagerCommand(nodeHandle, command, [pageIndex]);
         return Promise.resolve();
         } else if (Platform.OS === 'ios') {
             if (NativeModules.RCTPSPDFKitViewManager != null) {
                 NativeModules.RCTPSPDFKitViewManager.setPageIndex(
                     pageIndex,
-                    findNodeHandle(this.pdfViewRef),
+                    this.getRef(),
                 );
             } else {
                 NativeModules.PSPDFKitViewManager.setPageIndex(
                 pageIndex,
-                findNodeHandle(this.pdfViewRef),
+                this.getRef(),
                 );
             }
             return Promise.resolve();
@@ -464,7 +506,7 @@ export class PDFDocument {
     * @returns { Promise<PDFPageInfo> } A promise containing the page info.
     */
     getPageInfo(pageIndex: number): Promise<PDFPageInfo> {
-        return NativeModules.PDFDocumentManager.getPageInfo(findNodeHandle(this.pdfViewRef), pageIndex);
+        return NativeModules.PDFDocumentManager.getPageInfo(this.getRef(), pageIndex);
     }
 
    /**
@@ -477,7 +519,7 @@ export class PDFDocument {
     * @returns { Promise<boolean> } Returns a promise containing the result of the operation. ```true``` if the bookmarks were added, and ```false``` if an error occurred.
     */
     addBookmarks(bookmarks: Array<Bookmark>): Promise<boolean> {
-        return NativeModules.PDFDocumentManager.addBookmarks(findNodeHandle(this.pdfViewRef), bookmarks);
+        return NativeModules.PDFDocumentManager.addBookmarks(this.getRef(), bookmarks);
     }
 
    /**
@@ -490,7 +532,7 @@ export class PDFDocument {
     * @returns { Promise<boolean> } Returns a promise containing the result of the operation. ```true``` if the bookmarks were removed, and ```false``` if an error occurred.
     */
     removeBookmarks(bookmarks: Array<Bookmark>): Promise<boolean> {
-        return NativeModules.PDFDocumentManager.removeBookmarks(findNodeHandle(this.pdfViewRef), bookmarks);
+        return NativeModules.PDFDocumentManager.removeBookmarks(this.getRef(), bookmarks);
     }
 
    /**
@@ -502,6 +544,34 @@ export class PDFDocument {
     * @returns { Promise<Array<Bookmark>> } Returns a promise containing an array of bookmarks.
     */
     getBookmarks(): Promise<Array<Bookmark>> {
-        return NativeModules.PDFDocumentManager.getBookmarks(findNodeHandle(this.pdfViewRef));
+        return NativeModules.PDFDocumentManager.getBookmarks(this.getRef());
     }
+
+  /**
+   * Sets the flags of the specified annotation.
+   *
+   * @method setAnnotationFlags
+   * @memberof PDFDocument
+   * @param { string } uuid The UUID of the annotation to update.
+   * @param { Annotation.Flags[] } flags The flags to apply to the annotation.
+   * @example
+   * const result = await this.pdfRef.current?.getDocument().setAnnotationFlags('bb61b1bf-eacd-4227-a5bf-db205e591f5a', ['locked', 'hidden']);
+   * @returns { Promise<boolean> } A promise resolving to ```true``` if the annotations were added successfully, and ```false``` if an error occurred.
+   */
+  setAnnotationFlags(uuid: string, flags: Annotation.Flags[]): Promise<boolean> {
+    return NativeModules.PDFDocumentManager.setAnnotationFlags(this.getRef(), uuid, flags);
+  }
+  /**
+   * Gets the flags for the specified annotation.
+   *
+   * @method getAnnotationFlags
+   * @memberof PDFDocument
+   * @param { string } uuid The UUID of the annotation to query.
+   * @example
+   * const flags = await this.pdfRef.current?.getDocument().getAnnotationFlags('bb61b1bf-eacd-4227-a5bf-db205e591f5a');
+   * @returns { Promise<Annotation.Flags[]> } A promise containing the flags of the specified annotation.
+   */
+  getAnnotationFlags(uuid: string): Promise<Annotation.Flags[]> {
+    return NativeModules.PDFDocumentManager.getAnnotationFlags(this.getRef(), uuid);
+  }
 }

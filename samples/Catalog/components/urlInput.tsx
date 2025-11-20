@@ -4,6 +4,10 @@ import { Modal, StyleSheet, Text, TextInput, View } from 'react-native';
 import LinkButton from './linkButton';
 import PrimaryButton from './primaryButton';
 
+interface LinkButtonStyle {
+  container?: { marginRight?: number };
+}
+
 const UrlInput = ({
   shouldRender = false,
   // @ts-ignore
@@ -35,7 +39,7 @@ const UrlInput = ({
             <LinkButton
               title={'Cancel'}
               onPress={onCancel}
-              style={styles.linkButton}
+              style={{ container: { marginRight: 10 } }}
             />
             <PrimaryButton
               title={'Connect'}
@@ -79,8 +83,6 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     paddingBottom: 15,
   },
-  // @ts-ignore
-  linkButton: { container: { marginRight: 10 } },
   title: {
     fontSize: 19,
     height: 25,

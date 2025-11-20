@@ -1,15 +1,26 @@
 import React from 'react';
-import { Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { Text, TouchableOpacity, StyleSheet, ViewStyle, TextStyle } from 'react-native';
 import { pspdfkitColor } from '../configuration/Constants';
 
-const PrimaryButton = ({ title = '', onPress = () => {}, style = {} }) => {
+interface PrimaryButtonStyle {
+  container?: ViewStyle;
+  text?: TextStyle;
+}
+
+interface PrimaryButtonProps {
+  title?: string;
+  onPress?: () => void;
+  style?: PrimaryButtonStyle;
+}
+
+const PrimaryButton = ({ title = '', onPress = () => {}, style = {} }: PrimaryButtonProps) => {
   return (
     <TouchableOpacity
       // @ts-ignore
       style={[styles.primaryButton, style?.container ?? {}]}
       onPress={onPress}
     >
-      <Text style={[styles.primaryButtonText, style?.text ?? {}]}>{title}</Text>
+      <Text style={[styles.primaryButtonText, style?.text]}>{title}</Text>
     </TouchableOpacity>
   );
 };

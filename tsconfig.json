@@ -7,5 +7,6 @@
         "rootDir": "src",
         "skipLibCheck": true,
         "outDir": "./lib",
+        "esModuleInterop": true
     }
 }

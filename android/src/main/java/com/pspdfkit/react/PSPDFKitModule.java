@@ -101,15 +101,18 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
     @Nullable
     private Promise lastPresentPromise;
 
+    private final com.pspdfkit.react.common.NutrientModuleController controller;
+
     public PSPDFKitModule(ReactApplicationContext reactContext) {
         super(reactContext);
+        controller = new com.pspdfkit.react.common.NutrientModuleController(reactContext);
+        controller.initialize();
     }
 
     @Override
     public void initialize() {
         super.initialize();
-        getReactApplicationContext().addActivityEventListener(this);
-        NutrientNotificationCenter.INSTANCE.setReactContext(getReactApplicationContext());
+        // Now handled inside controller.initialize()
     }
 
     @Override
@@ -129,201 +132,46 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
 
     @ReactMethod
     public void present(@NonNull String document, @NonNull ReadableMap configuration, @Nullable Promise promise) {
-        if(PSPDFKitUtils.isValidPdf(document)) {
-            lastPresentPromise = promise;
-            presentPdf(document, configuration, promise);
-        } else if(PSPDFKitUtils.isValidImage(document)) {
-            lastPresentPromise = promise;
-            presentImage(document, configuration, promise);
-        }else {
-            Throwable error = new Throwable("The document must be one of these file types: .pdf, .jpg, .png, .jpeg, .tif, .tiff");
-            if (promise!=null){
-                promise.reject(error);
-            }
-        }
+        controller.present(document, configuration, promise);
     }
 
     @ReactMethod
     public void presentPdf(@NonNull String document, @NonNull ReadableMap configuration, @Nullable Promise promise) {
-        if (getReactApplicationContext().getCurrentActivity() != null) {
-            if (resumedActivity == null) {
-                // We register an activity lifecycle callback so we can get notified of the current activity.
-                getReactApplicationContext().getCurrentActivity().getApplication().registerActivityLifecycleCallbacks(this);
-            }
-            ConfigurationAdapter configurationAdapter = new ConfigurationAdapter(getReactApplicationContext().getCurrentActivity(), configuration);
-            // This is an edge case where file scheme is missing.
-            if (Uri.parse(document).getScheme() == null) {
-                document = FILE_SCHEME + document;
-            }
-
-            lastPresentPromise = promise;
-            PdfActivity.showDocument(getReactApplicationContext().getCurrentActivity(), Uri.parse(document), configurationAdapter.build());
-        }
+        controller.presentPdf(document, configuration, promise);
     }
 
     @ReactMethod
     public void presentImage(@NonNull String imageDocument, @NonNull ReadableMap configuration, @Nullable Promise promise) {
-        if (getReactApplicationContext().getCurrentActivity() != null) {
-            if (resumedActivity == null) {
-                // We register an activity lifecycle callback so we can get notified of the current activity.
-                getReactApplicationContext().getCurrentActivity().getApplication().registerActivityLifecycleCallbacks(this);
-            }
-            ConfigurationAdapter configurationAdapter = new ConfigurationAdapter(getReactApplicationContext().getCurrentActivity(), configuration);
-            // This is an edge case where file scheme is missing.
-            if (Uri.parse(imageDocument).getScheme() == null) {
-                imageDocument = FILE_SCHEME + imageDocument;
-            }
-
-            lastPresentPromise = promise;
-            PdfActivity.showImage(getReactApplicationContext().getCurrentActivity(), Uri.parse(imageDocument), configurationAdapter.build());
-        }
+        controller.presentImage(imageDocument, configuration, promise);
     }
 
     @ReactMethod
     public void presentInstant(@NonNull ReadableMap documentData, @NonNull ReadableMap configuration, @Nullable Promise promise) {
-        String serverUrl = documentData.getString("serverUrl");
-        String jwt = documentData.getString("jwt");
-
-        if (serverUrl == null || jwt == null) {
-            Throwable error = new Throwable("serverUrl and jwt are required");
-            if (promise != null) {
-                promise.reject(error);
-            }
-            return;
-        }
-
-        if (getReactApplicationContext().getCurrentActivity() != null) {
-            if (resumedActivity == null) {
-                // We register an activity lifecycle callback so we can get notified of the current activity.
-                getReactApplicationContext().getCurrentActivity().getApplication().registerActivityLifecycleCallbacks(this);
-            }
-            ConfigurationAdapter configurationAdapter = new ConfigurationAdapter(getReactApplicationContext().getCurrentActivity(), configuration);
-
-            lastPresentPromise = promise;
-
-            Handler mainHandler = new Handler(getReactApplicationContext().getMainLooper());
-            Runnable myRunnable = new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        RNInstantPdfActivity.showInstantDocument(getReactApplicationContext().getCurrentActivity(), serverUrl, jwt, configurationAdapter.build());
-                    } catch (Exception e) {
-                        // Could not start instant
-                    }
-                }
-            };
-            mainHandler.post(myRunnable);
-        }
+        controller.presentInstant(documentData, configuration, promise);
     }
     
     @ReactMethod
     public synchronized void setPageIndex(final int pageIndex, final boolean animated) {
-        if (resumedActivity instanceof PdfActivity) {
-            final PdfActivity activity = (PdfActivity) resumedActivity;
-            activity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if (activity.getDocument() != null) {
-                        // If the document is loaded we can instantly set the page index.
-                        activity.setPageIndex(pageIndex, animated);
-                    } else {
-                        activity.getPdfFragment().addDocumentListener(new SimpleDocumentListener() {
-                            @Override
-                            public void onDocumentLoaded(@NonNull PdfDocument document) {
-                                // Once the document is loaded set the page index.
-                                activity.setPageIndex(pageIndex, animated);
-                                activity.getPdfFragment().removeDocumentListener(this);
-                            }
-                        });
-                    }
-                }
-            });
-        } else {
-            // Queue up a runnable to set the page index as soon as a PdfActivity is available.
-            onPdfActivityOpenedTask = new Runnable() {
-                @Override
-                public void run() {
-                    setPageIndex(pageIndex, animated);
-                }
-            };
-        }
+        controller.setPageIndex(pageIndex, animated);
     }
 
     @ReactMethod(isBlockingSynchronousMethod = true)
     public boolean setLicenseKey(@Nullable String licenseKey) {
-        try {
-            if (licenseKey == null) {
-                licenseKey = "";
-            }
-            InitializationOptions options = new InitializationOptions(licenseKey, emptyList(), CrossPlatformTechnology.ReactNative, null);
-            Nutrient.initialize(getReactApplicationContext(), options);
-            return true;
-        } catch (InvalidNutrientLicenseException e) {
-            return false;
-        }
+        return controller.setLicenseKey(licenseKey);
     }
 
     @ReactMethod(isBlockingSynchronousMethod = true)
     public WritableMap getDocumentProperties(@Nullable String documentPath) {
-        WritableMap properties = Arguments.createMap();
-
-        try {
-            if (Uri.parse(documentPath).getScheme() == null) {
-                try {
-                    File file = new File(documentPath);
-                    documentPath = Uri.fromFile(file).toString();
-                } catch (Exception e) {
-                    documentPath = FILE_SCHEME + documentPath;
-                }
-            }
-
-            PdfDocument document = PdfDocumentLoader.openDocument(getReactApplicationContext(), Uri.parse(documentPath));
-            properties.putString("documentId", document.getDocumentIdString());
-            properties.putInt("pageCount", document.getPageCount());
-            properties.putBoolean("isEncrypted", document.isEncrypted());
-
-        } catch (IOException e) {
-            if (e instanceof InvalidPasswordException) {
-                properties.putInt("pageCount", 0);
-                properties.putBoolean("isEncrypted", true);
-            } else {
-                properties.putString("documentId", null);
-                properties.putInt("pageCount", 0);
-                properties.putBoolean("isEncrypted", false);
-            }
-        }
-
-        return properties;
+        return controller.getDocumentProperties(documentPath);
     }
 
     @ReactMethod(isBlockingSynchronousMethod = true)
     public boolean setLicenseKeys(@Nullable String androidLicenseKey, @Nullable String iOSLicenseKey) {
-        // Here, we ignore the `iOSLicenseKey` parameter and only care about `androidLicenseKey`.
+        // Ignore the `iOSLicenseKey` parameter since we only need the `androidLicenseKey`.
         // `iOSLicenseKey` will be used to activate the license on iOS.
-        try {
-            if (androidLicenseKey == null) {
-                androidLicenseKey = "";
-            }
-            InitializationOptions options = new InitializationOptions(androidLicenseKey, emptyList(), CrossPlatformTechnology.ReactNative, null);
-            Nutrient.initialize(getReactApplicationContext(), options);
-            return true;
-        } catch (InvalidNutrientLicenseException e) {
-            return false;
-        }
+        return controller.setLicenseKey(androidLicenseKey);
     }
 
-    private PdfProcessorTask setupProcessAnnotations(@NonNull final PdfDocument document,
-                                                @NonNull final String processingMode,
-                                                @Nullable final ReadableArray annotationTypes) {
-
-        PdfProcessorTask task = PdfProcessorTask.fromDocument(document);
-        final EnumSet<AnnotationType> types = ConversionHelpers.getAnnotationTypes(annotationTypes);
-        final PdfProcessorTask.AnnotationProcessingMode mode = getProcessingModeFromString(processingMode);
-        for (AnnotationType type : types) {
-            task.changeAnnotationsOfType(type, mode);
-        }
-        return task;
-    }
 
     @ReactMethod
     public void processAnnotations(@NonNull final String processingMode,
@@ -332,34 +180,7 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
                                    @NonNull final String targetDocumentPath,
                                    @Nullable final String password,
                                    @NonNull final Promise promise) {
-
-        // This is an edge case where file scheme is missing.
-        String documentPath = Uri.parse(sourceDocumentPath).getScheme() == null
-                ? FILE_SCHEME + sourceDocumentPath : sourceDocumentPath;
-
-        if (password != null) {
-            PdfDocumentLoader.openDocumentAsync(getReactApplicationContext(), Uri.parse(documentPath), password)
-                    .flatMapCompletable(document -> {
-                        PdfProcessorTask task = this.setupProcessAnnotations(document, processingMode, annotationTypes);
-                        return PdfProcessor.processDocumentAsync(task, new File(targetDocumentPath)).ignoreElements();
-                    })
-                    .subscribe(() -> {
-                        promise.resolve(Boolean.TRUE);
-                    }, throwable -> {
-                        promise.reject(throwable);
-                    });
-        } else {
-            PdfDocumentLoader.openDocumentAsync(getReactApplicationContext(), Uri.parse(documentPath))
-                    .flatMapCompletable(document -> {
-                        PdfProcessorTask task = this.setupProcessAnnotations(document, processingMode, annotationTypes);
-                        return PdfProcessor.processDocumentAsync(task, new File(targetDocumentPath)).ignoreElements();
-                    })
-                    .subscribe(() -> {
-                        promise.resolve(Boolean.TRUE);
-                    }, throwable -> {
-                        promise.reject(throwable);
-                    });
-        }
+        controller.processAnnotations(processingMode, annotationTypes, sourceDocumentPath, targetDocumentPath, password, promise);
     }
 
     @ReactMethod
@@ -404,21 +225,6 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
         }
     }
 
-    private static PdfProcessorTask.AnnotationProcessingMode getProcessingModeFromString(@NonNull final String mode) {
-        if ("print".equalsIgnoreCase(mode)) {
-            return PdfProcessorTask.AnnotationProcessingMode.PRINT;
-        } else if ("remove".equalsIgnoreCase(mode)) {
-            // Called remove to match iOS.
-            return PdfProcessorTask.AnnotationProcessingMode.DELETE;
-        } else if ("flatten".equalsIgnoreCase(mode)) {
-            return PdfProcessorTask.AnnotationProcessingMode.FLATTEN;
-        } else if ("embed".equalsIgnoreCase(mode)) {
-            // Called embed to match iOS.
-            return PdfProcessorTask.AnnotationProcessingMode.KEEP;
-        } else {
-            return PdfProcessorTask.AnnotationProcessingMode.KEEP;
-        }
-    }
 
     @NonNull
     @Override

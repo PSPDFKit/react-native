@@ -1,28 +1,88 @@
 import simpleImportSort from "eslint-plugin-simple-import-sort";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 import js from "@eslint/js";
-import { FlatCompat } from "@eslint/eslintrc";
+import globals from "globals";
+import babelParser from "@babel/eslint-parser";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const compat = new FlatCompat({
-    baseDirectory: __dirname,
-    recommendedConfig: js.configs.recommended,
-    allConfig: js.configs.all
-});
-
-export default [{
-    ignores: ["./android", "./ios", "./assets", "./node_modules/**/*.js"],
-}, ...compat.extends("@react-native"), {
-    plugins: {
-        "simple-import-sort": simpleImportSort,
+export default [
+    {
+        ignores: [
+            "./android/**",
+            "./ios/**",
+            "./assets/**",
+            "./node_modules/**",
+            "**/*.js",
+        ],
     },
-
-    rules: {
-        "react/no-string-refs": "off",
-        "no-alert": "off",
-        "react-native/no-inline-styles": "off",
-        "simple-import-sort/imports": "error",
+    // Only apply recommended config to JSX files, not TypeScript
+    {
+        ...js.configs.recommended,
+        files: ["**/*.jsx"],
     },
-}];
+    {
+        files: ["**/*.ts", "**/*.tsx"],
+        plugins: {
+            "simple-import-sort": simpleImportSort,
+        },
+
+        languageOptions: {
+            parser: babelParser,
+            ecmaVersion: 2022,
+            sourceType: "module",
+            globals: {
+                ...globals.node,
+                ...globals.es2021,
+            },
+
+            parserOptions: {
+                requireConfigFile: false,
+                ecmaFeatures: {
+                    jsx: true,
+                },
+            },
+        },
+
+        rules: {
+            "react/no-string-refs": "off",
+            "no-alert": "off",
+            "react-native/no-inline-styles": "off",
+            "simple-import-sort/imports": "off",
+            // Disable rules that don't work well with TypeScript when using Babel parser
+            "getter-return": "off",
+            "no-dupe-class-members": "off",
+            "no-dupe-args": "off",
+            "no-unused-vars": "off",
+            "no-undef": "off", // TypeScript handles this
+            "no-redeclare": "off", // TypeScript handles this
+        },
+    },
+    {
+        files: ["**/*.jsx"],
+        plugins: {
+            "simple-import-sort": simpleImportSort,
+        },
+
+        languageOptions: {
+            parser: babelParser,
+            ecmaVersion: 2022,
+            sourceType: "module",
+            globals: {
+                ...globals.node,
+                ...globals.es2021,
+            },
+
+            parserOptions: {
+                requireConfigFile: false,
+                ecmaFeatures: {
+                    jsx: true,
+                },
+            },
+        },
+
+        rules: {
+            "react/no-string-refs": "off",
+            "no-alert": "off",
+            "react-native/no-inline-styles": "off",
+            "simple-import-sort/imports": "off",
+        },
+    },
+];

@@ -18,9 +18,21 @@ Pod::Spec.new do |s|
   s.platform          = :ios, "16.0"
   s.module_name       = "PSPDFKitReactNativeiOS"
   s.source            = { git: "https://github.com/PSPDFKit/react-native" }
-  s.source_files      = "ios/*.{xcodeproj}", "ios/RCTPSPDFKit/*.{h,m,swift}", "ios/RCTPSPDFKit/Converters/*.{h,m,swift}", "ios/RCTPSPDFKit/Helpers/*.{h,m,swift}"
-  s.dependency("React")
-  s.dependency("PSPDFKit", "26.1.0")
-  s.dependency("Instant", "26.1.0")
+
+  # Include all source files
+  s.source_files      = "ios/*.{xcodeproj}", "ios/**/*.{h,m,swift,mm}"
+
+  # Don't expose Fabric C++ headers publicly to prevent compilation conflicts
+  s.project_header_files = "ios/Fabric/**/*.h"
+
+  # Call install_modules_dependencies to set up C++ environment
+  if !defined?(install_modules_dependencies).nil?
+    install_modules_dependencies(s)
+  else
+    s.dependency("React")
+  end
+
+  s.dependency("PSPDFKit", "26.2.0")
+  s.dependency("Instant", "26.2.0")
   s.frameworks = "UIKit"
 end

@@ -1,12 +1,17 @@
-## 3.2.0 - 20 Oct 2025
+## 4.0.0 — 20 Nov 2025
+
+- Adds support for React Native’s new architecture. (J#HYB-847)
+- Updates the `onDocumentLoadFailed` and `DocumentEvent.LOAD_FAILED` events to include a reason code and message. (J#HYB-903)
+
+## 3.2.0 — 20 Oct 2025
 
 - Adds the page size to the existing `getPageInfo` API call. (J#HYB-888)
 - Adds the `androidEnableStylusOnDetection` option to the `PDFConfiguration` object to control stylus detection on Android. (J#HYB-893)
-- Updates related to Nutrient Android SDK 10.7.0.
-- Updates related to Nutrient iOS SDK 26.1.0.
+- Updates for Nutrient Android SDK 10.7.0.
+- Updates for Nutrient iOS SDK 26.1.0.
 - Fixes image annotations being incorrectly placed when added on pages with a rotation or crop box. (J#IOS-767)
 - Fixes an issue where the `presentInstant` API call would never resolve its promise on iOS. (J#HYB-894)
-- Fixes an issue where the `onDocumentLoadFailed` callback wasn`t triggered for invalid documents on iOS. (J#HYB-885)
+- Fixes an issue where the `onDocumentLoadFailed` callback wasn’t triggered for invalid documents on iOS. (J#HYB-885)
 
 ## 3.1.1 - 19 Sep 2025
 

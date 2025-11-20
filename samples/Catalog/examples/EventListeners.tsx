@@ -26,68 +26,68 @@ export class EventListeners extends BaseExampleAutoHidingHeaderComponent {
       this.setState({ documentPath: writableFormDocumentPath });
     });
 
-    this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.TextEvent.SELECTED, (event: any) => {
-      console.log(event);
+    this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.TextEvent.SELECTED, (payload: NotificationCenter.TextSelectedPayload) => {
+      console.log(payload);
     });
 
-    this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.DocumentEvent.LOADED, (event: any) => {
-      console.log(event);
+    this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.DocumentEvent.LOADED, (payload: NotificationCenter.DocumentLoadedPayload) => {
+      console.log(payload);
     });
 
-    this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.DocumentEvent.PAGE_CHANGED, (event: any) => {
-      console.log(event);
+    this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.DocumentEvent.PAGE_CHANGED, (payload: NotificationCenter.DocumentPageChangedPayload) => {
+      console.log(payload);
     });
 
-    this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.DocumentEvent.SCROLLED, (event: any) => {
-      console.log(event);
+    this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.DocumentEvent.SCROLLED, (payload: NotificationCenter.DocumentScrolledPayload) => {
+      console.log(payload);
     });
 
-    this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.DocumentEvent.TAPPED, (event: any) => {
-      console.log(event);
+    this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.DocumentEvent.TAPPED, (payload: NotificationCenter.DocumentTappedPayload) => {
+      console.log(payload);
     });
 
-    this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.AnnotationsEvent.ADDED, (event: any) => {
-      Alert.alert('Nutrient', JSON.stringify(event));
+    this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.AnnotationsEvent.ADDED, (payload: NotificationCenter.AnnotationsAddedPayload) => {
+      Alert.alert('Nutrient', JSON.stringify(payload));
     });
 
-    this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.AnnotationsEvent.REMOVED, (event: any) => {
-      Alert.alert('Nutrient', JSON.stringify(event));
+    this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.AnnotationsEvent.REMOVED, (payload: NotificationCenter.AnnotationsRemovedPayload) => {
+      Alert.alert('Nutrient', JSON.stringify(payload));
     });
 
-    this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.AnnotationsEvent.CHANGED, (event: any) => {
-      Alert.alert('Nutrient', JSON.stringify(event));
+    this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.AnnotationsEvent.CHANGED, (payload: NotificationCenter.AnnotationChangedPayload) => {
+      Alert.alert('Nutrient', JSON.stringify(payload));
     });
 
-    this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.FormFieldEvent.SELECTED, (event: any) => {
-      Alert.alert('Nutrient', JSON.stringify(event));
+    this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.FormFieldEvent.SELECTED, (payload: NotificationCenter.FormFieldSelectedPayload) => {
+      Alert.alert('Nutrient', JSON.stringify(payload));
     });
 
-    this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.FormFieldEvent.DESELECTED, (event: any) => {
-      Alert.alert('Nutrient', JSON.stringify(event));
+    this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.FormFieldEvent.DESELECTED, (payload: NotificationCenter.FormFieldDeselectedPayload) => {
+      Alert.alert('Nutrient', JSON.stringify(payload));
     });
 
-    this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.FormFieldEvent.VALUES_UPDATED, (event: any) => {
-      Alert.alert('Nutrient', JSON.stringify(event));
+    this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.FormFieldEvent.VALUES_UPDATED, (payload: NotificationCenter.FormFieldValuesUpdatedPayload) => {
+      Alert.alert('Nutrient', JSON.stringify(payload));
     });
 
-    this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.AnnotationsEvent.SELECTED, (event: any) => {
-      Alert.alert('Nutrient', JSON.stringify(event));
+    this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.AnnotationsEvent.SELECTED, (payload: NotificationCenter.AnnotationsSelectedPayload) => {
+      Alert.alert('Nutrient', JSON.stringify(payload));
     });
 
-    this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.AnnotationsEvent.DESELECTED, (event: any) => {
-      Alert.alert('Nutrient', JSON.stringify(event));
+    this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.AnnotationsEvent.DESELECTED, (payload: NotificationCenter.AnnotationsDeselectedPayload) => {
+      Alert.alert('Nutrient', JSON.stringify(payload));
     });
 
-    this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.AnnotationsEvent.TAPPED, (event: any) => {
-      Alert.alert('Nutrient', JSON.stringify(event));
+    this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.AnnotationsEvent.TAPPED, (payload: NotificationCenter.AnnotationTappedPayload) => {
+      Alert.alert('Nutrient', JSON.stringify(payload));
     });
 
-    this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.AnalyticsEvent.ANALYTICS, (event: any) => {
-      console.log(event)
+    this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.AnalyticsEvent.ANALYTICS, (payload: NotificationCenter.AnalyticsPayload) => {
+      console.log(payload)
     });
 
-    this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.BookmarksEvent.CHANGED, (event: any) => {
-      Alert.alert('Nutrient', 'Bookmarks Changed: ' + JSON.stringify(event));
+    this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.BookmarksEvent.CHANGED, (payload: NotificationCenter.BookmarksChangedPayload) => {
+      Alert.alert('Nutrient', 'Bookmarks Changed: ' + JSON.stringify(payload));
     });
   }
 

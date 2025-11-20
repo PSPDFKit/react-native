@@ -23,25 +23,18 @@ class RemoteDocumentDownloader(private val remoteURL: String,
                                private val context: Context,
                                private val fragmentManager: FragmentManager) {
 
-    fun startDownload(callback: (File?) -> Unit) {
-        val source: WebDownloadSource = try {
-            // Try to parse the URL pointing to the PDF document.
-            WebDownloadSource(URL(remoteURL))
-        } catch (e: MalformedURLException) {
-            // Error while trying to parse the PDF Download URL
-            return
-        }
+    fun startDownload(callback: (File?, Throwable?) -> Unit) {
+        try {
+            val source = WebDownloadSource(URL(remoteURL))
 
-        if (overwriteExisting && destinationFileURL != null) {
-            val delete = destinationFileURL?.let { File(it) }
-            if (delete != null) {
-                if (delete.exists()) {
+            if (overwriteExisting && destinationFileURL != null) {
+                val delete = destinationFileURL?.let { File(it) }
+                if (delete != null && delete.exists()) {
                     delete.delete()
                 }
             }
-        }
 
-        val request = DownloadRequest.Builder(context)
+            val request = DownloadRequest.Builder(context)
                 .source(source)
                 .outputFile(if (destinationFileURL == null)
                     File(context.getDir("documents", Context.MODE_PRIVATE), "temp.pdf") else
@@ -50,19 +43,33 @@ class RemoteDocumentDownloader(private val remoteURL: String,
                 .useTemporaryOutputFile(false)
                 .build()
 
-        val job = DownloadJob.startDownload(request)
-        job.setProgressListener(object : DownloadJob.ProgressListenerAdapter() {
-            override fun onComplete(output: File) {
-                callback(output)
-            }
+            val job = DownloadJob.startDownload(request)
 
-            override fun onError(exception: Throwable) {
-                callback(null)
+            // Set listener BEFORE showing fragment - once listener is set, job handles all errors
+            job.setProgressListener(object : DownloadJob.ProgressListenerAdapter() {
+                override fun onComplete(output: File) {
+                    callback(output, null)
+                }
+
+                override fun onError(exception: Throwable) {
+                    callback(null, exception)
+                }
+            })
+
+            // Fragment setup - if this fails, job is already started and will handle errors
+            try {
+                val fragment = DownloadProgressFragment()
+                fragment.show(fragmentManager, "download-fragment")
+                fragment.job = job
+            } catch (e: Throwable) {
+                // Fragment error - job is already started, its error handler will report if download fails
+                // Don't call callback here to avoid duplicate callbacks
             }
-        })
-        val fragment = DownloadProgressFragment()
-        fragment.show(fragmentManager, "download-fragment")
-        fragment.job = job
+        } catch (e: Throwable) {
+            // Catch all setup errors (URL parsing, file operations, request building, job starting)
+            // Once job listener is set, job handles all download errors
+            callback(null, e)
+        }
     }
 }
 

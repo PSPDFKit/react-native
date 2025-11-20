@@ -14,5 +14,3 @@ object SessionStorage {
         aiAssistant = assistant
     }
 }
-
-

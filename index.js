@@ -34,6 +34,29 @@ import {
  *    />
  */
 class NutrientView extends React.Component {
+  // Cache architecture detection and Fabric component to avoid work on every render
+  static _isNewArchitecture = null;
+  static _FabricComponent = null;
+
+  static _getArchitectureInfo() {
+    if (this._isNewArchitecture === null) {
+      const { isNewArchitectureEnabled } = require('./lib/ArchitectureDetector');
+      this._isNewArchitecture = isNewArchitectureEnabled();
+
+      if (this._isNewArchitecture) {
+        try {
+          // Require from src/ so Metro can process codegen for NutrientViewNativeComponent
+          this._FabricComponent = require('./src/NutrientViewFabric').default;
+        } catch (error) {
+          console.error('[Nutrient] Failed to load Fabric component:', error);
+          this._isNewArchitecture = false; // Fallback to Paper
+          this._FabricComponent = null;
+        }
+      }
+    }
+
+    return { isNewArchitecture: this._isNewArchitecture, FabricComponent: this._FabricComponent };
+  }
   /**
    * @ignore
    */
@@ -58,8 +81,16 @@ class NutrientView extends React.Component {
    * @ignore
    */
   _componentRef = React.createRef(this);
+  // Fabric ref used only in New Architecture to forward imperative methods
+  _fabricRef = React.createRef();
 
   render() {
+    // Architecture detection - use cached result to decide Fabric vs Paper
+    const { isNewArchitecture, FabricComponent } = NutrientView._getArchitectureInfo();
+    if (isNewArchitecture && FabricComponent) {
+      return React.createElement(FabricComponent, { ...this.props, ref: this._fabricRef });
+    }
+
     if (Platform.OS === 'ios' || Platform.OS === 'android') {
       const onCloseButtonPressedHandler = this.props.onCloseButtonPressed
         ? event => {
@@ -257,6 +288,13 @@ class NutrientView extends React.Component {
    * @memberof NutrientView
    */
   enterAnnotationCreationMode = function (annotationType) {
+    // Architecture detection via helper function
+    const { isNewArchitectureEnabled } = require('./lib/ArchitectureDetector');
+    if (isNewArchitectureEnabled()) {
+      // Delegate to Fabric component
+      return this._fabricRef.current?.enterAnnotationCreationMode(annotationType);
+    }
+
     if (Platform.OS === 'android') {
       let requestId = this._nextRequestId++;
       let requestMap = this._requestMap;
@@ -287,6 +325,13 @@ class NutrientView extends React.Component {
    * @memberof NutrientView
    */
   exitCurrentlyActiveMode = function () {
+    // Architecture detection via helper function
+    const { isNewArchitectureEnabled } = require('./lib/ArchitectureDetector');
+    if (isNewArchitectureEnabled()) {
+      // Delegate to Fabric component
+      return this._fabricRef.current?.exitCurrentlyActiveMode();
+    }
+
     if (Platform.OS === 'android') {
       let requestId = this._nextRequestId++;
       let requestMap = this._requestMap;
@@ -309,7 +354,7 @@ class NutrientView extends React.Component {
   };
 
   /**
-   * Saves the document that’s currently open.
+   * Saves the document that's currently open.
    * @deprecated Since Nutrient React Native SDK 2.12. Use ```this.pdfRef.current?.getDocument().save()``` instead.
    * See {@link https://nutrient.io/api/react-native/PDFDocument.html#.save|save()}.
    * @method saveCurrentDocument
@@ -320,6 +365,13 @@ class NutrientView extends React.Component {
    * @returns { Promise<boolean> } A promise resolving to ```true``` if the document was saved, and ```false``` if not.
    */
   saveCurrentDocument = function () {
+    // Architecture detection via helper function
+    const { isNewArchitectureEnabled } = require('./lib/ArchitectureDetector');
+    if (isNewArchitectureEnabled()) {
+      // Delegate to Fabric component
+      return this._fabricRef.current?.saveCurrentDocument();
+    }
+
     if (Platform.OS === 'android') {
       let requestId = this._nextRequestId++;
       let requestMap = this._requestMap;
@@ -354,6 +406,12 @@ class NutrientView extends React.Component {
    * @returns { PDFDocument } A reference to the document that is currently loaded in the NutrientView component.
    */
   getDocument () {
+    // Architecture detection via helper function
+    const { isNewArchitectureEnabled } = require('./lib/ArchitectureDetector');
+    if (isNewArchitectureEnabled()) {
+      // Delegate to Fabric component ref
+      return this._fabricRef.current?.getDocument();
+    }
     if (this._pdfDocument == null) {
       this._pdfDocument = new PDFDocument(this._componentRef.current);
       return this._pdfDocument;
@@ -372,6 +430,12 @@ class NutrientView extends React.Component {
    * @returns { NotificationCenter } A reference to the Notification Center that can be used to subscribe and unsubscribe from events.
    */
   getNotificationCenter () {
+    // Architecture detection via helper function
+    const { isNewArchitectureEnabled } = require('./lib/ArchitectureDetector');
+    if (isNewArchitectureEnabled()) {
+      // Delegate to Fabric component ref
+      return this._fabricRef.current?.getNotificationCenter();
+    }
     if (this._notificationCenter == null) {
       this._notificationCenter = new NotificationCenter(this._componentRef.current);
       return this._notificationCenter;
@@ -389,6 +453,13 @@ class NutrientView extends React.Component {
    * @returns { Promise<any> } A promise containing the result of the operation. ```true``` if the annotations selection were cleared, ```false``` otherwise.
    */
   clearSelectedAnnotations = function () {
+    // Architecture detection via helper function
+    const { isNewArchitectureEnabled } = require('./lib/ArchitectureDetector');
+    if (isNewArchitectureEnabled()) {
+      // Delegate to Fabric component
+      return this._fabricRef.current?.clearSelectedAnnotations();
+    }
+
     if (Platform.OS === 'android') {
       let requestId = this._nextRequestId++;
       let requestMap = this._requestMap;
@@ -421,9 +492,15 @@ class NutrientView extends React.Component {
    * @description Select one or more annotations.
    * @example
    * const result = await this.pdfRef.current?.selectAnnotations(annotations);
-   * @returns { Promise<any> } A promise containing the result of the operation. ```true``` if the annotations were selected, ```false``` otherwise.
+   * @returns { Promise<boolean> } A promise containing the result of the operation. ```true``` if the annotations were selected, ```false``` otherwise.
    */
   selectAnnotations = function (annotations, showContextualMenu = false) {
+    // Architecture detection via helper function
+    const { isNewArchitectureEnabled } = require('./lib/ArchitectureDetector');
+    if (isNewArchitectureEnabled()) {
+      // Delegate to Fabric component
+      return this._fabricRef.current?.selectAnnotations(annotations, showContextualMenu);
+    }
 
     if (Platform.OS === 'android') {
       let requestId = this._nextRequestId++;
@@ -541,7 +618,7 @@ class NutrientView extends React.Component {
    * @example
    * const result = await this.pdfRef.current.removeAnnotation(instantJSON);
    *
-   * @returns { Promise } A promise resolving to ```true``` if the annotation was removed successfully, and ```false``` if the annotation couldn’t be found or an error occurred.
+   * @returns { Promise } A promise resolving to ```true``` if the annotation was removed successfully, and ```false``` if the annotation couldn't be found or an error occurred.
    */
   removeAnnotation = function (annotation) {
     if (Platform.OS === 'android') {
@@ -579,7 +656,7 @@ class NutrientView extends React.Component {
    * @example
    * const result = await this.pdfRef.current.removeAnnotations(instantJSON);
    *
-   * @returns { Promise } A promise resolving to ```true``` if the annotations were removed successfully, and ```false``` if the annotations couldn’t be found or an error occurred.
+   * @returns { Promise } A promise resolving to ```true``` if the annotations were removed successfully, and ```false``` if the annotations couldn't be found or an error occurred.
    */
   removeAnnotations = function (annotations) {
     if (Platform.OS === 'android') {
@@ -728,6 +805,7 @@ class NutrientView extends React.Component {
    * @memberof NutrientView
    * @param { string } uuid The UUID of the annotation to update.
    * @param { Annotation.Flags[] } flags The flags to apply to the annotation.
+   * @deprecated Since Nutrient React Native SDK 4.0. Use ```this.pdfRef.current?.getDocument().setAnnotationFlags()``` instead.
    * @example
    * const result = await this.pdfRef.current.setAnnotationFlags('bb61b1bf-eacd-4227-a5bf-db205e591f5a', ['locked', 'hidden']);
    *
@@ -766,6 +844,7 @@ class NutrientView extends React.Component {
    * @method getAnnotationFlags
    * @memberof NutrientView
    * @param { string } uuid The UUID of the annotation to query.
+   * @deprecated Since Nutrient React Native SDK 4.0. Use ```this.pdfRef.current?.getDocument().getAnnotationFlags()``` instead.
    * @example
    * const flags = await this.pdfRef.current.getAnnotationFlags('bb61b1bf-eacd-4227-a5bf-db205e591f5a');
    *
@@ -967,7 +1046,8 @@ class NutrientView extends React.Component {
    * @method setLeftBarButtonItems
    * @memberof NutrientView
    * @param { Array<string> } items The list of bar button items.
-   * @see {@link https://github.com/PSPDFKit/react-native/blob/master/ios/RCTPSPDFKit/Converters/RCTConvert+UIBarButtonItem.m} for supported button items.
+   * @deprecated Since Nutrient React Native SDK 4.0. Use ```this.pdfRef.current?.setToolbar()``` instead.
+   * @see {@link https://github.com/PSPDFKit/react-native/blob/master/ios/Converters/RCTConvert+UIBarButtonItem.m} for supported button items.
    * @param { string } [viewMode] The view mode for which the bar buttons should be set. Options are: ```document```, ```thumbnails```, ```documentEditor```, or ```null```. If ```null``` is passed, the bar button items for all the view modes are set.
    * @param { boolean } [animated] Specifies whether changing the bar buttons should be animated.
    * @example
@@ -994,8 +1074,8 @@ class NutrientView extends React.Component {
    * @method getLeftBarButtonItemsForViewMode
    * @memberof NutrientView
    * @param { string } [viewMode] The view mode to query. Options are: ```document```, ```thumbnails```, ```documentEditor```, or ```null```. If ```null``` is passed, the bar button items for the current view mode are returned.
-   *
-   * @returns { Promise<Array<string>> } A promise containing an array of bar button items, or an error if the items couldn’t be retrieved.
+   * @deprecated Since Nutrient React Native SDK 4.0. Use ```this.pdfRef.current?.getToolbar()``` instead.
+   * @returns { Promise<Array<string>> } A promise containing an array of bar button items, or an error if the items couldn't be retrieved.
    * @example
    * const leftBarButtonItems = await this.pdfRef.current.getLeftBarButtonItemsForViewMode('document');
    * // leftBarButtonItems: ['outlineButtonItem', 'searchButtonItem']
@@ -1019,7 +1099,8 @@ class NutrientView extends React.Component {
    * @method setRightBarButtonItems
    * @memberof NutrientView
    * @param { Array<string> } items The list of bar button items.
-   * @see {@link https://github.com/PSPDFKit/react-native/blob/master/ios/RCTPSPDFKit/Converters/RCTConvert+UIBarButtonItem.m} for supported button items.
+   * @deprecated Since Nutrient React Native SDK 4.0. Use ```this.pdfRef.current?.setToolbar()``` instead.
+   * @see {@link https://github.com/PSPDFKit/react-native/blob/master/ios/Converters/RCTConvert+UIBarButtonItem.m} for supported button items.
    * @param { string } [viewMode] The view mode for which the bar buttons should be set. Options are: ```document```, ```thumbnails```, ```documentEditor```, or ```null```. If ```null``` is passed, the bar button items for all the view modes are set.
    * @param { boolean } [animated] Specifies whether changing the bar buttons should be animated.
    * @example
@@ -1046,8 +1127,8 @@ class NutrientView extends React.Component {
    * @method getRightBarButtonItemsForViewMode
    * @memberof NutrientView
    * @param { string } [viewMode] The view mode to query. Options are: ```document```, ```thumbnails```, ```documentEditor```, or ```null```. If ```null``` is passed, the bar button items for the current view mode are returned.
-   *
-   * @returns { Promise<Array<string>> } A promise containing an array of bar button items, or an error if the items couldn’t be retrieved.
+   * @deprecated Since Nutrient React Native SDK 4.0. Use ```this.pdfRef.current?.getToolbar()``` instead.
+   * @returns { Promise<Array<string>> } A promise containing an array of bar button items, or an error if the items couldn't be retrieved.
    * @example
    * const rightBarButtonItems = await this.pdfRef.current.getRightBarButtonItemsForViewMode('document');
    * // rightBarButtonItems: ['outlineButtonItem', 'searchButtonItem']
@@ -1087,6 +1168,13 @@ class NutrientView extends React.Component {
    *
    */
   setToolbar = function (toolbar) {
+    // Architecture detection via helper function
+    const { isNewArchitectureEnabled } = require('./lib/ArchitectureDetector');
+    if (isNewArchitectureEnabled()) {
+      // Delegate to Fabric component
+      return this._fabricRef.current?.setToolbar(toolbar);
+    }
+
     if (Platform.OS === 'ios') {
       NativeModules.PSPDFKitViewManager.setToolbar(
         toolbar,
@@ -1108,12 +1196,19 @@ class NutrientView extends React.Component {
    * @memberof NutrientView
    * @param { string } [viewMode] The view mode to query. Options are: ```document```, ```thumbnails```, ```documentEditor```, or ```null```. If ```null``` is passed, the toolbar buttons for the current view mode are returned.
    *
-   * @returns { Promise<Array<string>> } A promise containing the toolbar object, or an error if it couldn’t be retrieved.
+   * @returns { Promise<Array<string>> } A promise containing the toolbar object, or an error if it couldn't be retrieved.
    * @example
    * const toolbar = await this.pdfRef.current.getToolbar('document');
    *
    */
   getToolbar = function (viewMode) {
+    // Architecture detection via helper function
+    const { isNewArchitectureEnabled } = require('./lib/ArchitectureDetector');
+    if (isNewArchitectureEnabled()) {
+      // Delegate to Fabric component
+      return this._fabricRef.current?.getToolbar(viewMode);
+    }
+
     if (Platform.OS === 'ios') {
       return NativeModules.PSPDFKitViewManager.getToolbar(
         viewMode,
@@ -1128,6 +1223,7 @@ class NutrientView extends React.Component {
    * @method setMeasurementValueConfigurations
    * @memberof NutrientView
    * @param { MeasurementValueConfiguration[] } configurations The array of ```MeasurementValueConfiguration``` objects that should be applied to the document.
+   * @returns { Promise<boolean> } A promise containing the result of the operation.
    * @example
    * const scale: MeasurementScale = {
    *    unitFrom: Measurements.ScaleUnitFrom.INCH,
@@ -1146,6 +1242,13 @@ class NutrientView extends React.Component {
    *  await this.pdfRef.current?.setMeasurementValueConfigurations(configs);
    */
   setMeasurementValueConfigurations = function (configurations) {
+    // Architecture detection via helper function
+    const { isNewArchitectureEnabled } = require('./lib/ArchitectureDetector');
+    if (isNewArchitectureEnabled()) {
+      // Delegate to Fabric component
+      return this._fabricRef.current?.setMeasurementValueConfigurations(configurations);
+    }
+
     if (Platform.OS === 'android') {
       let requestId = this._nextRequestId++;
       let requestMap = this._requestMap;
@@ -1182,6 +1285,13 @@ class NutrientView extends React.Component {
    * const configurations = await this.pdfRef.current.getMeasurementValueConfigurations();
    */
   getMeasurementValueConfigurations = function () {
+    // Architecture detection via helper function
+    const { isNewArchitectureEnabled } = require('./lib/ArchitectureDetector');
+    if (isNewArchitectureEnabled()) {
+      // Delegate to Fabric component
+      return this._fabricRef.current?.getMeasurementValueConfigurations();
+    }
+
     if (Platform.OS === 'android') {
       let requestId = this._nextRequestId++;
       let requestMap = this._requestMap;
@@ -1212,6 +1322,7 @@ class NutrientView extends React.Component {
    * @method setToolbarMenuItems
    * @memberof NutrientView
    * @param { Array<string> } toolbarMenuItems The list of bar button items.
+   * @deprecated Since Nutrient React Native SDK 4.0. Use ```this.pdfRef.current?.setToolbar()``` instead.
    * @see {@link https://nutrient.io/guides/react-native/user-interface/toolbars/main-toolbar/} for supported button items.
    * @example
    * const result = await this.pdfRef.current.setToolbarMenuItems(['searchButtonItem', 'readerViewButtonItem']);
@@ -1239,6 +1350,13 @@ class NutrientView extends React.Component {
    * const configuration = await this.pdfRef.current.getConfiguration();
    */
   getConfiguration = function () {
+    // Architecture detection via helper function
+    const { isNewArchitectureEnabled } = require('./lib/ArchitectureDetector');
+    if (isNewArchitectureEnabled()) {
+      // Delegate to Fabric component
+      return this._fabricRef.current?.getConfiguration();
+    }
+
     if (Platform.OS === 'android') {
       let requestId = this._nextRequestId++;
       let requestMap = this._requestMap;
@@ -1273,6 +1391,13 @@ class NutrientView extends React.Component {
    * @returns { void }
    */
   setExcludedAnnotations = function (annotations) {
+    // Architecture detection via helper function
+    const { isNewArchitectureEnabled } = require('./lib/ArchitectureDetector');
+    if (isNewArchitectureEnabled()) {
+      // Delegate to Fabric component
+      return this._fabricRef.current?.setExcludedAnnotations(annotations);
+    }
+
     if (Platform.OS === 'ios') {
       NativeModules.PSPDFKitViewManager.setExcludedAnnotations(
         annotations,
@@ -1298,6 +1423,13 @@ class NutrientView extends React.Component {
    *
    */
   destroyView = function () {
+    // Architecture detection via helper function
+    const { isNewArchitectureEnabled } = require('./lib/ArchitectureDetector');
+    if (isNewArchitectureEnabled()) {
+      // Delegate to Fabric component
+      return this._fabricRef.current?.destroyView();
+    }
+
     if (Platform.OS === 'android') {
       UIManager.dispatchViewManagerCommand(
         findNodeHandle(this._componentRef.current),
@@ -1306,7 +1438,7 @@ class NutrientView extends React.Component {
       );
     }
   };
-
+  
   _getViewManagerConfig = viewManagerName => {
     return UIManager.getViewManagerConfig(viewManagerName);
   };
@@ -1341,29 +1473,29 @@ if (Platform.OS === 'ios' || Platform.OS === 'android') {
  * @property {AnnotationContextualMenu} [annotationContextualMenu] Object to customize the menu shown when selecting an annotation.
  * @property {number} [pageIndex] Page index of the document that will be shown. Starts at 0.
  * @property {boolean} [hideNavigationBar] Controls whether a navigation bar is created and shown or not. Navigation bar is shown by default (```false```).
- * @property {boolean} [showCloseButton] Specifies whether the close button should be shown in the navigation bar. Disabled by default (```false```). Only applies when the ```NutrientView``` is presented modally. Will call ```onCloseButtonPressed``` when tapped if a callback was provided. If ```onCloseButtonPressed``` wasn’t provided, ```NutrientView``` will automatically be dismissed when modally presented.
+ * @property {boolean} [showCloseButton] Specifies whether the close button should be shown in the navigation bar. Disabled by default (```false```). Only applies when the ```NutrientView``` is presented modally. Will call ```onCloseButtonPressed``` when tapped if a callback was provided. If ```onCloseButtonPressed``` wasn't provided, ```NutrientView``` will automatically be dismissed when modally presented.
  * @property {boolean} [disableDefaultActionForTappedAnnotations] Controls whether or not the default action for tapped annotations is processed. Defaults to processing the action (```false```).
- * @property {boolean} [disableAutomaticSaving] Controls whether or not the document will automatically be saved. Defaults to automatically saving (```false```).
- * @property {string} [annotationAuthorName] Controls the author name that’s set for new annotations. If not set and the user hasn’t specified it before, the user will be asked and the result will be saved. The value set here will be persisted and the user won’t be asked, even if this isn’t set the next time.
+ * @property {boolean} [disableAutomaticSaving] Controls whether or not the document will automatically be saved. Defaults to automatically saving (```false```). Deprecated since Nutrient React Native SDK 4.0. Use ```disableDocumentEditing``` on the ```PDFConfiguration``` object instead.
+ * @property {string} [annotationAuthorName] Controls the author name that's set for new annotations. If not set and the user hasn't specified it before, the user will be asked and the result will be saved. The value set here will be persisted and the user won't be asked, even if this isn't set the next time.
  * @property {string} [imageSaveMode] Specifies what is written back to the original image URL when the receiver is saved. If this property is ```flattenAndEmbed```, then this allows for changes made to the image to be saved as metadata in the original file. If the same file is reopened, all previous changes made will remain editable. If this property is ```flatten```, the changes are simply written to the image, and will not be editable when reopened. Available options are: ```flatten``` or ```flattenAndEmbed```.
- * @property {function} [onCloseButtonPressed] Callback that’s called when the user tapped the close button. If you provide this function, you need to handle dismissal yourself. If you don't provide this function, ```NutrientView``` will be automatically dismissed. Only applies when the ```NutrientView``` is presented modally.
- * @property {function} [onDocumentLoaded] Callback that’s called when the document is loaded in the ```NutrientView```.
- * @property {function} [onReady] Callback that’s called when the ```NutrientView``` is ready. Use this callback start interacting with the ```PDFDocument``` object.
- * @property {function} [onDocumentLoadFailed] Callback that’s called when the document failed to load.
- * @property {function} [onDocumentSaved] Callback that’s called when the document is saved.
- * @property {function} [onDocumentSaveFailed] Callback that’s called when the document fails to save.
- * @property {function} [onAnnotationTapped] Callback that’s called when an annotation is tapped.
- * @property {function} [onAnnotationsChanged] Callback that’s called when an annotation is added, changed, or removed.
- * @property {function} [onStateChanged] Callback that’s called when the state of the ```NutrientView``` changes.
- * @property {function} [onCustomToolbarButtonTapped] Callback that’s called when a custom toolbar button is tapped.
- * @property {function} [onCustomAnnotationContextualMenuItemTapped] Callback that’s called when a custom annotation menu item is tapped.
+ * @property {function} [onCloseButtonPressed] Callback that's called when the user tapped the close button. If you provide this function, you need to handle dismissal yourself. If you don't provide this function, ```NutrientView``` will be automatically dismissed. Only applies when the ```NutrientView``` is presented modally.
+ * @property {function} [onDocumentLoaded] Callback that's called when the document is loaded in the ```NutrientView```.
+ * @property {function} [onReady] Callback that's called when the ```NutrientView``` is ready. Use this callback start interacting with the ```PDFDocument``` object. Does not indicate a successful document load - use ```NotificationCenter.DocumentEvent.LOADED``` to monitor this.
+ * @property {function} [onDocumentLoadFailed] Callback that's called when the document failed to load.
+ * @property {function} [onDocumentSaved] Callback that's called when the document is saved.
+ * @property {function} [onDocumentSaveFailed] Callback that's called when the document fails to save.
+ * @property {function} [onAnnotationTapped] Callback that's called when an annotation is tapped.
+ * @property {function} [onAnnotationsChanged] Callback that's called when an annotation is added, changed, or removed.
+ * @property {function} [onStateChanged] Callback that's called when the state of the ```NutrientView``` changes.
+ * @property {function} [onCustomToolbarButtonTapped] Callback that's called when a custom toolbar button is tapped.
+ * @property {function} [onCustomAnnotationContextualMenuItemTapped] Callback that's called when a custom annotation menu item is tapped.
  * @property {string} [fragmentTag] The tag used to identify a single PdfFragment in the view hierarchy. This needs to be unique in the view hierarchy.
  * @property {Array} [menuItemGrouping] Used to specify a custom grouping for the menu items in the annotation creation toolbar.
- * @property {Array<string>} [leftBarButtonItems] Sets the left bar button items. Note: The same button item cannot be added to both the left and right bar button items simultaneously. See {@link https://github.com/PSPDFKit/react-native/blob/master/ios/RCTPSPDFKit/Converters/RCTConvert+UIBarButtonItem.m} for supported button items.
- * @property {Array<string>} [rightBarButtonItems] Sets the right bar button items. Note: The same button item cannot be added to both the left and right bar button items simultaneously. See {@link https://github.com/PSPDFKit/react-native/blob/master/ios/RCTPSPDFKit/Converters/RCTConvert+UIBarButtonItem.m} for supported button items.
- * @property {string} [toolbarTitle] Used to specify a custom toolbar title on iOS by setting the ```title``` property of the ```PSPDFViewController```. Note: You need to set ```documentLabelEnabled```, ```useParentNavigationBar```, and ```allowToolbarTitleChange``` to ```false``` in your configuration before setting the custom title.
+ * @property {Array<string>} [leftBarButtonItems] Sets the left bar button items. Note: The same button item cannot be added to both the left and right bar button items simultaneously. See {@link https://github.com/PSPDFKit/react-native/blob/master/ios/Converters/RCTConvert+UIBarButtonItem.m} for supported button items.
+ * @property {Array<string>} [rightBarButtonItems] Sets the right bar button items. Note: The same button item cannot be added to both the left and right bar button items simultaneously. See {@link https://github.com/PSPDFKit/react-native/blob/master/ios/Converters/RCTConvert+UIBarButtonItem.m} for supported button items.
+ * @property {string} [toolbarTitle] Used to specify a custom toolbar title on iOS by setting the ```title``` property of the ```PSPDFViewController```. Note: You need to set ```documentLabelEnabled```, ```useParentNavigationBar```, and ```allowToolbarTitleChange``` to ```false``` in your configuration before setting the custom title. Deprecated since Nutrient React Native SDK 4.0. Use ```toolbarTitle``` on the ```PDFConfiguration``` object instead.
  * @property {Array<string>} [toolbarMenuItems] Used to customize the toolbar menu items for Android. See {@link https://github.com/PSPDFKit/react-native/blob/master/android/src/main/java/com/pspdfkit/react/ToolbarMenuItemsAdapter.java} for supported toolbar menu items.
- * @property {boolean} [showNavigationButtonInToolbar] When set to ```true```, the toolbar integrated into the ```NutrientView``` will display a back button in the top-left corner.
+ * @property {boolean} [showNavigationButtonInToolbar] When set to ```true```, the toolbar integrated into the ```NutrientView``` will display a back button in the top-left corner. Android only.
  * @property {function} [onNavigationButtonClicked] If ```showNavigationButtonInToolbar``` is set to ```true```, this callback will notify you when the back button is tapped.
  * @property {Array<string>} [availableFontNames] Used to specify the available font names in the font picker. Note on iOS: You need to set the desired font family names as ```UIFontDescriptor```. See {@link https://developer.apple.com/documentation/uikit/uifontdescriptor?language=objc} for more information. See {@link https://github.com/PSPDFKit/react-native/blob/master/samples/Catalog/examples/CustomFontPicker.tsx}
  * @property {string} [selectedFontName] Used to specify the current selected font in the font picker. Note on iOS: You need to set the desired font family names as ```UIFontDescriptor```. See {@link https://developer.apple.com/documentation/uikit/uifontdescriptor?language=objc} for more information. See {@link https://github.com/PSPDFKit/react-native/blob/master/samples/Catalog/examples/CustomFontPicker.tsx}
@@ -1419,7 +1551,7 @@ NutrientView.propTypes = {
    * Specifies whether the close button should be shown in the navigation bar. Disabled by default (```false```).
    * Only applies when the ```NutrientView``` is presented modally.
    * Will call ```onCloseButtonPressed``` when tapped if a callback was provided.
-   * If ```onCloseButtonPressed``` wasn’t provided, ```NutrientView``` will automatically be dismissed when modally presented.
+   * If ```onCloseButtonPressed``` wasn't provided, ```NutrientView``` will automatically be dismissed when modally presented.
    * @deprecated Since Nutrient React Native SDK 2.16. Use the ```toolbar``` property to add the ```Toolbar.DefaultToolbarButton.CLOSE_BUTTON_ITEM``` button item when setting up the ```NutrientView``` instead.
    * @type {boolean}
    * @memberof NutrientView
@@ -1434,13 +1566,14 @@ NutrientView.propTypes = {
   /**
    * Controls whether or not the document will automatically be saved. Defaults to automatically saving (```false```).
    * @type {boolean}
+   * @deprecated Since Nutrient React Native SDK 4.0. Use ```disableDocumentEditing``` on the ```PDFConfiguration``` object instead.
    * @memberof NutrientView
    */
   disableAutomaticSaving: PropTypes.bool,
   /**
-   * Controls the author name that’s set for new annotations.
-   * If not set and the user hasn’t specified it before, the user will be asked and the result will be saved.
-   * The value set here will be persisted and the user won’t be asked, even if this isn’t set the next time.
+   * Controls the author name that's set for new annotations.
+   * If not set and the user hasn't specified it before, the user will be asked and the result will be saved.
+   * The value set here will be persisted and the user won't be asked, even if this isn't set the next time.
    * @type {string}
    * @memberof NutrientView
    */
@@ -1456,7 +1589,7 @@ NutrientView.propTypes = {
    */
   imageSaveMode: PropTypes.string,
   /**
-   * Callback that’s called when the user tapped the close button.
+   * Callback that's called when the user tapped the close button.
    * If you provide this function, you need to handle dismissal yourself.
    * If you don't provide this function, ```NutrientView``` will be automatically dismissed.
    * Only applies when the ```NutrientView``` is presented modally.
@@ -1469,9 +1602,10 @@ NutrientView.propTypes = {
    */
   onCloseButtonPressed: PropTypes.func,
   /**
-   * Callback that’s called when the document is loaded in the ```NutrientView```.
+   * Callback that's called when the document is loaded in the ```NutrientView```.
    * @type {function}
    * @memberof NutrientView
+   * @deprecated Since Nutrient React Native SDK 4.0. Use ```NotificationCenter.DocumentEvent.LOADED``` instead.
    * @example
    * onDocumentLoaded={() => {
    *     // Document loaded event.
@@ -1479,15 +1613,16 @@ NutrientView.propTypes = {
    */
   onDocumentLoaded: PropTypes.func,
   /**
-   * Callback that’s called when the ```NutrientView``` is ready. Use this callback start interacting with the ```PDFDocument``` object.
+   * Callback that's called when the ```NutrientView``` is ready. Use this callback start interacting with the ```PDFDocument``` object. Does not indicate a successful document load - use ```NotificationCenter.DocumentEvent.LOADED``` to monitor this.
    * @type {function}
    * @memberof NutrientView
    */
   onReady: PropTypes.func,
   /**
-   * Callback that’s called when the document failed to load.
+   * Callback that's called when the document failed to load.
    * @type {function}
    * @memberof NutrientView
+   * @deprecated Since Nutrient React Native SDK 4.0. Use ```NotificationCenter.DocumentEvent.LOAD_FAILED``` instead.
    * @example
    * onDocumentLoadFailed={() => {
    *     // Document load failed event.
@@ -1495,7 +1630,7 @@ NutrientView.propTypes = {
    */
   onDocumentLoadFailed: PropTypes.func,
   /**
-   * Callback that’s called when the document is saved.
+   * Callback that's called when the document is saved.
    * @type {function}
    * @memberof NutrientView
    * @example
@@ -1505,7 +1640,7 @@ NutrientView.propTypes = {
    */
   onDocumentSaved: PropTypes.func,
   /**
-   * Callback that’s called when the document fails to save.
+   * Callback that's called when the document fails to save.
    * @returns { object } An object containing the error message.
    * @type {function}
    * @memberof NutrientView
@@ -1517,9 +1652,10 @@ NutrientView.propTypes = {
    */
   onDocumentSaveFailed: PropTypes.func,
   /**
-   * Callback that’s called when an annotation is tapped. The result contains the InstantJSON of the annotation that was tapped.
+   * Callback that's called when an annotation is tapped. The result contains the InstantJSON of the annotation that was tapped.
    * @type {function}
    * @memberof NutrientView
+   * @deprecated Since Nutrient React Native SDK 4.0. Use ```NotificationCenter.AnnotationsEvent.TAPPED``` or ```NotificationCenter.AnnotationsEvent.SELECTED``` instead.
    * @example
    * onAnnotationTapped={result => {
    *     if (result.error) {
@@ -1531,10 +1667,11 @@ NutrientView.propTypes = {
    */
   onAnnotationTapped: PropTypes.func,
   /**
-   * Callback that’s called when an annotation is added, changed, or removed.
+   * Callback that's called when an annotation is added, changed, or removed.
    * The result contains the type of change, as well as an array of the InstantJSON annotations.
    * @type {function}
    * @memberof NutrientView
+   * @deprecated Since Nutrient React Native SDK 4.0. Use ```NotificationCenter.AnnotationsEvent.ADDED```, ```NotificationCenter.AnnotationsEvent.CHANGED```, or ```NotificationCenter.AnnotationsEvent.REMOVED``` instead.
    * @example
    * onAnnotationsChanged={result => {
    *     if (result.error) {
@@ -1546,7 +1683,7 @@ NutrientView.propTypes = {
    */
   onAnnotationsChanged: PropTypes.func,
   /**
-   * Callback that’s called when the state of the ```NutrientView``` changes.
+   * Callback that's called when the state of the ```NutrientView``` changes.
    * @type {function}
    * @memberof NutrientView
    * @example
@@ -1569,7 +1706,7 @@ NutrientView.propTypes = {
    */
   onStateChanged: PropTypes.func,
   /**
-   * Callback that’s called when a custom toolbar button is tapped.
+   * Callback that's called when a custom toolbar button is tapped.
    * @type {function}
    * @memberof NutrientView
    * @example
@@ -1583,7 +1720,7 @@ NutrientView.propTypes = {
    */
   onCustomToolbarButtonTapped: PropTypes.func,
   /**
-   * Callback that’s called when a custom annotation menu item is tapped.
+   * Callback that's called when a custom annotation menu item is tapped.
    * @type {function}
    * @memberof NutrientView
    * @example
@@ -1607,7 +1744,7 @@ NutrientView.propTypes = {
    * On iOS, you can specify a custom grouping for the annotation creation toolbar items.
    * @type {Array}
    * @memberof NutrientView
-   * @see {@link https://github.com/PSPDFKit/react-native/blob/master/ios/RCTPSPDFKit/Converters/RCTConvert+PSPDFAnnotationToolbarConfiguration.m} for the complete list of toolbar items.
+   * @see {@link https://github.com/PSPDFKit/react-native/blob/master/ios/Converters/RCTConvert+PSPDFAnnotationToolbarConfiguration.m} for the complete list of toolbar items.
    * @example
    * menuItemGrouping={[
    *   'pen',
@@ -1622,7 +1759,7 @@ NutrientView.propTypes = {
    * Note: The same button item cannot be added to both the left and right bar button items simultaneously.
    * @type {Array<string>}
    * @memberof NutrientView
-   * @see {@link https://github.com/PSPDFKit/react-native/blob/master/ios/RCTPSPDFKit/Converters/RCTConvert+UIBarButtonItem.m} for supported button items.
+   * @see {@link https://github.com/PSPDFKit/react-native/blob/master/ios/Converters/RCTConvert+UIBarButtonItem.m} for supported button items.
    */
   leftBarButtonItems: PropTypes.array,
   /**
@@ -1630,13 +1767,14 @@ NutrientView.propTypes = {
    * Note: The same button item cannot be added to both the left and right bar button items simultaneously.
    * @type {Array<string>}
    * @memberof NutrientView
-   * @see {@link https://github.com/PSPDFKit/react-native/blob/master/ios/RCTPSPDFKit/Converters/RCTConvert+UIBarButtonItem.m} for supported button items.
+   * @see {@link https://github.com/PSPDFKit/react-native/blob/master/ios/Converters/RCTConvert+UIBarButtonItem.m} for supported button items.
    */
   rightBarButtonItems: PropTypes.array,
   /**
    * Used to specify a custom toolbar title on iOS by setting the ```title``` property of the ```PSPDFViewController```.
    * Note: You need to set ```documentLabelEnabled```, ```useParentNavigationBar```, and ```allowToolbarTitleChange``` to ```false``` in your configuration before setting the custom title.
    * @type {string}
+   * @deprecated Since Nutrient React Native SDK 4.0. Use ```toolbarTitle``` on the ```PDFConfiguration``` object instead.
    * @memberof NutrientView
    */
   toolbarTitle: PropTypes.string,
@@ -1648,7 +1786,7 @@ NutrientView.propTypes = {
    */
   toolbarMenuItems: PropTypes.array,
   /**
-   * When set to ```true```, the toolbar integrated into the ```NutrientView``` will display a back button in the top-left corner.
+   * When set to ```true```, the toolbar integrated into the ```NutrientView``` will display a back button in the top-left corner. Android only.
    * @type {boolean}
    * @memberof NutrientView
    */
@@ -1676,7 +1814,7 @@ NutrientView.propTypes = {
    * @see {@link https://developer.apple.com/documentation/uikit/uifontdescriptor?language=objc} for more information.
    * @see {@link https://github.com/PSPDFKit/react-native/blob/master/samples/Catalog/examples/CustomFontPicker.tsx}
    *
-   * Note on Android: This is the default font that’s selected. If the user changes the font, it’ll become the new default.
+   * Note on Android: This is the default font that's selected. If the user changes the font, it'll become the new default.
    */
   selectedFontName: PropTypes.string,
   /**
@@ -1734,7 +1872,7 @@ export default NutrientView;
  * @typedef InstantConfiguration
  * @property { boolean } enableInstantComments Specifies whether adding comment annotations is allowed.
  * @property { boolean } listenToServerChanges Automatically listen for and sync changes from the server.
- * @property { number } delay Delay in seconds before kicking off automatic sync after local changes are made to the ```editableDocument```’s annotations.
+ * @property { number } delay Delay in seconds before kicking off automatic sync after local changes are made to the ```editableDocument```'s annotations.
  * @property { boolean } syncAnnotations Specifies whether added annotations are automatically synced to the server.
  */
 
@@ -1901,7 +2039,7 @@ export class Nutrient {
   presentInstant = function (documentData, configuration) {};
 
   /**
-   * Delay in seconds before kicking off automatic sync after local changes are made to the ```editableDocument```’s annotations.
+   * Delay in seconds before kicking off automatic sync after local changes are made to the ```editableDocument```'s annotations.
    * @method setDelayForSyncingLocalChanges
    * @memberof Nutrient
    * @param { number } delay The delay in seconds.
@@ -1927,6 +2065,24 @@ export class Nutrient {
    * @ignore
    */
   removeListeners = function () {};
+
+  /**
+   * Method used by React Native Native Modules
+   * @ignore
+   * @param { string } event The event name.
+   * @param { number } componentId The component ID.
+   * @returns { Promise<void> }
+   */
+  handleListenerAdded = function (event, componentId) {};
+
+  /**
+   * Method used by React Native Native Modules
+   * @ignore
+   * @param { string } event The event name.
+   * @param { number } componentId The component ID.
+   * @returns { Promise<void> }
+   */
+  handleListenerRemoved = function (event, componentId) {};
 }
 
 /**
@@ -1975,6 +2131,7 @@ export class Nutrient {
  * @property { string } [position] The image position on the PDF page. Options are: ```top```, ```bottom```, ```left```, ```right```, ```center```.
  * @property { number } [rotation] The page rotation, in degrees.
  * @property { PDFTemplatePageMargins } [pageMargins] The page margins.
+ * @property { PDFTemplatePageSize } [pageSize] The size of the page.
  */
 
 /**

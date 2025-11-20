@@ -1,6 +1,6 @@
 import React from 'react';
 import { Dimensions, processColor, View } from 'react-native';
-import NutrientView from '@nutrient-sdk/react-native';
+import NutrientView, { NotificationCenter } from '@nutrient-sdk/react-native';
 
 import {
   exampleDocumentPath,
@@ -18,6 +18,85 @@ export class SplitPDF extends BaseExampleAutoHidingHeaderComponent {
     this.state = { dimensions: undefined };
     this.pdfRef1 = React.createRef();
     this.pdfRef2 = React.createRef();
+  }
+
+  override componentDidMount() {
+
+    this.pdfRef1.current?.getNotificationCenter().subscribe(NotificationCenter.DocumentEvent.LOADED, (event: any) => {
+      console.log(JSON.stringify(event));
+    });
+
+    this.pdfRef2.current?.getNotificationCenter().subscribe(NotificationCenter.DocumentEvent.LOADED, (event: any) => {
+      console.log(JSON.stringify(event));
+    });
+
+    this.pdfRef1.current?.getNotificationCenter().subscribe(NotificationCenter.DocumentEvent.TAPPED, (event: any) => {
+      console.log(JSON.stringify(event));
+    });
+
+    this.pdfRef2.current?.getNotificationCenter().subscribe(NotificationCenter.DocumentEvent.TAPPED, (event: any) => {
+      console.log(JSON.stringify(event));
+    });
+
+    setTimeout(() => {
+      this.pdfRef1.current?.getNotificationCenter().unsubscribeAllEvents()
+    }, 10000);
+
+    // this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.DocumentEvent.PAGE_CHANGED, (event: any) => {
+    //   console.log(event);
+    // });
+
+    // this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.DocumentEvent.SCROLLED, (event: any) => {
+    //   console.log(event);
+    // });
+
+    // this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.DocumentEvent.TAPPED, (event: any) => {
+    //   console.log(event);
+    // });
+
+    // this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.AnnotationsEvent.ADDED, (event: any) => {
+    //   Alert.alert('Nutrient', JSON.stringify(event));
+    // });
+
+    // this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.AnnotationsEvent.REMOVED, (event: any) => {
+    //   Alert.alert('Nutrient', JSON.stringify(event));
+    // });
+
+    // this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.AnnotationsEvent.CHANGED, (event: any) => {
+    //   Alert.alert('Nutrient', JSON.stringify(event));
+    // });
+
+    // this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.FormFieldEvent.SELECTED, (event: any) => {
+    //   Alert.alert('Nutrient', JSON.stringify(event));
+    // });
+
+    // this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.FormFieldEvent.DESELECTED, (event: any) => {
+    //   Alert.alert('Nutrient', JSON.stringify(event));
+    // });
+
+    // this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.FormFieldEvent.VALUES_UPDATED, (event: any) => {
+    //   Alert.alert('Nutrient', JSON.stringify(event));
+    // });
+
+    // this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.AnnotationsEvent.SELECTED, (event: any) => {
+    //   Alert.alert('Nutrient', JSON.stringify(event));
+    // });
+
+    // this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.AnnotationsEvent.DESELECTED, (event: any) => {
+    //   Alert.alert('Nutrient', JSON.stringify(event));
+    // });
+
+    // this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.AnnotationsEvent.TAPPED, (event: any) => {
+    //   Alert.alert('Nutrient', JSON.stringify(event));
+    // });
+
+    // this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.AnalyticsEvent.ANALYTICS, (event: any) => {
+    //   console.log(event)
+    // });
+
+    // this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.BookmarksEvent.CHANGED, (event: any) => {
+    //   Alert.alert('Nutrient', 'Bookmarks Changed: ' + JSON.stringify(event));
+    // });
   }
 
   override render() {

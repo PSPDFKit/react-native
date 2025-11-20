@@ -10,6 +10,8 @@ class ToolbarMenuItemListener: ContextualToolbar.OnMenuItemClickListener {
 
     private var parent: PdfView? = null
     private var eventDispatcher: EventDispatcher? = null
+    private var isFabricMode: Boolean = false
+    private var fabricDelegate: PdfView.PdfViewDelegate? = null
     private var context: Context? = null
     private var resourceIds: List<Int> = ArrayList()
 
@@ -17,6 +19,14 @@ class ToolbarMenuItemListener: ContextualToolbar.OnMenuItemClickListener {
         this.parent = parent
         this.eventDispatcher = eventDispatcher
         this.context = context
+    }
+
+    constructor(parent: PdfView, eventDispatcher: EventDispatcher, context: Context, isFabricMode: Boolean, fabricDelegate: PdfView.PdfViewDelegate?) {
+        this.parent = parent
+        this.eventDispatcher = eventDispatcher
+        this.context = context
+        this.isFabricMode = isFabricMode
+        this.fabricDelegate = fabricDelegate
     }
 
     fun setResourceIds(resIds: List<Int>) {
@@ -28,8 +38,13 @@ class ToolbarMenuItemListener: ContextualToolbar.OnMenuItemClickListener {
         if (this.resourceIds.contains(menuItem.id)) {
             val resourceName: String? = context?.resources?.getResourceEntryName(menuItem.id)
             if (resourceName != null) {
-                parent?.let { CustomAnnotationContextualMenuItemTappedEvent(it.id, resourceName) }
-                    ?.let { eventDispatcher!!.dispatchEvent(it) }
+                if (isFabricMode && fabricDelegate != null && parent != null) {
+                    // Fabric path: route back to manager delegate
+                    fabricDelegate!!.onCustomAnnotationContextualMenuItemTapped(resourceName)
+                } else {
+                    parent?.let { CustomAnnotationContextualMenuItemTappedEvent(it.id, resourceName) }
+                        ?.let { eventDispatcher!!.dispatchEvent(it) }
+                }
             }
             return true
         }
