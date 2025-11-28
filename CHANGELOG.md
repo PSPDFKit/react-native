@@ -1,3 +1,7 @@
+## 4.0.1 — 28 Nov 2025
+
+- Fixes an issue where the `setLicenseKeys` API could throw an error on iOS. (J#HYB-916)
+
 ## 4.0.0 — 20 Nov 2025
 
 - Adds support for React Native’s new architecture. (J#HYB-847)

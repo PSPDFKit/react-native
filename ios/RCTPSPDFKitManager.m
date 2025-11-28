@@ -47,7 +47,7 @@ RCT_REMAP_METHOD(setLicenseKey, setLicenseKey:(nullable NSString *)licenseKey re
 }
 
 RCT_REMAP_METHOD(setLicenseKeys, setLicenseKeys:(nullable NSString *)androidLicenseKey iOSLicenseKey:(nullable NSString *)iOSLicenseKey resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-  resolve([NutrientModuleCommon setLicenseKeysWithAndroid:androidLicenseKey iOS:iOSLicenseKey]);
+  resolve([NutrientModuleCommon setLicenseKey:iOSLicenseKey]);
 }
 
 RCT_REMAP_METHOD(present, present:(PSPDFDocument *)document withConfiguration:(PSPDFConfiguration *)configuration resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {

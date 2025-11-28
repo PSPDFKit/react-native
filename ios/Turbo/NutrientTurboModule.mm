@@ -86,7 +86,7 @@ RCT_EXPORT_MODULE(Nutrient);
 }
 
 - (NSNumber *)setLicenseKeys:(NSString * _Nullable)androidLicenseKey iOSLicenseKey:(NSString * _Nullable)iOSLicenseKey {
-  return [NutrientModuleCommon setLicenseKeysWithAndroid:androidLicenseKey iOS:iOSLicenseKey];
+  return [NutrientModuleCommon setLicenseKey:iOSLicenseKey];
 }
 
 - (void)handleListenerAdded:(NSString *)event componentId:(double)componentId resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject {

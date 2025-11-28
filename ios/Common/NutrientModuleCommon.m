@@ -29,13 +29,6 @@
   return @(YES);
 }
 
-+ (NSNumber *)setLicenseKeysWithAndroid:(NSString * _Nullable)androidLicenseKey iOS:(NSString * _Nullable)iOSLicenseKey {
-  if (iOSLicenseKey && (id)iOSLicenseKey != (id)kCFNull) {
-    [PSPDFKitGlobal setLicenseKey:iOSLicenseKey options:@{ @"com.pspdfkit.hybrid-environment": @"ReactNative" }];
-  }
-  return @(YES);
-}
-
 + (NSDictionary *)documentPropertiesForPath:(NSString * _Nullable)documentPath {
   if (documentPath == nil) {
     return @{ @"documentId": [NSNull null], @"pageCount": @0, @"isEncrypted": @NO };

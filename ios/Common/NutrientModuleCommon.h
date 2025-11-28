@@ -12,7 +12,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface NutrientModuleCommon : NSObject
 
 + (NSNumber *)setLicenseKey:(NSString * _Nullable)licenseKey;
-+ (NSNumber *)setLicenseKeysWithAndroid:(NSString * _Nullable)androidLicenseKey iOS:(NSString * _Nullable)iOSLicenseKey;
 + (NSDictionary *)documentPropertiesForPath:(NSString * _Nullable)documentPath;
 
 // Present/dismiss
