@@ -30,8 +30,8 @@ import {
   WidgetAnnotation,
   AnnotationAttachment} from '../annotations/AnnotationModels';
 import { Annotation } from '../annotations/Annotation';
-import { FormField } from '../forms/FormField';
-import { FormElement } from '../forms/FormElement';
+import { ButtonFormField, ChoiceFormField, FormField } from '../forms/FormField';
+import { ButtonFormElement, ChoiceFormElement, FormElement } from '../forms/FormElement';
 import { Forms } from '../forms/Forms';
 import { PDFPageInfo } from './PDFPageInfo';
 import { Bookmark } from './Bookmark';
@@ -250,15 +250,45 @@ export class PDFDocument {
                   return new UnderlineMarkupAnnotation(annotation);
               case 'pspdfkit/widget':
               case 'widget':
-                  const widgetAnnotation = new WidgetAnnotation(annotation);
-                  if (annotation.formElement) {
-                      widgetAnnotation.formElement = new FormElement(annotation.formElement);
-                      widgetAnnotation.formElement.pdfViewRef = findNodeHandle(this.pdfViewRef);
-                      if (annotation.formElement.formField) {
-                        widgetAnnotation.formElement.formField = new FormField(annotation.formElement.formField);
+                const widgetAnnotation = new WidgetAnnotation(annotation);
+                const formElement = annotation.formElement;
+                if (formElement) {
+                    const formType = formElement.formTypeName?.toLowerCase();
+                    let formElementInstance;
+                    let formFieldInstance;
+
+                    switch (formType) {
+                        case 'button':
+                            formElementInstance = new ButtonFormElement(formElement);
+                            if (formElement.formField) {
+                                formFieldInstance = new ButtonFormField(
+                                    formElement.formField,
+                                );
+                            }
+                            break;
+                        case 'choice':
+                            formElementInstance = new ChoiceFormElement(formElement);
+                            if (formElement.formField) {
+                                formFieldInstance = new ChoiceFormField(
+                                    formElement.formField,
+                                );
+                            }
+                            break;
+                        default:
+                            formElementInstance = new FormElement(formElement);
+                            if (formElement.formField) {
+                                formFieldInstance = new FormField(formElement.formField);
+                            }
+                            break;
                     }
-                  }
-                  return widgetAnnotation;
+
+                    formElementInstance.pdfViewRef = findNodeHandle(this.pdfViewRef);
+                    if (formFieldInstance) {
+                        formElementInstance.formField = formFieldInstance;
+                    }
+                    widgetAnnotation.formElement = formElementInstance;
+                }
+                return widgetAnnotation;
               default:
                   return undefined;
           }
@@ -353,12 +383,42 @@ export class PDFDocument {
                 case 'pspdfkit/widget':
                 case 'widget':
                     const widgetAnnotation = new WidgetAnnotation(annotation);
-                    if (annotation.formElement) {
-                        widgetAnnotation.formElement = new FormElement(annotation.formElement);
-                        widgetAnnotation.formElement.pdfViewRef = findNodeHandle(this.pdfViewRef);
-                        if (annotation.formElement.formField) {
-                            widgetAnnotation.formElement.formField = new FormField(annotation.formElement.formField);
+                    const formElement = annotation.formElement;
+                    if (formElement) {
+                        const formType = formElement.formTypeName?.toLowerCase();
+                        let formElementInstance;
+                        let formFieldInstance;
+
+                        switch (formType) {
+                            case 'button':
+                                formElementInstance = new ButtonFormElement(formElement);
+                                if (formElement.formField) {
+                                    formFieldInstance = new ButtonFormField(
+                                        formElement.formField,
+                                    );
+                                }
+                                break;
+                            case 'choice':
+                                formElementInstance = new ChoiceFormElement(formElement);
+                                if (formElement.formField) {
+                                    formFieldInstance = new ChoiceFormField(
+                                        formElement.formField,
+                                    );
+                                }
+                                break;
+                            default:
+                                formElementInstance = new FormElement(formElement);
+                                if (formElement.formField) {
+                                    formFieldInstance = new FormField(formElement.formField);
+                                }
+                                break;
                         }
+
+                        formElementInstance.pdfViewRef = findNodeHandle(this.pdfViewRef);
+                        if (formFieldInstance) {
+                            formElementInstance.formField = formFieldInstance;
+                        }
+                        widgetAnnotation.formElement = formElementInstance;
                     }
                     return widgetAnnotation;
                 default:
