@@ -43,6 +43,7 @@
     <link type="text/css" rel="stylesheet" href="css/jsdoc-stock.css">
     <link type="text/css" rel="stylesheet" href="styles/prettify-jsdoc.css">
     <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/angucomplete-alt.css">
   
     <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -113,11 +114,28 @@
     <div class="container">
       <div class="row">
         <div class="col-xs-12 col-md-3 container-col-sidebar">
-          <nav class="sidebar">
-          <section class="section">
-          <?js= this.nav ?>
-          </section>
-          </nav>
+          <div class="sidebar-container">
+            <div class="sidebar-search">
+              <div ng-app="search">
+                <div ng-controller="SearchController as ctrl">
+                  <angucomplete-alt
+                        placeholder="Search ..."
+                        pause="100"
+                        selected-object="ctrl.search"
+                        local-data="ctrl.docs"
+                        search-fields="longname"
+                        title-field="name"
+                        description-field="longname"
+                        minlength="1" />
+                </div>
+              </div>
+            </div>
+            <nav class="sidebar">
+              <section class="section">
+                <?js= this.nav ?>
+              </section>
+            </nav>
+          </div>
           </div>
 
     <div class="col-xs-12 col-md-9 container-col-content">
@@ -138,5 +156,9 @@
 
 <script> prettyPrint(); </script>
 <script src="scripts/linenumber.js"> </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.3/angular.min.js" integrity="sha512-KZmyTq3PLx9EZl0RHShHQuXtrvdJ+m35tuOiwlcZfs/rE7NZv29ygNA8SFCkMXTnYZQK2OX0Gm2qKGfvWEtRXA==" crossorigin="anonymous"></script>
+<script src="scripts/angucomplete-alt.js"></script>
+<script src="scripts/angular.jsdoc.search.js"></script>
+<script src="angular.jsdoc.search.data.js"></script>
 </body>
 </html>

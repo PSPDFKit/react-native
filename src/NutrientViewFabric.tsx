@@ -22,6 +22,7 @@ export interface NutrientViewFabricRef {
   getMeasurementValueConfigurations: () => Promise<any[]>;
   getConfiguration: () => Promise<any>;
   setExcludedAnnotations: (annotations: string[]) => void;
+  setUserInterfaceVisible: (visible: boolean) => Promise<boolean> | void;
   destroyView: () => void;
   clearSelectedAnnotations: () => Promise<any> | void;
   selectAnnotations: (annotations: any, showContextualMenu?: boolean) => Promise<any> | void;
@@ -98,6 +99,10 @@ const NutrientViewFabric = forwardRef<NutrientViewFabricRef, NativeProps>((props
     
     setExcludedAnnotations: (annotations: string[]) => {
       NativeNutrientViewTurboModule.setExcludedAnnotations(instanceId.toString(), annotations);
+    },
+    
+    setUserInterfaceVisible: (visible: boolean) => {
+      return NativeNutrientViewTurboModule.setUserInterfaceVisible(instanceId.toString(), visible);
     },
     
     destroyView: () => {

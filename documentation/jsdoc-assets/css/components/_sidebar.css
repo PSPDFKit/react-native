@@ -1,6 +1,5 @@
-.sidebar {
-  overflow-y: auto;
-  overflow-x: hidden;
+.sidebar-container {
+  overflow: visible;
   word-wrap: normal;
   background: #fff;
   border-bottom: 1px solid #e2e2e2;
@@ -8,10 +7,45 @@
 }
 
 @media (min-width: 992px) {
-  .sidebar {
+  .sidebar-container {
     height: calc(100vh - 150px);
     border-radius: 25px;
+    display: flex;
+    flex-direction: column;
   }
+}
+
+.sidebar-search {
+  flex-shrink: 0;
+  padding: 20px 20px 0;
+  overflow: visible;
+}
+
+.sidebar-search .angucomplete-holder {
+  width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.sidebar-search input {
+  width: 100%;
+  box-sizing: border-box;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.sidebar .section {
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 4px;
+}
+
+.sidebar {
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex: 1;
+  min-height: 0;
+  padding-top: 2px;
 }
 
 .sidebar a {

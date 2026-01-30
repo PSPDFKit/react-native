@@ -115,6 +115,7 @@ export interface Spec extends TurboModule {
   getMeasurementValueConfigurations: (reference: string) => Promise<MeasurementValueConfiguration[]>;
   getConfiguration: (reference: string) => Promise<PDFConfiguration>;
   setExcludedAnnotations: (reference: string, annotations: string[]) => void;
+  setUserInterfaceVisible: (reference: string, visible: boolean) => Promise<boolean>;
   destroyView: (reference: string) => void;
 }
 

@@ -2,7 +2,7 @@ import React from 'react';
 import { TouchableOpacity, StyleSheet, Text, ViewStyle, TextStyle } from 'react-native';
 import { pspdfkitColor } from '../configuration/Constants';
 
-interface LinkButtonStyle {
+export interface LinkButtonStyle {
   container?: ViewStyle;
   text?: TextStyle;
 }

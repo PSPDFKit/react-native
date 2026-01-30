@@ -1,5 +1,5 @@
 //
-//  Copyright © 2018-2025 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2018-2026 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -245,11 +245,19 @@ using namespace facebook::react;
     
   auto newProps = std::static_pointer_cast<const NutrientViewProps>(props);
   if (newProps != nullptr) {
+      // Parse configuration first so remoteDocumentConfiguration is available when applying document
+      NSDictionary *jsonConfig = nil;
+      if (!newProps->configurationJSONString.empty()) {
+          _configurationJSONString = RCTNSStringFromString(newProps->configurationJSONString);
+          jsonConfig = [NutrientFabricUtils dictionaryFromJSONString:_configurationJSONString];
+      }
+
       // Basic document props
       if (!newProps->document.empty()) {
           _document = RCTNSStringFromString(newProps->document);
           PDFDocumentManager *documentManager = [[RCTBridge currentBridge] moduleForClass:[PDFDocumentManager class]];
-          [NutrientPropsDocumentHelper applyDocumentFromJSON:_document toView:_view usingManager:documentManager withReference:[NSNumber numberWithInteger:[self.nativeId integerValue]]];
+          NSDictionary *remoteConfig = jsonConfig[@"remoteDocumentConfiguration"];
+          [NutrientPropsDocumentHelper applyDocumentFromJSON:_document remoteDocumentConfig:remoteConfig toView:_view usingManager:documentManager withReference:[NSNumber numberWithInteger:[self.nativeId integerValue]]];
           [NutrientPropsFontHelper configureCustomFontPickerForView:_view];
       }
           
@@ -298,13 +306,9 @@ using namespace facebook::react;
           [NutrientPropsDocumentHelper applyImageSaveModeFromJSON:_imageSaveMode toView:_view];
       }
 
-      // Only use JSON passthrough; omit entirely if not provided so native defaults apply
-      if (!newProps->configurationJSONString.empty()) {
-          _configurationJSONString = RCTNSStringFromString(newProps->configurationJSONString);
-          NSDictionary *jsonConfig = [NutrientFabricUtils dictionaryFromJSONString:_configurationJSONString];
-          if (jsonConfig) {
-              [NutrientPropsDocumentHelper applyConfigurationFromJSON:jsonConfig toView:_view];
-          }
+      // Apply configuration (parsed above); omit entirely if not provided so native defaults apply
+      if (jsonConfig) {
+          [NutrientPropsDocumentHelper applyConfigurationFromJSON:jsonConfig toView:_view];
       }
       
       // Handle toolbar JSON string

@@ -1,5 +1,5 @@
 //
-//  Copyright © 2018-2025 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2018-2026 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -54,22 +54,22 @@
     if ([formElement isKindOfClass:[PSPDFButtonFormElement class]]) {
         formElementJSON = [RCTConvert buttonFormElementToJSON:(PSPDFButtonFormElement *)formElement];
         NSMutableDictionary *mutableJSON = [formElementJSON mutableCopy];
-        mutableJSON[@"type"] = @"button";
+        mutableJSON[@"formTypeName"] = @"button";
         formElementJSON = [mutableJSON copy];
     } else if ([formElement isKindOfClass:[PSPDFChoiceFormElement class]]) {
         formElementJSON = [RCTConvert choiceFormElementToJSON:(PSPDFChoiceFormElement *)formElement];
         NSMutableDictionary *mutableJSON = [formElementJSON mutableCopy];
-        mutableJSON[@"type"] = @"choice";
+        mutableJSON[@"formTypeName"] = @"choice";
         formElementJSON = [mutableJSON copy];
     } else if ([formElement isKindOfClass:[PSPDFSignatureFormElement class]]) {
         formElementJSON = [RCTConvert signatureFormElementToJSON:(PSPDFSignatureFormElement *)formElement];
         NSMutableDictionary *mutableJSON = [formElementJSON mutableCopy];
-        mutableJSON[@"type"] = @"signature";
+        mutableJSON[@"formTypeName"] = @"signature";
         formElementJSON = [mutableJSON copy];
     } else if ([formElement isKindOfClass:[PSPDFTextFieldFormElement class]]) {
         formElementJSON = [RCTConvert textFieldFormElementToJSON:(PSPDFTextFieldFormElement *)formElement];
         NSMutableDictionary *mutableJSON = [formElementJSON mutableCopy];
-        mutableJSON[@"type"] = @"textField";
+        mutableJSON[@"formTypeName"] = @"textField";
         formElementJSON = [mutableJSON copy];
     } else {
         formElementJSON = nil;

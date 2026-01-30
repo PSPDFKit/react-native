@@ -66,6 +66,12 @@ public final class NutrientPropsDocumentHelper {
         if (configuration.hasKey("androidRemoveStatusBarOffset")) {
             view.setIsStatusBarHidden(configuration.getBoolean("androidRemoveStatusBarOffset"));
         }
+        if (configuration.hasKey("toolbarPosition")) {
+            view.setToolbarPosition(configuration.getString("toolbarPosition"));
+        }
+        if (configuration.hasKey("supportedToolbarPositions")) {
+            view.setSupportedToolbarPositions(configuration.getArray("supportedToolbarPositions"));
+        }
     }
 
     public static void applyConfigurationJSONString(@NonNull PdfView view, @Nullable String configurationJSONString) {

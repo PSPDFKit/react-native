@@ -2,6 +2,7 @@
 import { findNodeHandle, NativeModules } from 'react-native';
 import { FormElement, ButtonFormElement, ChoiceFormElement, SignatureFormElement, TextFieldFormElement } from './FormElement';
 import { FormField, ButtonFormField, ChoiceFormField, SignatureFormField, TextFormField } from './FormField';
+import { ElectronicSignatureFieldConfiguration, TextFormFieldConfiguration } from './FormFieldConfiguration';
 
 /**
  * @class Forms
@@ -144,4 +145,76 @@ export class Forms {
             value
         );
     }
-} 
+
+    /**
+     * @method addElectronicSignatureFormField
+     * @memberof Forms
+     * @param {ElectronicSignatureFieldConfiguration} configuration The configuration for the electronic signature field.
+     * @description Adds an electronic signature field to the document at the specified location.
+     * @example
+     * const result = await this.pdfRef.current?.getDocument().forms.addElectronicSignatureFormField({
+     *   pageIndex: 0,
+     *   bbox: { left: 100, top: 100, right: 300, bottom: 150 },
+     *   fullyQualifiedName: 'Signature1'
+     * });
+     * @returns { Promise<boolean> } A promise containing the result of the operation. ```true``` if the field was added successfully, ```false``` otherwise.
+     */
+    addElectronicSignatureFormField(
+        configuration: ElectronicSignatureFieldConfiguration
+    ): Promise<boolean> {
+        // Convert bbox to array format if it's an object
+        const bboxArray = Array.isArray(configuration.bbox)
+            ? configuration.bbox
+            : [
+                configuration.bbox.left,
+                configuration.bbox.top,
+                configuration.bbox.right,
+                configuration.bbox.bottom
+            ];
+
+        return NativeModules.PDFDocumentManager.addElectronicSignatureFormField(
+            findNodeHandle(this.pdfViewRef),
+            {
+                pageIndex: configuration.pageIndex,
+                bbox: bboxArray,
+                fullyQualifiedName: configuration.fullyQualifiedName
+            }
+        );
+    }
+
+    /**
+     * @method addTextFormField
+     * @memberof Forms
+     * @param {TextFormFieldConfiguration} configuration The configuration for the text form field.
+     * @description Adds a text form field to the document at the specified location.
+     * @example
+     * const result = await this.pdfRef.current?.getDocument().forms.addTextFormField({
+     *   pageIndex: 0,
+     *   bbox: { left: 100, top: 100, right: 300, bottom: 150 },
+     *   fullyQualifiedName: 'TextField1'
+     * });
+     * @returns { Promise<boolean> } A promise containing the result of the operation. ```true``` if the field was added successfully, ```false``` otherwise.
+     */
+    addTextFormField(
+        configuration: TextFormFieldConfiguration
+    ): Promise<boolean> {
+        // Convert bbox to array format if it's an object
+        const bboxArray = Array.isArray(configuration.bbox)
+            ? configuration.bbox
+            : [
+                configuration.bbox.left,
+                configuration.bbox.top,
+                configuration.bbox.right,
+                configuration.bbox.bottom
+            ];
+
+        return NativeModules.PDFDocumentManager.addTextFormField(
+            findNodeHandle(this.pdfViewRef),
+            {
+                pageIndex: configuration.pageIndex,
+                bbox: bboxArray,
+                fullyQualifiedName: configuration.fullyQualifiedName
+            }
+        );
+    }
+}

@@ -1,12 +1,8 @@
 import React, { useState } from 'react';
 import { Modal, StyleSheet, Text, TextInput, View } from 'react-native';
 
-import LinkButton from './linkButton';
+import LinkButton, { LinkButtonStyle } from './linkButton';
 import PrimaryButton from './primaryButton';
-
-interface LinkButtonStyle {
-  container?: { marginRight?: number };
-}
 
 const UrlInput = ({
   shouldRender = false,

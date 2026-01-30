@@ -1,5 +1,5 @@
 //
-//  Copyright © 2018-2025 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2018-2026 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -224,6 +224,23 @@ RCT_EXPORT_MODULE();
         }
         
         [view setExcludedAnnotations:annotations];
+    });
+}
+
+- (void)setUserInterfaceVisible:(nonnull NSString *)reference visible:(nonnull NSNumber *)visible resolve:(nonnull RCTPromiseResolveBlock)resolve reject:(nonnull RCTPromiseRejectBlock)reject {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        RCTPSPDFKitView *view = [[NutrientViewRegistry shared] viewForId:reference];
+        if (!view) {
+            reject(ERR_VIEW_NOT_FOUND, @"Fabric view not found for reference", [self _makeErrorWithCode:ERR_VIEW_NOT_FOUND message:@"Fabric view not found for reference"]);
+            return;
+        }
+        
+        BOOL success = [view setUserInterfaceVisible:[visible boolValue]];
+        if (success) {
+            resolve(@(success));
+        } else {
+            reject(ERR_OPERATION, @"setUserInterfaceVisible failed", [self _makeErrorWithCode:ERR_OPERATION message:@"setUserInterfaceVisible failed"]);
+        }
     });
 }
 

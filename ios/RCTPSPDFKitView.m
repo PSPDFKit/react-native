@@ -1,5 +1,5 @@
 //
-//  Copyright © 2018-2025 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2018-2026 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -902,6 +902,11 @@
     [_sessionStorage setExcludedAnnotations:annotations];
 }
 
+- (BOOL)setUserInterfaceVisible:(BOOL)visible {
+    [self.pdfController setUserInterfaceVisible:visible animated:YES];
+    return YES;
+}
+
 // MARK: - Helpers
 
 - (void)didSetProps:(NSArray<NSString *> *)changedProps {
@@ -1013,6 +1018,53 @@
       }
       controller.documentInfoCoordinator.availableControllerOptions = [availableControllerOptions copy];
       }
+      
+    // Apply toolbar position configuration
+    if ([dictionary objectForKey:@"toolbarPosition"] || [dictionary objectForKey:@"supportedToolbarPositions"]) {
+        // Helper function to convert position string to enum
+        PSPDFFlexibleToolbarPosition (^convertPositionString)(NSString *) = ^PSPDFFlexibleToolbarPosition(NSString *positionString) {
+            if ([positionString isEqualToString:@"top"]) {
+                return PSPDFFlexibleToolbarPositionTop;
+            } else if ([positionString isEqualToString:@"left"]) {
+                return PSPDFFlexibleToolbarPositionLeft;
+            } else if ([positionString isEqualToString:@"right"]) {
+                return PSPDFFlexibleToolbarPositionRight;
+            }
+            return PSPDFFlexibleToolbarPositionTop;
+        };
+        
+        // Helper function to apply toolbar position configuration
+        void (^applyToolbarPosition)(PSPDFFlexibleToolbar *) = ^(PSPDFFlexibleToolbar *toolbar) {
+            if (toolbar != nil) {
+                // Set supported toolbar positions
+                if ([dictionary objectForKey:@"supportedToolbarPositions"]) {
+                    NSArray<NSString *> *positions = [dictionary objectForKey:@"supportedToolbarPositions"];
+                    PSPDFFlexibleToolbarPosition supportedPositions = 0;
+                    for (NSString *positionString in positions) {
+                        supportedPositions |= convertPositionString(positionString);
+                    }
+                    toolbar.supportedToolbarPositions = supportedPositions;
+                }
+                
+                // Set toolbar position
+                if ([dictionary objectForKey:@"toolbarPosition"]) {
+                    NSString *positionString = [dictionary objectForKey:@"toolbarPosition"];
+                    toolbar.toolbarPosition = convertPositionString(positionString);
+                }
+            }
+        };
+        
+        // Apply to annotation toolbar
+        PSPDFAnnotationToolbar *annotationToolbar = controller.annotationToolbarController.annotationToolbar;
+        applyToolbarPosition(annotationToolbar);
+        
+        // Apply to document editor toolbar
+        if (controller.documentEditorController != nil && 
+            controller.documentEditorController.toolbarController != nil) {
+            PSPDFFlexibleToolbar *documentEditorToolbar = controller.documentEditorController.toolbarController.documentEditorToolbar;
+            applyToolbarPosition(documentEditorToolbar);
+        }
+    }
    }
 }
 

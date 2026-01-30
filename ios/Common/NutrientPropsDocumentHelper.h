@@ -14,6 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface NutrientPropsDocumentHelper : NSObject
 
 + (void)applyDocumentFromJSON:(id)json
+         remoteDocumentConfig:(nullable NSDictionary *)remoteDocumentConfig
                        toView:(RCTPSPDFKitView *)view
                  usingManager:(PDFDocumentManager *)manager
                 withReference:(NSNumber *)identifier;

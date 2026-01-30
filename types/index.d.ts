@@ -1347,6 +1347,17 @@ declare class NutrientView extends React.Component<Props, any, any> {
      */
     setExcludedAnnotations: (annotations: string[]) => void;
     /**
+     * Sets the visibility of the user interface controls.
+     *
+     * @method setUserInterfaceVisible
+     * @memberof NutrientView
+     * @param {boolean} visible Whether the user interface controls should be visible.
+     * @example
+     * const result = await this.pdfRef.current?.setUserInterfaceVisible(false);
+     * @returns { Promise<boolean> } A promise containing the result of the operation. ```true``` if the visibility was set successfully, ```false``` otherwise.
+     */
+    setUserInterfaceVisible: (visible: boolean) => Promise<boolean>;
+    /**
      * Removes the currently displayed Android Native ```PdfUiFragment```.
      * This function should only be used as a workaround for a bug in ```react-native-screen``` that causes a crash when
      * ```navigation.goBack()``` is called or a hardware back button is used to navigate back on Android. Calling this
@@ -1512,3 +1523,13 @@ export import PDFPageInfo = pageInfo.PDFPageInfo;
 //@ts-ignore
 import bookmark = require('../src/document/Bookmark');
 export import Bookmark = bookmark.Bookmark;
+
+//@ts-ignore
+import textRect = require('../src/document/TextRect');
+export import TextRect = textRect.TextRect;
+
+//@ts-ignore
+import formFieldConfiguration = require('../src/forms/FormFieldConfiguration');
+export import FormFieldConfiguration = formFieldConfiguration.FormFieldConfiguration;
+export import ElectronicSignatureFieldConfiguration = formFieldConfiguration.ElectronicSignatureFieldConfiguration;
+export import TextFormFieldConfiguration = formFieldConfiguration.TextFormFieldConfiguration;

@@ -108,3 +108,13 @@ export import PDFPageInfo = pageInfo.PDFPageInfo;
 //@ts-ignore
 import bookmark = require('../src/document/Bookmark');
 export import Bookmark = bookmark.Bookmark;
+
+//@ts-ignore
+import textRect = require('../src/document/TextRect');
+export import TextRect = textRect.TextRect;
+
+//@ts-ignore
+import formFieldConfiguration = require('../src/forms/FormFieldConfiguration');
+export import FormFieldConfiguration = formFieldConfiguration.FormFieldConfiguration;
+export import ElectronicSignatureFieldConfiguration = formFieldConfiguration.ElectronicSignatureFieldConfiguration;
+export import TextFormFieldConfiguration = formFieldConfiguration.TextFormFieldConfiguration;

@@ -55,10 +55,10 @@ export function logArchitectureInfo(): void {
 // CommonJS compatibility
 // @ts-ignore - module is available in CommonJS environments
 module.exports = {
-  isNewArchitectureEnabled: isNewArchitectureEnabled,
-  isFabricEnabled: isFabricEnabled,
-  areTurboModulesEnabled: areTurboModulesEnabled,
-  isBridgelessEnabled: isBridgelessEnabled,
-  getArchitectureName: getArchitectureName,
-  logArchitectureInfo: logArchitectureInfo,
+  isNewArchitectureEnabled,
+  isFabricEnabled,
+  areTurboModulesEnabled,
+  isBridgelessEnabled,
+  getArchitectureName,
+  logArchitectureInfo,
 };

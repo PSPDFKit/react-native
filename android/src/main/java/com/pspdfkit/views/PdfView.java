@@ -3,7 +3,7 @@
  *
  *   PSPDFKit
  *
- *   Copyright © 2021-2025 PSPDFKit GmbH. All rights reserved.
+ *   Copyright © 2021-2026 PSPDFKit GmbH. All rights reserved.
  *
  *   THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
  *   AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -13,7 +13,6 @@
 
 package com.pspdfkit.views;
 
-import static com.pspdfkit.annotations.AnnotationProvider.ALL_ANNOTATION_TYPES;
 import static com.pspdfkit.configuration.signatures.SignatureSavingStrategy.*;
 import static com.pspdfkit.react.helper.ConversionHelpers.getAnnotationTypes;
 
@@ -59,6 +58,8 @@ import com.pspdfkit.configuration.PdfConfiguration;
 import com.pspdfkit.configuration.activity.PdfActivityConfiguration;
 import com.pspdfkit.configuration.search.SearchType;
 import com.pspdfkit.configuration.sharing.ShareFeatures;
+
+import java.util.EnumSet;
 import com.pspdfkit.document.DocumentSource;
 import com.pspdfkit.document.ImageDocumentLoader;
 import com.pspdfkit.document.PdfDocument;
@@ -255,6 +256,15 @@ public class PdfView extends FrameLayout {
 
     @Nullable
     private ReadableArray measurementValueConfigurations;
+
+    @Nullable
+    private String toolbarPosition;
+
+    @Nullable
+    private ReadableArray supportedToolbarPositions;
+    
+    @Nullable
+    private List<String> supportedToolbarPositionsList;
 
     private ReactApplicationContext reactApplicationContext;
     // Reference passed from Fabric (nativeID-based). Null in Paper mode.
@@ -484,7 +494,7 @@ public class PdfView extends FrameLayout {
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(pdfDocument -> {
                                 PdfView.this.document = pdfDocument;
-                                reactApplicationContext.getNativeModule(PDFDocumentModule.class).setDocument(pdfDocument, null, reference != null ? reference : this.getId());
+                                reactApplicationContext.getNativeModule(PDFDocumentModule.class).setDocument(pdfDocument, null, reference != null ? reference : this.getId(), PdfView.this);
                                 reactApplicationContext.getNativeModule(PDFDocumentModule.class).updateDocumentConfiguration("imageSaveMode", imageSaveMode, reference != null ? reference : this.getId());
                                 setupFragment(false);
                             }, throwable -> {
@@ -510,7 +520,7 @@ public class PdfView extends FrameLayout {
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(imageDocument -> {
                             PdfView.this.document = imageDocument.getDocument();
-                            reactApplicationContext.getNativeModule(PDFDocumentModule.class).setDocument(imageDocument.getDocument(), imageDocument, reference != null ? reference : this.getId());
+                            reactApplicationContext.getNativeModule(PDFDocumentModule.class).setDocument(imageDocument.getDocument(), imageDocument, reference != null ? reference : this.getId(), PdfView.this);
                             reactApplicationContext.getNativeModule(PDFDocumentModule.class).updateDocumentConfiguration("imageSaveMode", imageSaveMode, reference != null ? reference : this.getId());
                             setupFragment(false);
                         }, throwable -> {
@@ -531,7 +541,7 @@ public class PdfView extends FrameLayout {
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(pdfDocument -> {
                             PdfView.this.document = pdfDocument;
-                            reactApplicationContext.getNativeModule(PDFDocumentModule.class).setDocument(pdfDocument, null, reference != null ? reference : this.getId());
+                            reactApplicationContext.getNativeModule(PDFDocumentModule.class).setDocument(pdfDocument, null, reference != null ? reference : this.getId(), PdfView.this);
                             reactApplicationContext.getNativeModule(PDFDocumentModule.class).updateDocumentConfiguration("imageSaveMode", imageSaveMode, reference != null ? reference : this.getId());
                             setupFragment(false);
                         }, throwable -> {
@@ -569,6 +579,14 @@ public class PdfView extends FrameLayout {
 
     public void setExcludedAnnotations(ReadableArray annotations) {
         pdfViewDocumentListener.setExcludedAnnotations(annotations);
+    }
+
+    public void setUserInterfaceVisible(boolean visible) {
+        pendingFragmentActions.add(getCurrentPdfUiFragment()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(pdfUiFragment -> {
+                    pdfUiFragment.setUserInterfaceVisible(visible, true);
+                }));
     }
 
     public void setDisableDefaultActionForTappedAnnotations(boolean disableDefaultActionForTappedAnnotations) {
@@ -901,7 +919,7 @@ public class PdfView extends FrameLayout {
             @Override
             public void onDocumentLoaded(@NonNull PdfDocument document) {
                 if (reactApplicationContext != null) {
-                    reactApplicationContext.getNativeModule(PDFDocumentModule.class).setDocument(document, null, getId());
+                    reactApplicationContext.getNativeModule(PDFDocumentModule.class).setDocument(document, null, getId(), PdfView.this);
                 }
                 manuallyLayoutChildren();
                 if (pageIndex <= document.getPageCount()-1) {
@@ -1122,7 +1140,7 @@ public class PdfView extends FrameLayout {
 
         ArrayList<Annotation> annotationsToSelect = new ArrayList<>();
 
-        return fragment.getDocument().getAnnotationProvider().getAllAnnotationsOfTypeAsync(ALL_ANNOTATION_TYPES)
+        return fragment.getDocument().getAnnotationProvider().getAllAnnotationsOfTypeAsync(EnumSet.allOf(AnnotationType.class))
                 .toList()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -1303,7 +1321,7 @@ public class PdfView extends FrameLayout {
         AtomicBoolean found = new AtomicBoolean(false);
         return getCurrentPdfFragment().map(PdfFragment::getDocument).subscribeOn(Schedulers.io())
                 .flatMapCompletable(currentDocument -> Completable.fromAction(() -> {
-                    List<Annotation> allAnnotations = currentDocument.getAnnotationProvider().getAllAnnotationsOfType(ALL_ANNOTATION_TYPES);
+                    List<Annotation> allAnnotations = currentDocument.getAnnotationProvider().getAllAnnotationsOfType(EnumSet.allOf(AnnotationType.class));
                     for (int i = 0; i < allAnnotations.size(); i++) {
                         Annotation annotation = allAnnotations.get(i);
                         if (annotation.getUuid().equals(uuid) || 
@@ -1341,7 +1359,7 @@ public class PdfView extends FrameLayout {
     public Disposable getAnnotationFlags(final int requestId, @NonNull String uuid, @Nullable Promise promise) {
         return getCurrentPdfFragment().map(PdfFragment::getDocument).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(currentDocument -> {
-                    List<Annotation> allAnnotations = currentDocument.getAnnotationProvider().getAllAnnotationsOfType(ALL_ANNOTATION_TYPES);
+                    List<Annotation> allAnnotations = currentDocument.getAnnotationProvider().getAllAnnotationsOfType(EnumSet.allOf(AnnotationType.class));
                     ArrayList<String> convertedFlags = new ArrayList<>();
                     for (int i = 0; i < allAnnotations.size(); i++) {
                         Annotation annotation = allAnnotations.get(i);
@@ -1502,7 +1520,7 @@ public class PdfView extends FrameLayout {
             final OutputStream outputStream =  getContext().getContentResolver().openOutputStream(Uri.parse(filePath));
             if (outputStream == null) return null;
 
-            List<Annotation> annotations = fragment.getDocument().getAnnotationProvider().getAllAnnotationsOfType(ALL_ANNOTATION_TYPES);
+            List<Annotation> annotations = fragment.getDocument().getAnnotationProvider().getAllAnnotationsOfType(EnumSet.allOf(AnnotationType.class));
 
             List<FormField> formFields  = Collections.emptyList();
             if (PSPDFKit.getLicenseFeatures().contains(LicenseFeature.FORMS)) {
@@ -1553,7 +1571,7 @@ public class PdfView extends FrameLayout {
             config.put("androidShowSearchAction", fragment.getConfiguration().isSearchEnabled());
             config.put("androidShowOutlineAction", fragment.getConfiguration().isOutlineEnabled());
             config.put("androidShowBookmarksAction", fragment.getConfiguration().isBookmarkListEnabled());
-            config.put("androidShowShareAction", fragment.getConfiguration().getConfiguration().getEnabledShareFeatures() == ShareFeatures.all() ? true : false);
+            config.put("androidShowShareAction", fragment.getConfiguration().getConfiguration().getEnabledShareFeatures().equals(EnumSet.allOf(ShareFeatures.class)));
             config.put("androidShowPrintAction", fragment.getConfiguration().isPrintingEnabled());
             config.put("androidShowDocumentInfoView", fragment.getConfiguration().isDocumentInfoViewEnabled());
             config.put("androidShowSettingsMenu", fragment.getConfiguration().isSettingsItemEnabled());
@@ -1643,6 +1661,69 @@ public class PdfView extends FrameLayout {
         if (fragment != null && fragment.getPdfFragment() != null) {
             this.applyMeasurementValueConfigurations(fragment.getPdfFragment(), measurementConfigs);
         }
+    }
+
+    /**
+     * Sets the toolbar position for the annotation toolbar.
+     * @param toolbarPosition The position string ("top", "left", or "right")
+     */
+    public void setToolbarPosition(@Nullable String toolbarPosition) {
+        this.toolbarPosition = toolbarPosition;
+    }
+
+    /**
+     * Sets the supported toolbar positions for the annotation toolbar.
+     * @param supportedToolbarPositions Array of position strings ("top", "left", "right")
+     */
+    public void setSupportedToolbarPositions(@Nullable ReadableArray supportedToolbarPositions) {
+        this.supportedToolbarPositions = supportedToolbarPositions;
+        
+        // Convert to List<String> for persistence (ReadableArray can become invalid)
+        if (supportedToolbarPositions != null) {
+            supportedToolbarPositionsList = new ArrayList<>();
+            for (int i = 0; i < supportedToolbarPositions.size(); i++) {
+                supportedToolbarPositionsList.add(supportedToolbarPositions.getString(i));
+            }
+        } else {
+            supportedToolbarPositionsList = null;
+        }
+    }
+
+    /**
+     * Gets the toolbar position.
+     * @return The toolbar position string
+     */
+    @Nullable
+    public String getToolbarPosition() {
+        return toolbarPosition;
+    }
+
+    /**
+     * Gets the supported toolbar positions.
+     * @return Array of supported toolbar position strings
+     */
+    @Nullable
+    public ReadableArray getSupportedToolbarPositions() {
+        // Try to use the persistent list first
+        if (supportedToolbarPositionsList != null && !supportedToolbarPositionsList.isEmpty()) {
+            // Convert List back to ReadableArray
+            com.facebook.react.bridge.WritableArray array = com.facebook.react.bridge.Arguments.createArray();
+            for (String pos : supportedToolbarPositionsList) {
+                array.pushString(pos);
+            }
+            return array;
+        }
+        
+        // Fallback to original ReadableArray if list is not available
+        if (supportedToolbarPositions != null) {
+            try {
+                return supportedToolbarPositions;
+            } catch (Exception e) {
+                return null;
+            }
+        }
+        
+        return null;
     }
 
     /**

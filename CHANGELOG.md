@@ -1,3 +1,14 @@
+## 4.1.0 — 30 Jan 2026
+
+- Adds the `updateAnnotations` API to `PDFDocument` to update existing annotation properties. (J#HYB-828)
+- Adds the `setUserInterfaceVisible` API to `NutrientView` to toggle the visibility of the user interface controls. (J#HYB-923)
+- Adds the `toolbarPosition` and `supportedToolbarPositions` options to the `PDFConfiguration` object to control the annotation toolbar position. (J#HYB-922)
+- Adds the `addTextFormField` and `addElectronicSignatureFormField` APIs to support programmatic form field creation. (J#HYB-924)
+- Updates the base `Annotation` model to expose the `group` property to control annotation grouping. (J#HYB-889)
+- Updates for Nutrient Android SDK 10.10.1.
+- Updates for Nutrient iOS SDK 26.4.0.
+- Fixes an issue where the `RemoteDocumentConfiguration` wasn’t being applied on iOS when opening a remote document. (J#HYB-939)
+
 ## 4.0.1 — 28 Nov 2025
 
 - Fixes an issue where the `setLicenseKeys` API could throw an error on iOS. (J#HYB-916)
@@ -6,6 +17,8 @@
 
 - Adds support for React Native’s new architecture. (J#HYB-847)
 - Updates the `onDocumentLoadFailed` and `DocumentEvent.LOAD_FAILED` events to include a reason code and message. (J#HYB-903)
+- Updates for Nutrient Android SDK 10.8.0.
+- Updates for Nutrient iOS SDK 26.2.0.
 
 ## 3.2.0 — 20 Oct 2025
 

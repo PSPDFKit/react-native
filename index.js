@@ -1,4 +1,4 @@
-//  Copyright © 2018-2025 PSPDFKit GmbH d/b/a Nutrient. All rights reserved.
+//  Copyright © 2018-2026 PSPDFKit GmbH d/b/a Nutrient. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -1408,6 +1408,49 @@ class NutrientView extends React.Component {
         findNodeHandle(this._componentRef.current),
         this._getViewManagerConfig('RCTPSPDFKitView').Commands.setExcludedAnnotations,
         [annotations],
+      );
+    }
+  };
+
+  /**
+   * Sets the visibility of the user interface controls.
+   * 
+   * @method setUserInterfaceVisible
+   * @memberof NutrientView
+   * @param {boolean} visible Whether the user interface controls should be visible.
+   * @example
+   * const result = await this.pdfRef.current?.setUserInterfaceVisible(false);
+   * @returns { Promise<boolean> } A promise containing the result of the operation. ```true``` if the visibility was set successfully, ```false``` otherwise.
+   */
+  setUserInterfaceVisible = function (visible) {
+    // Architecture detection via helper function
+    const { isNewArchitectureEnabled } = require('./lib/ArchitectureDetector');
+    if (isNewArchitectureEnabled()) {
+      // Delegate to Fabric component
+      return this._fabricRef.current?.setUserInterfaceVisible(visible);
+    }
+
+    if (Platform.OS === 'android') {
+      let requestId = this._nextRequestId++;
+      let requestMap = this._requestMap;
+
+      // We create a promise here that will be resolved once onDataReturned is called.
+      let promise = new Promise(function (resolve, reject) {
+        requestMap[requestId] = { resolve: resolve, reject: reject };
+      });
+
+      UIManager.dispatchViewManagerCommand(
+        findNodeHandle(this._componentRef.current),
+        this._getViewManagerConfig('RCTPSPDFKitView').Commands
+          .setUserInterfaceVisible,
+        [requestId, visible],
+      );
+
+      return promise;
+    } else if (Platform.OS === 'ios') {
+      return NativeModules.PSPDFKitViewManager.setUserInterfaceVisible(
+        visible,
+        findNodeHandle(this._componentRef.current),
       );
     }
   };

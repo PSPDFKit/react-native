@@ -107,6 +107,8 @@ import { AIAssistantConfiguration } from './AIAssistantConfiguration';
  * @property { PDFConfiguration.IOSFileConflictResolution } [iOSFileConflictResolution] Resolution options for conflicts due to out of process file changes or deletion.
  * @property { PDFConfiguration.IOSDocumentInfoOption[] } [iOSDocumentInfoOptions] Choose which document-related information to display in the document info controller.
  * @property { PDFConfiguration.BooleanType } [androidEnableStylusOnDetection] Indicates whether we should automatically detect the stylus. Enabling this will automatically disable all other inputs once we detect stylus use. Defaults to true.
+ * @property { PDFConfiguration.ToolbarPosition } [toolbarPosition] Sets the position of the annotation toolbar.
+ * @property { PDFConfiguration.ToolbarPosition[] } [supportedToolbarPositions] Sets the available positions for the annotation toolbar.
  */
 
 export class PDFConfiguration {
@@ -501,6 +503,14 @@ export class PDFConfiguration {
      * Indicates whether we should automatically detect the stylus. Enabling this will automatically disable all other inputs once we detect stylus use. Defaults to true.
      */
     androidEnableStylusOnDetection?: PDFConfiguration.BooleanType;
+    /**
+     * Sets the position of the annotation toolbar.
+     */
+    toolbarPosition?: PDFConfiguration.ToolbarPosition;
+    /**
+     * Sets the available positions for the annotation toolbar.
+     */
+    supportedToolbarPositions?: PDFConfiguration.ToolbarPosition[];
 }
 
 export namespace PDFConfiguration {
@@ -1053,6 +1063,26 @@ export namespace PDFConfiguration {
         SECURITY: 'security'
      } as const;
 
+   /**
+    * The ToolbarPosition options.
+    * @readonly
+    * @enum {string} ToolbarPosition
+    */
+   export const ToolbarPosition = {
+       /**
+        * Position the toolbar at the top.
+        */
+        TOP: 'top',
+       /**
+        * Position the toolbar on the left.
+        */
+        LEFT: 'left',
+       /**
+        * Position the toolbar on the right.
+        */
+        RIGHT: 'right'
+    } as const;
+
     export type BooleanType = ValueOf<typeof BooleanType>;
     export type ScrollDirection = ValueOf<typeof ScrollDirection>;
     export type PageTransition = ValueOf<typeof PageTransition>;
@@ -1076,6 +1106,7 @@ export namespace PDFConfiguration {
     export type IOSBookmarkSortOrder = ValueOf<typeof IOSBookmarkSortOrder>;
     export type IOSFileConflictResolution = ValueOf<typeof IOSFileConflictResolution>;
     export type IOSDocumentInfoOption = ValueOf<typeof IOSDocumentInfoOption>;
+    export type ToolbarPosition = ValueOf<typeof ToolbarPosition>;
 }
 
 /**

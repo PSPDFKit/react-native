@@ -583,17 +583,44 @@ static imageAnnotation: ImageAnnotation = {
               </View>
               <View style={styles.horizontalContainer}>
                 <TouchableOpacity onPress={() => {
-                  // Get ink annotations from the current page.
+                  // Get ink annotations from the current page & update first annotation.
                   this.pdfRef.current?.getDocument().getAnnotationsForPage(
                       this.state.currentPageIndex,
                       Annotation.Type.INK,
                     )
-                    .then((annotations: AnnotationType[]) => {
+                    .then(async (annotations: AnnotationType[]) => {
                       if (annotations) {
                         if (annotations[0] instanceof InkAnnotation) {
                             const inkAnnotation = annotations[0] as InkAnnotation;
                             // Access InkAnnotation specific properties
                             console.log(inkAnnotation.bbox);
+                            
+                            // Move annotation 100 pixels down (simple translation, no scaling or rotation)
+                            // Calculate translation offset: move 100 pixels down (increase Y by 100)
+                            const offsetX = 0;
+                            const offsetY = 100;
+                            
+                            // Simply translate all points by the offset (preserves shape and orientation)
+                            const adjustedPoints = inkAnnotation.lines.points.map(stroke => 
+                                stroke.map(point => [
+                                    point[0] + offsetX,
+                                    point[1] + offsetY
+                                ])
+                            );
+                            
+                            // Update annotation properties
+                            inkAnnotation.color = '#FFFFFF';
+                            inkAnnotation.lines = {
+                              ...inkAnnotation.lines,
+                              points: adjustedPoints as Array<Array<[number, number]>>
+                            };
+                            // Don't manually set bbox - Nutrient will recalculate it from the updated points
+                            
+                            console.log(inkAnnotation);
+                            await this.pdfRef.current?.getDocument().updateAnnotations([inkAnnotation])
+                              .catch((error: any) => {
+                                Alert.alert('Nutrient', 'Failed to update annotations: ' + JSON.stringify(error));
+                              });
                         }
                         Alert.alert('Nutrient', 'All Ink Annotations: ' + JSON.stringify(annotations));
                       } else {
@@ -604,7 +631,7 @@ static imageAnnotation: ImageAnnotation = {
                       Alert.alert('Nutrient', JSON.stringify(error));
                     });
                 }}>
-                  <Text style={styles.button}>{'Get Ink Annotations'}</Text>
+                  <Text style={styles.button}>{'Update Ink Annotations'}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => {
                   // Select all the Ink annotations on page 0.

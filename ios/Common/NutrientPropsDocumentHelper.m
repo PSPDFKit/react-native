@@ -23,10 +23,10 @@
 
 @implementation NutrientPropsDocumentHelper
 
-+ (void)applyDocumentFromJSON:(id)json toView:(RCTPSPDFKitView *)view usingManager:(PDFDocumentManager *)manager withReference:(NSNumber *)identifier {
++ (void)applyDocumentFromJSON:(id)json remoteDocumentConfig:(NSDictionary *)remoteDocumentConfig toView:(RCTPSPDFKitView *)view usingManager:(PDFDocumentManager *)manager withReference:(NSNumber *)identifier {
 	if (!json) { return; }
 	view.pdfController.document = [RCTConvert PSPDFDocument:json
-									 remoteDocumentConfig:[view.configurationJSON objectForKey:@"remoteDocumentConfiguration"]];
+									 remoteDocumentConfig:remoteDocumentConfig];
 	view.pdfController.document.delegate = (id<PSPDFDocumentDelegate>)view;
 
 #if RCT_NEW_ARCH_ENABLED
@@ -46,10 +46,6 @@
 		PSPDFImageDocument *imageDocument = (PSPDFImageDocument *)view.pdfController.document;
 		imageDocument.imageSaveMode = view.imageSaveMode;
 	}
-
-//	[view.pdfController updateConfigurationWithBuilder:^(PSPDFConfigurationBuilder *builder) {
-//		[builder overrideClass:PSPDFFontPickerViewController.class withClass:CustomFontPickerViewController.class];
-//	}];
 }
 
 + (void)applyPageIndexFromJSON:(id)json toView:(RCTPSPDFKitView *)view {
@@ -61,7 +57,6 @@
 
 + (void)applyConfigurationFromJSON:(id)json toView:(RCTPSPDFKitView *)view {
 	if (!json) { return; }
-//	view.configurationJSON = json;
     [view applyDocumentConfiguration:json];
 }
 

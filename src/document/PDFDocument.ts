@@ -30,11 +30,12 @@ import {
   WidgetAnnotation,
   AnnotationAttachment} from '../annotations/AnnotationModels';
 import { Annotation } from '../annotations/Annotation';
-import { FormField } from '../forms/FormField';
-import { FormElement } from '../forms/FormElement';
+import { ButtonFormField, ChoiceFormField, FormField, SignatureFormField, TextFormField } from '../forms/FormField';
+import { ButtonFormElement, ChoiceFormElement, FormElement, SignatureFormElement, TextFieldFormElement } from '../forms/FormElement';
 import { Forms } from '../forms/Forms';
 import { PDFPageInfo } from './PDFPageInfo';
 import { Bookmark } from './Bookmark';
+import { TextRect } from './TextRect';
 
 /**
  * @class PDFDocument
@@ -73,6 +74,405 @@ export class PDFDocument {
         ref = this.pdfViewRef;
       }
       return ref;
+    }
+
+   /**
+    * @private
+    * @method createAnnotationInstance
+    * @description Creates an annotation instance from a raw annotation object based on its type.
+    * @param {any} annotation The raw annotation object from native
+    * @returns {any | undefined} The created annotation instance, or undefined if type is not recognized
+    */
+    private createAnnotationInstance(annotation: any): any | undefined {
+      let annotationInstance: any;
+      
+      // Convert each annotation based on its type
+      switch (annotation.type) {
+        case 'pspdfkit/comment-marker':
+        case 'comment-marker':
+          annotationInstance = new CommentMarkerAnnotation(annotation);
+          break;
+        case 'pspdfkit/shape/ellipse':
+        case 'shape/ellipse':
+        case 'ellipse':
+          annotationInstance = new EllipseShapeAnnotation(annotation);
+          break;
+        case 'pspdfkit/markup/highlight':
+        case 'markup/highlight':
+        case 'highlight':
+          annotationInstance = new HighlightMarkupAnnotation(annotation);
+          break;
+        case 'pspdfkit/image':
+        case 'image':
+          annotationInstance = new ImageAnnotation(annotation);
+          break;
+        case 'pspdfkit/ink':
+        case 'ink':
+          annotationInstance = new InkAnnotation(annotation);
+          break;
+        case 'pspdfkit/shape/line':
+        case 'shape/line':
+        case 'line':
+          annotationInstance = new LineShapeAnnotation(annotation);
+          break;
+        case 'pspdfkit/link':
+        case 'link':
+          annotationInstance = new LinkAnnotation(annotation);
+          break;
+        case 'pspdfkit/media':
+        case 'media':
+          annotationInstance = new MediaAnnotation(annotation);
+          break;
+        case 'pspdfkit/note':
+        case 'note':
+          annotationInstance = new NoteAnnotation(annotation);
+          break;
+        case 'pspdfkit/shape/polygon':
+        case 'shape/polygon':
+        case 'polygon':
+          annotationInstance = new PolygonShapeAnnotation(annotation);
+          break;
+        case 'pspdfkit/shape/polyline':
+        case 'shape/polyline':
+        case 'polyline':
+          annotationInstance = new PolylineShapeAnnotation(annotation);
+          break;
+        case 'pspdfkit/shape/rectangle':
+        case 'shape/rectangle':
+        case 'rectangle':
+          annotationInstance = new RectangleShapeAnnotation(annotation);
+          break;
+        case 'pspdfkit/markup/redaction':
+        case 'markup/redaction':
+        case 'redaction':
+          annotationInstance = new RedactionMarkupAnnotation(annotation);
+          break;
+        case 'pspdfkit/markup/squiggly':
+        case 'markup/squiggly':
+        case 'squiggly':
+          annotationInstance = new SquigglyMarkupAnnotation(annotation);
+          break;
+        case 'pspdfkit/stamp':
+        case 'stamp':
+          annotationInstance = new StampAnnotation(annotation);
+          break;
+        case 'pspdfkit/markup/strikeout':
+        case 'markup/strikeout':
+        case 'strikeout':
+          annotationInstance = new StrikeOutMarkupAnnotation(annotation);
+          break;
+        case 'pspdfkit/text':
+        case 'text':
+          annotationInstance = new TextAnnotation(annotation);
+          break;
+        case 'pspdfkit/markup/underline':
+        case 'markup/underline':
+        case 'underline':
+          annotationInstance = new UnderlineMarkupAnnotation(annotation);
+          break;
+        case 'pspdfkit/widget':
+        case 'widget':
+
+          annotationInstance = new WidgetAnnotation(annotation);
+          const formElement = annotation.formElement;
+          if (formElement) {
+              const formType = formElement.formTypeName?.toLowerCase();
+              let formElementInstance;
+              let formFieldInstance;
+
+              switch (formType) {
+                  case 'button':
+                      formElementInstance = new ButtonFormElement(formElement);
+                      if (formElement.formField) {
+                          formFieldInstance = new ButtonFormField(
+                              formElement.formField,
+                          );
+                      }
+                      break;
+                  case 'choice':
+                      formElementInstance = new ChoiceFormElement(formElement);
+                      if (formElement.formField) {
+                          formFieldInstance = new ChoiceFormField(
+                              formElement.formField,
+                          );
+                      }
+                      break;
+                  case 'signature':
+                      formElementInstance = new SignatureFormElement(formElement);
+                      if (formElement.formField) {
+                          formFieldInstance = new SignatureFormField(
+                              formElement.formField,
+                          );
+                      }
+                      break;
+                  case 'textfield':
+                      formElementInstance = new TextFieldFormElement(formElement);
+                      if (formElement.formField) {
+                          formFieldInstance = new TextFormField(
+                              formElement.formField,
+                          );
+                      }
+                      break;
+                  default:
+                      formElementInstance = new FormElement(formElement);
+                      if (formElement.formField) {
+                          formFieldInstance = new FormField(formElement.formField);
+                      }
+                      break;
+              }
+
+              formElementInstance.pdfViewRef = findNodeHandle(this.pdfViewRef);
+              if (formFieldInstance) {
+                  formElementInstance.formField = formFieldInstance;
+              }
+              annotationInstance.formElement = formElementInstance;
+          }
+          break;
+        default:
+          return undefined;
+      }
+      
+      return annotationInstance;
+    }
+
+   /**
+    * @private
+    * @method wrapAnnotationWithChangeTracking
+    * @description Wraps an annotation object with a Proxy to track property changes.
+    * Stores original values and tracks which properties have been modified.
+    * @param {any} annotation The annotation object to wrap
+    * @returns {any} The wrapped annotation with change tracking
+    */
+    private wrapAnnotationWithChangeTracking(annotation: any): any {
+      // Store original values by deep cloning (only serializable properties)
+      const originalValues: any = {};
+      try {
+        const cloned = JSON.parse(JSON.stringify(annotation));
+        // Copy all enumerable properties to originalValues
+        for (const key in cloned) {
+          if (cloned.hasOwnProperty(key) && !key.startsWith('_')) {
+            originalValues[key] = cloned[key];
+          }
+        }
+      } catch (e) {
+        // If cloning fails, fall back to shallow copy of enumerable properties
+        for (const key in annotation) {
+          if (annotation.hasOwnProperty(key) && !key.startsWith('_')) {
+            originalValues[key] = annotation[key];
+          }
+        }
+      }
+      
+      // Track changed properties
+      const changedProperties = new Set<string>();
+      
+      // Helper to compare values with proper deep equality (order-independent)
+      const valuesEqual = (a: any, b: any): boolean => {
+        // Primitive comparison
+        if (a === b) return true;
+        if (a == null || b == null) return a === b;
+        if (typeof a !== typeof b) return false;
+        
+        // Handle arrays
+        if (Array.isArray(a) && Array.isArray(b)) {
+          if (a.length !== b.length) return false;
+          for (let i = 0; i < a.length; i++) {
+            if (!valuesEqual(a[i], b[i])) return false;
+          }
+          return true;
+        }
+        
+        // Handle objects (but not arrays, Date, RegExp, etc.)
+        if (typeof a === 'object' && typeof b === 'object') {
+          const keysA = Object.keys(a);
+          const keysB = Object.keys(b);
+          
+          if (keysA.length !== keysB.length) return false;
+          
+          // Check all keys in a are in b and values match (order-independent)
+          for (const key of keysA) {
+            if (!keysB.includes(key)) return false;
+            if (!valuesEqual(a[key], b[key])) return false;
+          }
+          
+          return true;
+        }
+        
+        return false;
+      };
+      
+      // Store the original constructor and prototype for instanceof checks
+      const OriginalConstructor = annotation.constructor;
+      let OriginalPrototype = OriginalConstructor?.prototype || Object.getPrototypeOf(annotation);
+      
+      // Fix for module mismatch: User imports from package, we import from source
+      // Try to get the user's class from the package to ensure instanceof works
+      // We check if the constructor name matches a known annotation class
+      if (OriginalConstructor?.name) {
+        try {
+          const packageModule = require('@nutrient-sdk/react-native');
+          const userClass = packageModule[OriginalConstructor.name];
+          if (userClass && userClass.prototype) {
+            // Use the user's class prototype instead of the local one
+            OriginalPrototype = userClass.prototype;
+          }
+        } catch (e) {
+          // If we can't get the package module, fall back to local prototype
+        }
+      }
+      
+      // Create a new object that inherits from the constructor's prototype
+      // This ensures instanceof works correctly with the actual class prototype
+      const wrapped = Object.create(OriginalPrototype);
+      
+      // Ensure the constructor is set correctly on the wrapped object
+      // This is important for instanceof checks
+      if (OriginalConstructor) {
+        try {
+          Object.defineProperty(wrapped, 'constructor', {
+            value: OriginalConstructor,
+            writable: true,
+            enumerable: false,
+            configurable: true
+          });
+        } catch (e) {
+          // If we can't set constructor, try simple assignment
+          try {
+            wrapped.constructor = OriginalConstructor;
+          } catch (e2) {
+            // Ignore if we can't set constructor
+          }
+        }
+      }
+      
+      // Copy all properties from annotation to wrapped object
+      // Get all own property names (including non-enumerable)
+      const ownNames = Object.getOwnPropertyNames(annotation);
+      // Get all own symbol properties
+      const ownSymbols = Object.getOwnPropertySymbols(annotation);
+      
+      // Copy all own property names
+      for (const key of ownNames) {
+        try {
+          const descriptor = Object.getOwnPropertyDescriptor(annotation, key);
+          if (descriptor) {
+            Object.defineProperty(wrapped, key, {
+              value: descriptor.value,
+              writable: descriptor.writable !== false,
+              enumerable: descriptor.enumerable !== false,
+              configurable: descriptor.configurable !== false,
+              get: descriptor.get,
+              set: descriptor.set
+            });
+          }
+        } catch (e) {
+          // If descriptor copy fails, try simple assignment
+          try {
+            wrapped[key] = annotation[key];
+          } catch (e2) {
+            // Ignore if we can't copy
+          }
+        }
+      }
+      
+      // Copy all symbol properties
+      for (const key of ownSymbols) {
+        try {
+          const descriptor = Object.getOwnPropertyDescriptor(annotation, key);
+          if (descriptor) {
+            Object.defineProperty(wrapped, key, {
+              value: descriptor.value,
+              writable: descriptor.writable !== false,
+              enumerable: descriptor.enumerable !== false,
+              configurable: descriptor.configurable !== false,
+              get: descriptor.get,
+              set: descriptor.set
+            });
+          }
+        } catch (e) {
+          // If descriptor copy fails, try simple assignment
+          try {
+            wrapped[key] = annotation[key];
+          } catch (e2) {
+            // Ignore if we can't copy
+          }
+        }
+      }
+      
+      // Now create Proxy on the wrapped object (which has correct prototype)
+      const proxy = new Proxy(wrapped, {
+        getPrototypeOf(target: any): object | null {
+          return OriginalPrototype;
+        },
+        
+        set(target: any, property: string | symbol, value: any): boolean {
+          const prop = String(property);
+          
+          // Skip tracking internal properties and methods
+          if (prop.startsWith('_') || prop === 'constructor' || typeof target[property] === 'function') {
+            target[property] = value;
+            return true;
+          }
+          
+          // Get original value
+          const originalValue = originalValues[prop];
+          
+          // Check if value has changed
+          const hasChanged = !valuesEqual(originalValue, value);
+          
+          if (hasChanged) {
+            changedProperties.add(prop);
+          } else {
+            // If value matches original, remove from changed set
+            changedProperties.delete(prop);
+          }
+          
+          // Set the property
+          target[property] = value;
+          
+          return true;
+        },
+        
+        get(target: any, property: string | symbol): any {
+          const prop = String(property);
+          
+          // Expose change tracking metadata
+          if (prop === '_changeTracking') {
+            return {
+              originalValues: originalValues,
+              changedProperties: changedProperties,
+              getChangedProperties: () => Array.from(changedProperties),
+              hasChanges: () => changedProperties.size > 0,
+              getChangedObject: () => {
+                const changed: any = {};
+                changedProperties.forEach(prop => {
+                  changed[prop] = target[prop];
+                });
+                return changed;
+              }
+            };
+          }
+          
+          // Preserve constructor access
+          if (prop === 'constructor') {
+            return OriginalConstructor;
+          }
+          
+          return target[property];
+        }
+      });
+      
+      // Try to set Proxy's prototype - this is what instanceof checks
+      // If this fails, the wrapped object already has the correct prototype
+      // so instanceof should still work via getPrototypeOf trap
+      try {
+        Object.setPrototypeOf(proxy, OriginalPrototype);
+      } catch (e) {
+        // If setPrototypeOf fails, the getPrototypeOf trap should handle it
+        // But some engines might not use the trap for instanceof
+      }
+      
+      return proxy;
     }
 
    /**
@@ -182,86 +582,9 @@ export class PDFDocument {
       }
       
       return annotations.map((annotation: any) => {
-          // Convert each annotation based on its type
-          switch (annotation.type) {
-              case 'pspdfkit/comment-marker':
-              case 'comment-marker':
-                  return new CommentMarkerAnnotation(annotation);
-              case 'pspdfkit/shape/ellipse':
-              case 'shape/ellipse':
-              case 'ellipse':
-                  return new EllipseShapeAnnotation(annotation);
-              case 'pspdfkit/markup/highlight':
-              case 'markup/highlight':
-              case 'highlight':
-                  return new HighlightMarkupAnnotation(annotation);
-              case 'pspdfkit/image':
-              case 'image':
-                  return new ImageAnnotation(annotation);
-              case 'pspdfkit/ink':
-              case 'ink':
-                  return new InkAnnotation(annotation);
-              case 'pspdfkit/shape/line':
-              case 'shape/line':
-              case 'line':
-                  return new LineShapeAnnotation(annotation);
-              case 'pspdfkit/link':
-              case 'link':
-                  return new LinkAnnotation(annotation);
-              case 'pspdfkit/media':
-              case 'media':
-                  return new MediaAnnotation(annotation);
-              case 'pspdfkit/note':
-              case 'note':
-                  return new NoteAnnotation(annotation);
-              case 'pspdfkit/shape/polygon':
-              case 'shape/polygon':
-              case 'polygon':
-                  return new PolygonShapeAnnotation(annotation);
-              case 'pspdfkit/shape/polyline':
-              case 'shape/polyline':
-              case 'polyline':
-                  return new PolylineShapeAnnotation(annotation);
-              case 'pspdfkit/shape/rectangle':
-              case 'shape/rectangle':
-              case 'rectangle':
-                  return new RectangleShapeAnnotation(annotation);
-              case 'pspdfkit/markup/redaction':
-              case 'markup/redaction':
-              case 'redaction':
-                  return new RedactionMarkupAnnotation(annotation);
-              case 'pspdfkit/markup/squiggly':
-              case 'markup/squiggly':
-              case 'squiggly':
-                  return new SquigglyMarkupAnnotation(annotation);
-              case 'pspdfkit/stamp':
-              case 'stamp':
-                  return new StampAnnotation(annotation);
-              case 'pspdfkit/markup/strikeout':
-              case 'markup/strikeout':
-              case 'strikeout':
-                  return new StrikeOutMarkupAnnotation(annotation);
-              case 'pspdfkit/text':
-              case 'text':
-                  return new TextAnnotation(annotation);
-              case 'pspdfkit/markup/underline':
-              case 'markup/underline':
-              case 'underline':
-                  return new UnderlineMarkupAnnotation(annotation);
-              case 'pspdfkit/widget':
-              case 'widget':
-                  const widgetAnnotation = new WidgetAnnotation(annotation);
-                  if (annotation.formElement) {
-                      widgetAnnotation.formElement = new FormElement(annotation.formElement);
-                      widgetAnnotation.formElement.pdfViewRef = findNodeHandle(this.pdfViewRef);
-                      if (annotation.formElement.formField) {
-                        widgetAnnotation.formElement.formField = new FormField(annotation.formElement.formField);
-                    }
-                  }
-                  return widgetAnnotation;
-              default:
-                  return undefined;
-          }
+          const annotationInstance = this.createAnnotationInstance(annotation);
+          // Wrap with change tracking if annotation was created
+          return annotationInstance ? this.wrapAnnotationWithChangeTracking(annotationInstance) : undefined;
       }).filter(Boolean); // Filter out undefined values
   }
 
@@ -284,86 +607,9 @@ export class PDFDocument {
         }
         
         return annotations.map((annotation: any) => {
-            // Convert each annotation based on its type
-            switch (annotation.type) {
-                case 'pspdfkit/comment-marker':
-                case 'comment-marker':
-                    return new CommentMarkerAnnotation(annotation);
-                case 'pspdfkit/shape/ellipse':
-                case 'shape/ellipse':
-                case 'ellipse':
-                    return new EllipseShapeAnnotation(annotation);
-                case 'pspdfkit/markup/highlight':
-                case 'markup/highlight':
-                case 'highlight':
-                    return new HighlightMarkupAnnotation(annotation);
-                case 'pspdfkit/image':
-                case 'image':
-                    return new ImageAnnotation(annotation);
-                case 'pspdfkit/ink':
-                case 'ink':
-                    return new InkAnnotation(annotation);
-                case 'pspdfkit/shape/line':
-                case 'shape/line':
-                case 'line':
-                    return new LineShapeAnnotation(annotation);
-                case 'pspdfkit/link':
-                case 'link':
-                    return new LinkAnnotation(annotation);
-                case 'pspdfkit/media':
-                case 'media':
-                    return new MediaAnnotation(annotation);
-                case 'pspdfkit/note':
-                case 'note':
-                    return new NoteAnnotation(annotation);
-                case 'pspdfkit/shape/polygon':
-                case 'shape/polygon':
-                case 'polygon':
-                    return new PolygonShapeAnnotation(annotation);
-                case 'pspdfkit/shape/polyline':
-                case 'shape/polyline':
-                case 'polyline':
-                    return new PolylineShapeAnnotation(annotation);
-                case 'pspdfkit/shape/rectangle':
-                case 'shape/rectangle':
-                case 'rectangle':
-                    return new RectangleShapeAnnotation(annotation);
-                case 'pspdfkit/markup/redaction':
-                case 'markup/redaction':
-                case 'redaction':
-                    return new RedactionMarkupAnnotation(annotation);
-                case 'pspdfkit/markup/squiggly':
-                case 'markup/squiggly':
-                case 'squiggly':
-                    return new SquigglyMarkupAnnotation(annotation);
-                case 'pspdfkit/stamp':
-                case 'stamp':
-                    return new StampAnnotation(annotation);
-                case 'pspdfkit/markup/strikeout':
-                case 'markup/strikeout':
-                case 'strikeout':
-                    return new StrikeOutMarkupAnnotation(annotation);
-                case 'pspdfkit/text':
-                case 'text':
-                    return new TextAnnotation(annotation);
-                case 'pspdfkit/markup/underline':
-                case 'markup/underline':
-                case 'underline':
-                    return new UnderlineMarkupAnnotation(annotation);
-                case 'pspdfkit/widget':
-                case 'widget':
-                    const widgetAnnotation = new WidgetAnnotation(annotation);
-                    if (annotation.formElement) {
-                        widgetAnnotation.formElement = new FormElement(annotation.formElement);
-                        widgetAnnotation.formElement.pdfViewRef = findNodeHandle(this.pdfViewRef);
-                        if (annotation.formElement.formField) {
-                            widgetAnnotation.formElement.formField = new FormField(annotation.formElement.formField);
-                        }
-                    }
-                    return widgetAnnotation;
-                default:
-                  return undefined;
-            }
+            const annotationInstance = this.createAnnotationInstance(annotation);
+            // Wrap with change tracking if annotation was created
+            return annotationInstance ? this.wrapAnnotationWithChangeTracking(annotationInstance) : undefined;
           }).filter(Boolean); // Filter out undefined values
     }
 
@@ -378,6 +624,53 @@ export class PDFDocument {
     */
     removeAnnotations(annotations: Array<any> | Array<AnnotationType>): Promise<boolean> {
       return NativeModules.PDFDocumentManager.removeAnnotations(this.getRef(), annotations);
+    }
+
+   /**
+    * @method updateAnnotations
+    * @memberof PDFDocument
+    * @param {Array<any> | Array<AnnotationType>} annotations An array of annotation objects that have been modified.
+    * @description Updates the specified annotations in the document. Only properties that have been modified since the annotation was retrieved will be updated.
+    * @example
+    * const annotations = await this.pdfRef.current?.getDocument().getAnnotations();
+    * annotations[0].color = '#FF0000';
+    * annotations[0].opacity = 0.5;
+    * const result = await this.pdfRef.current?.getDocument().updateAnnotations(annotations);
+    * @returns { Promise<boolean> } A promise containing the result of the operation. An exception will be thrown if an error occurred.
+    */
+    updateAnnotations(annotations: Array<any> | Array<AnnotationType>): Promise<boolean> {
+      // Extract only changed properties from each annotation
+      const updatePayload = annotations.map((annotation: any) => {
+        // Check if annotation has change tracking
+        const changeTracking = annotation._changeTracking;
+        
+        if (!changeTracking || !changeTracking.hasChanges()) {
+          // If no change tracking or no changes, return minimal payload with just identifier
+          return {
+            uuid: annotation.uuid,
+            name: annotation.name
+          };
+        }
+        
+        // Get changed properties
+        const changedProps = changeTracking.getChangedObject();
+        
+        // Always include uuid/name for matching on native side
+        return {
+          uuid: annotation.uuid,
+          name: annotation.name,
+          ...changedProps
+        };
+      }).filter((payload: any) => {
+        // Filter out annotations that have no identifier
+        return payload.uuid || payload.name;
+      });
+      
+      if (updatePayload.length === 0) {
+        return Promise.resolve(true); // No changes to apply
+      }
+      
+      return NativeModules.PDFDocumentManager.updateAnnotations(this.getRef(), updatePayload);
     }
 
    /**
@@ -573,5 +866,18 @@ export class PDFDocument {
    */
   getAnnotationFlags(uuid: string): Promise<Annotation.Flags[]> {
     return NativeModules.PDFDocumentManager.getAnnotationFlags(this.getRef(), uuid);
+  }
+  /**
+   * Gets the text positions (word rects) for a specific page.
+   *
+   * @method getPageTextRects
+   * @memberof PDFDocument
+   * @param { number } pageIndex The page index to get the text rects for. Starts at 0.
+   * @example
+   * const textRects = await this.pdfRef.current?.getDocument().getPageTextRects(0);
+   * @returns { Promise<Array<TextRect>> } A promise containing an array of text rects, each containing the word text and its bounding frame in PDF coordinates.
+   */
+    getPageTextRects(pageIndex: number): Promise<Array<TextRect>> {
+      return NativeModules.PDFDocumentManager.getPageTextRects(this.getRef(), pageIndex);
   }
 }

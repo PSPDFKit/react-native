@@ -1,5 +1,5 @@
 //
-//  Copyright © 2018-2025 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2018-2026 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -577,5 +577,434 @@ import PSPDFKit
             }
         }
         onSuccess([])
+    }
+    
+    @objc func updateAnnotations(_ reference: NSNumber, instantJSON: Array<Dictionary<String, Any>>, onSuccess: @escaping RCTPromiseResolveBlock, onError: @escaping RCTPromiseRejectBlock) -> Void {
+        guard let document = getDocument(reference) else {
+            onError("updateAnnotations", "Document is nil", nil)
+            return
+        }
+        
+        guard let documentProvider = document.documentProviders.first else {
+            onError("updateAnnotations", "DocumentProvider is nil", nil)
+            return
+        }
+        
+        var annotationsToUpdate = Array<Annotation>()
+        let allAnnotations = document.allAnnotations(of: .all).flatMap { $0.value }
+        
+        // Match annotations and apply changes
+        for updateDict in instantJSON {
+            // Find the annotation by uuid or name
+            var foundAnnotation: Annotation?
+            
+            for annotation in allAnnotations {
+                if let updateUUID = updateDict["uuid"] as? String, annotation.uuid == updateUUID {
+                    foundAnnotation = annotation
+                    break
+                }
+                if let updateName = updateDict["name"] as? String, 
+                   annotation.name != nil && annotation.name == updateName {
+                    foundAnnotation = annotation
+                    break
+                }
+            }
+            
+            guard let annotation = foundAnnotation else {
+                continue // Skip if annotation not found
+            }
+            
+            // Apply changed properties from dictionary
+            // Iterate through all keys in the dictionary (excluding uuid/name which are just for matching)
+            for (key, value) in updateDict {
+                // Skip uuid and name - they're only for matching
+                if key == "uuid" || key == "name" {
+                    continue
+                }
+                
+                // Apply property based on key
+                applyPropertyToAnnotation(annotation: annotation, key: key, value: value, document: document)
+            }
+            
+            annotationsToUpdate.append(annotation)
+        }
+        
+        if annotationsToUpdate.isEmpty {
+            onError("updateAnnotations", "No annotations found to update", nil)
+            return
+        }
+        
+        // Notify the system that annotations changed
+        documentProvider.annotationManager.update(annotationsToUpdate, animated: true)
+        
+        onSuccess(true)
+    }
+    
+    // Helper function to apply individual properties to annotations
+    private func applyPropertyToAnnotation(annotation: Annotation, key: String, value: Any, document: Document) {
+        switch key {
+        case "bbox":
+            // bbox format: [left, top, width, height]
+            // CGRect format: (x, y, width, height) where x=left, y=top
+            if let bboxArray = value as? [Double], bboxArray.count == 4 {
+                annotation.boundingBox = CGRect(
+                    x: bboxArray[0],      // left -> x
+                    y: bboxArray[1],      // top -> y
+                    width: bboxArray[2],  // width
+                    height: bboxArray[3]  // height
+                )
+            }
+            
+        case "opacity":
+            if let opacity = value as? Double {
+                annotation.alpha = CGFloat(opacity)
+            }
+            
+        case "color":
+            if let colorString = value as? String {
+                annotation.color = UIColor(hexString: colorString) ?? annotation.color
+            }
+            
+        case "flags":
+            if let flagsArray = value as? [String] {
+                let convertedFlags = RCTConvert.parseAnnotationFlags(flags: flagsArray)
+                annotation.flags = Annotation.Flag(rawValue: convertedFlags)
+            }
+            
+        case "subject":
+            if let subject = value as? String {
+                annotation.subject = subject
+            }
+            
+        case "group":
+            if let group = value as? String {
+                annotation.group = group
+            }
+            
+        case "hidden":
+            if let hidden = value as? Bool {
+                if hidden {
+                    annotation.flags.insert(.hidden)
+                } else {
+                    annotation.flags.remove(.hidden)
+                }
+            }
+            
+        case "locked":
+            if let locked = value as? Bool {
+                if locked {
+                    annotation.flags.insert(.locked)
+                } else {
+                    annotation.flags.remove(.locked)
+                }
+            }
+            
+        case "lockedContents":
+            if let lockedContents = value as? Bool {
+                if lockedContents {
+                    annotation.flags.insert(.lockedContents)
+                } else {
+                    annotation.flags.remove(.lockedContents)
+                }
+            }
+            
+        case "noPrint":
+            if let noPrint = value as? Bool {
+                if noPrint {
+                    annotation.flags.remove(.print)
+                } else {
+                    annotation.flags.insert(.print)
+                }
+            }
+            
+        case "noView":
+            if let noView = value as? Bool {
+                if noView {
+                    annotation.flags.insert(.noView)
+                } else {
+                    annotation.flags.remove(.noView)
+                }
+            }
+            
+        case "readOnly":
+            if let readOnly = value as? Bool {
+                if readOnly {
+                    annotation.flags.insert(.readOnly)
+                } else {
+                    annotation.flags.remove(.readOnly)
+                }
+            }
+            
+        case "note":
+            if let note = value as? String {
+                annotation.contents = note
+            }
+            
+        // Type-specific properties
+        case "lineWidth":
+            if let inkAnnotation = annotation as? InkAnnotation,
+               let lineWidth = value as? Double {
+                inkAnnotation.lineWidth = CGFloat(lineWidth)
+            }
+            
+        case "fillColor":
+            if let colorString = value as? String {
+                annotation.fillColor = UIColor(hexString: colorString) ?? annotation.fillColor
+            }
+            
+        case "strokeWidth":
+            if let strokeWidth = value as? Double {
+                annotation.lineWidth = CGFloat(strokeWidth)
+            }
+            
+        case "strokeDashArray":
+            if let dashArray = value as? [Double], dashArray.count == 2 {
+                annotation.dashArray = [CGFloat(dashArray[0]), CGFloat(dashArray[1])]
+            }
+            
+        case "cloudyBorderIntensity":
+            if let intensity = value as? Double {
+                annotation.borderEffectIntensity = CGFloat(intensity)
+            }
+            
+        case "fontSize":
+            if let textAnnotation = annotation as? FreeTextAnnotation,
+               let fontSize = value as? Double {
+                textAnnotation.fontSize = CGFloat(fontSize)
+            }
+            
+        case "fontColor":
+            if let textAnnotation = annotation as? FreeTextAnnotation,
+               let colorString = value as? String {
+                textAnnotation.color = UIColor(hexString: colorString) ?? textAnnotation.color
+            }
+            
+        case "text":
+            if let textAnnotation = annotation as? FreeTextAnnotation {
+                if let textString = value as? String {
+                    textAnnotation.contents = textString
+                }
+            } else if let noteAnnotation = annotation as? NoteAnnotation {
+                if let textString = value as? String {
+                    noteAnnotation.contents = textString
+                }
+            }
+            
+        case "rotation":
+            if let freeTextAnnotation = annotation as? FreeTextAnnotation,
+               let rotation = value as? Double {
+                freeTextAnnotation.setRotation(UInt(rotation), updateBoundingBox: true)
+            }
+            
+        case "backgroundColor":
+            if let inkAnnotation = annotation as? InkAnnotation,
+               let colorString = value as? String {
+                inkAnnotation.fillColor = UIColor(hexString: colorString) ?? inkAnnotation.fillColor
+            }
+                        
+        case "startPoint":
+            if let lineAnnotation = annotation as? LineAnnotation,
+               let pointArray = value as? [Double], pointArray.count == 2 {
+                lineAnnotation.point1 = CGPoint(x: pointArray[0], y: pointArray[1])
+            }
+            
+        case "endPoint":
+            if let lineAnnotation = annotation as? LineAnnotation,
+               let pointArray = value as? [Double], pointArray.count == 2 {
+                lineAnnotation.point2 = CGPoint(x: pointArray[0], y: pointArray[1])
+            }
+            
+        case "isSignature":
+            if let inkAnnotation = annotation as? InkAnnotation,
+               let isSignature = value as? Bool {
+                inkAnnotation.isSignature = isSignature
+            } else if let stampAnnotation = annotation as? StampAnnotation,
+                      let isSignature = value as? Bool {
+                stampAnnotation.isSignature = isSignature
+            }
+            
+        case "lines":
+            if let inkAnnotation = annotation as? InkAnnotation,
+               let linesDict = value as? [String: Any],
+               let pointsArray = linesDict["points"] as? [[[Double]]] {
+                // Parse nested array structure: strokes -> points -> [x, y]
+                // Also parse intensities if available: strokes -> intensities
+                let intensitiesArray = linesDict["intensities"] as? [[Double]]
+                
+                // CRITICAL: Convert from Instant JSON coordinates to PDF coordinates
+                // Instant JSON: top-left origin, Y increases downward (Y=0 at top)
+                // PDF coordinates: bottom-left origin, Y increases upward (Y=0 at bottom)
+                // Conversion: pdfY = pageHeight - instantJsonY
+                let pageInfo = document.pageInfoForPage(at: annotation.pageIndex)
+                let pageHeight = pageInfo?.size.height ?? 0
+                
+                var strokes: [[DrawingPoint]] = []
+                
+                for (strokeIndex, strokeArray) in pointsArray.enumerated() {
+                    var stroke: [DrawingPoint] = []
+                    // Get intensities for this stroke if available
+                    let strokeIntensities: [Double] = {
+                        if let intensities = intensitiesArray,
+                           strokeIndex < intensities.count {
+                            return intensities[strokeIndex]
+                        }
+                        return []
+                    }()
+                    
+                    for (pointIndex, pointArray) in strokeArray.enumerated() {
+                        if pointArray.count >= 2 {
+                            // Points come in Instant JSON format: [x, y] with top-left origin
+                            // PSPDFKit's lines property expects PDF coordinates: bottom-left origin
+                            let instantJsonX = CGFloat(pointArray[0])
+                            let instantJsonY = CGFloat(pointArray[1])
+                            
+                            // Convert to PDF coordinates
+                            let pdfX = instantJsonX  // X stays the same
+                            let pdfY = pageHeight > 0 ? pageHeight - instantJsonY : instantJsonY  // Flip Y: pdfY = pageHeight - instantJsonY
+                            
+                            // Get intensity for this point, default to 1.0 if not available
+                            let intensity = pointIndex < strokeIntensities.count
+                                ? CGFloat(strokeIntensities[pointIndex])
+                                : 1.0
+                            // Convert CGPoint to DrawingPoint with intensity (now in PDF coordinates)
+                            stroke.append(DrawingPoint(location: CGPoint(x: pdfX, y: pdfY), intensity: intensity))
+                        }
+                    }
+                    if !stroke.isEmpty {
+                        strokes.append(stroke)
+                    }
+                }
+                
+                // Set the lines property on the InkAnnotation (expects PDF coordinates)
+                inkAnnotation.lines = strokes
+            }
+        
+        default:
+            // Not implemented
+            break
+        }
+    }
+
+    @objc func getPageTextRects(_ reference: NSNumber, pageIndex: Int, onSuccess: @escaping RCTPromiseResolveBlock, onError: @escaping RCTPromiseRejectBlock) -> Void {
+        guard let document = getDocument(reference) else {
+            onError("getPageTextRects", "Document is nil", nil)
+            return
+        }
+        
+        guard let parser = document.textParserForPage(at: PageIndex(pageIndex)) else {
+            onError("getPageTextRects", "Could not get text parser for page", nil)
+            return
+        }
+        
+        var wordRects = [[String: Any]]()
+        
+        for word in parser.words {
+            let frame = word.frame
+            let wordDict: [String: Any] = [
+                "text": word.stringValue,
+                "frame": [
+                    "x": frame.origin.x,
+                    "y": frame.origin.y,
+                    "width": frame.size.width,
+                    "height": frame.size.height
+                ]
+            ]
+            wordRects.append(wordDict)
+        }
+        
+        onSuccess(wordRects)
+    }
+    
+    @objc func addElectronicSignatureFormField(_ reference: NSNumber, signatureData: Dictionary<String, Any>, onSuccess: @escaping RCTPromiseResolveBlock, onError: @escaping RCTPromiseRejectBlock) -> Void {
+        guard let document = getDocument(reference) else {
+            onError("addElectronicSignatureFormField", "Document is nil", nil)
+            return
+        }
+        
+        guard let documentProvider = document.documentProviders.first else {
+            onError("addElectronicSignatureFormField", "DocumentProvider is nil", nil)
+            return
+        }
+        
+        guard let bboxArray = signatureData["bbox"] as? Array<NSNumber>,
+              bboxArray.count == 4,
+              let pageIndex = signatureData["pageIndex"] as? Int,
+              let fullyQualifiedName = signatureData["fullyQualifiedName"] as? String else {
+            onError("addElectronicSignatureFormField", "Invalid signature data", nil)
+            return
+        }
+        
+        // Convert bbox array [left, top, right, bottom] to CGRect (x, y, width, height)
+        let left = bboxArray[0].floatValue
+        let top = bboxArray[1].floatValue
+        let right = bboxArray[2].floatValue
+        let bottom = bboxArray[3].floatValue
+        
+        let signatureFormElement = SignatureFormElement()
+        signatureFormElement.boundingBox = CGRect(
+            x: CGFloat(left),
+            y: CGFloat(bottom),
+            width: CGFloat(right - left),
+            height: CGFloat(top - bottom)
+        )
+        signatureFormElement.pageIndex = PageIndex(pageIndex)
+        
+        do {
+            _ = try SignatureFormField.insertedSignatureField(
+                withFullyQualifiedName: fullyQualifiedName,
+                documentProvider: documentProvider,
+                formElement: signatureFormElement
+            )
+            
+            onSuccess(true)
+        } catch {
+            onError("addElectronicSignatureFormField", error.localizedDescription, error as NSError)
+        }
+    }
+    
+    @objc func addTextFormField(_ reference: NSNumber, formData: Dictionary<String, Any>, onSuccess: @escaping RCTPromiseResolveBlock, onError: @escaping RCTPromiseRejectBlock) -> Void {
+        guard let document = getDocument(reference) else {
+            onError("addTextFormField", "Document is nil", nil)
+            return
+        }
+        
+        guard let documentProvider = document.documentProviders.first else {
+            onError("addTextFormField", "DocumentProvider is nil", nil)
+            return
+        }
+        
+        guard let bboxArray = formData["bbox"] as? Array<NSNumber>,
+              bboxArray.count == 4,
+              let pageIndex = formData["pageIndex"] as? Int,
+              let fullyQualifiedName = formData["fullyQualifiedName"] as? String else {
+            onError("addTextFormField", "Invalid form data", nil)
+            return
+        }
+        
+        // Convert bbox array [left, top, right, bottom] to CGRect (x, y, width, height)
+        let left = bboxArray[0].floatValue
+        let top = bboxArray[1].floatValue
+        let right = bboxArray[2].floatValue
+        let bottom = bboxArray[3].floatValue
+        
+        let textFieldFormElement = TextFieldFormElement()
+        textFieldFormElement.boundingBox = CGRect(
+            x: CGFloat(left),
+            y: CGFloat(bottom),
+            width: CGFloat(right - left),
+            height: CGFloat(top - bottom)
+        )
+        textFieldFormElement.pageIndex = PageIndex(pageIndex)
+        
+        do {
+            _ = try TextFormField.insertedTextField(
+                withFullyQualifiedName: fullyQualifiedName,
+                documentProvider: documentProvider,
+                formElement: textFieldFormElement
+            )
+            onSuccess(true)
+        } catch {
+            onError("addTextFormField", error.localizedDescription, error as NSError)
+        }
     }
 }

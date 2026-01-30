@@ -1,5 +1,5 @@
 //
-//  Copyright © 2025 PSPDFKit GmbH.
+//  Copyright © 2025-2026 PSPDFKit GmbH.
 //
 #if RCT_NEW_ARCH_ENABLED
 

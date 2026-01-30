@@ -51,7 +51,7 @@ Nutrient.setLicenseKey('YOUR_REACT_NATIVE_LICENSE_KEY_GOES_HERE');
 
 ### Installation
 
-The Nutrient React Native SDK dependency is installed from the GitHub repository and not the `npm` registry. To install the Nutrient React Native SDK, run `yarn add @nutrient-sdk/react-native` in your project directory or `npm install @nutrient-sdk/react-native` if you’re using `npm`.
+To install the Nutrient React Native SDK, run `yarn add @nutrient-sdk/react-native` in your project directory or `npm install @nutrient-sdk/react-native` if you’re using `npm`.
 
 ### Getting Started
 
@@ -244,7 +244,7 @@ Take a look at the instructions to get started [here](/samples/Catalog/README.md
 
 ### Configuration
 
-The behaviour of the `NutrientView` component can be customized using the configuration object. Refer to the [`PDFConfiguration`](https://www.nutrient.io/api/react-native/PDFConfiguration.html) API documentation. The `PDFConfiguration` object can be passed as parameter in when creating the `NutrientView` component, or when using the `Nutrient.present()` Native Module API.
+The behaviour of the `NutrientView` component can be customized using the configuration object. Refer to the [`PDFConfiguration`](https://www.nutrient.io/api/react-native/PDFConfiguration.html) API documentation. The `PDFConfiguration` object can be passed as a prop when creating the `NutrientView` component, or a parameter when using the `Nutrient.present()` Native Module API.
 
 ```typescript
 const configuration: PDFConfiguration = {
@@ -266,6 +266,6 @@ For Troubleshooting common issues you might encounter when setting up the Nutrie
 ## License
 
 This project can be used for evaluation or if you have a valid Nutrient license.
-All items and source code Copyright © 2010-2025 PSPDFKit GmbH.
+All items and source code Copyright © 2010-2026 PSPDFKit GmbH.
 
 See [LICENSE](./LICENSE) for details.

@@ -3,7 +3,7 @@
  *
  *   PSPDFKit
  *
- *   Copyright © 2017-2025 PSPDFKit GmbH. All rights reserved.
+ *   Copyright © 2017-2026 PSPDFKit GmbH. All rights reserved.
  *
  *   THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
  *   AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -35,6 +35,64 @@ public class PSPDFKitPackage extends BaseReactPackage {
 
     public PSPDFKitPackage() {
         super();
+        setupRxJavaErrorHandler();
+    }
+
+    /**
+     * Sets up a global error handler for RxJava3 to catch UndeliverableExceptions,
+     * especially those containing InterruptedException which can occur during fragment
+     * initialization when operations are canceled/disposed.
+     */
+    private void setupRxJavaErrorHandler() {
+        try {
+            // Use reflection to set up RxJava3 error handler without direct dependency
+            Class<?> rxJavaPluginsClass = Class.forName("io.reactivex.rxjava3.plugins.RxJavaPlugins");
+            
+            // RxJava3 uses io.reactivex.rxjava3.functions.Consumer<Throwable>
+            Class<?> consumerClass = Class.forName("io.reactivex.rxjava3.functions.Consumer");
+            
+            // Create a proxy implementation of the Consumer interface
+            java.lang.reflect.InvocationHandler handler = (proxy, method, args) -> {
+                if (method.getName().equals("accept") && args.length == 1 && args[0] instanceof Throwable) {
+                    Throwable throwable = (Throwable) args[0];
+                    
+                    // Check if this is an UndeliverableException
+                    String exceptionName = throwable.getClass().getSimpleName();
+                    if ("UndeliverableException".equals(exceptionName)) {
+                        Throwable cause = throwable.getCause();
+                        
+                        // InterruptedException during cancellation is benign - log and ignore
+                        if (cause instanceof InterruptedException) {
+                            android.util.Log.d("PSPDFKitPackage", 
+                                "RxJava: InterruptedException during disposed flow (likely during fragment cancellation): " + 
+                                cause.getMessage());
+                            return null;
+                        }
+                    }
+                    
+                    // For other exceptions, log as warning but don't crash
+                    android.util.Log.w("PSPDFKitPackage", 
+                        "RxJava: Unhandled exception in disposed flow: " + throwable.getMessage(), throwable);
+                }
+                return null;
+            };
+            
+            Object errorHandler = java.lang.reflect.Proxy.newProxyInstance(
+                consumerClass.getClassLoader(),
+                new Class[]{consumerClass},
+                handler
+            );
+            
+            java.lang.reflect.Method setErrorHandlerMethod = rxJavaPluginsClass.getMethod("setErrorHandler", consumerClass);
+            setErrorHandlerMethod.invoke(null, errorHandler);
+            android.util.Log.d("PSPDFKitPackage", "RxJava3 error handler configured successfully");
+        } catch (ClassNotFoundException e) {
+            // RxJava3 not available - this is fine, handler won't be needed
+            android.util.Log.d("PSPDFKitPackage", "RxJava3 not found, skipping error handler setup");
+        } catch (Exception e) {
+            // Failed to set up error handler - log but don't fail initialization
+            android.util.Log.w("PSPDFKitPackage", "Failed to set up RxJava3 error handler: " + e.getMessage());
+        }
     }
 
     @Override

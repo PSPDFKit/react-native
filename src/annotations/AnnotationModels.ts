@@ -34,6 +34,7 @@
  * @property {number} opacity Opacity value between 0 and 1. Default: 1
  * @property {number} [pdfObjectId] PDF object identifier. Default: null
  * @property {string} type Annotation type identifier
+ * @property {string} [color] Color associated with the annotation
  * @property {Array<string>} [flags] Annotation flags
  * @property {number} v Version number. Default: 1
  * @property {Object} [customData] Custom metadata
@@ -44,6 +45,7 @@
  * @property {boolean} [noPrint] Whether annotation can be printed. Default: false
  * @property {boolean} [noView] Whether annotation is visible. Default: false
  * @property {boolean} [readOnly] Whether annotation is read only. Default: false
+ * @property {string} [group] Group identifier for grouping multiple annotations together
  */
 /**
  * @class CommentMarkerAnnotation
@@ -333,6 +335,8 @@ export class BaseAnnotation {
   flags?: Array<string>;
   /** Version number */
   v: number = 1;
+  /** Color associated with the annotation */
+  color?: string;
   /** Custom data */
   customData?: Object;
   /** Blend mode */
@@ -349,6 +353,8 @@ export class BaseAnnotation {
   noView?: boolean = false;
   /** Whether the annotation is read only */
   readOnly?: boolean = false;
+  /** Group identifier for grouping multiple annotations together */
+  group?: string;
   // Optional annotation subject. This is used to add information.
   subject?: string;
   // Optional PDF Action.
@@ -374,6 +380,7 @@ export class BaseAnnotation {
     noPrint?: boolean;
     noView?: boolean;
     readOnly?: boolean;
+    group?: string;
     // Optional properties
     uuid?: string;
     id?: string;
@@ -402,6 +409,7 @@ export class BaseAnnotation {
     this.noPrint = params.noPrint ?? false;
     this.noView = params.noView ?? false;
     this.readOnly = params.readOnly ?? false;
+    this.group = params.group;
     this.uuid = params.uuid;
     this.id = params.id;
     this.name = params.name;
@@ -507,7 +515,7 @@ export class MarkupAnnotation extends BaseAnnotation {
         'pspdfkit/markup/squiggly' | 'markup/squiggly' | 'squiggly' |
         'pspdfkit/markup/strikeout' | 'markup/strikeout' | 'strikeout' |
         'pspdfkit/markup/underline' | 'markup/underline' | 'underline';
-  color: string;
+  override color: string;
   rects: Array<[number, number, number, number]>;
   note?: string;
 
@@ -555,7 +563,6 @@ export class MarkupAnnotation extends BaseAnnotation {
  */
 export class CommentMarkerAnnotation extends BaseAnnotation {
   override type: 'pspdfkit/comment-marker' | 'comment-marker';
-  color?: string;
 
   constructor(params: {
     pageIndex: number;
@@ -889,7 +896,6 @@ export class LinkAnnotation extends BaseAnnotation {
  */
 export class NoteAnnotation extends BaseAnnotation {
   override type: 'pspdfkit/note' | 'note';
-  color?: string;
   icon?: string;
   text?: string | {
     format: string;
@@ -1215,7 +1221,6 @@ export class StampAnnotation extends BaseAnnotation {
   stampType?: string;
   title?: string;
   subtitle?: string;
-  color?: string;
   rotation?: number;
   override subject?: string;
   size?: [number, number];

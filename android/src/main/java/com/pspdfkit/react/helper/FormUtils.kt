@@ -84,16 +84,16 @@ object FormUtils {
             }
             is SignatureFormElement -> {
                 elementJSON["formTypeName"] = "signature"
-                // Only include signatureInfo if customer has the ES license
-                if (PSPDFKit.getLicenseFeatures().contains(LicenseFeature.ELECTRONIC_SIGNATURES)) {
+                // Only include signatureInfo if customer has the DS license
+                if (PSPDFKit.getLicenseFeatures().contains(LicenseFeature.DIGITAL_SIGNATURES)) {
                     elementJSON["signatureInfo"] = mapOf(
                         "name" to (formElement.signatureInfo.name ?: ""),
                         "date" to (formElement.signatureInfo.creationDate?.toString() ?: ""),
                         "reason" to (formElement.signatureInfo.reason ?: ""),
                         "location" to (formElement.signatureInfo.location ?: "")
                     )
+                    elementJSON["isSigned"] = formElement.isSigned
                 }
-                elementJSON["isSigned"] = formElement.isSigned
             }
             is TextFormElement -> {
                 elementJSON["formTypeName"] = "textField"

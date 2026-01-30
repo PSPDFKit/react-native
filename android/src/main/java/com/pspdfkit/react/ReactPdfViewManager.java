@@ -3,7 +3,7 @@
  *
  *   PSPDFKit
  *
- *   Copyright © 2021-2025 PSPDFKit GmbH. All rights reserved.
+ *   Copyright © 2021-2026 PSPDFKit GmbH. All rights reserved.
  *
  *   THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
  *   AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -89,6 +89,7 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
     public static final int COMMAND_SELECT_ANNOTATIONS = 28;
     public static final int COMMAND_SET_PAGE_INDEX = 29;
     public static final int COMMAND_SET_EXCLUDED_ANNOTATIONS = 30;
+    public static final int COMMAND_SET_USER_INTERFACE_VISIBLE = 31;
 
     private final CompositeDisposable annotationDisposables = new CompositeDisposable();
 
@@ -152,6 +153,7 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
         commandMap.put("selectAnnotations", COMMAND_SELECT_ANNOTATIONS);
         commandMap.put("setPageIndex", COMMAND_SET_PAGE_INDEX);
         commandMap.put("setExcludedAnnotations", COMMAND_SET_EXCLUDED_ANNOTATIONS);
+        commandMap.put("setUserInterfaceVisible", COMMAND_SET_USER_INTERFACE_VISIBLE);
         return commandMap;
     }
 
@@ -201,6 +203,12 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
         }
         if (configuration.hasKey("androidRemoveStatusBarOffset")) {
             view.setIsStatusBarHidden(configuration.getBoolean("androidRemoveStatusBarOffset"));
+        }
+        if (configuration.hasKey("toolbarPosition")) {
+            view.setToolbarPosition(configuration.getString("toolbarPosition"));
+        }
+        if (configuration.hasKey("supportedToolbarPositions")) {
+            view.setSupportedToolbarPositions(configuration.getArray("supportedToolbarPositions"));
         }
     }
 
@@ -530,6 +538,18 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
             case COMMAND_SET_EXCLUDED_ANNOTATIONS:
                 if (args != null && args.size() == 1) {
                     root.setExcludedAnnotations(args.getArray(0));
+                }
+                break;
+            case COMMAND_SET_USER_INTERFACE_VISIBLE:
+                if (args != null && args.size() == 2) {
+                    final int requestId = args.getInt(0);
+                    final boolean visible = args.getBoolean(1);
+                    try {
+                        root.setUserInterfaceVisible(visible);
+                        root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, true));
+                    } catch (Exception e) {
+                        root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, e));
+                    }
                 }
                 break;
         }

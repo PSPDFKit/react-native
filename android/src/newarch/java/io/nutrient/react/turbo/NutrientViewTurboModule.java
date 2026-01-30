@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018-2025 PSPDFKit GmbH. All rights reserved.
+ * Copyright © 2018-2026 PSPDFKit GmbH. All rights reserved.
  *
  * THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
  * AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -250,6 +250,24 @@ public class NutrientViewTurboModule extends NativeNutrientViewTurboModuleSpec {
             view.setExcludedAnnotations(annotations);
         } catch (Exception e) {
             Log.e(TAG, "Error setting excluded annotations: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void setUserInterfaceVisible(String reference, boolean visible, Promise promise) {
+        Log.d(TAG, "setUserInterfaceVisible called with reference: " + reference + ", visible: " + visible);
+        
+        PdfView view = NutrientViewRegistry.getInstance().getViewForId(reference);
+        if (view == null) {
+            promise.reject(Errors.VIEW_NOT_FOUND, "No view found for reference: " + reference);
+            return;
+        }
+        
+        try {
+            view.setUserInterfaceVisible(visible);
+            promise.resolve(true);
+        } catch (Exception e) {
+            promise.reject(Errors.OPERATION_FAILED, e.getMessage());
         }
     }
 

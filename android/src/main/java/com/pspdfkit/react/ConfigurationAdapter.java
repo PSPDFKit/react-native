@@ -3,7 +3,7 @@
  *
  *   PSPDFKit
  *
- *   Copyright © 2017-2025 PSPDFKit GmbH. All rights reserved.
+ *   Copyright © 2017-2026 PSPDFKit GmbH. All rights reserved.
  *
  *   THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
  *   AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -38,6 +38,7 @@ import com.pspdfkit.preferences.PSPDFKitPreferences;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
 
@@ -568,9 +569,9 @@ public class ConfigurationAdapter {
 
     private void configureShowShareAction(final boolean showShareAction) {
         if (showShareAction) {
-            configuration.setEnabledShareFeatures(ShareFeatures.all());
+            configuration.setEnabledShareFeatures(EnumSet.allOf(ShareFeatures.class));
         } else {
-            configuration.setEnabledShareFeatures(ShareFeatures.none());
+            configuration.setEnabledShareFeatures(EnumSet.noneOf(ShareFeatures.class));
         }
     }
 

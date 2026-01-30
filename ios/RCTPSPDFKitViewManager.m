@@ -1,5 +1,5 @@
 //
-//  Copyright © 2018-2025 PSPDFKit GmbH. All rights reserved.
+//  Copyright © 2018-2026 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -567,6 +567,18 @@ RCT_EXPORT_METHOD(setExcludedAnnotations:(NSArray *)annotations reactTag:(nonnul
       RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
       [component setExcludedAnnotations:annotations];
       resolve(@YES);
+  });
+}
+
+RCT_EXPORT_METHOD(setUserInterfaceVisible:(BOOL)visible reactTag:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+  dispatch_async(dispatch_get_main_queue(), ^{
+    RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
+    BOOL success = [component setUserInterfaceVisible:visible];
+    if (success) {
+      resolve(@(success));
+    } else {
+      reject(@"error", @"Failed to set user interface visibility.", nil);
+    }
   });
 }
 

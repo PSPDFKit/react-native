@@ -25,6 +25,6 @@ For Troubleshooting common issues you might encounter when setting up Nutrient R
 ## License
 
 This project can be used for evaluation or if you have a valid Nutrient license.
-All items and source code Copyright © 2010-2025 PSPDFKit GmbH.
+All items and source code Copyright © 2010-2026 PSPDFKit GmbH.
 
 See [LICENSE](https://github.com/PSPDFKit/react-native/blob/master/LICENSE) for details.

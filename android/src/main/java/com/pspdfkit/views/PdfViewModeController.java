@@ -3,7 +3,7 @@
  *
  *   PSPDFKit
  *
- *   Copyright © 2021-2025 PSPDFKit GmbH. All rights reserved.
+ *   Copyright © 2021-2026 PSPDFKit GmbH. All rights reserved.
  *
  *   THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY INTERNATIONAL COPYRIGHT LAW
  *   AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -32,6 +32,7 @@ import com.pspdfkit.ui.toolbar.ToolbarCoordinatorLayout;
 import com.pspdfkit.ui.toolbar.grouping.MenuItemGroupingRule;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -101,6 +102,59 @@ class PdfViewModeController implements
 
     @Override
     public void onPrepareContextualToolbar(@NonNull ContextualToolbar contextualToolbar) {
+        // Apply toolbar position configuration
+        String toolbarPosition = parent.getToolbarPosition();
+        com.facebook.react.bridge.ReadableArray supportedPositions = parent.getSupportedToolbarPositions();
+        
+        if (toolbarPosition != null || supportedPositions != null) {
+            ToolbarCoordinatorLayout.LayoutParams.Position position = null;
+            EnumSet<ToolbarCoordinatorLayout.LayoutParams.Position> supportedPositionsSet = null;
+            
+            // Convert supported positions string array to EnumSet
+            if (supportedPositions != null) {
+                supportedPositionsSet = EnumSet.noneOf(ToolbarCoordinatorLayout.LayoutParams.Position.class);
+                for (int i = 0; i < supportedPositions.size(); i++) {
+                    String pos = supportedPositions.getString(i);
+                    if ("top".equals(pos)) {
+                        supportedPositionsSet.add(ToolbarCoordinatorLayout.LayoutParams.Position.TOP);
+                    } else if ("left".equals(pos)) {
+                        supportedPositionsSet.add(ToolbarCoordinatorLayout.LayoutParams.Position.LEFT);
+                    } else if ("right".equals(pos)) {
+                        supportedPositionsSet.add(ToolbarCoordinatorLayout.LayoutParams.Position.RIGHT);
+                    }
+                }
+            }
+            
+            // Convert toolbar position string to enum
+            if (toolbarPosition != null) {
+                if ("top".equals(toolbarPosition)) {
+                    position = ToolbarCoordinatorLayout.LayoutParams.Position.TOP;
+                } else if ("left".equals(toolbarPosition)) {
+                    position = ToolbarCoordinatorLayout.LayoutParams.Position.LEFT;
+                } else if ("right".equals(toolbarPosition)) {
+                    position = ToolbarCoordinatorLayout.LayoutParams.Position.RIGHT;
+                }
+            }
+            
+            // Set toolbar position and supported positions
+            if (supportedPositionsSet != null && !supportedPositionsSet.isEmpty()) {
+                // If both position and supported positions are set, use LayoutParams
+                ToolbarCoordinatorLayout.LayoutParams.Position finalPosition;
+                if (position != null) {
+                    finalPosition = position;
+                } else {
+                    // Only supported positions set, use first supported position as default
+                    finalPosition = supportedPositionsSet.iterator().next();
+                }
+                
+                // Create and set LayoutParams with position and supported positions
+                contextualToolbar.setLayoutParams(new ToolbarCoordinatorLayout.LayoutParams(finalPosition, supportedPositionsSet));
+            } else if (position != null) {
+                // Only position is set, use setPosition method
+                contextualToolbar.setPosition(position);
+            }
+        }
+        
         if (contextualToolbar instanceof AnnotationCreationToolbar) {
             if (itemGroupingRule != null) {
                 contextualToolbar.setMenuItemGroupingRule(itemGroupingRule);

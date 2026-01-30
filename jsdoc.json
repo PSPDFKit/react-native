@@ -12,12 +12,13 @@
     "default": {
       "layoutFile": "documentation/jsdoc-layout.tmpl",
       "staticFiles": {
-        "include": ["documentation/jsdoc-assets/"]
+        "include": ["documentation/jsdoc-assets/", "documentation/jsdoc-search/statics/"]
       }
     },
     "cleverLinks": true,
     "monospaceLinks": true
   },
+  "plugins": ["documentation/jsdoc-search/search.js"],
   "opts": {
     "destination": "./jsdoc",
     "recurse": true,
