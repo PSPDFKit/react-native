@@ -22,6 +22,8 @@
     return @"thumbnailsButtonItem";
   } else if (barButtonItem == pdfController.documentEditorButtonItem) {
     return @"documentEditorButtonItem";
+  } else if (barButtonItem == pdfController.contentEditingButtonItem) {
+    return @"contentEditingButtonItem";
   } else if (barButtonItem == pdfController.printButtonItem) {
     return @"printButtonItem";
   } else if (barButtonItem == pdfController.openInButtonItem) {
@@ -60,6 +62,8 @@
     return pdfController.thumbnailsButtonItem;
   } else if ([barButtonItem isEqualToString:@"documentEditorButtonItem"]) {
     return pdfController.documentEditorButtonItem;
+  } else if ([barButtonItem isEqualToString:@"contentEditingButtonItem"]) {
+    return pdfController.contentEditingButtonItem;
   } else if ([barButtonItem isEqualToString:@"printButtonItem"]) {
     return pdfController.printButtonItem;
   } else if ([barButtonItem isEqualToString:@"openInButtonItem"]) {

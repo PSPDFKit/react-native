@@ -318,6 +318,43 @@ class NutrientView extends React.Component {
   };
 
   /**
+   * Enters content editing mode, showing the content editing UI.
+   * @method enterContentEditingMode
+   * @example
+   * this.pdfRef.current.enterContentEditingMode();
+   * @memberof NutrientView
+   */
+  enterContentEditingMode = function () {
+    // Architecture detection via helper function
+    const { isNewArchitectureEnabled } = require('./lib/ArchitectureDetector');
+    if (isNewArchitectureEnabled()) {
+      // Delegate to Fabric component
+      return this._fabricRef.current?.enterContentEditingMode();
+    }
+
+    if (Platform.OS === 'android') {
+      let requestId = this._nextRequestId++;
+      let requestMap = this._requestMap;
+
+      let promise = new Promise(function (resolve, reject) {
+        requestMap[requestId] = { resolve: resolve, reject: reject };
+      });
+
+      UIManager.dispatchViewManagerCommand(
+        findNodeHandle(this._componentRef.current),
+        this._getViewManagerConfig('RCTPSPDFKitView').Commands
+          .enterContentEditingMode,
+          [requestId],
+      );
+      return promise;
+    } else if (Platform.OS === 'ios') {
+      return NativeModules.PSPDFKitViewManager.enterContentEditingMode(
+        findNodeHandle(this._componentRef.current),
+      );
+    }
+  };
+
+  /**
    * Exits the currently active mode, hiding all toolbars.
    * @method exitCurrentlyActiveMode
    * @example
@@ -447,46 +484,34 @@ class NutrientView extends React.Component {
   /**
    * @method clearSelectedAnnotations
    * @memberof NutrientView
+   * @deprecated Since Nutrient React Native SDK 4.2. Use ```this.pdfRef.current?.getDocument().clearSelectedAnnotations()``` instead.
    * @description Clears all currently selected Annotations.
    * @example
    * const result = await this.pdfRef.current?.clearSelectedAnnotations();
    * @returns { Promise<any> } A promise containing the result of the operation. ```true``` if the annotations selection were cleared, ```false``` otherwise.
    */
   clearSelectedAnnotations = function () {
-    // Architecture detection via helper function
     const { isNewArchitectureEnabled } = require('./lib/ArchitectureDetector');
     if (isNewArchitectureEnabled()) {
-      // Delegate to Fabric component
-      return this._fabricRef.current?.clearSelectedAnnotations();
+      const document = this.getDocument?.();
+      if (!document) {
+        return Promise.reject(new Error('PDF document is not available'));
+      }
+      return document.clearSelectedAnnotations();
     }
 
-    if (Platform.OS === 'android') {
-      let requestId = this._nextRequestId++;
-      let requestMap = this._requestMap;
-
-      // We create a promise here that will be resolved once onDataReturned is called.
-      let promise = new Promise(function (resolve, reject) {
-        requestMap[requestId] = { resolve: resolve, reject: reject };
-      });
-
-      UIManager.dispatchViewManagerCommand(
-        findNodeHandle(this._componentRef.current),
-        this._getViewManagerConfig('RCTPSPDFKitView').Commands
-          .clearSelectedAnnotations,
-        [requestId],
-      );
-
-      return promise;
-    } else if (Platform.OS === 'ios') {
-      return NativeModules.PSPDFKitViewManager.clearSelectedAnnotations(
-        findNodeHandle(this._componentRef.current),
-      );
+    const ref =
+      findNodeHandle(this._componentRef.current) ?? this._componentRef.current;
+    if (ref == null) {
+      return Promise.reject(new Error('PDF view reference is not available'));
     }
+    return NativeModules.PDFDocumentManager.clearSelectedAnnotations(ref);
   };
 
   /**
    * @method selectAnnotations
    * @memberof NutrientView
+   * @deprecated Since Nutrient React Native SDK 4.2. Use ```this.pdfRef.current?.getDocument().selectAnnotations(annotations, showContextualMenu)``` instead.
    * @param { object } annotations An array of the annotations to select in Instant JSON format.
    * @param { boolean } [showContextualMenu] Whether the annotation contextual menu should be shown after selection.
    * @description Select one or more annotations.
@@ -495,461 +520,25 @@ class NutrientView extends React.Component {
    * @returns { Promise<boolean> } A promise containing the result of the operation. ```true``` if the annotations were selected, ```false``` otherwise.
    */
   selectAnnotations = function (annotations, showContextualMenu = false) {
-    // Architecture detection via helper function
     const { isNewArchitectureEnabled } = require('./lib/ArchitectureDetector');
     if (isNewArchitectureEnabled()) {
-      // Delegate to Fabric component
-      return this._fabricRef.current?.selectAnnotations(annotations, showContextualMenu);
+      const document = this.getDocument?.();
+      if (!document) {
+        return Promise.reject(new Error('PDF document is not available'));
+      }
+      return document.selectAnnotations(annotations, showContextualMenu);
     }
 
-    if (Platform.OS === 'android') {
-      let requestId = this._nextRequestId++;
-      let requestMap = this._requestMap;
-
-      // We create a promise here that will be resolved once onDataReturned is called.
-      let promise = new Promise(function (resolve, reject) {
-        requestMap[requestId] = { resolve: resolve, reject: reject };
-      });
-
-      UIManager.dispatchViewManagerCommand(
-        findNodeHandle(this._componentRef.current),
-        this._getViewManagerConfig('RCTPSPDFKitView').Commands
-          .selectAnnotations,
-        [requestId, annotations, showContextualMenu],
-      );
-
-      return promise;
-    } else if (Platform.OS === 'ios') {
-      return NativeModules.PSPDFKitViewManager.selectAnnotations(
-        annotations,
-        showContextualMenu,
-        findNodeHandle(this._componentRef.current),
-      );
+    const ref =
+      findNodeHandle(this._componentRef.current) ?? this._componentRef.current;
+    if (ref == null) {
+      return Promise.reject(new Error('PDF view reference is not available'));
     }
-  };
-
-  /**
-   * Gets all annotations of the given type from the specified page.
-   *
-   * @method getAnnotations
-   * @deprecated Since Nutrient React Native SDK 2.12. Use ```this.pdfRef.current?.getDocument().getAnnotations()``` or ```getAnnotationsForPage()``` instead.
-   * See {@link https://nutrient.io/api/react-native/PDFDocument.html#.getAnnotations|getAnnotations()} and {@link https://nutrient.io/api/react-native/PDFDocument.html#.getAnnotationsForPage|getAnnotationsForPage()}.
-   * @memberof NutrientView
-   * @param { number } pageIndex The page index to get the annotations for, starting at 0.
-   * @param { string } [type] The type of annotations to get. If not specified or ```null```, all annotation types will be returned.
-   * @example
-   * const result = await this.pdfRef.current.getAnnotations(3, 'pspdfkit/ink');
-   * @see {@link https://nutrient.io/guides/web/json/schema/annotations/} for supported types.
-   *
-   * @returns { Promise } A promise containing an object with an array of InstantJSON objects.
-   */
-  getAnnotations = function (pageIndex, type) {
-    if (Platform.OS === 'android') {
-      let requestId = this._nextRequestId++;
-      let requestMap = this._requestMap;
-
-      // We create a promise here that will be resolved once onDataReturned is called.
-      let promise = new Promise(function (resolve, reject) {
-        requestMap[requestId] = { resolve: resolve, reject: reject };
-      });
-
-      UIManager.dispatchViewManagerCommand(
-        findNodeHandle(this._componentRef.current),
-        this._getViewManagerConfig('RCTPSPDFKitView').Commands.getAnnotations,
-        [requestId, pageIndex, type],
-      );
-
-      return promise;
-    } else if (Platform.OS === 'ios') {
-      return NativeModules.PSPDFKitViewManager.getAnnotations(
-        pageIndex,
-        type,
-        findNodeHandle(this._componentRef.current),
-      );
-    }
-  };
-
-  /**
-   * Adds a new annotation to the current document.
-   *
-   * @method addAnnotation
-   * @deprecated Since Nutrient React Native SDK 2.12. Use ```this.pdfRef.current?.getDocument().addAnnotations()``` instead.
-   * @memberof NutrientView
-   * @param { object } annotation The InstantJSON of the annotation to add.
-   * @example
-   * const result = await this.pdfRef.current.addAnnotation(annotationJSON);
-   * @see {@link https://nutrient.io/guides/web/json/schema/annotations/} for document JSON structure.
-   *
-   * @returns { Promise<boolean> } A promise resolving to ```true``` if the annotation was added successfully, and ```false``` if an error occurred.
-   */
-  addAnnotation = function (annotation) {
-    if (Platform.OS === 'android') {
-      let requestId = this._nextRequestId++;
-      let requestMap = this._requestMap;
-
-      // We create a promise here that will be resolved once onDataReturned is called.
-      let promise = new Promise(function (resolve, reject) {
-        requestMap[requestId] = { resolve: resolve, reject: reject };
-      });
-
-      UIManager.dispatchViewManagerCommand(
-        findNodeHandle(this._componentRef.current),
-        this._getViewManagerConfig('RCTPSPDFKitView').Commands.addAnnotation,
-        [requestId, annotation],
-      );
-
-      return promise;
-    } else if (Platform.OS === 'ios') {
-      return NativeModules.PSPDFKitViewManager.addAnnotation(
-        annotation,
-        findNodeHandle(this._componentRef.current),
-      );
-    }
-  };
-
-  /**
-   * Removes an existing annotation from the current document.
-   *
-   * @method removeAnnotation
-   * @deprecated Since Nutrient React Native SDK 2.12. Use ```this.pdfRef.current?.getDocument().removeAnnotations()``` instead.
-   * See {@link https://nutrient.io/api/react-native/PDFDocument.html#.removeAnnotations|removeAnnotations()}.
-   * @memberof NutrientView
-   * @param { object } annotation The InstantJSON of the annotation to remove.
-   * @example
-   * const result = await this.pdfRef.current.removeAnnotation(instantJSON);
-   *
-   * @returns { Promise } A promise resolving to ```true``` if the annotation was removed successfully, and ```false``` if the annotation couldn't be found or an error occurred.
-   */
-  removeAnnotation = function (annotation) {
-    if (Platform.OS === 'android') {
-      let requestId = this._nextRequestId++;
-      let requestMap = this._requestMap;
-
-      // We create a promise here that will be resolved once onDataReturned is called.
-      let promise = new Promise(function (resolve, reject) {
-        requestMap[requestId] = { resolve: resolve, reject: reject };
-      });
-
-      UIManager.dispatchViewManagerCommand(
-        findNodeHandle(this._componentRef.current),
-        this._getViewManagerConfig('RCTPSPDFKitView').Commands.removeAnnotation,
-        [requestId, annotation],
-      );
-
-      return promise;
-    } else if (Platform.OS === 'ios') {
-      return NativeModules.PSPDFKitViewManager.removeAnnotation(
-        annotation,
-        findNodeHandle(this._componentRef.current),
-      );
-    }
-  };
-
-  /**
-   * Removes the supplied document InstantJSON from the current document.
-   *
-   * @method removeAnnotations
-   * @deprecated Since Nutrient React Native SDK 2.12. Use ```this.pdfRef.current?.getDocument().removeAnnotations()``` instead.
-   * See {@link https://nutrient.io/api/react-native/PDFDocument.html#.removeAnnotations|removeAnnotations()}.
-   * @memberof NutrientView
-   * @param { object } annotation The InstantJSON of the annotations to remove.
-   * @example
-   * const result = await this.pdfRef.current.removeAnnotations(instantJSON);
-   *
-   * @returns { Promise } A promise resolving to ```true``` if the annotations were removed successfully, and ```false``` if the annotations couldn't be found or an error occurred.
-   */
-  removeAnnotations = function (annotations) {
-    if (Platform.OS === 'android') {
-      let requestId = this._nextRequestId++;
-      let requestMap = this._requestMap;
-      // We create a promise here that will be resolved once onDataReturned is called.
-      let promise = new Promise(function (resolve, reject) {
-        requestMap[requestId] = { resolve: resolve, reject: reject };
-      });
-
-      UIManager.dispatchViewManagerCommand(
-        findNodeHandle(this._componentRef.current),
-        this._getViewManagerConfig('RCTPSPDFKitView').Commands
-          .removeAnnotations,
-        [requestId, annotations],
-      );
-
-      return promise;
-    } else if (Platform.OS === 'ios') {
-      return NativeModules.PSPDFKitViewManager.removeAnnotations(
-        annotations,
-        findNodeHandle(this._componentRef.current),
-      );
-    }
-  };
-
-  /**
-   * Gets all unsaved changes to annotations.
-   *
-   * @method getAllUnsavedAnnotations
-   * @deprecated Since Nutrient React Native SDK 2.12. Use ```this.pdfRef.current?.getDocument().getAllUnsavedAnnotations()``` instead.
-   * See {@link https://nutrient.io/api/react-native/PDFDocument.html#.getAllUnsavedAnnotations|getAllUnsavedAnnotations()}.
-   * @memberof NutrientView
-   * @returns { Promise } A promise containing document InstantJSON.
-   * @see {@link https://nutrient.io/guides/android/current/importing-exporting/instant-json/#instant-document-json-api-a56628} for more information.
-   */
-  getAllUnsavedAnnotations = function () {
-    if (Platform.OS === 'android') {
-      let requestId = this._nextRequestId++;
-      let requestMap = this._requestMap;
-
-      // We create a promise here that will be resolved once onDataReturned is called.
-      let promise = new Promise(function (resolve, reject) {
-        requestMap[requestId] = { resolve: resolve, reject: reject };
-      });
-
-      UIManager.dispatchViewManagerCommand(
-        findNodeHandle(this._componentRef.current),
-        this._getViewManagerConfig('RCTPSPDFKitView').Commands
-          .getAllUnsavedAnnotations,
-        [requestId],
-      );
-
-      return promise;
-    } else if (Platform.OS === 'ios') {
-      return NativeModules.PSPDFKitViewManager.getAllUnsavedAnnotations(
-        findNodeHandle(this._componentRef.current),
-      );
-    }
-  };
-
-  /**
-   * Gets all annotations of the given type.
-   *
-   * @method getAllAnnotations
-   * @deprecated Since Nutrient React Native SDK 2.12. Use ```this.pdfRef.current?.getDocument().getAnnotations()``` instead.
-   * See {@link https://nutrient.io/api/react-native/PDFDocument.html#.getAnnotations|getAnnotations()}.
-   * @memberof NutrientView
-   * @param { string } [type] The type of annotations to get. If not specified or ```null```, all annotation types will be returned.
-   * @see {@link https://nutrient.io/guides/web/json/schema/annotations/} for supported types.
-   * @example
-   * const result = await this.pdfRef.current.getAllAnnotations('all');
-   * // result: {'annotations' : [instantJson]}
-   *
-   * @returns { Promise } A promise containing an object with an array of InstantJSON objects.
-   */
-  getAllAnnotations = function (type) {
-    if (Platform.OS === 'android') {
-      let requestId = this._nextRequestId++;
-      let requestMap = this._requestMap;
-
-      // We create a promise here that will be resolved once onDataReturned is called.
-      let promise = new Promise(function (resolve, reject) {
-        requestMap[requestId] = { resolve: resolve, reject: reject };
-      });
-
-      UIManager.dispatchViewManagerCommand(
-        findNodeHandle(this._componentRef.current),
-        this._getViewManagerConfig('RCTPSPDFKitView').Commands
-          .getAllAnnotations,
-        [requestId, type],
-      );
-
-      return promise;
-    } else if (Platform.OS === 'ios') {
-      return NativeModules.PSPDFKitViewManager.getAllAnnotations(
-        type,
-        findNodeHandle(this._componentRef.current),
-      );
-    }
-  };
-
-  /**
-   * Applies the supplied document InstantJSON to the current document.
-   *
-   * @method addAnnotations
-   * @deprecated Since Nutrient React Native SDK 2.12. Use ```this.pdfRef.current?.getDocument().addAnnotations()``` instead.
-   * See {@link https://nutrient.io/api/react-native/PDFDocument.html#.addAnnotations|addAnnotations()}.
-   * @memberof NutrientView
-   * @param { object } annotations The document InstantJSON to apply to the current document.
-   * @example
-   * const result = await this.pdfRef.current.addAnnotations(annotationsJSON);
-   * @see {@link https://nutrient.io/guides/web/json/schema/annotations/} for document JSON structure.
-   *
-   * @returns { Promise<boolean> } A promise resolving to ```true``` if the annotations were added successfully, and ```false``` if an error occurred.
-   */
-  addAnnotations = function (annotations) {
-    if (Platform.OS === 'android') {
-      let requestId = this._nextRequestId++;
-      let requestMap = this._requestMap;
-
-      // We create a promise here that will be resolved once onDataReturned is called.
-      let promise = new Promise(function (resolve, reject) {
-        requestMap[requestId] = { resolve: resolve, reject: reject };
-      });
-
-      UIManager.dispatchViewManagerCommand(
-        findNodeHandle(this._componentRef.current),
-        this._getViewManagerConfig('RCTPSPDFKitView').Commands.addAnnotations,
-        [requestId, annotations],
-      );
-
-      return promise;
-    } else if (Platform.OS === 'ios') {
-      return NativeModules.PSPDFKitViewManager.addAnnotations(
-        annotations,
-        findNodeHandle(this._componentRef.current),
-      );
-    }
-  };
-
-  /**
-   * Sets the flags of the specified annotation.
-   *
-   * @method setAnnotationFlags
-   * @memberof NutrientView
-   * @param { string } uuid The UUID of the annotation to update.
-   * @param { Annotation.Flags[] } flags The flags to apply to the annotation.
-   * @deprecated Since Nutrient React Native SDK 4.0. Use ```this.pdfRef.current?.getDocument().setAnnotationFlags()``` instead.
-   * @example
-   * const result = await this.pdfRef.current.setAnnotationFlags('bb61b1bf-eacd-4227-a5bf-db205e591f5a', ['locked', 'hidden']);
-   *
-   * @returns { Promise<boolean> } A promise resolving to ```true``` if the annotations were added successfully, and ```false``` if an error occurred.
-   */
-  setAnnotationFlags = function (uuid, flags) {
-    if (Platform.OS === 'android') {
-      let requestId = this._nextRequestId++;
-      let requestMap = this._requestMap;
-
-      // We create a promise here that will be resolved once onDataReturned is called.
-      let promise = new Promise(function (resolve, reject) {
-        requestMap[requestId] = { resolve: resolve, reject: reject };
-      });
-
-      UIManager.dispatchViewManagerCommand(
-        findNodeHandle(this._componentRef.current),
-        this._getViewManagerConfig('RCTPSPDFKitView').Commands
-          .setAnnotationFlags,
-        [requestId, uuid, flags],
-      );
-
-      return promise;
-    } else if (Platform.OS === 'ios') {
-      return NativeModules.PSPDFKitViewManager.setAnnotationFlags(
-        uuid,
-        flags,
-        findNodeHandle(this._componentRef.current),
-      );
-    }
-  };
-
-  /**
-   * Gets the flags for the specified annotation.
-   *
-   * @method getAnnotationFlags
-   * @memberof NutrientView
-   * @param { string } uuid The UUID of the annotation to query.
-   * @deprecated Since Nutrient React Native SDK 4.0. Use ```this.pdfRef.current?.getDocument().getAnnotationFlags()``` instead.
-   * @example
-   * const flags = await this.pdfRef.current.getAnnotationFlags('bb61b1bf-eacd-4227-a5bf-db205e591f5a');
-   *
-   * @returns { Promise<Annotation.Flags[]> } A promise containing the flags of the specified annotation.
-   */
-  getAnnotationFlags = function (uuid) {
-    if (Platform.OS === 'android') {
-      let requestId = this._nextRequestId++;
-      let requestMap = this._requestMap;
-
-      // We create a promise here that will be resolved once onDataReturned is called.
-      let promise = new Promise(function (resolve, reject) {
-        requestMap[requestId] = { resolve: resolve, reject: reject };
-      });
-
-      UIManager.dispatchViewManagerCommand(
-        findNodeHandle(this._componentRef.current),
-        this._getViewManagerConfig('RCTPSPDFKitView').Commands
-          .getAnnotationFlags,
-        [requestId, uuid],
-      );
-
-      return promise;
-    } else if (Platform.OS === 'ios') {
-      return NativeModules.PSPDFKitViewManager.getAnnotationFlags(
-        uuid,
-        findNodeHandle(this._componentRef.current),
-      );
-    }
-  };
-
-  /**
-   * Imports the supplied XFDF file into the current document.
-   *
-   * @method importXFDF
-   * @deprecated Since Nutrient React Native SDK 2.12. Use ```this.pdfRef.current?.getDocument().importXFDF()``` instead.
-   * See {@link https://nutrient.io/api/react-native/PDFDocument.html#.importXFDF|importXFDF()}.
-   * @memberof NutrientView
-   * @param { string } filePath The path to the XFDF file to import.
-   * @example
-   * const result = await this.pdfRef.current.importXFDF('path/to/XFDF.xfdf');
-   *
-   * @returns { Promise<any> } A promise containing an object with the result. ```true``` if the xfdf file was imported successfully, and ```false``` if an error occurred.
-   */
-  importXFDF = function (filePath) {
-    if (Platform.OS === 'android') {
-      let requestId = this._nextRequestId++;
-      let requestMap = this._requestMap;
-
-      // We create a promise here that will be resolved once onDataReturned is called.
-      let promise = new Promise(function (resolve, reject) {
-        requestMap[requestId] = { resolve: resolve, reject: reject };
-      });
-
-      UIManager.dispatchViewManagerCommand(
-        findNodeHandle(this._componentRef.current),
-        this._getViewManagerConfig('RCTPSPDFKitView').Commands.importXFDF,
-        [requestId, filePath],
-      );
-
-      return promise;
-    } else if (Platform.OS === 'ios') {
-      return NativeModules.PSPDFKitViewManager.importXFDF(
-        filePath,
-        findNodeHandle(this._componentRef.current),
-      );
-    }
-  };
-
-  /**
-   * Exports the annotations from the current document to a XFDF file.
-   *
-   * @method exportXFDF
-   * @deprecated Since Nutrient React Native SDK 2.12. Use ```this.pdfRef.current?.getDocument().exportXFDF()``` instead.
-   * See {@link https://nutrient.io/api/react-native/PDFDocument.html#.exportXFDF|exportXFDF()}.
-   * @memberof NutrientView
-   * @param { string } filePath The path where the XFDF file should be exported to.
-   * @example
-   * const result = await this.pdfRef.current.exportXFDF('path/to/XFDF.xfdf');
-   *
-   * @returns { Promise<any> } A promise containing an object with the exported file path and result. ```true``` if the xfdf file was exported successfully, and ```false``` if an error occurred.
-   */
-  exportXFDF = function (filePath) {
-    if (Platform.OS === 'android') {
-      let requestId = this._nextRequestId++;
-      let requestMap = this._requestMap;
-
-      // We create a promise here that will be resolved once onDataReturned is called.
-      let promise = new Promise(function (resolve, reject) {
-        requestMap[requestId] = { resolve: resolve, reject: reject };
-      });
-
-      UIManager.dispatchViewManagerCommand(
-        findNodeHandle(this._componentRef.current),
-        this._getViewManagerConfig('RCTPSPDFKitView').Commands.exportXFDF,
-        [requestId, filePath],
-      );
-
-      return promise;
-    } else if (Platform.OS === 'ios') {
-      return NativeModules.PSPDFKitViewManager.exportXFDF(
-        filePath,
-        findNodeHandle(this._componentRef.current),
-      );
-    }
+    return NativeModules.PDFDocumentManager.selectAnnotations(
+      ref,
+      annotations,
+      showContextualMenu,
+    );
   };
 
   /**

@@ -16,10 +16,16 @@ import PSPDFKit
     @objc optional func reloadControllerData()
 }
 
+private class WeakViewRef {
+    weak var view: RCTPSPDFKitView?
+    init(_ view: RCTPSPDFKitView) { self.view = view }
+}
+
 @objc(PDFDocumentManager) public class PDFDocumentManager: NSObject {
     
     var documents = [NSNumber:Document]()
     @objc public var delegate: PDFDocumentManagerDelegate?
+    private var viewByReference = [NSNumber: WeakViewRef]()
     private let queue = DispatchQueue(label: "io.nutrient.reactnative.documentmanager")
     
     private func getDocument(_ reference: NSNumber) -> Document? {
@@ -30,9 +36,24 @@ import PSPDFKit
         return result
     }
     
+    private func getView(for reference: NSNumber) -> RCTPSPDFKitView? {
+        var result: RCTPSPDFKitView?
+        queue.sync {
+            result = viewByReference[reference]?.view
+        }
+        return result
+    }
+    
     @objc public func setDocument(_ document: Document, reference: NSNumber) {
         queue.async {
             self.documents[reference] = document
+        }
+    }
+    
+    @objc public func setView(_ view: Any, forReference reference: NSNumber) {
+        guard let pdfView = view as? RCTPSPDFKitView else { return }
+        queue.async {
+            self.viewByReference[reference] = WeakViewRef(pdfView)
         }
     }
     
@@ -638,6 +659,61 @@ import PSPDFKit
         documentProvider.annotationManager.update(annotationsToUpdate, animated: true)
         
         onSuccess(true)
+    }
+    
+    @objc func selectAnnotations(_ reference: NSNumber, annotations: Any, showContextualMenu: Bool, onSuccess: @escaping RCTPromiseResolveBlock, onError: @escaping RCTPromiseRejectBlock) -> Void {
+        guard getDocument(reference) != nil else {
+            onError("selectAnnotations", "Document is nil", nil)
+            return
+        }
+        
+        guard let annotationArray = annotations as? [Dictionary<String, Any>] else {
+            onError("selectAnnotations", "Please provide list of annotation objects", nil)
+            return
+        }
+        
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else {
+                onError("selectAnnotations", "Manager deallocated", nil)
+                return
+            }
+            let view = self.getView(for: reference) ?? (self.delegate as? RCTPSPDFKitView)
+            if let view = view {
+                let success = view.selectAnnotations(annotationArray, showContextualMenu: showContextualMenu)
+                if success {
+                    onSuccess(true)
+                } else {
+                    onError("selectAnnotations", "Failed to select annotations", nil)
+                }
+            } else {
+                onError("selectAnnotations", "View is not available", nil)
+            }
+        }
+    }
+    
+    @objc func clearSelectedAnnotations(_ reference: NSNumber, onSuccess: @escaping RCTPromiseResolveBlock, onError: @escaping RCTPromiseRejectBlock) -> Void {
+        guard getDocument(reference) != nil else {
+            onError("clearSelectedAnnotations", "Document is nil", nil)
+            return
+        }
+        
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else {
+                onError("clearSelectedAnnotations", "Manager deallocated", nil)
+                return
+            }
+            let view = self.getView(for: reference) ?? (self.delegate as? RCTPSPDFKitView)
+            if let view = view {
+                let success = view.clearSelectedAnnotations()
+                if success {
+                    onSuccess(true)
+                } else {
+                    onError("clearSelectedAnnotations", "Failed to clear selected annotations.", nil)
+                }
+            } else {
+                onError("clearSelectedAnnotations", "View is not available", nil)
+            }
+        }
     }
     
     // Helper function to apply individual properties to annotations

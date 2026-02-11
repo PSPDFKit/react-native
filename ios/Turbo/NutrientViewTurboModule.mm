@@ -83,6 +83,19 @@ RCT_EXPORT_MODULE();
     });
 }
 
+- (void)enterContentEditingMode:(nonnull NSString *)reference resolve:(nonnull RCTPromiseResolveBlock)resolve reject:(nonnull RCTPromiseRejectBlock)reject {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        RCTPSPDFKitView *view = [[NutrientViewRegistry shared] viewForId:reference];
+        if (!view) {
+            reject(ERR_VIEW_NOT_FOUND, @"Fabric view not found for reference", [self _makeErrorWithCode:ERR_VIEW_NOT_FOUND message:@"Fabric view not found for reference"]);
+            return;
+        }
+        
+        [view enterContentEditingMode];
+        resolve(@(YES));
+    });
+}
+
 - (void)exitCurrentlyActiveMode:(nonnull NSString *)reference resolve:(nonnull RCTPromiseResolveBlock)resolve reject:(nonnull RCTPromiseRejectBlock)reject {
     dispatch_async(dispatch_get_main_queue(), ^{
         RCTPSPDFKitView *view = [[NutrientViewRegistry shared] viewForId:reference];
@@ -161,61 +174,6 @@ RCT_EXPORT_MODULE();
     });
 }
 
-- (void)clearSelectedAnnotations:(nonnull NSString *)reference resolve:(nonnull RCTPromiseResolveBlock)resolve reject:(nonnull RCTPromiseRejectBlock)reject {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        RCTPSPDFKitView *view = [[NutrientViewRegistry shared] viewForId:reference];
-        if (!view) {
-            reject(ERR_VIEW_NOT_FOUND, @"Fabric view not found for reference", [self _makeErrorWithCode:ERR_VIEW_NOT_FOUND message:@"Fabric view not found for reference"]);
-            return;
-        }
-        [view clearSelectedAnnotations];
-        resolve(@YES);
-    });
-}
-
-- (void)selectAnnotations:(nonnull NSString *)reference annotationsJSONString:(nonnull NSString *)annotationsJSONString showContextualMenu:(nonnull NSNumber *)showContextualMenu resolve:(nonnull RCTPromiseResolveBlock)resolve reject:(nonnull RCTPromiseRejectBlock)reject {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        RCTPSPDFKitView *view = [[NutrientViewRegistry shared] viewForId:reference];
-        if (!view) {
-            reject(ERR_VIEW_NOT_FOUND, @"Fabric view not found for reference", [self _makeErrorWithCode:ERR_VIEW_NOT_FOUND message:@"Fabric view not found for reference"]);
-            return;
-        }
-        
-        // Parse JSON string to array of dictionaries
-        NSData *data = [annotationsJSONString dataUsingEncoding:NSUTF8StringEncoding];
-        NSError *error;
-        NSArray *annotationsArray = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
-        
-        if (error || ![annotationsArray isKindOfClass:[NSArray class]]) {
-            reject(ERR_INVALID_ARGS, @"Invalid JSON string for annotations", error ?: [self _makeErrorWithCode:ERR_INVALID_ARGS message:@"Invalid JSON string for annotations"]);
-            return;
-        }
-        
-        // Extract only uuid and name properties as expected by selectAnnotations
-        NSMutableArray *annotationsJSON = [NSMutableArray array];
-        for (id annotation in annotationsArray) {
-            if ([annotation isKindOfClass:[NSDictionary class]]) {
-                NSDictionary *annotationDict = (NSDictionary *)annotation;
-                NSMutableDictionary *simplifiedDict = [NSMutableDictionary dictionary];
-                
-                // Only include uuid and name properties
-                if (annotationDict[@"uuid"]) {
-                    simplifiedDict[@"uuid"] = annotationDict[@"uuid"];
-                }
-                if (annotationDict[@"name"]) {
-                    simplifiedDict[@"name"] = annotationDict[@"name"];
-                }
-                
-                [annotationsJSON addObject:[simplifiedDict copy]];
-            }
-        }
-        
-        BOOL showMenu = showContextualMenu ? [showContextualMenu boolValue] : NO;
-        BOOL success = [view selectAnnotations:annotationsJSON showContextualMenu:showMenu];
-        resolve(@(success));
-    });
-}
-
 - (void)setExcludedAnnotations:(nonnull NSString *)reference annotations:(nonnull NSArray *)annotations { 
     dispatch_async(dispatch_get_main_queue(), ^{
         RCTPSPDFKitView *view = [[NutrientViewRegistry shared] viewForId:reference];
@@ -227,7 +185,7 @@ RCT_EXPORT_MODULE();
     });
 }
 
-- (void)setUserInterfaceVisible:(nonnull NSString *)reference visible:(nonnull NSNumber *)visible resolve:(nonnull RCTPromiseResolveBlock)resolve reject:(nonnull RCTPromiseRejectBlock)reject {
+- (void)setUserInterfaceVisible:(nonnull NSString *)reference visible:(BOOL)visible resolve:(nonnull RCTPromiseResolveBlock)resolve reject:(nonnull RCTPromiseRejectBlock)reject {
     dispatch_async(dispatch_get_main_queue(), ^{
         RCTPSPDFKitView *view = [[NutrientViewRegistry shared] viewForId:reference];
         if (!view) {
@@ -235,7 +193,7 @@ RCT_EXPORT_MODULE();
             return;
         }
         
-        BOOL success = [view setUserInterfaceVisible:[visible boolValue]];
+        BOOL success = [view setUserInterfaceVisible:visible];
         if (success) {
             resolve(@(success));
         } else {

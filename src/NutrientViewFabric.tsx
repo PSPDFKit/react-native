@@ -15,6 +15,7 @@ export interface NutrientViewFabricRef {
   
   // All the command methods exposed directly on the ref - matching index.js signatures
   enterAnnotationCreationMode: (annotationType?: string) => Promise<boolean> | void;
+  enterContentEditingMode: () => Promise<boolean> | void;
   exitCurrentlyActiveMode: () => Promise<boolean> | void;
   setToolbar: (toolbar: any) => void;
   getToolbar: (viewMode?: string) => Promise<any>;
@@ -24,8 +25,6 @@ export interface NutrientViewFabricRef {
   setExcludedAnnotations: (annotations: string[]) => void;
   setUserInterfaceVisible: (visible: boolean) => Promise<boolean> | void;
   destroyView: () => void;
-  clearSelectedAnnotations: () => Promise<any> | void;
-  selectAnnotations: (annotations: any, showContextualMenu?: boolean) => Promise<any> | void;
   setPageIndex: (pageIndex: number, animated: boolean) => Promise<boolean> | void;
 }
 
@@ -61,6 +60,10 @@ const NutrientViewFabric = forwardRef<NutrientViewFabricRef, NativeProps>((props
       return NativeNutrientViewTurboModule.enterAnnotationCreationMode(instanceId.toString(), annotationType);
     },
     
+    enterContentEditingMode: () => {
+      return NativeNutrientViewTurboModule.enterContentEditingMode(instanceId.toString());
+    },
+    
     exitCurrentlyActiveMode: () => {
       return NativeNutrientViewTurboModule.exitCurrentlyActiveMode(instanceId.toString());
     },
@@ -71,14 +74,6 @@ const NutrientViewFabric = forwardRef<NutrientViewFabricRef, NativeProps>((props
     
     getToolbar: (viewMode?: string) => {
       return NativeNutrientViewTurboModule.getToolbar(instanceId.toString(), viewMode);
-    },
-
-    clearSelectedAnnotations: () => {
-      return NativeNutrientViewTurboModule.clearSelectedAnnotations(instanceId.toString());
-    },
-
-    selectAnnotations: (annotations: any, showContextualMenu?: boolean) => {
-      return NativeNutrientViewTurboModule.selectAnnotations(instanceId.toString(), JSON.stringify(annotations), showContextualMenu);
     },
 
     setPageIndex: (pageIndex: number, animated: boolean) => {

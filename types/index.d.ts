@@ -911,6 +911,14 @@ declare class NutrientView extends React.Component<Props, any, any> {
      */
     enterAnnotationCreationMode: (annotationType?: Annotation.Type) => any;
     /**
+     * Enters content editing mode, showing the content editing UI.
+     * @method enterContentEditingMode
+     * @example
+     * this.pdfRef.current.enterContentEditingMode();
+     * @memberof NutrientView
+     */
+    enterContentEditingMode: () => any;
+    /**
      * Exits the currently active mode, hiding all toolbars.
      * @method exitCurrentlyActiveMode
      * @example
@@ -953,6 +961,7 @@ declare class NutrientView extends React.Component<Props, any, any> {
     /**
      * @method clearSelectedAnnotations
      * @memberof NutrientView
+     * @deprecated Since Nutrient React Native SDK 4.1.1. Use ```this.pdfRef.current?.getDocument().clearSelectedAnnotations()``` instead.
      * @description Clears all currently selected Annotations.
      * @example
      * const result = await this.pdfRef.current?.clearSelectedAnnotations();
@@ -962,6 +971,7 @@ declare class NutrientView extends React.Component<Props, any, any> {
     /**
      * @method selectAnnotations
      * @memberof NutrientView
+     * @deprecated Since Nutrient React Native SDK 4.1.1. Use ```this.pdfRef.current?.getDocument().selectAnnotations(annotations, showContextualMenu)``` instead.
      * @param { object } annotations An array of the annotations to select in Instant JSON format.
      * @param { boolean } [showContextualMenu] Whether the annotation contextual menu should be shown after selection.
      * @description Select one or more annotations.
@@ -970,161 +980,6 @@ declare class NutrientView extends React.Component<Props, any, any> {
      * @returns { Promise<boolean> } A promise containing the result of the operation. ```true``` if the annotations were selected, ```false``` otherwise.
      */
     selectAnnotations: (annotations: object, showContextualMenu?: boolean) => Promise<boolean>;
-    /**
-     * Gets all annotations of the given type from the specified page.
-     *
-     * @method getAnnotations
-     * @deprecated Since Nutrient React Native SDK 2.12. Use ```this.pdfRef.current?.getDocument().getAnnotations()``` or ```getAnnotationsForPage()``` instead.
-     * See {@link https://nutrient.io/api/react-native/PDFDocument.html#.getAnnotations|getAnnotations()} and {@link https://nutrient.io/api/react-native/PDFDocument.html#.getAnnotationsForPage|getAnnotationsForPage()}.
-     * @memberof NutrientView
-     * @param { number } pageIndex The page index to get the annotations for, starting at 0.
-     * @param { string } [type] The type of annotations to get. If not specified or ```null```, all annotation types will be returned.
-     * @example
-     * const result = await this.pdfRef.current.getAnnotations(3, 'pspdfkit/ink');
-     * @see {@link https://nutrient.io/guides/web/json/schema/annotations/} for supported types.
-     *
-     * @returns { Promise } A promise containing an object with an array of InstantJSON objects.
-     */
-    getAnnotations: (pageIndex: number, type?: string) => Promise<any>;
-    /**
-     * Adds a new annotation to the current document.
-     *
-     * @method addAnnotation
-     * @deprecated Since Nutrient React Native SDK 2.12. Use ```this.pdfRef.current?.getDocument().addAnnotations()``` instead.
-     * @memberof NutrientView
-     * @param { object } annotation The InstantJSON of the annotation to add.
-     * @example
-     * const result = await this.pdfRef.current.addAnnotation(annotationJSON);
-     * @see {@link https://nutrient.io/guides/web/json/schema/annotations/} for document JSON structure.
-     *
-     * @returns { Promise<boolean> } A promise resolving to ```true``` if the annotation was added successfully, and ```false``` if an error occurred.
-     */
-    addAnnotation: (annotation: object) => Promise<boolean>;
-    /**
-     * Removes an existing annotation from the current document.
-     *
-     * @method removeAnnotation
-     * @deprecated Since Nutrient React Native SDK 2.12. Use ```this.pdfRef.current?.getDocument().removeAnnotations()``` instead.
-     * See {@link https://nutrient.io/api/react-native/PDFDocument.html#.removeAnnotations|removeAnnotations()}.
-     * @memberof NutrientView
-     * @param { object } annotation The InstantJSON of the annotation to remove.
-     * @example
-     * const result = await this.pdfRef.current.removeAnnotation(instantJSON);
-     *
-     * @returns { Promise } A promise resolving to ```true``` if the annotation was removed successfully, and ```false``` if the annotation couldn't be found or an error occurred.
-     */
-    removeAnnotation: (annotation: object) => Promise<any>;
-    /**
-     * Removes the supplied document InstantJSON from the current document.
-     *
-     * @method removeAnnotations
-     * @deprecated Since Nutrient React Native SDK 2.12. Use ```this.pdfRef.current?.getDocument().removeAnnotations()``` instead.
-     * See {@link https://nutrient.io/api/react-native/PDFDocument.html#.removeAnnotations|removeAnnotations()}.
-     * @memberof NutrientView
-     * @param { object } annotation The InstantJSON of the annotations to remove.
-     * @example
-     * const result = await this.pdfRef.current.removeAnnotations(instantJSON);
-     *
-     * @returns { Promise } A promise resolving to ```true``` if the annotations were removed successfully, and ```false``` if the annotations couldn't be found or an error occurred.
-     */
-    removeAnnotations: (annotations: any) => Promise<any>;
-    /**
-     * Gets all unsaved changes to annotations.
-     *
-     * @method getAllUnsavedAnnotations
-     * @deprecated Since Nutrient React Native SDK 2.12. Use ```this.pdfRef.current?.getDocument().getAllUnsavedAnnotations()``` instead.
-     * See {@link https://nutrient.io/api/react-native/PDFDocument.html#.getAllUnsavedAnnotations|getAllUnsavedAnnotations()}.
-     * @memberof NutrientView
-     * @returns { Promise } A promise containing document InstantJSON.
-     * @see {@link https://nutrient.io/guides/android/current/importing-exporting/instant-json/#instant-document-json-api-a56628} for more information.
-     */
-    getAllUnsavedAnnotations: () => Promise<any>;
-    /**
-     * Gets all annotations of the given type.
-     *
-     * @method getAllAnnotations
-     * @deprecated Since Nutrient React Native SDK 2.12. Use ```this.pdfRef.current?.getDocument().getAnnotations()``` instead.
-     * See {@link https://nutrient.io/api/react-native/PDFDocument.html#.getAnnotations|getAnnotations()}.
-     * @memberof NutrientView
-     * @param { string } [type] The type of annotations to get. If not specified or ```null```, all annotation types will be returned.
-     * @see {@link https://nutrient.io/guides/web/json/schema/annotations/} for supported types.
-     * @example
-     * const result = await this.pdfRef.current.getAllAnnotations('all');
-     * // result: {'annotations' : [instantJson]}
-     *
-     * @returns { Promise } A promise containing an object with an array of InstantJSON objects.
-     */
-    getAllAnnotations: (type?: string) => Promise<any>;
-    /**
-     * Applies the supplied document InstantJSON to the current document.
-     *
-     * @method addAnnotations
-     * @deprecated Since Nutrient React Native SDK 2.12. Use ```this.pdfRef.current?.getDocument().addAnnotations()``` instead.
-     * See {@link https://nutrient.io/api/react-native/PDFDocument.html#.addAnnotations|addAnnotations()}.
-     * @memberof NutrientView
-     * @param { object } annotations The document InstantJSON to apply to the current document.
-     * @example
-     * const result = await this.pdfRef.current.addAnnotations(annotationsJSON);
-     * @see {@link https://nutrient.io/guides/web/json/schema/annotations/} for document JSON structure.
-     *
-     * @returns { Promise<boolean> } A promise resolving to ```true``` if the annotations were added successfully, and ```false``` if an error occurred.
-     */
-    addAnnotations: (annotations: object) => Promise<boolean>;
-    /**
-     * Sets the flags of the specified annotation.
-     *
-     * @method setAnnotationFlags
-     * @memberof NutrientView
-     * @param { string } uuid The UUID of the annotation to update.
-     * @param { Annotation.Flags[] } flags The flags to apply to the annotation.
-     * @deprecated Since Nutrient React Native SDK 4.0. Use ```this.pdfRef.current?.getDocument().setAnnotationFlags()``` instead.
-     * @example
-     * const result = await this.pdfRef.current.setAnnotationFlags('bb61b1bf-eacd-4227-a5bf-db205e591f5a', ['locked', 'hidden']);
-     *
-     * @returns { Promise<boolean> } A promise resolving to ```true``` if the annotations were added successfully, and ```false``` if an error occurred.
-     */
-    setAnnotationFlags: (uuid: string, flags: Annotation.Flags[]) => Promise<boolean>;
-    /**
-     * Gets the flags for the specified annotation.
-     *
-     * @method getAnnotationFlags
-     * @memberof NutrientView
-     * @param { string } uuid The UUID of the annotation to query.
-     * @deprecated Since Nutrient React Native SDK 4.0. Use ```this.pdfRef.current?.getDocument().getAnnotationFlags()``` instead.
-     * @example
-     * const flags = await this.pdfRef.current.getAnnotationFlags('bb61b1bf-eacd-4227-a5bf-db205e591f5a');
-     *
-     * @returns { Promise<Annotation.Flags[]> } A promise containing the flags of the specified annotation.
-     */
-    getAnnotationFlags: (uuid: string) => Promise<Annotation.Flags[]>;
-    /**
-     * Imports the supplied XFDF file into the current document.
-     *
-     * @method importXFDF
-     * @deprecated Since Nutrient React Native SDK 2.12. Use ```this.pdfRef.current?.getDocument().importXFDF()``` instead.
-     * See {@link https://nutrient.io/api/react-native/PDFDocument.html#.importXFDF|importXFDF()}.
-     * @memberof NutrientView
-     * @param { string } filePath The path to the XFDF file to import.
-     * @example
-     * const result = await this.pdfRef.current.importXFDF('path/to/XFDF.xfdf');
-     *
-     * @returns { Promise<any> } A promise containing an object with the result. ```true``` if the xfdf file was imported successfully, and ```false``` if an error occurred.
-     */
-    importXFDF: (filePath: string) => Promise<any>;
-    /**
-     * Exports the annotations from the current document to a XFDF file.
-     *
-     * @method exportXFDF
-     * @deprecated Since Nutrient React Native SDK 2.12. Use ```this.pdfRef.current?.getDocument().exportXFDF()``` instead.
-     * See {@link https://nutrient.io/api/react-native/PDFDocument.html#.exportXFDF|exportXFDF()}.
-     * @memberof NutrientView
-     * @param { string } filePath The path where the XFDF file should be exported to.
-     * @example
-     * const result = await this.pdfRef.current.exportXFDF('path/to/XFDF.xfdf');
-     *
-     * @returns { Promise<any> } A promise containing an object with the exported file path and result. ```true``` if the xfdf file was exported successfully, and ```false``` if an error occurred.
-     */
-    exportXFDF: (filePath: string) => Promise<any>;
     /**
      * @typedef FormFieldResult
      * @property { string } [formElement] The form field value

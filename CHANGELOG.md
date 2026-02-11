@@ -1,3 +1,10 @@
+## 4.2.0 — 11 Feb 2026
+
+- Removes the deprecated Annotation APIs from the `NutrientView` namespace, since they are available on `PDFDocument`. (J#HYB-945)
+- Adds the `enterContentEditingMode` API to `NutrientView` to enter content editing mode programmatically. (J#HYB-943)
+- Adds the `CONTENT_EDITING_BUTTON_ITEM` option to the list of available Toolbar buttons. (J#HYB-943)
+- Updates for Nutrient Android SDK 11.0.0.
+
 ## 4.1.0 — 30 Jan 2026
 
 - Adds the `updateAnnotations` API to `PDFDocument` to update existing annotation properties. (J#HYB-828)

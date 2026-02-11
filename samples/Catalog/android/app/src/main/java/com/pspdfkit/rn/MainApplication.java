@@ -30,6 +30,11 @@ public class MainApplication extends Application implements ReactApplication {
         }
 
         @Override
+        protected String getJSMainModuleName() {
+          return "index";
+        }
+
+        @Override
         protected List<ReactPackage> getPackages() {
           @SuppressWarnings("UnnecessaryLocalVariable")
           List<ReactPackage> packages = new PackageList(this).getPackages();
@@ -39,18 +44,8 @@ public class MainApplication extends Application implements ReactApplication {
         }
 
         @Override
-        protected String getJSMainModuleName() {
-          return "index";
-        }
-
-        @Override
         protected boolean isNewArchEnabled() {
           return BuildConfig.IS_NEW_ARCHITECTURE_ENABLED;
-        }
-
-        @Override
-        protected Boolean isHermesEnabled() {
-          return BuildConfig.IS_HERMES_ENABLED;
         }
       };
 

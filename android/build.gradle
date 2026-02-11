@@ -15,7 +15,7 @@
  *   Contains gradle configuration constants
  */
 ext {
-    NUTRIENT_VERSION = '10.10.1'
+    NUTRIENT_VERSION = '11.0.0'
 }
 
 buildscript {
@@ -145,6 +145,9 @@ dependencies {
     implementation 'com.squareup.okhttp3:logging-interceptor:4.12.0'
 
     implementation "androidx.recyclerview:recyclerview:1.4.0"
+
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-rx3:1.7.3"
 
     // Explicitly declare Compose Foundation to ensure version 1.9.4 (matches PSPDFKit SDK)
     implementation "androidx.compose.foundation:foundation:1.9.4"

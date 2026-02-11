@@ -52,6 +52,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)enterAnnotationCreationMode:(PSPDFAnnotationString)annotationType withVariant:(PSPDFAnnotationVariantString)annotationVariant;
 - (BOOL)exitCurrentlyActiveMode;
 
+/// Content editing
+- (void)enterContentEditingMode;
+
 /// Document
 - (void)setDocument:(PSPDFDocument *)document;
 - (BOOL)saveCurrentDocumentWithError:(NSError *_Nullable *)error;
@@ -60,15 +63,6 @@ NS_ASSUME_NONNULL_BEGIN
 /// Configuration
 - (void)applyDocumentConfiguration:(id)configuration;
 
-/// Anotations
-- (NSDictionary<NSString *, NSArray<NSDictionary *> *> *)getAnnotations:(PSPDFPageIndex)pageIndex type:(PSPDFAnnotationType)type error:(NSError *_Nullable *)error;
-- (BOOL)addAnnotation:(id)jsonAnnotation error:(NSError *_Nullable *)error;
-- (BOOL)removeAnnotations:(NSArray<NSDictionary *> *)annotationsJSON;
-- (NSDictionary<NSString *, NSArray<NSDictionary *> *> *)getAllUnsavedAnnotationsWithError:(NSError *_Nullable *)error;
-- (NSDictionary<NSString *, NSArray<NSDictionary *> *> *)getAllAnnotations:(PSPDFAnnotationType)type error:(NSError *_Nullable *)error;
-- (BOOL)addAnnotations:(NSString *)jsonAnnotations error:(NSError *_Nullable *)error;
-- (BOOL)setAnnotationFlags:(NSString *)uuid flags:(NSArray<NSString *> *)flags;
-- (NSArray <NSString *> *)getAnnotationFlags:(NSString *)uuid;
 - (BOOL)clearSelectedAnnotations;
 - (BOOL)selectAnnotations:(NSArray<NSDictionary *> *)annotationsJSON showContextualMenu:(BOOL)showContextualMenu;
 - (void)setExcludedAnnotations:(NSArray *)annotations;

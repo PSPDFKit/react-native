@@ -45,6 +45,14 @@ import androidx.core.graphics.toColorInt
 import java.lang.ref.WeakReference
 import com.pspdfkit.views.PdfView
 import com.pspdfkit.ui.PdfFragment
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.TimeUnit
 
 data class DocumentData(
     val document: PdfDocument,
@@ -55,8 +63,17 @@ data class DocumentData(
 @ReactModule(name = PDFDocumentModule.NAME)
 class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
 
-    private var documents = mutableMapOf<Int, DocumentData>()
-    private var documentConfigurations = mutableMapOf<Int, MutableMap<String, Any>>()
+    private val job = SupervisorJob()
+    private val scope = CoroutineScope(job + Dispatchers.Main.immediate)
+
+    override fun onCatalystInstanceDestroy() {
+        super.onCatalystInstanceDestroy()
+        job.cancel()
+        scope.cancel()
+    }
+
+    private val documents = ConcurrentHashMap<Int, DocumentData>()
+    private val documentConfigurations = ConcurrentHashMap<Int, MutableMap<String, Any>>()
 
     override fun getName(): String {
         return NAME
@@ -67,11 +84,16 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
     }
 
     @ReactMethod fun setAnnotationFlags(reference: Int, uuid: String, flags: ReadableArray, promise: Promise) {
-        try {
-            this.getDocument(reference)?.document?.let { document ->
-                val allAnnotations = document.annotationProvider.getAllAnnotationsOfType(EnumSet.allOf(
-                    AnnotationType::class.java
-                ))
+        val document = this.getDocument(reference)?.document
+        if (document == null) {
+            promise.reject("setAnnotationFlags", "Document is nil")
+            return
+        }
+        scope.launch {
+            try {
+                val allAnnotations = withContext(Dispatchers.Default) {
+                    document.annotationProvider.getAllAnnotationsOfType(EnumSet.allOf(AnnotationType::class.java))
+                }
                 var foundAnnotation: Annotation? = null
                 for (annotation in allAnnotations) {
                     if (annotation.uuid == uuid || (annotation.name != null && annotation.name == uuid)) {
@@ -81,10 +103,8 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
                         break
                     }
                 }
-
-                // Notify the fragment if annotation was found and updated
                 if (foundAnnotation != null) {
-                    val docData = this.getDocument(reference)
+                    val docData = this@PDFDocumentModule.getDocument(reference)
                     val pdfView = docData?.pdfViewRef?.get()
                     if (pdfView != null) {
                         pdfView.getPdfFragment()
@@ -96,22 +116,24 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
                             )
                     }
                 }
-
                 promise.resolve(foundAnnotation != null)
-            } ?: run {
-                promise.reject("setAnnotationFlags", "Document is nil")
+            } catch (e: Throwable) {
+                promise.reject("setAnnotationFlags", e)
             }
-        } catch (e: Throwable) {
-            promise.reject("setAnnotationFlags", e)
         }
     }
 
     @ReactMethod fun getAnnotationFlags(reference: Int, uuid: String, promise: Promise) {
-        try {
-            this.getDocument(reference)?.document?.let { document ->
-                val allAnnotations = document.annotationProvider.getAllAnnotationsOfType(EnumSet.allOf(
-                    AnnotationType::class.java
-                ))
+        val document = this.getDocument(reference)?.document
+        if (document == null) {
+            promise.reject("getAnnotationFlags", "Document is nil")
+            return
+        }
+        scope.launch {
+            try {
+                val allAnnotations = withContext(Dispatchers.Default) {
+                    document.annotationProvider.getAllAnnotationsOfType(EnumSet.allOf(AnnotationType::class.java))
+                }
                 var convertedFlags = ArrayList<String>()
                 for (annotation in allAnnotations) {
                     if (annotation.uuid == uuid || (annotation.name != null && annotation.name == uuid)) {
@@ -121,11 +143,9 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
                     }
                 }
                 promise.resolve(Arguments.makeNativeArray(convertedFlags))
-            } ?: run {
-                promise.reject("getAnnotationFlags", "Document is nil")
+            } catch (e: Throwable) {
+                promise.reject("getAnnotationFlags", e)
             }
-        } catch (e: Throwable) {
-            promise.reject("getAnnotationFlags", e)
         }
     }
 
@@ -233,129 +253,114 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
 
     @ReactMethod fun getAllUnsavedAnnotations(reference: Int, promise: Promise) {
         try {
-            this.getDocument(reference)?.document?.let {
-                val outputStream = ByteArrayOutputStream()
-                DocumentJsonFormatter.exportDocumentJsonAsync(it, outputStream)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                        {
-                            val json = JSONObject(outputStream.toString())
-                            val jsonMap = JsonUtilities.jsonObjectToMap(json)
-                            val nativeMap = Arguments.makeNativeMap(jsonMap)
-                            promise.resolve(nativeMap)
-                        }, { e ->
-                            promise.reject(RuntimeException(e))
-                        }
-                    )
+            val document = this.getDocument(reference)?.document
+            if (document == null) {
+                promise.reject("getAllUnsavedAnnotations", "Document is nil")
+                return
             }
+            val outputStream = ByteArrayOutputStream()
+            DocumentJsonFormatter.exportDocumentJsonAsync(document, outputStream)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                    {
+                        val json = JSONObject(outputStream.toString())
+                        val jsonMap = JsonUtilities.jsonObjectToMap(json)
+                        val nativeMap = Arguments.makeNativeMap(jsonMap)
+                        promise.resolve(nativeMap)
+                    }, { e ->
+                        promise.reject("getAllUnsavedAnnotations", RuntimeException(e))
+                    }
+                )
         } catch (e: Throwable) {
             promise.reject("getAllUnsavedAnnotations error", e)
         }
     }
 
     @ReactMethod fun getAnnotations(reference: Int, type: String?, promise: Promise) {
-        try {
-            this.getDocument(reference)?.document?.let {
-                it.annotationProvider.getAllAnnotationsOfTypeAsync(if (type == null) (EnumSet.allOf(
-                    AnnotationType::class.java
-                )) else getAnnotationTypes(Arguments.makeNativeArray<String>(arrayOf(type))))
-                    .toList()
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                        { annotations ->
-                            var annotationsSerialized: ArrayList<Map<String, Any>> = ArrayList()
-                            for (annotation in annotations) {
-                                if (annotation.type == AnnotationType.POPUP) {
-                                    continue
-                                }
-                                val annotationMap = AnnotationUtils.processAnnotation(annotation)
-                                annotationsSerialized.add(annotationMap)
-                            }
-                            val nativeList = Arguments.makeNativeArray(annotationsSerialized)
-                            promise.resolve(nativeList)
-                        }, { e ->
-                            promise.reject(RuntimeException(e))
-                        }
-                    )
+        val document = this.getDocument(reference)?.document
+        if (document == null) {
+            promise.reject("getAnnotations error", "Document is nil")
+            return
+        }
+        val types = if (type == null) EnumSet.allOf(AnnotationType::class.java)
+            else getAnnotationTypes(Arguments.makeNativeArray<String>(arrayOf(type)))
+        scope.launch {
+            try {
+                val annotations = withContext(Dispatchers.Default) {
+                    document.annotationProvider.getAllAnnotationsOfType(types)
+                }
+                var annotationsSerialized: ArrayList<Map<String, Any>> = ArrayList()
+                for (annotation in annotations) {
+                    if (annotation.type == AnnotationType.POPUP) continue
+                    val annotationMap = AnnotationUtils.processAnnotation(annotation)
+                    annotationsSerialized.add(annotationMap)
+                }
+                promise.resolve(Arguments.makeNativeArray(annotationsSerialized))
+            } catch (e: Throwable) {
+                promise.reject("getAnnotations error", e)
             }
-        } catch (e: Throwable) {
-            promise.reject("getAnnotations error", e)
         }
     }
 
     @ReactMethod fun getAnnotationsForPage(reference: Int, pageIndex: Int, type: String?, promise: Promise) {
-        try {
-            this.getDocument(reference)?.document?.let {
-
-                if (pageIndex > it.pageCount-1) {
-                    promise.reject(RuntimeException("Specified page index is out of bounds"))
-                    return
+        val document = this.getDocument(reference)?.document
+        if (document == null) {
+            promise.reject("getAnnotationsForPage error", "Document is nil")
+            return
+        }
+        if (pageIndex > document.pageCount - 1) {
+            promise.reject(RuntimeException("Specified page index is out of bounds"))
+            return
+        }
+        val types = if (type == null) EnumSet.allOf(AnnotationType::class.java)
+            else getAnnotationTypes(Arguments.makeNativeArray<String>(arrayOf(type)))
+        scope.launch {
+            try {
+                val annotations = withContext(Dispatchers.Default) {
+                    document.annotationProvider.getAllAnnotationsOfType(types, pageIndex, 1)
                 }
-
-                it.annotationProvider.getAllAnnotationsOfTypeAsync(if (type == null) EnumSet.allOf(AnnotationType::class.java) else
-                    getAnnotationTypes(Arguments.makeNativeArray<String>(arrayOf(type))), pageIndex, 1)
-                    .toList()
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                        { annotations ->
-                            var annotationsSerialized: ArrayList<Map<String, Any>> = ArrayList()
-                            for (annotation in annotations) {
-                                if (annotation.type == AnnotationType.POPUP) {
-                                    continue
-                                }
-                                val annotationMap = AnnotationUtils.processAnnotation(annotation)
-                                annotationsSerialized.add(annotationMap)
-                            }
-                            val nativeList = Arguments.makeNativeArray(annotationsSerialized)
-                            promise.resolve(nativeList)
-                        }, { e ->
-                            promise.reject(RuntimeException(e))
-                        }
-                    )
+                val annotationsSerialized = ArrayList<Map<String, Any>>()
+                for (annotation in annotations) {
+                    if (annotation.type == AnnotationType.POPUP) continue
+                    annotationsSerialized.add(AnnotationUtils.processAnnotation(annotation))
+                }
+                promise.resolve(Arguments.makeNativeArray(annotationsSerialized))
+            } catch (e: Throwable) {
+                promise.reject("getAnnotationsForPage error", e)
             }
-        } catch (e: Throwable) {
-            promise.reject("getAnnotationsForPage error", e)
         }
     }
 
     @ReactMethod fun removeAnnotations(reference: Int, instantJSON: ReadableArray, promise: Promise) {
-        try {
-            this.getDocument(reference)?.document?.let {
-
-                val instantJSONArray: List<Map<String, Any>> = instantJSON.toArrayList().filterIsInstance<Map<String, Any>>()
-                var annotationsToDelete: ArrayList<Annotation> = ArrayList()
-                it.annotationProvider.getAllAnnotationsOfTypeAsync(
-                    EnumSet.allOf(
-                        AnnotationType::class.java
-                    ))
-                    .toList()
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                        { annotations ->
-                            for (annotation in annotations) {
-                                for (instantJSONAnnotation in instantJSONArray) {
-                                    if (annotation.name == instantJSONAnnotation["name"] ||
-                                        annotation.uuid == instantJSONAnnotation["uuid"]) {
-                                        annotationsToDelete.add(annotation)
-                                    }
-                                }
-                            }
-
-                            for (annotation in annotationsToDelete) {
-                                it.annotationProvider.removeAnnotationFromPage(annotation)
-                            }
-                            promise.resolve(true)
-                        }, { e ->
-                            promise.reject(RuntimeException(e))
+        val document = this.getDocument(reference)?.document
+        if (document == null) {
+            promise.reject("removeAnnotations error", "Document is nil")
+            return
+        }
+        val instantJSONArray: List<Map<String, Any>> = instantJSON.toArrayList().filterIsInstance<Map<String, Any>>()
+        scope.launch {
+            try {
+                val annotations = withContext(Dispatchers.Default) {
+                    document.annotationProvider.getAllAnnotationsOfType(EnumSet.allOf(AnnotationType::class.java))
+                }
+                val annotationsToDelete = ArrayList<Annotation>()
+                for (annotation in annotations) {
+                    for (instantJSONAnnotation in instantJSONArray) {
+                        if (annotation.name == instantJSONAnnotation["name"] ||
+                            annotation.uuid == instantJSONAnnotation["uuid"]) {
+                            annotationsToDelete.add(annotation)
+                            break
                         }
-                    )
+                    }
+                }
+                for (annotation in annotationsToDelete) {
+                    document.annotationProvider.removeAnnotationFromPage(annotation)
+                }
+                promise.resolve(true)
+            } catch (e: Throwable) {
+                promise.reject("removeAnnotations error", e)
             }
-        } catch (e: Throwable) {
-            promise.reject("removeAnnotations error", e)
         }
     }
 
@@ -401,20 +406,25 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
                     } else {
                         // Process non-image annotations directly
                         if (instantJSONArray != null) {
-                            for (i in 0 until instantJSONArray.size()) {
+                            scope.launch {
                                 try {
-                                    val annotation = instantJSONArray.getMap(i)
-                                    val hashMap = annotation!!.toHashMap() as Map<*, *>
-                                    document.annotationProvider.createAnnotationFromInstantJson(
-                                        JSONObject(hashMap).toString()
-                                    )
+                                    withContext(Dispatchers.Default) {
+                                        for (i in 0 until instantJSONArray.size()) {
+                                            val annotation = instantJSONArray.getMap(i)
+                                            val hashMap = annotation!!.toHashMap() as Map<*, *>
+                                            document.annotationProvider.createAnnotationFromInstantJson(
+                                                JSONObject(hashMap).toString()
+                                            )
+                                        }
+                                    }
+                                    promise.resolve(true)
                                 } catch (e: Exception) {
                                     promise.reject("addAnnotations error", e)
-                                    return
                                 }
                             }
+                        } else {
+                            promise.resolve(true)
                         }
-                        promise.resolve(true)
                     }
                 } else {
                     promise.reject("addAnnotations error", "Cannot parse annotation data")
@@ -452,19 +462,28 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
                     importPath = "file:///$filePath";
                 }
 
-                XfdfFormatter.parseXfdfAsync(it, ContentResolverDataProvider((Uri.parse(importPath))))
+                val document = it
+                XfdfFormatter.parseXfdfAsync(document, ContentResolverDataProvider((Uri.parse(importPath))))
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                         { annotations ->
-                            for (annotation in annotations) {
-                                it.annotationProvider.addAnnotationToPage(annotation)
+                            scope.launch {
+                                try {
+                                    withContext(Dispatchers.Default) {
+                                        for (annotation in annotations) {
+                                            document.annotationProvider.addAnnotationToPage(annotation)
+                                        }
+                                    }
+                                    val result = JSONObject()
+                                    result.put("success", true)
+                                    val jsonMap = JsonUtilities.jsonObjectToMap(result)
+                                    val nativeMap = Arguments.makeNativeMap(jsonMap)
+                                    promise.resolve(nativeMap)
+                                } catch (e: Throwable) {
+                                    promise.reject("importXFDF error", e)
+                                }
                             }
-                            val result = JSONObject()
-                            result.put("success", true)
-                            val jsonMap = JsonUtilities.jsonObjectToMap(result)
-                            val nativeMap = Arguments.makeNativeMap(jsonMap)
-                            promise.resolve(nativeMap)
                         }, { e ->
                             promise.reject("importXFDF error", e)
                         })
@@ -475,45 +494,57 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
     }
 
     @ReactMethod fun exportXFDF(reference: Int, filePath: String, promise: Promise) {
-        try {
-            this.getDocument(reference)?.document?.let {
-                var exportPath = filePath;
-                if (Uri.parse(exportPath).scheme == null) {
-                    exportPath = "file:///$filePath";
+        val document = this.getDocument(reference)?.document
+        if (document == null) {
+            promise.reject("exportXFDF error", "Document is nil")
+            return
+        }
+        var exportPath = filePath
+        if (Uri.parse(exportPath).scheme == null) {
+            exportPath = "file:///$filePath"
+        }
+        val outputStream = reactApplicationContext.contentResolver.openOutputStream(Uri.parse(exportPath))
+            ?: run {
+                promise.reject("exportXFDF error", RuntimeException("Could not write to supplied file path error"))
+                return
+            }
+        scope.launch {
+            try {
+                val allAnnotations = withContext(Dispatchers.Default) {
+                    document.annotationProvider.getAllAnnotationsOfType(EnumSet.allOf(AnnotationType::class.java))
                 }
-
-                val outputStream = reactApplicationContext.contentResolver.openOutputStream(Uri.parse(exportPath))
-                if (outputStream == null) {
-                    promise.reject("exportXFDF error", RuntimeException("Could not write to supplied file path error"))
-                    return
-                }
-
-                val allAnnotations = it.annotationProvider.getAllAnnotationsOfType(
-                    EnumSet.allOf(
-                        AnnotationType::class.java
-                    ))
                 var allFormFields: List<com.pspdfkit.forms.FormField> = emptyList()
                 if (PSPDFKit.getLicenseFeatures().contains(LicenseFeature.FORMS)) {
-                    allFormFields = it.formProvider.formFields
+                    allFormFields = document.formProvider.formFields
                 }
-
-                XfdfFormatter.writeXfdfAsync(it, allAnnotations, allFormFields, outputStream)
+                XfdfFormatter.writeXfdfAsync(document, allAnnotations, allFormFields, outputStream)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                         {
+                            try {
+                                outputStream.close()
+                            } catch (_: Exception) { /* ignore */ }
                             val result = JSONObject()
                             result.put("success", true)
                             result.put("filePath", filePath)
                             val jsonMap = JsonUtilities.jsonObjectToMap(result)
                             val nativeMap = Arguments.makeNativeMap(jsonMap)
                             promise.resolve(nativeMap)
-                        }, { e ->
+                        },
+                        { e ->
+                            try {
+                                outputStream.close()
+                            } catch (_: Exception) { /* ignore */ }
                             promise.reject("exportXFDF error", e)
-                        })
+                        }
+                    )
+            } catch (e: Throwable) {
+                try {
+                    outputStream.close()
+                } catch (_: Exception) { /* ignore */ }
+                promise.reject("exportXFDF error", e)
             }
-        } catch (e: Throwable) {
-            promise.reject("exportXFDF error", e)
         }
     }
 
@@ -690,77 +721,134 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
     }
 
     @ReactMethod fun updateAnnotations(reference: Int, instantJSON: ReadableArray, promise: Promise) {
-        try {
-            this.getDocument(reference)?.document?.let { document ->
-                val instantJSONArray: List<ReadableMap> = (0 until instantJSON.size())
-                    .mapNotNull { instantJSON.getMap(it) }
+        val document = this.getDocument(reference)?.document
+        if (document == null) {
+            promise.reject("updateAnnotations", "Document is nil")
+            return
+        }
+        val instantJSONArray: List<ReadableMap> = (0 until instantJSON.size())
+            .mapNotNull { instantJSON.getMap(it) }
+        scope.launch {
+            try {
+                val annotations = withContext(Dispatchers.Default) {
+                    document.annotationProvider.getAllAnnotationsOfType(EnumSet.allOf(AnnotationType::class.java))
+                }
+                val annotationsToUpdate = ArrayList<Annotation>()
+                for (updateMap in instantJSONArray) {
+                    val updateUUID = updateMap.getString("uuid")
+                    val updateName = updateMap.getString("name")
+                    var foundAnnotation: Annotation? = null
+                    for (annotation in annotations) {
+                        if ((updateUUID != null && annotation.uuid == updateUUID) ||
+                            (updateName != null && annotation.name == updateName)) {
+                            foundAnnotation = annotation
+                            break
+                        }
+                    }
+                    foundAnnotation?.let { annotation ->
+                        applyPropertiesToAnnotation(annotation, updateMap, document)
+                        annotationsToUpdate.add(annotation)
+                    }
+                }
+                if (annotationsToUpdate.isEmpty()) {
+                    promise.reject("updateAnnotations", "No annotations found to update")
+                    return@launch
+                }
+                val docData = this@PDFDocumentModule.getDocument(reference)
+                val pdfView = docData?.pdfViewRef?.get()
+                if (pdfView != null) {
+                    for (annotation in annotationsToUpdate) {
+                        pdfView.getPdfFragment()
+                            .take(1)
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(
+                                { pdfFragment -> pdfFragment.notifyAnnotationHasChanged(annotation) },
+                                { /* Ignore errors if fragment is not available */ }
+                            )
+                    }
+                }
+                promise.resolve(true)
+            } catch (e: Throwable) {
+                promise.reject("updateAnnotations", e)
+            }
+        }
+    }
 
-                var annotationsToUpdate: ArrayList<Annotation> = ArrayList()
-
-                document.annotationProvider.getAllAnnotationsOfTypeAsync(EnumSet.allOf(
-                    AnnotationType::class.java
-                ))
-                    .toList()
-                    .subscribeOn(Schedulers.io())
+    @ReactMethod fun selectAnnotations(reference: Int, jsonAnnotations: ReadableArray, showContextualMenu: Boolean, promise: Promise) {
+        val docData = this.getDocument(reference)
+        val document = docData?.document
+        val pdfView = docData?.pdfViewRef?.get()
+        if (document == null || pdfView == null) {
+            promise.reject("selectAnnotations", "Document is nil")
+            return
+        }
+        val instantJSONArray: List<Map<String, Any>> = jsonAnnotations.toArrayList().filterIsInstance<Map<String, Any>>()
+        scope.launch {
+            try {
+                val annotationsToSelect = withContext(Dispatchers.Default) {
+                    val allAnnotations = document.annotationProvider.getAllAnnotationsOfType(EnumSet.allOf(AnnotationType::class.java))
+                    val toSelect = ArrayList<Annotation>()
+                    for (annotation in allAnnotations) {
+                        for (instantJSONAnnotation in instantJSONArray) {
+                            if ((annotation.name != null && annotation.name == instantJSONAnnotation["name"]) ||
+                                annotation.uuid == instantJSONAnnotation["uuid"]) {
+                                toSelect.add(annotation)
+                                break
+                            }
+                        }
+                    }
+                    toSelect
+                }
+                pdfView.getPdfFragment()
+                    .take(1)
+                    .timeout(5, TimeUnit.SECONDS)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
-                        { annotations ->
-                            // Match annotations and apply changes
-                            for (updateMap in instantJSONArray) {
-                                // Find the annotation by uuid or name
-                                var foundAnnotation: Annotation? = null
-
-                                val updateUUID = updateMap.getString("uuid")
-                                val updateName = updateMap.getString("name")
-
-                                for (annotation in annotations) {
-                                    if ((updateUUID != null && annotation.uuid == updateUUID) ||
-                                        (updateName != null && annotation.name == updateName)) {
-                                        foundAnnotation = annotation
-                                        break
-                                    }
+                        { pdfFragment ->
+                            try {
+                                pdfFragment.setSelectedAnnotations(annotationsToSelect)
+                                if (showContextualMenu) {
+                                    pdfFragment.enterAnnotationEditingMode(annotationsToSelect)
                                 }
-
-                                foundAnnotation?.let { annotation ->
-                                    // Apply changed properties from the map
-                                    applyPropertiesToAnnotation(annotation, updateMap, document)
-                                    annotationsToUpdate.add(annotation)
-                                }
+                                promise.resolve(true)
+                            } catch (e: Exception) {
+                                promise.reject("selectAnnotations", e.message ?: "Failed to select annotations")
                             }
-
-                            if (annotationsToUpdate.isEmpty()) {
-                                promise.reject("updateAnnotations", "No annotations found to update")
-                                return@subscribe
-                            }
-
-                            // Notify the system that annotations changed
-                            // iOS equivalent: documentProvider.annotationManager.update(annotationsToUpdate, animated: true)
-                            // On Android, we need to explicitly notify the fragment to update the UI
-                            val docData = this.getDocument(reference)
-                            val pdfView = docData?.pdfViewRef?.get()
-                            if (pdfView != null) {
-                                // Use PdfView's getPdfFragment() to notify each updated annotation
-                                for (annotation in annotationsToUpdate) {
-                                    pdfView.getPdfFragment()
-                                        .take(1)
-                                        .observeOn(AndroidSchedulers.mainThread())
-                                        .subscribe(
-                                            { pdfFragment -> pdfFragment.notifyAnnotationHasChanged(annotation) },
-                                            { /* Ignore errors if fragment is not available */ }
-                                        )
-                                }
-                            }
-
-                            promise.resolve(true)
                         },
-                        { e -> promise.reject(e) }
+                        { throwable ->
+                            promise.reject("selectAnnotations", throwable.message ?: throwable.toString())
+                        }
                     )
-            } ?: run {
-                promise.reject("updateAnnotations", "Document is nil")
+            } catch (e: Throwable) {
+                promise.reject("selectAnnotations", e.message ?: e.toString())
             }
-        } catch (e: Throwable) {
-            promise.reject("updateAnnotations error", e)
         }
+    }
+
+    @ReactMethod fun clearSelectedAnnotations(reference: Int, promise: Promise) {
+        val docData = this.getDocument(reference)
+        val pdfView = docData?.pdfViewRef?.get()
+        if (pdfView == null) {
+            promise.reject("clearSelectedAnnotations", "Document is nil")
+            return
+        }
+        pdfView.getPdfFragment()
+            .take(1)
+            .timeout(5, TimeUnit.SECONDS)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                { pdfFragment ->
+                    try {
+                        pdfFragment.clearSelectedAnnotations()
+                        promise.resolve(true)
+                    } catch (e: Exception) {
+                        promise.reject("clearSelectedAnnotations", e.message ?: "Failed to clear selected annotations")
+                    }
+                },
+                { throwable ->
+                    promise.reject("clearSelectedAnnotations", throwable.message ?: throwable.toString())
+                }
+            )
     }
 
     // Helper function to apply individual properties to annotations

@@ -6,7 +6,12 @@ jest.mock('react-native', () => {
   };
 });
 
+jest.mock('../src/ArchitectureDetector', () => ({
+  isNewArchitectureEnabled: jest.fn(),
+}));
+
 import { PDFDocument } from '../src/document/PDFDocument';
+import { isNewArchitectureEnabled } from '../src/ArchitectureDetector';
 import { NativeModules, findNodeHandle } from 'react-native';
 import {
   ButtonFormElement,
@@ -28,14 +33,25 @@ describe('PDFDocument JS helpers', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     (findNodeHandle as jest.Mock).mockReturnValue(999);
+    (isNewArchitectureEnabled as jest.Mock).mockReturnValue(false);
   });
 
-  test('getRef returns numeric reference when findNodeHandle returns null (Fabric fallback)', () => {
+  test('getRef returns numeric reference on Fabric (pdfViewRef is component id)', () => {
+    (isNewArchitectureEnabled as jest.Mock).mockReturnValue(true);
     (findNodeHandle as jest.Mock).mockReturnValue(null);
     const doc = new PDFDocument(1234);
     // @ts-ignore access private
     const ref = (doc as any).getRef();
     expect(ref).toBe(1234);
+  });
+
+  test('getRef returns null on Paper when findNodeHandle returns null (no fallback)', () => {
+    (isNewArchitectureEnabled as jest.Mock).mockReturnValue(false);
+    (findNodeHandle as jest.Mock).mockReturnValue(null);
+    const doc = new PDFDocument(1234);
+    // @ts-ignore access private
+    const ref = (doc as any).getRef();
+    expect(ref).toBeNull();
   });
 
   test('setPageIndex rejects out of bounds', async () => {

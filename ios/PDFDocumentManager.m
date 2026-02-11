@@ -68,4 +68,10 @@ RCT_EXTERN_METHOD(addElectronicSignatureFormField:(NSNumber _Nonnull)reference s
 
 RCT_EXTERN_METHOD(addTextFormField:(NSNumber _Nonnull)reference formData:(NSDictionary *)formData onSuccess:(RCTPromiseResolveBlock)resolve onError:(RCTPromiseRejectBlock)reject);
 
+RCT_EXTERN_METHOD(selectAnnotations:(NSNumber _Nonnull)reference annotations:(id)annotations showContextualMenu:(BOOL)showContextualMenu onSuccess:(RCTPromiseResolveBlock)resolve onError:(RCTPromiseRejectBlock)reject);
+
+RCT_EXTERN_METHOD(clearSelectedAnnotations:(NSNumber _Nonnull)reference onSuccess:(RCTPromiseResolveBlock)resolve onError:(RCTPromiseRejectBlock)reject);
+
+RCT_EXTERN_METHOD(setView:(id)view forReference:(NSNumber _Nonnull)reference);
+
 @end

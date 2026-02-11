@@ -64,16 +64,15 @@ export class PDFDocument {
     * @private
     * @method getRef
     * @description Helper method to get the appropriate ref for native module calls.
-    * In Paper architecture, this uses findNodeHandle. In Fabric, this uses the pdfViewRef directly.
-    * @returns {any} The ref to use for native module calls
+    * In Paper architecture, this uses findNodeHandle (may return null if the view is not yet mounted).
+    * In Fabric, this uses the pdfViewRef directly (numeric componentId).
+    * @returns {number | null} The ref to use for native module calls, or null on Paper when findNodeHandle fails
     */
-    private getRef(): any {
-      var ref = findNodeHandle(this.pdfViewRef);
-      if (ref == null) {
-        // In fabric the pdfViewRef is a generated number and should be used directly
-        ref = this.pdfViewRef;
+    private getRef(): number | null {
+      if (isNewArchitectureEnabled()) {
+        return this.pdfViewRef;
       }
-      return ref;
+      return findNodeHandle(this.pdfViewRef);
     }
 
    /**
@@ -671,6 +670,44 @@ export class PDFDocument {
       }
       
       return NativeModules.PDFDocumentManager.updateAnnotations(this.getRef(), updatePayload);
+    }
+
+   /**
+    * @method clearSelectedAnnotations
+    * @memberof PDFDocument
+    * @description Clears all currently selected Annotations.
+    * @example
+    * const result = await this.pdfRef.current?.getDocument().clearSelectedAnnotations();
+    * @returns { Promise<boolean> } A promise resolving to ```true``` if the selection was cleared, ```false``` otherwise.
+    */
+    clearSelectedAnnotations(): Promise<boolean> {
+      const ref = this.getRef();
+      if (ref == null) {
+        return Promise.reject(new Error('PDF view reference is not available'));
+      }
+      return NativeModules.PDFDocumentManager.clearSelectedAnnotations(ref);
+    }
+
+   /**
+    * @method selectAnnotations
+    * @memberof PDFDocument
+    * @param {object} annotations An array of the annotations to select in Instant JSON format.
+    * @param {boolean} [showContextualMenu] Whether the annotation contextual menu should be shown after selection.
+    * @description Select one or more annotations.
+    * @example
+    * const result = await this.pdfRef.current?.getDocument().selectAnnotations(annotations);
+    * @returns { Promise<boolean> } A promise resolving to ```true``` if the annotations were selected, ```false``` otherwise.
+    */
+    selectAnnotations(annotations: any, showContextualMenu?: boolean): Promise<boolean> {
+      const ref = this.getRef();
+      if (ref == null) {
+        return Promise.reject(new Error('PDF view reference is not available'));
+      }
+      return NativeModules.PDFDocumentManager.selectAnnotations(
+        ref,
+        annotations,
+        showContextualMenu ?? false,
+      );
     }
 
    /**

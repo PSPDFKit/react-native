@@ -256,8 +256,10 @@ using namespace facebook::react;
       if (!newProps->document.empty()) {
           _document = RCTNSStringFromString(newProps->document);
           PDFDocumentManager *documentManager = [[RCTBridge currentBridge] moduleForClass:[PDFDocumentManager class]];
+          NSNumber *reference = [NSNumber numberWithInteger:[self.nativeId integerValue]];
           NSDictionary *remoteConfig = jsonConfig[@"remoteDocumentConfiguration"];
-          [NutrientPropsDocumentHelper applyDocumentFromJSON:_document remoteDocumentConfig:remoteConfig toView:_view usingManager:documentManager withReference:[NSNumber numberWithInteger:[self.nativeId integerValue]]];
+          [NutrientPropsDocumentHelper applyDocumentFromJSON:_document remoteDocumentConfig:remoteConfig toView:_view usingManager:documentManager withReference:reference];
+          [documentManager setView:_view forReference:reference];
           [NutrientPropsFontHelper configureCustomFontPickerForView:_view];
       }
           

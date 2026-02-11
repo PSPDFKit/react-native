@@ -245,6 +245,21 @@ public class ReactPdfUiFragment extends PdfUiFragment {
             int resId = PSPDFKitUtils.getCustomResourceId(customId, "id", getContext());
             menuItems.add(Math.min(menuItems.size(), index), resId);
         }
+
+    // After IDs have been computed, post a task to configure the actual Menu
+    View view = getView();
+    if (view != null) {
+        Toolbar toolbar = view.findViewById(R.id.pspdf__toolbar_main);
+        if (toolbar != null) {
+            toolbar.post(() -> {
+                Menu menu = toolbar.getMenu();
+                if (menu != null) {
+                    setupOptionsMenu(menu);
+                }
+            });
+        }
+    }
+
         return menuItems;
     }
 

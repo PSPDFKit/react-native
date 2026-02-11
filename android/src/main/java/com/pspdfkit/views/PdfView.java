@@ -420,9 +420,7 @@ public class PdfView extends FrameLayout {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(pdfUiFragment -> {
                         ((ReactPdfUiFragment) pdfUiFragment).setCustomToolbarItems(stockToolbarItems, customToolbarItems, menuItemListener);
-                        if (reactApplicationContext != null && reactApplicationContext.getCurrentActivity() != null) {
-                            reactApplicationContext.getCurrentActivity().invalidateOptionsMenu();
-                        }
+                        pdfUiFragment.invalidateMenu();
         }));
     }
 
@@ -749,25 +747,6 @@ public class PdfView extends FrameLayout {
                         fragmentManager.beginTransaction()
                                 .detach(oldFragment)
                                 .commitNowAllowingStateLoss();
-
-//                        // Schedule delayed removal after background tasks have time to complete
-//                        Handler handler = new Handler(getContext().getMainLooper());
-//                        handler.postDelayed(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                // Only remove if fragment is still detached and not re-added
-//                                if (oldFragment.isDetached() && !oldFragment.isAdded()) {
-//                                    try {
-//                                        fragmentManager.beginTransaction()
-//                                                .remove(oldFragment)
-//                                                .commitNowAllowingStateLoss();
-//                                    } catch (Exception e) {
-//                                        // Fragment may have already been removed, ignore
-//                                        Log.d(TAG, "Failed to remove old fragment (may have been removed already): " + e.getMessage());
-//                                    }
-//                                }
-//                            }
-//                        }, 500); // 500ms delay - enough for font loading to complete
                     }
 
                     // The document changed, create a new PdfFragment.
@@ -828,21 +807,10 @@ public class PdfView extends FrameLayout {
                 @Override
                 public void run() {
                     try {
-//                        PdfUiFragment currentPdfUiFragment = (PdfUiFragment) fragmentManager.findFragmentByTag(fragmentTag);
-//
-//                        if (currentPdfUiFragment != null) {
-//                            // There is already a fragment, replace it with the latest one
-//                            fragmentManager
-//                                    .beginTransaction()
-//                                    .remove(currentPdfUiFragment)
-//                                    .add(getId(), pdfUiFragment, fragmentTag)
-//                                    .commitNowAllowingStateLoss();
-//                        } else {
-                            fragmentManager
-                                    .beginTransaction()
-                                    .add(getId(), pdfUiFragment, fragmentTag)
-                                    .commitNowAllowingStateLoss();
-//                        }
+                        fragmentManager
+                                .beginTransaction()
+                                .add(getId(), pdfUiFragment, fragmentTag)
+                                .commitNowAllowingStateLoss();
                         postFragmentSetup(pdfUiFragment);
                     } catch (Exception e) {
                         // Could not add fragment
@@ -1115,74 +1083,15 @@ public class PdfView extends FrameLayout {
         return disposable;
     }
 
-    public void clearSelectedAnnotations() {
-        pendingFragmentActions.add(getCurrentPdfFragment()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(PdfFragment::clearSelectedAnnotations));
-    }
-
-    public Disposable selectAnnotations(final int requestId, ReadableArray jsonAnnotations, Boolean showContextualMenu) throws Exception {
-        return selectAnnotations(requestId, jsonAnnotations, showContextualMenu, null);
-    }
-
-    public Disposable selectAnnotations(final int requestId, ReadableArray jsonAnnotations, Boolean showContextualMenu, @Nullable Promise promise) throws Exception {
-        if (fragment == null || fragment.getDocument() == null) {
-            if (promise != null) {
-                promise.reject("NO_DOCUMENT", "No document loaded");
-            }
-            return null;
-        }
-
-        List<Map<String, Object>> instantJSONArray = new ArrayList<Map<String, Object>>();
-        for (Object annotationsMap : jsonAnnotations.toArrayList()) {
-            instantJSONArray.add((Map) annotationsMap);
-        }
-
-        ArrayList<Annotation> annotationsToSelect = new ArrayList<>();
-
-        return fragment.getDocument().getAnnotationProvider().getAllAnnotationsOfTypeAsync(EnumSet.allOf(AnnotationType.class))
-                .toList()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        annotations -> {
-                            for (Annotation annotation : annotations) {
-                                for (Map instantJSONAnnotation : instantJSONArray) {
-                                    if ((annotation.getName() != null && annotation.getName().equals(instantJSONAnnotation.get("name"))) ||
-                                            annotation.getUuid().equals(instantJSONAnnotation.get("uuid"))) {
-                                        annotationsToSelect.add(annotation);
-                                    }
-                                }
-                            }
-
-                            try {
-                                fragment.getPdfFragment().setSelectedAnnotations(annotationsToSelect);
-                                if (showContextualMenu) {
-                                    fragment.getPdfFragment().enterAnnotationEditingMode(annotationsToSelect);
-                                }
-
-                                if (promise != null) {
-                                    promise.resolve(true);
-                                } else {
-                                    JSONObject result = new JSONObject();
-                                    result.put("success", true);
-                                    dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, result));
-                                }
-                            } catch (Exception e) {
-                                Exception exception = new Exception("Failed to select annotations");
-                                if (promise != null) {
-                                    promise.reject("SELECT_ANNOTATIONS_ERROR", exception.getMessage());
-                                } else {
-                                    dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, exception));
-                                }
-                            }
-                        }, throwable -> {
-                            if (promise != null) {
-                                promise.reject("SELECT_ANNOTATIONS_ERROR", throwable.getMessage());
-                            } else {
-                                dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, throwable));
-                            }
-                        });
+    public Disposable enterContentEditingMode(Runnable onComplete, Consumer<Throwable> onError) {
+        Disposable disposable = getCurrentPdfFragment()
+                .observeOn(Schedulers.io())
+                .subscribe(fragment -> {
+                    fragment.enterContentEditingMode();
+                    if (onComplete != null) onComplete.run();
+                }, onError);
+        pendingFragmentActions.add(disposable);
+        return disposable;
     }
 
     public boolean saveCurrentDocument() throws Exception {
@@ -1224,164 +1133,6 @@ public class PdfView extends FrameLayout {
             }
         }
         return false;
-    }
-
-    public Single<List<Annotation>> getAnnotations(final int pageIndex, @Nullable final String type) {
-        PdfDocument document = fragment.getDocument();
-        if (pageIndex > document.getPageCount()-1) {
-            return Single.just(new ArrayList<>());
-        }
-        return getCurrentPdfFragment()
-            .map(PdfFragment::getDocument)
-            .flatMap((Function<PdfDocument, ObservableSource<Annotation>>) pdfDocument ->
-                pdfDocument.getAnnotationProvider().getAllAnnotationsOfTypeAsync(getAnnotationTypes(Arguments.makeNativeArray(new String[]{type})), pageIndex, 1)).toList();
-    }
-
-    public Single<List<Annotation>> getAllAnnotations(@Nullable final String type) {
-        return getCurrentPdfFragment().map(PdfFragment::getDocument)
-            .flatMap(pdfDocument -> pdfDocument.getAnnotationProvider().getAllAnnotationsOfTypeAsync(getAnnotationTypes(Arguments.makeNativeArray(new String[]{type}))))
-            .toList();
-    }
-
-    public Disposable addAnnotation(final int requestId, ReadableMap annotation) {
-        return getCurrentPdfFragment().map(PdfFragment::getDocument).subscribeOn(Schedulers.io())
-            .map(pdfDocument -> {
-                JSONObject json = new JSONObject(annotation.toHashMap());
-                return pdfDocument.getAnnotationProvider().createAnnotationFromInstantJson(json.toString());
-            })
-            .map(Annotation::toInstantJson)
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe((instantJson) -> dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, true)),
-                (throwable) -> dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, throwable)));
-    }
-
-    public Disposable removeAnnotation(final int requestId, ReadableMap annotation) {
-        return getCurrentPdfFragment().map(PdfFragment::getDocument).subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .flatMap(pdfDocument -> {
-                JSONObject json = new JSONObject(annotation.toHashMap());
-                // We can't create an annotation from the instant json since that will attach it to the document,
-                // so we manually grab the necessary values.
-                int pageIndex = json.optInt("pageIndex", -1);
-                String type = json.optString("type", null);
-                String name = json.optString("name", null);
-                if (pageIndex == -1 || type == null || name == null) {
-                    return Observable.empty();
-                }
-
-                return pdfDocument.getAnnotationProvider().getAllAnnotationsOfTypeAsync(getAnnotationTypes(Arguments.makeNativeArray(new String[]{type})), pageIndex, 1)
-                    .filter(annotationToFilter -> name.equals(annotationToFilter.getName()))
-                    .map(filteredAnnotation -> new Pair<>(filteredAnnotation, pdfDocument));
-            })
-            .firstOrError()
-            .flatMapCompletable(pair -> Completable.fromAction(() -> {
-                pair.second.getAnnotationProvider().removeAnnotationFromPage(pair.first);
-            }))
-            .subscribe(() -> dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, true)), (throwable -> {
-                if (throwable instanceof NoSuchElementException) {
-                    // We didn't find an annotation so return false.
-                    dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, false));
-                } else {
-                    dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, throwable));
-                }
-            }));
-    }
-
-    public Single<JSONObject> getAllUnsavedAnnotations() {
-        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        return DocumentJsonFormatter.exportDocumentJsonAsync(document, outputStream)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .toSingle(() -> {
-                    try {
-                        return new JSONObject(outputStream.toString());
-                    } catch (JSONException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
-    }
-
-    public Disposable addAnnotations(final int requestId, ReadableMap annotation) {
-        return getCurrentPdfFragment().map(PdfFragment::getDocument).subscribeOn(Schedulers.io())
-            .flatMapCompletable(currentDocument -> Completable.fromAction(() -> {
-                JSONObject json = new JSONObject(annotation.toHashMap());
-                final DataProvider dataProvider = new DocumentJsonDataProvider(json);
-                DocumentJsonFormatter.importDocumentJson(currentDocument, dataProvider);
-            }))
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(() -> dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, true)),
-                (throwable) -> dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, throwable)));
-    }
-
-    public Disposable setAnnotationFlags(final int requestId, String uuid, ReadableArray flags) {
-        return setAnnotationFlags(requestId, uuid, flags, null);
-    }
-
-    public Disposable setAnnotationFlags(final int requestId, String uuid, ReadableArray flags, @Nullable Promise promise) {
-        AtomicBoolean found = new AtomicBoolean(false);
-        return getCurrentPdfFragment().map(PdfFragment::getDocument).subscribeOn(Schedulers.io())
-                .flatMapCompletable(currentDocument -> Completable.fromAction(() -> {
-                    List<Annotation> allAnnotations = currentDocument.getAnnotationProvider().getAllAnnotationsOfType(EnumSet.allOf(AnnotationType.class));
-                    for (int i = 0; i < allAnnotations.size(); i++) {
-                        Annotation annotation = allAnnotations.get(i);
-                        if (annotation.getUuid().equals(uuid) || 
-                           (annotation.getName() != null && annotation.getName().equals(uuid))) {
-                            EnumSet<AnnotationFlags> convertedFlags = ConversionHelpers.getAnnotationFlags(flags);
-                            annotation.setFlags(convertedFlags);
-                            getCurrentPdfFragment().subscribe(pdfFragment -> {
-                               pdfFragment.notifyAnnotationHasChanged(annotation);
-                            });
-                            found.set(true);
-                            break;
-                        }
-                    }
-                }))
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(() -> {
-                    if (promise != null) {
-                        promise.resolve(found.get());
-                    } else {
-                        dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, found.get()));
-                    }
-                }, (throwable) -> {
-                    if (promise != null) {
-                        promise.reject("SET_ANNOTATION_FLAGS_ERROR", throwable.getMessage());
-                    } else {
-                        dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, throwable));
-                    }
-                });
-    }
-
-    public Disposable getAnnotationFlags(final int requestId, @NonNull String uuid) {
-        return getAnnotationFlags(requestId, uuid, null);
-    }
-
-    public Disposable getAnnotationFlags(final int requestId, @NonNull String uuid, @Nullable Promise promise) {
-        return getCurrentPdfFragment().map(PdfFragment::getDocument).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(currentDocument -> {
-                    List<Annotation> allAnnotations = currentDocument.getAnnotationProvider().getAllAnnotationsOfType(EnumSet.allOf(AnnotationType.class));
-                    ArrayList<String> convertedFlags = new ArrayList<>();
-                    for (int i = 0; i < allAnnotations.size(); i++) {
-                        Annotation annotation = allAnnotations.get(i);
-                        if (annotation.getUuid().equals(uuid) || 
-                           (annotation.getName() != null && annotation.getName().equals(uuid))) {
-                            EnumSet<AnnotationFlags> flags = annotation.getFlags();
-                            convertedFlags = ConversionHelpers.convertAnnotationFlags(flags);
-                            break;
-                        }
-                    }
-                    if (promise != null) {
-                        promise.resolve(convertedFlags);
-                    } else {
-                        dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, convertedFlags));
-                    }
-                }, throwable -> {
-                    if (promise != null) {
-                        promise.reject("GET_ANNOTATION_FLAGS_ERROR", throwable.getMessage());
-                    } else {
-                        dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, throwable));
-                    }
-                });
     }
 
     public Disposable getFormFieldValue(final int requestId, @NonNull String formElementName) {
@@ -1481,69 +1232,6 @@ public class PdfView extends FrameLayout {
                 }
                 return false;
             });
-    }
-
-    public Disposable importXFDF(final int requestId, String filePath) {
-
-        if (Uri.parse(filePath).getScheme() == null) {
-            filePath = FILE_SCHEME + filePath;
-        }
-        if (fragment == null || fragment.getDocument() == null) {
-            return null;
-        }
-
-        return XfdfFormatter.parseXfdfAsync(fragment.getDocument(), new ContentResolverDataProvider(Uri.parse(filePath)))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(annotations -> {
-                    for (Annotation annotation : annotations) {
-                        fragment.getDocument().getAnnotationProvider().addAnnotationToPage(annotation);
-                    }
-                    JSONObject result = new JSONObject();
-                    result.put("success", true);
-                    dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, result));
-                    }, throwable -> {
-                    dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, throwable));
-                });
-    }
-
-    public Disposable exportXFDF(final int requestId, String filePath) {
-
-        if (Uri.parse(filePath).getScheme() == null) {
-            filePath = FILE_SCHEME + filePath;
-        }
-        if (fragment == null || fragment.getDocument() == null) {
-            return null;
-        }
-
-        try {
-            final OutputStream outputStream =  getContext().getContentResolver().openOutputStream(Uri.parse(filePath));
-            if (outputStream == null) return null;
-
-            List<Annotation> annotations = fragment.getDocument().getAnnotationProvider().getAllAnnotationsOfType(EnumSet.allOf(AnnotationType.class));
-
-            List<FormField> formFields  = Collections.emptyList();
-            if (PSPDFKit.getLicenseFeatures().contains(LicenseFeature.FORMS)) {
-                formFields = fragment.getDocument().getFormProvider().getFormFields();
-            }
-
-            String finalFilePath = filePath;
-            return XfdfFormatter.writeXfdfAsync(fragment.getDocument(), annotations, formFields, outputStream)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(() -> {
-                        JSONObject result = new JSONObject();
-                        result.put("success", true);
-                        result.put("filePath", finalFilePath);
-                                dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, result));
-                            }, throwable -> {
-                                dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, throwable));
-                            }
-                    );
-        } catch (final FileNotFoundException ignored) {
-            dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, ignored));
-        }
-        return null;
     }
 
     public JSONObject convertConfiguration() {

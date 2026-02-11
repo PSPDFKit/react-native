@@ -86,6 +86,7 @@ export namespace Toolbar {
         OUTLINE_BUTTON_ITEM: 'outlineButtonItem',
         SEARCH_BUTTON_ITEM: 'searchButtonItem',
         THUMBNAILS_BUTTON_ITEM: 'thumbnailsButtonItem',
+        CONTENT_EDITING_BUTTON_ITEM: 'contentEditingButtonItem',
         DOCUMENT_EDITOR_BUTTON_ITEM: 'documentEditorButtonItem',
         PRINT_BUTTON_ITEM: 'printButtonItem',
         OPEN_IN_BUTTON_ITEM: 'openInButtonItem',

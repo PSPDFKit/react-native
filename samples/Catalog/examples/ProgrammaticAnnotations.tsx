@@ -638,7 +638,7 @@ static imageAnnotation: ImageAnnotation = {
                   const document = this.pdfRef.current?.getDocument();
                   document?.getAnnotationsForPage(0, Annotation.Type.INK)
                     .then( async (annotations: AnnotationType[]) => {
-                      await this.pdfRef.current?.selectAnnotations(annotations, false);
+                      await document.selectAnnotations(annotations, false);
                     })
                     .catch((error: any) => {
                       Alert.alert('Nutrient', JSON.stringify(error));
