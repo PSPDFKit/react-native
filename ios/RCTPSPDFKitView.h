@@ -52,9 +52,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)enterAnnotationCreationMode:(PSPDFAnnotationString)annotationType withVariant:(PSPDFAnnotationVariantString)annotationVariant;
 - (BOOL)exitCurrentlyActiveMode;
 
-/// Content editing
-- (void)enterContentEditingMode;
-
 /// Document
 - (void)setDocument:(PSPDFDocument *)document;
 - (BOOL)saveCurrentDocumentWithError:(NSError *_Nullable *)error;

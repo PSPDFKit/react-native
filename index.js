@@ -318,43 +318,6 @@ class NutrientView extends React.Component {
   };
 
   /**
-   * Enters content editing mode, showing the content editing UI.
-   * @method enterContentEditingMode
-   * @example
-   * this.pdfRef.current.enterContentEditingMode();
-   * @memberof NutrientView
-   */
-  enterContentEditingMode = function () {
-    // Architecture detection via helper function
-    const { isNewArchitectureEnabled } = require('./lib/ArchitectureDetector');
-    if (isNewArchitectureEnabled()) {
-      // Delegate to Fabric component
-      return this._fabricRef.current?.enterContentEditingMode();
-    }
-
-    if (Platform.OS === 'android') {
-      let requestId = this._nextRequestId++;
-      let requestMap = this._requestMap;
-
-      let promise = new Promise(function (resolve, reject) {
-        requestMap[requestId] = { resolve: resolve, reject: reject };
-      });
-
-      UIManager.dispatchViewManagerCommand(
-        findNodeHandle(this._componentRef.current),
-        this._getViewManagerConfig('RCTPSPDFKitView').Commands
-          .enterContentEditingMode,
-          [requestId],
-      );
-      return promise;
-    } else if (Platform.OS === 'ios') {
-      return NativeModules.PSPDFKitViewManager.enterContentEditingMode(
-        findNodeHandle(this._componentRef.current),
-      );
-    }
-  };
-
-  /**
    * Exits the currently active mode, hiding all toolbars.
    * @method exitCurrentlyActiveMode
    * @example
@@ -484,7 +447,7 @@ class NutrientView extends React.Component {
   /**
    * @method clearSelectedAnnotations
    * @memberof NutrientView
-   * @deprecated Since Nutrient React Native SDK 4.2. Use ```this.pdfRef.current?.getDocument().clearSelectedAnnotations()``` instead.
+   * @deprecated Since Nutrient React Native SDK 4.1.1. Use ```this.pdfRef.current?.getDocument().clearSelectedAnnotations()``` instead.
    * @description Clears all currently selected Annotations.
    * @example
    * const result = await this.pdfRef.current?.clearSelectedAnnotations();
@@ -511,7 +474,7 @@ class NutrientView extends React.Component {
   /**
    * @method selectAnnotations
    * @memberof NutrientView
-   * @deprecated Since Nutrient React Native SDK 4.2. Use ```this.pdfRef.current?.getDocument().selectAnnotations(annotations, showContextualMenu)``` instead.
+   * @deprecated Since Nutrient React Native SDK 4.1.1. Use ```this.pdfRef.current?.getDocument().selectAnnotations(annotations, showContextualMenu)``` instead.
    * @param { object } annotations An array of the annotations to select in Instant JSON format.
    * @param { boolean } [showContextualMenu] Whether the annotation contextual menu should be shown after selection.
    * @description Select one or more annotations.

@@ -99,28 +99,6 @@ public class NutrientViewTurboModule extends NativeNutrientViewTurboModuleSpec {
     }
     
     @Override
-    public void enterContentEditingMode(String reference, Promise promise) {
-        Log.d(TAG, "enterContentEditingMode called with reference: " + reference);
-        
-        PdfView view = NutrientViewRegistry.getInstance().getViewForId(reference);
-        if (view == null) {
-            promise.reject(Errors.VIEW_NOT_FOUND, "No view found for reference: " + reference);
-            return;
-        }
-        
-        try {
-            view.enterContentEditingMode(
-                () -> promise.resolve(true),
-                throwable -> {
-                    promise.reject(Errors.MODE_ERROR, throwable.getMessage());
-                }
-            );
-        } catch (Exception e) {
-            promise.reject(Errors.MODE_ERROR, e.getMessage());
-        }
-    }
-    
-    @Override
     public void setPageIndex(String reference, double pageIndex, boolean animated, Promise promise) {
         Log.d(TAG, "setPageIndex called with reference: " + reference + ", pageIndex: " + pageIndex + ", animated: " + animated);
         

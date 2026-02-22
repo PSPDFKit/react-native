@@ -1083,17 +1083,6 @@ public class PdfView extends FrameLayout {
         return disposable;
     }
 
-    public Disposable enterContentEditingMode(Runnable onComplete, Consumer<Throwable> onError) {
-        Disposable disposable = getCurrentPdfFragment()
-                .observeOn(Schedulers.io())
-                .subscribe(fragment -> {
-                    fragment.enterContentEditingMode();
-                    if (onComplete != null) onComplete.run();
-                }, onError);
-        pendingFragmentActions.add(disposable);
-        return disposable;
-    }
-
     public boolean saveCurrentDocument() throws Exception {
         if (fragment != null) {
             try {

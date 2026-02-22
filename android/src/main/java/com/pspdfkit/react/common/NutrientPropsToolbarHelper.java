@@ -30,12 +30,7 @@ public final class NutrientPropsToolbarHelper {
             for (int i = 0; i < buttons.size(); i++) {
                 Object item = buttons.get(i);
                 if (item instanceof String) {
-                    String stockItem = (String) item;
-                    // On Android, documentEditorButtonItem should behave like thumbnailsButtonItem.
-                    if ("documentEditorButtonItem".equals(stockItem)) {
-                        stockItem = "thumbnailsButtonItem";
-                    }
-                    stockToolbarItems.pushString(stockItem);
+                    stockToolbarItems.pushString((String) item);
                 } else if (item instanceof HashMap) {
                     ((HashMap<String, Integer>) item).put("index", i);
                     customToolbarItems.add(item);

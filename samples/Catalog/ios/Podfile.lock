@@ -9,7 +9,7 @@ PODS:
     - hermes-engine/Pre-built (= 0.14.0)
   - hermes-engine/Pre-built (0.14.0)
   - Instant (26.5.0-dev)
-  - nutrient-sdk-react-native (4.2.0):
+  - nutrient-sdk-react-native (4.1.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -2965,7 +2965,7 @@ SPEC CHECKSUMS:
   glog: 5683914934d5b6e4240e497e0f4a3b42d1854183
   hermes-engine: 949f245610ade3c3701f96b679119dee1869e1b5
   Instant: 4aa4cde2b062d7b06ed91cad27495f0d1ca45289
-  nutrient-sdk-react-native: 280c3502d18368ea183c3b20b549a96799a733d0
+  nutrient-sdk-react-native: a633d30ded35e7dc10c44271c9e886f59fc3a3c5
   PSPDFKit: 033cd9a1f249776b4c8eb3b3c4c719870fb3c2aa
   RCT-Folly: 846fda9475e61ec7bcbf8a3fe81edfcaeb090669
   RCTDeprecation: a41bbdd9af30bf2e5715796b313e44ec43eefff1

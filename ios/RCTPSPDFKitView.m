@@ -181,10 +181,6 @@
   return true;
 }
 
-- (void)enterContentEditingMode {
-  [self.pdfController setViewMode:PSPDFViewModeContentEditing animated:YES];
-}
-
 - (BOOL)clearSelectedAnnotations {
     if (self.pdfController.visiblePageViews.count >= 1) {
         PSPDFPageView * pageView = self.pdfController.visiblePageViews[0];

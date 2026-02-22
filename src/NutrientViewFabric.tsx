@@ -15,7 +15,6 @@ export interface NutrientViewFabricRef {
   
   // All the command methods exposed directly on the ref - matching index.js signatures
   enterAnnotationCreationMode: (annotationType?: string) => Promise<boolean> | void;
-  enterContentEditingMode: () => Promise<boolean> | void;
   exitCurrentlyActiveMode: () => Promise<boolean> | void;
   setToolbar: (toolbar: any) => void;
   getToolbar: (viewMode?: string) => Promise<any>;
@@ -58,10 +57,6 @@ const NutrientViewFabric = forwardRef<NutrientViewFabricRef, NativeProps>((props
     // Expose all commands directly on the ref - Paper-style API with NativeModules
     enterAnnotationCreationMode: (annotationType?: string) => {
       return NativeNutrientViewTurboModule.enterAnnotationCreationMode(instanceId.toString(), annotationType);
-    },
-    
-    enterContentEditingMode: () => {
-      return NativeNutrientViewTurboModule.enterContentEditingMode(instanceId.toString());
     },
     
     exitCurrentlyActiveMode: () => {

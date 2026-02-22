@@ -101,7 +101,6 @@ export interface PDFConfiguration {
 export interface Spec extends TurboModule {
   // Annotation creation and management
   enterAnnotationCreationMode: (reference: string, annotationType?: string) => Promise<boolean>;
-  enterContentEditingMode: (reference: string) => Promise<boolean>;
   exitCurrentlyActiveMode: (reference: string) => Promise<boolean>;
   
   // Document operations

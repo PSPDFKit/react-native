@@ -51,8 +51,6 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.TimeUnit
 
 data class DocumentData(
     val document: PdfDocument,
@@ -69,11 +67,9 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
     override fun onCatalystInstanceDestroy() {
         super.onCatalystInstanceDestroy()
         job.cancel()
-        scope.cancel()
     }
-
-    private val documents = ConcurrentHashMap<Int, DocumentData>()
-    private val documentConfigurations = ConcurrentHashMap<Int, MutableMap<String, Any>>()
+    private var documents = mutableMapOf<Int, DocumentData>()
+    private var documentConfigurations = mutableMapOf<Int, MutableMap<String, Any>>()
 
     override fun getName(): String {
         return NAME
@@ -253,25 +249,22 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
 
     @ReactMethod fun getAllUnsavedAnnotations(reference: Int, promise: Promise) {
         try {
-            val document = this.getDocument(reference)?.document
-            if (document == null) {
-                promise.reject("getAllUnsavedAnnotations", "Document is nil")
-                return
+            this.getDocument(reference)?.document?.let {
+                val outputStream = ByteArrayOutputStream()
+                DocumentJsonFormatter.exportDocumentJsonAsync(it, outputStream)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(
+                        {
+                            val json = JSONObject(outputStream.toString())
+                            val jsonMap = JsonUtilities.jsonObjectToMap(json)
+                            val nativeMap = Arguments.makeNativeMap(jsonMap)
+                            promise.resolve(nativeMap)
+                        }, { e ->
+                            promise.reject(RuntimeException(e))
+                        }
+                    )
             }
-            val outputStream = ByteArrayOutputStream()
-            DocumentJsonFormatter.exportDocumentJsonAsync(document, outputStream)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                    {
-                        val json = JSONObject(outputStream.toString())
-                        val jsonMap = JsonUtilities.jsonObjectToMap(json)
-                        val nativeMap = Arguments.makeNativeMap(jsonMap)
-                        promise.resolve(nativeMap)
-                    }, { e ->
-                        promise.reject("getAllUnsavedAnnotations", RuntimeException(e))
-                    }
-                )
         } catch (e: Throwable) {
             promise.reject("getAllUnsavedAnnotations error", e)
         }
@@ -801,7 +794,6 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
                 }
                 pdfView.getPdfFragment()
                     .take(1)
-                    .timeout(5, TimeUnit.SECONDS)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                         { pdfFragment ->
@@ -834,7 +826,6 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
         }
         pdfView.getPdfFragment()
             .take(1)
-            .timeout(5, TimeUnit.SECONDS)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 { pdfFragment ->

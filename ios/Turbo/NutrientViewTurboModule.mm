@@ -83,19 +83,6 @@ RCT_EXPORT_MODULE();
     });
 }
 
-- (void)enterContentEditingMode:(nonnull NSString *)reference resolve:(nonnull RCTPromiseResolveBlock)resolve reject:(nonnull RCTPromiseRejectBlock)reject {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        RCTPSPDFKitView *view = [[NutrientViewRegistry shared] viewForId:reference];
-        if (!view) {
-            reject(ERR_VIEW_NOT_FOUND, @"Fabric view not found for reference", [self _makeErrorWithCode:ERR_VIEW_NOT_FOUND message:@"Fabric view not found for reference"]);
-            return;
-        }
-        
-        [view enterContentEditingMode];
-        resolve(@(YES));
-    });
-}
-
 - (void)exitCurrentlyActiveMode:(nonnull NSString *)reference resolve:(nonnull RCTPromiseResolveBlock)resolve reject:(nonnull RCTPromiseRejectBlock)reject {
     dispatch_async(dispatch_get_main_queue(), ^{
         RCTPSPDFKitView *view = [[NutrientViewRegistry shared] viewForId:reference];
