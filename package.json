@@ -15,7 +15,7 @@
   "license": "SEE LICENSE IN LICENSE",
   "repository": {
     "type": "git",
-    "url": "https://github.com/PSPDFKit/react-native.git"
+    "url": "git+https://github.com/PSPDFKit/react-native.git"
   },
   "main": "index.js",
   "types": "types/index.d.ts",

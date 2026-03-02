@@ -961,7 +961,7 @@ declare class NutrientView extends React.Component<Props, any, any> {
     /**
      * @method clearSelectedAnnotations
      * @memberof NutrientView
-     * @deprecated Since Nutrient React Native SDK 4.1.1. Use ```this.pdfRef.current?.getDocument().clearSelectedAnnotations()``` instead.
+     * @deprecated Since Nutrient React Native SDK 4.2. Use ```this.pdfRef.current?.getDocument().clearSelectedAnnotations()``` instead.
      * @description Clears all currently selected Annotations.
      * @example
      * const result = await this.pdfRef.current?.clearSelectedAnnotations();
@@ -971,7 +971,7 @@ declare class NutrientView extends React.Component<Props, any, any> {
     /**
      * @method selectAnnotations
      * @memberof NutrientView
-     * @deprecated Since Nutrient React Native SDK 4.1.1. Use ```this.pdfRef.current?.getDocument().selectAnnotations(annotations, showContextualMenu)``` instead.
+     * @deprecated Since Nutrient React Native SDK 4.2. Use ```this.pdfRef.current?.getDocument().selectAnnotations(annotations, showContextualMenu)``` instead.
      * @param { object } annotations An array of the annotations to select in Instant JSON format.
      * @param { boolean } [showContextualMenu] Whether the annotation contextual menu should be shown after selection.
      * @description Select one or more annotations.

@@ -1,5 +1,5 @@
 import React from 'react';
-import { processColor, View, Alert, Text, TouchableOpacity, Platform } from 'react-native';
+import { processColor, View, Alert, Text, TouchableOpacity } from 'react-native';
 import NutrientView from '@nutrient-sdk/react-native';
 
 import { examplePasswordDocumentPath, pspdfkitColor } from '../configuration/Constants';
@@ -60,7 +60,7 @@ const styles = {
   pdfColor: { flex: 1, color: pspdfkitColor },
   buttonContainer: {
     width: '100%' as '100%',
-    height: Platform.OS === 'ios' ? 80 : 60,
+    height: 80,
     justifyContent: 'center' as 'center',
     alignItems: 'center' as 'center',
     backgroundColor: '#f8f8f8',
@@ -78,5 +78,6 @@ const styles = {
     fontSize: 16,
     color: pspdfkitColor,
     textAlign: 'center' as 'center',
+    minHeight: 44,
   },
 };

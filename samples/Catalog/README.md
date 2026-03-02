@@ -35,7 +35,3 @@ The project contains a large set of sample code, which illustrates how to set up
 5. Install the iOS pods: `pod install`
 6. Go back to the Catalog directory: `cd ..`
 7. The Catalog app is now ready to launch: `react-native run-ios`
-
-### Troubleshooting
-
-**Note:** If you get an error about `config.h` not being found check out [this blog post](https://tuntunir.blogspot.com/2018/02/react-native-fatal-error-configh-file.html) for information on how to fix it.
