@@ -118,3 +118,7 @@ import formFieldConfiguration = require('../src/forms/FormFieldConfiguration');
 export import FormFieldConfiguration = formFieldConfiguration.FormFieldConfiguration;
 export import ElectronicSignatureFieldConfiguration = formFieldConfiguration.ElectronicSignatureFieldConfiguration;
 export import TextFormFieldConfiguration = formFieldConfiguration.TextFormFieldConfiguration;
+
+//@ts-ignore
+import nutrientViewEvents = require('../src/events/NutrientViewEvents');
+export import ShouldExecuteActionEvent = nutrientViewEvents.ShouldExecuteActionEvent;

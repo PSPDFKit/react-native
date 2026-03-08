@@ -32,6 +32,9 @@
 @property (nonatomic, strong) SessionStorage *sessionStorage;
 @property (nonatomic) BOOL isPropsSet;
 @property (nonatomic, strong) UITapGestureRecognizer *tapGestureRecognizer;
+@property (nonatomic, strong) NSMutableDictionary<NSString *, PSPDFAction *> *pendingActions;
+@property (nonatomic, strong) NSMutableDictionary<NSString *, NSNumber *> *pendingActionPageIndices;
+@property (nonatomic) BOOL isReplayingAction;
 
 @end
 
@@ -65,6 +68,9 @@
                                              selector:@selector(bookmarksDidChange:)
                                                  name:PSPDFBookmarksChangedNotification
                                                object:nil];
+      
+    _pendingActions = [NSMutableDictionary new];
+    _pendingActionPageIndices = [NSMutableDictionary new];
   }
     
   return self;
@@ -249,19 +255,167 @@
   }
 }
 
+// MARK: - PSPDFViewControllerDelegate (action interception)
+
+- (BOOL)pdfViewController:(PSPDFViewController *)pdfController shouldExecuteAction:(PSPDFAction *)action {
+    // When we are replaying an action that JS already approved, do not intercept again.
+    if (self.isReplayingAction) {
+        return YES;
+    }
+    // Align with Android: only intercept \"link-like\" actions that can be attached to LinkAnnotation
+    // (URL, GoTo, JavaScript, Named, Hide, SubmitForm, ResetForm, RemoteGoTo).
+    BOOL isLinkLikeAction =
+        [action isKindOfClass:PSPDFURLAction.class] ||
+        [action isKindOfClass:PSPDFGoToAction.class] ||
+        [action isKindOfClass:PSPDFRemoteGoToAction.class] ||
+        [action isKindOfClass:PSPDFJavaScriptAction.class] ||
+        [action isKindOfClass:PSPDFNamedAction.class] ||
+        [action isKindOfClass:PSPDFHideAction.class] ||
+        [action isKindOfClass:PSPDFSubmitFormAction.class] ||
+        [action isKindOfClass:PSPDFResetFormAction.class];
+
+    if (!isLinkLikeAction) {
+        // For all other actions, let PSPDFKit use its default behavior.
+        return YES;
+    }
+    // Only intercept when we have a handler *and* a way to deliver the event to JS.
+    // Otherwise allow default (e.g. open link). This avoids blocking when props haven't
+    // been applied yet or when the delegate isn't ready (Fabric).
+    BOOL canDeliverFabric = NO;
+    id<RCTPSPDFKitViewDelegate> delegate = (id<RCTPSPDFKitViewDelegate>)self.delegate;
+    if (self.hasShouldExecuteAction &&
+        delegate != nil &&
+        [delegate respondsToSelector:@selector(pspdfView:didRequestShouldExecuteActionWithPayload:)]) {
+        BOOL emitterReady = YES;
+        if ([delegate respondsToSelector:@selector(isEventEmitterReady)]) {
+            emitterReady = [delegate isEventEmitterReady];
+        }
+        canDeliverFabric = emitterReady;
+    }
+    BOOL canDeliverPaper = (self.onShouldExecuteAction != nil);
+    if (!canDeliverFabric && !canDeliverPaper) {
+        return YES;
+    }
+    
+    // Generate a stable request identifier and remember the action.
+    NSString *requestId = [NSUUID UUID].UUIDString;
+    if (!self.pendingActions) {
+        self.pendingActions = [NSMutableDictionary new];
+    }
+    if (!self.pendingActionPageIndices) {
+        self.pendingActionPageIndices = [NSMutableDictionary new];
+    }
+    self.pendingActions[requestId] = action;
+    PSPDFPageIndex pageIndex = pdfController.pageIndex;
+    self.pendingActionPageIndices[requestId] = @(pageIndex);
+    
+    // Build payload for JS.
+    NSMutableDictionary *payload = [NSMutableDictionary dictionary];
+    payload[@"requestId"] = requestId;
+    payload[@"pageIndex"] = @(pageIndex);
+    
+    // Provide a simple action type string.
+    NSString *actionType = NSStringFromClass([action class]);
+    if (actionType) {
+        payload[@"actionType"] = actionType;
+    }
+    
+    // If this is a URL action, include the URL string for convenience.
+    if ([action isKindOfClass:PSPDFURLAction.class]) {
+        PSPDFURLAction *urlAction = (PSPDFURLAction *)action;
+        if (urlAction.URL.absoluteString) {
+            payload[@"url"] = urlAction.URL.absoluteString;
+        }
+    }
+    
+    // Fabric path: forward via delegate so the Fabric component can emit a codegen event.
+    if (canDeliverFabric) {
+        id<RCTPSPDFKitViewDelegate> delegate = (id<RCTPSPDFKitViewDelegate>)self.delegate;
+        [delegate pspdfView:self didRequestShouldExecuteActionWithPayload:payload];
+    } else if (canDeliverPaper) {
+        // Legacy path: emit directly via bubbling event.
+        self.onShouldExecuteAction(payload);
+    }
+    
+    // Always prevent the default handling; JS will decide via executeAction.
+    return NO;
+}
+
+// Execute or cancel a previously intercepted action.
+- (BOOL)executePendingActionWithRequestId:(NSString *)requestId allow:(BOOL)allow {
+    if (!requestId.length) {
+        return NO;
+    }
+    
+    PSPDFAction *action = self.pendingActions[requestId];
+    NSNumber *pageIndexNumber = self.pendingActionPageIndices[requestId];
+    
+    if (action == nil) {
+        return NO;
+    }
+    
+    // Clear stored state first.
+    [self.pendingActions removeObjectForKey:requestId];
+    [self.pendingActionPageIndices removeObjectForKey:requestId];
+    
+    // If the caller decided to cancel, just drop the action.
+    if (!allow) {
+        return YES;
+    }
+    
+    PSPDFPageIndex pageIndex = self.pdfController.pageIndex;
+    if (pageIndexNumber != nil) {
+        pageIndex = (PSPDFPageIndex)pageIndexNumber.unsignedIntegerValue;
+    }
+    
+    // Execute the original action using the current controller, but temporarily
+    // disable interception so we don't re-enter onShouldExecuteAction.
+    self.isReplayingAction = YES;
+    @try {
+        [self.pdfController executePDFAction:action
+                                   targetRect:CGRectZero
+                                    pageIndex:pageIndex
+                                     animated:YES
+                              actionContainer:nil];
+    } @finally {
+        self.isReplayingAction = NO;
+    }
+    
+    return YES;
+}
+
 // MARK: - PSPDFViewControllerDelegate
 
 - (BOOL)pdfViewController:(PSPDFViewController *)pdfController didTapOnAnnotation:(PSPDFAnnotation *)annotation annotationPoint:(CGPoint)annotationPoint annotationView:(UIView<PSPDFAnnotationPresenting> *)annotationView pageView:(PSPDFPageView *)pageView viewPoint:(CGPoint)viewPoint {
     [NutrientNotificationCenter.shared didTapAnnotationWithAnnotation:annotation annotationPoint:annotationPoint documentID:pdfController.document.documentIdString componentID:self.componentID];
     
-  if (self.onAnnotationTapped) {
-    NSData *annotationData = [annotation generateInstantJSONWithError:NULL];
-    if (annotationData != nil) {
-        NSDictionary *annotationDictionary = [NSJSONSerialization JSONObjectWithData:annotationData options:kNilOptions error:NULL];
-        NSMutableDictionary *updatedDictionary = [[NSMutableDictionary alloc] initWithDictionary:annotationDictionary];
-        [updatedDictionary setObject:annotation.uuid forKey:@"uuid"];
-        self.onAnnotationTapped(updatedDictionary);
-    }
+  // Fabric path: forward to delegate so Fabric component can emit a codegen event.
+  if ([self.delegate respondsToSelector:@selector(pspdfView:didTapAnnotation:)]) {
+      id<RCTPSPDFKitViewDelegate> delegate = (id<RCTPSPDFKitViewDelegate>)self.delegate;
+      [delegate pspdfView:self didTapAnnotation:annotation];
+  } else if (self.onAnnotationTapped) {
+      // Legacy (Paper) path: emit directly via bubbling event with InstantJSON payload.
+      NSData *annotationData = [annotation generateInstantJSONWithError:NULL];
+      if (annotationData != nil) {
+          NSDictionary *annotationDictionary = [NSJSONSerialization JSONObjectWithData:annotationData options:kNilOptions error:NULL];
+          NSMutableDictionary *updatedDictionary = [[NSMutableDictionary alloc] initWithDictionary:annotationDictionary];
+          [updatedDictionary setObject:annotation.uuid forKey:@"uuid"];
+          self.onAnnotationTapped(updatedDictionary);
+      }
+  }
+  // When onShouldExecuteAction is present under New Architecture (Fabric), return NO so
+  // PSPDFKit proceeds to shouldExecuteAction:, where we intercept and delegate to JS.
+  // On legacy (Paper) we always let PSPDFKit handle taps normally and simply honor
+  // disableDefaultActionForTappedAnnotations.
+  BOOL hasActionHandler = NO;
+  id<RCTPSPDFKitViewDelegate> delegate = (id<RCTPSPDFKitViewDelegate>)self.delegate;
+  if (self.hasShouldExecuteAction &&
+      delegate != nil &&
+      [delegate respondsToSelector:@selector(pspdfView:didRequestShouldExecuteActionWithPayload:)]) {
+      hasActionHandler = YES;
+  }
+  if (hasActionHandler) {
+      return NO;
   }
   return self.disableDefaultActionForTappedAnnotations;
 }

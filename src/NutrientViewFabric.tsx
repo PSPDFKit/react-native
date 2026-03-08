@@ -26,6 +26,7 @@ export interface NutrientViewFabricRef {
   setUserInterfaceVisible: (visible: boolean) => Promise<boolean> | void;
   destroyView: () => void;
   setPageIndex: (pageIndex: number, animated: boolean) => Promise<boolean> | void;
+  executeAction: (requestId: string, allow: boolean) => Promise<boolean> | void;
 }
 
 // Fabric component using the actual native component
@@ -102,11 +103,17 @@ const NutrientViewFabric = forwardRef<NutrientViewFabricRef, NativeProps>((props
     
     destroyView: () => {
       NativeNutrientViewTurboModule.destroyView(instanceId.toString());
+    },
+
+    executeAction: (requestId: string, allow: boolean) => {
+      return NativeNutrientViewTurboModule.executeAction(instanceId.toString(), requestId, allow);
     }
   }), [instanceId]);
   
   const fabricProps = {
     ...props,
+    // Explicit booleans so native always gets a defined value when props are omitted (default = allow)
+    disableDefaultActionForTappedAnnotations: (props as any).disableDefaultActionForTappedAnnotations === true,
     configurationJSONString: props.configuration ? JSON.stringify(props.configuration) : undefined,
     toolbarJSONString: props.toolbar ? JSON.stringify(props.toolbar) : undefined,
     menuItemGroupingJSONString: (props as any).menuItemGrouping
@@ -146,6 +153,12 @@ const NutrientViewFabric = forwardRef<NutrientViewFabricRef, NativeProps>((props
           (props as any).onCustomAnnotationContextualMenuItemTapped({ id: native?.id });
         }
       : undefined,
+    onAnnotationTapped: (props as any).onAnnotationTapped
+      ? (e: any) => {
+          const native = e?.nativeEvent ?? e;
+          (props as any).onAnnotationTapped(native);
+        }
+      : undefined,
     onCloseButtonPressed: props.onCloseButtonPressed
       ? (_e: any) => {
           // Paper passed an empty object
@@ -173,6 +186,12 @@ const NutrientViewFabric = forwardRef<NutrientViewFabricRef, NativeProps>((props
           (props as any).onDocumentSaveFailed({ error: native?.error });
         }
       : undefined,
+    onShouldExecuteAction: (props as any).onShouldExecuteAction
+      ? (e: any) => {
+          const native = e?.nativeEvent ?? e;
+          (props as any).onShouldExecuteAction(native);
+        }
+      : undefined,
     onAnnotationsChanged: (props as any).onAnnotationsChanged
       ? (e: any) => {
           const native = e?.nativeEvent ?? e;
@@ -195,6 +214,8 @@ const NutrientViewFabric = forwardRef<NutrientViewFabricRef, NativeProps>((props
           (props as any).onReady({});
         }
       : undefined,
+    // Internal flag so native only intercepts actions when a JS handler is present
+    hasShouldExecuteAction: !!(props as any).onShouldExecuteAction,
     // Convert numeric instanceId to string for React Native nativeID
     nativeID: instanceId.toString(),
   };

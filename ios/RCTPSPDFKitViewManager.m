@@ -131,6 +131,8 @@ RCT_EXPORT_VIEW_PROPERTY(hideNavigationBar, BOOL)
 
 RCT_EXPORT_VIEW_PROPERTY(disableDefaultActionForTappedAnnotations, BOOL)
 
+RCT_EXPORT_VIEW_PROPERTY(hasShouldExecuteAction, BOOL)
+
 RCT_CUSTOM_VIEW_PROPERTY(disableAutomaticSaving, BOOL, RCTPSPDFKitView) {
   if (json) {
     view.disableAutomaticSaving = [RCTConvert BOOL:json];
@@ -168,6 +170,8 @@ RCT_EXPORT_VIEW_PROPERTY(onReady, RCTBubblingEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onCustomToolbarButtonTapped, RCTBubblingEventBlock)
 
 RCT_EXPORT_VIEW_PROPERTY(onCustomAnnotationContextualMenuItemTapped, RCTBubblingEventBlock)
+
+RCT_EXPORT_VIEW_PROPERTY(onShouldExecuteAction, RCTBubblingEventBlock)
 
 RCT_CUSTOM_VIEW_PROPERTY(availableFontNames, NSArray, RCTPSPDFKitView) {
   [NutrientPropsFontHelper applyAvailableFontNamesFromJSON:json toView:view];
@@ -419,6 +423,18 @@ RCT_EXPORT_METHOD(setUserInterfaceVisible:(BOOL)visible reactTag:(nonnull NSNumb
       resolve(@(success));
     } else {
       reject(@"error", @"Failed to set user interface visibility.", nil);
+    }
+  });
+}
+
+RCT_EXPORT_METHOD(executeAction:(NSString *)requestId allow:(BOOL)allow reactTag:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+  dispatch_async(dispatch_get_main_queue(), ^{
+    RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
+    BOOL success = [component executePendingActionWithRequestId:requestId allow:allow];
+    if (success) {
+      resolve(@YES);
+    } else {
+      reject(@"error", @"Failed to execute action.", nil);
     }
   });
 }

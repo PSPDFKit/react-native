@@ -44,6 +44,7 @@ import io.nutrient.react.events.FabricOnReadyEvent
 import io.nutrient.react.events.FabricOnNavigationButtonClickedEvent
 import io.nutrient.react.events.FabricOnAnnotationTappedEvent
 import io.nutrient.react.events.FabricOnAnnotationsChangedEvent
+import io.nutrient.react.events.FabricOnShouldExecuteActionEvent
 import com.pspdfkit.react.NutrientViewRegistry
 
 class ReactPdfViewManagerFabric : ViewGroupManager<PdfView>(), NutrientViewManagerInterface<PdfView> {
@@ -117,6 +118,25 @@ class ReactPdfViewManagerFabric : ViewGroupManager<PdfView>(), NutrientViewManag
                 override fun onAnnotationsChanged(eventType: String, annotation: com.pspdfkit.annotations.Annotation) {
                     val surfaceId = UIManagerHelper.getSurfaceId(reactContext)
                     eventDispatcher?.dispatchEvent(FabricOnAnnotationsChangedEvent(surfaceId, pdfView.id, eventType, annotation))
+                }
+
+                override fun onShouldExecuteAction(
+                    requestId: String,
+                    action: com.pspdfkit.annotations.actions.Action,
+                    pageIndex: Int,
+                    url: String?
+                ) {
+                    val surfaceId = UIManagerHelper.getSurfaceId(reactContext)
+                    eventDispatcher?.dispatchEvent(
+                        FabricOnShouldExecuteActionEvent(
+                            surfaceId,
+                            pdfView.id,
+                            requestId,
+                            pageIndex,
+                            action,
+                            url
+                        )
+                    )
                 }
 
                 override fun onCloseButtonPressed() {
@@ -216,6 +236,7 @@ class ReactPdfViewManagerFabric : ViewGroupManager<PdfView>(), NutrientViewManag
         map["onNavigationButtonClicked"] = mapOf("registrationName" to "onNavigationButtonClicked")
         map["onAnnotationTapped"] = mapOf("registrationName" to "onAnnotationTapped")
         map["onAnnotationsChanged"] = mapOf("registrationName" to "onAnnotationsChanged")
+        map["onShouldExecuteAction"] = mapOf("registrationName" to "onShouldExecuteAction")
         return map
     }
 
@@ -312,6 +333,10 @@ class ReactPdfViewManagerFabric : ViewGroupManager<PdfView>(), NutrientViewManag
 
     override fun setDisableDefaultActionForTappedAnnotations(view: PdfView, value: Boolean) {
         view.setDisableDefaultActionForTappedAnnotations(value)
+    }
+
+    override fun setHasShouldExecuteAction(view: PdfView, value: Boolean) {
+        view.setHasShouldExecuteAction(value)
     }
 
     override fun setAnnotationAuthorName(view: PdfView, @Nullable value: String?) {

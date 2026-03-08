@@ -165,6 +165,56 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
             }
         }
         if (annotation != null) {
+            boolean hasShouldExecute = parent.hasShouldExecuteAction();
+
+            // If there is no JS handler and default actions are disabled, consume the tap and do not execute.
+            if (!hasShouldExecute && disableDefaultActionForTappedAnnotations) {
+                return true;
+            }
+
+            // Intercept link annotations to allow React Native to decide whether to execute the action.
+            // Only do this in Fabric mode where the event is bridged to React Native, and only when a handler exists.
+            if (hasShouldExecute
+                && parent.isFabricMode()
+                && !parent.isSuppressedShouldExecuteAction()
+                && annotation instanceof com.pspdfkit.annotations.LinkAnnotation linkAnnotation) {
+                com.pspdfkit.annotations.actions.Action action = linkAnnotation.getAction();
+                if (action != null) {
+                    String requestId = java.util.UUID.randomUUID().toString();
+                    parent.storePendingAction(requestId, action, pageIndex);
+
+                    String url = null;
+                    if (action instanceof com.pspdfkit.annotations.actions.UriAction uriAction) {
+                        // UriAction#getUri returns a String in this SDK version.
+                        url = uriAction.getUri();
+                    }
+
+                    // Always notify JS about the tap itself, even if the action is later blocked.
+                    if (NutrientNotificationCenter.INSTANCE.getIsNotificationCenterInUse()) {
+                        if (pointF == null) {
+                            pointF = new PointF(0, 0);
+                        }
+                        int componentIdAnn = parent.isFabricMode()
+                                ? (parent.getComponentReferenceId() != null ? parent.getComponentReferenceId() : parent.getId())
+                                : parent.getId();
+                        NutrientNotificationCenter.INSTANCE.didTapAnnotation(annotation, pointF, documentID, componentIdAnn);
+                    }
+                    if (isFabricMode && fabricDelegate != null) {
+                        fabricDelegate.onAnnotationTapped(annotation);
+                    } else {
+                        dispatchEvent(new PdfViewAnnotationTappedEvent(parent.getId(), annotation));
+                    }
+
+                    // Fabric path: delegate directly so Fabric manager can emit a codegen event.
+                    if (isFabricMode && fabricDelegate != null) {
+                        fabricDelegate.onShouldExecuteAction(requestId, action, pageIndex, url);
+                    }
+                    // Prevent the SDK's default link handling here; JS will decide via executeAction.
+                    return true;
+                }
+            }
+
+            // Non-intercepted annotations follow the original tap path.
             if (NutrientNotificationCenter.INSTANCE.getIsNotificationCenterInUse()) {
                 if (pointF == null) {
                     pointF = new PointF(0,0);

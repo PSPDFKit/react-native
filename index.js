@@ -113,12 +113,16 @@ class NutrientView extends React.Component {
           configuration: configuration !== undefined ? configuration : null,
         };
         
+        const hasShouldExecute = !!this.props.onShouldExecuteAction;
+        const disableDefaultAction = this.props.disableDefaultActionForTappedAnnotations === true;
+
         return (
           <RCTPSPDFKitView
             ref={this._componentRef}
             documentAndConfiguration={documentAndConfiguration}  // Android only
             fragmentTag="NutrientView.FragmentTag"
             {...otherProps}
+            disableDefaultActionForTappedAnnotations={disableDefaultAction}
             onCloseButtonPressed={onCloseButtonPressedHandler}
             onStateChanged={this._onStateChanged}
             onDocumentSaved={this._onDocumentSaved}
@@ -134,15 +138,21 @@ class NutrientView extends React.Component {
               this._onCustomAnnotationContextualMenuItemTapped
             }
             onReady={this._onReady}
+            onShouldExecuteAction={hasShouldExecute ? this._onShouldExecuteAction : undefined}
+            hasShouldExecuteAction={hasShouldExecute}
           />
         );
       } else {
         // iOS: Use original approach with individual props
+        const hasShouldExecute = !!this.props.onShouldExecuteAction;
+        const disableDefaultAction = this.props.disableDefaultActionForTappedAnnotations === true;
+
         return (
           <RCTPSPDFKitView
             ref={this._componentRef}
             fragmentTag="NutrientView.FragmentTag"
             {...this.props}
+            disableDefaultActionForTappedAnnotations={disableDefaultAction}
             onCloseButtonPressed={onCloseButtonPressedHandler}
             onStateChanged={this._onStateChanged}
             onDocumentSaved={this._onDocumentSaved}
@@ -158,6 +168,8 @@ class NutrientView extends React.Component {
               this._onCustomAnnotationContextualMenuItemTapped
             }
             onReady={this._onReady}
+            onShouldExecuteAction={hasShouldExecute ? this._onShouldExecuteAction : undefined}
+            hasShouldExecuteAction={hasShouldExecute}
           />
         );
       }
@@ -280,6 +292,16 @@ class NutrientView extends React.Component {
   };
 
   /**
+   * @ignore
+   */
+  _onShouldExecuteAction = event => {
+    const payload = event && event.nativeEvent ? event.nativeEvent : event;
+    if (this.props.onShouldExecuteAction) {
+      this.props.onShouldExecuteAction(payload);
+    }
+  };
+
+  /**
    * Enters annotation creation mode, showing the annotation creation toolbar.
    * @method enterAnnotationCreationMode
    * @param { Annotation.Type } [annotationType] The annotation type that should be pre-selected when entering annotation creation mode.
@@ -312,6 +334,42 @@ class NutrientView extends React.Component {
     } else if (Platform.OS === 'ios') {
       return NativeModules.PSPDFKitViewManager.enterAnnotationCreationMode(
         annotationType,
+        findNodeHandle(this._componentRef.current),
+      );
+    }
+  };
+
+  /**
+   * Decides whether a previously intercepted PDF action (for example, a link tap)
+   * should be executed by the native SDK.
+   * Invoke this in response to the ```onShouldExecuteAction``` callback.
+   *
+   * @method executeAction
+   * @param {string} requestId The request identifier received from the shouldExecuteAction callback.
+   * @param {boolean} allow Whether the action should be executed (true) or cancelled (false).
+   * @memberof NutrientView
+   */
+  executeAction = function (requestId, allow) {
+    const { isNewArchitectureEnabled } = require('./lib/ArchitectureDetector');
+    if (isNewArchitectureEnabled()) {
+      // Delegate to Fabric component
+      return this._fabricRef.current?.executeAction(requestId, allow);
+    }
+
+    if (Platform.OS === 'android') {
+      // Legacy Android: fire-and-forget command. No Promise result is returned.
+      UIManager.dispatchViewManagerCommand(
+        findNodeHandle(this._componentRef.current),
+        this._getViewManagerConfig('RCTPSPDFKitView').Commands
+          .executeAction,
+        [requestId, allow],
+      );
+      return;
+    } else if (Platform.OS === 'ios') {
+      // Legacy iOS: Promise-based module method.
+      return NativeModules.PSPDFKitViewManager.executeAction(
+        requestId,
+        allow,
         findNodeHandle(this._componentRef.current),
       );
     }
@@ -1106,7 +1164,7 @@ if (Platform.OS === 'ios' || Platform.OS === 'android') {
  * @property {number} [pageIndex] Page index of the document that will be shown. Starts at 0.
  * @property {boolean} [hideNavigationBar] Controls whether a navigation bar is created and shown or not. Navigation bar is shown by default (```false```).
  * @property {boolean} [showCloseButton] Specifies whether the close button should be shown in the navigation bar. Disabled by default (```false```). Only applies when the ```NutrientView``` is presented modally. Will call ```onCloseButtonPressed``` when tapped if a callback was provided. If ```onCloseButtonPressed``` wasn't provided, ```NutrientView``` will automatically be dismissed when modally presented.
- * @property {boolean} [disableDefaultActionForTappedAnnotations] Controls whether or not the default action for tapped annotations is processed. Defaults to processing the action (```false```).
+ * @property {boolean} [disableDefaultActionForTappedAnnotations] Controls whether or not the default action for tapped annotations is processed. Defaults to processing the action (```false```). Does not take precedence over the ```onShouldExecuteAction``` callback for annotation actions.
  * @property {boolean} [disableAutomaticSaving] Controls whether or not the document will automatically be saved. Defaults to automatically saving (```false```). Deprecated since Nutrient React Native SDK 4.0. Use ```disableDocumentEditing``` on the ```PDFConfiguration``` object instead.
  * @property {string} [annotationAuthorName] Controls the author name that's set for new annotations. If not set and the user hasn't specified it before, the user will be asked and the result will be saved. The value set here will be persisted and the user won't be asked, even if this isn't set the next time.
  * @property {string} [imageSaveMode] Specifies what is written back to the original image URL when the receiver is saved. If this property is ```flattenAndEmbed```, then this allows for changes made to the image to be saved as metadata in the original file. If the same file is reopened, all previous changes made will remain editable. If this property is ```flatten```, the changes are simply written to the image, and will not be editable when reopened. Available options are: ```flatten``` or ```flattenAndEmbed```.
@@ -1121,6 +1179,7 @@ if (Platform.OS === 'ios' || Platform.OS === 'android') {
  * @property {function} [onStateChanged] Callback that's called when the state of the ```NutrientView``` changes.
  * @property {function} [onCustomToolbarButtonTapped] Callback that's called when a custom toolbar button is tapped.
  * @property {function} [onCustomAnnotationContextualMenuItemTapped] Callback that's called when a custom annotation menu item is tapped.
+ * @property {function} [onShouldExecuteAction] Callback that's called just before the native SDK executes a PDF action (for example, when a link annotation is tapped). Use this to decide, via {@link NutrientView#executeAction}, whether the intercepted action should proceed.
  * @property {string} [fragmentTag] The tag used to identify a single PdfFragment in the view hierarchy. This needs to be unique in the view hierarchy.
  * @property {Array} [menuItemGrouping] Used to specify a custom grouping for the menu items in the annotation creation toolbar.
  * @property {Array<string>} [leftBarButtonItems] Sets the left bar button items. Note: The same button item cannot be added to both the left and right bar button items simultaneously. See {@link https://github.com/PSPDFKit/react-native/blob/master/ios/Converters/RCTConvert+UIBarButtonItem.m} for supported button items.
@@ -1191,6 +1250,7 @@ NutrientView.propTypes = {
   showCloseButton: PropTypes.bool,
   /**
    * Controls whether or not the default action for tapped annotations is processed. Defaults to processing the action (```false```).
+   * Does not take precedence over the ```onShouldExecuteAction``` callback for annotation actions.
    * @type {boolean}
    * @memberof NutrientView
    */
@@ -2189,3 +2249,6 @@ module.exports.SignatureFormElement = SignatureFormElement;
 module.exports.TextFieldFormElement = TextFieldFormElement;
 
 module.exports.Forms = Forms;
+
+// Type-only helper for onShouldExecuteAction; runtime value is unused.
+module.exports.ShouldExecuteActionEvent = {};

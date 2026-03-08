@@ -78,6 +78,7 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
     public static final int COMMAND_SET_PAGE_INDEX = 13;
     public static final int COMMAND_SET_EXCLUDED_ANNOTATIONS = 14;
     public static final int COMMAND_SET_USER_INTERFACE_VISIBLE = 15;
+    public static final int COMMAND_EXECUTE_ACTION = 16;
 
     private final CompositeDisposable annotationDisposables = new CompositeDisposable();
 
@@ -130,6 +131,7 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
         commandMap.put("setPageIndex", COMMAND_SET_PAGE_INDEX);
         commandMap.put("setExcludedAnnotations", COMMAND_SET_EXCLUDED_ANNOTATIONS);
         commandMap.put("setUserInterfaceVisible", COMMAND_SET_USER_INTERFACE_VISIBLE);
+        commandMap.put("executeAction", COMMAND_EXECUTE_ACTION);
         return commandMap;
     }
 
@@ -420,6 +422,13 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
                     } catch (Exception e) {
                         root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, e));
                     }
+                }
+                break;
+            case COMMAND_EXECUTE_ACTION:
+                if (args != null && args.size() == 2) {
+                    final String actionRequestId = args.getString(0);
+                    final boolean allow = args.getBoolean(1);
+                    root.executeAction(actionRequestId, allow);
                 }
                 break;
         }

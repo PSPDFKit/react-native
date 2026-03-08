@@ -38,6 +38,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) RCTBubblingEventBlock onReady;
 @property (nonatomic, copy) RCTBubblingEventBlock onCustomToolbarButtonTapped;
 @property (nonatomic, copy) RCTBubblingEventBlock onCustomAnnotationContextualMenuItemTapped;
+/// Called when an action (for example, a link action) is about to be executed,
+/// allowing React Native to decide whether it should proceed.
+@property (nonatomic, copy) RCTBubblingEventBlock onShouldExecuteAction;
+/// Internal flag tracking whether onShouldExecuteAction is implemented in JS.
+@property (nonatomic, assign) BOOL hasShouldExecuteAction;
 @property (nonatomic, copy, nullable) NSArray<NSString *> *availableFontNames;
 @property (nonatomic, copy, nullable) NSString *selectedFontName;
 @property (nonatomic) BOOL showDownloadableFonts;
@@ -85,6 +90,9 @@ NS_ASSUME_NONNULL_BEGIN
 /// Annotation Contextual Menu Customization
 - (void)setAnnotationContextualMenuItems:(NSDictionary *)items;
 
+/// Execute or cancel a previously intercepted PSPDFAction identified by requestId.
+- (BOOL)executePendingActionWithRequestId:(NSString *)requestId allow:(BOOL)allow;
+
 @end
 
 @protocol RCTPSPDFKitViewDelegate <NSObject>
@@ -102,6 +110,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)pspdfView:(RCTPSPDFKitView *)view didFailToSaveDocumentWithError:(NSString *)error;
 /** Annotation changes callback for New Architecture bridging */
 - (void)pspdfView:(RCTPSPDFKitView *)view didChangeAnnotationsWithChange:(NSString *)change annotationsJSONString:(NSString *)annotationsJSONString;
+/** Annotation tap callback for New Architecture bridging */
+- (void)pspdfView:(RCTPSPDFKitView *)view didTapAnnotation:(PSPDFAnnotation *)annotation;
+/** Action execution callback for New Architecture bridging */
+- (void)pspdfView:(RCTPSPDFKitView *)view didRequestShouldExecuteActionWithPayload:(NSDictionary *)payload;
 @end
 
 NS_ASSUME_NONNULL_END
