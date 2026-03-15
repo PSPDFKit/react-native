@@ -1,3 +1,6 @@
+- Adds the `onShouldExecuteAction` callback and `executeAction` API to `NutrientView` to control whether an annotation action should execute. (J#HYB-926)
+- Fixes an issue where the `onAnnotationTapped` callback did not fire reliably on iOS new architecture. (J#HYB-984)
+
 ## 4.2.0 — 11 Feb 2026
 
 - Removes the deprecated Annotation APIs from the `NutrientView` namespace, since they are available on `PDFDocument`. (J#HYB-945)

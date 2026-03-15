@@ -189,6 +189,59 @@ using namespace facebook::react;
   }
 }
 
+- (void)pspdfView:(RCTPSPDFKitView *)view didTapAnnotation:(PSPDFAnnotation *)annotation {
+  if (!_eventEmitter || annotation == nil) {
+    return;
+  }
+
+  NSString *uuid = annotation.uuid ?: @"";
+  NSString *name = annotation.name ?: @"";
+  NSString *typeString = @"";
+  NSInteger pageIndex = annotation.pageIndex;
+
+  // Populate type and optionally uuid/name from InstantJSON so they match SDK serialization and are reliable.
+  NSError *err = nil;
+  NSData *annotationData = [annotation generateInstantJSONWithError:&err];
+  if (annotationData != nil) {
+    NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:annotationData options:kNilOptions error:NULL];
+    if ([dict isKindOfClass:[NSDictionary class]]) {
+      NSString *typeFromJson = dict[@"type"];
+      if ([typeFromJson isKindOfClass:[NSString class]] && typeFromJson.length > 0) {
+        typeString = typeFromJson;
+      }
+      if (uuid.length == 0) {
+        NSString *uuidFromJson = dict[@"uuid"];
+        if ([uuidFromJson isKindOfClass:[NSString class]]) uuid = uuidFromJson;
+      }
+      if (name.length == 0) {
+        NSString *nameFromJson = dict[@"name"];
+        if ([nameFromJson isKindOfClass:[NSString class]]) name = nameFromJson;
+      }
+    }
+  }
+  // Fallback for type when InstantJSON doesn't provide it: use class name (e.g. PSPDFLinkAnnotation -> Link).
+  if (typeString.length == 0) {
+    NSString *className = NSStringFromClass([annotation class]);
+    if ([className hasSuffix:@"Annotation"]) {
+      typeString = [className stringByReplacingOccurrencesOfString:@"PSPDF" withString:@""];
+      typeString = [typeString stringByReplacingOccurrencesOfString:@"Annotation" withString:@""];
+    } else {
+      typeString = className ?: @"";
+    }
+  }
+
+  // Build payload matching NativeProps.onAnnotationTapped: { annotation: { uuid, name?, type, pageIndex } }
+  facebook::react::NutrientViewEventEmitter::OnAnnotationTapped payload{
+    {
+      std::string([uuid UTF8String]),
+      std::string([name UTF8String]),
+      std::string([typeString UTF8String]),
+      (int)pageIndex
+    }
+  };
+  _eventEmitter->onAnnotationTapped(payload);
+}
+
 - (void)pspdfViewDidPressCloseButton:(RCTPSPDFKitView *)view {
   if (_eventEmitter) {
     facebook::react::NutrientViewEventEmitter::OnCloseButtonPressed payload{};
@@ -234,6 +287,25 @@ using namespace facebook::react;
   }
 }
 
+- (void)pspdfView:(RCTPSPDFKitView *)view didRequestShouldExecuteActionWithPayload:(NSDictionary *)payload {
+  if (!_eventEmitter || payload == nil) {
+    return;
+  }
+  
+  NSString *requestId = payload[@"requestId"];
+  NSNumber *pageIndex = payload[@"pageIndex"];
+  NSString *actionType = payload[@"actionType"];
+  NSString *url = payload[@"url"];
+  
+  facebook::react::NutrientViewEventEmitter::OnShouldExecuteAction eventPayload{
+    requestId ? std::string([requestId UTF8String]) : std::string(""),
+    pageIndex != nil ? (int)pageIndex.integerValue : 0,
+    actionType ? std::string([actionType UTF8String]) : std::string(""),
+    url ? std::string([url UTF8String]) : std::string("")
+  };
+  _eventEmitter->onShouldExecuteAction(eventPayload);
+}
+
 - (void)updateProps:(Props::Shared const &)props oldProps:(Props::Shared const &)oldProps
 {
   [super updateProps:props oldProps:oldProps];
@@ -272,6 +344,7 @@ using namespace facebook::react;
       [NutrientPropsUIHelper applyShowCloseButtonFromJSON:@(_showCloseButton) toView:_view];
       _disableDefaultActionForTappedAnnotations = newProps->disableDefaultActionForTappedAnnotations;
       _view.disableDefaultActionForTappedAnnotations = _disableDefaultActionForTappedAnnotations;
+      _view.hasShouldExecuteAction = newProps->hasShouldExecuteAction;
       _showNavigationButtonInToolbar = newProps->showNavigationButtonInToolbar;
       if (!newProps->availableFontNamesJSONString.empty()) {
         _availableFontNamesJSONString = RCTNSStringFromString(newProps->availableFontNamesJSONString);

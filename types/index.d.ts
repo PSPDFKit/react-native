@@ -465,7 +465,7 @@ export type Props = {
      */
     showCloseButton?: boolean;
     /**
-     * Controls whether or not the default action for tapped annotations is processed. Defaults to processing the action (```false```).
+     * Controls whether or not the default action for tapped annotations is processed. Defaults to processing the action (```false```). Does not take precedence over the ```onShouldExecuteAction``` callback for annotation actions.
      */
     disableDefaultActionForTappedAnnotations?: boolean;
     /**
@@ -524,6 +524,10 @@ export type Props = {
      * Callback that's called when a custom annotation menu item is tapped.
      */
     onCustomAnnotationContextualMenuItemTapped?: Function;
+    /**
+     * Callback that's called just before the native SDK executes a PDF action (for example, when a link annotation is tapped). Use this to decide, via {@link NutrientView#executeAction}, whether the intercepted action should proceed.
+     */
+    onShouldExecuteAction?: Function;
     /**
      * The tag used to identify a single PdfFragment in the view hierarchy. This needs to be unique in the view hierarchy.
      */
@@ -902,6 +906,10 @@ declare class NutrientView extends React.Component<Props, any, any> {
      */
     _onReady: (event: any) => void;
     /**
+     * @ignore
+     */
+    _onShouldExecuteAction: (event: any) => void;
+    /**
      * Enters annotation creation mode, showing the annotation creation toolbar.
      * @method enterAnnotationCreationMode
      * @param { Annotation.Type } [annotationType] The annotation type that should be pre-selected when entering annotation creation mode.
@@ -910,6 +918,17 @@ declare class NutrientView extends React.Component<Props, any, any> {
      * @memberof NutrientView
      */
     enterAnnotationCreationMode: (annotationType?: Annotation.Type) => any;
+    /**
+     * Decides whether a previously intercepted PDF action (for example, a link tap)
+     * should be executed by the native SDK.
+     * Invoke this in response to the ```onShouldExecuteAction``` callback.
+     *
+     * @method executeAction
+     * @param {string} requestId The request identifier received from the shouldExecuteAction callback.
+     * @param {boolean} allow Whether the action should be executed (true) or cancelled (false).
+     * @memberof NutrientView
+     */
+    executeAction: (requestId: string, allow: boolean) => any;
     /**
      * Enters content editing mode, showing the content editing UI.
      * @method enterContentEditingMode
@@ -961,7 +980,7 @@ declare class NutrientView extends React.Component<Props, any, any> {
     /**
      * @method clearSelectedAnnotations
      * @memberof NutrientView
-     * @deprecated Since Nutrient React Native SDK 4.1.1. Use ```this.pdfRef.current?.getDocument().clearSelectedAnnotations()``` instead.
+     * @deprecated Since Nutrient React Native SDK 4.2. Use ```this.pdfRef.current?.getDocument().clearSelectedAnnotations()``` instead.
      * @description Clears all currently selected Annotations.
      * @example
      * const result = await this.pdfRef.current?.clearSelectedAnnotations();
@@ -971,7 +990,7 @@ declare class NutrientView extends React.Component<Props, any, any> {
     /**
      * @method selectAnnotations
      * @memberof NutrientView
-     * @deprecated Since Nutrient React Native SDK 4.1.1. Use ```this.pdfRef.current?.getDocument().selectAnnotations(annotations, showContextualMenu)``` instead.
+     * @deprecated Since Nutrient React Native SDK 4.2. Use ```this.pdfRef.current?.getDocument().selectAnnotations(annotations, showContextualMenu)``` instead.
      * @param { object } annotations An array of the annotations to select in Instant JSON format.
      * @param { boolean } [showContextualMenu] Whether the annotation contextual menu should be shown after selection.
      * @description Select one or more annotations.
@@ -1388,3 +1407,7 @@ import formFieldConfiguration = require('../src/forms/FormFieldConfiguration');
 export import FormFieldConfiguration = formFieldConfiguration.FormFieldConfiguration;
 export import ElectronicSignatureFieldConfiguration = formFieldConfiguration.ElectronicSignatureFieldConfiguration;
 export import TextFormFieldConfiguration = formFieldConfiguration.TextFormFieldConfiguration;
+
+//@ts-ignore
+import nutrientViewEvents = require('../src/events/NutrientViewEvents');
+export import ShouldExecuteActionEvent = nutrientViewEvents.ShouldExecuteActionEvent;

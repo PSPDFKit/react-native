@@ -437,6 +437,11 @@ export interface NativeProps extends ViewProps {
 
   // Basic interaction settings
   disableDefaultActionForTappedAnnotations?: boolean;
+  /**
+   * Internal flag used so native knows whether onShouldExecuteAction is actually
+   * implemented on the JS side. When false, native should not intercept actions.
+   */
+  hasShouldExecuteAction?: WithDefault<boolean, false>;
 
   // Additional props from index.js
   annotationAuthorName?: string;
@@ -475,6 +480,16 @@ export interface NativeProps extends ViewProps {
    * Fabric-only annotations changed event. Send stringified annotations for codegen compatibility.
    */
   onAnnotationsChanged?: BubblingEventHandler<{ change: string; annotationsJSONString: string }>;
+  /**
+   * Called just before the native SDK executes a PDF action (for example, a link tap).
+   * React Native can later decide whether the action should proceed by calling executeAction on the ref.
+   */
+  onShouldExecuteAction?: BubblingEventHandler<{
+    requestId: string;
+    pageIndex: Int32;
+    actionType?: string;
+    url?: string;
+  }>;
 }
 
 // Export the Fabric native component with Nutrient prefix

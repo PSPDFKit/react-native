@@ -57,6 +57,8 @@ import com.pspdfkit.annotations.configuration.FreeTextAnnotationConfiguration;
 import com.pspdfkit.configuration.PdfConfiguration;
 import com.pspdfkit.configuration.activity.PdfActivityConfiguration;
 import com.pspdfkit.configuration.search.SearchType;
+import com.pspdfkit.annotations.LinkAnnotation;
+import com.pspdfkit.annotations.actions.Action;
 import com.pspdfkit.configuration.sharing.ShareFeatures;
 
 import java.util.EnumSet;
@@ -172,6 +174,7 @@ public class PdfView extends FrameLayout {
         void onReady();
         void onAnnotationTapped(Annotation annotation);
         void onAnnotationsChanged(String eventType, Annotation annotation);
+        void onShouldExecuteAction(String requestId, Action action, int pageIndex, @Nullable String url);
     }
 
     // Event data structure for state changes
@@ -275,6 +278,12 @@ public class PdfView extends FrameLayout {
     private PdfViewDelegate delegate;
     private final boolean isFabricMode;
 
+    // Pending PDF actions intercepted for shouldExecuteAction handling
+    private final java.util.Map<String, Action> pendingActions = new java.util.HashMap<>();
+    private final java.util.Map<String, Integer> pendingActionPageIndices = new java.util.HashMap<>();
+    private boolean suppressShouldExecuteAction = false;
+    private boolean hasShouldExecuteAction = false;
+
     public PdfView(@NonNull Context context) {
         this(context, false);
     }
@@ -362,6 +371,15 @@ public class PdfView extends FrameLayout {
     // Expose Fabric mode and component reference to other classes
     public boolean isFabricMode() {
         return isFabricMode;
+    }
+
+    // Internal flag accessor used by PdfViewDocumentListener to avoid re-entrancy
+    boolean isSuppressedShouldExecuteAction() {
+        return suppressShouldExecuteAction;
+    }
+
+    boolean hasShouldExecuteAction() {
+        return hasShouldExecuteAction;
     }
 
     @Nullable
@@ -589,6 +607,10 @@ public class PdfView extends FrameLayout {
 
     public void setDisableDefaultActionForTappedAnnotations(boolean disableDefaultActionForTappedAnnotations) {
         pdfViewDocumentListener.setDisableDefaultActionForTappedAnnotations(disableDefaultActionForTappedAnnotations);
+    }
+
+    public void setHasShouldExecuteAction(boolean hasShouldExecuteAction) {
+        this.hasShouldExecuteAction = hasShouldExecuteAction;
     }
 
     public void setDisableAutomaticSaving(boolean disableAutomaticSaving) {
@@ -1039,6 +1061,52 @@ public class PdfView extends FrameLayout {
         if (eventDispatcher != null) {
             eventDispatcher.dispatchEvent(event);
         }
+    }
+
+    /**
+     * Store a pending PDF action so React Native can decide later whether it should be executed.
+     */
+    public void storePendingAction(@NonNull String requestId, @NonNull Action action, int pageIndex) {
+        pendingActions.put(requestId, action);
+        pendingActionPageIndices.put(requestId, pageIndex);
+    }
+
+    /**
+     * Execute or cancel a previously stored action identified by requestId.
+     * Returns true if the requestId was known and handled.
+     */
+    public boolean executeAction(@NonNull String requestId, boolean allow) {
+        Action action = pendingActions.remove(requestId);
+        Integer pageIndex = pendingActionPageIndices.remove(requestId);
+
+        if (action == null) {
+            return false;
+        }
+
+        if (!allow) {
+            // Action is cancelled; nothing else to do.
+            return true;
+        }
+
+        // Execute action on the current PdfFragment on the main thread.
+        getCurrentPdfFragment()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(fragment -> {
+                try {
+                    // Prevent re-entrancy into onShouldExecuteAction while we replay the action JS approved.
+                    suppressShouldExecuteAction = true;
+                    // Use the simplest executeAction overload; the action itself encodes its target.
+                    fragment.executeAction(action);
+                } catch (Exception ignored) {
+                    // Swallow and treat as handled; RN already decided to allow.
+                } finally {
+                    suppressShouldExecuteAction = false;
+                }
+            }, throwable -> {
+                // Ignore errors for now; action was attempted.
+            });
+
+        return true;
     }
 
     public Disposable enterAnnotationCreationMode(@Nullable final String annotationType, Runnable onComplete, Consumer<Throwable> onError) {
