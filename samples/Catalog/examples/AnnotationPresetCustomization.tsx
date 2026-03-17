@@ -1,6 +1,6 @@
 import React from 'react';
 import { Alert, processColor, View } from 'react-native';
-import NutrientView, { Annotation } from '@nutrient-sdk/react-native';
+import NutrientView, { Annotation, ShouldExecuteActionEvent } from '@nutrient-sdk/react-native';
 
 import { exampleDocumentPath, pspdfkitColor } from '../configuration/Constants';
 import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
@@ -29,24 +29,45 @@ export class AnnotationPresetCustomization extends BaseExampleAutoHidingHeaderCo
             iOSBackgroundColor: processColor('lightgrey'),
             iOSUseParentNavigationBar: false,
           }}
-          annotationContextualMenu={
-            {
-              buttons: [
-                {
-                  id: 'custom_annotation_item',
-                  image: 'example_annotation_icon',
-                  title: 'Custom',
-                  selectable: false,
-                },
-              ],
-              retainSuggestedMenuItems: true,
-            }
-          }
-          onCustomAnnotationContextualMenuItemTapped={
-            (result: any) => {
-              Alert.alert('Nutrient', `Custom annotation contextual menu item tapped: ${JSON.stringify(result)}`);
-            }
-          }
+          onShouldExecuteAction={(event: ShouldExecuteActionEvent) => {
+            // Inspect the actionType and URL and optionally allow the action to proceed
+            this.pdfRef.current?.executeAction(event.requestId, true);
+          }}
+          annotationContextualMenu={{
+            buttons: [
+              {
+                id: 'custom_annotation_item',
+                image: 'example_annotation_icon',
+                title: 'Custom',
+                selectable: false,
+              },
+            ],
+            retainSuggestedMenuItems: true,
+          }}
+          textSelectionContextualMenu={{
+            buttons: [
+              Annotation.TextSelectionMenuItem.COPY,
+              Annotation.TextSelectionMenuItem.HIGHLIGHT,
+              {
+                id: 'custom_text_item',
+                image: 'example_annotation_icon',
+                title: 'Text Action'
+              },
+            ],
+            retainSuggestedMenuItems: false,
+          }}
+          onCustomAnnotationContextualMenuItemTapped={(result: any) => {
+            Alert.alert(
+              'Nutrient',
+              `Custom annotation contextual menu item tapped: ${JSON.stringify(result)}`,
+            );
+          }}
+          onCustomTextSelectionContextualMenuItemTapped={(result: any) => {
+            Alert.alert(
+              'Nutrient',
+              `Custom text selection contextual menu item tapped: ${JSON.stringify(result)}`,
+            );
+          }}
           annotationPresets={{
             arrow: {
               defaultColor: '#000000',

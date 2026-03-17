@@ -164,10 +164,19 @@ public class ConfigurationAdapter {
         ReadableMapKeySetIterator iterator = configuration.keySetIterator();
         boolean hasConfiguration = iterator.hasNextKey();
         this.configuration = new PdfActivityConfiguration.Builder(context);
-        this.configuration.contentEditingEnabled(false);
-        this.configuration.immersiveModeEnabled(false);
+        // Match the default PdfView configuration: disable immersive mode. We leave
+        // textSelectionPopupToolbarEnabled at its SDK default (popup menu) unless
+        // explicitly overridden by the app or by an internal flag.
+        this.configuration
+            .contentEditingEnabled(false)
+            .immersiveModeEnabled(false);
         if (hasConfiguration) {
             String key;
+
+            key = getKeyOrNull(configuration, "androidUseTextSelectionToolbar");
+            if (key != null && configuration.getBoolean(key)) {
+                this.configuration.textSelectionPopupToolbarEnabled(false);
+            }
 
             key = getKeyOrNull(configuration, PAGE_SCROLL_DIRECTION);
             if (key != null) {

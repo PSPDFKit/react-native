@@ -21,6 +21,7 @@ import Foundation
     }
     
     var annotationContextualMenuItems: NSDictionary!
+    var textSelectionContextualMenuItems: NSDictionary!
     var barButtonItems: NSMutableDictionary!
     var closeButtonAttributes: NSDictionary!
     var pendingCallbacks: NSMutableArray!
@@ -29,6 +30,7 @@ import Foundation
 
     override public init() {
         annotationContextualMenuItems = [:]
+        textSelectionContextualMenuItems = [:]
         barButtonItems = [:]
         closeButtonAttributes = [:]
         pendingCallbacks = []
@@ -43,6 +45,14 @@ import Foundation
     
     @objc public func getAnnotationContextualMenuItems() -> NSDictionary {
         return annotationContextualMenuItems
+    }
+
+    @objc public func setTextSelectionContextualMenuItems(_ items: NSDictionary) {
+        textSelectionContextualMenuItems = items
+    }
+    
+    @objc public func getTextSelectionContextualMenuItems() -> NSDictionary {
+        return textSelectionContextualMenuItems
     }
     
     @objc public func addBarButtonItem(_ object: UIBarButtonItem, key: NSString) {

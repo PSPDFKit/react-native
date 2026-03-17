@@ -26,4 +26,9 @@
 	[view setAnnotationContextualMenuItems:annotationContextualMenu];
 }
 
++ (void)applyTextSelectionContextualMenuFromJSON:(NSDictionary *)textSelectionContextualMenu toView:(RCTPSPDFKitView *)view {
+	if (!textSelectionContextualMenu) { return; }
+	[view setTextSelectionContextualMenuItems:textSelectionContextualMenu];
+}
+
 @end 

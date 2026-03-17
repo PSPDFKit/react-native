@@ -112,12 +112,12 @@ See our [Getting Started on React Native guide](https://www.nutrient.io/getting-
     ...
       android {
     -  compileSdkVersion rootProject.ext.compileSdkVersion
-    +  compileSdkVersion 35
+    +  compileSdkVersion 36
     ...
       defaultConfig {
         applicationId "com.nutrientdemo"
     -     minSdkVersion rootProject.ext.minSdkVersion
-    +     minSdkVersion 21
+    +     minSdkVersion 24
           targetSdkVersion rootProject.ext.targetSdkVersion
           versionCode 1
           versionName "1.0"
@@ -240,7 +240,7 @@ See our [Getting Started on React Native guide](https://www.nutrient.io/getting-
 
 ### Running the example Catalog application
 
-Take a look at the instructions to get started [here](/samples/Catalog/README.md#running-this-sample-on-ios) for iOS and [here](/samples/Catalog/README.md#running-this-sample-on-android) for Android.
+Take a look at the instructions to get started [here](/samples/Catalog/README.md#running-the-catalog-on-ios) for iOS and [here](/samples/Catalog/README.md#running-the-catalog-on-android) for Android.
 
 ### Configuration
 

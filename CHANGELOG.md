@@ -1,3 +1,12 @@
+## 4.3.0 — 17 Mar 2026
+
+- Adds the `onShouldExecuteAction` callback and `executeAction` API to `NutrientView` to control whether an annotation action should execute. (J#HYB-926)
+- Adds the `textSelectionContextualMenu` prop to `NutrientView` to customize the text selection menu button items. (J#HYB-846)
+- Adds the `setRotationOffset` API to `PDFDocument` to change page rotation. (J#HYB-944)
+- Updates for Nutrient Android SDK 11.1.1.
+- Updates for Nutrient iOS SDK 26.6.0.
+- Fixes an issue where the `onAnnotationTapped` callback did not fire reliably on iOS new architecture. (J#HYB-984)
+
 ## 4.2.0 — 11 Feb 2026
 
 - Removes the deprecated Annotation APIs from the `NutrientView` namespace, since they are available on `PDFDocument`. (J#HYB-945)

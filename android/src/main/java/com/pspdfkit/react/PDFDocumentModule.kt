@@ -225,6 +225,37 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
         }
     }
 
+    @ReactMethod fun setRotationOffset(reference: Int, pageIndex: Int, rotation: Int, promise: Promise) {
+        val documentData = this.getDocument(reference)
+        val document = documentData?.document
+        if (document == null) {
+            promise.reject("setRotationOffset", "Document is nil")
+            return
+        }
+
+        // Normalize the rotation to one of the supported values: 0, 90, 180, 270.
+        val normalizedDegrees = ((rotation % 360) + 360) % 360
+        val rotationConstant = when (normalizedDegrees) {
+            0 -> PdfDocument.NO_ROTATION
+            90 -> PdfDocument.ROTATION_90
+            180 -> PdfDocument.ROTATION_180
+            270 -> PdfDocument.ROTATION_270
+            else -> {
+                promise.reject("setRotationOffset", "Rotation must be 0, 90, 180, or 270")
+                return
+            }
+        }
+
+        try {
+            // Applies a temporary rotation to the specified page of the document.
+            // This does not persist the change to the underlying PDF.
+            document.setRotationOffset(rotationConstant, pageIndex)
+            promise.resolve(null)
+        } catch (e: Throwable) {
+            promise.reject("setRotationOffset", e)
+        }
+    }
+
     @ReactMethod fun invalidateCache(reference: Int, promise: Promise) {
         try {
             this.getDocument(reference)?.document?.invalidateCache()

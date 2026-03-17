@@ -3,8 +3,10 @@ package com.pspdfkit.views
 import android.content.Context
 import com.facebook.react.uimanager.events.EventDispatcher
 import com.pspdfkit.react.events.CustomAnnotationContextualMenuItemTappedEvent
+import com.pspdfkit.react.events.CustomTextSelectionContextualMenuItemTappedEvent
 import com.pspdfkit.ui.toolbar.ContextualToolbar
 import com.pspdfkit.ui.toolbar.ContextualToolbarMenuItem
+import com.pspdfkit.ui.toolbar.TextSelectionToolbar
 
 class ToolbarMenuItemListener: ContextualToolbar.OnMenuItemClickListener {
 
@@ -13,7 +15,8 @@ class ToolbarMenuItemListener: ContextualToolbar.OnMenuItemClickListener {
     private var isFabricMode: Boolean = false
     private var fabricDelegate: PdfView.PdfViewDelegate? = null
     private var context: Context? = null
-    private var resourceIds: List<Int> = ArrayList()
+    private var annotationResourceIds: List<Int> = emptyList()
+    private var textSelectionResourceIds: List<Int> = emptyList()
 
     constructor(parent: PdfView, eventDispatcher: EventDispatcher, context: Context) {
         this.parent = parent
@@ -29,25 +32,43 @@ class ToolbarMenuItemListener: ContextualToolbar.OnMenuItemClickListener {
         this.fabricDelegate = fabricDelegate
     }
 
-    fun setResourceIds(resIds: List<Int>) {
-        this.resourceIds = resIds
+    fun setAnnotationResourceIds(resIds: List<Int>) {
+        this.annotationResourceIds = resIds
+    }
+
+    fun setTextSelectionResourceIds(resIds: List<Int>) {
+        this.textSelectionResourceIds = resIds
     }
 
     override fun onToolbarMenuItemClick(toolbar: ContextualToolbar<*>, menuItem: ContextualToolbarMenuItem): Boolean {
-        // Check if the selected item is part of the custom items list
-        if (this.resourceIds.contains(menuItem.id)) {
-            val resourceName: String? = context?.resources?.getResourceEntryName(menuItem.id)
-            if (resourceName != null) {
-                if (isFabricMode && fabricDelegate != null && parent != null) {
-                    // Fabric path: route back to manager delegate
-                    fabricDelegate!!.onCustomAnnotationContextualMenuItemTapped(resourceName)
-                } else {
-                    parent?.let { CustomAnnotationContextualMenuItemTappedEvent(it.id, resourceName) }
-                        ?.let { eventDispatcher!!.dispatchEvent(it) }
-                }
-            }
-            return true
+        val id = menuItem.id
+        val isAnnotationCustom = annotationResourceIds.contains(id)
+        val isTextSelectionCustom = textSelectionResourceIds.contains(id)
+
+        if (!isAnnotationCustom && !isTextSelectionCustom) {
+            return false
         }
-        return false
+
+        val resourceName: String = context?.resources?.getResourceEntryName(id) ?: return false
+        val isTextSelection = isTextSelectionCustom
+
+        if (isFabricMode && fabricDelegate != null && parent != null) {
+            if (isTextSelection) {
+                fabricDelegate!!.onCustomTextSelectionContextualMenuItemTapped(resourceName)
+            } else {
+                fabricDelegate!!.onCustomAnnotationContextualMenuItemTapped(resourceName)
+            }
+        } else {
+            val viewId = parent?.id ?: return false
+            val event =
+                if (isTextSelection) {
+                    CustomTextSelectionContextualMenuItemTappedEvent(viewId, resourceName)
+                } else {
+                    CustomAnnotationContextualMenuItemTappedEvent(viewId, resourceName)
+                }
+            eventDispatcher!!.dispatchEvent(event)
+        }
+
+        return true
     }
 }

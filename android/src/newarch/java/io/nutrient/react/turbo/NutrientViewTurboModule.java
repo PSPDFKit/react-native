@@ -139,6 +139,24 @@ public class NutrientViewTurboModule extends NativeNutrientViewTurboModuleSpec {
     }
 
     @Override
+    public void executeAction(String reference, String requestId, boolean allow, Promise promise) {
+        Log.d(TAG, "executeAction called with reference: " + reference + ", requestId: " + requestId + ", allow: " + allow);
+
+        PdfView view = NutrientViewRegistry.getInstance().getViewForId(reference);
+        if (view == null) {
+            promise.reject(Errors.VIEW_NOT_FOUND, "No view found for reference: " + reference);
+            return;
+        }
+
+        try {
+            boolean handled = view.executeAction(requestId, allow);
+            promise.resolve(handled);
+        } catch (Exception e) {
+            promise.reject(Errors.OPERATION_FAILED, e.getMessage());
+        }
+    }
+
+    @Override
     public void setToolbar(String reference, String toolbar) {
         Log.d(TAG, "setToolbar called with reference: " + reference + ", toolbar: " + toolbar);
         

@@ -2,4 +2,5 @@
 <resources>
     <item name="custom_action" type="id"/>
     <item name="custom_annotation_item" type="id"/>
+    <item name="custom_text_item" type="id"/>
 </resources>

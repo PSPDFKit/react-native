@@ -12,6 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (void)applyAnnotationPresetsFromJSON:(id)json;
 + (void)applyAnnotationContextualMenuFromJSON:(NSDictionary *)annotationContextualMenu toView:(RCTPSPDFKitView *)view;
++ (void)applyTextSelectionContextualMenuFromJSON:(NSDictionary *)textSelectionContextualMenu toView:(RCTPSPDFKitView *)view;
 
 @end
 

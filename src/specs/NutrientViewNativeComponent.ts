@@ -159,6 +159,13 @@ export interface AnnotationContextualMenu {
   position?: WithDefault<'start' | 'end', 'end'>;
 }
 
+export interface TextSelectionContextualMenu {
+  buttons: (AnnotationContextualMenuItem | string)[];
+  retainSuggestedMenuItems?: boolean;
+  appearance?: WithDefault<'horizontalBar' | 'contextMenu', 'horizontalBar'>;
+  position?: WithDefault<'start' | 'end', 'end'>;
+}
+
 export interface AnnotationPresetInk {
   defaultColor?: string;
   defaultFillColor?: string;
@@ -415,6 +422,11 @@ export interface NativeProps extends ViewProps {
    * parse and apply; if omitted, no contextual menu customization occurs.
    */
   annotationContextualMenuJSONString?: string;
+  /**
+   * Stringified JSON of the text selection contextual menu. When provided, native should
+   * parse and apply; if omitted, no text selection contextual menu customization occurs.
+   */
+  textSelectionContextualMenuJSONString?: string;
   menuItemGrouping?: string[];
   /**
    * Stringified JSON for menu item grouping. Use this to support unions
@@ -437,6 +449,11 @@ export interface NativeProps extends ViewProps {
 
   // Basic interaction settings
   disableDefaultActionForTappedAnnotations?: boolean;
+  /**
+   * Internal flag used so native knows whether onShouldExecuteAction is actually
+   * implemented on the JS side. When false, native should not intercept actions.
+   */
+  hasShouldExecuteAction?: WithDefault<boolean, false>;
 
   // Additional props from index.js
   annotationAuthorName?: string;
@@ -459,6 +476,7 @@ export interface NativeProps extends ViewProps {
   }>;
   onCustomToolbarButtonTapped?: BubblingEventHandler<{ buttonId?: string; id?: string }>;
   onCustomAnnotationContextualMenuItemTapped?: BubblingEventHandler<{ id: string }>;
+  onCustomTextSelectionContextualMenuItemTapped?: BubblingEventHandler<{ id: string }>;
   onCloseButtonPressed?: BubblingEventHandler<{}>;
   onNavigationButtonClicked?: BubblingEventHandler<{}>;
   onDocumentLoadFailed?: BubblingEventHandler<{ code: string; message: string }>;
@@ -475,6 +493,16 @@ export interface NativeProps extends ViewProps {
    * Fabric-only annotations changed event. Send stringified annotations for codegen compatibility.
    */
   onAnnotationsChanged?: BubblingEventHandler<{ change: string; annotationsJSONString: string }>;
+  /**
+   * Called just before the native SDK executes a PDF action (for example, a link tap).
+   * React Native can later decide whether the action should proceed by calling executeAction on the ref.
+   */
+  onShouldExecuteAction?: BubblingEventHandler<{
+    requestId: string;
+    pageIndex: Int32;
+    actionType?: string;
+    url?: string;
+  }>;
 }
 
 // Export the Fabric native component with Nutrient prefix

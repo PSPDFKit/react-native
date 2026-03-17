@@ -527,6 +527,20 @@ export class PDFDocument {
     }
 
    /**
+    * @method setRotationOffset
+    * @memberof PDFDocument
+    * @param {number} pageIndex Zero-based page index of the page to rotate.
+    * @param {number} rotation Rotation in degrees. Must be 0, 90, 180, or 270. Display-only; does not persist to the PDF.
+    * @description Sets the display-only rotation offset for a page in the viewer. This is a temporary rotation that does not persist to the PDF after the document is closed.
+    * @example
+    * await this.pdfRef.current?.getDocument().setRotationOffset(0, 90);
+    * @returns { Promise<void> }
+    */
+    setRotationOffset(pageIndex: number, rotation: number): Promise<void> {
+      return NativeModules.PDFDocumentManager.setRotationOffset(this.getRef(), pageIndex, rotation);
+    }
+
+   /**
     * @method invalidateCache
     * @memberof PDFDocument
     * @description Invalidates the rendered cache of all the pages for this document.

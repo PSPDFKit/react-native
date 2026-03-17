@@ -110,6 +110,37 @@ private class WeakViewRef {
         SDK.shared.cache.invalidateImages(from: document, pageIndex: PageIndex(pageIndex))
         onSuccess(true)
     }
+
+    /// Sets the display-only rotation offset for a page (0, 90, 180, or 270 degrees). Does not persist to the PDF.
+    @objc func setRotationOffset(_ reference: NSNumber, pageIndex: Int, rotation: Int, onSuccess: @escaping RCTPromiseResolveBlock, onError: @escaping RCTPromiseRejectBlock) -> Void {
+        guard let document = getDocument(reference) else {
+            onError("setRotationOffset", "Document is nil", nil)
+            return
+        }
+
+        let validRotations: [Int] = [0, 90, 180, 270]
+        guard validRotations.contains(rotation) else {
+            onError("setRotationOffset", "Rotation must be 0, 90, 180, or 270", nil)
+            return
+        }
+
+        guard let rotationValue = Rotation(rawValue: UInt(rotation)) else {
+            onError("setRotationOffset", "Invalid rotation value", nil)
+            return
+        }
+
+        guard let documentProvider = document.documentProviderForPage(at: PageIndex(pageIndex)) else {
+            onError("setRotationOffset", "Document provider not found for page", nil)
+            return
+        }
+
+        DispatchQueue.main.async {
+            documentProvider.setRotationOffset(rotationValue, forPageAt: PageIndex(pageIndex))
+            SDK.shared.cache.invalidateImages(from: document, pageIndex: PageIndex(pageIndex))
+            self.delegate?.reloadControllerData?()
+            onSuccess(true)
+        }
+    }
     
     @objc func invalidateCache(_ reference: NSNumber, onSuccess: @escaping RCTPromiseResolveBlock, onError: @escaping RCTPromiseRejectBlock) -> Void {
         guard let document = getDocument(reference) else {

@@ -1,0 +1,3 @@
+# Bridging native APIs to TypeScript
+
+When adding or changing any native API exposed to the TypeScript/JavaScript layer, you MUST follow the recipe in BRIDGING.md in this directory. Do not skip steps. Every such API must support both Legacy (Paper) and New Architecture (Fabric + TurboModules); the public API must branch on isNewArchitectureEnabled() and delegate to the correct path. Use the checklist in BRIDGING.md before submitting.

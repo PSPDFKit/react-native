@@ -33,5 +33,20 @@ public final class NutrientPropsAnnotationsHelper {
         } catch (JSONException ignored) {
         }
     }
+
+    public static void applyTextSelectionContextualMenu(@NonNull PdfView view, @Nullable ReadableMap textSelectionContextualMenu) {
+        if (textSelectionContextualMenu == null) return;
+        view.setTextSelectionToolbarMenuButtonItems(textSelectionContextualMenu);
+    }
+
+    public static void applyTextSelectionContextualMenuJSONString(@NonNull PdfView view, @Nullable String textSelectionContextualMenuJSONString) {
+        if (textSelectionContextualMenuJSONString == null || textSelectionContextualMenuJSONString.isEmpty()) return;
+        try {
+            JSONObject jsonObject = new JSONObject(textSelectionContextualMenuJSONString);
+            Map<String, Object> map = JsonHelpers.toMap(jsonObject);
+            applyTextSelectionContextualMenu(view, Arguments.makeNativeMap(map));
+        } catch (JSONException ignored) {
+        }
+    }
 }
 

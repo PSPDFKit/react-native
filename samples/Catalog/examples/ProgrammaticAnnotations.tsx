@@ -550,33 +550,53 @@ static imageAnnotation: ImageAnnotation = {
                 <TouchableOpacity onPress={async () => {
                   // Programmatically add a downloaded image annotation.
                   const filePath = fileSystem.DocumentDirectoryPath + '/pspdfkit.png';
-                  fileSystem.downloadFile({
-                    fromUrl:'https://github.com/PSPDFKit/react-native/blob/master/samples/Catalog/assets/logo-flat.png?raw=true', 
-                    toFile: filePath
-                  }).promise.then(async (_result) => {
-                    const base64ImageData = await fileSystem.readFile(filePath, 'base64');
-                    const attachments: Record<string, AnnotationAttachment> = {
-                      ["492adff9842bff7dcb81a20950870be8a0bb665c8d48175680c1e5e1070243ff"]: {
-                        binary: base64ImageData,
-                        contentType: "image/png",
-                      },
-                    };
-
-                  this.pdfRef.current?.getDocument().addAnnotations([ProgrammaticAnnotations.imageAnnotation], attachments)
-                    .then((result: any) => {
-                      if (result) {
-                        Alert.alert(
-                          'Nutrient',
-                          'Annotation was successfully added.',
-                        );
-                      } else {
-                        Alert.alert('Nutrient', 'Failed to add annotations.');
-                      }
+                  fileSystem
+                    .downloadFile({
+                      fromUrl:
+                        'https://raw.githubusercontent.com/PSPDFKit/react-native/master/samples/Catalog/assets/logo-flat.png',
+                      toFile: filePath,
                     })
-                    .catch((error: any) => {
-                      Alert.alert('Nutrient', JSON.stringify(error));
+                    .promise.then(async result => {
+                      if (result.statusCode !== 200) {
+                        Alert.alert('Nutrient', `Download failed: ${result.statusCode}`);
+                        return;
+                      }
+                      const exists = await fileSystem.exists(filePath);
+                      if (!exists) {
+                        Alert.alert('Nutrient', 'Downloaded file does not exist on disk.');
+                        return;
+                      }
+                      const base64ImageData = await fileSystem.readFile(filePath, 'base64');
+                      const attachments: Record<string, AnnotationAttachment> = {
+                        ['492adff9842bff7dcb81a20950870be8a0bb665c8d48175680c1e5e1070243ff']:
+                          {
+                            binary: base64ImageData,
+                            contentType: 'image/png',
+                          },
+                      };
+                      this.pdfRef.current
+                        ?.getDocument()
+                        .addAnnotations([ProgrammaticAnnotations.imageAnnotation], attachments)
+                        .then((result: any) => {
+                          if (result) {
+                            Alert.alert(
+                              'Nutrient',
+                              'Annotation was successfully added.',
+                            );
+                          } else {
+                            Alert.alert('Nutrient', 'Failed to add annotations.');
+                          }
+                        })
+                        .catch((error: any) => {
+                          Alert.alert('Nutrient', JSON.stringify(error));
+                        });
+                    })
+                    .catch(error => {
+                      Alert.alert(
+                        'Nutrient',
+                        'Download error: ' + JSON.stringify(error),
+                      );
                     });
-                  });
                 }}>
                   <Text style={styles.button}>{'Add Image Annotation'}</Text>
                 </TouchableOpacity>

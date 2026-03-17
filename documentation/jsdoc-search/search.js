@@ -3,9 +3,20 @@ var env = require('jsdoc/env'),
     fs = require('fs'),
     _ = require('underscore');
 
+// Use project-relative paths instead of absolute local paths so generated
+// search data does not leak developer-specific directories.
+var projectRoot = env.pwd;
+
 exports.handlers = {
     parseComplete: function (e) {
-        var src = env.opts._.map(function (src) { return path.join(env.pwd, src); }),
+        var src = env.opts._.map(function (srcPath) {
+          var abs = path.join(projectRoot, srcPath);
+          if (abs.indexOf(projectRoot) === 0) {
+            var rel = abs.slice(projectRoot.length);
+            return rel || '/';
+          }
+          return abs;
+        }),
           destinationPath = path.join(env.opts.destination, 'angular.jsdoc.search.data.js'),
           destinationDir = path.dirname(destinationPath),
           fd, data;

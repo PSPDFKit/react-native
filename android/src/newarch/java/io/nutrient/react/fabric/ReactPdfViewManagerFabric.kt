@@ -36,6 +36,7 @@ import io.nutrient.react.events.FabricOnDocumentLoadedEvent
 import io.nutrient.react.events.FabricOnStateChangedEvent
 import io.nutrient.react.events.FabricOnCustomToolbarButtonTappedEvent
 import io.nutrient.react.events.FabricOnCustomAnnotationContextualMenuItemTappedEvent
+import io.nutrient.react.events.FabricOnCustomTextSelectionContextualMenuItemTappedEvent
 import io.nutrient.react.events.FabricOnCloseButtonPressedEvent
 import io.nutrient.react.events.FabricOnDocumentLoadFailedEvent
 import io.nutrient.react.events.FabricOnDocumentSavedEvent
@@ -44,6 +45,7 @@ import io.nutrient.react.events.FabricOnReadyEvent
 import io.nutrient.react.events.FabricOnNavigationButtonClickedEvent
 import io.nutrient.react.events.FabricOnAnnotationTappedEvent
 import io.nutrient.react.events.FabricOnAnnotationsChangedEvent
+import io.nutrient.react.events.FabricOnShouldExecuteActionEvent
 import com.pspdfkit.react.NutrientViewRegistry
 
 class ReactPdfViewManagerFabric : ViewGroupManager<PdfView>(), NutrientViewManagerInterface<PdfView> {
@@ -104,6 +106,11 @@ class ReactPdfViewManagerFabric : ViewGroupManager<PdfView>(), NutrientViewManag
                     eventDispatcher?.dispatchEvent(FabricOnCustomAnnotationContextualMenuItemTappedEvent(surfaceId, pdfView.id, id))
                 }
 
+                override fun onCustomTextSelectionContextualMenuItemTapped(id: String) {
+                    val surfaceId = UIManagerHelper.getSurfaceId(reactContext)
+                    eventDispatcher?.dispatchEvent(FabricOnCustomTextSelectionContextualMenuItemTappedEvent(surfaceId, pdfView.id, id))
+                }
+
                 override fun onNavigationButtonClicked() {
                     val surfaceId = UIManagerHelper.getSurfaceId(reactContext)
                     eventDispatcher?.dispatchEvent(FabricOnNavigationButtonClickedEvent(surfaceId, pdfView.id))
@@ -117,6 +124,25 @@ class ReactPdfViewManagerFabric : ViewGroupManager<PdfView>(), NutrientViewManag
                 override fun onAnnotationsChanged(eventType: String, annotation: com.pspdfkit.annotations.Annotation) {
                     val surfaceId = UIManagerHelper.getSurfaceId(reactContext)
                     eventDispatcher?.dispatchEvent(FabricOnAnnotationsChangedEvent(surfaceId, pdfView.id, eventType, annotation))
+                }
+
+                override fun onShouldExecuteAction(
+                    requestId: String,
+                    action: com.pspdfkit.annotations.actions.Action,
+                    pageIndex: Int,
+                    url: String?
+                ) {
+                    val surfaceId = UIManagerHelper.getSurfaceId(reactContext)
+                    eventDispatcher?.dispatchEvent(
+                        FabricOnShouldExecuteActionEvent(
+                            surfaceId,
+                            pdfView.id,
+                            requestId,
+                            pageIndex,
+                            action,
+                            url
+                        )
+                    )
                 }
 
                 override fun onCloseButtonPressed() {
@@ -208,6 +234,7 @@ class ReactPdfViewManagerFabric : ViewGroupManager<PdfView>(), NutrientViewManag
         map["onStateChanged"] = mapOf("registrationName" to "onStateChanged")
         map["onCustomToolbarButtonTapped"] = mapOf("registrationName" to "onCustomToolbarButtonTapped")
         map["onCustomAnnotationContextualMenuItemTapped"] = mapOf("registrationName" to "onCustomAnnotationContextualMenuItemTapped")
+        map["onCustomTextSelectionContextualMenuItemTapped"] = mapOf("registrationName" to "onCustomTextSelectionContextualMenuItemTapped")
         map["onCloseButtonPressed"] = mapOf("registrationName" to "onCloseButtonPressed")
         map["onDocumentLoadFailed"] = mapOf("registrationName" to "onDocumentLoadFailed")
         map["onDocumentSaved"] = mapOf("registrationName" to "onDocumentSaved")
@@ -216,6 +243,7 @@ class ReactPdfViewManagerFabric : ViewGroupManager<PdfView>(), NutrientViewManag
         map["onNavigationButtonClicked"] = mapOf("registrationName" to "onNavigationButtonClicked")
         map["onAnnotationTapped"] = mapOf("registrationName" to "onAnnotationTapped")
         map["onAnnotationsChanged"] = mapOf("registrationName" to "onAnnotationsChanged")
+        map["onShouldExecuteAction"] = mapOf("registrationName" to "onShouldExecuteAction")
         return map
     }
 
@@ -269,6 +297,10 @@ class ReactPdfViewManagerFabric : ViewGroupManager<PdfView>(), NutrientViewManag
         NutrientPropsAnnotationsHelper.applyAnnotationContextualMenuJSONString(view, value)
     }
 
+    override fun setTextSelectionContextualMenuJSONString(view: PdfView, @Nullable value: String?) {
+        NutrientPropsAnnotationsHelper.applyTextSelectionContextualMenuJSONString(view, value)
+    }
+
     override fun setMenuItemGroupingJSONString(view: PdfView, @Nullable value: String?) {
         NutrientPropsDocumentHelper.applyMenuItemGroupingJSONString(view, value)
     }
@@ -312,6 +344,10 @@ class ReactPdfViewManagerFabric : ViewGroupManager<PdfView>(), NutrientViewManag
 
     override fun setDisableDefaultActionForTappedAnnotations(view: PdfView, value: Boolean) {
         view.setDisableDefaultActionForTappedAnnotations(value)
+    }
+
+    override fun setHasShouldExecuteAction(view: PdfView, value: Boolean) {
+        view.setHasShouldExecuteAction(value)
     }
 
     override fun setAnnotationAuthorName(view: PdfView, @Nullable value: String?) {

@@ -103,6 +103,7 @@ export interface Spec extends TurboModule {
   enterAnnotationCreationMode: (reference: string, annotationType?: string) => Promise<boolean>;
   enterContentEditingMode: (reference: string) => Promise<boolean>;
   exitCurrentlyActiveMode: (reference: string) => Promise<boolean>;
+  executeAction: (reference: string, requestId: string, allow: boolean) => Promise<boolean>;
   
   // Document operations
   setPageIndex: (reference: string, pageIndex: number, animated: boolean) => Promise<boolean>;

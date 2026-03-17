@@ -18,6 +18,15 @@
  * @property { Annotation.ContextualMenuItemPosition } [position] The position where the buttons should be added in the menu.
  */
 /**
+ * The object to customize the menu shown when selecting text.
+ * @typedef TextSelectionContextualMenu
+ * @memberof Annotation
+ * @property { AnnotationContextualMenuItem[] } buttons The menu items to display when text is selected.
+ * @property { Boolean } [retainSuggestedMenuItems] Specifies whether the Nutrient suggested text selection menu items should be retained when custom menu items are set.
+ * @property { Annotation.ContextualMenuAppearance } [appearance] Specifies for which appearance mode this change should apply to (iOS only).
+ * @property { Annotation.ContextualMenuItemPosition } [position] The position where the buttons should be added in the menu.
+ */
+/**
  * The object to configure annotation presets.
  * @typedef AnnotationPresetConfiguration
  * @memberof Annotation
@@ -306,6 +315,32 @@ export interface AnnotationContextualMenu {
   position?: Annotation.ContextualMenuItemPosition;
 }
 
+/**
+ * The object to customize the menu shown when selecting text.
+ */
+export interface TextSelectionContextualMenu {
+ /**
+  * The menu items to display when text is selected.
+  *
+  * This can be a mix of:
+  * - stock text selection actions (see {@link Annotation.TextSelectionMenuItem})
+  * - custom menu item objects ({@link TextSelectionContextualMenuItem})
+  */
+  buttons: Array<TextSelectionContextualMenuItem | Annotation.TextSelectionMenuItem>;
+ /**
+  * Specifies whether the Nutrient suggested text selection menu items should be retained when custom menu items are set.
+  */
+  retainSuggestedMenuItems?: Boolean;
+ /**
+  * Specifies for which appearance mode this change should apply to (iOS only).
+  */
+  appearance?: Annotation.ContextualMenuAppearance;
+ /**
+  * The position where the buttons should be added in the menu.
+  */
+  position?: Annotation.ContextualMenuItemPosition;
+}
+
  /**
   * The annotation menu item used to display a custom button on the annotation menu.
   */
@@ -327,6 +362,14 @@ export interface AnnotationContextualMenuItem {
   */
   selectable?: boolean;
 }
+
+/**
+ * The custom menu item used inside {@link TextSelectionContextualMenu.buttons}.
+ *
+ * For text selection menus we do not support selectable/toggle behavior, so the
+ * `selectable` property is intentionally omitted here.
+ */
+export interface TextSelectionContextualMenuItem extends Omit<AnnotationContextualMenuItem, 'selectable'> {}
 
  /**
  * The object to customize the ink annotation presets.
@@ -779,6 +822,57 @@ export namespace Annotation {
     } as const;
 
     /**
+     * The available stock text selection menu items that can be used inside
+     * {@link TextSelectionContextualMenu.buttons}.
+     *
+     * When using TypeScript, prefer these constants instead of raw strings:
+     *
+     * ```ts
+     * textSelectionContextualMenu={{
+     *   buttons: [
+     *     Annotation.TextSelectionMenuItem.COPY,
+     *     { id: 'custom_text_item', image: 'example_annotation_icon', title: 'Text Action' },
+     *   ],
+     *   retainSuggestedMenuItems: false,
+     * }}
+     * ```
+     *
+     * The underlying string values are the same keys used by the native SDKs.
+     * @readonly
+     * @enum {string} TextSelectionMenuItem
+     */
+    export const TextSelectionMenuItem = {
+      /**
+       * The system "Copy" action.
+       */
+      COPY: 'copy',
+      /**
+       * The system "Highlight" action.
+       */
+      HIGHLIGHT: 'highlight',
+      /**
+       * The system "Redact" action.
+       */
+      REDACTION: 'redaction',
+      /**
+       * The system "Speak" action (text-to-speech).
+       */
+      SPEAK: 'speak',
+      /**
+       * The system "Search" action.
+       */
+      SEARCH: 'search',
+      /**
+       * The system "Share" action.
+       */
+      SHARE: 'share',
+      /**
+       * The system "Link" action.
+       */
+      LINK: 'link',
+    } as const;
+
+    /**
      * The available annotation blend modes
      * @readonly
      * @enum {string} BlendMode
@@ -916,6 +1010,7 @@ export namespace Annotation {
     export type BorderStyle = ValueOf<typeof BorderStyle>;
     export type Type = ValueOf<typeof Type>;
     export type Change = ValueOf<typeof Change>;
+    export type TextSelectionMenuItem = ValueOf<typeof TextSelectionMenuItem>;
     
     type ValueOf<T> = T[keyof T];
 }

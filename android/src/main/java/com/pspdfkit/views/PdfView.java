@@ -43,6 +43,7 @@ import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.events.EventDispatcher;
@@ -57,6 +58,8 @@ import com.pspdfkit.annotations.configuration.FreeTextAnnotationConfiguration;
 import com.pspdfkit.configuration.PdfConfiguration;
 import com.pspdfkit.configuration.activity.PdfActivityConfiguration;
 import com.pspdfkit.configuration.search.SearchType;
+import com.pspdfkit.annotations.LinkAnnotation;
+import com.pspdfkit.annotations.actions.Action;
 import com.pspdfkit.configuration.sharing.ShareFeatures;
 
 import java.util.EnumSet;
@@ -80,6 +83,7 @@ import com.pspdfkit.react.PDFDocumentModule;
 import com.pspdfkit.react.R;
 import com.pspdfkit.react.annotations.ReactAnnotationPresetConfiguration;
 import com.pspdfkit.react.events.CustomAnnotationContextualMenuItemTappedEvent;
+import com.pspdfkit.react.events.CustomTextSelectionContextualMenuItemTappedEvent;
 import com.pspdfkit.react.events.OnReadyEvent;
 import com.pspdfkit.react.events.PdfViewAnnotationChangedEvent;
 import com.pspdfkit.react.ConfigurationAdapter;
@@ -164,6 +168,7 @@ public class PdfView extends FrameLayout {
         void onStateChanged(StateChangedEvent event);
         void onCustomToolbarButtonTapped(String buttonId, String id);
         void onCustomAnnotationContextualMenuItemTapped(String id);
+        void onCustomTextSelectionContextualMenuItemTapped(String id);
         void onNavigationButtonClicked();
         void onCloseButtonPressed();
         void onDocumentLoadFailed(Throwable throwable);
@@ -172,6 +177,7 @@ public class PdfView extends FrameLayout {
         void onReady();
         void onAnnotationTapped(Annotation annotation);
         void onAnnotationsChanged(String eventType, Annotation annotation);
+        void onShouldExecuteAction(String requestId, Action action, int pageIndex, @Nullable String url);
     }
 
     // Event data structure for state changes
@@ -275,6 +281,12 @@ public class PdfView extends FrameLayout {
     private PdfViewDelegate delegate;
     private final boolean isFabricMode;
 
+    // Pending PDF actions intercepted for shouldExecuteAction handling
+    private final java.util.Map<String, Action> pendingActions = new java.util.HashMap<>();
+    private final java.util.Map<String, Integer> pendingActionPageIndices = new java.util.HashMap<>();
+    private boolean suppressShouldExecuteAction = false;
+    private boolean hasShouldExecuteAction = false;
+
     public PdfView(@NonNull Context context) {
         this(context, false);
     }
@@ -330,6 +342,8 @@ public class PdfView extends FrameLayout {
         });
 
         // Set a default configuration. Immersive should be disabled for React Native.
+        // We keep the default text selection popup menu here; at this point no React
+        // props (such as textSelectionContextualMenu) have been applied yet.
         configuration = new PdfActivityConfiguration.Builder(getContext())
                 .immersiveModeEnabled(false)
                 .build();
@@ -362,6 +376,15 @@ public class PdfView extends FrameLayout {
     // Expose Fabric mode and component reference to other classes
     public boolean isFabricMode() {
         return isFabricMode;
+    }
+
+    // Internal flag accessor used by PdfViewDocumentListener to avoid re-entrancy
+    boolean isSuppressedShouldExecuteAction() {
+        return suppressShouldExecuteAction;
+    }
+
+    boolean hasShouldExecuteAction() {
+        return hasShouldExecuteAction;
     }
 
     @Nullable
@@ -589,6 +612,10 @@ public class PdfView extends FrameLayout {
 
     public void setDisableDefaultActionForTappedAnnotations(boolean disableDefaultActionForTappedAnnotations) {
         pdfViewDocumentListener.setDisableDefaultActionForTappedAnnotations(disableDefaultActionForTappedAnnotations);
+    }
+
+    public void setHasShouldExecuteAction(boolean hasShouldExecuteAction) {
+        this.hasShouldExecuteAction = hasShouldExecuteAction;
     }
 
     public void setDisableAutomaticSaving(boolean disableAutomaticSaving) {
@@ -1041,6 +1068,52 @@ public class PdfView extends FrameLayout {
         }
     }
 
+    /**
+     * Store a pending PDF action so React Native can decide later whether it should be executed.
+     */
+    public void storePendingAction(@NonNull String requestId, @NonNull Action action, int pageIndex) {
+        pendingActions.put(requestId, action);
+        pendingActionPageIndices.put(requestId, pageIndex);
+    }
+
+    /**
+     * Execute or cancel a previously stored action identified by requestId.
+     * Returns true if the requestId was known and handled.
+     */
+    public boolean executeAction(@NonNull String requestId, boolean allow) {
+        Action action = pendingActions.remove(requestId);
+        Integer pageIndex = pendingActionPageIndices.remove(requestId);
+
+        if (action == null) {
+            return false;
+        }
+
+        if (!allow) {
+            // Action is cancelled; nothing else to do.
+            return true;
+        }
+
+        // Execute action on the current PdfFragment on the main thread.
+        getCurrentPdfFragment()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(fragment -> {
+                try {
+                    // Prevent re-entrancy into onShouldExecuteAction while we replay the action JS approved.
+                    suppressShouldExecuteAction = true;
+                    // Use the simplest executeAction overload; the action itself encodes its target.
+                    fragment.executeAction(action);
+                } catch (Exception ignored) {
+                    // Swallow and treat as handled; RN already decided to allow.
+                } finally {
+                    suppressShouldExecuteAction = false;
+                }
+            }, throwable -> {
+                // Ignore errors for now; action was attempted.
+            });
+
+        return true;
+    }
+
     public Disposable enterAnnotationCreationMode(@Nullable final String annotationType, Runnable onComplete, Consumer<Throwable> onError) {
         Disposable disposable;
         if (annotationType == null) {
@@ -1328,6 +1401,7 @@ public class PdfView extends FrameLayout {
        map.put(OnReadyEvent.EVENT_NAME, MapBuilder.of("registrationName", "onReady"));
        map.put(CustomToolbarButtonTappedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onCustomToolbarButtonTapped"));
        map.put(CustomAnnotationContextualMenuItemTappedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onCustomAnnotationContextualMenuItemTapped"));
+       map.put(CustomTextSelectionContextualMenuItemTappedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onCustomTextSelectionContextualMenuItemTapped"));
        return map;
     }
 
@@ -1488,8 +1562,97 @@ public class PdfView extends FrameLayout {
         for (ContextualToolbarMenuItem menuItem : toolbarMenuItems) {
             resIds.add(menuItem.getId());
         }
-        toolbarMenuItemListener.setResourceIds(resIds);
+        toolbarMenuItemListener.setAnnotationResourceIds(resIds);
         ContextualToolbarMenuItemConfig config = new ContextualToolbarMenuItemConfig(toolbarMenuItems, retainSuggestedMenuItems, toolbarMenuItemListener);
         pdfViewModeController.setAnnotationSelectionMenuConfig(config);
+    }
+
+    /**
+     * Sets the Text Selection menu toolbar items on the current pdfFragment during setup
+     * @param textSelectionContextualMenuItems
+     */
+    public void setTextSelectionToolbarMenuButtonItems(ReadableMap textSelectionContextualMenuItems) {
+        List<ContextualToolbarMenuItem> toolbarMenuItems = new ArrayList<>();
+        ReadableArray menuItems = textSelectionContextualMenuItems.getArray("buttons");
+        // Gracefully handle the case where no buttons array is provided. This matches
+        // the iOS behavior where iterating over a nil collection is a no-op.
+        if (menuItems == null || menuItems.size() == 0) {
+            return;
+        }
+        boolean retainSuggestedMenuItems = textSelectionContextualMenuItems.hasKey("retainSuggestedMenuItems") ? textSelectionContextualMenuItems.getBoolean("retainSuggestedMenuItems") : true;
+        String position = textSelectionContextualMenuItems.hasKey("position") ? textSelectionContextualMenuItems.getString("position") : "end";
+        ContextualToolbarMenuItem.Position buttonPosition = ConversionHelpers.getContextualToolbarMenuItemPosition(position);
+
+        List<String> stockActions = new ArrayList<>();
+
+        for (int i = 0; i < menuItems.size(); i++) {
+            if (menuItems.getType(i) == ReadableType.String) {
+                // Stock item identifier; record the key so we can filter the toolbar later.
+                stockActions.add(menuItems.getString(i));
+            } else {
+                ReadableMap item = menuItems.getMap(i);
+                String customId = item.getString("id");
+                String image = item.getString("image");
+                String title = item.hasKey("title") ? item.getString("title") : customId;
+                int resId = PSPDFKitUtils.getCustomResourceId(customId, "id", getContext());
+                int iconId = PSPDFKitUtils.getCustomResourceId(image, "drawable", getContext());
+
+                // Apply contextual toolbar theme color to custom menu item icon
+                Drawable customIcon = ContextCompat.getDrawable(getContext(), iconId);
+                final TypedArray a = getContext().getTheme().obtainStyledAttributes(
+                        null,
+                        com.pspdfkit.R.styleable.pspdf__ContextualToolbar,
+                        com.pspdfkit.R.attr.pspdf__contextualToolbarStyle,
+                        com.pspdfkit.R.style.PSPDFKit_ContextualToolbar
+                );
+                int contextualToolbarIconsColor = a.getColor(com.pspdfkit.R.styleable.pspdf__ContextualToolbar_pspdf__iconsColor, ContextCompat.getColor(getContext(), android.R.color.white));
+                int contextualToolbarIconsColorActivated = a.getColor(com.pspdfkit.R.styleable.pspdf__ContextualToolbar_pspdf__iconsColorActivated, ContextCompat.getColor(getContext(), android.R.color.white));
+                a.recycle();
+                try {
+                    DrawableCompat.setTint(customIcon, contextualToolbarIconsColor);
+                } catch (Exception e) {
+                    // Omit the icon if the image is missing
+                }
+
+                ContextualToolbarMenuItem customItem = ContextualToolbarMenuItem.createSingleItem(
+                        getContext(),
+                        resId,
+                        customIcon,
+                        title,
+                        contextualToolbarIconsColor,
+                        contextualToolbarIconsColorActivated,
+                        buttonPosition,
+                        false);
+
+                toolbarMenuItems.add(customItem);
+                pendingFragmentActions.add(getCurrentPdfUiFragment()
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(pdfUiFragment -> {
+                            pdfUiFragment.registerForContextMenu(customItem);
+                        }));
+            }
+        }
+
+        List<Integer> resIds = new ArrayList();
+        for (ContextualToolbarMenuItem menuItem : toolbarMenuItems) {
+            resIds.add(menuItem.getId());
+        }
+        toolbarMenuItemListener.setTextSelectionResourceIds(resIds);
+        pdfViewModeController.setTextSelectionContextualMenu(toolbarMenuItems, retainSuggestedMenuItems, toolbarMenuItemListener);
+        pdfViewModeController.setTextSelectionStockActions(stockActions);
+
+        // A custom text selection contextual menu has been provided from React
+        // Native, so update the PdfActivityConfiguration to disable the popup
+        // menu and use the contextual TextSelectionToolbar instead.
+        configuration = new PdfActivityConfiguration.Builder(configuration)
+                .textSelectionPopupToolbarEnabled(false)
+                .build();
+        // Use the public setter to keep internal state in sync.
+        setConfiguration(configuration);
+        // If a fragment is already attached, update its configuration in place so
+        // the new text selection behavior takes effect without recreating it.
+        if (fragment != null) {
+            fragment.setConfiguration(configuration);
+        }
     }
 }

@@ -202,6 +202,27 @@ RCT_EXPORT_MODULE();
     });
 }
 
+- (void)executeAction:(nonnull NSString *)reference
+            requestId:(nonnull NSString *)requestId
+                allow:(BOOL)allow
+              resolve:(nonnull RCTPromiseResolveBlock)resolve
+               reject:(nonnull RCTPromiseRejectBlock)reject {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        RCTPSPDFKitView *view = [[NutrientViewRegistry shared] viewForId:reference];
+        if (!view) {
+            reject(ERR_VIEW_NOT_FOUND, @"Fabric view not found for reference", [self _makeErrorWithCode:ERR_VIEW_NOT_FOUND message:@"Fabric view not found for reference"]);
+            return;
+        }
+        
+        BOOL success = [view executePendingActionWithRequestId:requestId allow:allow];
+        if (success) {
+            resolve(@YES);
+        } else {
+            reject(ERR_OPERATION, @"executeAction failed", [self _makeErrorWithCode:ERR_OPERATION message:@"executeAction failed"]);
+        }
+    });
+}
+
 - (void)setMeasurementValueConfigurations:(nonnull NSString *)reference configurations:(nonnull NSArray *)configurations resolve:(nonnull RCTPromiseResolveBlock)resolve reject:(nonnull RCTPromiseRejectBlock)reject { 
     dispatch_async(dispatch_get_main_queue(), ^{
         RCTPSPDFKitView *view = [[NutrientViewRegistry shared] viewForId:reference];
