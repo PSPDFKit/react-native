@@ -1,3 +1,7 @@
+## 4.3.1 — 22 Apr 2026
+
+- Fixes a crash when setting the `toolbarPosition` without the Document Editor component in the Nutrient license. (J#HYB-991)
+
 ## 4.3.0 — 17 Mar 2026
 
 - Adds the `onShouldExecuteAction` callback and `executeAction` API to `NutrientView` to control whether an annotation action should execute. (J#HYB-926)

@@ -1,7 +1,6 @@
 import React from 'react';
 import { Alert, processColor, Text, TouchableOpacity, View } from 'react-native';
 import NutrientView, { PDFConfiguration } from '@nutrient-sdk/react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { exampleDocumentPath, pspdfkitColor } from '../configuration/Constants';
 import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
@@ -33,6 +32,7 @@ export class NutrientViewComponent extends BaseExampleAutoHidingHeaderComponent 
             iOSUseParentNavigationBar: false,
             iOSDocumentInfoOptions: [PDFConfiguration.IOSDocumentInfoOption.OUTLINE, PDFConfiguration.IOSDocumentInfoOption.ANNOTATIONS],
             androidEnableStylusOnDetection: false,
+            toolbarPosition: PDFConfiguration.ToolbarPosition.TOP,
           }}
           onReady={() => {
             console.log('NutrientView is ready');
