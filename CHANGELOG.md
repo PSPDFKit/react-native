@@ -1,3 +1,8 @@
+## 4.3.2 — 30 Apr 2026
+
+- Updated the `getConfiguration` API to return the current `toolbarPosition`. (J#HYB-991)
+- Fixes a crash that could occur during `NutrientView` initialization on iOS. (J#HYB-994)
+
 ## 4.3.1 — 22 Apr 2026
 
 - Fixes a crash when setting the `toolbarPosition` without the Document Editor component in the Nutrient license. (J#HYB-991)

@@ -126,6 +126,19 @@
 #define BookmarkSortOrderMap @{@"custom" : @(PSPDFBookmarkManagerSortOrderCustom), \
                                @"pageBased" : @(PSPDFBookmarkManagerSortOrderPageBased)} \
 
+static NSString *StringForPSPDFFlexibleToolbarPosition(PSPDFFlexibleToolbarPosition position) {
+    if (position == PSPDFFlexibleToolbarPositionTop) {
+        return @"top";
+    }
+    if (position == PSPDFFlexibleToolbarPositionLeft) {
+        return @"left";
+    }
+    if (position == PSPDFFlexibleToolbarPositionRight) {
+        return @"right";
+    }
+    return @"top";
+}
+
 @implementation RCTConvert (PSPDFConfiguration)
 
 + (PSPDFConfiguration *)PSPDFConfiguration:(id)json {
@@ -556,6 +569,15 @@ RCT_MULTI_ENUM_CONVERTER(PSPDFDocumentSharingPagesOptions,
 
     [convertedConfiguration setObject:[RCTConvert findKeyForValue:viewController.appearanceModeManager.appearanceMode 
                          inDictionary:AppearanceModeMap] forKey:@"appearanceMode"];
+
+    NSString *toolbarPosition = @"top";
+    if ([PSPDFKitGlobal isFeatureEnabled:PSPDFFeatureMaskAnnotationEditing]) {
+        PSPDFFlexibleToolbar *annotationToolbar = viewController.annotationToolbarController.annotationToolbar;
+        if (annotationToolbar != nil) {
+            toolbarPosition = StringForPSPDFFlexibleToolbarPosition(annotationToolbar.toolbarPosition);
+        }
+    }
+    [convertedConfiguration setObject:toolbarPosition forKey:@"toolbarPosition"];
     
     return convertedConfiguration;
 }

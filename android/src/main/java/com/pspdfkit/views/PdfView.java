@@ -869,6 +869,7 @@ public class PdfView extends FrameLayout {
 
     private void attachPdfFragmentListeners(final PdfUiFragment pdfUiFragment) {
         pdfUiFragment.setOnContextualToolbarLifecycleListener(pdfViewModeController);
+        pdfUiFragment.setOnContextualToolbarMovementListener(pdfViewModeController);
         pdfUiFragment.getPSPDFKitViews().getFormEditingBarView().addOnFormEditingBarLifecycleListener(pdfViewModeController);
         ((ReactPdfUiFragment) pdfUiFragment).setReactPdfUiFragmentListener(new ReactPdfUiFragment.ReactPdfUiFragmentListener() {
             @Override
@@ -1345,6 +1346,11 @@ public class PdfView extends FrameLayout {
             config.put("enableAnnotationEditing", fragment.getConfiguration().getConfiguration().isAnnotationEditingEnabled());
             config.put("enableFormEditing", fragment.getConfiguration().getConfiguration().isFormEditingEnabled());
             config.put("androidShowAnnotationListAction", fragment.getConfiguration().isAnnotationListEnabled());
+
+            {
+                String pos = getToolbarPosition();
+                config.put("toolbarPosition", pos != null ? pos : "top");
+            }
 
             return config;
         } catch (Exception e) {

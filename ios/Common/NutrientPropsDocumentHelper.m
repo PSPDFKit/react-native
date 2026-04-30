@@ -23,18 +23,25 @@
 
 @implementation NutrientPropsDocumentHelper
 
-+ (void)applyDocumentFromJSON:(id)json remoteDocumentConfig:(NSDictionary *)remoteDocumentConfig toView:(RCTPSPDFKitView *)view usingManager:(PDFDocumentManager *)manager withReference:(NSNumber *)identifier {
++ (void)applyDocumentFromJSON:(id)json remoteDocumentConfig:(NSDictionary * _Nullable)remoteDocumentConfig toView:(RCTPSPDFKitView *)view usingManager:(PDFDocumentManager * _Nullable)manager withReference:(NSNumber *)identifier {
 	if (!json) { return; }
 	view.pdfController.document = [RCTConvert PSPDFDocument:json
 									 remoteDocumentConfig:remoteDocumentConfig];
 	view.pdfController.document.delegate = (id<PSPDFDocumentDelegate>)view;
 
 #if RCT_NEW_ARCH_ENABLED
-	[manager setDocument:view.pdfController.document reference:identifier];
+	[PDFDocumentStore setDocument:view.pdfController.document reference:identifier];
+	[PDFDocumentStore setView:view forReference:identifier];
+    [PDFDocumentStore setDelegate:(id<PDFDocumentManagerDelegate>)view forReference:identifier];
 #else
+    NSCParameterAssert(manager != nil);
+    if (manager == nil) {
+        return;
+    }
     [manager setDocument:view.pdfController.document reference:view.reactTag];
+    [manager setView:view forReference:view.reactTag];
+    [manager setDelegate:(id<PDFDocumentManagerDelegate>)view];
 #endif
-	[manager setDelegate:(id<PDFDocumentManagerDelegate>)view];
 
 	if (view.annotationAuthorName) {
 		view.pdfController.document.defaultAnnotationUsername = view.annotationAuthorName;

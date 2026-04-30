@@ -44,7 +44,9 @@ import javax.annotation.Nullable;
  */
 class PdfViewModeController implements
     TextSelectionManager.OnTextSelectionModeChangeListener, TextSelectionManager.OnTextSelectionChangeListener,
-    ToolbarCoordinatorLayout.OnContextualToolbarLifecycleListener, FormEditingBar.OnFormEditingBarLifecycleListener {
+    ToolbarCoordinatorLayout.OnContextualToolbarLifecycleListener,
+    ToolbarCoordinatorLayout.OnContextualToolbarMovementListener,
+    FormEditingBar.OnFormEditingBarLifecycleListener {
 
     private final PdfView parent;
 
@@ -135,7 +137,9 @@ class PdfViewModeController implements
         // Apply toolbar position configuration
         String toolbarPosition = parent.getToolbarPosition();
         com.facebook.react.bridge.ReadableArray supportedPositions = parent.getSupportedToolbarPositions();
-        
+
+        ToolbarCoordinatorLayout.LayoutParams.Position appliedPosition = null;
+
         if (toolbarPosition != null || supportedPositions != null) {
             ToolbarCoordinatorLayout.LayoutParams.Position position = null;
             EnumSet<ToolbarCoordinatorLayout.LayoutParams.Position> supportedPositionsSet = null;
@@ -179,13 +183,18 @@ class PdfViewModeController implements
                 
                 // Create and set LayoutParams with position and supported positions
                 contextualToolbar.setLayoutParams(new ToolbarCoordinatorLayout.LayoutParams(finalPosition, supportedPositionsSet));
+                appliedPosition = finalPosition;
             } else if (position != null) {
                 // Only position is set, use setPosition method
                 contextualToolbar.setPosition(position);
+                appliedPosition = position;
             }
         }
-        
+
         if (contextualToolbar instanceof AnnotationCreationToolbar) {
+            if (appliedPosition != null) {
+                parent.setToolbarPosition(toolbarPositionString(appliedPosition));
+            }
             if (itemGroupingRule != null) {
                 contextualToolbar.setMenuItemGroupingRule(itemGroupingRule);
             }
@@ -263,8 +272,29 @@ class PdfViewModeController implements
         }
     }
 
+    private static String toolbarPositionString(@NonNull ToolbarCoordinatorLayout.LayoutParams.Position position) {
+        if (position == ToolbarCoordinatorLayout.LayoutParams.Position.TOP) {
+            return "top";
+        }
+        if (position == ToolbarCoordinatorLayout.LayoutParams.Position.LEFT) {
+            return "left";
+        }
+        if (position == ToolbarCoordinatorLayout.LayoutParams.Position.RIGHT) {
+            return "right";
+        }
+        return "top";
+    }
+
+    private void syncToolbarPositionFromContextualToolbar(@NonNull ContextualToolbar contextualToolbar) {
+        ToolbarCoordinatorLayout.LayoutParams.Position position = contextualToolbar.getPosition();
+        if (position != null) {
+            parent.setToolbarPosition(toolbarPositionString(position));
+        }
+    }
+
     @Override
     public void onDisplayContextualToolbar(@NonNull ContextualToolbar contextualToolbar) {
+        syncToolbarPositionFromContextualToolbar(contextualToolbar);
         if (contextualToolbar instanceof AnnotationCreationToolbar) {
             annotationCreationActive = true;
         }
@@ -277,6 +307,7 @@ class PdfViewModeController implements
 
     @Override
     public void onRemoveContextualToolbar(@NonNull ContextualToolbar contextualToolbar) {
+        syncToolbarPositionFromContextualToolbar(contextualToolbar);
         if (contextualToolbar instanceof AnnotationCreationToolbar) {
             annotationCreationActive = false;
         }
@@ -285,6 +316,21 @@ class PdfViewModeController implements
         }
 
         parent.updateState();
+    }
+
+    @Override
+    public void onDragContextualToolbar(@NonNull ContextualToolbar contextualToolbar, int dx, int dy) {
+        syncToolbarPositionFromContextualToolbar(contextualToolbar);
+    }
+
+    @Override
+    public void onAttachContextualToolbar(@NonNull ContextualToolbar contextualToolbar) {
+        syncToolbarPositionFromContextualToolbar(contextualToolbar);
+    }
+
+    @Override
+    public void onDetachContextualToolbar(@NonNull ContextualToolbar contextualToolbar) {
+        syncToolbarPositionFromContextualToolbar(contextualToolbar);
     }
 
     @Override

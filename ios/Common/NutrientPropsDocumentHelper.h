@@ -16,7 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)applyDocumentFromJSON:(id)json
          remoteDocumentConfig:(nullable NSDictionary *)remoteDocumentConfig
                        toView:(RCTPSPDFKitView *)view
-                 usingManager:(PDFDocumentManager *)manager
+                 usingManager:(nullable PDFDocumentManager *)manager
                 withReference:(NSNumber *)identifier;
 
 + (void)applyPageIndexFromJSON:(id)json
