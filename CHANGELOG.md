@@ -1,3 +1,7 @@
+## 4.3.3 — 29 May 2026
+
+- Adds an Expo config plugin for Android that applies a theme to prevent `InvalidThemeException` in Expo managed apps. (J#HYB-995)
+
 ## 4.3.2 — 30 Apr 2026
 
 - Updated the `getConfiguration` API to return the current `toolbarPosition`. (J#HYB-991)

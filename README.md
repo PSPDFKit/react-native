@@ -53,6 +53,41 @@ Nutrient.setLicenseKey('YOUR_REACT_NATIVE_LICENSE_KEY_GOES_HERE');
 
 To install the Nutrient React Native SDK, run `yarn add @nutrient-sdk/react-native` in your project directory or `npm install @nutrient-sdk/react-native` if you’re using `npm`.
 
+### Expo config plugin (Android)
+
+When using Expo prebuild/dev client, add the package as a plugin so Android `AppTheme` is switched to a MaterialComponents-compatible theme:
+
+```js
+// app.config.js
+export default {
+  expo: {
+    plugins: ['@nutrient-sdk/react-native'],
+  },
+};
+```
+
+The plugin defaults to an edge-to-edge-friendly DayNight parent (`@style/NutrientRN.AppTheme`). You can override it:
+
+```js
+// app.config.js
+export default {
+  expo: {
+    plugins: [
+      [
+        '@nutrient-sdk/react-native',
+        {
+          androidThemePreset: 'fullNutrient',
+          // or provide a fully custom parent:
+          // androidAppThemeParent: '@style/YourCustomTheme',
+        },
+      ],
+    ],
+  },
+};
+```
+
+After updating app config, run `npx expo prebuild -p android` (or rebuild with EAS).
+
 ### Getting Started
 
 See our [Getting Started on React Native guide](https://www.nutrient.io/getting-started/react-native/?react-native-platform=android-ios&project=new-project) to integrate the SDK into your new or existing application, or follow the steps below:

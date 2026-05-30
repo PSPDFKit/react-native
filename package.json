@@ -1,6 +1,6 @@
 {
   "name": "@nutrient-sdk/react-native",
-  "version": "4.3.2",
+  "version": "4.3.3",
   "description": "Nutrient React Native SDK",
   "keywords": [
     "react native",
@@ -81,6 +81,8 @@
   },
 
   "files": [
+    "app.plugin.js",
+    "plugin/",
     "ios/",
     "android/",
     "lib/",

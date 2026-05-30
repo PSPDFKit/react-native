@@ -1,0 +1,14 @@
+<resources>
+    <!--
+      DayNight + MaterialComponents bridge app theme for Expo host activities.
+      This includes the required attributes validated by Nutrient theme checks.
+    -->
+    <style name="NutrientRN.AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar.Bridge">
+        <item name="colorPrimary">@color/pspdf__primaryLight</item>
+        <item name="colorPrimaryDark">@color/pspdf__onPrimaryContainerLight</item>
+        <item name="colorAccent">?colorPrimaryDark</item>
+        <item name="colorSecondary">@color/pspdf__primaryLight</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+</resources>
