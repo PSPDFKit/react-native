@@ -1,7 +1,7 @@
 package com.pspdfkit.react.helper
 
 import com.pspdfkit.LicenseFeature
-import com.pspdfkit.PSPDFKit
+import com.pspdfkit.Nutrient
 import com.pspdfkit.forms.ButtonFormElement
 import com.pspdfkit.forms.FormField
 import com.pspdfkit.forms.FormType
@@ -85,7 +85,7 @@ object FormUtils {
             is SignatureFormElement -> {
                 elementJSON["formTypeName"] = "signature"
                 // Only include signatureInfo if customer has the DS license
-                if (PSPDFKit.getLicenseFeatures().contains(LicenseFeature.DIGITAL_SIGNATURES)) {
+                if (Nutrient.getLicenseFeatures().contains(LicenseFeature.DIGITAL_SIGNATURES)) {
                     elementJSON["signatureInfo"] = mapOf(
                         "name" to (formElement.signatureInfo.name ?: ""),
                         "date" to (formElement.signatureInfo.creationDate?.toString() ?: ""),

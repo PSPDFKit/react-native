@@ -329,9 +329,17 @@ using namespace facebook::react;
 
       // Basic document props
       if (!newProps->document.empty()) {
-          _document = RCTNSStringFromString(newProps->document);
+          NSString *nextDocument = RCTNSStringFromString(newProps->document);
+          BOOL hasAppliedDocument = _document.length > 0 && _view.pdfController.document.isValid;
           NSNumber *reference = [NSNumber numberWithInteger:[self.nativeId integerValue]];
           NSDictionary *remoteConfig = jsonConfig[@"remoteDocumentConfiguration"];
+          if (hasAppliedDocument) {
+              // applyDocumentFromJSON rebuilds the document from disk on prop updates, which
+              // would drop committed-but-unsaved annotations. Skip the initial mount because
+              // there is no user work to preserve yet. (J#HYB-999)
+              [_view flushDirtyAnnotationsIfNeeded];
+          }
+          _document = nextDocument;
           [NutrientPropsDocumentHelper applyDocumentFromJSON:_document
                                           remoteDocumentConfig:remoteConfig
                                                         toView:_view

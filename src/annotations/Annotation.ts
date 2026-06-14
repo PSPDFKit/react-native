@@ -4,7 +4,8 @@
  * @memberof Annotation
  * @property {string} id The unique identifier for the custom annotation menu button. This will be used to identify the button in the ```onCustomAnnotationContextualMenuItemTapped``` callback. On Android the ID needs to be specified as a resource item inside your application's ```ids.xml``` file.
  * @property {string} image The image name (iOS) or resource ID (Android) for the toolbar button. Images must be included in the application bundle on iOS and specified as a drawable resource on Android. System image names can also be used on iOS, for example ```multiply.circle.fill```. On iOS the image will only be used if no title is specified.
- * @property {string} [title] The title of the toolbar button. If no title is set, the image will be used.
+ * @property {string} [title] The title of the toolbar button on iOS only. On React Native 4.4 and up, use `titleRes` to provide a string resource name for Android.
+ * @property {string} [titleRes] Android only. The string resource name (for example, `my_custom_menu_title`) defined in your app's `res/values/strings.xml`.
  * @property {boolean} [selectable] Whether the button should be selectable or not. If the button is selectable, it will remain highlighted after being tapped (Android only).
  */
 /**
@@ -17,7 +18,7 @@
  * @property { Annotation.ContextualMenuAppearance } [appearance] Specifies for which appearance mode this change should apply to (iOS only).
  * @property { Annotation.ContextualMenuItemPosition } [position] The position where the buttons should be added in the menu.
  */
-/**
+/** 
  * The object to customize the menu shown when selecting text.
  * @typedef TextSelectionContextualMenu
  * @memberof Annotation
@@ -295,8 +296,12 @@ export class Annotation {}
 export interface AnnotationContextualMenu {
  /**
   * The annotation menu items to display when an annotation is selected.
+   *
+   * This can be a mix of:
+   * - stock annotation editing actions (see {@link Annotation.TextSelectionMenuItem})
+   * - custom menu item objects ({@link AnnotationContextualMenuItem})
   */
-  buttons: AnnotationContextualMenuItem[];
+  buttons: Array<AnnotationContextualMenuItem | Annotation.TextSelectionMenuItem>;
  /**
   * Specifies whether the Nutrient suggested annotation menu items should be retained when custom annotation menu items are set.
   */
@@ -350,13 +355,17 @@ export interface AnnotationContextualMenuItem {
   */
   id: string;
  /**
-  * The image name (iOS) or resource ID (Android) for the toolbar button. Images must be included in the application bundle on iOS and specified as a drawable resource on Android. System image names can also be used on iOS, for example ```multiply.circle.fill```. On iOS the image will only be used if no title is specified.
+ * The image name (iOS) or resource ID (Android) for the toolbar button. Images must be included in the application bundle on iOS and specified as a drawable resource on Android. System image names can also be used on iOS, for example ```multiply.circle.fill```. On iOS the image will only be used if no title is specified.
   */
   image: string;
  /**
-  * The title of the toolbar button. If no title is set, the image will be used.
+ * The title of the toolbar button on iOS. On React Native 4.4 and up, use `titleRes` to provide a string resource name for Android.
   */
   title?: string;
+ /**
+  * Android only. The string resource name (for example, `my_custom_menu_title`) defined in your app's `res/values/strings.xml`.
+  */
+  titleRes?: string;
  /**
   * Whether the button should be selectable or not. If the button is selectable, it will remain highlighted after being tapped (Android only).
   */
@@ -822,8 +831,9 @@ export namespace Annotation {
     } as const;
 
     /**
-     * The available stock text selection menu items that can be used inside
-     * {@link TextSelectionContextualMenu.buttons}.
+     * The available system menu item keys that can be used inside:
+     * - {@link TextSelectionContextualMenu.buttons}
+     * - {@link AnnotationContextualMenu.buttons}
      *
      * When using TypeScript, prefer these constants instead of raw strings:
      *
@@ -847,6 +857,10 @@ export namespace Annotation {
        */
       COPY: 'copy',
       /**
+       * The system "Cut" action.
+       */
+      CUT: 'cut',
+      /**
        * The system "Highlight" action.
        */
       HIGHLIGHT: 'highlight',
@@ -854,6 +868,10 @@ export namespace Annotation {
        * The system "Redact" action.
        */
       REDACTION: 'redaction',
+      /**
+       * The system "Color" action (opens the color/inspector flow).
+       */
+      COLOR: 'color',
       /**
        * The system "Speak" action (text-to-speech).
        */
@@ -870,6 +888,22 @@ export namespace Annotation {
        * The system "Link" action.
        */
       LINK: 'link',
+      /**
+       * The system "Undo" action.
+       */
+      UNDO: 'undo',
+      /**
+       * The system "Redo" action.
+       */
+      REDO: 'redo',
+      /**
+       * The system "Note" action.
+       */
+      NOTE: 'note',
+      /**
+       * The system "Delete" action.
+       */
+      DELETE: 'delete',
     } as const;
 
     /**

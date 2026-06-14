@@ -1,14 +1,13 @@
 package com.pspdfkit.views
 
 import android.content.Context
+import com.facebook.react.uimanager.UIManagerHelper
 import com.facebook.react.uimanager.events.EventDispatcher
 import com.pspdfkit.react.events.CustomAnnotationContextualMenuItemTappedEvent
-import com.pspdfkit.react.events.CustomTextSelectionContextualMenuItemTappedEvent
 import com.pspdfkit.ui.toolbar.ContextualToolbar
 import com.pspdfkit.ui.toolbar.ContextualToolbarMenuItem
-import com.pspdfkit.ui.toolbar.TextSelectionToolbar
 
-class ToolbarMenuItemListener: ContextualToolbar.OnMenuItemClickListener {
+class ToolbarMenuItemListener : ContextualToolbar.OnMenuItemClickListener {
 
     private var parent: PdfView? = null
     private var eventDispatcher: EventDispatcher? = null
@@ -16,7 +15,6 @@ class ToolbarMenuItemListener: ContextualToolbar.OnMenuItemClickListener {
     private var fabricDelegate: PdfView.PdfViewDelegate? = null
     private var context: Context? = null
     private var annotationResourceIds: List<Int> = emptyList()
-    private var textSelectionResourceIds: List<Int> = emptyList()
 
     constructor(parent: PdfView, eventDispatcher: EventDispatcher, context: Context) {
         this.parent = parent
@@ -24,7 +22,13 @@ class ToolbarMenuItemListener: ContextualToolbar.OnMenuItemClickListener {
         this.context = context
     }
 
-    constructor(parent: PdfView, eventDispatcher: EventDispatcher, context: Context, isFabricMode: Boolean, fabricDelegate: PdfView.PdfViewDelegate?) {
+    constructor(
+        parent: PdfView,
+        eventDispatcher: EventDispatcher,
+        context: Context,
+        isFabricMode: Boolean,
+        fabricDelegate: PdfView.PdfViewDelegate?,
+    ) {
         this.parent = parent
         this.eventDispatcher = eventDispatcher
         this.context = context
@@ -36,37 +40,27 @@ class ToolbarMenuItemListener: ContextualToolbar.OnMenuItemClickListener {
         this.annotationResourceIds = resIds
     }
 
-    fun setTextSelectionResourceIds(resIds: List<Int>) {
-        this.textSelectionResourceIds = resIds
+    fun setEventDispatcher(eventDispatcher: EventDispatcher) {
+        this.eventDispatcher = eventDispatcher
     }
 
     override fun onToolbarMenuItemClick(toolbar: ContextualToolbar<*>, menuItem: ContextualToolbarMenuItem): Boolean {
         val id = menuItem.id
-        val isAnnotationCustom = annotationResourceIds.contains(id)
-        val isTextSelectionCustom = textSelectionResourceIds.contains(id)
-
-        if (!isAnnotationCustom && !isTextSelectionCustom) {
+        if (!annotationResourceIds.contains(id)) {
             return false
         }
 
         val resourceName: String = context?.resources?.getResourceEntryName(id) ?: return false
-        val isTextSelection = isTextSelectionCustom
 
         if (isFabricMode && fabricDelegate != null && parent != null) {
-            if (isTextSelection) {
-                fabricDelegate!!.onCustomTextSelectionContextualMenuItemTapped(resourceName)
-            } else {
-                fabricDelegate!!.onCustomAnnotationContextualMenuItemTapped(resourceName)
-            }
+            fabricDelegate!!.onCustomAnnotationContextualMenuItemTapped(resourceName)
         } else {
-            val viewId = parent?.id ?: return false
-            val event =
-                if (isTextSelection) {
-                    CustomTextSelectionContextualMenuItemTappedEvent(viewId, resourceName)
-                } else {
-                    CustomAnnotationContextualMenuItemTappedEvent(viewId, resourceName)
-                }
-            eventDispatcher!!.dispatchEvent(event)
+            val parentView = parent ?: return false
+            val viewId = parentView.id
+            val surfaceId = UIManagerHelper.getSurfaceId(parentView)
+            eventDispatcher!!.dispatchEvent(
+                CustomAnnotationContextualMenuItemTappedEvent(surfaceId, viewId, resourceName),
+            )
         }
 
         return true

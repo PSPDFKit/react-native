@@ -35,12 +35,18 @@ public final class NutrientPropsAnnotationsHelper {
     }
 
     public static void applyTextSelectionContextualMenu(@NonNull PdfView view, @Nullable ReadableMap textSelectionContextualMenu) {
-        if (textSelectionContextualMenu == null) return;
+        if (textSelectionContextualMenu == null) {
+            view.clearTextSelectionPopupMenu();
+            return;
+        }
         view.setTextSelectionToolbarMenuButtonItems(textSelectionContextualMenu);
     }
 
     public static void applyTextSelectionContextualMenuJSONString(@NonNull PdfView view, @Nullable String textSelectionContextualMenuJSONString) {
-        if (textSelectionContextualMenuJSONString == null || textSelectionContextualMenuJSONString.isEmpty()) return;
+        if (textSelectionContextualMenuJSONString == null || textSelectionContextualMenuJSONString.isEmpty()) {
+            view.clearTextSelectionPopupMenu();
+            return;
+        }
         try {
             JSONObject jsonObject = new JSONObject(textSelectionContextualMenuJSONString);
             Map<String, Object> map = JsonHelpers.toMap(jsonObject);

@@ -15,7 +15,7 @@
  *   Contains gradle configuration constants
  */
 ext {
-    NUTRIENT_VERSION = '11.1.1'
+    NUTRIENT_VERSION = '11.3.0'
 }
 
 buildscript {
@@ -122,15 +122,9 @@ android {
     }
 }
 
-configurations.all {
-    resolutionStrategy {
-        force "androidx.compose.foundation:foundation:1.9.4"
-        force "androidx.compose.ui:ui:1.9.4"
-        force "androidx.compose.runtime:runtime:1.9.4"
-        force "androidx.compose.material:material:1.9.4"
-        force "androidx.compose.material3:material3:1.4.0"
-    }
-}
+// IMPORTANT: Do not force Compose runtime versions here.
+// Nutrient bundles/depends on a specific Compose runtime; forcing a mismatched version can lead to runtime
+// NoSuchMethodError crashes (e.g. androidx.compose.runtime.Updater init-impl).
 
 dependencies {
     api("io.nutrient:nutrient:${NUTRIENT_VERSION}") {
@@ -149,11 +143,7 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-rx3:1.7.3"
 
-    // Explicitly declare Compose Foundation to ensure version 1.9.4 (matches PSPDFKit SDK)
-    implementation "androidx.compose.foundation:foundation:1.9.4"
-
-    // Let PSPDFKit SDK manage Compose versions - only specify lifecycle-viewmodel-compose to match SDK requirement
-    implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.9.4"
+    // Let Nutrient manage Compose versions.
 
     // AI Assistant dependencies
     implementation("io.noties.markwon:core:4.6.2")

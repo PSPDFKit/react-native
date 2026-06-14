@@ -1,144 +1,118 @@
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Alert, Linking, Switch, Text, TextInput, View } from 'react-native';
 
+import { NutrientInstantView, Toolbar } from '@nutrient-sdk/react-native';
 import PrimaryButton from '../components/primaryButton';
 import UrlInput from '../components/urlInput';
 import { pspdfkitColor } from '../configuration/Constants';
 import { loadDocument } from '../helpers/api/ApiClient';
-import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
-import { Nutrient } from '../helpers/Nutrient';
+import { useBaseExampleAutoHidingHeader } from '../helpers/ExampleScreenLayoutHelpers';
 import defaultStyles from '../styles/styles';
 
-export default class InstantSynchronization extends BaseExampleAutoHidingHeaderComponent {
-  subscription = null;
-  constructor(props: any) {
-    super(props);
-    this.state = {
-      shouldListenForChanges: true,
-      documentURL: '',
-      areCommentsEnabled: false,
-      isUrlInputPresented: false,
-      syncAnnotations: true,
-    };
-  }
+export default function InstantSynchronization({ navigation }: any) {
+  useBaseExampleAutoHidingHeader(navigation);
+  const [documentURL, setDocumentURL] = useState('');
+  const [isUrlInputPresented, setIsUrlInputPresented] = useState(false);
+  const [instantDocument, setInstantDocument] = useState<any>(null);
 
-  updateSyncDelay = async (delayValue: string) => {
-    this.setState({ delay: delayValue });
-  };
+  const syncHeaderVisibility = useCallback(() => {
+    if (!navigation) return;
+    navigation.setOptions({
+      headerShown: true,
+    });
+  }, [navigation]);
 
-  openInstantLink = async () => {
+  useEffect(() => {
+    syncHeaderVisibility();
+  }, [syncHeaderVisibility, instantDocument]);
+
+  const openInstantLink = async () => {
     await Linking.openURL('https://www.nutrient.io/demo/instant-collaboration');
   };
 
-  toggleOption = (type: string) => {
+  const toggleOption = (type: string) => {
     switch (type) {
-      case 'shouldListenForChanges':
-        return this.setState({
-          shouldListenForChanges: !this.state.shouldListenForChanges,
-        });
-
-      case 'areCommentsEnabled':
-        return this.setState({
-          areCommentsEnabled: !this.state.areCommentsEnabled,
-        });
-
       case 'isUrlInputPresented':
-        return this.setState({
-          isUrlInputPresented: !this.state.isUrlInputPresented,
-        });
+        setIsUrlInputPresented(value => !value);
+        return;
       default:
         return;
     }
   };
 
-  onCloseModal = () => {
-    this.setState({
-      isUrlInputPresented: false,
-    });
+  const onCloseModal = () => {
+    setIsUrlInputPresented(false);
   };
 
-  onConnect = async (url: any) => {
-    // Load Instant Document from URL
-    this.setState({ documentURL: url });
+  const onConnect = async (url: any) => {
+    setDocumentURL(url);
     try {
-      this.onCloseModal();
+      onCloseModal();
       const response = await loadDocument(url);
-      const documentData = {
+      setInstantDocument({
         serverUrl: response.serverUrl,
         jwt: response.jwt,
-      };
-      Nutrient.presentInstant(documentData, {
-        enableInstantComments: this.state.areCommentsEnabled,
-        listenToServerChanges: this.state.shouldListenForChanges,
-        delay: this.state.delay ?? '1',
-        syncAnnotations: this.state.syncAnnotations ?? true,
-      }).then(async () => {
-        console.log('Presented Instant Document');
       });
     } catch (error: any) {
       Alert.alert('Nutrient', error.message);
     }
   };
 
-  override render() {
+  if (instantDocument) {
     return (
-      <View style={styles.container}>
-        <UrlInput
-          shouldRender={this.state.isUrlInputPresented}
-          onCancel={this.onCloseModal}
-          defaultURL={''}
-          placeholder={'Enter Document URL'}
-          onConnect={(url: any) => this.onConnect(url)}
-        />
-        <View>
-          <Text style={defaultStyles.text}>
-            Copy the collaboration URL from{' '}
-            <Text style={defaultStyles.linkText} onPress={this.openInstantLink}>
-              https://www.nutrient.io/demo/instant-collaboration
-            </Text>{' '}
-            to connect to the document shown in your browser:
-          </Text>
-          <PrimaryButton
-            title={'Enter Document URL'}
-            style={styles.bottomMargin}
-            onPress={() => this.toggleOption('isUrlInputPresented')}
-          />
-        </View>
-        <View style={styles.delayContainer}>
-          <Text style={defaultStyles.text}>
-            Delay for syncing local changes:{' '}
-          </Text>
-          <TextInput
-            onChangeText={text => this.updateSyncDelay(text)}
-            style={defaultStyles.textInput}
-            keyboardType={'numeric'}
-          />
-        </View>
-        <View style={defaultStyles.horizontalContainer}>
-          <Text style={[defaultStyles.text, defaultStyles.flex]}>
-            Listen to server changes:{' '}
-          </Text>
-          <Switch
-            value={this.state.shouldListenForChanges}
-            trackColor={{ false: '#767577', true: pspdfkitColor }}
-            onValueChange={() => {
-              this.toggleOption('shouldListenForChanges');
-            }}
-          />
-        </View>
-        <View style={defaultStyles.horizontalContainer}>
-          <Text style={[defaultStyles.text, defaultStyles.flex]}>
-            Enable comments:{' '}
-          </Text>
-          <Switch
-            trackColor={{ false: '#767577', true: pspdfkitColor }}
-            value={this.state.areCommentsEnabled}
-            onValueChange={() => this.toggleOption('areCommentsEnabled')}
-          />
-        </View>
-      </View>
+      <NutrientInstantView
+        style={{ flex: 1 }}
+        documentInfo={instantDocument}
+        configuration={{
+          userInterfaceViewMode: 'alwaysVisible',
+          iOSUseParentNavigationBar: true,
+          androidRemoveStatusBarOffset: true,
+        }}
+        toolbar={{
+          rightBarButtonItems: {
+            viewMode: Toolbar.PDFViewMode.VIEW_MODE_DOCUMENT,
+            animated: true,
+            buttons: [
+              Toolbar.DefaultToolbarButton.SEARCH_BUTTON_ITEM,
+              Toolbar.DefaultToolbarButton.ANNOTATION_BUTTON_ITEM,
+            ],
+          },
+          toolbarMenuItems: {
+            buttons: [
+              Toolbar.DefaultToolbarButton.SEARCH_BUTTON_ITEM,
+              Toolbar.DefaultToolbarButton.ANNOTATION_BUTTON_ITEM,
+            ],
+          },
+        }}
+      />
     );
   }
+
+  return (
+    <View style={styles.container}>
+      <UrlInput
+        shouldRender={isUrlInputPresented}
+        onCancel={onCloseModal}
+        defaultURL={documentURL}
+        placeholder={'Enter Document URL'}
+        onConnect={onConnect}
+      />
+      <View>
+        <Text style={defaultStyles.text}>
+          Copy the collaboration URL from{' '}
+          <Text style={defaultStyles.linkText} onPress={openInstantLink}>
+            https://www.nutrient.io/demo/instant-collaboration
+          </Text>{' '}
+          to connect to the document shown in your browser:
+        </Text>
+        <PrimaryButton
+          title={'Enter Document URL'}
+          style={styles.bottomMargin}
+          onPress={() => toggleOption('isUrlInputPresented')}
+        />
+      </View>
+    </View>
+  );
 }
 
 const styles = {

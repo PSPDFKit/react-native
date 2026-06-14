@@ -14,28 +14,21 @@
 package com.pspdfkit.views;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 
 import androidx.annotation.NonNull;
 
 import com.pspdfkit.datastructures.TextSelection;
 import com.pspdfkit.react.NutrientNotificationCenter;
-import com.pspdfkit.react.menu.AnnotationContextualToolbarGroupingRule;
-import com.pspdfkit.react.menu.ContextualToolbarMenuItemConfig;
 import com.pspdfkit.ui.forms.FormEditingBar;
 import com.pspdfkit.ui.special_mode.controller.TextSelectionController;
 import com.pspdfkit.ui.special_mode.manager.TextSelectionManager;
-import com.pspdfkit.ui.toolbar.AnnotationCreationToolbar;
-import com.pspdfkit.ui.toolbar.AnnotationEditingToolbar;
+import com.pspdfkit.ui.toolbar.AnnotationToolbar;
 import com.pspdfkit.ui.toolbar.ContextualToolbar;
-import com.pspdfkit.ui.toolbar.ContextualToolbarMenuItem;
 import com.pspdfkit.ui.toolbar.ToolbarCoordinatorLayout;
 import com.pspdfkit.ui.toolbar.grouping.MenuItemGroupingRule;
 
-import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 import javax.annotation.Nullable;
 
@@ -51,24 +44,11 @@ class PdfViewModeController implements
     private final PdfView parent;
 
     private boolean annotationCreationActive = false;
-    private boolean annotationEditingActive = false;
     private boolean textSelectionActive = false;
     private boolean formEditingActive = false;
 
     @Nullable
     private MenuItemGroupingRule itemGroupingRule;
-
-    // Annotation selection contextual menu configuration (legacy behavior).
-    private ContextualToolbarMenuItemConfig annotationSelectionMenuConfig;
-
-    // Text selection contextual menu configuration (React-driven).
-    @Nullable
-    private List<ContextualToolbarMenuItem> textSelectionCustomItems;
-    private boolean textSelectionRetainSuggestedMenuItems = true;
-    @Nullable
-    private ToolbarMenuItemListener textSelectionToolbarMenuItemListener;
-    @Nullable
-    private List<String> textSelectionStockActions;
 
     PdfViewModeController(@NonNull PdfView parent) {
         this.parent = parent;
@@ -79,31 +59,6 @@ class PdfViewModeController implements
      */
     public void setMenuItemGroupingRule(@Nullable MenuItemGroupingRule groupingRule) {
         this.itemGroupingRule = groupingRule;
-    }
-
-    /**
-     * Sets the annotation menu items used when an annotation is selected.
-     */
-    public void setAnnotationSelectionMenuConfig(ContextualToolbarMenuItemConfig annotationSelectionMenuConfig) {
-        this.annotationSelectionMenuConfig = annotationSelectionMenuConfig;
-    }
-
-    /**
-     * Sets the text selection contextual menu configuration used when text is selected.
-     */
-    public void setTextSelectionContextualMenu(@Nullable List<ContextualToolbarMenuItem> customItems,
-                                               boolean retainSuggestedMenuItems,
-                                               @Nullable ToolbarMenuItemListener listener) {
-        this.textSelectionCustomItems = customItems;
-        this.textSelectionRetainSuggestedMenuItems = retainSuggestedMenuItems;
-        this.textSelectionToolbarMenuItemListener = listener;
-    }
-
-    /**
-     * Sets the stock text selection actions (by key) that should be retained.
-     */
-    public void setTextSelectionStockActions(@Nullable List<String> stockActions) {
-        this.textSelectionStockActions = stockActions;
     }
 
     @Override
@@ -118,10 +73,6 @@ class PdfViewModeController implements
 
     boolean isAnnotationCreationActive() {
         return annotationCreationActive;
-    }
-
-    boolean isAnnotationEditingActive() {
-        return annotationEditingActive;
     }
 
     boolean isTextSelectionActive() {
@@ -191,83 +142,12 @@ class PdfViewModeController implements
             }
         }
 
-        if (contextualToolbar instanceof AnnotationCreationToolbar) {
+        if (contextualToolbar instanceof AnnotationToolbar) {
             if (appliedPosition != null) {
                 parent.setToolbarPosition(toolbarPositionString(appliedPosition));
             }
             if (itemGroupingRule != null) {
                 contextualToolbar.setMenuItemGroupingRule(itemGroupingRule);
-            }
-        }
-        if (contextualToolbar instanceof AnnotationEditingToolbar) {
-            if (this.annotationSelectionMenuConfig != null) {
-                List<ContextualToolbarMenuItem> annotationSelectionMenuItems = this.annotationSelectionMenuConfig.getAnnotationSelectionMenuItems();
-                boolean retainSuggestedMenuItems = this.annotationSelectionMenuConfig.getRetainSuggestedMenuItems();
-
-                if (annotationSelectionMenuItems != null) {
-                    final List<ContextualToolbarMenuItem> menuItems = ((AnnotationEditingToolbar) contextualToolbar).getMenuItems();
-                    List<ContextualToolbarMenuItem> newList = new ArrayList<>(menuItems);
-                    newList.addAll(annotationSelectionMenuItems);
-                    contextualToolbar.setMenuItemGroupingRule(new AnnotationContextualToolbarGroupingRule(contextualToolbar.getContext(), annotationSelectionMenuItems));
-                    contextualToolbar.setMenuItems(retainSuggestedMenuItems ? newList : annotationSelectionMenuItems);
-                }
-                contextualToolbar.setOnMenuItemClickListener(this.annotationSelectionMenuConfig.getToolbarMenuItemListener());
-            }
-        }
-        if (contextualToolbar instanceof com.pspdfkit.ui.toolbar.TextSelectionToolbar) {
-            if (this.textSelectionCustomItems != null) {
-                final List<ContextualToolbarMenuItem> currentItems = contextualToolbar.getMenuItems();
-                List<ContextualToolbarMenuItem> baseItems = new ArrayList<>();
-
-                boolean hasStockActions = textSelectionStockActions != null && !textSelectionStockActions.isEmpty();
-
-                if (textSelectionRetainSuggestedMenuItems) {
-                    // Keep all default suggested items; ignore any stock string filtering.
-                    baseItems.addAll(currentItems);
-                } else if (hasStockActions) {
-                    // Suggested items disabled, but specific stock actions requested as strings:
-                    // filter the current items down to only those stock actions.
-                    Set<Integer> allowedIds = new HashSet<>();
-                    for (String key : textSelectionStockActions) {
-                        if ("copy".equals(key)) {
-                            allowedIds.add(com.pspdfkit.R.id.pspdf__text_selection_toolbar_item_copy);
-                        } else if ("highlight".equals(key)) {
-                            allowedIds.add(com.pspdfkit.R.id.pspdf__text_selection_toolbar_item_highlight);
-                        } else if ("redaction".equals(key) || "redact".equals(key)) {
-                            allowedIds.add(com.pspdfkit.R.id.pspdf__text_selection_toolbar_item_redact);
-                        } else if ("speak".equals(key)) {
-                            allowedIds.add(com.pspdfkit.R.id.pspdf__text_selection_toolbar_item_speak);
-                        } else if ("search".equals(key)) {
-                            allowedIds.add(com.pspdfkit.R.id.pspdf__text_selection_toolbar_item_search);
-                        } else if ("share".equals(key)) {
-                            allowedIds.add(com.pspdfkit.R.id.pspdf__text_selection_toolbar_item_share);
-                        } else if ("link".equals(key)) {
-                            allowedIds.add(com.pspdfkit.R.id.pspdf__text_selection_toolbar_item_link);
-                        }
-                    }
-
-                    for (ContextualToolbarMenuItem item : currentItems) {
-                        if (allowedIds.contains(item.getId())) {
-                            baseItems.add(item);
-                        }
-                    }
-                } // else: retainSuggestedMenuItems == false and no stock actions -> baseItems stays empty
-
-                List<ContextualToolbarMenuItem> finalItems = new ArrayList<>();
-                finalItems.addAll(baseItems);
-
-                // Append custom items if they are not already present.
-                for (ContextualToolbarMenuItem customItem : textSelectionCustomItems) {
-                    if (!finalItems.contains(customItem)) {
-                        finalItems.add(customItem);
-                    }
-                }
-
-                contextualToolbar.setMenuItems(finalItems);
-            }
-
-            if (this.textSelectionToolbarMenuItemListener != null) {
-                contextualToolbar.setOnMenuItemClickListener(this.textSelectionToolbarMenuItemListener);
             }
         }
     }
@@ -295,11 +175,8 @@ class PdfViewModeController implements
     @Override
     public void onDisplayContextualToolbar(@NonNull ContextualToolbar contextualToolbar) {
         syncToolbarPositionFromContextualToolbar(contextualToolbar);
-        if (contextualToolbar instanceof AnnotationCreationToolbar) {
+        if (contextualToolbar instanceof AnnotationToolbar) {
             annotationCreationActive = true;
-        }
-        if (contextualToolbar instanceof AnnotationEditingToolbar) {
-            annotationEditingActive = true;
         }
 
         parent.updateState();
@@ -308,11 +185,8 @@ class PdfViewModeController implements
     @Override
     public void onRemoveContextualToolbar(@NonNull ContextualToolbar contextualToolbar) {
         syncToolbarPositionFromContextualToolbar(contextualToolbar);
-        if (contextualToolbar instanceof AnnotationCreationToolbar) {
+        if (contextualToolbar instanceof AnnotationToolbar) {
             annotationCreationActive = false;
-        }
-        if (contextualToolbar instanceof AnnotationEditingToolbar) {
-            annotationEditingActive = false;
         }
 
         parent.updateState();

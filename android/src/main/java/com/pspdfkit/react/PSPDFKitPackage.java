@@ -129,6 +129,16 @@ public class PSPDFKitPackage extends BaseReactPackage {
             } catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException | InstantiationException | java.lang.reflect.InvocationTargetException | NoSuchMethodException e) {
                 // TurboModule not available
             }
+
+            try {
+                Class<?> instantViewTurboModuleClass = Class.forName("io.nutrient.react.turbo.NutrientInstantViewTurboModule");
+                Object instantViewTurboModuleConstant = instantViewTurboModuleClass.getField("NAME").get(null);
+                if (instantViewTurboModuleConstant.equals(name)) {
+                    return (NativeModule) instantViewTurboModuleClass.getConstructor(ReactApplicationContext.class).newInstance(reactContext);
+                }
+            } catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException | InstantiationException | java.lang.reflect.InvocationTargetException | NoSuchMethodException e) {
+                // TurboModule not available
+            }
         }
 
         // Handle regular NativeModules in both Old and New Architecture
@@ -230,6 +240,25 @@ public class PSPDFKitPackage extends BaseReactPackage {
                 } catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException e) {
                     // Should not happen if isNewArch is true
                 }
+
+                try {
+                    Class<?> instantViewTurboModuleClass = Class.forName("io.nutrient.react.turbo.NutrientInstantViewTurboModule");
+                    String instantViewTurboModuleName = (String) instantViewTurboModuleClass.getField("NAME").get(null);
+                    moduleInfos.put(
+                            instantViewTurboModuleName,
+                            new ReactModuleInfo(
+                                    instantViewTurboModuleName,
+                                    instantViewTurboModuleName,
+                                    false, // canOverrideExistingModule
+                                    false, // needsEagerInit
+                                    true,  // hasConstants
+                                    false, // isCxxModule
+                                    true   // isTurboModule
+                            )
+                    );
+                } catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException e) {
+                    // Should not happen if isNewArch is true
+                }
             } else {
                 moduleInfos.put(
                         "PSPDFKitModule",
@@ -267,13 +296,20 @@ public class PSPDFKitPackage extends BaseReactPackage {
         List<ViewManager> viewManagers = new ArrayList<>();
         viewManagers.add(new ReactPdfViewManager());
 
-        // Only add Fabric ViewManager if New Architecture is enabled
+        // Only add Fabric ViewManagers if New Architecture is enabled
         try {
             Class<?> fabricManagerClass = Class.forName("io.nutrient.react.fabric.ReactPdfViewManagerFabric");
             ViewManager fabricManager = (ViewManager) fabricManagerClass.getDeclaredConstructor().newInstance();
             viewManagers.add(fabricManager);
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | java.lang.reflect.InvocationTargetException | NoSuchMethodException e) {
             // Fabric ViewManager not available (Legacy Architecture)
+        }
+        try {
+            Class<?> instantFabricManagerClass = Class.forName("io.nutrient.react.fabric.ReactInstantPdfViewManagerFabric");
+            ViewManager instantFabricManager = (ViewManager) instantFabricManagerClass.getDeclaredConstructor().newInstance();
+            viewManagers.add(instantFabricManager);
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | java.lang.reflect.InvocationTargetException | NoSuchMethodException e) {
+            // Instant Fabric ViewManager not available (Legacy Architecture)
         }
 
         return viewManagers;

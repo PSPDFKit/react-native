@@ -6,7 +6,7 @@ import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.ReactContext
 import com.facebook.react.bridge.WritableArray
 import com.facebook.react.bridge.WritableMap
-import com.pspdfkit.PSPDFKit
+import com.pspdfkit.Nutrient
 import com.pspdfkit.analytics.AnalyticsClient
 import com.pspdfkit.annotations.Annotation
 import com.pspdfkit.bookmarks.Bookmark
@@ -341,11 +341,11 @@ object NutrientNotificationCenter {
     }
 
     fun analyticsEnabled() {
-        PSPDFKit.addAnalyticsClient(customAnalyticsClient)
+        Nutrient.addAnalyticsClient(customAnalyticsClient)
     }
 
     fun analyticsDisabled() {
-        PSPDFKit.removeAnalyticsClient(customAnalyticsClient)
+        Nutrient.removeAnalyticsClient(customAnalyticsClient)
     }
 
     fun analyticsReceived(event: String, attributes: Bundle?) {

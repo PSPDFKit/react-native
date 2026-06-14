@@ -214,17 +214,21 @@ public class AnnotationsConfigurationsConverter: NSObject {
                 }
                 break
             case DEFAULT_THICKNESS:
-                if let thickness = presets[key] as? NSNumber, thickness.floatValue >= 0 {
+                // `> 0`: zero is treated as "not set" (invisible stroke). Prevents callers
+                // — including the Fabric New-Architecture bridge, whose codegen produces
+                // `0.0` for unset `Double` props — from clobbering the style manager's
+                // persisted last-used value with a non-usable default.
+                if let thickness = presets[key] as? NSNumber, thickness.floatValue > 0 {
                     styleManager.setLastUsedValue(thickness, forProperty: #keyPath(Annotation.lineWidth), forKey: annotationTool)
                 }
                 break
             case DEFAULT_ALPHA:
-                if let alpha = presets[key] as? NSNumber, alpha.floatValue <= 1 {
+                if let alpha = presets[key] as? NSNumber, alpha.floatValue > 0, alpha.floatValue <= 1 {
                     styleManager.setLastUsedValue(alpha, forProperty: #keyPath(Annotation.alpha), forKey: annotationTool)
                 }
                 break
             case DEFAULT_TEXT_SIZE:
-                if let fontSize = presets[key] as? NSNumber, fontSize.floatValue >= 0 {
+                if let fontSize = presets[key] as? NSNumber, fontSize.floatValue > 0 {
                     styleManager.setLastUsedValue(fontSize, forProperty: #keyPath(FreeTextAnnotation.fontSize), forKey: annotationTool)
                 }
                 break

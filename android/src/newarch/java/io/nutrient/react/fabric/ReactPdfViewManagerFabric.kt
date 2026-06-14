@@ -11,6 +11,7 @@ package io.nutrient.react.fabric
 
 import android.app.Activity
 import android.util.Log
+import android.view.View
 import androidx.annotation.NonNull
 import androidx.annotation.Nullable
 import androidx.fragment.app.FragmentActivity
@@ -63,6 +64,19 @@ class ReactPdfViewManagerFabric : ViewGroupManager<PdfView>(), NutrientViewManag
     private var configuration: String? = null
     private var fragmentTag: String? = null
 
+    /**
+     * Fabric assigns the native React tag after [createViewInstance]; [UIManagerHelper.getEventDispatcher]
+     * must use that tag, not [View.NO_ID].
+     */
+    private fun refreshEventDispatcherForView(view: PdfView) {
+        if (view.id == View.NO_ID) return
+        val themed = view.context as? ThemedReactContext ?: return
+        val refreshed = UIManagerHelper.getEventDispatcher(themed, view.id) ?: return
+        if (refreshed === eventDispatcher) return
+        eventDispatcher = refreshed
+        view.replaceEventDispatcher(refreshed)
+    }
+
     override fun getDelegate(): BaseViewManagerDelegate<PdfView, ReactPdfViewManagerFabric> = delegate
 
     @NonNull
@@ -70,7 +84,6 @@ class ReactPdfViewManagerFabric : ViewGroupManager<PdfView>(), NutrientViewManag
 
     @NonNull
     override fun createViewInstance(@NonNull reactContext: ThemedReactContext): PdfView {
-        
         reference = 0
         document = null
         configuration = null
@@ -190,7 +203,6 @@ class ReactPdfViewManagerFabric : ViewGroupManager<PdfView>(), NutrientViewManag
     }
 
     override fun onDropViewInstance(view: PdfView) {
-        
         // Unregister using the view's componentReferenceId (the actual view being dropped)
         if (view.componentReferenceId != null && view.componentReferenceId != 0) {
             val viewReference = view.componentReferenceId.toString()
@@ -203,7 +215,6 @@ class ReactPdfViewManagerFabric : ViewGroupManager<PdfView>(), NutrientViewManag
             configuration = null
             fragmentTag = null
         } else {
-            Log.d(TAG, "onDropViewInstance: Preserving reference=${this.reference} (likely hot reload, will be reused for new view)")
             // Don't clear document/configuration/fragmentTag - they're still valid for the active view
         }
 
@@ -212,6 +223,7 @@ class ReactPdfViewManagerFabric : ViewGroupManager<PdfView>(), NutrientViewManag
 
     override fun onAfterUpdateTransaction(view: PdfView) {
         super.onAfterUpdateTransaction(view)
+        refreshEventDispatcherForView(view)
         this.fragmentTag?.let { view.setFragmentTag(it) }
         this.configuration?.let {
             NutrientPropsDocumentHelper.applyConfigurationJSONString(
@@ -367,6 +379,6 @@ class ReactPdfViewManagerFabric : ViewGroupManager<PdfView>(), NutrientViewManag
     }
 
     override fun setHideDefaultToolbar(view: PdfView, value: Boolean) {
-        // No-op. iOS only.
+        NutrientPropsDocumentHelper.applyHideDefaultToolbar(view, value)
     }
 }

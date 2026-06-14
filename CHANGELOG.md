@@ -1,3 +1,14 @@
+- Adds the `scrollOnEdgeTapEnabled` and `scrollOnEdgeTapMargin` configuration options on Android, toggles flipping pages when tapping the edges of the document. (J#HYB-1002)
+- Adds the `NutrientInstantView` component that can be used to embed a Nutrient Instant view as a react component. (J#HYB-913)
+- Updates both `annotationContextualMenu` and `textSelectionContextualMenu` menu's to support system button customization using the new popup toolbar on Android. (J#HYB-653)
+- Updates the deployment target to iOS 17. (J#IOS-1103)
+- Updates the minimum supported Kotlin version to 2.2.20.
+- Removes the deprecated React Native text selection configuration APIs `PDFConfiguration.IOSTextSelectionMode`, `iOSTextSelectionMode`, and `iOSTextSelectionShouldSnapToWord`. Use the default text selection behavior instead. (J#IOS-1104)
+- Updates the iOS annotation preset converter to ignore `defaultThickness`, `defaultAlpha`, and `defaultTextSize` values of `0`, which previously overwrote the SDK's persisted last-used styles. (J#HYB-997)
+- Fixes the iOS `textSelectionContextualMenu` so that `retainSuggestedMenuItems: false` again hides the suggested items on iOS 26, where system text services are no longer plain menu actions.
+- Fixes an issue on iOS where committed-but-unsaved annotations could be lost when re-applying configuration. (J#HYB-999)
+- Fixes an issue on iOS New Architecture where pencil, highlighter, eraser, and free-text default thickness, opacity, and text size were reset to SDK defaults on every `NutrientView` remount. (J#HYB-996)
+
 ## 4.3.3 — 29 May 2026
 
 - Adds an Expo config plugin for Android that applies a theme to prevent `InvalidThemeException` in Expo managed apps. (J#HYB-995)
