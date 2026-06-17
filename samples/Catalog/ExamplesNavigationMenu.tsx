@@ -277,17 +277,6 @@ export default [
         title: 'AI Assistant',
       });
     },
-  },
-  {
-    key: 'item26',
-    name: 'Switch Annotation Tools',
-    description:
-      'Switch between annotation creation tools without losing unsaved annotations. Toggle to compare a dynamic vs. static menuItemGrouping.',
-    action: (component: any) => {
-      extractFromAssetsIfMissing(exampleDocumentName, function () {
-        component.props.navigation.push('SwitchAnnotationTools');
-      });
-    },
   }
 ];
 

@@ -319,7 +319,6 @@ using namespace facebook::react;
     _view.componentID = [self.nativeId integerValue];
     
   auto newProps = std::static_pointer_cast<const NutrientViewProps>(props);
-  auto oldViewProps = std::static_pointer_cast<const NutrientViewProps>(oldProps);
   if (newProps != nullptr) {
       // Parse configuration first so remoteDocumentConfiguration is available when applying document
       NSDictionary *jsonConfig = nil;
@@ -328,16 +327,8 @@ using namespace facebook::react;
           jsonConfig = [NutrientFabricUtils dictionaryFromJSONString:_configurationJSONString];
       }
 
-      // Basic document props.
-      //
-      // Only (re)apply the document when the path actually changes. Fabric calls
-      // updateProps with the full prop set on every re-render, so applying the
-      // document unconditionally here would create a fresh PSPDFDocument and
-      // reload the controller on *any* prop change (e.g. a dynamic
-      // menuItemGrouping driven by React state), discarding unsaved in-memory
-      // annotations. Mirrors the document-identity guard used on Android.
-      BOOL documentChanged = (oldViewProps == nullptr) || (newProps->document != oldViewProps->document);
-      if (!newProps->document.empty() && documentChanged) {
+      // Basic document props
+      if (!newProps->document.empty()) {
           _document = RCTNSStringFromString(newProps->document);
           NSNumber *reference = [NSNumber numberWithInteger:[self.nativeId integerValue]];
           NSDictionary *remoteConfig = jsonConfig[@"remoteDocumentConfiguration"];
