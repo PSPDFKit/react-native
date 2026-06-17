@@ -25,6 +25,7 @@ import { ManualSave } from './examples/ManualSave';
 import Measurement from './examples/Measurement';
 import { OpenImageDocument } from './examples/OpenImageDocument';
 import { ProgrammaticAnnotations } from './examples/ProgrammaticAnnotations';
+import { SwitchAnnotationTools } from './examples/SwitchAnnotationTools';
 import { ProgrammaticFormFilling } from './examples/ProgrammaticFormFilling';
 import { NutrientViewComponent } from './examples/NutrientViewComponent';
 import { SaveAs } from './examples/SaveAs';
@@ -83,6 +84,10 @@ class Catalog extends React.Component {
             component={OpenRemoteDocument}
           />
           <Stack.Screen name="ManualSave" component={ManualSave} />
+          <Stack.Screen
+            name="SwitchAnnotationTools"
+            component={SwitchAnnotationTools}
+          />
           <Stack.Screen name="SaveAs" component={SaveAs} />
           <Stack.Screen name="EventListeners" component={EventListeners} />
           <Stack.Screen name="StateChange" component={StateChange} />
