@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION", "OVERRIDE_DEPRECATION")
+
 package com.pspdfkit.react
 
 import android.net.Uri
@@ -420,8 +422,7 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
                     val instantJSONArray = instantJSON.asArray()
                     val hasImageAnnotations = (0 until (instantJSONArray?.size() ?: 0)).any { i ->
                         val annotation = instantJSONArray?.getMap(i)
-                        val hashMap = annotation?.toHashMap() as? Map<String, Any>
-                        hashMap?.containsKey("imageAttachmentId") == true
+                        annotation?.toHashMap()?.containsKey("imageAttachmentId") == true
                     }
 
                     if (hasImageAnnotations) {
@@ -838,9 +839,8 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
                         { pdfFragment ->
                             try {
                                 pdfFragment.setSelectedAnnotations(annotationsToSelect)
-                                if (showContextualMenu) {
-                                    pdfFragment.enterAnnotationEditingMode(annotationsToSelect)
-                                }
+                                // Nutrient 11.3+: Annotation editing is handled by the annotation popup toolbar, which
+                                // is shown automatically for selected annotations when annotation editing is enabled.
                                 promise.resolve(true)
                             } catch (e: Exception) {
                                 promise.reject("selectAnnotations", e.message ?: "Failed to select annotations")
@@ -1241,7 +1241,7 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
 
                 // Get the full page text
                 val pageText = document.getPageText(pageIndex)
-                if (pageText == null || pageText.isEmpty()) {
+                if (pageText.isEmpty()) {
                     promise.resolve(Arguments.makeNativeArray(ArrayList<Map<String, Any>>()))
                     return
                 }

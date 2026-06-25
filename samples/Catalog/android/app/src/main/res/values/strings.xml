@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Catalog</string>
+    <string name="custom_annotation_item_title">Custom</string>
+    <string name="custom_text_item_title">Text Action</string>
 </resources>

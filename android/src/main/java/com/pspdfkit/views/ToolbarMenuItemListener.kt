@@ -6,9 +6,8 @@ import com.pspdfkit.react.events.CustomAnnotationContextualMenuItemTappedEvent
 import com.pspdfkit.react.events.CustomTextSelectionContextualMenuItemTappedEvent
 import com.pspdfkit.ui.toolbar.ContextualToolbar
 import com.pspdfkit.ui.toolbar.ContextualToolbarMenuItem
-import com.pspdfkit.ui.toolbar.TextSelectionToolbar
 
-class ToolbarMenuItemListener: ContextualToolbar.OnMenuItemClickListener {
+class ToolbarMenuItemListener : ContextualToolbar.OnMenuItemClickListener {
 
     private var parent: PdfView? = null
     private var eventDispatcher: EventDispatcher? = null
@@ -24,7 +23,13 @@ class ToolbarMenuItemListener: ContextualToolbar.OnMenuItemClickListener {
         this.context = context
     }
 
-    constructor(parent: PdfView, eventDispatcher: EventDispatcher, context: Context, isFabricMode: Boolean, fabricDelegate: PdfView.PdfViewDelegate?) {
+    constructor(
+        parent: PdfView,
+        eventDispatcher: EventDispatcher,
+        context: Context,
+        isFabricMode: Boolean,
+        fabricDelegate: PdfView.PdfViewDelegate?,
+    ) {
         this.parent = parent
         this.eventDispatcher = eventDispatcher
         this.context = context

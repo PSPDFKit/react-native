@@ -1,3 +1,9 @@
+## 4.3.4 — 25 Jun 2026
+
+- Updates both `annotationContextualMenu` and `textSelectionContextualMenu` menu's to support system button customization using the new popup toolbar on Android. (J#HYB-653)
+- Updates for Nutrient Android SDK 11.5.1.
+- Updates the minimum supported Kotlin version to 2.2.20.
+
 ## 4.3.3 — 29 May 2026
 
 - Adds an Expo config plugin for Android that applies a theme to prevent `InvalidThemeException` in Expo managed apps. (J#HYB-995)

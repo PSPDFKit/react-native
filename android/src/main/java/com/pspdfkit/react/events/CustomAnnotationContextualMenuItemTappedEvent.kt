@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION", "OVERRIDE_DEPRECATION")
+
 package com.pspdfkit.react.events
 
 import androidx.annotation.IdRes

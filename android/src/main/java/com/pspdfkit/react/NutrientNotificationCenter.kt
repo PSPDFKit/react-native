@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.pspdfkit.react
 
 import android.os.Bundle

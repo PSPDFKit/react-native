@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Placeholder title for TextSelection popup items when JS supplies a literal title (patched onto the button after layout). -->
+    <string name="nutrient_rn_empty_menu_title" translatable="false" />
+</resources>

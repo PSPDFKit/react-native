@@ -23,7 +23,7 @@ import com.pspdfkit.react.helper.AnnotationUtils
 import org.json.JSONArray
 import org.json.JSONObject
 
-class FabricOnAnnotationsChangedEvent(surfaceId: Int, viewId: Int, @NonNull private val eventType: String, @NonNull private val annotation: Annotation) : Event<FabricOnAnnotationsChangedEvent>(surfaceId, viewId) {
+class FabricOnAnnotationsChangedEvent(surfaceId: Int, viewId: Int, @param:NonNull private val eventType: String, @param:NonNull private val annotation: Annotation) : Event<FabricOnAnnotationsChangedEvent>(surfaceId, viewId) {
 
     companion object {
         const val EVENT_NAME = "onAnnotationsChanged"

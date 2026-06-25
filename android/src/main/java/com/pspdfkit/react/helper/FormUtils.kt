@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.pspdfkit.react.helper
 
 import com.pspdfkit.LicenseFeature
@@ -114,4 +116,4 @@ object FormUtils {
 
         return sanitizedJSON
     }
-} 
+}

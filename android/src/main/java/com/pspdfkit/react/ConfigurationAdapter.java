@@ -164,9 +164,10 @@ public class ConfigurationAdapter {
         ReadableMapKeySetIterator iterator = configuration.keySetIterator();
         boolean hasConfiguration = iterator.hasNextKey();
         this.configuration = new PdfActivityConfiguration.Builder(context);
-        // Match the default PdfView configuration: disable immersive mode. We leave
-        // textSelectionPopupToolbarEnabled at its SDK default (popup menu) unless
-        // explicitly overridden by the app or by an internal flag.
+        // Match the default PdfView configuration: disable immersive mode. Text selection uses the
+        // SDK popup toolbar by default; React Native customizes it via OnPreparePopupToolbarListener
+        // (see NutrientTextSelectionPopupMenuBridge). The legacy key androidUseTextSelectionToolbar
+        // is still honored for apps that explicitly force the contextual TextSelectionToolbar.
         this.configuration
             .contentEditingEnabled(false)
             .immersiveModeEnabled(false);
