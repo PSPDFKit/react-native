@@ -24,6 +24,7 @@ import annotation = require('../src/annotations/Annotation');
 export import Annotation = annotation.Annotation;
 export import AnnotationContextualMenu = annotation.AnnotationContextualMenu;
 export import AnnotationContextualMenuItem = annotation.AnnotationContextualMenuItem;
+export import TextSelectionContextualMenu = annotation.TextSelectionContextualMenu;
 export import AnnotationPresetConfiguration = annotation.AnnotationPresetConfiguration;
 
 export import AnnotationPresetInk = annotation.AnnotationPresetInk
@@ -122,3 +123,6 @@ export import TextFormFieldConfiguration = formFieldConfiguration.TextFormFieldC
 //@ts-ignore
 import nutrientViewEvents = require('../src/events/NutrientViewEvents');
 export import ShouldExecuteActionEvent = nutrientViewEvents.ShouldExecuteActionEvent;
+
+//@ts-ignore
+export declare const NutrientInstantView: any;

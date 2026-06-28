@@ -4,15 +4,13 @@ import NutrientView, { Annotation, AnnotationAttachment, AnnotationType, Documen
 import fileSystem from 'react-native-fs';
 
 import { exampleDocumentPath, pspdfkitColor } from '../configuration/Constants';
-import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
+import {
+  renderWithBaseExampleSafeArea,
+  useBaseExampleAutoHidingHeader,
+} from '../helpers/ExampleScreenLayoutHelpers';
 import { hideToolbar } from '../helpers/NavigationHelper';
-import React from 'react';
-
-export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponent {
-  pdfRef: React.RefObject<NutrientView | null>;
-  lastAddedAnnotationUUID: string | undefined;
-
-  static basicInkAnnotation: InkAnnotation[] = [new InkAnnotation({
+import React, { useEffect, useRef, useState } from 'react';
+const basicInkAnnotation: InkAnnotation[] = [new InkAnnotation({
     type: 'pspdfkit/ink',
     bbox: [89.586334228515625, 98.5791015625, 143.12948608398438, 207.1583251953125],
     pageIndex: 0,
@@ -36,8 +34,7 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
       ],
     }
   })];
-
-  static inkAnnotation: DocumentJSON = {"annotations" : [{
+const inkAnnotation: DocumentJSON = {"annotations" : [{
     bbox: [
       89.586334228515625, 98.5791015625, 143.12948608398438,
       207.1583251953125,
@@ -71,8 +68,7 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
   }],
     "format": "https://pspdfkit.com/instant-json/v1"
   };
-
-  static multipleAnnotations: DocumentJSON = {
+const multipleAnnotations: DocumentJSON = {
     annotations: [
       {
         v: 1,
@@ -179,8 +175,7 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
     ],
     format: 'https://pspdfkit.com/instant-json/v1',
   };
-
-  static textAnnotation: DocumentJSON = {"annotations" : [{
+const textAnnotation: DocumentJSON = {"annotations" : [{
     "v": 2,
     "pageIndex": 0,
     "bbox": [150, 275, 120, 70],
@@ -205,8 +200,7 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
   }],
     "format": "https://pspdfkit.com/instant-json/v1"
   };
-
-  static complexAnnotation: DocumentJSON = {
+const complexAnnotation: DocumentJSON = {
     "annotations":
     [
         {
@@ -260,8 +254,7 @@ export class ProgrammaticAnnotations extends BaseExampleAutoHidingHeaderComponen
     ],
     "format": "https://pspdfkit.com/instant-json/v1",
 };
-
-static imageAnnotation: ImageAnnotation = {
+const imageAnnotation: ImageAnnotation = {
   bbox: [229, 426, 125, 125],
   contentType: "image/png",
   createdAt: new Date().toISOString(),
@@ -278,8 +271,7 @@ static imageAnnotation: ImageAnnotation = {
   updatedAt: new Date().toISOString(),
   v: 2,
 };
-
-  static linkAnnotation: DocumentJSON = {
+const linkAnnotation: DocumentJSON = {
     "annotations": [{
       "v": 1,
       "pageIndex": 0,
@@ -302,8 +294,7 @@ static imageAnnotation: ImageAnnotation = {
     }],
     "format": "https://pspdfkit.com/instant-json/v1"
   };
-
-  static highlightAnnotation: DocumentJSON = {
+const highlightAnnotation: DocumentJSON = {
     "annotations": [{
       "v": 1,
       "pageIndex": 1,
@@ -322,8 +313,7 @@ static imageAnnotation: ImageAnnotation = {
     }],
     "format": "https://pspdfkit.com/instant-json/v1"
   };
-
-  static noteAnnotation: DocumentJSON = {
+const noteAnnotation: DocumentJSON = {
     "annotations": [{
       "v": 2,
       "pageIndex": 0,
@@ -345,8 +335,7 @@ static imageAnnotation: ImageAnnotation = {
     }],
     "format": "https://pspdfkit.com/instant-json/v1"
   };
-
-  static shapeEllipseAnnotation: DocumentJSON = {
+const shapeEllipseAnnotation: DocumentJSON = {
     "annotations": [{
       "v": 1,
       "pageIndex": 0,
@@ -367,8 +356,7 @@ static imageAnnotation: ImageAnnotation = {
     }],
     "format": "https://pspdfkit.com/instant-json/v1"
   };
-
-  static shapeLineAnnotation: DocumentJSON = {
+const shapeLineAnnotation: DocumentJSON = {
     "annotations": [{
       "v": 1,
       "pageIndex": 0,
@@ -392,8 +380,7 @@ static imageAnnotation: ImageAnnotation = {
     }],
     "format": "https://pspdfkit.com/instant-json/v1"
   };
-
-  static stampAnnotation: DocumentJSON = {
+const stampAnnotation: DocumentJSON = {
     "annotations": [{
       "v": 1,
       "pageIndex": 0,
@@ -414,33 +401,35 @@ static imageAnnotation: ImageAnnotation = {
     "format": "https://pspdfkit.com/instant-json/v1"
   };
 
-  constructor(props: any) {
-    super(props);
-    const { navigation } = this.props;
-    this.pdfRef = React.createRef();
+
+export const ProgrammaticAnnotations = ({ navigation }: any) => {
+  const pdfRef = useRef<NutrientView | null>(null);
+  const lastAddedAnnotationUUIDRef = useRef<string | undefined>(undefined);
+  const [currentPageIndex, setCurrentPageIndex] = useState(0);
+  useBaseExampleAutoHidingHeader(navigation);
+
+  useEffect(() => {
     hideToolbar(navigation);
+  }, [navigation]);
 
-    this.state = {
-      currentPageIndex: 0,
-    };
-  }
-
-  override componentDidMount(): void {
-    this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.AnnotationsEvent.ADDED, (event: any) => {
+  useEffect(() => {
+    const center = pdfRef.current?.getNotificationCenter();
+    center?.subscribe(NotificationCenter.AnnotationsEvent.ADDED, (event: any) => {
       console.log(JSON.stringify(event));
-      this.lastAddedAnnotationUUID = event.annotations[0]?.uuid;
+      lastAddedAnnotationUUIDRef.current = event.annotations[0]?.uuid;
     });
 
-    this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.AnnotationsEvent.CHANGED, (event: any) => {
+    center?.subscribe(NotificationCenter.AnnotationsEvent.CHANGED, (event: any) => {
       console.log(JSON.stringify(event));
     });
-  }
 
-  override render() {
-    return (
+    return () => center?.unsubscribeAllEvents();
+  }, []);
+
+  return (
       <View style={styles.flex}>
         <NutrientView
-          ref={this.pdfRef}
+          ref={pdfRef}
           document={exampleDocumentPath}
           disableAutomaticSaving={true}
           configuration={{
@@ -455,16 +444,16 @@ static imageAnnotation: ImageAnnotation = {
             annotations: any;
           }) => {
             console.log(JSON.stringify(event));
-            this.lastAddedAnnotationUUID = event.annotations[0]?.uuid;
+            lastAddedAnnotationUUIDRef.current = event.annotations[0]?.uuid;
           }}
         />
-        {this.renderWithSafeArea(insets => (
+        {renderWithBaseExampleSafeArea(insets => (
           <View style={[styles.column, { paddingBottom: insets.bottom }]}>
             <View>
               <View style={styles.horizontalContainer}>
                 <TouchableOpacity onPress={() => {
                   // Programmatically add an ink annotation.
-                  this.pdfRef.current?.getDocument().addAnnotations(ProgrammaticAnnotations.basicInkAnnotation)
+                  pdfRef.current?.getDocument().addAnnotations(basicInkAnnotation)
                     .then((result: boolean) => {
                       if (result) {
                         Alert.alert(
@@ -475,19 +464,19 @@ static imageAnnotation: ImageAnnotation = {
                               text: 'Set readOnly flag',
                               onPress: async () => {
                                 // Get the existing annotation flags
-                                const flags = await this.pdfRef.current?.getDocument().getAnnotationFlags(
-                                  this.lastAddedAnnotationUUID!);
+                                const flags = await pdfRef.current?.getDocument().getAnnotationFlags(
+                                  lastAddedAnnotationUUIDRef.current!);
 
                                 // Add the READ_ONLY flag
                                 flags?.push(Annotation.Flags.READ_ONLY);
 
                                 // Set the new flags
-                                await this.pdfRef.current?.getDocument().setAnnotationFlags(
-                                  this.lastAddedAnnotationUUID!,
+                                await pdfRef.current?.getDocument().setAnnotationFlags(
+                                  lastAddedAnnotationUUIDRef.current!,
                                   flags!,
                                 );
-                                this.pdfRef.current?.getDocument().getAnnotationFlags(
-                                  this.lastAddedAnnotationUUID!).then((flags: Annotation.Flags[]): any => {
+                                pdfRef.current?.getDocument().getAnnotationFlags(
+                                  lastAddedAnnotationUUIDRef.current!).then((flags: Annotation.Flags[]): any => {
                                   Alert.alert('Nutrient', `New annotation flags: ${JSON.stringify(flags)}`);
                                 });
                               },
@@ -507,9 +496,9 @@ static imageAnnotation: ImageAnnotation = {
                 </TouchableOpacity>
                 <TouchableOpacity onPress={async () => {
                   // For certain type of widget annotations, the document cache needs to be cleared before adding them.
-                  await this.pdfRef.current?.getDocument().invalidateCache();
+                  await pdfRef.current?.getDocument().invalidateCache();
                   // Programmatically add multiple annotations.
-                  this.pdfRef.current?.getDocument().applyInstantJSON(ProgrammaticAnnotations.complexAnnotation)
+                  pdfRef.current?.getDocument().applyInstantJSON(complexAnnotation)
                     .then((result: any) => {
                       if (result) {
                         Alert.alert(
@@ -530,7 +519,7 @@ static imageAnnotation: ImageAnnotation = {
               <View style={styles.horizontalContainer}>
                 <TouchableOpacity onPress={() => {
                   // Programmatically add multiple annotations.
-                  this.pdfRef.current?.getDocument().applyInstantJSON(ProgrammaticAnnotations.multipleAnnotations)
+                  pdfRef.current?.getDocument().applyInstantJSON(multipleAnnotations)
                     .then((result: any) => {
                       if (result) {
                         Alert.alert(
@@ -574,9 +563,9 @@ static imageAnnotation: ImageAnnotation = {
                             contentType: 'image/png',
                           },
                       };
-                      this.pdfRef.current
+                      pdfRef.current
                         ?.getDocument()
-                        .addAnnotations([ProgrammaticAnnotations.imageAnnotation], attachments)
+                        .addAnnotations([imageAnnotation], attachments)
                         .then((result: any) => {
                           if (result) {
                             Alert.alert(
@@ -604,8 +593,8 @@ static imageAnnotation: ImageAnnotation = {
               <View style={styles.horizontalContainer}>
                 <TouchableOpacity onPress={() => {
                   // Get ink annotations from the current page & update first annotation.
-                  this.pdfRef.current?.getDocument().getAnnotationsForPage(
-                      this.state.currentPageIndex,
+                  pdfRef.current?.getDocument().getAnnotationsForPage(
+                      currentPageIndex,
                       Annotation.Type.INK,
                     )
                     .then(async (annotations: AnnotationType[]) => {
@@ -637,7 +626,7 @@ static imageAnnotation: ImageAnnotation = {
                             // Don't manually set bbox - Nutrient will recalculate it from the updated points
                             
                             console.log(inkAnnotation);
-                            await this.pdfRef.current?.getDocument().updateAnnotations([inkAnnotation])
+                            await pdfRef.current?.getDocument().updateAnnotations([inkAnnotation])
                               .catch((error: any) => {
                                 Alert.alert('Nutrient', 'Failed to update annotations: ' + JSON.stringify(error));
                               });
@@ -655,7 +644,7 @@ static imageAnnotation: ImageAnnotation = {
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => {
                   // Select all the Ink annotations on page 0.
-                  const document = this.pdfRef.current?.getDocument();
+                  const document = pdfRef.current?.getDocument();
                   document?.getAnnotationsForPage(0, Annotation.Type.INK)
                     .then( async (annotations: AnnotationType[]) => {
                       await document.selectAnnotations(annotations, false);
@@ -669,7 +658,7 @@ static imageAnnotation: ImageAnnotation = {
               </View>
               <View style={styles.horizontalContainer}>
                 <TouchableOpacity onPress={() => {
-                  const document = this.pdfRef.current?.getDocument();
+                  const document = pdfRef.current?.getDocument();
                   document?.getAnnotations() // No parameter returns all annotations
                     .then((annotations: AnnotationType[]) => {
                       document?.removeAnnotations(annotations);
@@ -682,7 +671,7 @@ static imageAnnotation: ImageAnnotation = {
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => {
                   // Get all annotations annotations from the document.
-                  this.pdfRef.current?.getDocument().getAnnotations()
+                  pdfRef.current?.getDocument().getAnnotations()
                     .then((annotations: AnnotationType[]) => {
                       if (annotations) {
                         Alert.alert('Nutrient', 'All Annotations: ' + JSON.stringify(annotations));
@@ -704,9 +693,8 @@ static imageAnnotation: ImageAnnotation = {
           </View>
         ))}
       </View>
-    );
-  }
-}
+  );
+};
 
 const styles = {
   flex: { flex: 1 },

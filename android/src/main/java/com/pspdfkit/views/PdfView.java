@@ -46,6 +46,7 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.common.MapBuilder;
+import com.facebook.react.uimanager.UIManagerHelper;
 import com.facebook.react.uimanager.events.EventDispatcher;
 import com.facebook.react.uimanager.events.Event;
 import com.pspdfkit.LicenseFeature;
@@ -412,6 +413,24 @@ public class PdfView extends FrameLayout {
             eventDispatcher, isFabricMode, delegate);
         menuItemListener = new MenuItemListener(this, eventDispatcher, getContext());
         toolbarMenuItemListener = new ToolbarMenuItemListener(this, eventDispatcher, getContext(), isFabricMode, delegate);
+    }
+
+    /**
+     * Replaces the {@link EventDispatcher} used by Fabric/paper listeners after the view has a valid
+     * React tag (Fabric assigns the tag after {@code createViewInstance}; initial {@code inject} may
+     * have used {@link android.view.View#NO_ID}).
+     */
+    public void replaceEventDispatcher(@NonNull EventDispatcher newDispatcher) {
+        this.eventDispatcher = newDispatcher;
+        if (pdfViewDocumentListener != null) {
+            pdfViewDocumentListener.setEventDispatcher(newDispatcher);
+        }
+        if (menuItemListener != null) {
+            menuItemListener.setEventDispatcher(newDispatcher);
+        }
+        if (toolbarMenuItemListener != null) {
+            toolbarMenuItemListener.setEventDispatcher(newDispatcher);
+        }
     }
     
     public void setDelegate(PdfViewDelegate delegate) {
@@ -1578,7 +1597,8 @@ public class PdfView extends FrameLayout {
         if (isFabricMode && delegate != null) {
             delegate.onCustomTextSelectionContextualMenuItemTapped(resourceName);
         } else if (eventDispatcher != null) {
-            eventDispatcher.dispatchEvent(new CustomTextSelectionContextualMenuItemTappedEvent(getId(), resourceName));
+            int surfaceId = UIManagerHelper.getSurfaceId(this);
+            eventDispatcher.dispatchEvent(new CustomTextSelectionContextualMenuItemTappedEvent(surfaceId, getId(), resourceName));
         }
     }
 
@@ -1587,7 +1607,8 @@ public class PdfView extends FrameLayout {
         if (isFabricMode && delegate != null) {
             delegate.onCustomAnnotationContextualMenuItemTapped(resourceName);
         } else if (eventDispatcher != null) {
-            eventDispatcher.dispatchEvent(new CustomAnnotationContextualMenuItemTappedEvent(getId(), resourceName));
+            int surfaceId = UIManagerHelper.getSurfaceId(this);
+            eventDispatcher.dispatchEvent(new CustomAnnotationContextualMenuItemTappedEvent(surfaceId, getId(), resourceName));
         }
     }
 }

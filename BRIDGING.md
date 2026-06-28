@@ -66,8 +66,8 @@ You **MUST** implement **both**:
 ### Step 2: New Architecture – TypeScript spec
 
 1. **File**:  
-   - App-level module: `pspdfkit-react-native/src/specs/NativeNutrientModule.ts`  
-   - View-backed module: `pspdfkit-react-native/src/specs/NativeNutrientViewTurboModule.ts`
+   - App-level module: `src/specs/NativeNutrientModule.ts`  
+   - View-backed module: `src/specs/NativeNutrientViewTurboModule.ts`
 
 2. **In the spec file**:
    - Add or update the `Spec` interface (extends `TurboModule`).
@@ -105,8 +105,8 @@ You **MUST** implement **both**:
 ### Step 5: Public API layer – Dual branch
 
 1. **Where**:  
-   - For `NutrientView` ref methods: `pspdfkit-react-native/index.js` (the class that wraps the view and its ref).  
-   - For app-level APIs: `pspdfkit-react-native/index.js` or the relevant export (e.g. `Nutrient` singleton).
+   - For `NutrientView` ref methods: `index.js` (the class that wraps the view and its ref).  
+   - For app-level APIs: `index.js` or the relevant export (e.g. `Nutrient` singleton).
 
 2. **Pattern** (you **MUST** follow this structure):
 
@@ -161,10 +161,10 @@ Use this list to verify the recipe was followed. **Every item MUST be true.**
 
 ### Copying native files into node_modules (MUST do before building)
 
-After implementing native changes in the SDK root (`pspdfkit-react-native/ios/` and/or `android/`), you **MUST** copy those changed files into the Catalog app’s copy of the SDK so the build uses your code:
+After implementing native changes in the SDK root (`ios/` and/or `android/`), you **MUST** copy those changed files into the Catalog app’s copy of the SDK so the build uses your code:
 
-- **iOS:** Copy each modified file under `pspdfkit-react-native/ios/` (e.g. `RCTPSPDFKitView.m`, `RCTPSPDFKitViewManager.m`, `Turbo/NutrientViewTurboModule.mm`, etc.) to `pspdfkit-react-native/samples/Catalog/node_modules/@nutrient-sdk/react-native/ios/`, preserving path (e.g. `ios/Turbo/NutrientViewTurboModule.mm` → `node_modules/.../ios/Turbo/NutrientViewTurboModule.mm`).
-- **Android:** Copy each modified file under `pspdfkit-react-native/android/` to `pspdfkit-react-native/samples/Catalog/node_modules/@nutrient-sdk/react-native/android/`, preserving path.
+- **iOS:** Copy each modified file under `ios/` (e.g. `RCTPSPDFKitView.m`, `RCTPSPDFKitViewManager.m`, `Turbo/NutrientViewTurboModule.mm`, etc.) to `samples/Catalog/node_modules/@nutrient-sdk/react-native/ios/`, preserving path (e.g. `ios/Turbo/NutrientViewTurboModule.mm` → `node_modules/.../ios/Turbo/NutrientViewTurboModule.mm`).
+- **Android:** Copy each modified file under `android/` to `samples/Catalog/node_modules/@nutrient-sdk/react-native/android/`, preserving path.
 
 Use `cp` (or a script) from the Shell tool. `npm run dev-build` does **not** copy native sources; it only syncs JS/TS. The Catalog build reads from `node_modules`, so this copy is required.
 
@@ -173,8 +173,8 @@ Use `cp` (or a script) from the Shell tool. `npm run dev-build` does **not** cop
 After the checklist passes and **after you have copied native edits into** `samples/Catalog/node_modules/@nutrient-sdk/react-native/`, you **MUST** run the Catalog builds yourself to verify compilation:
 
 1. **Run the builds** using the Shell tool. Request `required_permissions: ["all"]` and a long timeout (e.g. 300000–600000 ms). The user may need to approve the command; do not only provide the commands for the user to copy-paste—you must execute them and read the output.
-2. **iOS:** `cd pspdfkit-react-native/samples/Catalog/ios && pod install && xcodebuild -workspace Catalog.xcworkspace -scheme Catalog -configuration Debug -sdk iphonesimulator build`
-3. **Android:** `cd pspdfkit-react-native/samples/Catalog/android && ./gradlew assembleDebug`
+2. **iOS:** `cd samples/Catalog/ios && pod install && xcodebuild -workspace Catalog.xcworkspace -scheme Catalog -configuration Debug -sdk iphonesimulator build`
+3. **Android:** `cd samples/Catalog/android && ./gradlew assembleDebug`
 4. If a build fails, read the error output, fix the issue in the SDK root and in `node_modules/@nutrient-sdk/react-native` (keep them in sync), then re-run the failed build until it succeeds. Do not consider the bridge work complete until both iOS and Android builds succeed.
 
 ---
@@ -265,7 +265,7 @@ Once the customer has tested the changes and is happy with the result, the AI ag
 
 ### Development and testing setup
 
-- Implement changes in the **local SDK** (e.g. the cloned `pspdfkit-react-native/` directory).
+- Implement changes in the **local SDK** (this package’s repository root).
 - For testing, the app (e.g. Catalog or the customer's app) must run against the modified code. Do that by either:
   - Running `npm run dev-build` from the SDK root so the built files are copied into the app's `node_modules/@nutrient-sdk/react-native`, or
   - Applying the same edits under the app's `node_modules/@nutrient-sdk/react-native` so the app uses the patched code.
@@ -307,13 +307,13 @@ To avoid the AI inventing its own approach or skipping steps, **give the AI this
 
 **1. Always load the recipe first (Cursor: use @ to include the file in context):**
 
-- Cursor: Start your message with `@pspdfkit-react-native/BRIDGING.md` so the recipe is in context.
-- Other tools: Paste the instruction below and ensure the AI has access to this repo; tell it to read `pspdfkit-react-native/BRIDGING.md` before doing anything.
+- Cursor: Start your message with `@BRIDGING.md` so the recipe is in context.
+- Other tools: Paste the instruction below and ensure the AI has access to this repo; tell it to read `BRIDGING.md` before doing anything.
 
 **2. Copy this prompt and fill in every `[ ]`:**
 
 ```
-You MUST follow the recipe in pspdfkit-react-native/BRIDGING.md step by step. Do not skip steps or use a different pattern. Read that file first. The user has already provided the requirements below; do not ask again—proceed to Step 1 of the recipe.
+You MUST follow the recipe in BRIDGING.md step by step. Do not skip steps or use a different pattern. Read that file first. The user has already provided the requirements below; do not ask again—proceed to Step 1 of the recipe.
 
 Requirements:
 

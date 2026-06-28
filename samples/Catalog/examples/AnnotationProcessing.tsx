@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Alert, Button, processColor, View, TouchableOpacity, Text } from 'react-native';
 import fileSystem from 'react-native-fs';
 import NutrientView, { Annotation } from '@nutrient-sdk/react-native';
@@ -7,33 +7,30 @@ import {
   pspdfkitColor,
   writableDocumentPath,
 } from '../configuration/Constants';
-import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
+import { useBaseExampleAutoHidingHeader } from '../helpers/ExampleScreenLayoutHelpers';
 import { hideToolbar } from '../helpers/NavigationHelper';
 import { Nutrient } from '../helpers/Nutrient';
 
-export class AnnotationProcessing extends BaseExampleAutoHidingHeaderComponent {
-  pdfRef: React.RefObject<NutrientView | null>;
+export const AnnotationProcessing = ({ navigation }: any) => {
+  const pdfRef = useRef<NutrientView | null>(null);
+  useBaseExampleAutoHidingHeader(navigation);
 
-  constructor(props: any) {
-    super(props);
-    const { navigation } = this.props;
-    this.pdfRef = React.createRef<NutrientView>();
+  useEffect(() => {
     hideToolbar(navigation);
-  }
+  }, [navigation]);
 
-  override render() {
-    return (
-      <View style={styles.flex}>
-        <NutrientView
-          ref={this.pdfRef}
+  return (
+    <View style={styles.flex}>
+      <NutrientView
+          ref={pdfRef}
           document={writableDocumentPath}
           disableAutomaticSaving={true}
           configuration={{
             iOSBackgroundColor: processColor('lightgrey'),
           }}
           style={styles.pdfColor}
-        />
-        <View style={styles.column}>
+      />
+      <View style={styles.column}>
           <View style={styles.wrapper}>
             <View>
               <TouchableOpacity
@@ -50,7 +47,7 @@ export class AnnotationProcessing extends BaseExampleAutoHidingHeaderComponent {
                     })
                     // First, save all annotations in the current document.
                     .then(() => {
-                      this.pdfRef.current?.getDocument()
+                      pdfRef.current?.getDocument()
                         ?.save()
                         .then(_saved => {
                           // Then, embed all the annotations
@@ -100,7 +97,7 @@ export class AnnotationProcessing extends BaseExampleAutoHidingHeaderComponent {
                     })
                     .then(() => {
                       // First, save all annotations in the current document.
-                      this.pdfRef.current?.getDocument()
+                      pdfRef.current?.getDocument()
                         ?.save()
                         .then(_saved => {
                           // Then, flatten all the annotations
@@ -152,7 +149,7 @@ export class AnnotationProcessing extends BaseExampleAutoHidingHeaderComponent {
                     })
                     .then(() => {
                       // First, save all annotations in the current document.
-                      this.pdfRef.current?.getDocument()
+                      pdfRef.current?.getDocument()
                         ?.save()
                         .then(_saved => {
                           // Then, remove all the annotations
@@ -199,7 +196,7 @@ export class AnnotationProcessing extends BaseExampleAutoHidingHeaderComponent {
                     })
                     .then(() => {
                       // First, save all annotations in the current document.
-                      this.pdfRef.current?.getDocument()
+                      pdfRef.current?.getDocument()
                         ?.save()
                         .then(_success => {
                           // Then, print all the annotations
@@ -235,11 +232,10 @@ export class AnnotationProcessing extends BaseExampleAutoHidingHeaderComponent {
               </TouchableOpacity>
             </View>
           </View>
-        </View>
       </View>
-    );
-  }
-}
+      </View>
+  );
+};
 
 const styles = {
   flex: { flex: 1 },
