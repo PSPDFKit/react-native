@@ -1,5 +1,3 @@
-@file:Suppress("DEPRECATION", "OVERRIDE_DEPRECATION")
-
 package com.pspdfkit.react
 
 import android.net.Uri
@@ -15,7 +13,7 @@ import com.facebook.react.bridge.ReadableType
 import com.facebook.react.bridge.WritableMap
 import com.facebook.react.module.annotations.ReactModule
 import com.pspdfkit.LicenseFeature
-import com.pspdfkit.PSPDFKit
+import com.pspdfkit.Nutrient
 import com.pspdfkit.annotations.Annotation
 import com.pspdfkit.annotations.AnnotationType
 import com.pspdfkit.document.ImageDocument
@@ -68,8 +66,8 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
     private val job = SupervisorJob()
     private val scope = CoroutineScope(job + Dispatchers.Main.immediate)
 
-    override fun onCatalystInstanceDestroy() {
-        super.onCatalystInstanceDestroy()
+    override fun invalidate() {
+        super.invalidate()
         job.cancel()
         scope.cancel()
     }
@@ -292,19 +290,19 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
                 return
             }
             val outputStream = ByteArrayOutputStream()
-            DocumentJsonFormatter.exportDocumentJsonAsync(document, outputStream)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                    {
-                        val json = JSONObject(outputStream.toString())
-                        val jsonMap = JsonUtilities.jsonObjectToMap(json)
-                        val nativeMap = Arguments.makeNativeMap(jsonMap)
-                        promise.resolve(nativeMap)
-                    }, { e ->
-                        promise.reject("getAllUnsavedAnnotations", RuntimeException(e))
+            scope.launch {
+                try {
+                    withContext(Dispatchers.IO) {
+                        DocumentJsonFormatter.exportDocumentJson(document, outputStream)
                     }
-                )
+                    val json = JSONObject(outputStream.toString())
+                    val jsonMap = JsonUtilities.jsonObjectToMap(json)
+                    val nativeMap = Arguments.makeNativeMap(jsonMap)
+                    promise.resolve(nativeMap)
+                } catch (e: Throwable) {
+                    promise.reject("getAllUnsavedAnnotations", RuntimeException(e))
+                }
+            }
         } catch (e: Throwable) {
             promise.reject("getAllUnsavedAnnotations error", e)
         }
@@ -422,7 +420,10 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
                     val instantJSONArray = instantJSON.asArray()
                     val hasImageAnnotations = (0 until (instantJSONArray?.size() ?: 0)).any { i ->
                         val annotation = instantJSONArray?.getMap(i)
-                        annotation?.toHashMap()?.containsKey("imageAttachmentId") == true
+                        val hashMap = annotation?.toHashMap()?.entries?.associate { (key, value) ->
+                            key.toString() to value
+                        }
+                        hashMap?.containsKey("imageAttachmentId") == true
                     }
 
                     if (hasImageAnnotations) {
@@ -472,14 +473,16 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
             this.getDocument(reference)?.document?.let {
                 val json = (instantJSON.toHashMap() as? Map<*, *>)?.let { it1 -> JSONObject(it1) }
                 val dataProvider: DataProvider = DocumentJsonDataProvider(json)
-                DocumentJsonFormatter.importDocumentJsonAsync(it, dataProvider)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({
+                scope.launch {
+                    try {
+                        withContext(Dispatchers.IO) {
+                            DocumentJsonFormatter.importDocumentJson(it, dataProvider)
+                        }
                         promise.resolve(true)
-                    }, { e ->
+                    } catch (e: Throwable) {
                         promise.reject(RuntimeException(e))
-                    })
+                    }
+                }
             }
         } catch (e: Throwable) {
             promise.reject("applyInstantJSON error", e)
@@ -546,7 +549,7 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
                     document.annotationProvider.getAllAnnotationsOfType(EnumSet.allOf(AnnotationType::class.java))
                 }
                 var allFormFields: List<com.pspdfkit.forms.FormField> = emptyList()
-                if (PSPDFKit.getLicenseFeatures().contains(LicenseFeature.FORMS)) {
+                if (Nutrient.getLicenseFeatures().contains(LicenseFeature.FORMS)) {
                     allFormFields = document.formProvider.formFields
                 }
                 XfdfFormatter.writeXfdfAsync(document, allAnnotations, allFormFields, outputStream)

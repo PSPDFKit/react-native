@@ -188,6 +188,7 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
         if (configuration.hasKey("supportedToolbarPositions")) {
             view.setSupportedToolbarPositions(configuration.getArray("supportedToolbarPositions"));
         }
+        NutrientPropsDocumentHelper.applyToolbarVisibilityFromConfiguration(view, configuration);
     }
 
     @ReactProp(name = "annotationPresets")

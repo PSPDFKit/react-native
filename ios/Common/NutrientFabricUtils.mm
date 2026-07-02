@@ -6,7 +6,14 @@
 
 using namespace facebook::react;
 
-// Helpers replicated from NutrientView.mm for struct-to-dictionary conversions
+// Helpers replicated from NutrientView.mm for struct-to-dictionary conversions.
+//
+// Numeric "default*" fields (alpha, thickness, text size) use `> 0` as a sentinel
+// meaning "JS did not provide this key": Fabric codegen does not generate
+// std::optional<double> for `?: Double` props, so unset values arrive as 0.0 and
+// would otherwise clobber PSPDFAnnotationStyleManager's last-used values via
+// AnnotationConfigurationsConverter.setLastUsedValue. Zero is not a usable
+// stroke/text default in practice (invisible), so the conflation is safe.
 static inline NSString *NVS( const std::string &value ) {
     return value.empty() ? nil : [NSString stringWithUTF8String:value.c_str()];
 }
@@ -43,8 +50,8 @@ static inline NSDictionary *InkLikePresetDict(
     NSMutableDictionary *dict = [NSMutableDictionary dictionary];
     if (NVS(defaultColor)) dict[@"defaultColor"] = NVS(defaultColor);
     if (NVS(defaultFillColor)) dict[@"defaultFillColor"] = NVS(defaultFillColor);
-    dict[@"defaultAlpha"] = @(defaultAlpha);
-    dict[@"defaultThickness"] = @(defaultThickness);
+    if (defaultAlpha > 0) dict[@"defaultAlpha"] = @(defaultAlpha);
+    if (defaultThickness > 0) dict[@"defaultThickness"] = @(defaultThickness);
     if (NVS(blendMode)) dict[@"blendMode"] = NVS(blendMode);
     dict[@"availableColors"] = NVArrayS(availableColors);
     dict[@"availableFillColors"] = NVArrayS(availableFillColors);
@@ -81,7 +88,7 @@ static inline NSDictionary *FreeTextLikePresetDict(
     if (NVS(defaultColor)) dict[@"defaultColor"] = NVS(defaultColor);
     dict[@"availableColors"] = NVArrayS(availableColors);
     dict[@"customColorPickerEnabled"] = @(customColorPickerEnabled);
-    dict[@"defaultTextSize"] = @(defaultTextSize);
+    if (defaultTextSize > 0) dict[@"defaultTextSize"] = @(defaultTextSize);
     dict[@"minimumTextSize"] = @(minimumTextSize);
     dict[@"maximumTextSize"] = @(maximumTextSize);
     if (NVS(defaultFont)) dict[@"defaultFont"] = NVS(defaultFont);
@@ -116,8 +123,8 @@ static inline NSDictionary *ShapeLikePresetDict(
     NSMutableDictionary *dict = [NSMutableDictionary dictionary];
     if (NVS(defaultColor)) dict[@"defaultColor"] = NVS(defaultColor);
     if (NVS(defaultFillColor)) dict[@"defaultFillColor"] = NVS(defaultFillColor);
-    dict[@"defaultAlpha"] = @(defaultAlpha);
-    dict[@"defaultThickness"] = @(defaultThickness);
+    if (defaultAlpha > 0) dict[@"defaultAlpha"] = @(defaultAlpha);
+    if (defaultThickness > 0) dict[@"defaultThickness"] = @(defaultThickness);
     dict[@"availableColors"] = NVArrayS(availableColors);
     dict[@"availableFillColors"] = NVArrayS(availableFillColors);
     dict[@"minimumAlpha"] = @(minimumAlpha);
@@ -159,10 +166,10 @@ static inline NSDictionary *LineLikePresetDict(
     if (NVS(defaultFillColor)) dict[@"defaultFillColor"] = NVS(defaultFillColor);
     dict[@"availableFillColors"] = NVArrayS(availableFillColors);
     dict[@"customColorPickerEnabled"] = @(customColorPickerEnabled);
-    dict[@"defaultThickness"] = @(defaultThickness);
+    if (defaultThickness > 0) dict[@"defaultThickness"] = @(defaultThickness);
     dict[@"minimumThickness"] = @(minimumThickness);
     dict[@"maximumThickness"] = @(maximumThickness);
-    dict[@"defaultAlpha"] = @(defaultAlpha);
+    if (defaultAlpha > 0) dict[@"defaultAlpha"] = @(defaultAlpha);
     dict[@"minimumAlpha"] = @(minimumAlpha);
     dict[@"maximumAlpha"] = @(maximumAlpha);
     if (NVS(defaultLineEnd)) dict[@"defaultLineEnd"] = NVS(defaultLineEnd);
@@ -188,7 +195,7 @@ static inline NSDictionary *AlphaOnlyPresetDict(
 ) {
     NSMutableDictionary *dict = [NSMutableDictionary dictionary];
     if (NVS(defaultColor)) dict[@"defaultColor"] = NVS(defaultColor);
-    dict[@"defaultAlpha"] = @(defaultAlpha);
+    if (defaultAlpha > 0) dict[@"defaultAlpha"] = @(defaultAlpha);
     dict[@"availableColors"] = NVArrayS(availableColors);
     dict[@"minimumAlpha"] = @(minimumAlpha);
     dict[@"maximumAlpha"] = @(maximumAlpha);
@@ -426,15 +433,18 @@ static inline NSDictionary *AlphaOnlyPresetDict(
         );
     }
     // Eraser
-    dict[@"eraser"] = @{
-        @"defaultThickness": @(presetsStruct.eraser.defaultThickness),
-        @"minimumThickness": @(presetsStruct.eraser.minimumThickness),
-        @"maximumThickness": @(presetsStruct.eraser.maximumThickness),
-        @"previewEnabled": @(presetsStruct.eraser.previewEnabled),
-        @"zIndexEditingEnabled": @(presetsStruct.eraser.zIndexEditingEnabled),
-        @"forceDefaults": @(presetsStruct.eraser.forceDefaults),
-        @"supportedProperties": NVArrayS(presetsStruct.eraser.supportedProperties),
-    };
+    {
+        const auto &p = presetsStruct.eraser;
+        NSMutableDictionary *eraser = [NSMutableDictionary dictionary];
+        if (p.defaultThickness > 0) eraser[@"defaultThickness"] = @(p.defaultThickness);
+        eraser[@"minimumThickness"] = @(p.minimumThickness);
+        eraser[@"maximumThickness"] = @(p.maximumThickness);
+        eraser[@"previewEnabled"] = @(p.previewEnabled);
+        eraser[@"zIndexEditingEnabled"] = @(p.zIndexEditingEnabled);
+        eraser[@"forceDefaults"] = @(p.forceDefaults);
+        eraser[@"supportedProperties"] = NVArrayS(p.supportedProperties);
+        dict[@"eraser"] = [eraser copy];
+    }
     // File
     dict[@"file"] = @{
         @"zIndexEditingEnabled": @(presetsStruct.file.zIndexEditingEnabled),

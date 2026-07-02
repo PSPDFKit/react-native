@@ -15,7 +15,7 @@ Pod::Spec.new do |s|
   DESC
   s.authors           = { "PSPDFKit GmbH d/b/a Nutrient" => "support@nutrient.io" }
   s.homepage          = "https://nutrient.io/guides/react-native/"
-  s.platform          = :ios, "16.0"
+  s.platform          = :ios, "17.0"
   s.module_name       = "PSPDFKitReactNativeiOS"
   s.source            = { git: "https://github.com/PSPDFKit/react-native" }
 
@@ -32,7 +32,7 @@ Pod::Spec.new do |s|
     s.dependency("React")
   end
 
-  s.dependency("PSPDFKit", "26.6.0")
-  s.dependency("Instant", "26.6.0")
+  s.dependency("PSPDFKit")
+  s.dependency("Instant")
   s.frameworks = "UIKit"
 end

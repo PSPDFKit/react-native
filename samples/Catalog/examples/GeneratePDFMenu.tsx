@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useMemo } from 'react';
 import {
   FlatList,
   Image,
@@ -28,38 +28,19 @@ const getVersionString = (): string => {
   }
 };
 
-class GeneratePDFMenu extends Component {
-  override render() {
-    return (
-      <View style={styles.flex}>
-        <View style={styles.header}>
-          <Image
-            source={require('../assets/logo-flat.png')}
-            style={styles.logo}
-          />
-          <Text style={styles.version}>{getVersionString()}</Text>
-        </View>
-        <FlatList
-          data={generatePDFMenu}
-          renderItem={this._renderRow}
-          ItemSeparatorComponent={this._renderSeparator}
-          contentContainerStyle={styles.listContainer}
-          style={styles.list}
-          contentInset={{ bottom: 22 }}
-        />
-      </View>
-    );
-  }
+const GeneratePDFMenu = (props: any) => {
+  // Keep compatibility with menu actions that expect a class component instance.
+  const actionContext = useMemo(() => ({ props }), [props]);
 
-  _renderSeparator = () => {
+  const renderSeparator = () => {
     return <View style={styles.separator} />;
-  }
+  };
 
-  _renderRow = ({ item }: { item: any }) => {
+  const renderRow = ({ item }: { item: any }) => {
     return (
       <TouchableHighlight
         onPress={() => {
-          item.action(this);
+          item.action(actionContext);
         }}
         style={styles.rowContent}
         underlayColor={pspdfkitColor}
@@ -71,6 +52,23 @@ class GeneratePDFMenu extends Component {
       </TouchableHighlight>
     );
   };
-}
+
+  return (
+    <View style={styles.flex}>
+      <View style={styles.header}>
+        <Image source={require('../assets/logo-flat.png')} style={styles.logo} />
+        <Text style={styles.version}>{getVersionString()}</Text>
+      </View>
+      <FlatList
+        data={generatePDFMenu}
+        renderItem={renderRow}
+        ItemSeparatorComponent={renderSeparator}
+        contentContainerStyle={styles.listContainer}
+        style={styles.list}
+        contentInset={{ bottom: 22 }}
+      />
+    </View>
+  );
+};
 
 export default GeneratePDFMenu;

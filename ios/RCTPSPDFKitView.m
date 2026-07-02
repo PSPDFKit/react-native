@@ -499,22 +499,49 @@
     if (annotationButtons[@"appearance"] == nil ||
         appearance == [RCTConvert PSPDFEditMenuAppearance:annotationButtons[@"appearance"]]) {
         
-        if ([annotationButtons count] > 0) {
-            UIMenu *newMenu;
-            NSArray *items = annotationButtons[@"buttons"];
-            
-            if (annotationButtons[@"retainSuggestedMenuItems"] == nil || [annotationButtons[@"retainSuggestedMenuItems"] boolValue] == YES) {
-                if (annotationButtons[@"position"] != nil && [annotationButtons[@"position"] isEqualToString:@"start"]) {
-                    newMenu = [suggestedMenu menuByReplacingChildren:[items arrayByAddingObjectsFromArray:suggestedMenu.children]];
-                } else {
-                    newMenu = [suggestedMenu menuByReplacingChildren:[suggestedMenu.children arrayByAddingObjectsFromArray:items]];
-                }
-            } else {
-                newMenu = [suggestedMenu menuByReplacingChildren:items];
-            }
-            return newMenu;
-        } else {
+        BOOL retainSuggested = (annotationButtons[@"retainSuggestedMenuItems"] == nil ||
+                                [annotationButtons[@"retainSuggestedMenuItems"] boolValue] == YES);
+        NSArray *customItems = annotationButtons[@"buttons"] ?: @[];
+        NSArray<NSString *> *stockActions = annotationButtons[@"stockActions"] ?: @[];
+        BOOL hasCustomItems = (customItems.count > 0);
+        BOOL hasStockActions = (stockActions.count > 0);
+
+        // Nothing to customize.
+        if (!hasCustomItems && !hasStockActions) {
             return suggestedMenu;
+        }
+
+        if (retainSuggested) {
+            // Keep all default suggested items and only append/prepend custom items.
+            if (!hasCustomItems) {
+                return suggestedMenu;
+            }
+            if (annotationButtons[@"position"] != nil && [annotationButtons[@"position"] isEqualToString:@"start"]) {
+                UIMenu *newMenu = [suggestedMenu menuByReplacingChildren:[customItems arrayByAddingObjectsFromArray:suggestedMenu.children]];
+                return newMenu;
+            } else {
+                UIMenu *newMenu = [suggestedMenu menuByReplacingChildren:[suggestedMenu.children arrayByAddingObjectsFromArray:customItems]];
+                return newMenu;
+            }
+        } else {
+            // When retainSuggested == false, stockActions are applied by filtering the suggested menu tree.
+            // Custom items in `buttons[]` are always added.
+            UIMenu *baseMenu = suggestedMenu;
+            if (hasStockActions) {
+                NSSet<NSString *> *allowed = [NSSet setWithArray:stockActions];
+                baseMenu = [self pspdf_filteredMenuFromMenu:suggestedMenu allowedKeys:allowed];
+            }
+
+            NSArray *baseChildren = baseMenu.children ?: @[];
+            NSArray *finalChildren;
+            if (annotationButtons[@"position"] != nil && [annotationButtons[@"position"] isEqualToString:@"start"]) {
+                finalChildren = [customItems arrayByAddingObjectsFromArray:baseChildren];
+            } else {
+                finalChildren = [baseChildren arrayByAddingObjectsFromArray:customItems];
+            }
+
+            UIMenu *newMenu = [suggestedMenu menuByReplacingChildren:finalChildren];
+            return newMenu;
         }
     } else {
         return suggestedMenu;
@@ -601,7 +628,13 @@
             if (filteredSubmenu.children.count > 0) {
                 [filteredChildren addObject:filteredSubmenu];
             }
-        } else {
+        } else if (allowedKeys.count == 0) {
+            // Only keep non-action elements (e.g. separators) when no allow-list is active.
+            // When the caller passes stockActions (retainSuggestedMenuItems: false), iOS 26 injects
+            // system text services such as Look Up, Translate and Writing Tools as
+            // UIDeferredMenuElement/UICommand instances rather than plain UIActions. Passing those
+            // through defeated the filter and pushed the custom menu item into the "more" overflow,
+            // so drop anything not explicitly allowed.
             [filteredChildren addObject:element];
         }
     }
@@ -932,12 +965,24 @@
     
     NSArray *buttonItems = items[@"buttons"];
     
-    NSMutableArray *updatedButtons = [NSMutableArray array];
-    for (id item in buttonItems) {
+    NSMutableArray<UIAction *> *updatedButtons = [NSMutableArray array];
+    NSMutableArray<NSString *> *stockActions = [NSMutableArray array];
+    for (id rawItem in buttonItems) {
+        if ([rawItem isKindOfClass:NSString.class]) {
+            // Stock item identifier; keep separately so we can filter the suggestedMenu later.
+            [stockActions addObject:(NSString *)rawItem];
+            continue;
+        }
+
+        if (![rawItem isKindOfClass:NSDictionary.class]) {
+            continue;
+        }
+
+        NSDictionary *item = (NSDictionary *)rawItem;
         UIAction *menuAction = [UIAction actionWithTitle:item[@"title"] image:nil identifier:item[@"id"] handler:^(__kindof UIAction * _Nonnull action) {
-          [self handleCustomAnnotationContextualMenuItemEvent:action];
+            [self handleCustomAnnotationContextualMenuItemEvent:action];
         }];
-        
+
         if (item[@"image"]) {
             // First check if the image specified is a system image
             UIImage *image = [UIImage systemImageNamed:item[@"image"]];
@@ -953,6 +998,11 @@
     
     NSMutableDictionary *updatedItems = [NSMutableDictionary dictionaryWithDictionary:items];
     [updatedItems setObject:updatedButtons forKey:@"buttons"];
+    if (stockActions.count > 0) {
+        [updatedItems setObject:stockActions forKey:@"stockActions"];
+    } else {
+        [updatedItems removeObjectForKey:@"stockActions"];
+    }
     
     [_sessionStorage setAnnotationContextualMenuItems:updatedItems];
 }
@@ -1090,11 +1140,42 @@
 }
 
 - (void)applyDocumentConfiguration:(id)configuration {
+    // Reconfiguring the controller rebuilds page view controllers, so flush any
+    // committed-but-unsaved annotations first — see -flushDirtyAnnotationsIfNeeded.
+    [self flushDirtyAnnotationsIfNeeded];
+
     [self.pdfController updateConfigurationWithBuilder:^(PSPDFConfigurationBuilder *builder) {
         [builder setupFromJSON:configuration];
     }];
-    
+
     [self postProcessConfigurationOptionsWithJSON:configuration forPDFViewController:self.pdfController];
+}
+
+- (void)flushDirtyAnnotationsIfNeeded {
+    // A reconfigure (Legacy: applyDocumentConfiguration:) or a document rebuild from disk
+    // (New Architecture: NutrientView.mm updateProps) replaces the page view controllers /
+    // the document, so a committed-but-unsaved annotation would be silently lost. Flush it
+    // first whenever the document is dirty — but only when automatic saving is actually
+    // enabled. If the consumer opted out of autosave they manage persistence themselves, and
+    // we must not write to disk on their behalf; this mirrors the veto we already apply in
+    // -pdfViewController:shouldSaveDocument:. Note that -saveCurrentDocumentWithError: saves the
+    // document directly, bypassing that delegate, so the gate has to be re-checked here.
+    //
+    // Two inputs make up the effective autosave state. `PDFConfiguration.isAutosaveEnabled`
+    // carries the supported configuration-object setting (`disableAutomaticSaving` /
+    // `autosaveEnabled`), which is honored on both architectures. `self.disableAutomaticSaving`
+    // is the deprecated top-level Legacy view prop (a silent no-op on the New Architecture —
+    // see https://nutrient.atlassian.net/browse/HYB-1000). Check both so the flush honors
+    // whichever path the consumer used. Failures surface through the existing
+    // PSPDFDocumentDelegate route (pdfDocument:saveDidFailWithError:), which fires onDocumentSaveFailed.
+    BOOL autosaveEnabled = self.pdfController.configuration.isAutosaveEnabled && !self.disableAutomaticSaving;
+    if (!autosaveEnabled) {
+        return;
+    }
+    PSPDFDocument *document = self.pdfController.document;
+    if (document.isValid && document.hasDirtyAnnotations) {
+        [self saveCurrentDocumentWithError:NULL];
+    }
 }
 
 // These options are configuration options in Android, but not on iOS, so we apply them

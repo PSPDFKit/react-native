@@ -19,7 +19,7 @@ import com.facebook.react.bridge.WritableMap
 import com.facebook.react.uimanager.events.Event
 import com.pspdfkit.annotations.Annotation
 
-class FabricOnAnnotationTappedEvent(surfaceId: Int, viewId: Int, @param:NonNull private val annotation: Annotation) : Event<FabricOnAnnotationTappedEvent>(surfaceId, viewId) {
+class FabricOnAnnotationTappedEvent(surfaceId: Int, viewId: Int, @NonNull private val annotation: Annotation) : Event<FabricOnAnnotationTappedEvent>(surfaceId, viewId) {
 
     companion object {
         const val EVENT_NAME = "onAnnotationTapped"

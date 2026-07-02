@@ -3,7 +3,7 @@
 # Resolve react_native_pods.rb with node to allow for hoisting
 require Pod::Executable.execute_command("node", ["-p", "require.resolve('react-native/scripts/react_native_pods.rb',{paths: [process.argv[1]]},)", __dir__]).strip
 
-platform :ios, "16.0"
+platform :ios, "17.0"
 prepare_react_native_project!
 ENV["RCT_NEW_ARCH_ENABLED"] = "1"
 
@@ -28,8 +28,8 @@ target "Catalog" do
     app_path: "#{Pod::Config.instance.installation_root}/.."
   )
 
-  # PSPDFKit iOS SDK version specified by Nutrient React Native Plugin. Do not remove this line.
-  # Instant iOS SDK version specified by Nutrient React Native Plugin. Do not remove this line.
+  pod "PSPDFKit", podspec: "https://my.nutrient.io/pspdfkit-ios/nightly.podspec"
+  pod "Instant", podspec: "https://my.nutrient.io/instant/nightly.podspec"
 
   target "CatalogTests" do
     inherit! :complete
@@ -43,7 +43,7 @@ target "Catalog" do
           if host_cpu.eql?("x86_64")
             target_config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
           end
-          target_config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = "16.0"
+          target_config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = "17.0"
         end
       end
       aggregate_target.user_project.save
@@ -52,11 +52,11 @@ target "Catalog" do
       if host_cpu.eql?("x86_64")
         excl_config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
       end
-      excl_config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = "16.0"
+      excl_config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = "17.0"
     end
     installer.pods_project.targets.each do |target|
       target.build_configurations.each do |target_config|
-        target_config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = "16.0"
+        target_config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = "17.0"
       end
     end
     react_native_post_install(
@@ -64,5 +64,18 @@ target "Catalog" do
       config[:reactNativePath],
       mac_catalyst_enabled: false
     )
+    # Must come after react_native_post_install, which resets the C++ standard
+    # on all pod targets.
+    installer.pods_project.targets.each do |target|
+      next unless target.name == "fmt"
+
+      target.build_configurations.each do |target_config|
+        # fmt's consteval format-string checking miscompiles under the clang in
+        # Xcode 26.4+. Building fmt as C++17 makes fmt disable consteval through
+        # its own compiler detection (fmt 11.0.2 redefines FMT_USE_CONSTEVAL, so
+        # the macro can't be forced from build settings).
+        target_config.build_settings["CLANG_CXX_LANGUAGE_STANDARD"] = "c++17"
+      end
+    end
   end
 end

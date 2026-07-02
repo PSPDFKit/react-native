@@ -1,37 +1,32 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { Alert, processColor, Text, TouchableOpacity, View } from 'react-native';
 import NutrientView, { Annotation } from '@nutrient-sdk/react-native';
 
 import { exampleDocumentPath, pspdfkitColor } from '../configuration/Constants';
-import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
+import { useBaseExampleAutoHidingHeader } from '../helpers/ExampleScreenLayoutHelpers';
 
-export class StateChange extends BaseExampleAutoHidingHeaderComponent {
-  pdfRef: React.RefObject<NutrientView | null>;
+export const StateChange = ({ navigation }: any) => {
+  const pdfRef = useRef<NutrientView | null>(null);
+  useBaseExampleAutoHidingHeader(navigation);
+  const [state, setState] = useState({
+    currentPageIndex: 0,
+    pageCount: 0,
+    annotationCreationActive: false,
+    annotationEditingActive: false,
+  });
 
-  constructor(props: any) {
-    super(props);
-    this.pdfRef = React.createRef();
-    this.state = {
-      currentPageIndex: 0,
-      pageCount: 0,
-      annotationCreationActive: false,
-      annotationEditingActive: false,
-    };
-  }
-
-  override render() {
-    let buttonTitle;
-    if (this.state.annotationCreationActive) {
+  let buttonTitle;
+  if (state.annotationCreationActive) {
       buttonTitle = 'Exit Annotation Creation Mode';
-    } else if (this.state.annotationEditingActive) {
+    } else if (state.annotationEditingActive) {
       buttonTitle = 'Exit Annotation Editing Mode';
-    } else {
+  } else {
       buttonTitle = 'Enter Annotation Creation Mode';
-    }
-    return (
-      <View style={styles.flex}>
-        <NutrientView
-          ref={this.pdfRef}
+  }
+  return (
+    <View style={styles.flex}>
+      <NutrientView
+          ref={pdfRef}
           document={exampleDocumentPath}
           configuration={{
             iOSBackgroundColor: processColor('lightgrey'),
@@ -45,7 +40,7 @@ export class StateChange extends BaseExampleAutoHidingHeaderComponent {
               ],
             },
           ]}
-          pageIndex={this.state.currentPageIndex}
+          pageIndex={state.currentPageIndex}
           style={styles.pdfColor}
           onStateChanged={(event: {
             currentPageIndex: any;
@@ -53,31 +48,32 @@ export class StateChange extends BaseExampleAutoHidingHeaderComponent {
             annotationEditingActive: any;
             pageCount: any;
           }) => {
-            if (event.currentPageIndex !== this.state.currentPageIndex) {
+            if (event.currentPageIndex !== state.currentPageIndex) {
               return;
             }
 
-            this.setState({
+            setState(prev => ({
+              ...prev,
               annotationCreationActive: event.annotationCreationActive,
               annotationEditingActive: event.annotationEditingActive,
               currentPageIndex: event.currentPageIndex,
               pageCount: event.pageCount,
-            });
+            }));
           }}
-        />
-        <View style={styles.column}>
+      />
+      <View style={styles.column}>
           <View style={styles.annotationContainer}>
             <TouchableOpacity
               accessibilityLabel="Change state"
               testID="Change state"
               onPress={() => {
                 if (
-                  this.state.annotationCreationActive ||
-                  this.state.annotationEditingActive
+                  state.annotationCreationActive ||
+                  state.annotationEditingActive
                 ) {
-                  this.pdfRef.current?.exitCurrentlyActiveMode();
+                  pdfRef.current?.exitCurrentlyActiveMode();
                 } else {
-                  this.pdfRef.current?.enterAnnotationCreationMode(Annotation.Type.PEN);
+                  pdfRef.current?.enterAnnotationCreationMode(Annotation.Type.PEN);
                 }
               }}
             >
@@ -87,46 +83,43 @@ export class StateChange extends BaseExampleAutoHidingHeaderComponent {
           <View style={styles.horizontalContainer}>
             <Text accessibilityLabel="Page Number" style={styles.pageText}>
               {'Page ' +
-                (this.state.currentPageIndex + 1) +
+                (state.currentPageIndex + 1) +
                 ' of ' +
-                this.state.pageCount}
+                state.pageCount}
             </Text>
             <TouchableOpacity
               accessibilityLabel="Previous Page"
               onPress={() => {
-                this.setState((previousState: { currentPageIndex: number }) => {
+                setState(previousState => {
                   return {
+                    ...previousState,
                     currentPageIndex: previousState.currentPageIndex - 1,
                   };
                 });
               }}
-              disabled={this.state.currentPageIndex === 0}
+              disabled={state.currentPageIndex === 0}
             >
-              <Text style={[styles.button, this.state.currentPageIndex === 0 && styles.disabledButton]}>Previous Page</Text>
+              <Text style={[styles.button, state.currentPageIndex === 0 && styles.disabledButton]}>Previous Page</Text>
             </TouchableOpacity>
             <TouchableOpacity
               accessibilityLabel="Next Page"
               onPress={() => {
-                this.setState(
-                  (previousState: { currentPageIndex: number }) => {
-                    return {
-                      currentPageIndex: previousState.currentPageIndex + 1,
-                    };
-                  },
-                );
+                setState(previousState => ({
+                  ...previousState,
+                  currentPageIndex: previousState.currentPageIndex + 1,
+                }));
               }}
               disabled={
-                this.state.currentPageIndex === this.state.pageCount - 1
+                state.currentPageIndex === state.pageCount - 1
               }
             >
-              <Text style={[styles.button, this.state.currentPageIndex === this.state.pageCount - 1 && styles.disabledButton]}>Next Page</Text>
+              <Text style={[styles.button, state.currentPageIndex === state.pageCount - 1 && styles.disabledButton]}>Next Page</Text>
             </TouchableOpacity>
           </View>
-        </View>
       </View>
-    );
-  }
-}
+    </View>
+  );
+};
 
 const styles = {
   flex: { flex: 1 },

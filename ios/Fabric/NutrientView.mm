@@ -319,6 +319,7 @@ using namespace facebook::react;
     _view.componentID = [self.nativeId integerValue];
     
   auto newProps = std::static_pointer_cast<const NutrientViewProps>(props);
+  auto oldViewProps = std::static_pointer_cast<const NutrientViewProps>(oldProps);
   if (newProps != nullptr) {
       // Parse configuration first so remoteDocumentConfiguration is available when applying document
       NSDictionary *jsonConfig = nil;
@@ -327,11 +328,19 @@ using namespace facebook::react;
           jsonConfig = [NutrientFabricUtils dictionaryFromJSONString:_configurationJSONString];
       }
 
-      // Basic document props
-      if (!newProps->document.empty()) {
-          _document = RCTNSStringFromString(newProps->document);
+      BOOL documentChanged = (oldViewProps == nullptr) || (newProps->document != oldViewProps->document);
+      if (!newProps->document.empty() && documentChanged) {
+          NSString *nextDocument = RCTNSStringFromString(newProps->document);
+          BOOL hasAppliedDocument = _document.length > 0 && _view.pdfController.document.isValid;
           NSNumber *reference = [NSNumber numberWithInteger:[self.nativeId integerValue]];
           NSDictionary *remoteConfig = jsonConfig[@"remoteDocumentConfiguration"];
+          if (hasAppliedDocument) {
+              // applyDocumentFromJSON rebuilds the document from disk on prop updates, which
+              // would drop committed-but-unsaved annotations. Skip the initial mount because
+              // there is no user work to preserve yet.
+              [_view flushDirtyAnnotationsIfNeeded];
+          }
+          _document = nextDocument;
           [NutrientPropsDocumentHelper applyDocumentFromJSON:_document
                                           remoteDocumentConfig:remoteConfig
                                                         toView:_view
@@ -386,8 +395,12 @@ using namespace facebook::react;
           [NutrientPropsDocumentHelper applyImageSaveModeFromJSON:_imageSaveMode toView:_view];
       }
 
-      // Apply configuration (parsed above); omit entirely if not provided so native defaults apply
-      if (jsonConfig) {
+      // Apply configuration only when it actually changed. Re-applying reconfigures the controller,
+      // which rebuilds the page view controllers and dismisses any presented modal (e.g. an open Note
+      // editor); on Fabric, updateProps re-applies every prop on every re-render. Mirrors the document
+      // guard above. https://nutrient.atlassian.net/browse/HYB-1007
+      BOOL configurationChanged = (oldViewProps == nullptr) || (newProps->configurationJSONString != oldViewProps->configurationJSONString);
+      if (jsonConfig && configurationChanged) {
           [NutrientPropsDocumentHelper applyConfigurationFromJSON:jsonConfig toView:_view];
       }
       

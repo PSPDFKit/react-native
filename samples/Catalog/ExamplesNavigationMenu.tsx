@@ -151,6 +151,15 @@ export default [
     },
   },
   {
+    key: 'scrollOnEdgeTap',
+    name: 'Scroll on Edge Tap',
+    description:
+      'Toggle scrollOnEdgeTapEnabled in horizontal + automatic UI mode to control whether edge taps flip pages or toggle the toolbar.',
+    action: (component: any) => {
+      component.props.navigation.push('ScrollOnEdgeTap');
+    },
+  },
+  {
     key: 'item14',
     name: 'Custom Font Picker',
     description:

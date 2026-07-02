@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { Alert, processColor, Text, TouchableOpacity, View, Platform } from 'react-native';
 import NutrientView from '@nutrient-sdk/react-native';
 
@@ -6,72 +6,68 @@ import {
   pspdfkitColor,
   writableDocumentPath,
 } from '../configuration/Constants';
-import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
+import {
+  renderWithBaseExampleSafeArea,
+  useBaseExampleAutoHidingHeader,
+} from '../helpers/ExampleScreenLayoutHelpers';
 
-export class ManualSave extends BaseExampleAutoHidingHeaderComponent {
-  pdfRef: React.RefObject<NutrientView | null>;
+export const ManualSave = ({ navigation }: any) => {
+  const pdfRef = useRef<NutrientView | null>(null);
+  useBaseExampleAutoHidingHeader(navigation);
 
-  constructor(props: any) {
-    super(props);
-    this.pdfRef = React.createRef();
-  }
-
-  override render() {
-    return (
-      <View style={styles.flex}>
-        <NutrientView
-          ref={this.pdfRef}
-          document={writableDocumentPath}
-          disableAutomaticSaving={true}
-          configuration={{
-            iOSBackgroundColor: processColor('lightgrey'),
-          }}
-          menuItemGrouping={[
-            'note',
-            { key: 'markup', items: ['freetext', 'freetext_callout'] },
-            { key: 'markup', items: ['pen', 'magic_ink', 'highlighter'] },
-            { key: 'drawing', items: ['arrow', 'line', 'square', 'circle', 'polygon', 'polyline', 'cloudy_polygon'] },
-            { key: 'measurement', items: ['distance', 'perimeter', 'area_polygon', 'area_square', 'area_circle'] },
-            { key: 'multimedia', items: ['image', 'stamp', 'signature', 'link', 'camera'] },
-            'eraser'
-          ]}
-          pageIndex={3}
-          style={styles.pdfColor}
-        />
-        {this.renderWithSafeArea(insets => (
-          <View style={[styles.buttonContainer, { paddingBottom: insets.bottom }]}>
-            <TouchableOpacity
-              style={styles.fullWidthButton}
-              accessibilityLabel={'Save Button'}
-              testID={'Save Button'}
-              onPress={() => {
-                // Manual Save
-                this.pdfRef?.current?.getDocument().save()
-                  .then(saved => {
-                    if (saved) {
-                      Alert.alert(
-                        'Nutrient',
-                        'Successfully saved current document.',
-                      );
-                    } else {
-                      Alert.alert(
-                        'Nutrient',
-                        'Document was not saved as it was not modified.',
-                      );
-                    }
-                  })
-                  .catch(error => {
-                    Alert.alert('Nutrient', JSON.stringify(error));
-                  });
-              }}>
-              <Text style={styles.button}>Save</Text>
-            </TouchableOpacity>
-          </View>
-        ))}
-      </View>
-    );
-  }
-}
+  return (
+    <View style={styles.flex}>
+      <NutrientView
+        ref={pdfRef}
+        document={writableDocumentPath}
+        disableAutomaticSaving={true}
+        configuration={{
+          iOSBackgroundColor: processColor('lightgrey'),
+        }}
+        menuItemGrouping={[
+          'note',
+          { key: 'markup', items: ['freetext', 'freetext_callout'] },
+          { key: 'markup', items: ['pen', 'magic_ink', 'highlighter'] },
+          { key: 'drawing', items: ['arrow', 'line', 'square', 'circle', 'polygon', 'polyline', 'cloudy_polygon'] },
+          { key: 'measurement', items: ['distance', 'perimeter', 'area_polygon', 'area_square', 'area_circle'] },
+          { key: 'multimedia', items: ['image', 'stamp', 'signature', 'link', 'camera'] },
+          'eraser',
+        ]}
+        pageIndex={3}
+        style={styles.pdfColor}
+      />
+      {renderWithBaseExampleSafeArea(insets => (
+        <View style={[styles.buttonContainer, { paddingBottom: insets.bottom }]}>
+          <TouchableOpacity
+            style={styles.fullWidthButton}
+            accessibilityLabel={'Save Button'}
+            testID={'Save Button'}
+            onPress={() => {
+              pdfRef.current
+                ?.getDocument()
+                .save()
+                .then(saved => {
+                  if (saved) {
+                    Alert.alert('Nutrient', 'Successfully saved current document.');
+                  } else {
+                    Alert.alert(
+                      'Nutrient',
+                      'Document was not saved as it was not modified.',
+                    );
+                  }
+                })
+                .catch(error => {
+                  Alert.alert('Nutrient', JSON.stringify(error));
+                });
+            }}
+          >
+            <Text style={styles.button}>Save</Text>
+          </TouchableOpacity>
+        </View>
+      ))}
+    </View>
+  );
+};
 
 const styles = {
   flex: { flex: 1 },

@@ -64,6 +64,10 @@ NS_ASSUME_NONNULL_BEGIN
 /// Document
 - (void)setDocument:(PSPDFDocument *)document;
 - (BOOL)saveCurrentDocumentWithError:(NSError *_Nullable *)error;
+/// Saves committed-but-unsaved annotations so a prop-driven reconfigure (or, on the New
+/// Architecture, a document rebuild) cannot silently drop unsaved work. No-op when nothing
+/// is dirty.
+- (void)flushDirtyAnnotationsIfNeeded;
 - (void)updatePageIndex:(PSPDFPageIndex)pageIndex;
 
 /// Configuration

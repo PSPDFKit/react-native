@@ -24,7 +24,6 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableMapKeySetIterator;
 import com.pspdfkit.annotations.AnnotationType;
 import com.pspdfkit.configuration.activity.PdfActivityConfiguration;
-import com.pspdfkit.configuration.activity.TabBarHidingMode;
 import com.pspdfkit.configuration.activity.ThumbnailBarMode;
 import com.pspdfkit.configuration.activity.UserInterfaceViewMode;
 import com.pspdfkit.configuration.page.PageFitMode;
@@ -53,6 +52,8 @@ public class ConfigurationAdapter {
     private static final String PAGE_TRANSITION = "pageTransition";
     private static final String PAGE_TRANSITION_PER_SPREAD = "scrollPerSpread";
     private static final String PAGE_TRANSITION_CONTINUOUS = "scrollContinuous";
+    private static final String SCROLL_ON_EDGE_TAP_ENABLED = "scrollOnEdgeTapEnabled";
+    private static final String SCROLL_ON_EDGE_TAP_MARGIN = "scrollOnEdgeTapMargin";
     private static final String ENABLE_TEXT_SELECTION = "enableTextSelection";
     private static final String AUTOSAVE_ENABLED = "autosaveEnabled";
     private static final String AUTOSAVE_DISABLED = "disableAutomaticSaving";
@@ -206,6 +207,14 @@ public class ConfigurationAdapter {
             key = getKeyOrNull(configuration, PAGE_TRANSITION);
             if (key != null) {
                 configurePageTransition(configuration.getString(key));
+            }
+            key = getKeyOrNull(configuration, SCROLL_ON_EDGE_TAP_ENABLED);
+            if (key != null) {
+                configureScrollOnEdgeTapEnabled(configuration.getBoolean(key));
+            }
+            key = getKeyOrNull(configuration, SCROLL_ON_EDGE_TAP_MARGIN);
+            if (key != null) {
+                configureScrollOnEdgeTapMargin(configuration.getInt(key));
             }
             key = getKeyOrNull(configuration, SPREAD_FITTING);
             if (key != null) {
@@ -428,6 +437,18 @@ public class ConfigurationAdapter {
     private void configurePageScrollContinuous(final boolean pageScrollContinuous) {
         final PageScrollMode pageScrollMode = pageScrollContinuous ? PageScrollMode.CONTINUOUS : PageScrollMode.PER_PAGE;
         configuration.scrollMode(pageScrollMode);
+    }
+
+    private void configureScrollOnEdgeTapEnabled(final boolean scrollOnEdgeTapEnabled) {
+        configuration.scrollOnEdgeTapEnabled(scrollOnEdgeTapEnabled);
+    }
+
+    private void configureScrollOnEdgeTapMargin(final int scrollOnEdgeTapMarginDp) {
+        if (scrollOnEdgeTapMarginDp < 1) {
+            Log.e(LOG_TAG, "Illegal configuration option for scroll on edge tap margin; must be at least 1.");
+            return;
+        }
+        configuration.scrollOnEdgeTapMargin(scrollOnEdgeTapMarginDp);
     }
 
     private void configurePageTransition(@Nullable final String pageTransition) {
@@ -676,14 +697,12 @@ public class ConfigurationAdapter {
         PSPDFKitPreferences.get(context).setMeasurementSnappingEnabled(snappingEnabled);
     }
 
+    @SuppressWarnings("unused")
     private void configureShowDefaultToolbar(final boolean showDefaultToolbar) {
-        if (showDefaultToolbar) {
-            // Set it back to the default, which is AUTOMATIC_HIDE_SINGLE
-            configuration.setTabBarHidingMode(TabBarHidingMode.AUTOMATIC_HIDE_SINGLE);
-        } else {
-            configuration.setTabBarHidingMode(TabBarHidingMode.HIDE);
-        }
-        configuration.defaultToolbarEnabled(showDefaultToolbar);
+        // Toolbar visibility for React Native is driven by PdfView#setHideDefaultToolbar via
+        // NutrientPropsDocumentHelper.applyToolbarVisibilityFromConfiguration (same path as the
+        // hideDefaultToolbar prop). PdfActivityConfiguration tab bar / defaultToolbar flags are
+        // not used here to avoid conflicting with that behavior.
     }
 
     private void configureShowActionButtons(final boolean showActionButtons) {
