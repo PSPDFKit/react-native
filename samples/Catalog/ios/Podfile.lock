@@ -8,16 +8,16 @@ PODS:
   - hermes-engine (0.14.1):
     - hermes-engine/Pre-built (= 0.14.1)
   - hermes-engine/Pre-built (0.14.1)
-  - Instant (26.6.0)
-  - nutrient-sdk-react-native (4.3.4):
+  - Instant (26.10.0)
+  - nutrient-sdk-react-native (4.4.0):
     - boost
     - DoubleConversion
     - fast_float
     - fmt
     - glog
     - hermes-engine
-    - Instant (= 26.6.0)
-    - PSPDFKit (= 26.6.0)
+    - Instant (= 26.10.0)
+    - PSPDFKit (= 26.10.0)
     - RCT-Folly
     - RCT-Folly/Fabric
     - RCTRequired
@@ -39,9 +39,9 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - PSPDFKit (26.6.0):
-    - PSPDFKit/Core (= 26.6.0)
-  - PSPDFKit/Core (26.6.0)
+  - PSPDFKit (26.10.0):
+    - PSPDFKit/Core (= 26.10.0)
+  - PSPDFKit/Core (26.10.0)
   - RCT-Folly (2024.11.18.00):
     - boost
     - DoubleConversion
@@ -2601,7 +2601,7 @@ PODS:
     - Yoga
   - RNFS (2.20.0):
     - React-Core
-  - RNGestureHandler (2.32.0):
+  - RNGestureHandler (2.31.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -2961,9 +2961,9 @@ SPEC CHECKSUMS:
   fmt: 530618a01105dae0fa3a2f27c81ae11fa8f67eac
   glog: 5683914934d5b6e4240e497e0f4a3b42d1854183
   hermes-engine: 40901885cf1da22472b2046a230505db0b88023f
-  Instant: 95db4686c0be5e2953d8a80184ce4f239bcda5e5
-  nutrient-sdk-react-native: 811565496e8863aae7bf38eb5f0e556670ec55f7
-  PSPDFKit: 8b63d55bf7df1947f9b20319703f7153550b81b3
+  Instant: da212741060b19c29bfc7b23d24c45449c64f0e6
+  nutrient-sdk-react-native: ad4fcbb67c30d3beb0f5d1669eef9bcfe09f87eb
+  PSPDFKit: dedbc23dff3fff9906425a2baa499bca429e2d5c
   RCT-Folly: 121436bcc4611f6bde5c09bf35f0a7a82cef1969
   RCTDeprecation: 66da7829306a6741edb3f866687c13a4938ca5f4
   RCTRequired: c6853c7a563306968f833210c476741e09fc5f61
@@ -3036,11 +3036,11 @@ SPEC CHECKSUMS:
   ReactCommon: 506ceb24983c6b80e0075968be21aac74a367739
   RNCMaskedView: 63268de1986a098b5f4d1fb5b1bc1e97fade0aee
   RNFS: 4ac0f0ea233904cb798630b3c077808c06931688
-  RNGestureHandler: 336ce8e4fb4f4eb3e0b7c18e092684caa0ace5b5
+  RNGestureHandler: cdaeba6240a34ade4463b52ea0c54e1685a46265
   RNScreens: 7179cc1ba31b4e18ed29f10abf20c24a7961cf4c
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   Yoga: 897e8c1fb1fd80c3c01231ed4ec8c1ffa652c29f
 
-PODFILE CHECKSUM: 2bbb2514bf14043e0bb2aaaf0592df313d45f0aa
+PODFILE CHECKSUM: 15a803dd005df51c73e8bdc6743f55cca97a3bed
 
 COCOAPODS: 1.16.2

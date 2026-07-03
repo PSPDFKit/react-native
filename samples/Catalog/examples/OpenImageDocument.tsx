@@ -1,62 +1,57 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Alert, processColor, Text, TouchableOpacity, View, Platform } from 'react-native';
 import NutrientView from '@nutrient-sdk/react-native';
 
 import { pspdfkitColor, tiffImagePath } from '../configuration/Constants';
-import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
+import {
+  renderWithBaseExampleSafeArea,
+  useBaseExampleAutoHidingHeader,
+} from '../helpers/ExampleScreenLayoutHelpers';
 import { hideToolbar } from '../helpers/NavigationHelper';
 
-export class OpenImageDocument extends BaseExampleAutoHidingHeaderComponent {
-  pdfRef: React.RefObject<NutrientView | null>;
-
-  constructor(props: any) {
-    super(props);
-    const { navigation } = this.props;
-    this.pdfRef = React.createRef();
-
+export const OpenImageDocument = ({ navigation }: any) => {
+  const pdfRef = useRef<NutrientView | null>(null);
+  useBaseExampleAutoHidingHeader(navigation);
+  useEffect(() => {
     hideToolbar(navigation);
-  }
+  }, [navigation]);
 
-  override render() {
-    const { navigation } = this.props;
-
-    return (
-      <View style={styles.flex}>
-        <NutrientView
-          document={tiffImagePath}
-          ref={this.pdfRef}
-          configuration={{
-            iOSBackgroundColor: processColor('lightgrey'),
-            showPageLabels: false,
-            iOSUseParentNavigationBar: false,
-            iOSAllowToolbarTitleChange: false,
-          }}
-          showNavigationButtonInToolbar={true}
-          onNavigationButtonClicked={() => navigation.goBack()}
-          style={styles.pdfColor}
-        />
-        {this.renderWithSafeArea(insets => (
-          <View style={[styles.buttonContainer, { paddingBottom: insets.bottom }]}>
-            <TouchableOpacity
-              style={styles.fullWidthButton}
-              accessibilityLabel={'Get Document ID'}
-              testID={'Get Document ID'}
-              onPress={ async () => {
-                const document = this.pdfRef.current?.getDocument();
-                Alert.alert(
-                  'Nutrient',
-                  'Document ID: ' + await document?.getDocumentId(),
-                );
-              }}
-            >
-              <Text style={styles.button}>Get Document ID</Text>
-            </TouchableOpacity>
-          </View>
-        ))}
-      </View>
-    );
-  }
-}
+  return (
+    <View style={styles.flex}>
+      <NutrientView
+        document={tiffImagePath}
+        ref={pdfRef}
+        configuration={{
+          iOSBackgroundColor: processColor('lightgrey'),
+          showPageLabels: false,
+          iOSUseParentNavigationBar: false,
+          iOSAllowToolbarTitleChange: false,
+        }}
+        showNavigationButtonInToolbar={true}
+        onNavigationButtonClicked={() => navigation.goBack()}
+        style={styles.pdfColor}
+      />
+      {renderWithBaseExampleSafeArea(insets => (
+        <View style={[styles.buttonContainer, { paddingBottom: insets.bottom }]}>
+          <TouchableOpacity
+            style={styles.fullWidthButton}
+            accessibilityLabel={'Get Document ID'}
+            testID={'Get Document ID'}
+            onPress={async () => {
+              const document = pdfRef.current?.getDocument();
+              Alert.alert(
+                'Nutrient',
+                'Document ID: ' + (await document?.getDocumentId()),
+              );
+            }}
+          >
+            <Text style={styles.button}>Get Document ID</Text>
+          </TouchableOpacity>
+        </View>
+      ))}
+    </View>
+  );
+};
 
 const styles = {
   flex: { flex: 1 },

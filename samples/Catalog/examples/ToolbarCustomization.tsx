@@ -1,23 +1,21 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { Alert, Platform, processColor, Text, TouchableOpacity, View } from 'react-native';
 import NutrientView, { PDFConfiguration, Toolbar } from '@nutrient-sdk/react-native';
 
 import { exampleDocumentPath, pspdfkitColor } from '../configuration/Constants';
-import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
+import {
+  renderWithBaseExampleSafeArea,
+  useBaseExampleAutoHidingHeader,
+} from '../helpers/ExampleScreenLayoutHelpers';
 
-export class ToolbarCustomization extends BaseExampleAutoHidingHeaderComponent {
-  pdfRef: React.RefObject<NutrientView | null>;
+export const ToolbarCustomization = ({ navigation }: any) => {
+  const pdfRef = useRef<NutrientView | null>(null);
+  useBaseExampleAutoHidingHeader(navigation);
 
-  constructor(props: any) {
-    super(props);
-    this.pdfRef = React.createRef();
-  }
-
-  override render() {
-    return (
-      <View style={styles.flex}>
-        <NutrientView
-          ref={this.pdfRef}
+  return (
+    <View style={styles.flex}>
+      <NutrientView
+          ref={pdfRef}
           document={exampleDocumentPath}
           menuItemGrouping={['ink', 'highlight', 'note', 'signature']}
           disableAutomaticSaving={true}
@@ -31,51 +29,51 @@ export class ToolbarCustomization extends BaseExampleAutoHidingHeaderComponent {
             pageMode: 'single',
             signatureSavingStrategy: 'alwaysSave',
             }}
-          toolbar={{
-            // iOS only.
-            leftBarButtonItems: {
-              viewMode: Toolbar.PDFViewMode.VIEW_MODE_DOCUMENT,
-              animated: true,
-              buttons: [
-                Toolbar.DefaultToolbarButton.EMAIL_BUTTON_ITEM,
-              ],
-            },
-            // iOS only.
-            rightBarButtonItems: {
-              viewMode: Toolbar.PDFViewMode.VIEW_MODE_DOCUMENT,
-              animated: true,
-              buttons: [
-                {
-                  image: 'example_toolbar_icon',
-                  id: 'myCustomButton'
-                }
-              ],
-            },
-            // Android only.
-            toolbarMenuItems: {
-              buttons: [
-                {
-                  image: 'example_toolbar_icon', 
-                  id: 'custom_action',
-                  title: 'Android title',
-                  showAsAction: true
-                },
-                Toolbar.DefaultToolbarButton.SETTINGS_BUTTON_ITEM,
-                Toolbar.DefaultToolbarButton.SEARCH_BUTTON_ITEM,
-                Toolbar.DefaultToolbarButton.ANNOTATION_BUTTON_ITEM,
-              ],
-            },
+            toolbar={{
+              // iOS only.
+              leftBarButtonItems: {
+                viewMode: Toolbar.PDFViewMode.VIEW_MODE_DOCUMENT,
+                animated: true,
+                buttons: [
+                  Toolbar.DefaultToolbarButton.EMAIL_BUTTON_ITEM,
+                ],
+              },
+              // iOS only.
+              rightBarButtonItems: {
+                viewMode: Toolbar.PDFViewMode.VIEW_MODE_DOCUMENT,
+                animated: true,
+                buttons: [
+                  {
+                    image: 'example_toolbar_icon',
+                    id: 'myCustomButton'
+                  }
+                ],
+              },
+              // Android only.
+              toolbarMenuItems: {
+                buttons: [
+                  {
+                    image: 'example_toolbar_icon', 
+                    id: 'custom_action',
+                    title: 'Android title',
+                    showAsAction: true
+                  },
+                  Toolbar.DefaultToolbarButton.SETTINGS_BUTTON_ITEM,
+                  Toolbar.DefaultToolbarButton.SEARCH_BUTTON_ITEM,
+                  Toolbar.DefaultToolbarButton.ANNOTATION_BUTTON_ITEM,
+                ],
+              },
           }}
           onCustomToolbarButtonTapped={(event: any) => {
             Alert.alert('Nutrient', `Custom button tapped: ${JSON.stringify(event)}`);
           }}
           style={styles.pdfColor}
-        />
-        {this.renderWithSafeArea(insets => (
-          <View style={[styles.column, { paddingBottom: insets.bottom }]}>
-            <View>
-              <View style={styles.horizontalContainer}>
-                <TouchableOpacity onPress={async () => {
+      />
+      {renderWithBaseExampleSafeArea(insets => (
+        <View style={[styles.column, { paddingBottom: insets.bottom }]}>
+          <View>
+            <View style={styles.horizontalContainer}>
+              <TouchableOpacity onPress={async () => {
                   const toolbar: Toolbar = {
                     leftBarButtonItems: {
                       viewMode: Toolbar.PDFViewMode.VIEW_MODE_DOCUMENT,
@@ -108,31 +106,30 @@ export class ToolbarCustomization extends BaseExampleAutoHidingHeaderComponent {
                       ],
                     },
                 };
-                this.pdfRef.current?.setToolbar(toolbar);
+                pdfRef.current?.setToolbar(toolbar);
                 }}
                 accessibilityLabel="Set Toolbar Items"
               >
                 <Text style={styles.button}>Set Toolbar</Text>
               </TouchableOpacity>
-                <TouchableOpacity onPress={async () => {
+              <TouchableOpacity onPress={async () => {
                   if (Platform.OS === 'android') {
                     Alert.alert('Nutrient', 'Not supported on Android');
                     return;
                   }
-                  const toolbarItems = await this.pdfRef.current?.getToolbar();
+                  const toolbarItems = await pdfRef.current?.getToolbar();
                   Alert.alert('Nutrient', JSON.stringify(toolbarItems));
                 }}
               >
                 <Text style={styles.button}>Get Toolbar</Text>
               </TouchableOpacity>
-              </View>
             </View>
           </View>
-        ))}
-      </View>
-    );
-  }
-}
+        </View>
+      ))}
+    </View>
+  );
+};
 
 const styles = {
   flex: { flex: 1 },

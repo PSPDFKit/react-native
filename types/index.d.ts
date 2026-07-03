@@ -545,11 +545,11 @@ export type Props = {
      */
     menuItemGrouping?: any[];
     /**
-     * Sets the left bar button items. Note: The same button item cannot be added to both the left and right bar button items simultaneously. See {@link https://github.com/PSPDFKit/react-native/blob/master/ios/Converters/RCTConvert+UIBarButtonItem.m} for supported button items.
+     * Sets the left bar button items. Note: The same button item cannot be added to both the left and right bar button items simultaneously. Deprecated since Nutrient React Native SDK 4.0. Use ```NutrientView.toolbar.leftBarButtonItems``` instead.
      */
     leftBarButtonItems?: Array<string>;
     /**
-     * Sets the right bar button items. Note: The same button item cannot be added to both the left and right bar button items simultaneously. See {@link https://github.com/PSPDFKit/react-native/blob/master/ios/Converters/RCTConvert+UIBarButtonItem.m} for supported button items.
+     * Sets the right bar button items. Note: The same button item cannot be added to both the left and right bar button items simultaneously. Deprecated since Nutrient React Native SDK 4.0. Use ```NutrientView.toolbar.rightBarButtonItems``` instead.
      */
     rightBarButtonItems?: Array<string>;
     /**
@@ -557,7 +557,7 @@ export type Props = {
      */
     toolbarTitle?: string;
     /**
-     * Used to customize the toolbar menu items for Android. See {@link https://github.com/PSPDFKit/react-native/blob/master/android/src/main/java/com/pspdfkit/react/ToolbarMenuItemsAdapter.java} for supported toolbar menu items.
+     * Used to customize the toolbar menu items for Android. Deprecated since Nutrient React Native SDK 4.0. Use ```NutrientView.toolbar.toolbarMenuItems``` instead.
      */
     toolbarMenuItems?: Array<string>;
     /**
@@ -1327,6 +1327,7 @@ import annotation = require('../src/annotations/Annotation');
 export import Annotation = annotation.Annotation;
 export import AnnotationContextualMenu = annotation.AnnotationContextualMenu;
 export import AnnotationContextualMenuItem = annotation.AnnotationContextualMenuItem;
+export import TextSelectionContextualMenu = annotation.TextSelectionContextualMenu;
 export import AnnotationPresetConfiguration = annotation.AnnotationPresetConfiguration;
 
 export import AnnotationPresetInk = annotation.AnnotationPresetInk
@@ -1425,3 +1426,6 @@ export import TextFormFieldConfiguration = formFieldConfiguration.TextFormFieldC
 //@ts-ignore
 import nutrientViewEvents = require('../src/events/NutrientViewEvents');
 export import ShouldExecuteActionEvent = nutrientViewEvents.ShouldExecuteActionEvent;
+
+//@ts-ignore
+export declare const NutrientInstantView: any;

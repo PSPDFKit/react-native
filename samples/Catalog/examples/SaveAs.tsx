@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { Alert, processColor, Text, TouchableOpacity, View, Platform } from 'react-native';
 import fileSystem from 'react-native-fs';
 import NutrientView, { Annotation } from '@nutrient-sdk/react-native';
@@ -7,94 +7,84 @@ import {
   pspdfkitColor,
   writableDocumentPath,
 } from '../configuration/Constants';
-import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
+import {
+  renderWithBaseExampleSafeArea,
+  useBaseExampleAutoHidingHeader,
+} from '../helpers/ExampleScreenLayoutHelpers';
 import { Nutrient } from '../helpers/Nutrient';
 
-export class SaveAs extends BaseExampleAutoHidingHeaderComponent {
-  pdfRef: React.RefObject<NutrientView | null>;
+export const SaveAs = ({ navigation }: any) => {
+  const pdfRef = useRef<NutrientView | null>(null);
+  useBaseExampleAutoHidingHeader(navigation);
 
-  constructor(props: any) {
-    super(props);
-    this.pdfRef = React.createRef();
-  }
-
-  override render() {
-    const { navigation } = this.props;
-
-    return (
-      <View style={styles.flex}>
-        <NutrientView
-          ref={this.pdfRef}
-          document={writableDocumentPath}
-          disableAutomaticSaving={true}
-          fragmentTag="PDF1"
-          showNavigationButtonInToolbar={true}
-          onNavigationButtonClicked={() => navigation.goBack()}
-          configuration={{
-            iOSBackgroundColor: processColor('lightgrey')
-          }}
-          pageIndex={3}
-          style={styles.colorView(pspdfkitColor)}
-        />
-        {this.renderWithSafeArea(insets => (
-          <View style={[styles.buttonContainer, { paddingBottom: insets.bottom }]}>
-            <TouchableOpacity 
-              style={styles.fullWidthButton}
-              onPress={() => {
-                // Ensure that the path to the new document is a writable document path
-                // You can use a React Native package like https://github.com/rnmods/react-native-document-picker to allow users of your application to select the path and the file name for the new document
-                const newDocumentPath =
-                  fileSystem.DocumentDirectoryPath + '/newdocument.pdf';
-                // Delete the document if it already exists in that path.
-                fileSystem
-                  .exists(newDocumentPath)
-                  .then(exists => {
-                    if (exists) {
-                      fileSystem.unlink(newDocumentPath);
-                    }
-                  })
-                  // First, save all annotations in the current document.
-                  .then(() => {
-                    this.pdfRef?.current?.getDocument().save()
-                      .then(_saved => {
-                        // Then, embed all the annotations
-                        Nutrient.processAnnotations(
-                          Annotation.Change.EMBED,
-                          ['all'],
-                          writableDocumentPath,
-                          newDocumentPath,
-                          null
-                        )
-                          .then(success => {
-                            if (success) {
-                              Alert.alert(
-                                'Nutrient',
-                                `Document saved as ${newDocumentPath}`,
-                              );
-                            } else {
-                              Alert.alert(
-                                'Nutrient',
-                                'Failed to save document',
-                              );
-                            }
-                          })
-                          .catch(error => {
-                            Alert.alert('Nutrient', JSON.stringify(error));
-                          });
-                      })
-                      .catch(error => {
-                        Alert.alert('Nutrient', JSON.stringify(error));
-                      });
-                  });
-              }}>
-              <Text style={styles.button}>Save As</Text>
-            </TouchableOpacity>
-          </View>
-        ))}
-      </View>
-    );
-  }
-}
+  return (
+    <View style={styles.flex}>
+      <NutrientView
+        ref={pdfRef}
+        document={writableDocumentPath}
+        disableAutomaticSaving={true}
+        fragmentTag="PDF1"
+        showNavigationButtonInToolbar={true}
+        onNavigationButtonClicked={() => navigation.goBack()}
+        configuration={{
+          iOSBackgroundColor: processColor('lightgrey'),
+        }}
+        pageIndex={3}
+        style={styles.colorView(pspdfkitColor)}
+      />
+      {renderWithBaseExampleSafeArea(insets => (
+        <View style={[styles.buttonContainer, { paddingBottom: insets.bottom }]}>
+          <TouchableOpacity
+            style={styles.fullWidthButton}
+            onPress={() => {
+              const newDocumentPath =
+                fileSystem.DocumentDirectoryPath + '/newdocument.pdf';
+              fileSystem
+                .exists(newDocumentPath)
+                .then(exists => {
+                  if (exists) {
+                    fileSystem.unlink(newDocumentPath);
+                  }
+                })
+                .then(() => {
+                  pdfRef.current
+                    ?.getDocument()
+                    .save()
+                    .then(_saved => {
+                      Nutrient.processAnnotations(
+                        Annotation.Change.EMBED,
+                        ['all'],
+                        writableDocumentPath,
+                        newDocumentPath,
+                        null,
+                      )
+                        .then(success => {
+                          if (success) {
+                            Alert.alert(
+                              'Nutrient',
+                              `Document saved as ${newDocumentPath}`,
+                            );
+                          } else {
+                            Alert.alert('Nutrient', 'Failed to save document');
+                          }
+                        })
+                        .catch(error => {
+                          Alert.alert('Nutrient', JSON.stringify(error));
+                        });
+                    })
+                    .catch(error => {
+                      Alert.alert('Nutrient', JSON.stringify(error));
+                    });
+                });
+            }}
+          >
+            <Text style={styles.button}>Save As</Text>
+          </TouchableOpacity>
+        </View>
+      ))}
+    </View>
+  );
+};
 
 const styles = {
   flex: { flex: 1 },

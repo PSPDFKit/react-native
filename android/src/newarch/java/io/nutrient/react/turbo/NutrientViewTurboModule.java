@@ -50,13 +50,10 @@ public class NutrientViewTurboModule extends NativeNutrientViewTurboModuleSpec {
 
     public NutrientViewTurboModule(ReactApplicationContext reactContext) {
         super(reactContext);
-        Log.d(TAG, "NutrientViewTurboModule initialized");
     }
 
     @Override
     public void enterAnnotationCreationMode(String reference, String annotationType, Promise promise) {
-        Log.d(TAG, "enterAnnotationCreationMode called with reference: " + reference + ", type: " + annotationType);
-        
         PdfView view = NutrientViewRegistry.getInstance().getViewForId(reference);
         if (view == null) {
             promise.reject(Errors.VIEW_NOT_FOUND, "No view found for reference: " + reference);
@@ -78,8 +75,6 @@ public class NutrientViewTurboModule extends NativeNutrientViewTurboModuleSpec {
 
     @Override
     public void exitCurrentlyActiveMode(String reference, Promise promise) {
-        Log.d(TAG, "exitCurrentlyActiveMode called with reference: " + reference);
-        
         PdfView view = NutrientViewRegistry.getInstance().getViewForId(reference);
         if (view == null) {
             promise.reject(Errors.VIEW_NOT_FOUND, "No view found for reference: " + reference);
@@ -100,8 +95,6 @@ public class NutrientViewTurboModule extends NativeNutrientViewTurboModuleSpec {
     
     @Override
     public void enterContentEditingMode(String reference, Promise promise) {
-        Log.d(TAG, "enterContentEditingMode called with reference: " + reference);
-        
         PdfView view = NutrientViewRegistry.getInstance().getViewForId(reference);
         if (view == null) {
             promise.reject(Errors.VIEW_NOT_FOUND, "No view found for reference: " + reference);
@@ -122,8 +115,6 @@ public class NutrientViewTurboModule extends NativeNutrientViewTurboModuleSpec {
     
     @Override
     public void setPageIndex(String reference, double pageIndex, boolean animated, Promise promise) {
-        Log.d(TAG, "setPageIndex called with reference: " + reference + ", pageIndex: " + pageIndex + ", animated: " + animated);
-        
         PdfView view = NutrientViewRegistry.getInstance().getViewForId(reference);
         if (view == null) {
             promise.reject(Errors.VIEW_NOT_FOUND, "No view found for reference: " + reference);
@@ -140,8 +131,6 @@ public class NutrientViewTurboModule extends NativeNutrientViewTurboModuleSpec {
 
     @Override
     public void executeAction(String reference, String requestId, boolean allow, Promise promise) {
-        Log.d(TAG, "executeAction called with reference: " + reference + ", requestId: " + requestId + ", allow: " + allow);
-
         PdfView view = NutrientViewRegistry.getInstance().getViewForId(reference);
         if (view == null) {
             promise.reject(Errors.VIEW_NOT_FOUND, "No view found for reference: " + reference);
@@ -158,8 +147,6 @@ public class NutrientViewTurboModule extends NativeNutrientViewTurboModuleSpec {
 
     @Override
     public void setToolbar(String reference, String toolbar) {
-        Log.d(TAG, "setToolbar called with reference: " + reference + ", toolbar: " + toolbar);
-        
         PdfView view = NutrientViewRegistry.getInstance().getViewForId(reference);
         if (view == null) {
             Log.w(TAG, "No view found for reference: " + reference);
@@ -176,16 +163,12 @@ public class NutrientViewTurboModule extends NativeNutrientViewTurboModuleSpec {
 
     @Override
     public void getToolbar(String reference, String viewMode, Promise promise) {
-        Log.d(TAG, "getToolbar called with reference: " + reference + ", viewMode: " + viewMode);
-        
         // Not currently supported on Android.
         promise.resolve(null);
     }
 
     @Override
     public void setMeasurementValueConfigurations(String reference, ReadableArray configurations, Promise promise) {
-        Log.d(TAG, "setMeasurementValueConfigurations called with reference: " + reference);
-        
         PdfView view = NutrientViewRegistry.getInstance().getViewForId(reference);
         if (view == null) {
             promise.reject(Errors.VIEW_NOT_FOUND, "No view found for reference: " + reference);
@@ -202,8 +185,6 @@ public class NutrientViewTurboModule extends NativeNutrientViewTurboModuleSpec {
 
     @Override
     public void getMeasurementValueConfigurations(String reference, Promise promise) {
-        Log.d(TAG, "getMeasurementValueConfigurations called with reference: " + reference);
-        
         PdfView view = NutrientViewRegistry.getInstance().getViewForId(reference);
         if (view == null) {
             promise.reject(Errors.VIEW_NOT_FOUND, "No view found for reference: " + reference);
@@ -220,8 +201,6 @@ public class NutrientViewTurboModule extends NativeNutrientViewTurboModuleSpec {
 
     @Override
     public void getConfiguration(String reference, Promise promise) {
-        Log.d(TAG, "getConfiguration called with reference: " + reference);
-        
         PdfView view = NutrientViewRegistry.getInstance().getViewForId(reference);
         if (view == null) {
             promise.reject(Errors.VIEW_NOT_FOUND, "No view found for reference: " + reference);
@@ -240,8 +219,6 @@ public class NutrientViewTurboModule extends NativeNutrientViewTurboModuleSpec {
 
     @Override
     public void setExcludedAnnotations(String reference, ReadableArray annotations) {
-        Log.d(TAG, "setExcludedAnnotations called with reference: " + reference);
-        
         PdfView view = NutrientViewRegistry.getInstance().getViewForId(reference);
         if (view == null) {
             Log.w(TAG, "No view found for reference: " + reference);
@@ -257,8 +234,6 @@ public class NutrientViewTurboModule extends NativeNutrientViewTurboModuleSpec {
 
     @Override
     public void setUserInterfaceVisible(String reference, boolean visible, Promise promise) {
-        Log.d(TAG, "setUserInterfaceVisible called with reference: " + reference + ", visible: " + visible);
-        
         PdfView view = NutrientViewRegistry.getInstance().getViewForId(reference);
         if (view == null) {
             promise.reject(Errors.VIEW_NOT_FOUND, "No view found for reference: " + reference);
@@ -275,8 +250,6 @@ public class NutrientViewTurboModule extends NativeNutrientViewTurboModuleSpec {
 
     @Override
     public void destroyView(String reference) {
-        Log.d(TAG, "destroyView called with reference: " + reference);
-        
         PdfView view = NutrientViewRegistry.getInstance().getViewForId(reference);
         if (view == null) {
             Log.w(TAG, "No view found for reference: " + reference);

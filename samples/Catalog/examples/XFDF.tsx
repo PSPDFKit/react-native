@@ -1,29 +1,27 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Alert, processColor, Text, TouchableOpacity, View } from 'react-native';
 import NutrientView from '@nutrient-sdk/react-native';
 
 import { pspdfkitColor, exampleReportPath, writableXFDFPath } from '../configuration/Constants';
-import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
+import {
+  renderWithBaseExampleSafeArea,
+  useBaseExampleAutoHidingHeader,
+} from '../helpers/ExampleScreenLayoutHelpers';
 import { hideToolbar } from '../helpers/NavigationHelper';
 import RNFS from 'react-native-fs';
 
-export class XFDF extends BaseExampleAutoHidingHeaderComponent {
-  pdfRef: React.RefObject<NutrientView | null>;
+export const XFDF = ({ navigation }: any) => {
+  const pdfRef = useRef<NutrientView | null>(null);
+  useBaseExampleAutoHidingHeader(navigation);
 
-  constructor(props: any) {
-    super(props);
-    const { navigation } = this.props;
-    this.pdfRef = React.createRef();
+  useEffect(() => {
     hideToolbar(navigation);
-  }
+  }, [navigation]);
 
-  override render() {
-    const { navigation } = this.props;
-
-    return (
-      <View style={styles.flex}>
-        <NutrientView
-          ref={this.pdfRef}
+  return (
+    <View style={styles.flex}>
+      <NutrientView
+          ref={pdfRef}
           document={exampleReportPath}
           configuration={{
             iOSAllowToolbarTitleChange: false,
@@ -35,37 +33,44 @@ export class XFDF extends BaseExampleAutoHidingHeaderComponent {
           showNavigationButtonInToolbar={true}
           onNavigationButtonClicked={() => navigation.goBack()}
           style={styles.pdfColor}
-        />
-        {this.renderWithSafeArea(insets => (
-          <View style={[styles.column, { paddingBottom: insets.bottom }]}>
-            <View>
-              <View style={styles.horizontalContainer}>
-                <TouchableOpacity onPress={async () => {
-                  const result = await this.pdfRef.current?.getDocument().importXFDF(writableXFDFPath);
+      />
+      {renderWithBaseExampleSafeArea(insets => (
+        <View style={[styles.column, { paddingBottom: insets.bottom }]}>
+          <View>
+            <View style={styles.horizontalContainer}>
+              <TouchableOpacity
+                onPress={async () => {
+                  const result = await pdfRef.current
+                    ?.getDocument()
+                    .importXFDF(writableXFDFPath);
                   Alert.alert('Nutrient', 'Import XFDF result: ' + JSON.stringify(result));
                   console.log('Import XFDF result: ', result);
-                }}>
-                  <Text style={styles.button}>{'Import XFDF'}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={async () => {
+                }}
+              >
+                <Text style={styles.button}>{'Import XFDF'}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={async () => {
                   const outputFile = RNFS.TemporaryDirectoryPath + '/test.xfdf';
                   if (await RNFS.exists(outputFile)) {
                     await RNFS.unlink(outputFile);
                   }
-                  const result = await this.pdfRef.current?.getDocument().exportXFDF(outputFile);
+                  const result = await pdfRef.current
+                    ?.getDocument()
+                    .exportXFDF(outputFile);
                   Alert.alert('Nutrient', 'Export XFDF result: ' + JSON.stringify(result));
                   console.log('Export XFDF result: ', result);
-                }}>
-                  <Text style={styles.button}>{'Export XFDF'}</Text>
-                </TouchableOpacity>
-              </View>
+                }}
+              >
+                <Text style={styles.button}>{'Export XFDF'}</Text>
+              </TouchableOpacity>
             </View>
           </View>
-        ))}
-      </View>
-    );
-  }
-}
+        </View>
+      ))}
+    </View>
+  );
+};
 
 const styles = {
   flex: { flex: 1 },

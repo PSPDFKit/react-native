@@ -1,16 +1,14 @@
-@file:Suppress("DEPRECATION", "OVERRIDE_DEPRECATION")
-
 package com.pspdfkit.react.events
 
 import androidx.annotation.IdRes
 import com.facebook.react.bridge.Arguments
+import com.facebook.react.bridge.WritableMap
 import com.facebook.react.uimanager.events.Event
-import com.facebook.react.uimanager.events.RCTEventEmitter
 
 class CustomAnnotationContextualMenuItemTappedEvent: Event<CustomAnnotationContextualMenuItemTappedEvent> {
     private var buttonId: String? = null
 
-    constructor(@IdRes viewId: Int, buttonId: String) : super(viewId) {
+    constructor(surfaceId: Int, @IdRes viewId: Int, buttonId: String) : super(surfaceId, viewId) {
 
         this.buttonId = buttonId
     }
@@ -23,10 +21,10 @@ class CustomAnnotationContextualMenuItemTappedEvent: Event<CustomAnnotationConte
         return buttonId
     }
 
-    override fun dispatch(rctEventEmitter: RCTEventEmitter) {
+    override fun getEventData(): WritableMap {
         val eventData = Arguments.createMap()
         eventData.putString("id", buttonId)
-        rctEventEmitter.receiveEvent(viewTag, eventName, eventData)
+        return eventData
     }
 
     companion object {

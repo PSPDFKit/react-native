@@ -27,6 +27,7 @@ let REPEAT_OVERLAY_TEXT = "repeatOverlayText"
 let DEFAULT_BORDER_EFFECT = "borderEffect"
 let DEFAULT_TEXT_ALIGNMENT = "textAlignment"
 let DEFAULT_ICON_NAME = "iconName"
+let FORCE_DEFAULTS = "forceDefaults"
 
 // Annotation types constants
 let ANNOTATION_INK_PEN = "inkPen"
@@ -194,8 +195,64 @@ public class AnnotationsConfigurationsConverter: NSObject {
         }
     }
 
+    /// Property keys whose values are written into the style manager as last-used
+    /// values. These are the "defaults" gated by `forceDefaults`; keys configuring
+    /// the UI itself (like `availableColors`) always apply.
+    private static let defaultValueKeys: [String] = [
+        DEFAULT_COLOR, DEFAULT_FILL_COLOR, OUTLINE_COLOR, DEFAULT_THICKNESS,
+        DEFAULT_ALPHA, DEFAULT_TEXT_SIZE, DEFAULT_FONT, DEFAULT_BORDER_STYLE,
+        DEFAULT_BORDER_EFFECT, BLEND_MODE, DEFAULT_LINE_END, OVERLAY_TEXT,
+        REPEAT_OVERLAY_TEXT, DEFAULT_TEXT_ALIGNMENT, DEFAULT_ICON_NAME,
+    ]
+
+    private static let appliedDefaultsUserDefaultsKey = "PSPDFKitReactNative.AnnotationPresets.AppliedDefaults"
+
+    /// With `forceDefaults: false` (the default, matching Android), configured default
+    /// values may seed the style manager but must not overwrite values the user picked
+    /// later. The SDK pre-seeds last-used values for every tool, so an absent last-used
+    /// value can't signal "first run" — instead we remember a fingerprint of the
+    /// defaults we last applied per tool and skip re-applying while it is unchanged.
+    /// Changing the configured defaults in JS re-seeds them once.
+    private class func shouldApplyDefaults(presets: [String: Any], annotationTool: Annotation.ToolVariantID) -> Bool {
+        let fingerprint = defaultValueKeys
+            .compactMap { key in presets[key].map { "\(key)=\($0)" } }
+            .joined(separator: ";")
+        // `forceDefaults: true` always re-applies, but we still record the fingerprint so a
+        // later switch to `forceDefaults: false` with unchanged defaults doesn't trigger one
+        // extra reset of the user's last-used styles before the gate starts matching.
+        if presets[FORCE_DEFAULTS] as? Bool == true {
+            recordAppliedDefaults(fingerprint: fingerprint, annotationTool: annotationTool)
+            return true
+        }
+        if fingerprint.isEmpty {
+            return false
+        }
+        let applied = (UserDefaults.standard.dictionary(forKey: appliedDefaultsUserDefaultsKey) ?? [:]).compactMapValues { $0 as? String }
+        if applied[annotationTool.rawValue] == fingerprint {
+            return false
+        }
+        recordAppliedDefaults(fingerprint: fingerprint, annotationTool: annotationTool)
+        return true
+    }
+
+    /// Persists the fingerprint of the defaults last applied for `annotationTool`, so a
+    /// subsequent mount with the same defaults and `forceDefaults: false` is skipped.
+    private class func recordAppliedDefaults(fingerprint: String, annotationTool: Annotation.ToolVariantID) {
+        guard !fingerprint.isEmpty else { return }
+        let userDefaults = UserDefaults.standard
+        var applied = (userDefaults.dictionary(forKey: appliedDefaultsUserDefaultsKey) ?? [:]).compactMapValues { $0 as? String }
+        applied[annotationTool.rawValue] = fingerprint
+        userDefaults.set(applied, forKey: appliedDefaultsUserDefaultsKey)
+    }
+
     private class func extractPresets(presets: [String: Any], annotationTool: Annotation.ToolVariantID) {
         let styleManager = SDK.shared.styleManager
+        if let colors = presets[AVAILABLE_COLORS] as? Array<String> {
+            styleManager.setPresets(parseColorPresets(colors: colors), forKey: annotationTool, type: .colorPreset)
+        }
+        guard shouldApplyDefaults(presets: presets, annotationTool: annotationTool) else {
+            return
+        }
         for key in presets.keys {
             switch key {
             case DEFAULT_COLOR:
@@ -214,17 +271,21 @@ public class AnnotationsConfigurationsConverter: NSObject {
                 }
                 break
             case DEFAULT_THICKNESS:
-                if let thickness = presets[key] as? NSNumber, thickness.floatValue >= 0 {
+                // `> 0`: zero is treated as "not set" (invisible stroke). Prevents callers
+                // — including the Fabric New-Architecture bridge, whose codegen produces
+                // `0.0` for unset `Double` props — from clobbering the style manager's
+                // persisted last-used value with a non-usable default.
+                if let thickness = presets[key] as? NSNumber, thickness.floatValue > 0 {
                     styleManager.setLastUsedValue(thickness, forProperty: #keyPath(Annotation.lineWidth), forKey: annotationTool)
                 }
                 break
             case DEFAULT_ALPHA:
-                if let alpha = presets[key] as? NSNumber, alpha.floatValue <= 1 {
+                if let alpha = presets[key] as? NSNumber, alpha.floatValue > 0, alpha.floatValue <= 1 {
                     styleManager.setLastUsedValue(alpha, forProperty: #keyPath(Annotation.alpha), forKey: annotationTool)
                 }
                 break
             case DEFAULT_TEXT_SIZE:
-                if let fontSize = presets[key] as? NSNumber, fontSize.floatValue >= 0 {
+                if let fontSize = presets[key] as? NSNumber, fontSize.floatValue > 0 {
                     styleManager.setLastUsedValue(fontSize, forProperty: #keyPath(FreeTextAnnotation.fontSize), forKey: annotationTool)
                 }
                 break
@@ -284,11 +345,6 @@ public class AnnotationsConfigurationsConverter: NSObject {
             case DEFAULT_ICON_NAME:
                 if let icon = presets[key] as? String {
                     styleManager.setLastUsedValue(icon, forProperty: #keyPath(NoteAnnotation.iconName), forKey: annotationTool)
-                }
-                break
-            case AVAILABLE_COLORS:
-                if let colors = presets[key] as? Array<String> {
-                    styleManager.setPresets(parseColorPresets(colors: colors), forKey: annotationTool, type: .colorPreset)
                 }
                 break
             default:

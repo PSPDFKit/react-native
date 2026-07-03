@@ -12,6 +12,8 @@ import { AIAssistantConfiguration } from './AIAssistantConfiguration';
  * @interface PDFConfiguration
  * @property { PDFConfiguration.ScrollDirection } [scrollDirection] Configures the direction of page scrolling in the document view.
  * @property { PDFConfiguration.PageTransition } [pageTransition] Configures the page scrolling mode. Note that ```curl``` mode is only available for iOS and will be ignored on Android.
+ * @property { PDFConfiguration.BooleanType } [scrollOnEdgeTapEnabled] Determines whether tapping on the leading / trailing edges of the document view should change to the previous / next page. Only applies when ```scrollDirection``` is ```horizontal```. Defaults to ```true```. When enabled, edge taps are reserved for page navigation and will not toggle the user interface; set this to ```false``` to allow taps anywhere on the page to toggle the user interface.
+ * @property { number } [scrollOnEdgeTapMargin] The margin (in points on iOS, dp on Android) from the view's sides in which tapping should change to the previous / next page when ```scrollOnEdgeTapEnabled``` is enabled.
  * @property { string } [documentPassword] The password to unlock the document.
  * @property { PDFConfiguration.BooleanType } [enableTextSelection] Allow / disallow text selection.
  * @property { PDFConfiguration.BooleanType } [autosaveEnabled] Determines whether Nutrient should save automatically in response to [certain UI triggers][], such as the app entering the background or the view disappearing.
@@ -20,7 +22,6 @@ import { AIAssistantConfiguration } from './AIAssistantConfiguration';
  * @property { PDFConfiguration.BooleanType } [iOSShouldScrollToChangedPage] Scrolls to the affected page during an undo / redo operation.
  * @property { PDFConfiguration.BooleanType } [iOSFormElementZoomEnabled] Option to automatically focus on selected form elements.
  * @property { PDFConfiguration.BooleanType } [iOSImageSelectionEnabled] Allow / disallow image selection.
- * @property { PDFConfiguration.BooleanType } [iOSTextSelectionShouldSnapToWord] Configure if text selection should snap to words.
  * @property { PDFConfiguration.BooleanType } [iOSFreeTextAccessoryViewEnabled] Shows a toolbar with text editing options above the keyboard while editing free text annotations.
  * @property { PDFConfiguration.BooleanType } [iOSInternalTapGesturesEnabled] Enable / disable all internal gesture recognizers.
  * @property { PDFConfiguration.BooleanType } [iOSAllowBackgroundSaving] Determines whether automatic saving should happen on a background thread.
@@ -56,8 +57,8 @@ import { AIAssistantConfiguration } from './AIAssistantConfiguration';
  * @property { PDFConfiguration.BooleanType } [iOSShouldHideStatusBarWithUserInterface] Option to hide / show the status bar with the user interface.
  * @property { PDFConfiguration.BooleanType } [iOSShouldHideNavigationBarWithUserInterface] Option to hide / show the navigation bar with the user interface.
  * @property { PDFConfiguration.IOSSearchMode } [iOSSearchMode] Sets the type of search bar to be inline or modal.
- * @property { PDFConfiguration.BooleanType } [iOSScrollOnEdgeTapEnabled] Determines whether tapping on leading / trailing edges of the document view should trigger changing to the previous / next page.
- * @property { number } [iOSScrollOnEdgeTapMargin] The margin in points from the view’s sides in which tapping should trigger scrolling to the previous / next page.
+ * @property { PDFConfiguration.BooleanType } [iOSScrollOnEdgeTapEnabled] Determines whether tapping on leading / trailing edges of the document view should trigger changing to the previous / next page. Deprecated. Use the cross-platform ```scrollOnEdgeTapEnabled``` instead.
+ * @property { number } [iOSScrollOnEdgeTapMargin] The margin in points from the view’s sides in which tapping should trigger scrolling to the previous / next page. Deprecated. Use the cross-platform ```scrollOnEdgeTapMargin``` instead.
  * @property { PDFConfiguration.BooleanType } [iOSUseParentNavigationBar] Set this to true to allow this controller to access the parent ```navigationBar``` / ```navigationController``` to add custom buttons.
  * @property { PDFConfiguration.BooleanType } [iOSAllowToolbarTitleChange] Allow Nutrient to change the title of this view controller.
  * @property { PDFConfiguration.BooleanType } [iOSShouldHideStatusBar] If ```true```, the status bar will always remain hidden (regardless of the ```shouldHideStatusBarWithUserInterface``` setting).
@@ -121,6 +122,14 @@ export class PDFConfiguration {
      */
     pageTransition?: PDFConfiguration.PageTransition;
     /**
+     * Determines whether tapping on the leading / trailing edges of the document view should change to the previous / next page. Only applies when ```scrollDirection``` is ```horizontal```. Defaults to ```true```. When enabled, edge taps are reserved for page navigation and will not toggle the user interface; set this to ```false``` to allow taps anywhere on the page to toggle the user interface.
+     */
+    scrollOnEdgeTapEnabled?: PDFConfiguration.BooleanType;
+    /**
+     * The margin (in points on iOS, dp on Android) from the view's sides in which tapping should change to the previous / next page when ```scrollOnEdgeTapEnabled``` is enabled.
+     */
+    scrollOnEdgeTapMargin?: number;
+    /**
      * The password to unlock the document.
      */
     documentPassword?: string;
@@ -152,10 +161,6 @@ export class PDFConfiguration {
      * Allow / disallow image selection.
      */
     iOSImageSelectionEnabled?: PDFConfiguration.BooleanType;
-    /**
-     * Configure if text selection should snap to words.
-     */
-    iOSTextSelectionShouldSnapToWord?: PDFConfiguration.BooleanType;
     /**
      * Shows a toolbar with text editing options above the keyboard while editing free text annotations.
      */
@@ -298,10 +303,12 @@ export class PDFConfiguration {
     iOSSearchMode?: PDFConfiguration.IOSSearchMode;
     /**
      * Determines whether tapping on leading / trailing edges of the document view should trigger changing to the previous / next page.
+     * @deprecated Use the cross-platform ```scrollOnEdgeTapEnabled``` instead.
      */
     iOSScrollOnEdgeTapEnabled?: PDFConfiguration.BooleanType;
     /**
      * The margin in points from the view’s sides in which tapping should trigger scrolling to the previous / next page.
+     * @deprecated Use the cross-platform ```scrollOnEdgeTapMargin``` instead.
      */
     iOSScrollOnEdgeTapMargin?: number;
     /**
@@ -605,26 +612,6 @@ export namespace PDFConfiguration {
         * Smart zoom on double tap.
         */
         SMART_ZOOM: 'smartZoom'
-    } as const;
-
-   /**
-    * The IOSTextSelectionMode options.
-    * @readonly
-    * @enum {string} IOSTextSelectionMode
-    */
-    export const IOSTextSelectionMode = {
-       /**
-        * Selecting text in regular mode starts after a long-press and results in a selection with dragging handles.
-        */
-        REGULAR: 'regular',
-       /**
-        * Selecting text in simple mode starts almost immediately on touch down and results in a selection with dragging handles.
-        */
-        SIMPLE: 'simple',
-       /**
-        * Selection mode will be chosen based on input device: selecting text with finger or Apple Pencil will use regular mode, while selecting text with trackpad or mouse will use simple mode. 
-        */
-        AUTOMATIC: 'automatic'
     } as const;
 
    /**
@@ -1088,7 +1075,6 @@ export namespace PDFConfiguration {
     export type PageTransition = ValueOf<typeof PageTransition>;
     export type SignatureSavingStrategy = ValueOf<typeof SignatureSavingStrategy>;
     export type IOSDoubleTapAction = ValueOf<typeof IOSDoubleTapAction>;
-    export type IOSTextSelectionMode = ValueOf<typeof IOSTextSelectionMode>;
     export type IOSTypesShowingColorPresets = ValueOf<typeof IOSTypesShowingColorPresets>;
     export type PageMode = ValueOf<typeof PageMode>;
     export type SpreadFitting = ValueOf<typeof SpreadFitting>;

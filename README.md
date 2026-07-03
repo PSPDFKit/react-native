@@ -172,7 +172,7 @@ See our [Getting Started on React Native guide](https://www.nutrient.io/getting-
     ```diff
     ...
     - platform :ios, min_ios_version_supported
-    + platform :ios, '16.0'
+    + platform :ios, '17.0'
     ...
     ```
 
@@ -194,7 +194,7 @@ See our [Getting Started on React Native guide](https://www.nutrient.io/getting-
    open NutrientDemo.xcworkspace
    ```
 
-1. Make sure the deployment target is set to 16.0 or higher:
+1. Make sure the deployment target is set to 17.0 or higher:
 
    ![deployment-target](./screenshots/deployment-target.png)
 

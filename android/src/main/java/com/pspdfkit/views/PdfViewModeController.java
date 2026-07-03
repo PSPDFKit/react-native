@@ -141,6 +141,7 @@ class PdfViewModeController implements
                 appliedPosition = position;
             }
         }
+
         if (contextualToolbar instanceof AnnotationToolbar) {
             if (appliedPosition != null) {
                 parent.setToolbarPosition(toolbarPositionString(appliedPosition));

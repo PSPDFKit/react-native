@@ -21,6 +21,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.uimanager.UIManagerHelper;
 import com.facebook.react.uimanager.events.EventDispatcher;
 import com.pspdfkit.annotations.Annotation;
 import com.pspdfkit.annotations.AnnotationProvider;
@@ -55,7 +56,7 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
     private final PdfView parent;
 
     @NonNull
-    private final EventDispatcher eventDispatcher;
+    private EventDispatcher eventDispatcher;
     private final boolean isFabricMode;
     private final PdfView.PdfViewDelegate fabricDelegate;
 
@@ -86,6 +87,10 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
         this.excludedAnnotations = annotations;
     }
 
+    void setEventDispatcher(@NonNull EventDispatcher eventDispatcher) {
+        this.eventDispatcher = eventDispatcher;
+    }
+
     /**
      * Routes events to React via EventDispatcher.
      * Note: Fabric events are dispatched by the Fabric ViewManager; this listener always uses EventDispatcher.
@@ -102,7 +107,7 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
             fabricDelegate.onReady();
             fabricDelegate.onDocumentLoaded();
         } else {
-            dispatchEvent(new OnReadyEvent(parent.getId()));
+            dispatchEvent(new OnReadyEvent(UIManagerHelper.getSurfaceId(parent), parent.getId()));
             dispatchEvent(new PdfViewDocumentLoadedEvent(parent.getId()));
         }
     }
@@ -118,7 +123,7 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
             fabricDelegate.onReady();
             fabricDelegate.onDocumentLoadFailed(throwable);
         } else {
-            dispatchEvent(new OnReadyEvent(parent.getId()));
+            dispatchEvent(new OnReadyEvent(UIManagerHelper.getSurfaceId(parent), parent.getId()));
             dispatchEvent(new com.pspdfkit.react.events.PdfViewDocumentLoadFailedEvent(parent.getId(), throwable.getMessage()));
         }
     }

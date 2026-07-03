@@ -43,10 +43,6 @@
                              @"zoom" : @(PSPDFTapActionZoom), \
                              @"smartZoom" : @(PSPDFTapActionSmartZoom)} \
 
-#define TextSelectionModeMap @{@"regular" : @(PSPDFTextSelectionModeRegular), \
-                               @"simple" : @(PSPDFTextSelectionModeSimple), \
-                               @"automatic": @(PSPDFTextSelectionModeAutomatic)} \
-
 #define TypesShowingColorPresetsMap @{@"none" : @(PSPDFAnnotationTypeNone), \
                                     @"undefined" : @(PSPDFAnnotationTypeUndefined), \
                                     PSPDFAnnotationStringLink : @(PSPDFAnnotationTypeLink), \
@@ -177,11 +173,6 @@ RCT_ENUM_CONVERTER(PSPDFScrollDirection,
 RCT_ENUM_CONVERTER(PSPDFTapAction,
                    (DoubleTapActionMap),
                    PSPDFTapActionNone,
-                   unsignedIntegerValue)
-
-RCT_ENUM_CONVERTER(PSPDFTextSelectionMode,
-                   (TextSelectionModeMap),
-                   PSPDFTextSelectionModeRegular,
                    unsignedIntegerValue)
 
 RCT_ENUM_CONVERTER(PSPDFBookmarkManagerSortOrder,
@@ -417,8 +408,6 @@ RCT_MULTI_ENUM_CONVERTER(PSPDFDocumentSharingPagesOptions,
     
     [convertedConfiguration setObject:@(configuration.imageSelectionEnabled) forKey:@"iOSImageSelectionEnabled"];
     
-    [convertedConfiguration setObject:@(configuration.textSelectionShouldSnapToWord) forKey:@"iOSTextSelectionShouldSnapToWord"];
-    
     [convertedConfiguration setObject:@(configuration.freeTextAccessoryViewEnabled) forKey:@"iOSFreeTextAccessoryViewEnabled"];
     
     [convertedConfiguration setObject:@(configuration.internalTapGesturesEnabled) forKey:@"iOSInternalTapGesturesEnabled"];
@@ -431,9 +420,6 @@ RCT_MULTI_ENUM_CONVERTER(PSPDFDocumentSharingPagesOptions,
     
     [convertedConfiguration setObject:[RCTConvert findKeyForValue:configuration.doubleTapAction
                                                      inDictionary:DoubleTapActionMap] forKey:@"iOSDoubleTapAction"];
-    
-    [convertedConfiguration setObject:[RCTConvert findKeyForValue:configuration.textSelectionMode
-                                                     inDictionary:TextSelectionModeMap] forKey:@"iOSTextSelectionMode"];
     
     [convertedConfiguration setObject:[RCTConvert findKeyForValue:configuration.typesShowingColorPresets
                                                      inDictionary:TypesShowingColorPresetsMap] forKey:@"iOSTypesShowingColorPresets"];
@@ -601,7 +587,6 @@ RCT_MULTI_ENUM_CONVERTER(PSPDFDocumentSharingPagesOptions,
   SET(formElementZoomEnabled, BOOL)
   SET_PROPERTY(enableTextSelection, textSelectionEnabled, BOOL)
   SET(imageSelectionEnabled, BOOL)
-  SET(textSelectionShouldSnapToWord, BOOL)
   SET(freeTextAccessoryViewEnabled, BOOL)
   SET(internalTapGesturesEnabled, BOOL)
   SET(autosaveEnabled, BOOL)
@@ -614,7 +599,6 @@ RCT_MULTI_ENUM_CONVERTER(PSPDFDocumentSharingPagesOptions,
   SET(minimumZoomScale, float)
   SET(maximumZoomScale, float)
   SET(doubleTapAction, PSPDFTapAction)
-  SET(textSelectionMode, PSPDFTextSelectionMode)
   SET(typesShowingColorPresets, PSPDFAnnotationType)
   if (dictionary[@"disableAutomaticSaving"]) {
     self.autosaveEnabled = ![RCTConvert BOOL:dictionary[@"disableAutomaticSaving"]];

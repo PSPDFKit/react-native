@@ -11,6 +11,7 @@ package io.nutrient.react.fabric
 
 import android.app.Activity
 import android.util.Log
+import android.view.View
 import androidx.annotation.NonNull
 import androidx.annotation.Nullable
 import androidx.fragment.app.FragmentActivity
@@ -19,6 +20,7 @@ import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReadableArray
 import com.facebook.react.bridge.ReadableMap
 import java.util.HashMap
+import java.util.WeakHashMap
 import org.json.JSONArray
 import org.json.JSONException
 import com.facebook.react.uimanager.BaseViewManagerDelegate
@@ -62,6 +64,25 @@ class ReactPdfViewManagerFabric : ViewGroupManager<PdfView>(), NutrientViewManag
     private var document: String? = null
     private var configuration: String? = null
     private var fragmentTag: String? = null
+    private val appliedPropsByView = WeakHashMap<PdfView, AppliedDocumentProps>()
+
+    private data class AppliedDocumentProps(
+        var document: String? = null,
+        var configuration: String? = null
+    )
+
+    /**
+     * Fabric assigns the native React tag after [createViewInstance]; [UIManagerHelper.getEventDispatcher]
+     * must use that tag, not [View.NO_ID].
+     */
+    private fun refreshEventDispatcherForView(view: PdfView) {
+        if (view.id == View.NO_ID) return
+        val themed = view.context as? ThemedReactContext ?: return
+        val refreshed = UIManagerHelper.getEventDispatcher(themed, view.id) ?: return
+        if (refreshed === eventDispatcher) return
+        eventDispatcher = refreshed
+        view.replaceEventDispatcher(refreshed)
+    }
 
     override fun getDelegate(): BaseViewManagerDelegate<PdfView, ReactPdfViewManagerFabric> = delegate
 
@@ -70,7 +91,6 @@ class ReactPdfViewManagerFabric : ViewGroupManager<PdfView>(), NutrientViewManag
 
     @NonNull
     override fun createViewInstance(@NonNull reactContext: ThemedReactContext): PdfView {
-        
         reference = 0
         document = null
         configuration = null
@@ -190,7 +210,6 @@ class ReactPdfViewManagerFabric : ViewGroupManager<PdfView>(), NutrientViewManag
     }
 
     override fun onDropViewInstance(view: PdfView) {
-        
         // Unregister using the view's componentReferenceId (the actual view being dropped)
         if (view.componentReferenceId != null && view.componentReferenceId != 0) {
             val viewReference = view.componentReferenceId.toString()
@@ -203,25 +222,36 @@ class ReactPdfViewManagerFabric : ViewGroupManager<PdfView>(), NutrientViewManag
             configuration = null
             fragmentTag = null
         } else {
-            Log.d(TAG, "onDropViewInstance: Preserving reference=${this.reference} (likely hot reload, will be reused for new view)")
             // Don't clear document/configuration/fragmentTag - they're still valid for the active view
         }
 
         view.removeFragment(true)
+        appliedPropsByView.remove(view)
     }
 
     override fun onAfterUpdateTransaction(view: PdfView) {
         super.onAfterUpdateTransaction(view)
+        refreshEventDispatcherForView(view)
         this.fragmentTag?.let { view.setFragmentTag(it) }
-        this.configuration?.let {
-            NutrientPropsDocumentHelper.applyConfigurationJSONString(
-                view,
-                it
-            )
+        val appliedProps = appliedPropsByView.getOrPut(view) { AppliedDocumentProps() }
+        // Fabric runs this transaction for every prop update. Re-applying the same
+        // configuration or document tears down the fragment/document, so only replay
+        // these expensive props when their values actually changed for this view.
+        this.configuration?.let { config ->
+            if (config != appliedProps.configuration) {
+                NutrientPropsDocumentHelper.applyConfigurationJSONString(
+                    view,
+                    config
+                )
+                appliedProps.configuration = config
+            }
         }
         this.document?.let { doc ->
-            reactApplicationContext?.let { ctx ->
-                NutrientPropsDocumentHelper.applyDocument(view, doc, ctx, this.reference)
+            if (doc != appliedProps.document) {
+                reactApplicationContext?.let { ctx ->
+                    NutrientPropsDocumentHelper.applyDocument(view, doc, ctx, this.reference)
+                    appliedProps.document = doc
+                }
             }
         }
     }
@@ -367,6 +397,6 @@ class ReactPdfViewManagerFabric : ViewGroupManager<PdfView>(), NutrientViewManag
     }
 
     override fun setHideDefaultToolbar(view: PdfView, value: Boolean) {
-        // No-op. iOS only.
+        NutrientPropsDocumentHelper.applyHideDefaultToolbar(view, value)
     }
 }

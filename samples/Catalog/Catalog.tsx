@@ -19,6 +19,7 @@ import { EventListeners } from './examples/EventListeners';
 import { GeneratePDF } from './examples/GeneratePDF';
 import GeneratePDFMenu from './examples/GeneratePDFMenu';
 import { HiddenToolbar } from './examples/HiddenToolbar';
+import { ScrollOnEdgeTap } from './examples/ScrollOnEdgeTap';
 import HomeScreen from './examples/HomeScreen';
 import InstantSynchronization from './examples/InstantSynchronization';
 import { ManualSave } from './examples/ManualSave';
@@ -104,6 +105,7 @@ class Catalog extends React.Component {
             component={ToolbarCustomization}
           />
           <Stack.Screen name="HiddenToolbar" component={HiddenToolbar} />
+          <Stack.Screen name="ScrollOnEdgeTap" component={ScrollOnEdgeTap} />
           <Stack.Screen name="CustomFontPicker" component={CustomFontPicker} />
           <Stack.Screen name="GeneratePDFMenu" component={GeneratePDFMenu} />
           <Stack.Screen name="GeneratePDF" component={GeneratePDF} />

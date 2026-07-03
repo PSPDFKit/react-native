@@ -103,30 +103,14 @@ class NutrientView extends React.Component {
         const {
           document,
           configuration,
-          textSelectionContextualMenu,
           // Explicitly exclude document and configuration from otherProps
           ...otherProps
         } = this.props;
 
-        // If a custom text selection contextual menu is provided, include an
-        // internal Android-only flag in the configuration so the native
-        // ConfigurationAdapter can disable the popup menu and use the
-        // contextual TextSelectionToolbar instead.
-        const configurationWithTextSelectionFlag =
-          configuration != null
-            ? {
-                ...configuration,
-                androidUseTextSelectionToolbar: !!textSelectionContextualMenu,
-              }
-            : configuration;
-
         // Only create combined prop for document and configuration
         const documentAndConfiguration = {
           document: document !== undefined ? document : null,
-          configuration:
-            configurationWithTextSelectionFlag !== undefined
-              ? configurationWithTextSelectionFlag
-              : null,
+          configuration: configuration !== undefined ? configuration : null,
         };
         
         const hasShouldExecute = !!this.props.onShouldExecuteAction;
@@ -1183,6 +1167,60 @@ if (Platform.OS === 'ios' || Platform.OS === 'android') {
 }
 
 /**
+ * NutrientInstantView is a React Native component for displaying Instant (real-time collaboration) PDF documents.
+ * @augments {React.Component<Props, *>}
+ * @hideconstructor
+ * @example
+ * <NutrientInstantView
+ *   documentInfo={JSON.stringify({ serverUrl: 'https://...', jwt: '...' })}
+ *   configuration={{ enableInstantComments: true }}
+ *   ref={instantRef}
+ *   style={{ flex: 1 }}
+ * />
+ */
+class NutrientInstantView extends React.Component {
+  static _isNewArchitecture = null;
+  static _FabricComponent = null;
+  static _warnedUnsupported = false;
+
+  static _getArchitectureInfo() {
+    if (this._isNewArchitecture === null) {
+      try {
+        const { isNewArchitectureEnabled } = require('./lib/ArchitectureDetector');
+        this._isNewArchitecture = isNewArchitectureEnabled();
+
+        if (this._isNewArchitecture) {
+          // Require from src/ so Metro can process codegen for NutrientInstantViewNativeComponent
+          this._FabricComponent = require('./src/NutrientInstantViewFabric').default;
+        }
+      } catch (e) {
+        this._isNewArchitecture = false;
+        this._FabricComponent = null;
+      }
+    }
+    return { isNewArchitecture: this._isNewArchitecture, FabricComponent: this._FabricComponent };
+  }
+
+  _fabricRef = React.createRef();
+
+  render() {
+    const { isNewArchitecture, FabricComponent } = NutrientInstantView._getArchitectureInfo();
+    if (isNewArchitecture && FabricComponent) {
+      return React.createElement(FabricComponent, { ...this.props, ref: this._fabricRef });
+    }
+
+    if (!NutrientInstantView._warnedUnsupported && typeof console !== 'undefined' && console.warn) {
+      NutrientInstantView._warnedUnsupported = true;
+      console.warn(
+        'NutrientInstantView is only supported with React Native New Architecture (Fabric). Enable New Architecture or use Nutrient.presentInstant() for full-screen Instant.',
+      );
+    }
+
+    return null;
+  }
+}
+
+/**
  * @ignore
  * @typedef {object} Props
  * @property {string} document The path to the PDF file that should be displayed.
@@ -1212,10 +1250,10 @@ if (Platform.OS === 'ios' || Platform.OS === 'android') {
  * @property {function} [onShouldExecuteAction] Callback that's called just before the native SDK executes a PDF action (for example, when a link annotation is tapped). Use this to decide, via {@link NutrientView#executeAction}, whether the intercepted action should proceed.
  * @property {string} [fragmentTag] The tag used to identify a single PdfFragment in the view hierarchy. This needs to be unique in the view hierarchy.
  * @property {Array} [menuItemGrouping] Used to specify a custom grouping for the menu items in the annotation creation toolbar.
- * @property {Array<string>} [leftBarButtonItems] Sets the left bar button items. Note: The same button item cannot be added to both the left and right bar button items simultaneously. See {@link https://github.com/PSPDFKit/react-native/blob/master/ios/Converters/RCTConvert+UIBarButtonItem.m} for supported button items.
- * @property {Array<string>} [rightBarButtonItems] Sets the right bar button items. Note: The same button item cannot be added to both the left and right bar button items simultaneously. See {@link https://github.com/PSPDFKit/react-native/blob/master/ios/Converters/RCTConvert+UIBarButtonItem.m} for supported button items.
+ * @property {Array<string>} [leftBarButtonItems] Sets the left bar button items. Note: The same button item cannot be added to both the left and right bar button items simultaneously. Deprecated since Nutrient React Native SDK 4.0. Use ```NutrientView.toolbar.leftBarButtonItems``` instead.
+ * @property {Array<string>} [rightBarButtonItems] Sets the right bar button items. Note: The same button item cannot be added to both the left and right bar button items simultaneously. Deprecated since Nutrient React Native SDK 4.0. Use ```NutrientView.toolbar.rightBarButtonItems``` instead.
  * @property {string} [toolbarTitle] Used to specify a custom toolbar title on iOS by setting the ```title``` property of the ```PSPDFViewController```. Note: You need to set ```documentLabelEnabled```, ```useParentNavigationBar```, and ```allowToolbarTitleChange``` to ```false``` in your configuration before setting the custom title. Deprecated since Nutrient React Native SDK 4.0. Use ```toolbarTitle``` on the ```PDFConfiguration``` object instead.
- * @property {Array<string>} [toolbarMenuItems] Used to customize the toolbar menu items for Android. See {@link https://github.com/PSPDFKit/react-native/blob/master/android/src/main/java/com/pspdfkit/react/ToolbarMenuItemsAdapter.java} for supported toolbar menu items.
+ * @property {Array<string>} [toolbarMenuItems] Used to customize the toolbar menu items for Android. Deprecated since Nutrient React Native SDK 4.0. Use ```NutrientView.toolbar.toolbarMenuItems``` instead.
  * @property {boolean} [showNavigationButtonInToolbar] When set to ```true```, the toolbar integrated into the ```NutrientView``` will display a back button in the top-left corner. Android only.
  * @property {function} [onNavigationButtonClicked] If ```showNavigationButtonInToolbar``` is set to ```true```, this callback will notify you when the back button is tapped.
  * @property {Array<string>} [availableFontNames] Used to specify the available font names in the font picker. Note on iOS: You need to set the desired font family names as ```UIFontDescriptor```. See {@link https://developer.apple.com/documentation/uikit/uifontdescriptor?language=objc} for more information. See {@link https://github.com/PSPDFKit/react-native/blob/master/samples/Catalog/examples/CustomFontPicker.tsx}
@@ -2291,6 +2329,8 @@ module.exports.SignatureFormElement = SignatureFormElement;
 module.exports.TextFieldFormElement = TextFieldFormElement;
 
 module.exports.Forms = Forms;
+
+module.exports.NutrientInstantView = NutrientInstantView;
 
 // Type-only helper for onShouldExecuteAction; runtime value is unused.
 module.exports.ShouldExecuteActionEvent = {};

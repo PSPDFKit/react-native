@@ -72,6 +72,31 @@ public final class NutrientPropsDocumentHelper {
         if (configuration.hasKey("supportedToolbarPositions")) {
             view.setSupportedToolbarPositions(configuration.getArray("supportedToolbarPositions"));
         }
+        applyToolbarVisibilityFromConfiguration(view, configuration);
+    }
+
+    /**
+     * Applies {@link PdfView#setHideDefaultToolbar(boolean)} from configuration keys.
+     * {@code hideDefaultToolbar} wins when present; otherwise {@code showDefaultToolbar} /
+     * {@code androidShowDefaultToolbar} maps with inverted boolean (same visibility path as the
+     * {@code hideDefaultToolbar} view prop).
+     */
+    public static void applyToolbarVisibilityFromConfiguration(
+            @NonNull PdfView view,
+            @NonNull ReadableMap configuration) {
+        if (configuration.hasKey("hideDefaultToolbar")) {
+            applyHideDefaultToolbar(view, configuration.getBoolean("hideDefaultToolbar"));
+            return;
+        }
+        String showKey = null;
+        if (configuration.hasKey("showDefaultToolbar")) {
+            showKey = "showDefaultToolbar";
+        } else if (configuration.hasKey("androidShowDefaultToolbar")) {
+            showKey = "androidShowDefaultToolbar";
+        }
+        if (showKey != null) {
+            applyHideDefaultToolbar(view, !configuration.getBoolean(showKey));
+        }
     }
 
     public static void applyConfigurationJSONString(@NonNull PdfView view, @Nullable String configurationJSONString) {

@@ -114,16 +114,7 @@ const NutrientViewFabric = forwardRef<NutrientViewFabricRef, NativeProps>((props
     ...props,
     // Explicit booleans so native always gets a defined value when props are omitted (default = allow)
     disableDefaultActionForTappedAnnotations: (props as any).disableDefaultActionForTappedAnnotations === true,
-    configurationJSONString: props.configuration
-      ? JSON.stringify({
-          ...props.configuration,
-          // Mirror the Paper behavior: if a custom text selection contextual
-          // menu is provided, include an internal Android-only flag so the
-          // ConfigurationAdapter can enable the TextSelectionToolbar instead
-          // of the default popup.
-          androidUseTextSelectionToolbar: !!(props as any).textSelectionContextualMenu,
-        })
-      : undefined,
+    configurationJSONString: props.configuration ? JSON.stringify(props.configuration) : undefined,
     toolbarJSONString: props.toolbar ? JSON.stringify(props.toolbar) : undefined,
     menuItemGroupingJSONString: (props as any).menuItemGrouping
       ? JSON.stringify((props as any).menuItemGrouping)

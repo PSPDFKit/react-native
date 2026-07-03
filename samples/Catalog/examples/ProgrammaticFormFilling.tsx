@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Alert, processColor, Text, TouchableOpacity, View } from 'react-native';
 import NutrientView, { NotificationCenter, PDFConfiguration } from '@nutrient-sdk/react-native';
 
@@ -8,35 +8,37 @@ import {
   pspdfkitColor,
   writableFormDocumentPath,
 } from '../configuration/Constants';
-import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
+import {
+  renderWithBaseExampleSafeArea,
+  useBaseExampleAutoHidingHeader,
+} from '../helpers/ExampleScreenLayoutHelpers';
 import { extractFromAssetsIfMissing } from '../helpers/FileSystemHelpers';
 
-export class ProgrammaticFormFilling extends BaseExampleAutoHidingHeaderComponent {
-  pdfRef: React.RefObject<NutrientView | null>;
-  private alertShowing: boolean = false;
+export const ProgrammaticFormFilling = ({ navigation }: any) => {
+  const pdfRef = useRef<NutrientView | null>(null);
+  const alertShowingRef = useRef(false);
+  const [documentPath, setDocumentPath] = useState(formDocumentPath);
+  useBaseExampleAutoHidingHeader(navigation);
 
-  constructor(props: any) {
-    super(props);
-    this.pdfRef = React.createRef();
-    this.state = {
-      documentPath: formDocumentPath,
-    };
-  }
-
-  override componentDidMount() {
+  useEffect(() => {
     extractFromAssetsIfMissing(formDocumentName, () => {
-      this.setState({ documentPath: writableFormDocumentPath });
+      setDocumentPath(writableFormDocumentPath);
     });
 
-    this.pdfRef.current?.getNotificationCenter().subscribe(NotificationCenter.FormFieldEvent.VALUES_UPDATED, (event: any) => {
+    const center = pdfRef.current?.getNotificationCenter();
+    center?.subscribe(NotificationCenter.FormFieldEvent.VALUES_UPDATED, (event: any) => {
       console.log(JSON.stringify(event));
     });
-  }
 
-  private async handleFillFormPress() {
-    const forms = this.pdfRef.current?.getDocument().forms;
+    return () => {
+      center?.unsubscribeAllEvents();
+    };
+  }, []);
+
+  const handleFillFormPress = async () => {
+    const forms = pdfRef.current?.getDocument().forms;
     if (!forms) {
-      this.showAlertOnce('Nutrient', 'Failed to get forms instance');
+      showAlertOnce('Nutrient', 'Failed to get forms instance');
       return;
     }
 
@@ -45,10 +47,10 @@ export class ProgrammaticFormFilling extends BaseExampleAutoHidingHeaderComponen
       if (result) {
         console.log('Successfully set the form field value.');
       } else {
-        this.showAlertOnce('Nutrient', 'Failed to set form field value.');
+        showAlertOnce('Nutrient', 'Failed to set form field value.');
       }
     }).catch(error => {
-      this.showAlertOnce('Nutrient', JSON.stringify(error));
+      showAlertOnce('Nutrient', JSON.stringify(error));
     });
 
     forms.updateTextFormFieldValue('Name_First', 'John')
@@ -56,77 +58,77 @@ export class ProgrammaticFormFilling extends BaseExampleAutoHidingHeaderComponen
         if (result) {
           console.log('Successfully set the form field value.');
         } else {
-          this.showAlertOnce('Nutrient', 'Failed to set form field value.');
+          showAlertOnce('Nutrient', 'Failed to set form field value.');
         }
       })
       .catch(error => {
-        this.showAlertOnce('Nutrient', JSON.stringify(error));
+        showAlertOnce('Nutrient', JSON.stringify(error));
       });
     forms.updateTextFormFieldValue('Address_1', '1 Infinite Loop')
       .then(result => {
         if (result) {
           console.log('Successfully set the form field value.');
         } else {
-          this.showAlertOnce('Nutrient', 'Failed to set form field value.');
+          showAlertOnce('Nutrient', 'Failed to set form field value.');
         }
       })
       .catch(error => {
-        this.showAlertOnce('Nutrient', JSON.stringify(error));
+        showAlertOnce('Nutrient', JSON.stringify(error));
       });
     forms.updateTextFormFieldValue('City', 'Cupertino')
       .then(result => {
         if (result) {
           console.log('Successfully set the form field value.');
         } else {
-          this.showAlertOnce('Nutrient', 'Failed to set form field value.');
+          showAlertOnce('Nutrient', 'Failed to set form field value.');
         }
       })
       .catch(error => {
-        this.showAlertOnce('Nutrient', JSON.stringify(error));
+        showAlertOnce('Nutrient', JSON.stringify(error));
       });
     forms.updateTextFormFieldValue('STATE', 'CA')
       .then(result => {
         if (result) {
           console.log('Successfully set the form field value.');
         } else {
-          this.showAlertOnce('Nutrient', 'Failed to set form field value.');
+          showAlertOnce('Nutrient', 'Failed to set form field value.');
         }
       })
       .catch(error => {
-        this.showAlertOnce('Nutrient', JSON.stringify(error));
+        showAlertOnce('Nutrient', JSON.stringify(error));
       });
     forms.updateTextFormFieldValue('SSN', '123456789')
       .then(result => {
         if (result) {
           console.log('Successfully set the form field value.');
         } else {
-          this.showAlertOnce('Nutrient', 'Failed to set form field value.');
+          showAlertOnce('Nutrient', 'Failed to set form field value.');
         }
       })
       .catch(error => {
-        this.showAlertOnce('Nutrient', JSON.stringify(error));
+        showAlertOnce('Nutrient', JSON.stringify(error));
       });
     forms.updateTextFormFieldValue('Telephone_Home', '(123) 456-7890')
       .then(result => {
         if (result) {
           console.log('Successfully set the form field value.');
         } else {
-          this.showAlertOnce('Nutrient', 'Failed to set form field value.');
+          showAlertOnce('Nutrient', 'Failed to set form field value.');
         }
       })
       .catch(error => {
-        this.showAlertOnce('Nutrient', JSON.stringify(error));
+        showAlertOnce('Nutrient', JSON.stringify(error));
       });
     forms.updateTextFormFieldValue('Birthdate', '1/1/1983')
       .then(result => {
         if (result) {
           console.log('Successfully set the form field value.');
         } else {
-          this.showAlertOnce('Nutrient', 'Failed to set form field value.');
+          showAlertOnce('Nutrient', 'Failed to set form field value.');
         }
       })
       .catch(error => {
-        this.showAlertOnce('Nutrient', JSON.stringify(error));
+        showAlertOnce('Nutrient', JSON.stringify(error));
       });
 
     // Select a button form elements.
@@ -135,42 +137,42 @@ export class ProgrammaticFormFilling extends BaseExampleAutoHidingHeaderComponen
         if (result) {
           console.log('Successfully set the form field value.');
         } else {
-          this.showAlertOnce('Nutrient', 'Failed to set form field value.');
+          showAlertOnce('Nutrient', 'Failed to set form field value.');
         }
       })
       .catch(error => {
-        this.showAlertOnce('Nutrient', JSON.stringify(error));
+        showAlertOnce('Nutrient', JSON.stringify(error));
       });
     forms.updateButtonFormFieldValue('PHD', true)
       .then(result => {
         if (result) {
           console.log('Successfully set the form field value.');
         } else {
-          this.showAlertOnce('Nutrient', 'Failed to set form field value.');
+          showAlertOnce('Nutrient', 'Failed to set form field value.');
         }
       })
       .catch(error => {
-        this.showAlertOnce('Nutrient', JSON.stringify(error));
+        showAlertOnce('Nutrient', JSON.stringify(error));
       });
   }
 
-  private showAlertOnce(title: string, message: string) {
-    if (this.alertShowing) {
+  const showAlertOnce = (title: string, message: string) => {
+    if (alertShowingRef.current) {
       return; // Skip if alert is already showing
     }
-    this.alertShowing = true;
+    alertShowingRef.current = true;
     Alert.alert(title, message, [
-      { text: 'OK', onPress: () => { this.alertShowing = false; } }
+      { text: 'OK', onPress: () => { alertShowingRef.current = false; } }
     ]);
   }
 
-  private async handleAddFormFields() {
+  const handleAddFormFields = async () => {
     try {
-      const document = this.pdfRef.current?.getDocument();
+      const document = pdfRef.current?.getDocument();
       // Get all text rects for page 0
       const textRects = await document?.getPageTextRects(0);
       if (!textRects || textRects.length === 0) {
-        this.showAlertOnce('Nutrient', 'No text found on page');
+        showAlertOnce('Nutrient', 'No text found on page');
         return;
       }
 
@@ -180,7 +182,7 @@ export class ProgrammaticFormFilling extends BaseExampleAutoHidingHeaderComponen
       );
 
       if (!nameRect) {
-        this.showAlertOnce('Nutrient', 'Could not find "NAME" on the page');
+        showAlertOnce('Nutrient', 'Could not find "NAME" on the page');
         return;
       }
 
@@ -214,7 +216,7 @@ export class ProgrammaticFormFilling extends BaseExampleAutoHidingHeaderComponen
       }
 
       if (!employeeSignatureRect) {
-        this.showAlertOnce('Nutrient', 'Could not find "EMPLOYEE SIGNATURE" on the page');
+        showAlertOnce('Nutrient', 'Could not find "EMPLOYEE SIGNATURE" on the page');
         return;
       }
 
@@ -258,25 +260,24 @@ export class ProgrammaticFormFilling extends BaseExampleAutoHidingHeaderComponen
       });
 
       if (nameFieldResult && signatureFieldResult) {
-        this.showAlertOnce('Nutrient', 'Both form fields added successfully');
+        showAlertOnce('Nutrient', 'Both form fields added successfully');
       } else if (nameFieldResult) {
-        this.showAlertOnce('Nutrient', 'Text field added, but signature field failed');
+        showAlertOnce('Nutrient', 'Text field added, but signature field failed');
       } else if (signatureFieldResult) {
-        this.showAlertOnce('Nutrient', 'Signature field added, but text field failed');
+        showAlertOnce('Nutrient', 'Signature field added, but text field failed');
       } else {
-        this.showAlertOnce('Nutrient', 'Failed to add form fields');
+        showAlertOnce('Nutrient', 'Failed to add form fields');
       }
     } catch (error) {
-      this.showAlertOnce('Nutrient', `Error: ${JSON.stringify(error)}`);
+      showAlertOnce('Nutrient', `Error: ${JSON.stringify(error)}`);
     }
-  }
+  };
 
-  override render() {
-    return (
+  return (
       <View style={styles.flex}>
         <NutrientView
-          ref={this.pdfRef}
-          document={this.state.documentPath}
+          ref={pdfRef}
+          document={documentPath}
           configuration={{
             iOSBackgroundColor: processColor('lightgray'),
             documentLabelEnabled: true,
@@ -286,36 +287,36 @@ export class ProgrammaticFormFilling extends BaseExampleAutoHidingHeaderComponen
             iOSFileConflictResolution: PDFConfiguration.IOSFileConflictResolution.CLOSE,
           }}
           onAnnotationsChanged={(event: { error: any }) => {
-            if (this.alertShowing) {
+            if (alertShowingRef.current) {
               return; // Skip if alert is already showing
             }
-            this.alertShowing = true;
+            alertShowingRef.current = true;
             if (event.error) {
               Alert.alert('Nutrient', event.error, [
-                { text: 'OK', onPress: () => { this.alertShowing = false; } }
+                { text: 'OK', onPress: () => { alertShowingRef.current = false; } }
               ]);
             } else {
               Alert.alert(
                 'Nutrient',
                 'Annotations changed: ' + JSON.stringify(event),
-                [{ text: 'OK', onPress: () => { this.alertShowing = false; } }]
+                [{ text: 'OK', onPress: () => { alertShowingRef.current = false; } }]
               );
             }
           }}
           style={styles.pdfColor}
         />
-        {this.renderWithSafeArea(insets => (
+        {renderWithBaseExampleSafeArea(insets => (
           <View style={[styles.column, { paddingBottom: insets.bottom }]}>
             <View>
               <View style={styles.horizontalContainer}>
                 <TouchableOpacity
-                  onPress={() => this.handleFillFormPress()}
+                  onPress={() => handleFillFormPress()}
                   accessibilityLabel="Fill Form"
                 >
                   <Text style={styles.button}>Fill Form</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  onPress={() => this.handleAddFormFields()}
+                  onPress={() => handleAddFormFields()}
                   accessibilityLabel="Add FormFields"
                 >
                   <Text style={styles.button}>Add FormFields</Text>
@@ -325,9 +326,8 @@ export class ProgrammaticFormFilling extends BaseExampleAutoHidingHeaderComponen
           </View>
         ))}
       </View>
-    );
-  }
-}
+  );
+};
 
 const styles = {
   flex: { flex: 1 },

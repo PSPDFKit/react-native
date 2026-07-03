@@ -1,27 +1,23 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Alert, processColor, View } from 'react-native';
 import NutrientView, { Annotation, ShouldExecuteActionEvent } from '@nutrient-sdk/react-native';
 
 import { exampleDocumentPath, pspdfkitColor } from '../configuration/Constants';
-import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
+import { useBaseExampleAutoHidingHeader } from '../helpers/ExampleScreenLayoutHelpers';
 import { hideToolbar } from '../helpers/NavigationHelper';
 
-export class AnnotationPresetCustomization extends BaseExampleAutoHidingHeaderComponent {
-  pdfRef: React.RefObject<NutrientView | null>;
-  constructor(props: any) {
-    super(props);
-    const { navigation } = this.props;
-    this.pdfRef = React.createRef<NutrientView>();
+export const AnnotationPresetCustomization = ({ navigation }: any) => {
+  const pdfRef = useRef<NutrientView | null>(null);
+  useBaseExampleAutoHidingHeader(navigation);
+
+  useEffect(() => {
     hideToolbar(navigation);
-  }
+  }, [navigation]);
 
-  override render() {
-    const { navigation } = this.props;
-
-    return (
-      <View style={styles.flex}>
-        <NutrientView
-          ref={this.pdfRef}
+  return (
+    <View style={styles.flex}>
+      <NutrientView
+          ref={pdfRef}
           document={exampleDocumentPath}
           configuration={{
             iOSAllowToolbarTitleChange: false,
@@ -31,27 +27,31 @@ export class AnnotationPresetCustomization extends BaseExampleAutoHidingHeaderCo
           }}
           onShouldExecuteAction={(event: ShouldExecuteActionEvent) => {
             // Inspect the actionType and URL and optionally allow the action to proceed
-            this.pdfRef.current?.executeAction(event.requestId, true);
+            pdfRef.current?.executeAction(event.requestId, true);
           }}
           annotationContextualMenu={{
             buttons: [
+              // System annotation menu items (only applied when retainSuggestedMenuItems is false).
+              Annotation.TextSelectionMenuItem.COPY,
+              Annotation.TextSelectionMenuItem.DELETE,
               {
                 id: 'custom_annotation_item',
                 image: 'example_annotation_icon',
                 title: 'Custom',
+                titleRes: 'custom_annotation_item_title',
                 selectable: false,
               },
             ],
-            retainSuggestedMenuItems: true,
+            retainSuggestedMenuItems: false,
           }}
           textSelectionContextualMenu={{
             buttons: [
               Annotation.TextSelectionMenuItem.COPY,
-              Annotation.TextSelectionMenuItem.HIGHLIGHT,
               {
                 id: 'custom_text_item',
                 image: 'example_annotation_icon',
-                title: 'Text Action'
+                title: 'Text Action',
+                titleRes: 'custom_text_item_title',
               },
             ],
             retainSuggestedMenuItems: false,
@@ -79,6 +79,15 @@ export class AnnotationPresetCustomization extends BaseExampleAutoHidingHeaderCo
               availableColors: ['#99cc00', '#ffcc00', '#ff9900', '#ff0000', '#000000'],
               minimumAlpha: 0.5,
               forceDefaults: true
+            },
+            inkHighlighter: {
+              defaultColor: '#ffff00',
+              availableColors: ['#ffff00', '#00ff00', '#00ffff', '#ff00ff', '#ff9900'],
+              defaultAlpha: 0.4,
+              defaultThickness: 12,
+              minimumThickness: 4,
+              maximumThickness: 40,
+              forceDefaults: false,
             },
             freeText: {
               defaultTextSize: 40,
@@ -121,11 +130,10 @@ export class AnnotationPresetCustomization extends BaseExampleAutoHidingHeaderCo
           showNavigationButtonInToolbar={true}
           onNavigationButtonClicked={() => navigation.goBack()}
           style={styles.pdfColor}
-        />
-      </View>
-    );
-  }
-}
+      />
+    </View>
+  );
+};
 const styles = {
   flex: { flex: 1 },
   pdfColor: { flex: 1, color: pspdfkitColor },

@@ -2,7 +2,7 @@ import examples from '../ExamplesNavigationMenu';
 
 const { View, Image, Text, FlatList } = require('react-native');
 const { Nutrient } = require('../helpers/Nutrient');
-import React, { Component } from 'react';
+import React, { useMemo } from 'react';
 import { TouchableHighlight } from 'react-native';
 
 import { pspdfkitColor } from '../configuration/Constants';
@@ -22,15 +22,21 @@ const getVersionString = (): string => {
   }
 };
 
-class HomeScreen extends Component {
-  exampleList = examples.filter(item => item && item?.name !== null);
+const HomeScreen = (props: any) => {
+  const exampleList = useMemo(
+    () => examples.filter(item => item && item?.name !== null),
+    [],
+  );
 
-  renderRow = ({ item }: { item: any }) => {
+  // Keep compatibility with menu actions that expect a class component instance.
+  const actionContext = useMemo(() => ({ props }), [props]);
+
+  const renderRow = ({ item }: { item: any }) => {
     return (
       <TouchableHighlight
         accessibilityLabel={item.name}
         onPress={() => {
-          item.action(this);
+          item.action(actionContext);
         }}
         style={styles.rowContent}
         underlayColor={pspdfkitColor}
@@ -43,32 +49,27 @@ class HomeScreen extends Component {
     );
   };
 
-  renderSeparator(sectionId: any, rowId: React.Key | null | undefined) {
-    return <View key={rowId} style={styles.separator} />;
-  }
+  const renderSeparator = () => {
+    return <View style={styles.separator} />;
+  };
 
-  override render() {
-    return (
-      <View style={styles.flex}>
-        <View style={styles.header}>
-          <Image
-            source={require('../assets/logo-flat.png')}
-            style={styles.logo}
-          />
-          <Text style={styles.version}>{getVersionString()}</Text>
-        </View>
-        <FlatList
-          nativeID="catalog_list"
-          data={this.exampleList}
-          renderItem={this.renderRow}
-          ItemSeparatorComponent={this.renderSeparator}
-          contentContainerStyle={styles.listContainer}
-          style={styles.list}
-          contentInset={{ bottom: 22 }}
-        />
+  return (
+    <View style={styles.flex}>
+      <View style={styles.header}>
+        <Image source={require('../assets/logo-flat.png')} style={styles.logo} />
+        <Text style={styles.version}>{getVersionString()}</Text>
       </View>
-    );
-  }
-}
+      <FlatList
+        nativeID="catalog_list"
+        data={exampleList}
+        renderItem={renderRow}
+        ItemSeparatorComponent={renderSeparator}
+        contentContainerStyle={styles.listContainer}
+        style={styles.list}
+        contentInset={{ bottom: 22 }}
+      />
+    </View>
+  );
+};
 
 export default HomeScreen;

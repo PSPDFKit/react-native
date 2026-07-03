@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import {
   Alert,
   processColor,
@@ -12,17 +12,16 @@ import {
   measurementsDocument,
   pspdfkitColor,
 } from '../configuration/Constants';
-import { BaseExampleAutoHidingHeaderComponent } from '../helpers/BaseExampleAutoHidingHeaderComponent';
+import {
+  renderWithBaseExampleSafeArea,
+  useBaseExampleAutoHidingHeader,
+} from '../helpers/ExampleScreenLayoutHelpers';
 
-class Measurement extends BaseExampleAutoHidingHeaderComponent {
-  pdfRef: React.RefObject<NutrientView | null>;
+const Measurement = ({ navigation }: any) => {
+  const pdfRef = useRef<NutrientView | null>(null);
+  useBaseExampleAutoHidingHeader(navigation);
 
-  constructor(props: any) {
-    super(props);
-    this.pdfRef = React.createRef();
-  }
-
-  onChangeMeasurement = async () => {
+  const onChangeMeasurement = async () => {
      const scale: MeasurementScale = {
       unitFrom: Measurements.ScaleUnitFrom.INCH,
       valueFrom: 1.0,
@@ -38,21 +37,20 @@ class Measurement extends BaseExampleAutoHidingHeaderComponent {
      };
      
      const configs = [measurementValueConfig];
-     await this.pdfRef.current?.setMeasurementValueConfigurations(configs);
+     await pdfRef.current?.setMeasurementValueConfigurations(configs);
      Alert.alert('Nutrient', 'New Measurement Config Added!');
   };
 
-  onGetMeasurementConfigs = async () => {
-    const result = await this.pdfRef.current?.getMeasurementValueConfigurations();
+  const onGetMeasurementConfigs = async () => {
+    const result = await pdfRef.current?.getMeasurementValueConfigurations();
     Alert.alert('Nutrient', 'Measurement Configs: ' + JSON.stringify(result));
     console.log(JSON.stringify(result));
  };
 
-  override render() {
-    return (
-      <View style={styles.flex}>
-        <NutrientView
-          ref={this.pdfRef}
+  return (
+    <View style={styles.flex}>
+      <NutrientView
+          ref={pdfRef}
           document={measurementsDocument}
           configuration={{
             iOSBackgroundColor: processColor('lightgrey'),
@@ -83,25 +81,24 @@ class Measurement extends BaseExampleAutoHidingHeaderComponent {
           }}
           fragmentTag="PDF1"
           style={styles.pdfColor}
-        />
-        {this.renderWithSafeArea(insets => (
-          <View style={[styles.column, { paddingBottom: insets.bottom }]}>
-            <View>
-              <View style={styles.horizontalContainer}>
-                <TouchableOpacity onPress={this.onChangeMeasurement}>
-                  <Text style={styles.button}>{'Change Measurements'}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={this.onGetMeasurementConfigs}>
-                  <Text style={styles.button}>{'Get Measurements'}</Text>
-                </TouchableOpacity>
-              </View>
+      />
+      {renderWithBaseExampleSafeArea(insets => (
+        <View style={[styles.column, { paddingBottom: insets.bottom }]}>
+          <View>
+            <View style={styles.horizontalContainer}>
+              <TouchableOpacity onPress={onChangeMeasurement}>
+                <Text style={styles.button}>{'Change Measurements'}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={onGetMeasurementConfigs}>
+                <Text style={styles.button}>{'Get Measurements'}</Text>
+              </TouchableOpacity>
             </View>
           </View>
-        ))}
-      </View>
-    );
-  }
-}
+        </View>
+      ))}
+    </View>
+  );
+};
 
 export default Measurement;
 
