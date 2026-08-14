@@ -286,6 +286,24 @@ export default [
         title: 'AI Assistant',
       });
     },
+  },
+  {
+    key: 'item26',
+    name: 'Form Field Read Only',
+    description:
+      'How to lock and unlock an individual form field at runtime by its fully qualified name.',
+    action: (component: any) => {
+      component.props.navigation.push('FormFieldReadOnly');
+    },
+  },
+  {
+    key: 'item27',
+    name: 'Signature Pad Control',
+    description:
+      'How to intercept a signature field tap before the native signature UI opens, and how to dismiss it programmatically.',
+    action: (component: any) => {
+      component.props.navigation.push('SignaturePadControl');
+    },
   }
 ];
 

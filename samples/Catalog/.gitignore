@@ -55,6 +55,19 @@ yarn-error.log
 
 # Bundle artifact
 *.jsbundle
+/android/app/src/main/assets/index.android.bundle
+
+# Resources that `react-native bundle --assets-dest` copies next to the Android
+# bundle. Only the density-suffixed drawable folders and raw/ are generated; the
+# plain drawable/ and values/ folders are checked in. These are the same paths
+# ci/scripts/ci-android-catalog-build.sh removes in clear_dependencies.
+/android/app/src/main/res/drawable-*/
+/android/app/src/main/res/raw/
+
+# The iOS equivalent, written by `--assets-dest ios` in
+# ci/scripts/ci-ios-catalog-build.sh. main.jsbundle is already covered by the
+# *.jsbundle rule above; this is the accompanying asset tree.
+/ios/assets/
 
 # Ruby / CocoaPods
 /ios/Pods/

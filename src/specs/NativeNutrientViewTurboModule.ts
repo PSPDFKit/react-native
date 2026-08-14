@@ -33,6 +33,32 @@ export interface MeasurementValueConfiguration {
   precision: string;
 }
 
+// Coordinate-conversion types. Screen values are in RN points relative to the
+// NutrientView's frame origin; PDF values are in PDF points for the given page.
+export interface Point {
+  x: Double;
+  y: Double;
+}
+
+export interface Rect {
+  x: Double;
+  y: Double;
+  width: Double;
+  height: Double;
+}
+
+export interface ViewportState {
+  documentID: string;
+  pageIndex: Double;
+  zoomScale: Double;
+  visiblePdfRect: Rect;
+  contentOffset: Point;
+  viewportSize: {
+    width: Double;
+    height: Double;
+  };
+}
+
 export interface PDFConfiguration {
   scrollDirection?: string;
   pageTransition?: string;
@@ -104,6 +130,8 @@ export interface Spec extends TurboModule {
   enterContentEditingMode: (reference: string) => Promise<boolean>;
   exitCurrentlyActiveMode: (reference: string) => Promise<boolean>;
   executeAction: (reference: string, requestId: string, allow: boolean) => Promise<boolean>;
+  showSignaturePad: (reference: string, requestId: string, allow: boolean) => Promise<boolean>;
+  dismissSignaturePad: (reference: string) => Promise<boolean>;
   
   // Document operations
   setPageIndex: (reference: string, pageIndex: number, animated: boolean) => Promise<boolean>;
@@ -117,6 +145,15 @@ export interface Spec extends TurboModule {
   setExcludedAnnotations: (reference: string, annotations: string[]) => void;
   setUserInterfaceVisible: (reference: string, visible: boolean) => Promise<boolean>;
   destroyView: (reference: string) => void;
+
+  // Coordinate conversion between PDF and screen space, plus a one-shot viewport pull.
+  // Point/Rect arguments are passed as plain objects ({ x, y } / { x, y, width, height }) so
+  // Codegen bridges them as NSDictionary/ReadableMap rather than generating typed structs.
+  convertPointToScreen: (reference: string, pageIndex: Double, point: Object) => Promise<Point>;
+  convertPointToPage: (reference: string, pageIndex: Double, point: Object) => Promise<Point>;
+  convertRectToScreen: (reference: string, pageIndex: Double, rect: Object) => Promise<Rect>;
+  convertRectToPage: (reference: string, pageIndex: Double, rect: Object) => Promise<Rect>;
+  getViewportState: (reference: string) => Promise<ViewportState>;
 }
 
 export default TurboModuleRegistry.getEnforcing<Spec>('NutrientViewTurboModule'); 

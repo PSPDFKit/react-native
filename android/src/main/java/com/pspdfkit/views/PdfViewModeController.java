@@ -50,6 +50,8 @@ class PdfViewModeController implements
     @Nullable
     private MenuItemGroupingRule itemGroupingRule;
 
+    private boolean showStylusButton = true;
+
     PdfViewModeController(@NonNull PdfView parent) {
         this.parent = parent;
     }
@@ -59,6 +61,20 @@ class PdfViewModeController implements
      */
     public void setMenuItemGroupingRule(@Nullable MenuItemGroupingRule groupingRule) {
         this.itemGroupingRule = groupingRule;
+    }
+
+    /**
+     * Sets whether the stylus button should be shown on the annotation creation toolbar.
+     */
+    public void setShowStylusButton(boolean showStylusButton) {
+        this.showStylusButton = showStylusButton;
+    }
+
+    /**
+     * Returns whether the stylus button should be shown on the annotation creation toolbar.
+     */
+    public boolean getShowStylusButton() {
+        return showStylusButton;
     }
 
     @Override
@@ -149,6 +165,7 @@ class PdfViewModeController implements
             if (itemGroupingRule != null) {
                 contextualToolbar.setMenuItemGroupingRule(itemGroupingRule);
             }
+            ((AnnotationToolbar) contextualToolbar).setShouldShowStylusButton(showStylusButton);
         }
     }
 

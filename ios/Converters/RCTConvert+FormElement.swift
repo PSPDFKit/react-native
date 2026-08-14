@@ -30,6 +30,7 @@ import React
             formElementDictionary["highlightColor"] = NSNull()
         }
         formElementDictionary["calculationOrderIndex"] = formElement.calculationOrderIndex
+        formElementDictionary["readOnly"] = formElement.isReadOnly
         formElementDictionary["isRequired"] = formElement.isRequired
         formElementDictionary["isNoExport"] = formElement.isNoExport
         formElementDictionary["fieldName"] = formElement.fieldName

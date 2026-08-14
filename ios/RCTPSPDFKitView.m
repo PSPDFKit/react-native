@@ -14,6 +14,7 @@
 #import "RCTConvert+UIBarButtonItem.h"
 #import "RCTConvert+PSPDFDocument.h"
 #import "RCTConvert+PSPDFConfiguration.h"
+#import "RCTNoteAnnotationEditorDismissHandler.h"
 #if __has_include("PSPDFKitReactNativeiOS-Swift.h")
 #import "PSPDFKitReactNativeiOS-Swift.h"
 #else
@@ -35,6 +36,14 @@
 @property (nonatomic, strong) NSMutableDictionary<NSString *, PSPDFAction *> *pendingActions;
 @property (nonatomic, strong) NSMutableDictionary<NSString *, NSNumber *> *pendingActionPageIndices;
 @property (nonatomic) BOOL isReplayingAction;
+/// Last zoom scale reported by the document view controller. Cached so the viewport event and
+/// getViewportState can report a value even outside of a zoom callback. Defaults to 1.0.
+@property (nonatomic) CGFloat currentZoomScale;
+@property (nonatomic) BOOL noteEditorDismissesOnSave;
+@property (nonatomic, strong) NSMutableDictionary<NSString *, UIViewController *> *pendingSignatureControllers;
+@property (nonatomic, strong) NSMutableDictionary<NSString *, NSDictionary *> *pendingSignaturePresentationInfo;
+@property (nonatomic) BOOL isReplayingSignaturePad;
+@property (nonatomic, copy, nullable) NSString *lastTappedSignatureFieldName;
 
 @end
 
@@ -71,6 +80,7 @@
       
     _pendingActions = [NSMutableDictionary new];
     _pendingActionPageIndices = [NSMutableDictionary new];
+    _currentZoomScale = 1.0;
   }
     
   return self;
@@ -255,6 +265,151 @@
   }
 }
 
+// MARK: - PSPDFViewControllerDelegate (signature pad interception)
+
+// Returns YES when the controller (or the top controller of a wrapping navigation
+// controller) is one of the SDK's signature creation/selection UIs.
+static BOOL RCTPSPDFControllerIsSignatureUI(UIViewController *controller) {
+    UIViewController *target = controller;
+    if ([controller isKindOfClass:UINavigationController.class]) {
+        target = ((UINavigationController *)controller).topViewController ?: controller;
+    }
+    for (NSString *className in @[@"PSPDFSignatureCreationViewController",
+                                  @"PSPDFSignatureViewController",
+                                  @"PSPDFSignatureSelectorViewController"]) {
+        Class cls = NSClassFromString(className);
+        if (cls != Nil && [target isKindOfClass:cls]) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
+- (BOOL)pdfViewController:(PSPDFViewController *)pdfController shouldShowController:(UIViewController *)controller options:(nullable NSDictionary<NSString *, id> *)options animated:(BOOL)animated {
+    // When we are re-presenting a controller that JS already approved, do not intercept again.
+    if (self.isReplayingSignaturePad) {
+        return YES;
+    }
+    if (!RCTPSPDFControllerIsSignatureUI(controller)) {
+        return YES;
+    }
+
+    // Only intercept presentations that originate from a signature form-field tap.
+    // didTapOnAnnotation: runs before the presentation and records the tapped field;
+    // signature UI created from the annotation toolbar has no field and stays on the
+    // default path (Android likewise only intercepts form-element taps). Consume the
+    // recorded name so one tap maps to at most one intercepted presentation and a
+    // later unrelated presentation can't pick up a stale field name.
+    NSString *tappedSignatureFieldName = self.lastTappedSignatureFieldName;
+    if (tappedSignatureFieldName == nil) {
+        return YES;
+    }
+    self.lastTappedSignatureFieldName = nil;
+
+    // Only intercept when we have a handler *and* a way to deliver the event to JS.
+    BOOL canDeliverFabric = NO;
+    id<RCTPSPDFKitViewDelegate> delegate = (id<RCTPSPDFKitViewDelegate>)self.delegate;
+    if (self.hasShouldShowSignaturePad &&
+        delegate != nil &&
+        [delegate respondsToSelector:@selector(pspdfView:didRequestShouldShowSignaturePadWithPayload:)]) {
+        BOOL emitterReady = YES;
+        if ([delegate respondsToSelector:@selector(isEventEmitterReady)]) {
+            emitterReady = [delegate isEventEmitterReady];
+        }
+        canDeliverFabric = emitterReady;
+    }
+    BOOL canDeliverPaper = (self.onShouldShowSignaturePad != nil);
+    if (!canDeliverFabric && !canDeliverPaper) {
+        return YES;
+    }
+
+    // Remember the suppressed controller and its presentation parameters so JS can replay it.
+    NSString *requestId = [NSUUID UUID].UUIDString;
+    if (!self.pendingSignatureControllers) {
+        self.pendingSignatureControllers = [NSMutableDictionary new];
+    }
+    if (!self.pendingSignaturePresentationInfo) {
+        self.pendingSignaturePresentationInfo = [NSMutableDictionary new];
+    }
+    // At most one suppressed presentation is actionable at a time; drop unanswered
+    // requests so their retained controllers can't accumulate if JS never responds.
+    [self.pendingSignatureControllers removeAllObjects];
+    [self.pendingSignaturePresentationInfo removeAllObjects];
+    self.pendingSignatureControllers[requestId] = controller;
+    NSMutableDictionary *presentationInfo = [NSMutableDictionary new];
+    if (options != nil) {
+        presentationInfo[@"options"] = options;
+    }
+    presentationInfo[@"animated"] = @(animated);
+    self.pendingSignaturePresentationInfo[requestId] = presentationInfo;
+
+    NSMutableDictionary *payload = [NSMutableDictionary dictionary];
+    payload[@"requestId"] = requestId;
+    payload[@"pageIndex"] = @(pdfController.pageIndex);
+    payload[@"fullyQualifiedName"] = tappedSignatureFieldName;
+
+    if (canDeliverFabric) {
+        [delegate pspdfView:self didRequestShouldShowSignaturePadWithPayload:payload];
+    } else {
+        self.onShouldShowSignaturePad(payload);
+    }
+
+    // Suppress the presentation; JS will decide via showSignaturePad.
+    return NO;
+}
+
+- (BOOL)showPendingSignaturePadWithRequestId:(NSString *)requestId allow:(BOOL)allow {
+    if (!requestId.length) {
+        return NO;
+    }
+
+    UIViewController *controller = self.pendingSignatureControllers[requestId];
+    NSDictionary *presentationInfo = self.pendingSignaturePresentationInfo[requestId];
+    if (controller == nil) {
+        return NO;
+    }
+
+    [self.pendingSignatureControllers removeObjectForKey:requestId];
+    [self.pendingSignaturePresentationInfo removeObjectForKey:requestId];
+
+    if (!allow) {
+        return YES;
+    }
+
+    NSDictionary *options = presentationInfo[@"options"];
+    BOOL animated = presentationInfo[@"animated"] == nil ? YES : [presentationInfo[@"animated"] boolValue];
+
+    // Re-present through the SDK's presentation pipeline, but temporarily disable
+    // interception so we don't re-enter shouldShowController:.
+    self.isReplayingSignaturePad = YES;
+    @try {
+        [self.pdfController presentViewController:controller options:options animated:animated sender:nil completion:NULL];
+    } @finally {
+        self.isReplayingSignaturePad = NO;
+    }
+
+    return YES;
+}
+
+- (BOOL)dismissSignaturePad {
+    PSPDFViewController *pdfController = self.pdfController;
+    for (NSString *className in @[@"PSPDFSignatureCreationViewController",
+                                  @"PSPDFSignatureViewController",
+                                  @"PSPDFSignatureSelectorViewController"]) {
+        Class cls = NSClassFromString(className);
+        if (cls != Nil && [pdfController dismissViewControllerOfClass:cls animated:YES completion:NULL]) {
+            return YES;
+        }
+    }
+    // Fallback: the signature UI may be wrapped in a container the class check misses.
+    UIViewController *presented = pdfController.presentedViewController;
+    if (presented != nil && RCTPSPDFControllerIsSignatureUI(presented)) {
+        [presented.presentingViewController dismissViewControllerAnimated:YES completion:NULL];
+        return YES;
+    }
+    return NO;
+}
+
 // MARK: - PSPDFViewControllerDelegate (action interception)
 
 - (BOOL)pdfViewController:(PSPDFViewController *)pdfController shouldExecuteAction:(PSPDFAction *)action {
@@ -386,8 +541,22 @@
 
 // MARK: - PSPDFViewControllerDelegate
 
+- (void)pdfViewController:(PSPDFViewController *)pdfController didShowController:(UIViewController *)controller options:(NSDictionary<NSString *, id> *)options animated:(BOOL)animated {
+    if (self.noteEditorDismissesOnSave && [controller isKindOfClass:PSPDFNoteAnnotationViewController.class]) {
+        [RCTNoteAnnotationEditorDismissHandler installOnNoteController:(PSPDFNoteAnnotationViewController *)controller];
+    }
+}
+
 - (BOOL)pdfViewController:(PSPDFViewController *)pdfController didTapOnAnnotation:(PSPDFAnnotation *)annotation annotationPoint:(CGPoint)annotationPoint annotationView:(UIView<PSPDFAnnotationPresenting> *)annotationView pageView:(PSPDFPageView *)pageView viewPoint:(CGPoint)viewPoint {
     [NutrientNotificationCenter.shared didTapAnnotationWithAnnotation:annotation annotationPoint:annotationPoint documentID:pdfController.document.documentIdString componentID:self.componentID];
+
+    // Remember which signature field was tapped so shouldShowController: can attach it
+    // to the interception payload (the controller itself doesn't expose the field).
+    if ([annotation isKindOfClass:PSPDFSignatureFormElement.class]) {
+        self.lastTappedSignatureFieldName = ((PSPDFSignatureFormElement *)annotation).fullyQualifiedFieldName;
+    } else {
+        self.lastTappedSignatureFieldName = nil;
+    }
     
   // Fabric path: forward to delegate so Fabric component can emit a codegen event.
   if ([self.delegate respondsToSelector:@selector(pspdfView:didTapAnnotation:)]) {
@@ -681,6 +850,130 @@
                                                        scrollDirection:_pdfController.configuration.scrollDirection
                                                             documentID:_pdfController.document.documentIdString
                                                             componentID:self.componentID];
+    [self emitDocumentViewportChanged];
+}
+
+- (void)documentViewController:(PSPDFDocumentViewController *)documentViewController didUpdateZoomScale:(CGFloat)zoomScale forSpreadAtIndex:(NSInteger)spreadIndex {
+    self.currentZoomScale = zoomScale;
+    [self emitDocumentViewportChanged];
+}
+
+// MARK: - Viewport / coordinate conversion
+
+/// Returns the page view for the current page, falling back to the first visible page view.
+- (nullable PSPDFPageView *)primaryVisiblePageView {
+    PSPDFViewController *controller = self.pdfController;
+    PSPDFPageView *pageView = [controller pageViewForPageAtIndex:controller.pageIndex];
+    if (pageView == nil) {
+        pageView = controller.visiblePageViews.firstObject;
+    }
+    return pageView;
+}
+
+/// Computes the spatial values shared by the viewport event and getViewportState.
+/// Returns NO (and leaves out-params untouched) when no page is currently visible.
+- (BOOL)computeViewportPageView:(PSPDFPageView *_Nullable *_Nullable)outPageView
+                 visiblePdfRect:(CGRect *_Nullable)outVisibleRect
+                  contentOffset:(CGPoint *_Nullable)outContentOffset {
+    PSPDFPageView *pageView = [self primaryVisiblePageView];
+    if (pageView == nil) {
+        return NO;
+    }
+    // Visible region of the page, in PDF points. pdfCoordinateSpace's origin is the PDF's
+    // bottom-left, per PSPDFPageView.h.
+    CGRect visiblePdfRect = [self convertRect:self.bounds toCoordinateSpace:pageView.pdfCoordinateSpace];
+    // Screen-space offset of the page's top-left relative to the viewport, in points.
+    // Deliberately NOT pdfCoordinateSpace here: CGPointZero is pageView's own bounds origin
+    // (plain UIKit, top-left, y-down — PSPDFPageView doesn't override view geometry), matching
+    // Android's equivalent (PdfView.computeViewportData), which maps the PDF-native top-left
+    // through the page's y-flipping transform into the same top-left, y-down convention before
+    // negating. Both platforms compute the same quantity here.
+    CGPoint pageTopLeftInView = [pageView convertPoint:CGPointZero toView:self];
+    if (outPageView) { *outPageView = pageView; }
+    if (outVisibleRect) { *outVisibleRect = visiblePdfRect; }
+    if (outContentOffset) { *outContentOffset = CGPointMake(-pageTopLeftInView.x, -pageTopLeftInView.y); }
+    return YES;
+}
+
+- (void)emitDocumentViewportChanged {
+    if (!NutrientNotificationCenter.shared.isInUse) {
+        return;
+    }
+    PSPDFPageView *pageView = nil;
+    CGRect visiblePdfRect = CGRectZero;
+    CGPoint contentOffset = CGPointZero;
+    if (![self computeViewportPageView:&pageView visiblePdfRect:&visiblePdfRect contentOffset:&contentOffset]) {
+        return;
+    }
+    NSString *documentID = self.pdfController.document.documentIdString ?: @"";
+    [NutrientNotificationCenter.shared documentViewportChangedWithPageIndex:pageView.pageIndex
+                                                                 zoomScale:self.currentZoomScale
+                                                            visiblePdfRect:visiblePdfRect
+                                                             contentOffset:contentOffset
+                                                              viewportSize:self.bounds.size
+                                                                documentID:documentID
+                                                               componentID:self.componentID];
+}
+
+- (nullable NSDictionary *)getViewportState {
+    PSPDFPageView *pageView = nil;
+    CGRect visiblePdfRect = CGRectZero;
+    CGPoint contentOffset = CGPointZero;
+    if (![self computeViewportPageView:&pageView visiblePdfRect:&visiblePdfRect contentOffset:&contentOffset]) {
+        return nil;
+    }
+    NSString *documentID = self.pdfController.document.documentIdString ?: @"";
+    return @{
+        @"event": @"documentViewportChanged",
+        @"documentID": documentID,
+        @"pageIndex": @(pageView.pageIndex),
+        @"zoomScale": @(self.currentZoomScale),
+        @"visiblePdfRect": @{ @"x": @(CGRectGetMinX(visiblePdfRect)),
+                              @"y": @(CGRectGetMinY(visiblePdfRect)),
+                              @"width": @(CGRectGetWidth(visiblePdfRect)),
+                              @"height": @(CGRectGetHeight(visiblePdfRect)) },
+        @"contentOffset": @{ @"x": @(contentOffset.x), @"y": @(contentOffset.y) },
+        @"viewportSize": @{ @"width": @(CGRectGetWidth(self.bounds)),
+                            @"height": @(CGRectGetHeight(self.bounds)) },
+    };
+}
+
+- (nullable NSDictionary *)convertPointToScreen:(CGPoint)point onPageAtIndex:(PSPDFPageIndex)pageIndex {
+    PSPDFPageView *pageView = [self.pdfController pageViewForPageAtIndex:pageIndex];
+    if (pageView == nil) {
+        return nil;
+    }
+    CGPoint screenPoint = [self convertPoint:point fromCoordinateSpace:pageView.pdfCoordinateSpace];
+    return @{ @"x": @(screenPoint.x), @"y": @(screenPoint.y) };
+}
+
+- (nullable NSDictionary *)convertPointToPage:(CGPoint)point onPageAtIndex:(PSPDFPageIndex)pageIndex {
+    PSPDFPageView *pageView = [self.pdfController pageViewForPageAtIndex:pageIndex];
+    if (pageView == nil) {
+        return nil;
+    }
+    CGPoint pdfPoint = [self convertPoint:point toCoordinateSpace:pageView.pdfCoordinateSpace];
+    return @{ @"x": @(pdfPoint.x), @"y": @(pdfPoint.y) };
+}
+
+- (nullable NSDictionary *)convertRectToScreen:(CGRect)rect onPageAtIndex:(PSPDFPageIndex)pageIndex {
+    PSPDFPageView *pageView = [self.pdfController pageViewForPageAtIndex:pageIndex];
+    if (pageView == nil) {
+        return nil;
+    }
+    CGRect screenRect = [self convertRect:rect fromCoordinateSpace:pageView.pdfCoordinateSpace];
+    return @{ @"x": @(CGRectGetMinX(screenRect)), @"y": @(CGRectGetMinY(screenRect)),
+              @"width": @(CGRectGetWidth(screenRect)), @"height": @(CGRectGetHeight(screenRect)) };
+}
+
+- (nullable NSDictionary *)convertRectToPage:(CGRect)rect onPageAtIndex:(PSPDFPageIndex)pageIndex {
+    PSPDFPageView *pageView = [self.pdfController pageViewForPageAtIndex:pageIndex];
+    if (pageView == nil) {
+        return nil;
+    }
+    CGRect pdfRect = [self convertRect:rect toCoordinateSpace:pageView.pdfCoordinateSpace];
+    return @{ @"x": @(CGRectGetMinX(pdfRect)), @"y": @(CGRectGetMinY(pdfRect)),
+              @"width": @(CGRectGetWidth(pdfRect)), @"height": @(CGRectGetHeight(pdfRect)) };
 }
 
 // MARK: - PSPDFFlexibleToolbarContainerDelegate
@@ -1147,6 +1440,10 @@
     [self.pdfController updateConfigurationWithBuilder:^(PSPDFConfigurationBuilder *builder) {
         [builder setupFromJSON:configuration];
     }];
+
+    // iOS-only opt-in: make the comment editor save-and-dismiss in one step. Applied when the editor
+    // is shown, in -pdfViewController:didShowController:options:animated:.
+    self.noteEditorDismissesOnSave = [RCTConvert BOOL:configuration[@"iOSNoteEditorDismissesOnSave"]];
 
     [self postProcessConfigurationOptionsWithJSON:configuration forPDFViewController:self.pdfController];
 }

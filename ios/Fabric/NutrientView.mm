@@ -309,6 +309,23 @@ using namespace facebook::react;
   _eventEmitter->onShouldExecuteAction(eventPayload);
 }
 
+- (void)pspdfView:(RCTPSPDFKitView *)view didRequestShouldShowSignaturePadWithPayload:(NSDictionary *)payload {
+  if (!_eventEmitter || payload == nil) {
+    return;
+  }
+
+  NSString *requestId = payload[@"requestId"];
+  NSNumber *pageIndex = payload[@"pageIndex"];
+  NSString *fullyQualifiedName = payload[@"fullyQualifiedName"];
+
+  facebook::react::NutrientViewEventEmitter::OnShouldShowSignaturePad eventPayload{
+    requestId ? std::string([requestId UTF8String]) : std::string(""),
+    pageIndex != nil ? (int)pageIndex.integerValue : 0,
+    fullyQualifiedName ? std::string([fullyQualifiedName UTF8String]) : std::string("")
+  };
+  _eventEmitter->onShouldShowSignaturePad(eventPayload);
+}
+
 - (void)updateProps:(Props::Shared const &)props oldProps:(Props::Shared const &)oldProps
 {
   [super updateProps:props oldProps:oldProps];
@@ -359,6 +376,7 @@ using namespace facebook::react;
       _disableDefaultActionForTappedAnnotations = newProps->disableDefaultActionForTappedAnnotations;
       _view.disableDefaultActionForTappedAnnotations = _disableDefaultActionForTappedAnnotations;
       _view.hasShouldExecuteAction = newProps->hasShouldExecuteAction;
+      _view.hasShouldShowSignaturePad = newProps->hasShouldShowSignaturePad;
       _showNavigationButtonInToolbar = newProps->showNavigationButtonInToolbar;
       if (!newProps->availableFontNamesJSONString.empty()) {
         _availableFontNamesJSONString = RCTNSStringFromString(newProps->availableFontNamesJSONString);

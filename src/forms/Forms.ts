@@ -147,6 +147,27 @@ export class Forms {
     }
 
     /**
+     * @method setFormFieldReadOnly
+     * @memberof Forms
+     * @param {string} fullyQualifiedName The fully qualified name of the form field to update.
+     * @param {boolean} readOnly Whether the form field should be read-only.
+     * @description Sets the read-only state of a form field on the document.
+     * @example
+     * const result = await this.pdfRef.current?.getDocument().forms.setFormFieldReadOnly(name, true);
+     * @returns { Promise<boolean> } A promise containing the result of the operation.
+     */
+    setFormFieldReadOnly(
+        fullyQualifiedName: string,
+        readOnly: boolean
+    ): Promise<boolean> {
+        return NativeModules.PDFDocumentManager.setFormFieldReadOnly(
+            findNodeHandle(this.pdfViewRef),
+            fullyQualifiedName,
+            readOnly
+        );
+    }
+
+    /**
      * @method addElectronicSignatureFormField
      * @memberof Forms
      * @param {ElectronicSignatureFieldConfiguration} configuration The configuration for the electronic signature field.

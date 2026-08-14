@@ -32,7 +32,7 @@ Pod::Spec.new do |s|
     s.dependency("React")
   end
 
-  s.dependency("PSPDFKit", "26.10.0")
-  s.dependency("Instant", "26.10.0")
+  s.dependency("PSPDFKit", "26.11.0")
+  s.dependency("Instant", "26.11.0")
   s.frameworks = "UIKit"
 end

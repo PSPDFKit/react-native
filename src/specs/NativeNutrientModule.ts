@@ -26,6 +26,7 @@ export interface Spec extends TurboModule {
   readonly documentLoadFailed?: EventEmitter<Object>;
   readonly documentPageChanged?: EventEmitter<Object>;
   readonly documentScrolled?: EventEmitter<Object>;
+  readonly documentViewportChanged?: EventEmitter<Object>;
   readonly documentTapped?: EventEmitter<Object>;
   readonly annotationsAdded?: EventEmitter<Object>;
   readonly annotationChanged?: EventEmitter<Object>;

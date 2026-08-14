@@ -108,6 +108,7 @@ import { AIAssistantConfiguration } from './AIAssistantConfiguration';
  * @property { PDFConfiguration.IOSFileConflictResolution } [iOSFileConflictResolution] Resolution options for conflicts due to out of process file changes or deletion.
  * @property { PDFConfiguration.IOSDocumentInfoOption[] } [iOSDocumentInfoOptions] Choose which document-related information to display in the document info controller.
  * @property { PDFConfiguration.BooleanType } [androidEnableStylusOnDetection] Indicates whether we should automatically detect the stylus. Enabling this will automatically disable all other inputs once we detect stylus use. Defaults to true.
+ * @property { PDFConfiguration.BooleanType } [androidShowStylusButton] Shows or hides the stylus tool button in the annotation toolbar. Applied the next time the annotation toolbar is shown, so it does not affect a toolbar that is already on screen. Defaults to true.
  * @property { PDFConfiguration.ToolbarPosition } [toolbarPosition] Sets the position of the annotation and document editing toolbars.
  * @property { PDFConfiguration.ToolbarPosition[] } [supportedToolbarPositions] Sets the available positions for the annotation and document editing toolbars.
  */
@@ -173,6 +174,15 @@ export class PDFConfiguration {
      * Determines whether automatic saving should happen on a background thread.
      */
     iOSAllowBackgroundSaving?: PDFConfiguration.BooleanType;
+    /**
+     * When enabled, the comment (note annotation) editor automatically dismisses once the user
+     * saves the comment, so tapping Done both saves the comment and closes the editor.
+     * Defaults to `false`, which keeps the standard behavior where the editor stays open after saving.
+     * Note: dismissal triggers whenever the comment text is committed, so editing the comment and then
+     * changing its color/icon or adding a reply in the same session will also close the editor.
+     * iOS only.
+     */
+    iOSNoteEditorDismissesOnSave?: PDFConfiguration.BooleanType;
     /**
      * Minimum zoom scale for the scroll view.
      */
@@ -510,6 +520,12 @@ export class PDFConfiguration {
      * Indicates whether we should automatically detect the stylus. Enabling this will automatically disable all other inputs once we detect stylus use. Defaults to true.
      */
     androidEnableStylusOnDetection?: PDFConfiguration.BooleanType;
+    /**
+     * Shows or hides the stylus tool button in the annotation toolbar. Defaults to true.
+     * Applied when the annotation toolbar is next shown, so changing this while the toolbar is
+     * on screen only takes effect after the toolbar is dismissed and shown again.
+     */
+    androidShowStylusButton?: PDFConfiguration.BooleanType;
     /**
      * Sets the position of the annotation toolbar.
      */

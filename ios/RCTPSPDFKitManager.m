@@ -97,6 +97,7 @@ RCT_EXPORT_METHOD(handleListenerRemoved:(nonnull NSString* )event
              @"documentLoadFailed",
              @"documentPageChanged",
              @"documentScrolled",
+             @"documentViewportChanged",
              @"documentTapped",
              @"annotationsAdded",
              @"annotationChanged",

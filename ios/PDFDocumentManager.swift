@@ -261,7 +261,38 @@ import PSPDFKit
             onError("updateFormFieldValue", "Could not update form field value", nil)
         }
     }
-    
+
+    @objc func setFormFieldReadOnly(_ reference: NSNumber, fullyQualifiedName: String, readOnly: Bool, onSuccess: @escaping RCTPromiseResolveBlock, onError: @escaping RCTPromiseRejectBlock) -> Void {
+        guard let document = getDocument(reference) else {
+            onError("setFormFieldReadOnly", "Document is nil", nil)
+            return
+        }
+
+        guard let formElements = document.formParser?.forms else {
+            onError("setFormFieldReadOnly", "No form elements found", nil)
+            return
+        }
+
+        var success = false
+
+        for formElement in formElements {
+            if formElement.fullyQualifiedFieldName == fullyQualifiedName ||
+                formElement.formField?.fullyQualifiedName == fullyQualifiedName {
+                if let formField = formElement.formField {
+                    formField.isReadOnly = readOnly
+                    success = true
+                }
+                break
+            }
+        }
+
+        if success {
+            onSuccess(true)
+        } else {
+            onError("setFormFieldReadOnly", "Could not update form field read-only state", nil)
+        }
+    }
+
     @objc func getAnnotations(_ reference: NSNumber, type: String?, onSuccess: @escaping RCTPromiseResolveBlock, onError: @escaping RCTPromiseRejectBlock) -> Void {
         guard let document = getDocument(reference) else {
             onError("getAnnotations", "Document is nil", nil)

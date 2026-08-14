@@ -360,6 +360,10 @@ public class ConfigurationAdapter {
             if (key != null) {
                 configureEnableStylusOnDetection(configuration.getBoolean(key));
             }
+            // showStylusButton / androidShowStylusButton is deliberately not handled here: the
+            // stylus button lives on the live AnnotationToolbar instance rather than on
+            // PdfActivityConfiguration, so it can't be set on this builder. It's applied through
+            // NutrientPropsDocumentHelper#applyShowStylusButtonFromConfiguration instead.
         }
     }
 

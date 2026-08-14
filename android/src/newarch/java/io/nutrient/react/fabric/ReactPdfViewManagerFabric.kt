@@ -48,6 +48,7 @@ import io.nutrient.react.events.FabricOnNavigationButtonClickedEvent
 import io.nutrient.react.events.FabricOnAnnotationTappedEvent
 import io.nutrient.react.events.FabricOnAnnotationsChangedEvent
 import io.nutrient.react.events.FabricOnShouldExecuteActionEvent
+import io.nutrient.react.events.FabricOnShouldShowSignaturePadEvent
 import com.pspdfkit.react.NutrientViewRegistry
 
 class ReactPdfViewManagerFabric : ViewGroupManager<PdfView>(), NutrientViewManagerInterface<PdfView> {
@@ -165,6 +166,23 @@ class ReactPdfViewManagerFabric : ViewGroupManager<PdfView>(), NutrientViewManag
                     )
                 }
 
+                override fun onShouldShowSignaturePad(
+                    requestId: String,
+                    fullyQualifiedName: String?,
+                    pageIndex: Int
+                ) {
+                    val surfaceId = UIManagerHelper.getSurfaceId(reactContext)
+                    eventDispatcher?.dispatchEvent(
+                        FabricOnShouldShowSignaturePadEvent(
+                            surfaceId,
+                            pdfView.id,
+                            requestId,
+                            fullyQualifiedName,
+                            pageIndex
+                        )
+                    )
+                }
+
                 override fun onCloseButtonPressed() {
                     val surfaceId = UIManagerHelper.getSurfaceId(reactContext)
                     eventDispatcher?.dispatchEvent(FabricOnCloseButtonPressedEvent(surfaceId, pdfView.id))
@@ -274,6 +292,7 @@ class ReactPdfViewManagerFabric : ViewGroupManager<PdfView>(), NutrientViewManag
         map["onAnnotationTapped"] = mapOf("registrationName" to "onAnnotationTapped")
         map["onAnnotationsChanged"] = mapOf("registrationName" to "onAnnotationsChanged")
         map["onShouldExecuteAction"] = mapOf("registrationName" to "onShouldExecuteAction")
+        map["onShouldShowSignaturePad"] = mapOf("registrationName" to "onShouldShowSignaturePad")
         return map
     }
 
@@ -378,6 +397,10 @@ class ReactPdfViewManagerFabric : ViewGroupManager<PdfView>(), NutrientViewManag
 
     override fun setHasShouldExecuteAction(view: PdfView, value: Boolean) {
         view.setHasShouldExecuteAction(value)
+    }
+
+    override fun setHasShouldShowSignaturePad(view: PdfView, value: Boolean) {
+        view.setHasShouldShowSignaturePad(value)
     }
 
     override fun setAnnotationAuthorName(view: PdfView, @Nullable value: String?) {

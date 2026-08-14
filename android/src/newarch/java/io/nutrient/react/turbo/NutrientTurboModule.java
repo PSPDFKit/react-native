@@ -57,6 +57,7 @@ public class NutrientTurboModule extends NativeNutrientModuleSpec {
                 else if ("documentLoadFailed".equals(eventName)) emitDocumentLoadFailed(payload);
                 else if ("documentPageChanged".equals(eventName)) emitDocumentPageChanged(payload);
                 else if ("documentScrolled".equals(eventName)) emitDocumentScrolled(payload);
+                else if ("documentViewportChanged".equals(eventName)) emitDocumentViewportChanged(payload);
                 else if ("documentTapped".equals(eventName)) emitDocumentTapped(payload);
                 else if ("annotationsAdded".equals(eventName)) emitAnnotationsAdded(payload);
                 else if ("annotationChanged".equals(eventName)) emitAnnotationChanged(payload);

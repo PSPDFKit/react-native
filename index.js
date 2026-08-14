@@ -40,7 +40,9 @@ class NutrientView extends React.Component {
 
   static _getArchitectureInfo() {
     if (this._isNewArchitecture === null) {
-      const { isNewArchitectureEnabled } = require('./lib/ArchitectureDetector');
+      const {
+        isNewArchitectureEnabled,
+      } = require('./lib/ArchitectureDetector');
       this._isNewArchitecture = isNewArchitectureEnabled();
 
       if (this._isNewArchitecture) {
@@ -55,7 +57,10 @@ class NutrientView extends React.Component {
       }
     }
 
-    return { isNewArchitecture: this._isNewArchitecture, FabricComponent: this._FabricComponent };
+    return {
+      isNewArchitecture: this._isNewArchitecture,
+      FabricComponent: this._FabricComponent,
+    };
   }
   /**
    * @ignore
@@ -86,9 +91,13 @@ class NutrientView extends React.Component {
 
   render() {
     // Architecture detection - use cached result to decide Fabric vs Paper
-    const { isNewArchitecture, FabricComponent } = NutrientView._getArchitectureInfo();
+    const { isNewArchitecture, FabricComponent } =
+      NutrientView._getArchitectureInfo();
     if (isNewArchitecture && FabricComponent) {
-      return React.createElement(FabricComponent, { ...this.props, ref: this._fabricRef });
+      return React.createElement(FabricComponent, {
+        ...this.props,
+        ref: this._fabricRef,
+      });
     }
 
     if (Platform.OS === 'ios' || Platform.OS === 'android') {
@@ -112,14 +121,16 @@ class NutrientView extends React.Component {
           document: document !== undefined ? document : null,
           configuration: configuration !== undefined ? configuration : null,
         };
-        
+
         const hasShouldExecute = !!this.props.onShouldExecuteAction;
-        const disableDefaultAction = this.props.disableDefaultActionForTappedAnnotations === true;
+        const hasSignaturePadHandler = !!this.props.onShouldShowSignaturePad;
+        const disableDefaultAction =
+          this.props.disableDefaultActionForTappedAnnotations === true;
 
         return (
           <RCTPSPDFKitView
             ref={this._componentRef}
-            documentAndConfiguration={documentAndConfiguration}  // Android only
+            documentAndConfiguration={documentAndConfiguration} // Android only
             fragmentTag="NutrientView.FragmentTag"
             {...otherProps}
             disableDefaultActionForTappedAnnotations={disableDefaultAction}
@@ -141,14 +152,24 @@ class NutrientView extends React.Component {
               this._onCustomTextSelectionContextualMenuItemTapped
             }
             onReady={this._onReady}
-            onShouldExecuteAction={hasShouldExecute ? this._onShouldExecuteAction : undefined}
+            onShouldExecuteAction={
+              hasShouldExecute ? this._onShouldExecuteAction : undefined
+            }
             hasShouldExecuteAction={hasShouldExecute}
+            onShouldShowSignaturePad={
+              hasSignaturePadHandler
+                ? this._onShouldShowSignaturePad
+                : undefined
+            }
+            hasShouldShowSignaturePad={hasSignaturePadHandler}
           />
         );
       } else {
         // iOS: Use original approach with individual props
         const hasShouldExecute = !!this.props.onShouldExecuteAction;
-        const disableDefaultAction = this.props.disableDefaultActionForTappedAnnotations === true;
+        const hasSignaturePadHandler = !!this.props.onShouldShowSignaturePad;
+        const disableDefaultAction =
+          this.props.disableDefaultActionForTappedAnnotations === true;
 
         return (
           <RCTPSPDFKitView
@@ -171,8 +192,16 @@ class NutrientView extends React.Component {
               this._onCustomAnnotationContextualMenuItemTapped
             }
             onReady={this._onReady}
-            onShouldExecuteAction={hasShouldExecute ? this._onShouldExecuteAction : undefined}
+            onShouldExecuteAction={
+              hasShouldExecute ? this._onShouldExecuteAction : undefined
+            }
             hasShouldExecuteAction={hasShouldExecute}
+            onShouldShowSignaturePad={
+              hasSignaturePadHandler
+                ? this._onShouldShowSignaturePad
+                : undefined
+            }
+            hasShouldShowSignaturePad={hasSignaturePadHandler}
           />
         );
       }
@@ -290,7 +319,9 @@ class NutrientView extends React.Component {
    */
   _onCustomTextSelectionContextualMenuItemTapped = event => {
     if (this.props.onCustomTextSelectionContextualMenuItemTapped) {
-      this.props.onCustomTextSelectionContextualMenuItemTapped(event.nativeEvent);
+      this.props.onCustomTextSelectionContextualMenuItemTapped(
+        event.nativeEvent,
+      );
     }
   };
 
@@ -314,6 +345,16 @@ class NutrientView extends React.Component {
   };
 
   /**
+   * @ignore
+   */
+  _onShouldShowSignaturePad = event => {
+    const payload = event && event.nativeEvent ? event.nativeEvent : event;
+    if (this.props.onShouldShowSignaturePad) {
+      this.props.onShouldShowSignaturePad(payload);
+    }
+  };
+
+  /**
    * Enters annotation creation mode, showing the annotation creation toolbar.
    * @method enterAnnotationCreationMode
    * @param { Annotation.Type } [annotationType] The annotation type that should be pre-selected when entering annotation creation mode.
@@ -326,7 +367,9 @@ class NutrientView extends React.Component {
     const { isNewArchitectureEnabled } = require('./lib/ArchitectureDetector');
     if (isNewArchitectureEnabled()) {
       // Delegate to Fabric component
-      return this._fabricRef.current?.enterAnnotationCreationMode(annotationType);
+      return this._fabricRef.current?.enterAnnotationCreationMode(
+        annotationType,
+      );
     }
 
     if (Platform.OS === 'android') {
@@ -341,7 +384,7 @@ class NutrientView extends React.Component {
         findNodeHandle(this._componentRef.current),
         this._getViewManagerConfig('RCTPSPDFKitView').Commands
           .enterAnnotationCreationMode,
-          [requestId, annotationType],
+        [requestId, annotationType],
       );
     } else if (Platform.OS === 'ios') {
       return NativeModules.PSPDFKitViewManager.enterAnnotationCreationMode(
@@ -372,8 +415,7 @@ class NutrientView extends React.Component {
       // Legacy Android: fire-and-forget command. No Promise result is returned.
       UIManager.dispatchViewManagerCommand(
         findNodeHandle(this._componentRef.current),
-        this._getViewManagerConfig('RCTPSPDFKitView').Commands
-          .executeAction,
+        this._getViewManagerConfig('RCTPSPDFKitView').Commands.executeAction,
         [requestId, allow],
       );
       return;
@@ -382,6 +424,66 @@ class NutrientView extends React.Component {
       return NativeModules.PSPDFKitViewManager.executeAction(
         requestId,
         allow,
+        findNodeHandle(this._componentRef.current),
+      );
+    }
+  };
+
+  /**
+   * Decides whether a previously intercepted signature UI presentation should proceed.
+   * Invoke this in response to the ```onShouldShowSignaturePad``` callback.
+   *
+   * @method showSignaturePad
+   * @param {string} requestId The request identifier received from the onShouldShowSignaturePad callback.
+   * @param {boolean} allow Whether the signature UI should be shown (true) or stay suppressed (false).
+   * @memberof NutrientView
+   * @returns { Promise<boolean> } A promise resolving to ```true``` if the request identifier was known and handled, ```false``` otherwise.
+   */
+  showSignaturePad = function (requestId, allow) {
+    const { isNewArchitectureEnabled } = require('./lib/ArchitectureDetector');
+    if (isNewArchitectureEnabled()) {
+      // Delegate to Fabric component
+      return this._fabricRef.current?.showSignaturePad(requestId, allow);
+    }
+
+    if (Platform.OS === 'android') {
+      // Legacy Android: request-id-keyed command; resolves with the native result.
+      return this._dispatchLegacyViewportCommand('showSignaturePad', [
+        requestId,
+        allow,
+      ]);
+    } else if (Platform.OS === 'ios') {
+      // Legacy iOS: Promise-based module method.
+      return NativeModules.PSPDFKitViewManager.showSignaturePad(
+        requestId,
+        allow,
+        findNodeHandle(this._componentRef.current),
+      );
+    }
+  };
+
+  /**
+   * Dismisses the signature UI if it is currently presented.
+   *
+   * @method dismissSignaturePad
+   * @example
+   * const didDismiss = await this.pdfRef.current.dismissSignaturePad();
+   * @memberof NutrientView
+   * @returns { Promise<boolean> } A promise resolving to ```true``` if a signature UI was showing and got dismissed, ```false``` if none was showing.
+   */
+  dismissSignaturePad = function () {
+    const { isNewArchitectureEnabled } = require('./lib/ArchitectureDetector');
+    if (isNewArchitectureEnabled()) {
+      // Delegate to Fabric component
+      return this._fabricRef.current?.dismissSignaturePad();
+    }
+
+    if (Platform.OS === 'android') {
+      // Legacy Android: request-id-keyed command; resolves with the native result.
+      return this._dispatchLegacyViewportCommand('dismissSignaturePad', []);
+    } else if (Platform.OS === 'ios') {
+      // Legacy iOS: Promise-based module method.
+      return NativeModules.PSPDFKitViewManager.dismissSignaturePad(
         findNodeHandle(this._componentRef.current),
       );
     }
@@ -414,7 +516,7 @@ class NutrientView extends React.Component {
         findNodeHandle(this._componentRef.current),
         this._getViewManagerConfig('RCTPSPDFKitView').Commands
           .enterContentEditingMode,
-          [requestId],
+        [requestId],
       );
       return promise;
     } else if (Platform.OS === 'ios') {
@@ -512,7 +614,7 @@ class NutrientView extends React.Component {
    * @memberof NutrientView
    * @returns { PDFDocument } A reference to the document that is currently loaded in the NutrientView component.
    */
-  getDocument () {
+  getDocument() {
     // Architecture detection via helper function
     const { isNewArchitectureEnabled } = require('./lib/ArchitectureDetector');
     if (isNewArchitectureEnabled()) {
@@ -525,7 +627,7 @@ class NutrientView extends React.Component {
     } else {
       return this._pdfDocument;
     }
-  };
+  }
 
   /**
    * Get the current Notification Center.
@@ -536,7 +638,7 @@ class NutrientView extends React.Component {
    * @memberof NutrientView
    * @returns { NotificationCenter } A reference to the Notification Center that can be used to subscribe and unsubscribe from events.
    */
-  getNotificationCenter () {
+  getNotificationCenter() {
     // Architecture detection via helper function
     const { isNewArchitectureEnabled } = require('./lib/ArchitectureDetector');
     if (isNewArchitectureEnabled()) {
@@ -544,12 +646,14 @@ class NutrientView extends React.Component {
       return this._fabricRef.current?.getNotificationCenter();
     }
     if (this._notificationCenter == null) {
-      this._notificationCenter = new NotificationCenter(this._componentRef.current);
+      this._notificationCenter = new NotificationCenter(
+        this._componentRef.current,
+      );
       return this._notificationCenter;
     } else {
       return this._notificationCenter;
     }
-  };
+  }
 
   /**
    * @method clearSelectedAnnotations
@@ -905,7 +1009,9 @@ class NutrientView extends React.Component {
     const { isNewArchitectureEnabled } = require('./lib/ArchitectureDetector');
     if (isNewArchitectureEnabled()) {
       // Delegate to Fabric component
-      return this._fabricRef.current?.setMeasurementValueConfigurations(configurations);
+      return this._fabricRef.current?.setMeasurementValueConfigurations(
+        configurations,
+      );
     }
 
     if (Platform.OS === 'android') {
@@ -1040,8 +1146,195 @@ class NutrientView extends React.Component {
   };
 
   /**
+   * @typedef Point
+   * @property { number } x The x coordinate.
+   * @property { number } y The y coordinate.
+   */
+
+  /**
+   * @typedef Rect
+   * @property { number } x The x coordinate of the origin.
+   * @property { number } y The y coordinate of the origin.
+   * @property { number } width The width of the rectangle.
+   * @property { number } height The height of the rectangle.
+   */
+
+  /**
+   * @typedef DocumentViewportChangedPayload
+   * @property { string } documentID Identifier of the document currently displayed.
+   * @property { number } pageIndex The primary (most visible) page index for which ```visiblePdfRect``` is reported.
+   * @property { number } zoomScale Current zoom factor of the view.
+   * @property { Rect } visiblePdfRect Visible region of ```pageIndex```, expressed in PDF points.
+   * @property { Point } contentOffset Content offset of the scroll view, in screen points,
+   * relative to ```pageIndex```'s top-left. Since ```pageIndex``` is whichever page is
+   * currently anchored (closest to the center of the viewport), this jumps discontinuously
+   * when the anchor page changes, e.g. scrolling past a page boundary. It is not a
+   * document-absolute offset; use ```visiblePdfRect``` and ```pageIndex``` together if you
+   * need position relative to a specific page instead.
+   * @property { object } viewportSize Size of the viewport, in screen points.
+   * @property { number } viewportSize.width The width of the viewport.
+   * @property { number } viewportSize.height The height of the viewport.
+   */
+
+  /**
+   * Dispatches a legacy-bridge command by name and awaits its request-id-keyed
+   * response. Shared by the viewport/coordinate and signature-pad methods, which
+   * differ only in command name and arguments.
+   */
+  _dispatchLegacyViewportCommand = function (commandName, commandArgs) {
+    let requestId = this._nextRequestId++;
+    let requestMap = this._requestMap;
+    let promise = new Promise(function (resolve, reject) {
+      requestMap[requestId] = { resolve: resolve, reject: reject };
+    });
+    UIManager.dispatchViewManagerCommand(
+      findNodeHandle(this._componentRef.current),
+      this._getViewManagerConfig('RCTPSPDFKitView').Commands[commandName],
+      [requestId, ...commandArgs],
+    );
+    return promise;
+  };
+
+  /**
+   * Runs a viewport/coordinate method on whichever architecture/platform path applies,
+   * rejecting instead of silently returning `undefined` when none does (e.g. the Fabric
+   * ref isn't attached yet, or the method is called on an unsupported platform).
+   */
+  _invokeViewportMethod = function (
+    methodName,
+    fabricArgs,
+    legacyCommandArgs,
+    iosArgs,
+  ) {
+    const { isNewArchitectureEnabled } = require('./lib/ArchitectureDetector');
+    if (isNewArchitectureEnabled()) {
+      if (!this._fabricRef.current) {
+        return Promise.reject(
+          new Error(
+            `NutrientView.${methodName}: the native view is not ready yet.`,
+          ),
+        );
+      }
+      return this._fabricRef.current[methodName](...fabricArgs);
+    }
+
+    if (Platform.OS === 'android') {
+      return this._dispatchLegacyViewportCommand(methodName, legacyCommandArgs);
+    } else if (Platform.OS === 'ios') {
+      return NativeModules.PSPDFKitViewManager[methodName](
+        ...iosArgs,
+        findNodeHandle(this._componentRef.current),
+      );
+    }
+    return Promise.reject(
+      new Error(
+        `NutrientView.${methodName} is not supported on platform "${Platform.OS}".`,
+      ),
+    );
+  };
+
+  /**
+   * Converts a point in PDF coordinates (for the given page) to screen coordinates,
+   * in points, relative to the ```NutrientView```'s frame origin. Useful for positioning
+   * custom overlays on top of the rendered document.
+   *
+   * @method convertPointToScreen
+   * @memberof NutrientView
+   * @param {number} pageIndex The index of the page the point belongs to. Starts at 0.
+   * @param {Point} point The point in PDF coordinates, e.g. ```{ x: 100, y: 200 }```.
+   * @returns { Promise<Point> } A promise resolving to the point in screen coordinates.
+   * @example
+   * const screenPoint = await this.pdfRef.current?.convertPointToScreen(0, { x: 100, y: 200 });
+   */
+  convertPointToScreen = function (pageIndex, point) {
+    return this._invokeViewportMethod(
+      'convertPointToScreen',
+      [pageIndex, point],
+      [pageIndex, point],
+      [pageIndex, point],
+    );
+  };
+
+  /**
+   * Converts a point in screen coordinates (in points, relative to the ```NutrientView```'s
+   * frame origin) to PDF coordinates for the given page.
+   *
+   * @method convertPointToPage
+   * @memberof NutrientView
+   * @param {number} pageIndex The index of the page the point belongs to. Starts at 0.
+   * @param {Point} point The point in screen coordinates, e.g. ```{ x: 50, y: 120 }```.
+   * @returns { Promise<Point> } A promise resolving to the point in PDF coordinates.
+   * @example
+   * const pdfPoint = await this.pdfRef.current?.convertPointToPage(0, { x: 50, y: 120 });
+   */
+  convertPointToPage = function (pageIndex, point) {
+    return this._invokeViewportMethod(
+      'convertPointToPage',
+      [pageIndex, point],
+      [pageIndex, point],
+      [pageIndex, point],
+    );
+  };
+
+  /**
+   * Converts a rectangle in PDF coordinates (for the given page) to screen coordinates,
+   * in points, relative to the ```NutrientView```'s frame origin.
+   *
+   * @method convertRectToScreen
+   * @memberof NutrientView
+   * @param {number} pageIndex The index of the page the rectangle belongs to. Starts at 0.
+   * @param {Rect} rect The rectangle in PDF coordinates, e.g. ```{ x: 100, y: 200, width: 50, height: 20 }```.
+   * @returns { Promise<Rect> } A promise resolving to the rectangle in screen coordinates.
+   * @example
+   * const screenRect = await this.pdfRef.current?.convertRectToScreen(0, { x: 100, y: 200, width: 50, height: 20 });
+   */
+  convertRectToScreen = function (pageIndex, rect) {
+    return this._invokeViewportMethod(
+      'convertRectToScreen',
+      [pageIndex, rect],
+      [pageIndex, rect],
+      [pageIndex, rect],
+    );
+  };
+
+  /**
+   * Converts a rectangle in screen coordinates (in points, relative to the ```NutrientView```'s
+   * frame origin) to PDF coordinates for the given page.
+   *
+   * @method convertRectToPage
+   * @memberof NutrientView
+   * @param {number} pageIndex The index of the page the rectangle belongs to. Starts at 0.
+   * @param {Rect} rect The rectangle in screen coordinates, e.g. ```{ x: 50, y: 120, width: 30, height: 10 }```.
+   * @returns { Promise<Rect> } A promise resolving to the rectangle in PDF coordinates.
+   * @example
+   * const pdfRect = await this.pdfRef.current?.convertRectToPage(0, { x: 50, y: 120, width: 30, height: 10 });
+   */
+  convertRectToPage = function (pageIndex, rect) {
+    return this._invokeViewportMethod(
+      'convertRectToPage',
+      [pageIndex, rect],
+      [pageIndex, rect],
+      [pageIndex, rect],
+    );
+  };
+
+  /**
+   * Returns a one-shot snapshot of the current viewport transformation state. This is the
+   * same payload delivered by the ```documentViewportChanged``` notification, but pulled on demand.
+   *
+   * @method getViewportState
+   * @memberof NutrientView
+   * @returns { Promise<DocumentViewportChangedPayload> } A promise resolving to the current viewport state.
+   * @example
+   * const viewport = await this.pdfRef.current?.getViewportState();
+   */
+  getViewportState = function () {
+    return this._invokeViewportMethod('getViewportState', [], [], []);
+  };
+
+  /**
    * Prevents the specified annotations from being interacted with.
-   * 
+   *
    * @method setExcludedAnnotations
    * @memberof NutrientView
    * @param {string[]} annotations The list of annotation UUIDs to exclude from annotation interaction.
@@ -1065,7 +1358,8 @@ class NutrientView extends React.Component {
     } else if (Platform.OS === 'android') {
       UIManager.dispatchViewManagerCommand(
         findNodeHandle(this._componentRef.current),
-        this._getViewManagerConfig('RCTPSPDFKitView').Commands.setExcludedAnnotations,
+        this._getViewManagerConfig('RCTPSPDFKitView').Commands
+          .setExcludedAnnotations,
         [annotations],
       );
     }
@@ -1073,7 +1367,7 @@ class NutrientView extends React.Component {
 
   /**
    * Sets the visibility of the user interface controls.
-   * 
+   *
    * @method setUserInterfaceVisible
    * @memberof NutrientView
    * @param {boolean} visible Whether the user interface controls should be visible.
@@ -1140,7 +1434,7 @@ class NutrientView extends React.Component {
       );
     }
   };
-  
+
   _getViewManagerConfig = viewManagerName => {
     return UIManager.getViewManagerConfig(viewManagerName);
   };
@@ -1186,30 +1480,44 @@ class NutrientInstantView extends React.Component {
   static _getArchitectureInfo() {
     if (this._isNewArchitecture === null) {
       try {
-        const { isNewArchitectureEnabled } = require('./lib/ArchitectureDetector');
+        const {
+          isNewArchitectureEnabled,
+        } = require('./lib/ArchitectureDetector');
         this._isNewArchitecture = isNewArchitectureEnabled();
 
         if (this._isNewArchitecture) {
           // Require from src/ so Metro can process codegen for NutrientInstantViewNativeComponent
-          this._FabricComponent = require('./src/NutrientInstantViewFabric').default;
+          this._FabricComponent =
+            require('./src/NutrientInstantViewFabric').default;
         }
       } catch (e) {
         this._isNewArchitecture = false;
         this._FabricComponent = null;
       }
     }
-    return { isNewArchitecture: this._isNewArchitecture, FabricComponent: this._FabricComponent };
+    return {
+      isNewArchitecture: this._isNewArchitecture,
+      FabricComponent: this._FabricComponent,
+    };
   }
 
   _fabricRef = React.createRef();
 
   render() {
-    const { isNewArchitecture, FabricComponent } = NutrientInstantView._getArchitectureInfo();
+    const { isNewArchitecture, FabricComponent } =
+      NutrientInstantView._getArchitectureInfo();
     if (isNewArchitecture && FabricComponent) {
-      return React.createElement(FabricComponent, { ...this.props, ref: this._fabricRef });
+      return React.createElement(FabricComponent, {
+        ...this.props,
+        ref: this._fabricRef,
+      });
     }
 
-    if (!NutrientInstantView._warnedUnsupported && typeof console !== 'undefined' && console.warn) {
+    if (
+      !NutrientInstantView._warnedUnsupported &&
+      typeof console !== 'undefined' &&
+      console.warn
+    ) {
       NutrientInstantView._warnedUnsupported = true;
       console.warn(
         'NutrientInstantView is only supported with React Native New Architecture (Fabric). Enable New Architecture or use Nutrient.presentInstant() for full-screen Instant.',
@@ -1248,6 +1556,7 @@ class NutrientInstantView extends React.Component {
  * @property {function} [onCustomAnnotationContextualMenuItemTapped] Callback that's called when a custom annotation menu item is tapped.
  * @property {function} [onCustomTextSelectionContextualMenuItemTapped] Callback that's called when a custom text selection menu item is tapped.
  * @property {function} [onShouldExecuteAction] Callback that's called just before the native SDK executes a PDF action (for example, when a link annotation is tapped). Use this to decide, via {@link NutrientView#executeAction}, whether the intercepted action should proceed.
+ * @property {function} [onShouldShowSignaturePad] Callback that's called just before the native SDK presents the signature creation/selection UI for a tapped signature form field. Use this to decide, via {@link NutrientView#showSignaturePad}, whether the signature UI should be presented.
  * @property {string} [fragmentTag] The tag used to identify a single PdfFragment in the view hierarchy. This needs to be unique in the view hierarchy.
  * @property {Array} [menuItemGrouping] Used to specify a custom grouping for the menu items in the annotation creation toolbar.
  * @property {Array<string>} [leftBarButtonItems] Sets the left bar button items. Note: The same button item cannot be added to both the left and right bar button items simultaneously. Deprecated since Nutrient React Native SDK 4.0. Use ```NutrientView.toolbar.leftBarButtonItems``` instead.
@@ -2191,6 +2500,21 @@ import { NotificationCenter } from './lib/notification-center/NotificationCenter
 export { NotificationCenter } from './lib/notification-center/NotificationCenter';
 
 import {
+  NutrientOverlay,
+  NutrientOverlayItem,
+} from './lib/overlay/NutrientOverlay';
+export {
+  NutrientOverlay,
+  NutrientOverlayItem,
+} from './lib/overlay/NutrientOverlay';
+export {
+  NutrientOverlayProps,
+  NutrientOverlayItemProps,
+  NutrientOverlayPoint,
+  NutrientOverlayViewRef,
+} from './lib/overlay/NutrientOverlay';
+
+import {
   AnnotationType,
   DocumentJSON,
   AnnotationAttachment,
@@ -2215,7 +2539,7 @@ import {
   StrikeOutMarkupAnnotation,
   TextAnnotation,
   UnderlineMarkupAnnotation,
-  WidgetAnnotation
+  WidgetAnnotation,
 } from './lib/annotations/AnnotationModels';
 export {
   AnnotationType,
@@ -2242,14 +2566,38 @@ export {
   StrikeOutMarkupAnnotation,
   TextAnnotation,
   UnderlineMarkupAnnotation,
-  WidgetAnnotation
+  WidgetAnnotation,
 } from './lib/annotations/AnnotationModels';
 
-import { FormField, ButtonFormField, ChoiceFormField, SignatureFormField, TextFormField } from './lib/forms/FormField';
-export { FormField, ButtonFormField, ChoiceFormField, SignatureFormField, TextFormField } from './lib/forms/FormField';
+import {
+  FormField,
+  ButtonFormField,
+  ChoiceFormField,
+  SignatureFormField,
+  TextFormField,
+} from './lib/forms/FormField';
+export {
+  FormField,
+  ButtonFormField,
+  ChoiceFormField,
+  SignatureFormField,
+  TextFormField,
+} from './lib/forms/FormField';
 
-import { FormElement, ButtonFormElement, ChoiceFormElement, SignatureFormElement, TextFieldFormElement } from './lib/forms/FormElement';
-export { FormElement, ButtonFormElement, ChoiceFormElement, SignatureFormElement, TextFieldFormElement } from './lib/forms/FormElement';
+import {
+  FormElement,
+  ButtonFormElement,
+  ChoiceFormElement,
+  SignatureFormElement,
+  TextFieldFormElement,
+} from './lib/forms/FormElement';
+export {
+  FormElement,
+  ButtonFormElement,
+  ChoiceFormElement,
+  SignatureFormElement,
+  TextFieldFormElement,
+} from './lib/forms/FormElement';
 
 import { Forms } from './lib/forms/Forms';
 export { Forms } from './lib/forms/Forms';
@@ -2332,5 +2680,13 @@ module.exports.Forms = Forms;
 
 module.exports.NutrientInstantView = NutrientInstantView;
 
+// `module.exports = NutrientView` above replaces the exports object, discarding
+// the ESM re-export bindings, so every public name has to be re-attached here.
+module.exports.NutrientOverlay = NutrientOverlay;
+module.exports.NutrientOverlayItem = NutrientOverlayItem;
+
 // Type-only helper for onShouldExecuteAction; runtime value is unused.
 module.exports.ShouldExecuteActionEvent = {};
+
+// Type-only helper for onShouldShowSignaturePad; runtime value is unused.
+module.exports.ShouldShowSignaturePadEvent = {};

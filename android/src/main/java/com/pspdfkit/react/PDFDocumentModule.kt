@@ -29,6 +29,7 @@ import com.pspdfkit.forms.SignatureFormElement
 import com.pspdfkit.forms.TextFormElement
 import com.pspdfkit.forms.SignatureFormConfiguration
 import com.pspdfkit.forms.TextFormConfiguration
+import com.pspdfkit.internal.jni.NativeFormFlags
 import android.graphics.RectF
 import com.pspdfkit.react.helper.AnnotationUtils
 import com.pspdfkit.react.helper.BookmarkUtils
@@ -161,6 +162,11 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
             if (pdfView != null) WeakReference(pdfView) else existingDocData?.pdfViewRef
         )
         this.documents[reference] = docData
+    }
+
+    fun releaseDocument(reference: Int) {
+        documents.remove(reference)
+        documentConfigurations.remove(reference)
     }
 
     fun updateDocumentConfiguration(key: String, value: Any, reference: Int) {
@@ -659,6 +665,35 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
         }
     }
 
+    @ReactMethod fun setFormFieldReadOnly(reference: Int, fullyQualifiedName: String, readOnly: Boolean, promise: Promise) {
+        try {
+            this.getDocument(reference)?.document?.let { document ->
+                val formField = document.formProvider.getFormFieldWithFullyQualifiedName(fullyQualifiedName)
+                    ?: document.formProvider.getFormElementWithName(fullyQualifiedName)?.formField
+
+                if (formField == null) {
+                    promise.reject("setFormFieldReadOnly", "Could not find form field")
+                    return
+                }
+
+                // Copy the flags before mutating: getFlags() returns the internally cached
+                // set, and setFlags() is a no-op when passed a set equal to the cached one.
+                val flags = EnumSet.copyOf(formField.internal.flags)
+                if (readOnly) {
+                    flags.add(NativeFormFlags.READONLY)
+                } else {
+                    flags.remove(NativeFormFlags.READONLY)
+                }
+                formField.internal.setFlags(flags)
+                promise.resolve(true)
+            } ?: run {
+                promise.reject("setFormFieldReadOnly", "Document is nil")
+            }
+        } catch (e: Throwable) {
+            promise.reject("setFormFieldReadOnly", e)
+        }
+    }
+
     @ReactMethod fun getBookmarks(reference: Int, promise: Promise) {
         try {
             this.getDocument(reference)?.document?.let { document ->
@@ -732,7 +767,7 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
 
                 // Check if it's a SignatureFormElement and get the overlapping annotation
                 val overlappingAnnotation = if (formElement is SignatureFormElement) {
-                    formElement.getOverlappingSignatures()
+                    formElement.overlappingSignatures
                 } else {
                     null
                 }

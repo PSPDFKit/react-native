@@ -2,6 +2,7 @@ package com.pspdfkit.react
 
 import android.os.Bundle
 import android.graphics.PointF
+import android.graphics.RectF
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.ReactContext
 import com.facebook.react.bridge.WritableArray
@@ -30,6 +31,7 @@ enum class NotificationEvent(val value: String) {
     DOCUMENT_LOAD_FAILED("documentLoadFailed"),
     DOCUMENT_PAGE_CHANGED("documentPageChanged"),
     DOCUMENT_SCROLLED("documentScrolled"),
+    DOCUMENT_VIEWPORT_CHANGED("documentViewportChanged"),
     DOCUMENT_TAPPED("documentTapped"),
     ANNOTATIONS_ADDED("annotationsAdded"),
     ANNOTATION_CHANGED("annotationChanged"),
@@ -132,6 +134,43 @@ object NutrientNotificationCenter {
         jsonData.putString("documentID", documentID)
         val payload = createEventPayload(jsonData, componentID)
         sendEvent(NotificationEvent.DOCUMENT_SCROLLED.value, payload)
+    }
+
+    fun documentViewportChanged(
+        pageIndex: Int,
+        zoomScale: Float,
+        visiblePdfRect: RectF,
+        contentOffset: PointF,
+        viewportWidth: Float,
+        viewportHeight: Float,
+        documentID: String,
+        componentID: Int
+    ) {
+        val jsonData = Arguments.createMap()
+        jsonData.putString("event", NotificationEvent.DOCUMENT_VIEWPORT_CHANGED.value)
+        jsonData.putInt("pageIndex", pageIndex)
+        jsonData.putDouble("zoomScale", zoomScale.toDouble())
+
+        val visibleRectMap = Arguments.createMap()
+        visibleRectMap.putDouble("x", visiblePdfRect.left.toDouble())
+        visibleRectMap.putDouble("y", visiblePdfRect.top.toDouble())
+        visibleRectMap.putDouble("width", visiblePdfRect.width().toDouble())
+        visibleRectMap.putDouble("height", visiblePdfRect.height().toDouble())
+        jsonData.putMap("visiblePdfRect", visibleRectMap)
+
+        val contentOffsetMap = Arguments.createMap()
+        contentOffsetMap.putDouble("x", contentOffset.x.toDouble())
+        contentOffsetMap.putDouble("y", contentOffset.y.toDouble())
+        jsonData.putMap("contentOffset", contentOffsetMap)
+
+        val viewportSizeMap = Arguments.createMap()
+        viewportSizeMap.putDouble("width", viewportWidth.toDouble())
+        viewportSizeMap.putDouble("height", viewportHeight.toDouble())
+        jsonData.putMap("viewportSize", viewportSizeMap)
+
+        jsonData.putString("documentID", documentID)
+        val payload = createEventPayload(jsonData, componentID)
+        sendEvent(NotificationEvent.DOCUMENT_VIEWPORT_CHANGED.value, payload)
     }
 
     fun didTapDocument(pointF: PointF, pageIndex: Int, documentID: String, componentID: Int) {

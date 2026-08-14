@@ -136,6 +136,7 @@ RCT_EXPORT_MODULE(Nutrient);
 - (void)nncDocumentLoadFailed:(NSDictionary *)payload { [self emitDocumentLoadFailed:payload]; }
 - (void)nncDocumentPageChanged:(NSDictionary *)payload { [self emitDocumentPageChanged:payload]; }
 - (void)nncDocumentScrolled:(NSDictionary *)payload { [self emitDocumentScrolled:payload]; }
+- (void)nncDocumentViewportChanged:(NSDictionary *)payload { [self emitDocumentViewportChanged:payload]; }
 - (void)nncDocumentTapped:(NSDictionary *)payload { [self emitDocumentTapped:payload]; }
 - (void)nncAnnotationsAdded:(NSDictionary *)payload { [self emitAnnotationsAdded:payload]; }
 - (void)nncAnnotationChanged:(NSDictionary *)payload { [self emitAnnotationChanged:payload]; }

@@ -12,3 +12,16 @@ export interface ShouldExecuteActionEvent {
   url?: string;
 }
 
+/**
+ * Event payload passed to `onShouldShowSignaturePad` when the native SDK is about
+ * to present the signature creation/selection UI for a tapped signature form field.
+ *
+ * Use `NutrientView#showSignaturePad(requestId, allow)` to allow or cancel
+ * the intercepted presentation.
+ */
+export interface ShouldShowSignaturePadEvent {
+  requestId: string;
+  pageIndex: number;
+  fullyQualifiedName?: string;
+}
+

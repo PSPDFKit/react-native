@@ -36,6 +36,8 @@ RCT_EXTERN_METHOD(getFormElements:(NSNumber _Nonnull)reference onSuccess:(RCTPro
 
 RCT_EXTERN_METHOD(updateFormFieldValue:(NSNumber _Nonnull)reference fullyQualifiedName:(NSString *)fullyQualifiedName value:(id)value onSuccess:(RCTPromiseResolveBlock)resolve onError:(RCTPromiseRejectBlock)reject);
 
+RCT_EXTERN_METHOD(setFormFieldReadOnly:(NSNumber _Nonnull)reference fullyQualifiedName:(NSString *)fullyQualifiedName readOnly:(BOOL)readOnly onSuccess:(RCTPromiseResolveBlock)resolve onError:(RCTPromiseRejectBlock)reject);
+
 RCT_EXTERN_METHOD(getAnnotations:(NSNumber _Nonnull)reference type:(NSString *)type onSuccess:(RCTPromiseResolveBlock)resolve onError:(RCTPromiseRejectBlock)reject);
 
 RCT_EXTERN_METHOD(getAnnotationsForPage:(NSNumber _Nonnull)reference pageIndex:(NSInteger)pageIndex type:(NSString *)type onSuccess:(RCTPromiseResolveBlock)resolve onError:(RCTPromiseRejectBlock)reject);

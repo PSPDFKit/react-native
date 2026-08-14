@@ -15,7 +15,7 @@ const isNA: boolean = isNewArchitectureEnabled();
    */
   export class NotificationCenter {
   
-    subscribedEvents = new Map<string, any>();
+    subscribedEvents = new Map<string, NotificationCenter.Subscription[]>();
     eventEmitter = new NativeEventEmitter(NativeModules.Nutrient);
     pdfViewRef: any;
 
@@ -52,24 +52,34 @@ const isNA: boolean = isNewArchitectureEnabled();
     subscribe<T extends keyof NotificationCenter.EventPayloadMap>(
       event: T,
       callback: (payload: NotificationCenter.EventPayloadMap[T]) => void
-    ): void;
-    subscribe(event: string, callback: (payload: any) => void): void;
+    ): NotificationCenter.Subscription;
+    subscribe(event: string, callback: (payload: any) => void): NotificationCenter.Subscription;
     /**
     * @method subscribe
     * @memberof NotificationCenter
     * @param {string} event The event to subscribe to. Use NotificationCenter.DocumentEvent, NotificationCenter.AnnotationsEvent, etc. for type-safe events.
     * @param {function} callback The callback to be called when the event is triggered. The payload type is automatically inferred based on the event type.
+    * @returns {NotificationCenter.Subscription} A handle that removes this listener when its ``remove`` method is called. Multiple listeners can be subscribed to the same event; each handle removes only its own listener.
     * @description Subscribes to a given Notification Center event.
     * @example
-    * this.pdfRef.current?.notificationCenter().subscribe(NotificationCenter.DocumentEvent.LOADED, (payload: NotificationCenter.DocumentLoadedPayload) => {
+    * const subscription = this.pdfRef.current?.notificationCenter().subscribe(NotificationCenter.DocumentEvent.LOADED, (payload: NotificationCenter.DocumentLoadedPayload) => {
     *   console.log('Document ID: ' + payload.documentID); // payload is typed as DocumentLoadedPayload
     * });
+    * // Later:
+    * subscription.remove();
     */
     subscribe<T extends keyof NotificationCenter.EventPayloadMap>(
       event: T | string,
       callback: (payload: NotificationCenter.EventPayloadMap[T] | any) => void
-    ): void {
+    ): NotificationCenter.Subscription {
+      const deliver = (payload: any) => {
+        // Only deliver events to the specific ref it is subscribed to. Allow any analytics events to be delivered since they are not associated with a specific view.
+        if (this.shouldDeliverEvent(payload, event)) {
+          callback(payload.data);
+        }
+      };
 
+      let emitterSubscription: any;
       if (isNA) {
         // New Architecture: subscribe via typed TurboModule EventEmitter properties
         // Lazy load the codegen module to avoid import errors in Paper architecture
@@ -79,57 +89,71 @@ const isNA: boolean = isNewArchitectureEnabled();
           // @ts-ignore dynamic property access for event name
           const emitter = (Nutrient as any)[event];
           if (typeof emitter === 'function') {
-            const subscription = emitter((payload: any) => {
-              if (this.shouldDeliverEvent(payload, event)) {
-                callback(payload.data);
-              }
-            });
-            this.subscribedEvents.set(event, subscription);
+            emitterSubscription = emitter(deliver);
           } else {
-            const subscription = this.eventEmitter.addListener(event, (payload: any) => {
-              if (this.shouldDeliverEvent(payload, event)) {
-                callback(payload.data);
-              }
-            });
-            this.subscribedEvents.set(event, subscription);
+            emitterSubscription = this.eventEmitter.addListener(event, deliver);
           }
         } catch (e) {
           // Fallback to old emitter if codegen module is not available
-          const subscription = this.eventEmitter.addListener(event, (payload: any) => {
-            if (this.shouldDeliverEvent(payload, event)) {
-              callback(payload.data);
-            }
-          });
-          this.subscribedEvents.set(event, subscription);
+          emitterSubscription = this.eventEmitter.addListener(event, deliver);
         }
       } else {
         // Old Architecture: Use NativeEventEmitter
-        const subscription = this.eventEmitter.addListener(event, (payload: any) => {
-          // Only deliver events to the specific ref it is subscribed to. Allow any analytics events to be delivered since they are not associated with a specific view.
-          if (this.shouldDeliverEvent(payload, event)) {
-            callback(payload.data);
-          }
-        });
-        this.subscribedEvents.set(event, subscription);
+        emitterSubscription = this.eventEmitter.addListener(event, deliver);
       }
-      
-      NativeModules.Nutrient.handleListenerAdded(event, this.getComponentId());
+
+      const subscription: NotificationCenter.Subscription = {
+        remove: () => this.removeSubscription(event, subscription, emitterSubscription),
+      };
+      const subscriptions = this.subscribedEvents.get(event);
+      if (subscriptions) {
+        subscriptions.push(subscription);
+      } else {
+        this.subscribedEvents.set(event, [subscription]);
+        // Notify native only for the first listener of an event, paired with
+        // the notification for the last removal in removeSubscription.
+        NativeModules.Nutrient.handleListenerAdded(event, this.getComponentId());
+      }
+      return subscription;
+    }
+
+    /**
+     * @private
+     * @method removeSubscription
+     * @description Removes a single listener, notifying native when the last
+     * listener for the event is gone. Safe to call more than once.
+     */
+    private removeSubscription(
+      event: string,
+      subscription: NotificationCenter.Subscription,
+      emitterSubscription: any
+    ): void {
+      const subscriptions = this.subscribedEvents.get(event);
+      if (!subscriptions || !subscriptions.includes(subscription)) {
+        return;
+      }
+      emitterSubscription.remove();
+      const remaining = subscriptions.filter(existing => existing !== subscription);
+      if (remaining.length === 0) {
+        this.subscribedEvents.delete(event);
+        NativeModules.Nutrient.handleListenerRemoved(event, this.getComponentId());
+      } else {
+        this.subscribedEvents.set(event, remaining);
+      }
     }
 
    /**
     * @method unsubscribe
     * @memberof NotificationCenter
     * @param {string} event The event to unsubscribe from.
-    * @description Unsubscribes from a given Notification Center event.
+    * @description Unsubscribes all listeners from a given Notification Center event. To remove a single listener, call ``remove`` on the subscription returned by ``subscribe`` instead.
     * @example
     * this.pdfRef.current?.notificationCenter().unsubscribe('documentLoaded');
     */
     unsubscribe(event: string): void {
-      const subscription = this.subscribedEvents.get(event);
-      if (subscription) {
-        subscription.remove();
-        this.subscribedEvents.delete(event);
-        NativeModules.Nutrient.handleListenerRemoved(event, this.getComponentId());
+      const subscriptions = this.subscribedEvents.get(event);
+      if (subscriptions) {
+        [...subscriptions].forEach(subscription => subscription.remove());
       }
     }
 
@@ -141,15 +165,25 @@ const isNA: boolean = isNewArchitectureEnabled();
     * this.pdfRef.current?.notificationCenter().unsubscribeAllEvents();
     */
   unsubscribeAllEvents(): void {
-    this.subscribedEvents.forEach((subscription: any, event: string) => {
-      subscription.remove();
-      this.subscribedEvents.delete(event);
-      NativeModules.Nutrient.handleListenerRemoved(event, this.getComponentId());
-    });
+    Array.from(this.subscribedEvents.keys()).forEach(event =>
+      this.unsubscribe(event),
+    );
   }
   }
 
   export namespace NotificationCenter {
+    /**
+     * A handle to an active event listener, returned by ``subscribe``.
+     * @interface Subscription
+     */
+    export interface Subscription {
+      /**
+       * Removes this listener. Safe to call more than once; only the first
+       * call has an effect.
+       */
+      remove(): void;
+    }
+
     /**
      * Document events.
      * @readonly
@@ -172,6 +206,12 @@ const isNA: boolean = isNewArchitectureEnabled();
       * Called when the document is scrolled.
       */
       SCROLLED: 'documentScrolled',
+     /**
+      * Called when the document viewport (zoom or scroll) changes. The payload carries
+      * the current transformation state so custom overlays can be positioned in sync
+      * with the rendered document.
+      */
+      VIEWPORT_CHANGED: 'documentViewportChanged',
      /**
       * Called when the document is tapped.
       */
@@ -308,6 +348,27 @@ const isNA: boolean = isNewArchitectureEnabled();
       documentID: string;
     };
 
+    /**
+     * Rectangle expressed in the document (PDF) coordinate space, in PDF points.
+     */
+    export type PdfRect = { x: number; y: number; width: number; height: number };
+
+    export type DocumentViewportChangedPayload = {
+      event: typeof DocumentEvent.VIEWPORT_CHANGED;
+      /** Identifier of the document currently displayed. */
+      documentID: string;
+      /** The primary (most visible) page index for which `visiblePdfRect` is reported. */
+      pageIndex: number;
+      /** Current zoom factor of the view. */
+      zoomScale: number;
+      /** Visible region of `pageIndex`, expressed in PDF points. */
+      visiblePdfRect: PdfRect;
+      /** Content offset of the scroll view, in screen points. */
+      contentOffset: { x: number; y: number };
+      /** Size of the viewport, in screen points. */
+      viewportSize: { width: number; height: number };
+    };
+
     export type DocumentTappedPayload = {
       event: typeof DocumentEvent.TAPPED;
       point: { x: number; y: number };
@@ -399,6 +460,7 @@ const isNA: boolean = isNewArchitectureEnabled();
       [DocumentEvent.LOAD_FAILED]: DocumentLoadFailedPayload;
       [DocumentEvent.PAGE_CHANGED]: DocumentPageChangedPayload;
       [DocumentEvent.SCROLLED]: DocumentScrolledPayload;
+      [DocumentEvent.VIEWPORT_CHANGED]: DocumentViewportChangedPayload;
       [DocumentEvent.TAPPED]: DocumentTappedPayload;
       [AnnotationsEvent.ADDED]: AnnotationsAddedPayload;
       [AnnotationsEvent.CHANGED]: AnnotationChangedPayload;
@@ -436,6 +498,7 @@ export const PDFErrorCode = NotificationCenter.DocumentLoadFailedCode;
 export type PDFErrorCode = NotificationCenter.DocumentLoadFailedCode;
 export type DocumentPageChangedPayload = NotificationCenter.DocumentPageChangedPayload;
 export type DocumentScrolledPayload = NotificationCenter.DocumentScrolledPayload;
+export type DocumentViewportChangedPayload = NotificationCenter.DocumentViewportChangedPayload;
 export type DocumentTappedPayload = NotificationCenter.DocumentTappedPayload;
 export type AnnotationsAddedPayload = NotificationCenter.AnnotationsAddedPayload;
 export type AnnotationChangedPayload = NotificationCenter.AnnotationChangedPayload;

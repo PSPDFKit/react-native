@@ -23,6 +23,7 @@ import com.pspdfkit.react.common.NutrientPropsToolbarHelper;
 import com.pspdfkit.react.common.NutrientPropsMeasurementConfigurationHelper;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReadableMap;
+import io.reactivex.rxjava3.functions.Consumer;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -146,6 +147,39 @@ public class NutrientViewTurboModule extends NativeNutrientViewTurboModuleSpec {
     }
 
     @Override
+    public void showSignaturePad(String reference, String requestId, boolean allow, Promise promise) {
+        PdfView view = NutrientViewRegistry.getInstance().getViewForId(reference);
+        if (view == null) {
+            promise.reject(Errors.VIEW_NOT_FOUND, "No view found for reference: " + reference);
+            return;
+        }
+
+        try {
+            boolean handled = view.showSignaturePad(requestId, allow);
+            promise.resolve(handled);
+        } catch (Exception e) {
+            promise.reject(Errors.OPERATION_FAILED, e.getMessage());
+        }
+    }
+
+    @Override
+    public void dismissSignaturePad(String reference, Promise promise) {
+        PdfView view = NutrientViewRegistry.getInstance().getViewForId(reference);
+        if (view == null) {
+            promise.reject(Errors.VIEW_NOT_FOUND, "No view found for reference: " + reference);
+            return;
+        }
+
+        try {
+            view.dismissSignaturePad()
+                .subscribe(promise::resolve,
+                    throwable -> promise.reject(Errors.OPERATION_FAILED, throwable.getMessage()));
+        } catch (Exception e) {
+            promise.reject(Errors.OPERATION_FAILED, e.getMessage());
+        }
+    }
+
+    @Override
     public void setToolbar(String reference, String toolbar) {
         PdfView view = NutrientViewRegistry.getInstance().getViewForId(reference);
         if (view == null) {
@@ -262,6 +296,64 @@ public class NutrientViewTurboModule extends NativeNutrientViewTurboModuleSpec {
         } catch (Exception e) {
             Log.e(TAG, "Error destroying view: " + e.getMessage());
         }
+    }
+
+    @Override
+    public void convertPointToScreen(String reference, double pageIndex, ReadableMap point, Promise promise) {
+        resolveViewportResult(reference, promise, (view, callback) ->
+            view.convertPointToScreen((int) pageIndex, point.getDouble("x"), point.getDouble("y"), callback));
+    }
+
+    @Override
+    public void convertPointToPage(String reference, double pageIndex, ReadableMap point, Promise promise) {
+        resolveViewportResult(reference, promise, (view, callback) ->
+            view.convertPointToPage((int) pageIndex, point.getDouble("x"), point.getDouble("y"), callback));
+    }
+
+    @Override
+    public void convertRectToScreen(String reference, double pageIndex, ReadableMap rect, Promise promise) {
+        resolveViewportResult(reference, promise, (view, callback) ->
+            view.convertRectToScreen((int) pageIndex, rect.getDouble("x"), rect.getDouble("y"), rect.getDouble("width"), rect.getDouble("height"), callback));
+    }
+
+    @Override
+    public void convertRectToPage(String reference, double pageIndex, ReadableMap rect, Promise promise) {
+        resolveViewportResult(reference, promise, (view, callback) ->
+            view.convertRectToPage((int) pageIndex, rect.getDouble("x"), rect.getDouble("y"), rect.getDouble("width"), rect.getDouble("height"), callback));
+    }
+
+    @Override
+    public void getViewportState(String reference, Promise promise) {
+        resolveViewportResult(reference, promise, PdfView::getViewportState);
+    }
+
+    /** Produces a viewport/coordinate JSONObject from a PdfView asynchronously. */
+    private interface ViewportProducer {
+        void produce(PdfView view, Consumer<JSONObject> callback);
+    }
+
+    /**
+     * Runs a viewport/coordinate computation and resolves the promise with the resulting map
+     * once it becomes available, or rejects if the page/document never becomes available.
+     */
+    private void resolveViewportResult(String reference, Promise promise, ViewportProducer producer) {
+        PdfView view = NutrientViewRegistry.getInstance().getViewForId(reference);
+        if (view == null) {
+            promise.reject(Errors.VIEW_NOT_FOUND, "No view found for reference: " + reference);
+            return;
+        }
+        producer.produce(view, result -> {
+            if (result == null) {
+                promise.reject(Errors.OPERATION_FAILED, "The page may not be visible or the document is not laid out yet.");
+                return;
+            }
+            try {
+                java.util.Map<String, Object> objMap = com.pspdfkit.react.helper.JsonUtilities.jsonObjectToMap(result);
+                promise.resolve(Arguments.makeNativeMap(objMap));
+            } catch (Exception e) {
+                promise.reject(Errors.OPERATION_FAILED, e.getMessage());
+            }
+        });
     }
 
     // Helper: parse a JSON array string into a ReadableArray

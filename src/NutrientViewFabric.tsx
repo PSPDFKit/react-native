@@ -27,6 +27,13 @@ export interface NutrientViewFabricRef {
   destroyView: () => void;
   setPageIndex: (pageIndex: number, animated: boolean) => Promise<boolean> | void;
   executeAction: (requestId: string, allow: boolean) => Promise<boolean> | void;
+  convertPointToScreen: (pageIndex: number, point: { x: number; y: number }) => Promise<{ x: number; y: number }>;
+  convertPointToPage: (pageIndex: number, point: { x: number; y: number }) => Promise<{ x: number; y: number }>;
+  convertRectToScreen: (pageIndex: number, rect: { x: number; y: number; width: number; height: number }) => Promise<{ x: number; y: number; width: number; height: number }>;
+  convertRectToPage: (pageIndex: number, rect: { x: number; y: number; width: number; height: number }) => Promise<{ x: number; y: number; width: number; height: number }>;
+  getViewportState: () => Promise<any>;
+  showSignaturePad: (requestId: string, allow: boolean) => Promise<boolean> | void;
+  dismissSignaturePad: () => Promise<boolean> | void;
 }
 
 // Fabric component using the actual native component
@@ -107,6 +114,34 @@ const NutrientViewFabric = forwardRef<NutrientViewFabricRef, NativeProps>((props
 
     executeAction: (requestId: string, allow: boolean) => {
       return NativeNutrientViewTurboModule.executeAction(instanceId.toString(), requestId, allow);
+    },
+
+    convertPointToScreen: (pageIndex: number, point: { x: number; y: number }) => {
+      return NativeNutrientViewTurboModule.convertPointToScreen(instanceId.toString(), pageIndex, point);
+    },
+
+    convertPointToPage: (pageIndex: number, point: { x: number; y: number }) => {
+      return NativeNutrientViewTurboModule.convertPointToPage(instanceId.toString(), pageIndex, point);
+    },
+
+    convertRectToScreen: (pageIndex: number, rect: { x: number; y: number; width: number; height: number }) => {
+      return NativeNutrientViewTurboModule.convertRectToScreen(instanceId.toString(), pageIndex, rect);
+    },
+
+    convertRectToPage: (pageIndex: number, rect: { x: number; y: number; width: number; height: number }) => {
+      return NativeNutrientViewTurboModule.convertRectToPage(instanceId.toString(), pageIndex, rect);
+    },
+
+    getViewportState: () => {
+      return NativeNutrientViewTurboModule.getViewportState(instanceId.toString());
+    },
+
+    showSignaturePad: (requestId: string, allow: boolean) => {
+      return NativeNutrientViewTurboModule.showSignaturePad(instanceId.toString(), requestId, allow);
+    },
+
+    dismissSignaturePad: () => {
+      return NativeNutrientViewTurboModule.dismissSignaturePad(instanceId.toString());
     }
   }), [instanceId]);
   
@@ -201,6 +236,12 @@ const NutrientViewFabric = forwardRef<NutrientViewFabricRef, NativeProps>((props
           (props as any).onShouldExecuteAction(native);
         }
       : undefined,
+    onShouldShowSignaturePad: (props as any).onShouldShowSignaturePad
+      ? (e: any) => {
+          const native = e?.nativeEvent ?? e;
+          (props as any).onShouldShowSignaturePad(native);
+        }
+      : undefined,
     onAnnotationsChanged: (props as any).onAnnotationsChanged
       ? (e: any) => {
           const native = e?.nativeEvent ?? e;
@@ -225,6 +266,8 @@ const NutrientViewFabric = forwardRef<NutrientViewFabricRef, NativeProps>((props
       : undefined,
     // Internal flag so native only intercepts actions when a JS handler is present
     hasShouldExecuteAction: !!(props as any).onShouldExecuteAction,
+    // Internal flag so native only intercepts the signature UI when a JS handler is present
+    hasShouldShowSignaturePad: !!(props as any).onShouldShowSignaturePad,
     // Convert numeric instanceId to string for React Native nativeID
     nativeID: instanceId.toString(),
   };

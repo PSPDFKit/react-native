@@ -9,10 +9,11 @@ import {
 } from '../helpers/ExampleScreenLayoutHelpers';
 import { hideToolbar } from '../helpers/NavigationHelper';
 import { Nutrient } from '../helpers/Nutrient';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export const NutrientViewComponent = ({ navigation }: any) => {
   const pdfRef = useRef<NutrientView | null>(null);
+  const [showStylusButton, setShowStylusButton] = useState(true);
   useBaseExampleAutoHidingHeader(navigation);
 
   useEffect(() => {
@@ -31,6 +32,9 @@ export const NutrientViewComponent = ({ navigation }: any) => {
             iOSUseParentNavigationBar: false,
             iOSDocumentInfoOptions: [PDFConfiguration.IOSDocumentInfoOption.OUTLINE, PDFConfiguration.IOSDocumentInfoOption.ANNOTATIONS],
             androidEnableStylusOnDetection: false,
+            // Only visible on Android devices with a stylus, such as a Samsung S Pen, and applied
+            // the next time the annotation toolbar is shown.
+            androidShowStylusButton: showStylusButton,
             toolbarPosition: PDFConfiguration.ToolbarPosition.TOP,
           }}
           onReady={() => {
@@ -70,6 +74,15 @@ export const NutrientViewComponent = ({ navigation }: any) => {
                 }}
               >
                 <Text style={styles.button}>{'Get Document Props'}</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.horizontalContainer}>
+              <TouchableOpacity
+                onPress={() => setShowStylusButton(current => !current)}
+              >
+                <Text style={styles.button}>
+                  {showStylusButton ? 'Hide Stylus Button' : 'Show Stylus Button'}
+                </Text>
               </TouchableOpacity>
             </View>
           </View>

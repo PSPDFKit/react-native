@@ -73,6 +73,7 @@ public final class NutrientPropsDocumentHelper {
             view.setSupportedToolbarPositions(configuration.getArray("supportedToolbarPositions"));
         }
         applyToolbarVisibilityFromConfiguration(view, configuration);
+        applyShowStylusButtonFromConfiguration(view, configuration);
     }
 
     /**
@@ -97,6 +98,26 @@ public final class NutrientPropsDocumentHelper {
         if (showKey != null) {
             applyHideDefaultToolbar(view, !configuration.getBoolean(showKey));
         }
+    }
+
+    /**
+     * Applies {@link PdfView#setShowStylusButton(boolean)} from the {@code showStylusButton} /
+     * {@code androidShowStylusButton} configuration keys. The stylus button is on the live
+     * {@code AnnotationToolbar} instance rather than {@code PdfActivityConfiguration}, so it's
+     * applied here instead of through {@link ConfigurationAdapter}. When neither key is present the
+     * documented default of {@code true} is restored, so dropping the key from a configuration
+     * update doesn't leave a previously applied {@code false} in place.
+     */
+    public static void applyShowStylusButtonFromConfiguration(
+            @NonNull PdfView view,
+            @NonNull ReadableMap configuration) {
+        String key = null;
+        if (configuration.hasKey("showStylusButton")) {
+            key = "showStylusButton";
+        } else if (configuration.hasKey("androidShowStylusButton")) {
+            key = "androidShowStylusButton";
+        }
+        view.setShowStylusButton(key == null || configuration.getBoolean(key));
     }
 
     public static void applyConfigurationJSONString(@NonNull PdfView view, @Nullable String configurationJSONString) {

@@ -123,6 +123,16 @@ export import TextFormFieldConfiguration = formFieldConfiguration.TextFormFieldC
 //@ts-ignore
 import nutrientViewEvents = require('../src/events/NutrientViewEvents');
 export import ShouldExecuteActionEvent = nutrientViewEvents.ShouldExecuteActionEvent;
+export import ShouldShowSignaturePadEvent = nutrientViewEvents.ShouldShowSignaturePadEvent;
+
+//@ts-ignore
+import nutrientOverlay = require('../src/overlay/NutrientOverlay');
+export import NutrientOverlay = nutrientOverlay.NutrientOverlay;
+export import NutrientOverlayItem = nutrientOverlay.NutrientOverlayItem;
+export import NutrientOverlayProps = nutrientOverlay.NutrientOverlayProps;
+export import NutrientOverlayItemProps = nutrientOverlay.NutrientOverlayItemProps;
+export import NutrientOverlayPoint = nutrientOverlay.NutrientOverlayPoint;
+export import NutrientOverlayViewRef = nutrientOverlay.NutrientOverlayViewRef;
 
 //@ts-ignore
 export declare const NutrientInstantView: any;

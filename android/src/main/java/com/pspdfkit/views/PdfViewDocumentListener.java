@@ -31,6 +31,7 @@ import com.pspdfkit.document.DocumentSaveOptions;
 import com.pspdfkit.document.PdfDocument;
 import com.pspdfkit.forms.FormElement;
 import com.pspdfkit.forms.FormField;
+import com.pspdfkit.forms.SignatureFormElement;
 import com.pspdfkit.forms.FormListeners;
 import com.pspdfkit.listeners.DocumentListener;
 import com.pspdfkit.listeners.scrolling.DocumentScrollListener;
@@ -42,6 +43,7 @@ import com.pspdfkit.react.events.PdfViewAnnotationTappedEvent;
 import com.pspdfkit.react.events.PdfViewDocumentLoadedEvent;
 import com.pspdfkit.react.events.PdfViewDocumentSaveFailedEvent;
 import com.pspdfkit.react.events.PdfViewDocumentSavedEvent;
+import com.pspdfkit.react.events.PdfViewShouldShowSignaturePadEvent;
 import com.pspdfkit.ui.special_mode.controller.AnnotationSelectionController;
 import com.pspdfkit.ui.special_mode.manager.AnnotationManager;
 import com.pspdfkit.ui.special_mode.manager.FormManager;
@@ -50,7 +52,7 @@ import com.pspdfkit.utils.Size;
 import java.util.List;
 import java.util.Map;
 
-class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annotations.OnAnnotationSelectedListener, AnnotationProvider.OnAnnotationUpdatedListener, FormListeners.OnFormFieldUpdatedListener, FormManager.OnFormElementSelectedListener, FormManager.OnFormElementDeselectedListener, DocumentScrollListener, BookmarkProvider.BookmarkListener {
+class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annotations.OnAnnotationSelectedListener, AnnotationProvider.OnAnnotationUpdatedListener, FormListeners.OnFormFieldUpdatedListener, FormManager.OnFormElementClickedListener, FormManager.OnFormElementSelectedListener, FormManager.OnFormElementDeselectedListener, DocumentScrollListener, BookmarkProvider.BookmarkListener {
 
     @NonNull
     private final PdfView parent;
@@ -257,7 +259,9 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
 
     @Override
     public void onDocumentZoomed(@NonNull PdfDocument pdfDocument, int i, float v) {
-
+        if (NutrientNotificationCenter.INSTANCE.getIsNotificationCenterInUse()) {
+            parent.emitViewportChangedEvent();
+        }
     }
 
     @Override
@@ -396,6 +400,37 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
         }
     }
 
+    @Override
+    public boolean onFormElementClicked(@NonNull FormElement formElement) {
+        if (!(formElement instanceof SignatureFormElement)) {
+            return false;
+        }
+        if (!parent.hasShouldShowSignaturePad()) {
+            return false;
+        }
+
+        SignatureFormElement signatureFormElement = (SignatureFormElement) formElement;
+        // Only intercept the signature pad flow. Signed fields show the signature info
+        // dialog instead, which is not what this interception targets.
+        if (signatureFormElement.isSigned()) {
+            return false;
+        }
+
+        String requestId = java.util.UUID.randomUUID().toString();
+        int pageIndex = signatureFormElement.getAnnotation().getPageIndex();
+        String fullyQualifiedName = signatureFormElement.getFormField().getFullyQualifiedName();
+        parent.storePendingSignatureForm(requestId, signatureFormElement);
+
+        if (isFabricMode && fabricDelegate != null) {
+            fabricDelegate.onShouldShowSignaturePad(requestId, fullyQualifiedName, pageIndex);
+        } else {
+            dispatchEvent(new PdfViewShouldShowSignaturePadEvent(parent.getId(), requestId, fullyQualifiedName, pageIndex));
+        }
+
+        // Consume the click; JS will decide via showSignaturePad.
+        return true;
+    }
+
     @SuppressLint("CheckResult")
     @Override
     public void onFormElementSelected(@NonNull FormElement formElement) {
@@ -434,6 +469,7 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
                 int componentIdScroll = parent.isFabricMode() ? (parent.getComponentReferenceId() != null ? parent.getComponentReferenceId() : parent.getId()) : parent.getId();
                 NutrientNotificationCenter.INSTANCE.documentScrolled(Map.of("currX", currX, "currY", currY, "maxX", maxX, "maxY", maxY, "extendX", extendX, "extendY", extendY), documentID, componentIdScroll);
             });
+            parent.emitViewportChangedEvent();
         }
     }
 

@@ -15,7 +15,7 @@
  *   Contains gradle configuration constants
  */
 ext {
-    NUTRIENT_VERSION = '11.5.1'
+    NUTRIENT_VERSION = '11.6.2'
 }
 
 buildscript {
@@ -39,9 +39,6 @@ buildscript {
         google()
         maven {
             url 'https://maven.google.com'
-        }
-        maven {
-            url 'https://my.nutrient.io/maven/'
         }
     }
 
@@ -127,7 +124,11 @@ android {
 // NoSuchMethodError crashes (e.g. androidx.compose.runtime.Updater init-impl).
 
 dependencies {
-    api("io.nutrient:nutrient:${NUTRIENT_VERSION}") {
+    // Nutrient Android SDK is published to Maven Central as `nutrient-android-sdk`.
+    // The legacy `io.nutrient:nutrient` coordinate on https://my.nutrient.io/maven/ still
+    // resolves during the transition period, but must not be combined with this one — both
+    // on the classpath means duplicate classes.
+    api("io.nutrient:nutrient-android-sdk:${NUTRIENT_VERSION}") {
         exclude group: 'com.google.auto.value', module: 'auto-value'
         exclude group: 'androidx.recyclerview', module: 'recyclerview'
     }

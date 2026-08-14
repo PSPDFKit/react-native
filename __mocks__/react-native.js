@@ -1,5 +1,10 @@
 module.exports = {
   Platform: { OS: 'ios' },
+  View: 'View',
+  StyleSheet: {
+    create: (styles) => styles,
+    absoluteFill: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 },
+  },
   UIManager: {
     getViewManagerConfig: () => ({ Commands: {} }),
     dispatchViewManagerCommand: jest.fn(),

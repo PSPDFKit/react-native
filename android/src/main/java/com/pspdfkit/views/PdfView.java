@@ -19,6 +19,8 @@ import static com.pspdfkit.react.helper.ConversionHelpers.getAnnotationTypes;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.PointF;
+import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Handler;
@@ -37,6 +39,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.facebook.react.bridge.Arguments;
@@ -77,9 +80,11 @@ import com.pspdfkit.forms.ChoiceFormElement;
 import com.pspdfkit.forms.ComboBoxFormElement;
 import com.pspdfkit.forms.EditableButtonFormElement;
 import com.pspdfkit.forms.FormField;
+import com.pspdfkit.forms.SignatureFormElement;
 import com.pspdfkit.forms.TextFormElement;
 import com.pspdfkit.listeners.OnVisibilityChangedListener;
 import com.pspdfkit.listeners.SimpleDocumentListener;
+import com.pspdfkit.react.NutrientNotificationCenter;
 import com.pspdfkit.react.PDFDocumentModule;
 import com.pspdfkit.react.R;
 import com.pspdfkit.react.annotations.ReactAnnotationPresetConfiguration;
@@ -94,6 +99,7 @@ import com.pspdfkit.react.events.PdfViewDocumentLoadFailedEvent;
 import com.pspdfkit.react.events.PdfViewDocumentLoadedEvent;
 import com.pspdfkit.react.events.PdfViewDocumentSaveFailedEvent;
 import com.pspdfkit.react.events.PdfViewDocumentSavedEvent;
+import com.pspdfkit.react.events.PdfViewShouldShowSignaturePadEvent;
 import com.pspdfkit.react.events.PdfViewNavigationButtonClickedEvent;
 import com.pspdfkit.react.events.CustomToolbarButtonTappedEvent;
 import com.pspdfkit.react.events.PdfViewStateChangedEvent;
@@ -104,11 +110,16 @@ import com.pspdfkit.react.helper.RemoteDocumentDownloader;
 import com.pspdfkit.react.menu.NutrientAnnotationPopupMenuBridge;
 import com.pspdfkit.react.menu.NutrientPopupMenuBridge;
 import com.pspdfkit.react.menu.NutrientTextSelectionPopupMenuBridge;
+import com.pspdfkit.signatures.Signature;
+import com.pspdfkit.signatures.listeners.OnSignaturePickedListener;
 import com.pspdfkit.signatures.storage.DatabaseSignatureStorage;
 import com.pspdfkit.signatures.storage.SignatureStorage;
+import com.pspdfkit.ui.signatures.ElectronicSignatureFragment;
 import com.pspdfkit.react.helper.PSPDFKitUtils;
+import com.pspdfkit.react.helper.SignatureHelper;
 import com.pspdfkit.ui.DocumentDescriptor;
 import com.pspdfkit.ui.PdfFragment;
+import com.pspdfkit.utils.Size;
 import com.pspdfkit.ui.PdfUiFragment;
 import com.pspdfkit.ui.PdfUiFragmentBuilder;
 import com.pspdfkit.ui.fonts.Font;
@@ -134,6 +145,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 
@@ -180,6 +192,7 @@ public class PdfView extends FrameLayout {
         void onAnnotationTapped(Annotation annotation);
         void onAnnotationsChanged(String eventType, Annotation annotation);
         void onShouldExecuteAction(String requestId, Action action, int pageIndex, @Nullable String url);
+        void onShouldShowSignaturePad(String requestId, @Nullable String fullyQualifiedName, int pageIndex);
     }
 
     // Event data structure for state changes
@@ -216,6 +229,8 @@ public class PdfView extends FrameLayout {
 
     private PdfViewModeController pdfViewModeController;
     private PdfViewDocumentListener pdfViewDocumentListener;
+    @Nullable
+    private SimpleDocumentListener fragmentDocumentLoadedListener;
     private MenuItemListener menuItemListener;
     private ToolbarMenuItemListener toolbarMenuItemListener;
 
@@ -300,6 +315,8 @@ public class PdfView extends FrameLayout {
     private final java.util.Map<String, Integer> pendingActionPageIndices = new java.util.HashMap<>();
     private boolean suppressShouldExecuteAction = false;
     private boolean hasShouldExecuteAction = false;
+    private final java.util.Map<String, SignatureFormElement> pendingSignatureForms = new java.util.HashMap<>();
+    private boolean hasShouldShowSignaturePad = false;
 
     public PdfView(@NonNull Context context) {
         this(context, false);
@@ -399,6 +416,10 @@ public class PdfView extends FrameLayout {
 
     boolean hasShouldExecuteAction() {
         return hasShouldExecuteAction;
+    }
+
+    boolean hasShouldShowSignaturePad() {
+        return hasShouldShowSignaturePad;
     }
 
     @Nullable
@@ -503,6 +524,10 @@ public class PdfView extends FrameLayout {
         }
 
         this.reactApplicationContext = reactApplicationContext;
+        // Re-activate the view for this load. A prior removeFragment(true) (e.g. the
+        // COMMAND_REMOVE_FRAGMENT workaround) leaves isActive false; without resetting it here the
+        // load callbacks below would be gated off and the reloaded document would never appear.
+        isActive = true;
         // Store component reference for Fabric mode if provided
         if (reference != null) {
             this.componentReferenceId = reference;
@@ -534,6 +559,12 @@ public class PdfView extends FrameLayout {
 
             RemoteDocumentDownloader downloader = new RemoteDocumentDownloader(documentPath, outputFilePath, overwriteExisting, getContext(), fragmentManager);
             downloader.startDownload((fileLocation, error) -> {
+                // The download is not tracked by documentOpeningDisposable, so a teardown while it
+                // is in flight cannot cancel it. Bail out if the view was torn down meanwhile,
+                // otherwise this would start a new open and re-attach a fragment after teardown.
+                if (!isActive) {
+                    return Unit.INSTANCE;
+                }
                 if (error != null) {
                     // Download failed: forward to delegate and JS, then reset fragment
                     PdfView.this.document = null;
@@ -546,11 +577,17 @@ public class PdfView extends FrameLayout {
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(pdfDocument -> {
+                                if (!isActive) {
+                                    return;
+                                }
                                 PdfView.this.document = pdfDocument;
                                 reactApplicationContext.getNativeModule(PDFDocumentModule.class).setDocument(pdfDocument, null, reference != null ? reference : this.getId(), PdfView.this);
                                 reactApplicationContext.getNativeModule(PDFDocumentModule.class).updateDocumentConfiguration("imageSaveMode", imageSaveMode, reference != null ? reference : this.getId());
                                 setupFragment(false);
                             }, throwable -> {
+                                if (!isActive) {
+                                    return;
+                                }
                                 if (throwable instanceof  InvalidPasswordException) {
                                     if (delegate != null) {
                                         delegate.onDocumentLoadFailed(throwable);
@@ -572,11 +609,17 @@ public class PdfView extends FrameLayout {
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(imageDocument -> {
+                            if (!isActive) {
+                                return;
+                            }
                             PdfView.this.document = imageDocument.getDocument();
                             reactApplicationContext.getNativeModule(PDFDocumentModule.class).setDocument(imageDocument.getDocument(), imageDocument, reference != null ? reference : this.getId(), PdfView.this);
                             reactApplicationContext.getNativeModule(PDFDocumentModule.class).updateDocumentConfiguration("imageSaveMode", imageSaveMode, reference != null ? reference : this.getId());
                             setupFragment(false);
                         }, throwable -> {
+                            if (!isActive) {
+                                return;
+                            }
                             PdfView.this.document = null;
                             if (throwable instanceof  InvalidPasswordException) {
                                 if (delegate != null) {
@@ -593,11 +636,17 @@ public class PdfView extends FrameLayout {
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(pdfDocument -> {
+                            if (!isActive) {
+                                return;
+                            }
                             PdfView.this.document = pdfDocument;
                             reactApplicationContext.getNativeModule(PDFDocumentModule.class).setDocument(pdfDocument, null, reference != null ? reference : this.getId(), PdfView.this);
                             reactApplicationContext.getNativeModule(PDFDocumentModule.class).updateDocumentConfiguration("imageSaveMode", imageSaveMode, reference != null ? reference : this.getId());
                             setupFragment(false);
                         }, throwable -> {
+                            if (!isActive) {
+                                return;
+                            }
                             if (throwable instanceof  InvalidPasswordException) {
                                 if (delegate != null) {
                                     delegate.onDocumentLoadFailed(throwable);
@@ -650,6 +699,10 @@ public class PdfView extends FrameLayout {
         this.hasShouldExecuteAction = hasShouldExecuteAction;
     }
 
+    public void setHasShouldShowSignaturePad(boolean hasShouldShowSignaturePad) {
+        this.hasShouldShowSignaturePad = hasShouldShowSignaturePad;
+    }
+
     public void setDisableAutomaticSaving(boolean disableAutomaticSaving) {
         pdfViewDocumentListener.setDisableAutomaticSaving(disableAutomaticSaving);
     }
@@ -659,6 +712,20 @@ public class PdfView extends FrameLayout {
      */
     public void setMenuItemGroupingRule(@NonNull MenuItemGroupingRule groupingRule) {
         pdfViewModeController.setMenuItemGroupingRule(groupingRule);
+    }
+
+    /**
+     * Sets whether the stylus button should be shown on the annotation creation toolbar.
+     */
+    public void setShowStylusButton(boolean showStylusButton) {
+        pdfViewModeController.setShowStylusButton(showStylusButton);
+    }
+
+    /**
+     * Returns whether the stylus button should be shown on the annotation creation toolbar.
+     */
+    public boolean getShowStylusButton() {
+        return pdfViewModeController.getShowStylusButton();
     }
 
     public void setAvailableFontNames(@Nullable final ReadableArray availableFontNames) {
@@ -943,7 +1010,7 @@ public class PdfView extends FrameLayout {
     }
 
     private void preparePdfFragment(@NonNull PdfFragment pdfFragment) {
-        pdfFragment.addDocumentListener(new SimpleDocumentListener() {
+        fragmentDocumentLoadedListener = new SimpleDocumentListener() {
             @Override
             public void onDocumentLoaded(@NonNull PdfDocument document) {
                 if (reactApplicationContext != null) {
@@ -955,12 +1022,14 @@ public class PdfView extends FrameLayout {
                 }
                 updateState();
             }
-        });
+        };
+        pdfFragment.addDocumentListener(fragmentDocumentLoadedListener);
 
         pdfFragment.addOnTextSelectionModeChangeListener(pdfViewModeController);
         pdfFragment.addOnTextSelectionChangeListener(pdfViewModeController);
         pdfFragment.setOnPreparePopupToolbarListener(NutrientPopupMenuBridge.createPrepareListener(this));
         pdfFragment.addDocumentListener(pdfViewDocumentListener);
+        pdfFragment.addOnFormElementClickedListener(pdfViewDocumentListener);
         pdfFragment.addOnFormElementSelectedListener(pdfViewDocumentListener);
         pdfFragment.addOnFormElementDeselectedListener(pdfViewDocumentListener);
         pdfFragment.addOnAnnotationSelectedListener(pdfViewDocumentListener);
@@ -1011,7 +1080,18 @@ public class PdfView extends FrameLayout {
 
     public void removeFragment(boolean makeInactive) {
         PdfUiFragment pdfUiFragment = (PdfUiFragment) fragmentManager.findFragmentByTag(fragmentTag);
+        if (makeInactive) {
+            // Detach the document-scoped listeners first, driven by the retained document rather
+            // than the fragment. These form and bookmark listeners are held by a native form
+            // observer through a JNI global reference, so they must be removed even when the UI
+            // fragment can no longer be resolved by tag; otherwise the retain cycle survives and
+            // the view hierarchy and document leak.
+            detachDocumentListeners();
+        }
         if (pdfUiFragment != null) {
+            if (makeInactive) {
+                detachFragmentListeners(pdfUiFragment.getPdfFragment());
+            }
             fragmentManager.beginTransaction()
                 .remove(pdfUiFragment)
                 .commitNowAllowingStateLoss();
@@ -1019,12 +1099,82 @@ public class PdfView extends FrameLayout {
         if (makeInactive) {
             // Clear everything.
             isActive = false;
+            // Cancel any in-flight document open so its callback cannot repopulate the document
+            // or re-attach a fragment after teardown. isActive gates the callbacks that disposal
+            // cannot reach (e.g. a remote download still in flight).
+            if (documentOpeningDisposable != null) {
+                documentOpeningDisposable.dispose();
+                documentOpeningDisposable = null;
+            }
             document = null;
+            releaseDocumentReferences();
+            // The attach runnable captures the PdfUiFragment; clearing it releases the fragment's
+            // view hierarchy once the fragment is removed.
+            fragmentTransactionRunnable = null;
             pendingFragmentActions.dispose();
             pendingFragmentActions = new CompositeDisposable();
         }
         fragment = null;
         pdfUiFragmentGetter.onNext(Collections.emptyList());
+    }
+
+    /**
+     * Removes the document-scoped listeners registered in {@link #preparePdfFragment}. The form
+     * field and bookmark listeners are registered on the document, which outlives the fragment and
+     * is held by a native form observer through a JNI global reference, so they are what pin this
+     * view after teardown. Driven by the retained {@link #document} so it works even when the UI
+     * fragment can no longer be resolved by tag. Must run before {@link #document} is cleared.
+     */
+    private void detachDocumentListeners() {
+        if (pdfViewDocumentListener == null || document == null) {
+            return;
+        }
+        document.getFormProvider().removeOnFormFieldUpdatedListener(pdfViewDocumentListener);
+        document.getBookmarkProvider().removeBookmarkListener(pdfViewDocumentListener);
+    }
+
+    /**
+     * Removes the fragment-scoped listeners registered in {@link #preparePdfFragment}. These are
+     * held by the {@link PdfFragment} being removed, so they only need detaching when the fragment
+     * is still available.
+     */
+    private void detachFragmentListeners(@Nullable PdfFragment pdfFragment) {
+        if (pdfFragment == null) {
+            return;
+        }
+        if (fragmentDocumentLoadedListener != null) {
+            pdfFragment.removeDocumentListener(fragmentDocumentLoadedListener);
+            fragmentDocumentLoadedListener = null;
+        }
+        pdfFragment.removeOnTextSelectionModeChangeListener(pdfViewModeController);
+        pdfFragment.removeOnTextSelectionChangeListener(pdfViewModeController);
+        if (pdfViewDocumentListener != null) {
+            pdfFragment.removeDocumentListener(pdfViewDocumentListener);
+            pdfFragment.removeOnFormElementSelectedListener(pdfViewDocumentListener);
+            pdfFragment.removeOnFormElementDeselectedListener(pdfViewDocumentListener);
+            pdfFragment.removeOnAnnotationSelectedListener(pdfViewDocumentListener);
+            pdfFragment.removeOnAnnotationUpdatedListener(pdfViewDocumentListener);
+            pdfFragment.removeDocumentScrollListener(pdfViewDocumentListener);
+        }
+    }
+
+    /**
+     * Removes this view's entries from the {@link PDFDocumentModule} registry so the loaded
+     * documents can be garbage collected. Documents are registered under the component reference
+     * ID (Fabric) and under the view ID (document load listener), so both keys must be released.
+     */
+    private void releaseDocumentReferences() {
+        if (reactApplicationContext == null) {
+            return;
+        }
+        PDFDocumentModule documentModule = reactApplicationContext.getNativeModule(PDFDocumentModule.class);
+        if (documentModule == null) {
+            return;
+        }
+        if (componentReferenceId != null && componentReferenceId != 0) {
+            documentModule.releaseDocument(componentReferenceId);
+        }
+        documentModule.releaseDocument(getId());
     }
 
     void manuallyLayoutChildren() {
@@ -1109,6 +1259,120 @@ public class PdfView extends FrameLayout {
     public void storePendingAction(@NonNull String requestId, @NonNull Action action, int pageIndex) {
         pendingActions.put(requestId, action);
         pendingActionPageIndices.put(requestId, pageIndex);
+    }
+
+    public void storePendingSignatureForm(@NonNull String requestId, @NonNull SignatureFormElement formElement) {
+        pendingSignatureForms.put(requestId, formElement);
+    }
+
+    /**
+     * Present or drop the signature UI for a previously intercepted signature form tap.
+     * Returns true if the requestId was known and handled.
+     */
+    public boolean showSignaturePad(@NonNull String requestId, boolean allow) {
+        final SignatureFormElement formElement = pendingSignatureForms.remove(requestId);
+        if (formElement == null) {
+            return false;
+        }
+
+        if (!allow) {
+            // The signature UI stays suppressed; nothing else to do.
+            return true;
+        }
+
+        getCurrentPdfFragment()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(fragment -> {
+                ElectronicSignatureFragment.show(
+                    fragment.getParentFragmentManager(),
+                    new OnSignaturePickedListener() {
+                        @Override
+                        public void onSignaturePicked(@NonNull Signature signature) {
+                            applyPickedSignature(fragment, formElement, signature);
+                        }
+
+                        @Override
+                        public void onDismiss() {
+                            // No-op: the user closed the signature UI without picking.
+                        }
+                    },
+                    null,
+                    fragment.getSignatureStorage());
+            }, throwable -> {
+                // Ignore errors; the fragment is not available.
+            });
+
+        return true;
+    }
+
+    /**
+     * Applies a picked signature to the widget of the intercepted signature form element,
+     * mirroring the SDK's default signing behavior.
+     */
+    private void applyPickedSignature(@NonNull PdfFragment fragment, @NonNull SignatureFormElement formElement, @NonNull Signature signature) {
+        PdfDocument document = fragment.getDocument();
+        if (document == null) {
+            return;
+        }
+
+        RectF boundingBox = new RectF(formElement.getAnnotation().getBoundingBox());
+        // Shrink the target rect slightly so floating point inaccuracies can't push the
+        // signature outside the form field bounds (matches the SDK's default behavior).
+        float insetX = Math.abs(boundingBox.width()) * 0.025f;
+        float insetY = Math.abs(boundingBox.height()) * 0.025f;
+        if (boundingBox.left <= boundingBox.right) {
+            boundingBox.left += insetX;
+            boundingBox.right -= insetX;
+        } else {
+            boundingBox.left -= insetX;
+            boundingBox.right += insetX;
+        }
+        if (boundingBox.top >= boundingBox.bottom) {
+            boundingBox.top -= insetY;
+            boundingBox.bottom += insetY;
+        } else {
+            boundingBox.top += insetY;
+            boundingBox.bottom -= insetY;
+        }
+
+        Annotation signatureAnnotation = signature.toAnnotation(document, formElement.getAnnotation().getPageIndex(), boundingBox);
+        signatureAnnotation.setCreator(fragment.getAnnotationPreferences().getAnnotationCreator());
+        SignatureHelper.addAnnotation(document, signatureAnnotation,
+            () -> fragment.setSelectedAnnotation(signatureAnnotation));
+    }
+
+    /**
+     * Dismisses the currently presented signature UI, if any.
+     * Emits whether a signature UI was actually showing and got dismissed.
+     */
+    @SuppressWarnings("deprecation")
+    public Single<Boolean> dismissSignaturePad() {
+        // With no hosted fragment there is no signature UI that could be showing;
+        // settle with false instead of waiting on a fragment that may never arrive.
+        final List<PdfUiFragment> pdfUiFragments = pdfUiFragmentGetter.getValue();
+        if (pdfUiFragments == null || pdfUiFragments.isEmpty() || pdfUiFragments.get(0).getPdfFragment() == null) {
+            return Single.just(false);
+        }
+        return getCurrentPdfFragment()
+            .firstOrError()
+            .observeOn(AndroidSchedulers.mainThread())
+            .map(fragment -> {
+                FragmentManager fragmentManager = fragment.getParentFragmentManager();
+                // Detect by type rather than by fragment tag: this stays in sync with the
+                // dismiss() calls below by construction, and breaks at compile time instead
+                // of silently returning false if the SDK ever drops these classes.
+                boolean wasShowing = false;
+                for (Fragment attachedFragment : fragmentManager.getFragments()) {
+                    if (attachedFragment instanceof ElectronicSignatureFragment
+                        || attachedFragment instanceof com.pspdfkit.ui.signatures.SignaturePickerFragment) {
+                        wasShowing = true;
+                        break;
+                    }
+                }
+                ElectronicSignatureFragment.dismiss(fragmentManager);
+                com.pspdfkit.ui.signatures.SignaturePickerFragment.dismiss(fragmentManager);
+                return wasShowing;
+            });
     }
 
     /**
@@ -1296,6 +1560,241 @@ public class PdfView extends FrameLayout {
 
     }
 
+    // region Viewport / coordinate conversion
+
+    /** Immutable snapshot of the current viewport transformation state. */
+    private static final class ViewportData {
+        int pageIndex;
+        float zoomScale;
+        final RectF visiblePdfRect = new RectF();
+        final PointF contentOffset = new PointF();
+        float viewportWidth;
+        float viewportHeight;
+        String documentID = "";
+    }
+
+    /**
+     * Computes the current viewport state from the given fragment. Must be called on the UI
+     * thread. Returns {@code null} if the primary page is not visible / laid out yet.
+     */
+    @Nullable
+    private ViewportData computeViewportData(@NonNull PdfFragment pdfFragment) {
+        PdfDocument doc = pdfFragment.getDocument();
+        if (doc == null) {
+            return null;
+        }
+        int pageIndex = pdfFragment.getPageIndex();
+        List<Integer> visiblePages = pdfFragment.getVisiblePages();
+        if (pageIndex < 0 && !visiblePages.isEmpty()) {
+            pageIndex = visiblePages.get(0);
+        }
+        if (pageIndex < 0) {
+            return null;
+        }
+
+        // Visible PDF rect (already in PDF coordinates). Returns false when the page is not visible.
+        RectF visibleRect = new RectF();
+        if (!pdfFragment.getVisiblePdfRect(visibleRect, pageIndex)) {
+            return null;
+        }
+
+        float density = getResources().getDisplayMetrics().density;
+        if (density <= 0f) {
+            density = 1f;
+        }
+
+        ViewportData data = new ViewportData();
+        data.pageIndex = pageIndex;
+        data.documentID = doc.getDocumentIdString();
+        data.zoomScale = pdfFragment.getZoomScale(pageIndex);
+        // Normalize so serialization matches iOS (x = minX, y = minY).
+        data.visiblePdfRect.set(
+            Math.min(visibleRect.left, visibleRect.right),
+            Math.min(visibleRect.top, visibleRect.bottom),
+            Math.max(visibleRect.left, visibleRect.right),
+            Math.max(visibleRect.top, visibleRect.bottom));
+
+        // Content offset: screen-space (dp) position of the page's visual top-left, negated.
+        // (0, pageSize.height) is the PDF-native (bottom-left, y-up) top-left; toViewPoint's
+        // page transform flips Y and translates by page height, landing on the same top-left
+        // in view (y-down) space that iOS's equivalent computes (RCTPSPDFKitView.m,
+        // computeViewportPageView) via pageView's own plain UIKit bounds. Both platforms
+        // compute the same quantity here.
+        Size pageSize = doc.getPageSize(pageIndex);
+        PointF pageTopLeft = new PointF(0f, pageSize.height);
+        pdfFragment.getViewProjection().toViewPoint(pageTopLeft, pageIndex); // -> view pixels
+        data.contentOffset.set(-pageTopLeft.x / density, -pageTopLeft.y / density);
+
+        data.viewportWidth = getWidth() / density;
+        data.viewportHeight = getHeight() / density;
+        return data;
+    }
+
+    private JSONObject viewportDataToJson(@NonNull ViewportData data) throws JSONException {
+        JSONObject json = new JSONObject();
+        json.put("event", "documentViewportChanged");
+        json.put("documentID", data.documentID);
+        json.put("pageIndex", data.pageIndex);
+        json.put("zoomScale", data.zoomScale);
+
+        JSONObject rect = new JSONObject();
+        rect.put("x", data.visiblePdfRect.left);
+        rect.put("y", data.visiblePdfRect.top);
+        rect.put("width", data.visiblePdfRect.width());
+        rect.put("height", data.visiblePdfRect.height());
+        json.put("visiblePdfRect", rect);
+
+        JSONObject offset = new JSONObject();
+        offset.put("x", data.contentOffset.x);
+        offset.put("y", data.contentOffset.y);
+        json.put("contentOffset", offset);
+
+        JSONObject size = new JSONObject();
+        size.put("width", data.viewportWidth);
+        size.put("height", data.viewportHeight);
+        json.put("viewportSize", size);
+        return json;
+    }
+
+    /** Emits the {@code documentViewportChanged} notification. Must be called on the UI thread. */
+    public void emitViewportChangedEvent() {
+        if (!NutrientNotificationCenter.INSTANCE.getIsNotificationCenterInUse()) {
+            return;
+        }
+        PdfFragment pdfFragment = fragment != null ? fragment.getPdfFragment() : null;
+        if (pdfFragment == null) {
+            return;
+        }
+        ViewportData data;
+        try {
+            data = computeViewportData(pdfFragment);
+        } catch (Exception e) {
+            return;
+        }
+        if (data == null) {
+            return;
+        }
+        int componentId = isFabricMode()
+            ? (getComponentReferenceId() != null ? getComponentReferenceId() : getId())
+            : getId();
+        NutrientNotificationCenter.INSTANCE.documentViewportChanged(
+            data.pageIndex, data.zoomScale, data.visiblePdfRect, data.contentOffset,
+            data.viewportWidth, data.viewportHeight, data.documentID, componentId);
+    }
+
+    /** Produces a viewport/coordinate JSONObject from an available PdfFragment. */
+    private interface ViewportResultProducer {
+        @Nullable JSONObject produce(@NonNull PdfFragment pdfFragment) throws Exception;
+    }
+
+    /**
+     * Runs a viewport/coordinate computation once a PdfFragment is available, without blocking
+     * the calling thread. {@code callback} is invoked on the main thread with the result, or
+     * with {@code null} if the fragment never becomes available (e.g. the view is destroyed
+     * before it attaches) within the timeout.
+     *
+     * The subscription is tracked so teardown cancels it: without that, a request made against
+     * one document could still be waiting when the view is torn down and resolve against a
+     * freshly attached document instead.
+     */
+    private void computeViewportResultAsync(@NonNull ViewportResultProducer producer, @NonNull Consumer<JSONObject> callback) {
+        Disposable disposable = getActivePdfFragment()
+            .timeout(5, TimeUnit.SECONDS, Maybe.empty())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                pdfFragment -> {
+                    JSONObject result;
+                    try {
+                        result = producer.produce(pdfFragment);
+                    } catch (Exception e) {
+                        result = null;
+                    }
+                    callback.accept(result);
+                },
+                throwable -> callback.accept(null),
+                () -> callback.accept(null));
+        pendingFragmentActions.add(disposable);
+    }
+
+    /** One-shot pull of the current viewport state. */
+    public void getViewportState(@NonNull Consumer<JSONObject> callback) {
+        computeViewportResultAsync(pdfFragment -> {
+            ViewportData data = computeViewportData(pdfFragment);
+            return data == null ? null : viewportDataToJson(data);
+        }, callback);
+    }
+
+    /** Converts a PDF-space point to screen (dp) coordinates. */
+    public void convertPointToScreen(int pageIndex, double x, double y, @NonNull Consumer<JSONObject> callback) {
+        computeViewportResultAsync(pdfFragment -> {
+            float density = getResources().getDisplayMetrics().density;
+            if (density <= 0f) {
+                density = 1f;
+            }
+            PointF point = new PointF((float) x, (float) y);
+            pdfFragment.getViewProjection().toViewPoint(point, pageIndex); // -> view pixels
+            JSONObject json = new JSONObject();
+            json.put("x", point.x / density);
+            json.put("y", point.y / density);
+            return json;
+        }, callback);
+    }
+
+    /** Converts a screen (dp) point to PDF-space coordinates. */
+    public void convertPointToPage(int pageIndex, double x, double y, @NonNull Consumer<JSONObject> callback) {
+        computeViewportResultAsync(pdfFragment -> {
+            float density = getResources().getDisplayMetrics().density;
+            if (density <= 0f) {
+                density = 1f;
+            }
+            PointF point = new PointF((float) (x * density), (float) (y * density)); // dp -> px
+            pdfFragment.getViewProjection().toPdfPoint(point, pageIndex);
+            JSONObject json = new JSONObject();
+            json.put("x", point.x);
+            json.put("y", point.y);
+            return json;
+        }, callback);
+    }
+
+    /** Converts a PDF-space rect to screen (dp) coordinates. */
+    public void convertRectToScreen(int pageIndex, double x, double y, double width, double height, @NonNull Consumer<JSONObject> callback) {
+        computeViewportResultAsync(pdfFragment -> {
+            float density = getResources().getDisplayMetrics().density;
+            if (density <= 0f) {
+                density = 1f;
+            }
+            RectF rect = new RectF((float) x, (float) y, (float) (x + width), (float) (y + height));
+            pdfFragment.getViewProjection().toViewRect(rect, pageIndex); // -> view pixels
+            return normalizedRectToJson(rect, density);
+        }, callback);
+    }
+
+    /** Converts a screen (dp) rect to PDF-space coordinates. */
+    public void convertRectToPage(int pageIndex, double x, double y, double width, double height, @NonNull Consumer<JSONObject> callback) {
+        computeViewportResultAsync(pdfFragment -> {
+            float density = getResources().getDisplayMetrics().density;
+            if (density <= 0f) {
+                density = 1f;
+            }
+            RectF rect = new RectF(
+                (float) (x * density), (float) (y * density),
+                (float) ((x + width) * density), (float) ((y + height) * density)); // dp -> px
+            pdfFragment.getViewProjection().toPdfRect(rect, pageIndex);
+            return normalizedRectToJson(rect, 1f);
+        }, callback);
+    }
+
+    private JSONObject normalizedRectToJson(@NonNull RectF rect, float divisor) throws JSONException {
+        JSONObject json = new JSONObject();
+        json.put("x", Math.min(rect.left, rect.right) / divisor);
+        json.put("y", Math.min(rect.top, rect.bottom) / divisor);
+        json.put("width", Math.abs(rect.width()) / divisor);
+        json.put("height", Math.abs(rect.height()) / divisor);
+        return json;
+    }
+
+    // endregion
+
     public Maybe<Boolean> setFormFieldValue(@NonNull String formElementName, @NonNull final String value) {
         return document.getFormProvider().getFormElementWithNameAsync(formElementName)
             .map(formElement -> {
@@ -1372,6 +1871,7 @@ public class PdfView extends FrameLayout {
             config.put("androidShowDocumentInfoView", fragment.getConfiguration().isDocumentInfoViewEnabled());
             config.put("androidShowSettingsMenu", fragment.getConfiguration().isSettingsItemEnabled());
             config.put("androidEnableStylusOnDetection", fragment.getConfiguration().getConfiguration().getEnableStylusOnDetection());
+            config.put("androidShowStylusButton", getShowStylusButton());
 
             config.put("showThumbnailBar", ConfigurationAdapter.getStringValueForConfigurationItem(fragment.getConfiguration().getThumbnailBarMode()));
             config.put("androidShowThumbnailGridAction", fragment.getConfiguration().isThumbnailGridEnabled());
@@ -1442,6 +1942,7 @@ public class PdfView extends FrameLayout {
        map.put(CustomToolbarButtonTappedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onCustomToolbarButtonTapped"));
        map.put(CustomAnnotationContextualMenuItemTappedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onCustomAnnotationContextualMenuItemTapped"));
        map.put(CustomTextSelectionContextualMenuItemTappedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onCustomTextSelectionContextualMenuItemTapped"));
+       map.put(PdfViewShouldShowSignaturePadEvent.EVENT_NAME, MapBuilder.of("registrationName", "onShouldShowSignaturePad"));
        return map;
     }
 

@@ -79,6 +79,13 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
     public static final int COMMAND_SET_EXCLUDED_ANNOTATIONS = 14;
     public static final int COMMAND_SET_USER_INTERFACE_VISIBLE = 15;
     public static final int COMMAND_EXECUTE_ACTION = 16;
+    public static final int COMMAND_CONVERT_POINT_TO_SCREEN = 17;
+    public static final int COMMAND_CONVERT_POINT_TO_PAGE = 18;
+    public static final int COMMAND_CONVERT_RECT_TO_SCREEN = 19;
+    public static final int COMMAND_CONVERT_RECT_TO_PAGE = 20;
+    public static final int COMMAND_GET_VIEWPORT_STATE = 21;
+    public static final int COMMAND_SHOW_SIGNATURE_PAD = 22;
+    public static final int COMMAND_DISMISS_SIGNATURE_PAD = 23;
 
     private final CompositeDisposable annotationDisposables = new CompositeDisposable();
 
@@ -132,7 +139,19 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
         commandMap.put("setExcludedAnnotations", COMMAND_SET_EXCLUDED_ANNOTATIONS);
         commandMap.put("setUserInterfaceVisible", COMMAND_SET_USER_INTERFACE_VISIBLE);
         commandMap.put("executeAction", COMMAND_EXECUTE_ACTION);
+        commandMap.put("convertPointToScreen", COMMAND_CONVERT_POINT_TO_SCREEN);
+        commandMap.put("convertPointToPage", COMMAND_CONVERT_POINT_TO_PAGE);
+        commandMap.put("convertRectToScreen", COMMAND_CONVERT_RECT_TO_SCREEN);
+        commandMap.put("convertRectToPage", COMMAND_CONVERT_RECT_TO_PAGE);
+        commandMap.put("getViewportState", COMMAND_GET_VIEWPORT_STATE);
+        commandMap.put("showSignaturePad", COMMAND_SHOW_SIGNATURE_PAD);
+        commandMap.put("dismissSignaturePad", COMMAND_DISMISS_SIGNATURE_PAD);
         return commandMap;
+    }
+
+    @ReactProp(name = "hasShouldShowSignaturePad")
+    public void setHasShouldShowSignaturePad(PdfView view, boolean hasShouldShowSignaturePad) {
+        view.setHasShouldShowSignaturePad(hasShouldShowSignaturePad);
     }
 
     @ReactProp(name = "documentAndConfiguration")
@@ -189,6 +208,7 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
             view.setSupportedToolbarPositions(configuration.getArray("supportedToolbarPositions"));
         }
         NutrientPropsDocumentHelper.applyToolbarVisibilityFromConfiguration(view, configuration);
+        NutrientPropsDocumentHelper.applyShowStylusButtonFromConfiguration(view, configuration);
     }
 
     @ReactProp(name = "annotationPresets")
@@ -437,6 +457,75 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
                     root.executeAction(actionRequestId, allow);
                 }
                 break;
+            case COMMAND_CONVERT_POINT_TO_SCREEN:
+                if (args != null && args.size() == 3) {
+                    final int requestId = args.getInt(0);
+                    final int pageIndex = args.getInt(1);
+                    final ReadableMap point = args.getMap(2);
+                    root.convertPointToScreen(pageIndex, point.getDouble("x"), point.getDouble("y"),
+                        result -> dispatchViewportResult(root, requestId, result));
+                }
+                break;
+            case COMMAND_CONVERT_POINT_TO_PAGE:
+                if (args != null && args.size() == 3) {
+                    final int requestId = args.getInt(0);
+                    final int pageIndex = args.getInt(1);
+                    final ReadableMap point = args.getMap(2);
+                    root.convertPointToPage(pageIndex, point.getDouble("x"), point.getDouble("y"),
+                        result -> dispatchViewportResult(root, requestId, result));
+                }
+                break;
+            case COMMAND_CONVERT_RECT_TO_SCREEN:
+                if (args != null && args.size() == 3) {
+                    final int requestId = args.getInt(0);
+                    final int pageIndex = args.getInt(1);
+                    final ReadableMap rect = args.getMap(2);
+                    root.convertRectToScreen(pageIndex, rect.getDouble("x"), rect.getDouble("y"), rect.getDouble("width"), rect.getDouble("height"),
+                        result -> dispatchViewportResult(root, requestId, result));
+                }
+                break;
+            case COMMAND_CONVERT_RECT_TO_PAGE:
+                if (args != null && args.size() == 3) {
+                    final int requestId = args.getInt(0);
+                    final int pageIndex = args.getInt(1);
+                    final ReadableMap rect = args.getMap(2);
+                    root.convertRectToPage(pageIndex, rect.getDouble("x"), rect.getDouble("y"), rect.getDouble("width"), rect.getDouble("height"),
+                        result -> dispatchViewportResult(root, requestId, result));
+                }
+                break;
+            case COMMAND_GET_VIEWPORT_STATE:
+                if (args != null && args.size() >= 1) {
+                    final int requestId = args.getInt(0);
+                    root.getViewportState(result -> dispatchViewportResult(root, requestId, result));
+                }
+                break;
+            case COMMAND_SHOW_SIGNATURE_PAD:
+                if (args != null && args.size() == 3) {
+                    final int requestId = args.getInt(0);
+                    final String signatureRequestId = args.getString(1);
+                    final boolean allowSignature = args.getBoolean(2);
+                    final boolean handled = root.showSignaturePad(signatureRequestId, allowSignature);
+                    root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, handled));
+                }
+                break;
+            case COMMAND_DISMISS_SIGNATURE_PAD:
+                if (args != null && args.size() >= 1) {
+                    final int requestId = args.getInt(0);
+                    root.dismissSignaturePad().subscribe(
+                        didDismiss -> root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, (boolean) didDismiss)),
+                        throwable -> root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, throwable)));
+                }
+                break;
+        }
+    }
+
+    /** Dispatches a viewport/coordinate result back to JS, or an error if the result is null. */
+    private void dispatchViewportResult(@NonNull PdfView root, int requestId, @Nullable JSONObject result) {
+        if (result != null) {
+            root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, result));
+        } else {
+            root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId,
+                new IllegalStateException("The page may not be visible or the document is not laid out yet.")));
         }
     }
 

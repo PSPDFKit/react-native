@@ -19,6 +19,7 @@ import PSPDFKit
     func nncDocumentLoadFailed(_ payload: NSDictionary)
     func nncDocumentPageChanged(_ payload: NSDictionary)
     func nncDocumentScrolled(_ payload: NSDictionary)
+    func nncDocumentViewportChanged(_ payload: NSDictionary)
     func nncDocumentTapped(_ payload: NSDictionary)
     func nncAnnotationsAdded(_ payload: NSDictionary)
     func nncAnnotationChanged(_ payload: NSDictionary)
@@ -39,6 +40,7 @@ import PSPDFKit
     case documentLoadFailed
     case documentPageChanged
     case documentScrolled
+    case documentViewportChanged
     case documentTapped
     case annotationsAdded
     case annotationChanged
@@ -65,6 +67,8 @@ import PSPDFKit
                 return "documentPageChanged"
             case .documentScrolled:
                 return "documentScrolled"
+            case .documentViewportChanged:
+                return "documentViewportChanged"
             case .documentTapped:
                 return "documentTapped"
             case .annotationsAdded:
@@ -104,6 +108,8 @@ import PSPDFKit
                 self = .documentPageChanged
             case "documentScrolled":
                 self = .documentScrolled
+            case "documentViewportChanged":
+                self = .documentViewportChanged
             case "documentTapped":
                 self = .documentTapped
             case "annotationCreated":
@@ -177,6 +183,7 @@ import PSPDFKit
             case .documentLoadFailed: delegate.nncDocumentLoadFailed(dict)
             case .documentPageChanged: delegate.nncDocumentPageChanged(dict)
             case .documentScrolled: delegate.nncDocumentScrolled(dict)
+            case .documentViewportChanged: delegate.nncDocumentViewportChanged(dict)
             case .documentTapped: delegate.nncDocumentTapped(dict)
             case .annotationsAdded: delegate.nncAnnotationsAdded(dict)
             case .annotationChanged: delegate.nncAnnotationChanged(dict)
@@ -229,7 +236,26 @@ import PSPDFKit
         let payload = createEventPayload(jsonData: jsonData, componentID: componentID)
         routeEvent(.documentScrolled, payload: payload)
     }
-    
+
+    @objc public func documentViewportChanged(pageIndex: Int, zoomScale: CGFloat, visiblePdfRect: CGRect, contentOffset: CGPoint, viewportSize: CGSize, documentID: String, componentID: Int) {
+        if (!isInUse) { return }
+
+        let visibleRectDictionary = ["x" : visiblePdfRect.minX, "y" : visiblePdfRect.minY,
+                                     "width" : visiblePdfRect.width, "height" : visiblePdfRect.height]
+        let contentOffsetDictionary = ["x" : contentOffset.x, "y" : contentOffset.y]
+        let viewportSizeDictionary = ["width" : viewportSize.width, "height" : viewportSize.height]
+
+        let jsonData = ["event" : NotificationEvent.documentViewportChanged.rawValue,
+                        "pageIndex" : pageIndex,
+                        "zoomScale" : zoomScale,
+                        "visiblePdfRect" : visibleRectDictionary,
+                        "contentOffset" : contentOffsetDictionary,
+                        "viewportSize" : viewportSizeDictionary,
+                        "documentID" : documentID] as [String : Any]
+        let payload = createEventPayload(jsonData: jsonData, componentID: componentID)
+        routeEvent(.documentViewportChanged, payload: payload)
+    }
+
     @objc public func didTapDocument(tapPoint: CGPoint, pageIndex: Int, documentID: String, componentID: Int) {
         if (!isInUse) { return }
 

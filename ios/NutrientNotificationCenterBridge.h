@@ -19,6 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)nncDocumentLoadFailed:(NSDictionary *)payload;
 - (void)nncDocumentPageChanged:(NSDictionary *)payload;
 - (void)nncDocumentScrolled:(NSDictionary *)payload;
+- (void)nncDocumentViewportChanged:(NSDictionary *)payload;
 - (void)nncDocumentTapped:(NSDictionary *)payload;
 - (void)nncAnnotationsAdded:(NSDictionary *)payload;
 - (void)nncAnnotationChanged:(NSDictionary *)payload;

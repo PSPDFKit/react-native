@@ -29,8 +29,5 @@ allprojects {
         google()
         mavenLocal()
         mavenCentral()
-        maven {
-            url 'https://my.nutrient.io/maven/'
-        }
     }
 }

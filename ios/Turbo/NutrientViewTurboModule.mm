@@ -223,6 +223,41 @@ RCT_EXPORT_MODULE();
     });
 }
 
+- (void)showSignaturePad:(nonnull NSString *)reference
+               requestId:(nonnull NSString *)requestId
+                   allow:(BOOL)allow
+                 resolve:(nonnull RCTPromiseResolveBlock)resolve
+                  reject:(nonnull RCTPromiseRejectBlock)reject {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        RCTPSPDFKitView *view = [[NutrientViewRegistry shared] viewForId:reference];
+        if (!view) {
+            reject(ERR_VIEW_NOT_FOUND, @"Fabric view not found for reference", [self _makeErrorWithCode:ERR_VIEW_NOT_FOUND message:@"Fabric view not found for reference"]);
+            return;
+        }
+
+        BOOL success = [view showPendingSignaturePadWithRequestId:requestId allow:allow];
+        if (success) {
+            resolve(@YES);
+        } else {
+            reject(ERR_OPERATION, @"showSignaturePad failed", [self _makeErrorWithCode:ERR_OPERATION message:@"showSignaturePad failed"]);
+        }
+    });
+}
+
+- (void)dismissSignaturePad:(nonnull NSString *)reference
+                    resolve:(nonnull RCTPromiseResolveBlock)resolve
+                     reject:(nonnull RCTPromiseRejectBlock)reject {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        RCTPSPDFKitView *view = [[NutrientViewRegistry shared] viewForId:reference];
+        if (!view) {
+            reject(ERR_VIEW_NOT_FOUND, @"Fabric view not found for reference", [self _makeErrorWithCode:ERR_VIEW_NOT_FOUND message:@"Fabric view not found for reference"]);
+            return;
+        }
+
+        resolve(@([view dismissSignaturePad]));
+    });
+}
+
 - (void)setMeasurementValueConfigurations:(nonnull NSString *)reference configurations:(nonnull NSArray *)configurations resolve:(nonnull RCTPromiseResolveBlock)resolve reject:(nonnull RCTPromiseRejectBlock)reject { 
     dispatch_async(dispatch_get_main_queue(), ^{
         RCTPSPDFKitView *view = [[NutrientViewRegistry shared] viewForId:reference];
@@ -270,6 +305,90 @@ RCT_EXPORT_MODULE();
 
 - (void)destroyView:(nonnull NSString *)reference { 
     // No-Op. Only Android.
+}
+
+- (void)convertPointToScreen:(nonnull NSString *)reference pageIndex:(double)pageIndex point:(nonnull NSDictionary *)point resolve:(nonnull RCTPromiseResolveBlock)resolve reject:(nonnull RCTPromiseRejectBlock)reject {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        RCTPSPDFKitView *view = [[NutrientViewRegistry shared] viewForId:reference];
+        if (!view) {
+            reject(ERR_VIEW_NOT_FOUND, @"Fabric view not found for reference", [self _makeErrorWithCode:ERR_VIEW_NOT_FOUND message:@"Fabric view not found for reference"]);
+            return;
+        }
+        CGPoint pdfPoint = CGPointMake([point[@"x"] doubleValue], [point[@"y"] doubleValue]);
+        NSDictionary *result = [view convertPointToScreen:pdfPoint onPageAtIndex:(PSPDFPageIndex)pageIndex];
+        if (result) {
+            resolve(result);
+        } else {
+            reject(ERR_OPERATION, @"Failed to convert point to screen. The page may not be visible.", [self _makeErrorWithCode:ERR_OPERATION message:@"Failed to convert point to screen."]);
+        }
+    });
+}
+
+- (void)convertPointToPage:(nonnull NSString *)reference pageIndex:(double)pageIndex point:(nonnull NSDictionary *)point resolve:(nonnull RCTPromiseResolveBlock)resolve reject:(nonnull RCTPromiseRejectBlock)reject {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        RCTPSPDFKitView *view = [[NutrientViewRegistry shared] viewForId:reference];
+        if (!view) {
+            reject(ERR_VIEW_NOT_FOUND, @"Fabric view not found for reference", [self _makeErrorWithCode:ERR_VIEW_NOT_FOUND message:@"Fabric view not found for reference"]);
+            return;
+        }
+        CGPoint screenPoint = CGPointMake([point[@"x"] doubleValue], [point[@"y"] doubleValue]);
+        NSDictionary *result = [view convertPointToPage:screenPoint onPageAtIndex:(PSPDFPageIndex)pageIndex];
+        if (result) {
+            resolve(result);
+        } else {
+            reject(ERR_OPERATION, @"Failed to convert point to page. The page may not be visible.", [self _makeErrorWithCode:ERR_OPERATION message:@"Failed to convert point to page."]);
+        }
+    });
+}
+
+- (void)convertRectToScreen:(nonnull NSString *)reference pageIndex:(double)pageIndex rect:(nonnull NSDictionary *)rect resolve:(nonnull RCTPromiseResolveBlock)resolve reject:(nonnull RCTPromiseRejectBlock)reject {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        RCTPSPDFKitView *view = [[NutrientViewRegistry shared] viewForId:reference];
+        if (!view) {
+            reject(ERR_VIEW_NOT_FOUND, @"Fabric view not found for reference", [self _makeErrorWithCode:ERR_VIEW_NOT_FOUND message:@"Fabric view not found for reference"]);
+            return;
+        }
+        CGRect pdfRect = CGRectMake([rect[@"x"] doubleValue], [rect[@"y"] doubleValue], [rect[@"width"] doubleValue], [rect[@"height"] doubleValue]);
+        NSDictionary *result = [view convertRectToScreen:pdfRect onPageAtIndex:(PSPDFPageIndex)pageIndex];
+        if (result) {
+            resolve(result);
+        } else {
+            reject(ERR_OPERATION, @"Failed to convert rect to screen. The page may not be visible.", [self _makeErrorWithCode:ERR_OPERATION message:@"Failed to convert rect to screen."]);
+        }
+    });
+}
+
+- (void)convertRectToPage:(nonnull NSString *)reference pageIndex:(double)pageIndex rect:(nonnull NSDictionary *)rect resolve:(nonnull RCTPromiseResolveBlock)resolve reject:(nonnull RCTPromiseRejectBlock)reject {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        RCTPSPDFKitView *view = [[NutrientViewRegistry shared] viewForId:reference];
+        if (!view) {
+            reject(ERR_VIEW_NOT_FOUND, @"Fabric view not found for reference", [self _makeErrorWithCode:ERR_VIEW_NOT_FOUND message:@"Fabric view not found for reference"]);
+            return;
+        }
+        CGRect screenRect = CGRectMake([rect[@"x"] doubleValue], [rect[@"y"] doubleValue], [rect[@"width"] doubleValue], [rect[@"height"] doubleValue]);
+        NSDictionary *result = [view convertRectToPage:screenRect onPageAtIndex:(PSPDFPageIndex)pageIndex];
+        if (result) {
+            resolve(result);
+        } else {
+            reject(ERR_OPERATION, @"Failed to convert rect to page. The page may not be visible.", [self _makeErrorWithCode:ERR_OPERATION message:@"Failed to convert rect to page."]);
+        }
+    });
+}
+
+- (void)getViewportState:(nonnull NSString *)reference resolve:(nonnull RCTPromiseResolveBlock)resolve reject:(nonnull RCTPromiseRejectBlock)reject {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        RCTPSPDFKitView *view = [[NutrientViewRegistry shared] viewForId:reference];
+        if (!view) {
+            reject(ERR_VIEW_NOT_FOUND, @"Fabric view not found for reference", [self _makeErrorWithCode:ERR_VIEW_NOT_FOUND message:@"Fabric view not found for reference"]);
+            return;
+        }
+        NSDictionary *result = [view getViewportState];
+        if (result) {
+            resolve(result);
+        } else {
+            reject(ERR_OPERATION, @"Failed to retrieve viewport state. No page is currently visible.", [self _makeErrorWithCode:ERR_OPERATION message:@"Failed to retrieve viewport state."]);
+        }
+    });
 }
 
 - (NSDictionary *)dictionaryFromJSONString:(NSString *)jsonString {

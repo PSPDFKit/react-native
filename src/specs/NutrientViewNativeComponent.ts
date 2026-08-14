@@ -454,6 +454,11 @@ export interface NativeProps extends ViewProps {
    * implemented on the JS side. When false, native should not intercept actions.
    */
   hasShouldExecuteAction?: WithDefault<boolean, false>;
+  /**
+   * Internal flag used so native knows whether onShouldShowSignaturePad is actually
+   * implemented on the JS side. When false, native should not intercept the signature UI.
+   */
+  hasShouldShowSignaturePad?: WithDefault<boolean, false>;
 
   // Additional props from index.js
   annotationAuthorName?: string;
@@ -502,6 +507,15 @@ export interface NativeProps extends ViewProps {
     pageIndex: Int32;
     actionType?: string;
     url?: string;
+  }>;
+  /**
+   * Called just before the native SDK presents the signature creation/selection UI.
+   * React Native can later decide whether the UI should be shown by calling showSignaturePad on the ref.
+   */
+  onShouldShowSignaturePad?: BubblingEventHandler<{
+    requestId: string;
+    pageIndex: Int32;
+    fullyQualifiedName?: string;
   }>;
 }
 

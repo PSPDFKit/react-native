@@ -133,6 +133,8 @@ RCT_EXPORT_VIEW_PROPERTY(disableDefaultActionForTappedAnnotations, BOOL)
 
 RCT_EXPORT_VIEW_PROPERTY(hasShouldExecuteAction, BOOL)
 
+RCT_EXPORT_VIEW_PROPERTY(hasShouldShowSignaturePad, BOOL)
+
 RCT_CUSTOM_VIEW_PROPERTY(disableAutomaticSaving, BOOL, RCTPSPDFKitView) {
   if (json) {
     view.disableAutomaticSaving = [RCTConvert BOOL:json];
@@ -174,6 +176,8 @@ RCT_EXPORT_VIEW_PROPERTY(onCustomAnnotationContextualMenuItemTapped, RCTBubbling
 RCT_EXPORT_VIEW_PROPERTY(onCustomTextSelectionContextualMenuItemTapped, RCTBubblingEventBlock)
 
 RCT_EXPORT_VIEW_PROPERTY(onShouldExecuteAction, RCTBubblingEventBlock)
+
+RCT_EXPORT_VIEW_PROPERTY(onShouldShowSignaturePad, RCTBubblingEventBlock)
 
 RCT_CUSTOM_VIEW_PROPERTY(availableFontNames, NSArray, RCTPSPDFKitView) {
   [NutrientPropsFontHelper applyAvailableFontNamesFromJSON:json toView:view];
@@ -445,6 +449,90 @@ RCT_EXPORT_METHOD(executeAction:(NSString *)requestId allow:(BOOL)allow reactTag
     } else {
       reject(@"error", @"Failed to execute action.", nil);
     }
+  });
+}
+
+RCT_EXPORT_METHOD(convertPointToScreen:(NSInteger)pageIndex point:(NSDictionary *)point reactTag:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+  dispatch_async(dispatch_get_main_queue(), ^{
+    RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
+    CGPoint pdfPoint = CGPointMake([point[@"x"] doubleValue], [point[@"y"] doubleValue]);
+    NSDictionary *result = [component convertPointToScreen:pdfPoint onPageAtIndex:pageIndex];
+    if (result) {
+      resolve(result);
+    } else {
+      reject(@"error", @"Failed to convert point to screen. The page may not be visible.", nil);
+    }
+  });
+}
+
+RCT_EXPORT_METHOD(showSignaturePad:(NSString *)requestId allow:(BOOL)allow reactTag:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+  dispatch_async(dispatch_get_main_queue(), ^{
+    RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
+    BOOL success = [component showPendingSignaturePadWithRequestId:requestId allow:allow];
+    if (success) {
+      resolve(@YES);
+    } else {
+      reject(@"error", @"Failed to resolve signature pad request.", nil);
+    }
+  });
+}
+
+RCT_EXPORT_METHOD(convertPointToPage:(NSInteger)pageIndex point:(NSDictionary *)point reactTag:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+  dispatch_async(dispatch_get_main_queue(), ^{
+    RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
+    CGPoint screenPoint = CGPointMake([point[@"x"] doubleValue], [point[@"y"] doubleValue]);
+    NSDictionary *result = [component convertPointToPage:screenPoint onPageAtIndex:pageIndex];
+    if (result) {
+      resolve(result);
+    } else {
+      reject(@"error", @"Failed to convert point to page. The page may not be visible.", nil);
+    }
+  });
+}
+
+RCT_EXPORT_METHOD(convertRectToScreen:(NSInteger)pageIndex rect:(NSDictionary *)rect reactTag:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+  dispatch_async(dispatch_get_main_queue(), ^{
+    RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
+    CGRect pdfRect = CGRectMake([rect[@"x"] doubleValue], [rect[@"y"] doubleValue], [rect[@"width"] doubleValue], [rect[@"height"] doubleValue]);
+    NSDictionary *result = [component convertRectToScreen:pdfRect onPageAtIndex:pageIndex];
+    if (result) {
+      resolve(result);
+    } else {
+      reject(@"error", @"Failed to convert rect to screen. The page may not be visible.", nil);
+    }
+  });
+}
+
+RCT_EXPORT_METHOD(convertRectToPage:(NSInteger)pageIndex rect:(NSDictionary *)rect reactTag:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+  dispatch_async(dispatch_get_main_queue(), ^{
+    RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
+    CGRect screenRect = CGRectMake([rect[@"x"] doubleValue], [rect[@"y"] doubleValue], [rect[@"width"] doubleValue], [rect[@"height"] doubleValue]);
+    NSDictionary *result = [component convertRectToPage:screenRect onPageAtIndex:pageIndex];
+    if (result) {
+      resolve(result);
+    } else {
+      reject(@"error", @"Failed to convert rect to page. The page may not be visible.", nil);
+    }
+  });
+}
+
+RCT_EXPORT_METHOD(getViewportState:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+  dispatch_async(dispatch_get_main_queue(), ^{
+    RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
+    NSDictionary *result = [component getViewportState];
+    if (result) {
+      resolve(result);
+    } else {
+      reject(@"error", @"Failed to retrieve viewport state. No page is currently visible.", nil);
+    }
+  });
+}
+
+RCT_EXPORT_METHOD(dismissSignaturePad:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+  dispatch_async(dispatch_get_main_queue(), ^{
+    RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
+    BOOL success = [component dismissSignaturePad];
+    resolve(@(success));
   });
 }
 

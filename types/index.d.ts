@@ -537,6 +537,10 @@ export type Props = {
      */
     onShouldExecuteAction?: Function;
     /**
+     * Callback that's called just before the native SDK presents the signature creation/selection UI for a tapped signature form field. Use this to decide, via {@link NutrientView#showSignaturePad}, whether the signature UI should be presented.
+     */
+    onShouldShowSignaturePad?: Function;
+    /**
      * The tag used to identify a single PdfFragment in the view hierarchy. This needs to be unique in the view hierarchy.
      */
     fragmentTag?: string;
@@ -922,6 +926,10 @@ declare class NutrientView extends React.Component<Props, any, any> {
      */
     _onShouldExecuteAction: (event: any) => void;
     /**
+     * @ignore
+     */
+    _onShouldShowSignaturePad: (event: any) => void;
+    /**
      * Enters annotation creation mode, showing the annotation creation toolbar.
      * @method enterAnnotationCreationMode
      * @param { Annotation.Type } [annotationType] The annotation type that should be pre-selected when entering annotation creation mode.
@@ -941,6 +949,27 @@ declare class NutrientView extends React.Component<Props, any, any> {
      * @memberof NutrientView
      */
     executeAction: (requestId: string, allow: boolean) => any;
+    /**
+     * Decides whether a previously intercepted signature UI presentation should proceed.
+     * Invoke this in response to the ```onShouldShowSignaturePad``` callback.
+     *
+     * @method showSignaturePad
+     * @param {string} requestId The request identifier received from the onShouldShowSignaturePad callback.
+     * @param {boolean} allow Whether the signature UI should be shown (true) or stay suppressed (false).
+     * @memberof NutrientView
+     * @returns { Promise<boolean> } A promise resolving to ```true``` if the request identifier was known and handled, ```false``` otherwise.
+     */
+    showSignaturePad: (requestId: string, allow: boolean) => Promise<boolean>;
+    /**
+     * Dismisses the signature UI if it is currently presented.
+     *
+     * @method dismissSignaturePad
+     * @example
+     * const didDismiss = await this.pdfRef.current.dismissSignaturePad();
+     * @memberof NutrientView
+     * @returns { Promise<boolean> } A promise resolving to ```true``` if a signature UI was showing and got dismissed, ```false``` if none was showing.
+     */
+    dismissSignaturePad: () => Promise<boolean>;
     /**
      * Enters content editing mode, showing the content editing UI.
      * @method enterContentEditingMode
@@ -1222,6 +1251,273 @@ declare class NutrientView extends React.Component<Props, any, any> {
      */
     getConfiguration: () => Promise<PDFConfiguration>;
     /**
+     * @typedef Point
+     * @property { number } x The x coordinate.
+     * @property { number } y The y coordinate.
+     */
+    /**
+     * @typedef Rect
+     * @property { number } x The x coordinate of the origin.
+     * @property { number } y The y coordinate of the origin.
+     * @property { number } width The width of the rectangle.
+     * @property { number } height The height of the rectangle.
+     */
+    /**
+     * @typedef DocumentViewportChangedPayload
+     * @property { string } documentID Identifier of the document currently displayed.
+     * @property { number } pageIndex The primary (most visible) page index for which ```visiblePdfRect``` is reported.
+     * @property { number } zoomScale Current zoom factor of the view.
+     * @property { Rect } visiblePdfRect Visible region of ```pageIndex```, expressed in PDF points.
+     * @property { Point } contentOffset Content offset of the scroll view, in screen points,
+     * relative to ```pageIndex```'s top-left. Since ```pageIndex``` is whichever page is
+     * currently anchored (closest to the center of the viewport), this jumps discontinuously
+     * when the anchor page changes, e.g. scrolling past a page boundary. It is not a
+     * document-absolute offset; use ```visiblePdfRect``` and ```pageIndex``` together if you
+     * need position relative to a specific page instead.
+     * @property { object } viewportSize Size of the viewport, in screen points.
+     * @property { number } viewportSize.width The width of the viewport.
+     * @property { number } viewportSize.height The height of the viewport.
+     */
+    /**
+     * Dispatches a legacy-bridge command by name and awaits its request-id-keyed
+     * response. Shared by the viewport/coordinate and signature-pad methods, which
+     * differ only in command name and arguments.
+     */
+    _dispatchLegacyViewportCommand: (commandName: any, commandArgs: any) => Promise<any>;
+    /**
+     * Runs a viewport/coordinate method on whichever architecture/platform path applies,
+     * rejecting instead of silently returning `undefined` when none does (e.g. the Fabric
+     * ref isn't attached yet, or the method is called on an unsupported platform).
+     */
+    _invokeViewportMethod: (methodName: any, fabricArgs: any, legacyCommandArgs: any, iosArgs: any) => any;
+    /**
+     * Converts a point in PDF coordinates (for the given page) to screen coordinates,
+     * in points, relative to the ```NutrientView```'s frame origin. Useful for positioning
+     * custom overlays on top of the rendered document.
+     *
+     * @method convertPointToScreen
+     * @memberof NutrientView
+     * @param {number} pageIndex The index of the page the point belongs to. Starts at 0.
+     * @param {Point} point The point in PDF coordinates, e.g. ```{ x: 100, y: 200 }```.
+     * @returns { Promise<Point> } A promise resolving to the point in screen coordinates.
+     * @example
+     * const screenPoint = await this.pdfRef.current?.convertPointToScreen(0, { x: 100, y: 200 });
+     */
+    convertPointToScreen: (pageIndex: number, point: {
+        /**
+         * The x coordinate.
+         */
+        x: number;
+        /**
+         * The y coordinate.
+         */
+        y: number;
+    }) => Promise<{
+        /**
+         * The x coordinate.
+         */
+        x: number;
+        /**
+         * The y coordinate.
+         */
+        y: number;
+    }>;
+    /**
+     * Converts a point in screen coordinates (in points, relative to the ```NutrientView```'s
+     * frame origin) to PDF coordinates for the given page.
+     *
+     * @method convertPointToPage
+     * @memberof NutrientView
+     * @param {number} pageIndex The index of the page the point belongs to. Starts at 0.
+     * @param {Point} point The point in screen coordinates, e.g. ```{ x: 50, y: 120 }```.
+     * @returns { Promise<Point> } A promise resolving to the point in PDF coordinates.
+     * @example
+     * const pdfPoint = await this.pdfRef.current?.convertPointToPage(0, { x: 50, y: 120 });
+     */
+    convertPointToPage: (pageIndex: number, point: {
+        /**
+         * The x coordinate.
+         */
+        x: number;
+        /**
+         * The y coordinate.
+         */
+        y: number;
+    }) => Promise<{
+        /**
+         * The x coordinate.
+         */
+        x: number;
+        /**
+         * The y coordinate.
+         */
+        y: number;
+    }>;
+    /**
+     * Converts a rectangle in PDF coordinates (for the given page) to screen coordinates,
+     * in points, relative to the ```NutrientView```'s frame origin.
+     *
+     * @method convertRectToScreen
+     * @memberof NutrientView
+     * @param {number} pageIndex The index of the page the rectangle belongs to. Starts at 0.
+     * @param {Rect} rect The rectangle in PDF coordinates, e.g. ```{ x: 100, y: 200, width: 50, height: 20 }```.
+     * @returns { Promise<Rect> } A promise resolving to the rectangle in screen coordinates.
+     * @example
+     * const screenRect = await this.pdfRef.current?.convertRectToScreen(0, { x: 100, y: 200, width: 50, height: 20 });
+     */
+    convertRectToScreen: (pageIndex: number, rect: {
+        /**
+         * The x coordinate of the origin.
+         */
+        x: number;
+        /**
+         * The y coordinate of the origin.
+         */
+        y: number;
+        /**
+         * The width of the rectangle.
+         */
+        width: number;
+        /**
+         * The height of the rectangle.
+         */
+        height: number;
+    }) => Promise<{
+        /**
+         * The x coordinate of the origin.
+         */
+        x: number;
+        /**
+         * The y coordinate of the origin.
+         */
+        y: number;
+        /**
+         * The width of the rectangle.
+         */
+        width: number;
+        /**
+         * The height of the rectangle.
+         */
+        height: number;
+    }>;
+    /**
+     * Converts a rectangle in screen coordinates (in points, relative to the ```NutrientView```'s
+     * frame origin) to PDF coordinates for the given page.
+     *
+     * @method convertRectToPage
+     * @memberof NutrientView
+     * @param {number} pageIndex The index of the page the rectangle belongs to. Starts at 0.
+     * @param {Rect} rect The rectangle in screen coordinates, e.g. ```{ x: 50, y: 120, width: 30, height: 10 }```.
+     * @returns { Promise<Rect> } A promise resolving to the rectangle in PDF coordinates.
+     * @example
+     * const pdfRect = await this.pdfRef.current?.convertRectToPage(0, { x: 50, y: 120, width: 30, height: 10 });
+     */
+    convertRectToPage: (pageIndex: number, rect: {
+        /**
+         * The x coordinate of the origin.
+         */
+        x: number;
+        /**
+         * The y coordinate of the origin.
+         */
+        y: number;
+        /**
+         * The width of the rectangle.
+         */
+        width: number;
+        /**
+         * The height of the rectangle.
+         */
+        height: number;
+    }) => Promise<{
+        /**
+         * The x coordinate of the origin.
+         */
+        x: number;
+        /**
+         * The y coordinate of the origin.
+         */
+        y: number;
+        /**
+         * The width of the rectangle.
+         */
+        width: number;
+        /**
+         * The height of the rectangle.
+         */
+        height: number;
+    }>;
+    /**
+     * Returns a one-shot snapshot of the current viewport transformation state. This is the
+     * same payload delivered by the ```documentViewportChanged``` notification, but pulled on demand.
+     *
+     * @method getViewportState
+     * @memberof NutrientView
+     * @returns { Promise<DocumentViewportChangedPayload> } A promise resolving to the current viewport state.
+     * @example
+     * const viewport = await this.pdfRef.current?.getViewportState();
+     */
+    getViewportState: () => Promise<{
+        /**
+         * Identifier of the document currently displayed.
+         */
+        documentID: string;
+        /**
+         * The primary (most visible) page index for which ```visiblePdfRect``` is reported.
+         */
+        pageIndex: number;
+        /**
+         * Current zoom factor of the view.
+         */
+        zoomScale: number;
+        /**
+         * Visible region of ```pageIndex```, expressed in PDF points.
+         */
+        visiblePdfRect: {
+            /**
+             * The x coordinate of the origin.
+             */
+            x: number;
+            /**
+             * The y coordinate of the origin.
+             */
+            y: number;
+            /**
+             * The width of the rectangle.
+             */
+            width: number;
+            /**
+             * The height of the rectangle.
+             */
+            height: number;
+        };
+        /**
+         * Content offset of the scroll view, in screen points,
+         * relative to ```pageIndex```'s top-left. Since ```pageIndex``` is whichever page is
+         * currently anchored (closest to the center of the viewport), this jumps discontinuously
+         * when the anchor page changes, e.g. scrolling past a page boundary. It is not a
+         * document-absolute offset; use ```visiblePdfRect``` and ```pageIndex``` together if you
+         * need position relative to a specific page instead.
+         */
+        contentOffset: {
+            /**
+             * The x coordinate.
+             */
+            x: number;
+            /**
+             * The y coordinate.
+             */
+            y: number;
+        };
+        /**
+         * Size of the viewport, in screen points.
+         */
+        viewportSize: {
+            width: number;
+            height: number;
+        };
+    }>;
+    /**
      * Prevents the specified annotations from being interacted with.
      *
      * @method setExcludedAnnotations
@@ -1426,6 +1722,16 @@ export import TextFormFieldConfiguration = formFieldConfiguration.TextFormFieldC
 //@ts-ignore
 import nutrientViewEvents = require('../src/events/NutrientViewEvents');
 export import ShouldExecuteActionEvent = nutrientViewEvents.ShouldExecuteActionEvent;
+export import ShouldShowSignaturePadEvent = nutrientViewEvents.ShouldShowSignaturePadEvent;
+
+//@ts-ignore
+import nutrientOverlay = require('../src/overlay/NutrientOverlay');
+export import NutrientOverlay = nutrientOverlay.NutrientOverlay;
+export import NutrientOverlayItem = nutrientOverlay.NutrientOverlayItem;
+export import NutrientOverlayProps = nutrientOverlay.NutrientOverlayProps;
+export import NutrientOverlayItemProps = nutrientOverlay.NutrientOverlayItemProps;
+export import NutrientOverlayPoint = nutrientOverlay.NutrientOverlayPoint;
+export import NutrientOverlayViewRef = nutrientOverlay.NutrientOverlayViewRef;
 
 //@ts-ignore
 export declare const NutrientInstantView: any;

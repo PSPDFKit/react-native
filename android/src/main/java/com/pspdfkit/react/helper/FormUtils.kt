@@ -55,6 +55,7 @@ object FormUtils {
         val elementJSON = mutableMapOf<String, Any>()
 
         elementJSON["isRequired"] = formElement.isRequired
+        elementJSON["readOnly"] = formElement.isReadOnly
         elementJSON["fieldName"] = formElement.name
         elementJSON["fullyQualifiedFieldName"] = formElement.fullyQualifiedName
         elementJSON["formField"] = FormUtils.formFieldToJSON(formElement.formField)

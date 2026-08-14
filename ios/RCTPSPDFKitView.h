@@ -44,6 +44,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) RCTBubblingEventBlock onShouldExecuteAction;
 /// Internal flag tracking whether onShouldExecuteAction is implemented in JS.
 @property (nonatomic, assign) BOOL hasShouldExecuteAction;
+/// Called when the signature creation/selection UI is about to be presented,
+/// allowing React Native to decide whether it should proceed.
+@property (nonatomic, copy) RCTBubblingEventBlock onShouldShowSignaturePad;
+/// Internal flag tracking whether onShouldShowSignaturePad is implemented in JS.
+@property (nonatomic, assign) BOOL hasShouldShowSignaturePad;
 @property (nonatomic, copy, nullable) NSArray<NSString *> *availableFontNames;
 @property (nonatomic, copy, nullable) NSString *selectedFontName;
 @property (nonatomic) BOOL showDownloadableFonts;
@@ -101,6 +106,22 @@ NS_ASSUME_NONNULL_BEGIN
 /// Execute or cancel a previously intercepted PSPDFAction identified by requestId.
 - (BOOL)executePendingActionWithRequestId:(NSString *)requestId allow:(BOOL)allow;
 
+/// Viewport / coordinate conversion. Screen values are in points relative to this view's
+/// frame origin; PDF values are in PDF points for the given page. Conversion is only
+/// possible for currently visible pages; returns nil when the page view is unavailable.
+- (nullable NSDictionary *)convertPointToScreen:(CGPoint)point onPageAtIndex:(PSPDFPageIndex)pageIndex;
+- (nullable NSDictionary *)convertPointToPage:(CGPoint)point onPageAtIndex:(PSPDFPageIndex)pageIndex;
+- (nullable NSDictionary *)convertRectToScreen:(CGRect)rect onPageAtIndex:(PSPDFPageIndex)pageIndex;
+- (nullable NSDictionary *)convertRectToPage:(CGRect)rect onPageAtIndex:(PSPDFPageIndex)pageIndex;
+/// Snapshot of the current viewport transformation state, or nil if no page is visible.
+- (nullable NSDictionary *)getViewportState;
+
+/// Present or drop a previously suppressed signature UI identified by requestId.
+- (BOOL)showPendingSignaturePadWithRequestId:(NSString *)requestId allow:(BOOL)allow;
+
+/// Dismiss the currently presented signature UI, if any. Returns YES when a controller was dismissed.
+- (BOOL)dismissSignaturePad;
+
 @end
 
 @protocol RCTPSPDFKitViewDelegate <NSObject>
@@ -124,6 +145,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)pspdfView:(RCTPSPDFKitView *)view didTapAnnotation:(PSPDFAnnotation *)annotation;
 /** Action execution callback for New Architecture bridging */
 - (void)pspdfView:(RCTPSPDFKitView *)view didRequestShouldExecuteActionWithPayload:(NSDictionary *)payload;
+/** Signature pad interception callback for New Architecture bridging */
+- (void)pspdfView:(RCTPSPDFKitView *)view didRequestShouldShowSignaturePadWithPayload:(NSDictionary *)payload;
 @end
 
 NS_ASSUME_NONNULL_END
