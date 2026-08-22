@@ -39,14 +39,12 @@ If you are not sure whether a change is native-backed, **assume it is** and foll
 These are summaries; the **full source of truth is `BRIDGING.md`**.
 
 - **Dual architecture support is mandatory**
-
   - Every public API that talks to native **MUST** work in both:
     - Legacy Architecture (bridge-based: `NativeModules`, `UIManager`, `requireNativeComponent`)
     - New Architecture (Fabric + TurboModules)
   - Do **not** add an API that works only on one architecture.
 
 - **Single public surface**
-
   - Callers use only the public API (usually `index.js` and the exported classes/components).
   - The public API **branches on** `isNewArchitectureEnabled()` and then delegates to:
     - TurboModule / Fabric implementation (New Architecture), or
@@ -80,7 +78,6 @@ These are summaries; the **full source of truth is `BRIDGING.md`**.
 ## Safe changes vs risky changes
 
 - **Generally safe (no native changes):**
-
   - Pure TypeScript changes under `src/` that do **not** call native
   - Documentation in `README.md`, `CHANGELOG.md`, comments
   - Sample app JS/TS changes in `samples/Catalog` that do not alter native APIs
@@ -100,7 +97,6 @@ If in doubt, treat the change as **native-backed** and follow the bridging recip
 When implementing or modifying native-backed APIs:
 
 - **iOS**
-
   - LLMS guide index: `https://www.nutrient.io/guides/ios/llms.txt`
   - Objective‑C API reference: `https://www.nutrient.io/api/ios/documentation/overview?language=objc`
   - Swift API reference: `https://www.nutrient.io/api/ios/documentation/overview`
@@ -119,3 +115,4 @@ You should **scan all relevant APIs and guides** before choosing which native AP
   - For native bridge changes, follow the build and validation steps in `BRIDGING.md`
 
 This ensures that custom bridges and extensions added by customers remain robust across both architectures.
+

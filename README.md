@@ -128,38 +128,38 @@ See our [Getting Started on React Native guide](https://www.nutrient.io/getting-
    open android/build.gradle
    ```
 
-1. Make sure Maven Central is in your repositories — Nutrient Android SDK is published there, so no custom repository is needed:
+1. Add the Nutrient repository to download the Nutrient SDK:
 
-   ```diff
-     allprojects {
-       repositories {
-         mavenLocal()
-   +     mavenCentral()
-       }
-     }
-   ```
-
-   > If you previously added `https://my.nutrient.io/maven/` for the Nutrient SDK, you can remove it. Keep it only if you also use an add-on that isn't on Maven Central yet, such as OCR (`io.nutrient:nutrient-ocr`).
+    ```diff
+      allprojects {
+        repositories {
+          mavenLocal()
+    +     maven {
+    +         url 'https://my.nutrient.io/maven/'
+    +     }
+        }
+      }
+    ```
 
 1. Open the app’s build.gradle file:
 
-   ```diff
-   ...
-     android {
-   -  compileSdkVersion rootProject.ext.compileSdkVersion
-   +  compileSdkVersion 36
-   ...
-     defaultConfig {
-       applicationId "com.nutrientdemo"
-   -     minSdkVersion rootProject.ext.minSdkVersion
-   +     minSdkVersion 24
-         targetSdkVersion rootProject.ext.targetSdkVersion
-         versionCode 1
-         versionName "1.0"
-     }
-   }
-   ...
-   ```
+    ```diff
+    ...
+      android {
+    -  compileSdkVersion rootProject.ext.compileSdkVersion
+    +  compileSdkVersion 36
+    ...
+      defaultConfig {
+        applicationId "com.nutrientdemo"
+    -     minSdkVersion rootProject.ext.minSdkVersion
+    +     minSdkVersion 24
+          targetSdkVersion rootProject.ext.targetSdkVersion
+          versionCode 1
+          versionName "1.0"
+      }
+    }
+    ...
+    ```
 
 1. Open your project’s Podfile:
 
@@ -169,12 +169,12 @@ See our [Getting Started on React Native guide](https://www.nutrient.io/getting-
 
 1. Update the minimum iOS platform version in the Podfile:
 
-   ```diff
-   ...
-   - platform :ios, min_ios_version_supported
-   + platform :ios, '17.0'
-   ...
-   ```
+    ```diff
+    ...
+    - platform :ios, min_ios_version_supported
+    + platform :ios, '17.0'
+    ...
+    ```
 
 1. Change the location of the current working directory to the `ios` folder:
 
@@ -232,38 +232,36 @@ See our [Getting Started on React Native guide](https://www.nutrient.io/getting-
 
 1. Replace the entire contents of `App.tsx` with the following code snippet:
 
-   ```typescript
-   import React, { Component } from 'react';
-   import { Platform } from 'react-native';
-   import NutrientView from '@nutrient-sdk/react-native';
-   import { NativeModules } from 'react-native';
+    ```typescript
+    import React, {Component} from 'react';
+    import {Platform} from 'react-native';
+    import NutrientView from '@nutrient-sdk/react-native';
+    import { NativeModules } from 'react-native';
 
-   const Nutrient = NativeModules.Nutrient;
-   Nutrient.setLicenseKey(null);
+    const Nutrient = NativeModules.Nutrient;
+    Nutrient.setLicenseKey(null);
 
-   const DOCUMENT =
-     Platform.OS === 'ios'
-       ? 'Document.pdf'
-       : 'file:///android_asset/Document.pdf';
-   export default class NutrientDemo extends Component<{}> {
-     render() {
-       var pdfRef: React.RefObject<NutrientView | null> = React.createRef();
-       return (
-         <NutrientView
-           document={DOCUMENT}
-           configuration={{
-             showThumbnailBar: 'scrollable',
-             pageTransition: 'scrollContinuous',
-             scrollDirection: 'vertical',
-           }}
-           ref={pdfRef}
-           fragmentTag="PDF1"
-           style={{ flex: 1 }}
-         />
-       );
-     }
-   }
-   ```
+    const DOCUMENT =
+      Platform.OS === 'ios' ? 'Document.pdf' : 'file:///android_asset/Document.pdf';
+    export default class NutrientDemo extends Component<{}> {
+      render() {
+        var pdfRef: React.RefObject<NutrientView | null> = React.createRef();
+        return (
+          <NutrientView
+            document={DOCUMENT}
+            configuration={{
+              showThumbnailBar: 'scrollable',
+              pageTransition: 'scrollContinuous',
+              scrollDirection: 'vertical',
+            }}
+            ref={pdfRef}
+            fragmentTag="PDF1"
+            style={{flex: 1}}
+          />
+        );
+      }
+    }
+    ```
 
 1. The app is now ready to launch! Go back to the terminal app and run:
 
@@ -288,7 +286,7 @@ const configuration: PDFConfiguration = {
   showPageLabels: false,
   pageTransition: 'scrollContinuous',
   scrollDirection: 'vertical',
-  showThumbnailBar: 'scrollable',
+  showThumbnailBar: 'scrollable'
 };
 ```
 

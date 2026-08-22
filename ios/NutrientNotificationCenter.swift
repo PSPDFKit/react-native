@@ -237,18 +237,21 @@ import PSPDFKit
         routeEvent(.documentScrolled, payload: payload)
     }
 
-    @objc public func documentViewportChanged(pageIndex: Int, zoomScale: CGFloat, visiblePdfRect: CGRect, contentOffset: CGPoint, viewportSize: CGSize, documentID: String, componentID: Int) {
+    @objc public func documentViewportChanged(pageIndex: Int, zoomScale: CGFloat, visiblePdfRect: CGRect, contentOffset: CGPoint, viewportSize: CGSize, pdfToScreenScale: CGFloat, pageSize: CGSize, documentID: String, componentID: Int) {
         if (!isInUse) { return }
 
         let visibleRectDictionary = ["x" : visiblePdfRect.minX, "y" : visiblePdfRect.minY,
                                      "width" : visiblePdfRect.width, "height" : visiblePdfRect.height]
         let contentOffsetDictionary = ["x" : contentOffset.x, "y" : contentOffset.y]
         let viewportSizeDictionary = ["width" : viewportSize.width, "height" : viewportSize.height]
+        let pageSizeDictionary = ["width" : pageSize.width, "height" : pageSize.height]
 
         let jsonData = ["event" : NotificationEvent.documentViewportChanged.rawValue,
                         "pageIndex" : pageIndex,
                         "zoomScale" : zoomScale,
+                        "pdfToScreenScale" : pdfToScreenScale,
                         "visiblePdfRect" : visibleRectDictionary,
+                        "pageSize" : pageSizeDictionary,
                         "contentOffset" : contentOffsetDictionary,
                         "viewportSize" : viewportSizeDictionary,
                         "documentID" : documentID] as [String : Any]

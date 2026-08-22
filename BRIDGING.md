@@ -44,7 +44,7 @@ When you add or change methods on the **`PDFDocument`** TypeScript class (`src/d
   - JS/TS (`PDFDocument.ts`) should invoke `NativeModules.PDFDocumentManager.*` / `NativeModules.PDFDocumentModule.*` style methods for document operations (page metadata, rotation, annotations, bookmarks, etc.).
   - Only use `NutrientView`/view-backed TurboModules when the API truly acts on the **view** (UI state, toolbar, selection, visibility), not on the document model itself.
 - **Rationale:** This keeps all document logic consolidated in the document managers on each platform, preserves parity between iOS (`PDFDocumentManager`) and Android (`PDFDocumentModule`), and prevents leaking view-specific details into the `PDFDocument` abstraction.
-- **Note (iOS reload behavior):** `PDFDocumentManager.swift` can trigger a reload of the active `PDFViewController` via its delegate hook `delegate?.reloadControllerData?()`. When you add document-centric behavior that changes what’s shown (like page rotation), prefer using this delegate path from `PDFDocumentManager` instead of reaching for the view controller directly.
+ - **Note (iOS reload behavior):** `PDFDocumentManager.swift` can trigger a reload of the active `PDFViewController` via its delegate hook `delegate?.reloadControllerData?()`. When you add document-centric behavior that changes what’s shown (like page rotation), prefer using this delegate path from `PDFDocumentManager` instead of reaching for the view controller directly.
 
 ### Step 1: Decide the API shape
 
@@ -65,13 +65,11 @@ You **MUST** implement **both**:
 
 ### Step 2: New Architecture – TypeScript spec
 
-1. **File**:
-
-   - App-level module: `src/specs/NativeNutrientModule.ts`
+1. **File**:  
+   - App-level module: `src/specs/NativeNutrientModule.ts`  
    - View-backed module: `src/specs/NativeNutrientViewTurboModule.ts`
 
 2. **In the spec file**:
-
    - Add or update the `Spec` interface (extends `TurboModule`).
    - Use exact method names and types that match what the native side will implement.
    - For events, use `EventEmitter<Payload>` from `react-native/Libraries/Types/CodegenTypes`.
@@ -83,35 +81,31 @@ You **MUST** implement **both**:
 
 ### Step 3: New Architecture – Native implementation
 
-1. **Android**
-
-   - Implement the method in the appropriate TurboModule/ViewManager under `android/src/newarch/java/`.
+1. **Android**  
+   - Implement the method in the appropriate TurboModule/ViewManager under `android/src/newarch/java/`.  
    - Ensure the module/view is registered so the name passed to `TurboModuleRegistry.getEnforcing` resolves.
 
-2. **iOS**
-
-   - Implement the method in `ios/Turbo/` (e.g. `NutrientTurboModule.mm` or `NutrientViewTurboModule.mm`).
+2. **iOS**  
+   - Implement the method in `ios/Turbo/` (e.g. `NutrientTurboModule.mm` or `NutrientViewTurboModule.mm`).  
    - For view-backed APIs, use the view registry (e.g. `NutrientViewRegistry`) to resolve the view by identifier when required.
 
 3. **MUST**: Keep method signatures (names, argument types, return types) in sync with the TypeScript spec and with the Legacy implementation behavior.
 
 ### Step 4: Legacy – Native implementation
 
-1. **Android**
-
-   - Implement or update the method in the appropriate module under `android/src/main/java/` (Legacy).
+1. **Android**  
+   - Implement or update the method in the appropriate module under `android/src/main/java/` (Legacy).  
    - Ensure it is exposed via the same module name used by `NativeModules.<ModuleName>` on the JS side.
 
-2. **iOS**
-   - Implement or update the method in the appropriate Legacy module (e.g. `RCTPSPDFKitViewManager`, `RCTNutrientModule`).
+2. **iOS**  
+   - Implement or update the method in the appropriate Legacy module (e.g. `RCTPSPDFKitViewManager`, `RCTNutrientModule`).  
    - Ensure the module is registered so `NativeModules.<ModuleName>` resolves.
    - **Keep headers and implementations in sync**: any selector you call from a view manager macro (e.g. `RCT_CUSTOM_VIEW_PROPERTY`) or from Fabric **must** be declared in the corresponding `*.h` (e.g. `RCTPSPDFKitView.h`) and implemented in `*.m`. Missing header declarations will surface as “No visible @interface…” compile errors in the app.
 
 ### Step 5: Public API layer – Dual branch
 
-1. **Where**:
-
-   - For `NutrientView` ref methods: `index.js` (the class that wraps the view and its ref).
+1. **Where**:  
+   - For `NutrientView` ref methods: `index.js` (the class that wraps the view and its ref).  
    - For app-level APIs: `index.js` or the relevant export (e.g. `Nutrient` singleton).
 
 2. **Pattern** (you **MUST** follow this structure):
@@ -192,9 +186,7 @@ After the checklist passes and **after you have copied native edits into** `samp
 ```javascript
 // WRONG: No New Architecture branch
 saveDocument = function () {
-  return NativeModules.PSPDFKitViewManager.saveCurrentDocument(
-    findNodeHandle(this._componentRef.current),
-  );
+  return NativeModules.PSPDFKitViewManager.saveCurrentDocument(findNodeHandle(this._componentRef.current));
 };
 ```
 
@@ -208,9 +200,7 @@ saveCurrentDocument = function () {
     return this._fabricRef.current?.saveCurrentDocument();
   }
   if (Platform.OS === 'ios') {
-    return NativeModules.PSPDFKitViewManager.saveCurrentDocument(
-      findNodeHandle(this._componentRef.current),
-    );
+    return NativeModules.PSPDFKitViewManager.saveCurrentDocument(findNodeHandle(this._componentRef.current));
   }
   // ... Android Legacy
 };
@@ -233,11 +223,7 @@ const { isNewArchitectureEnabled } = require('./lib/ArchitectureDetector');
 if (isNewArchitectureEnabled()) {
   return this._fabricRef.current?.setPageIndex(pageIndex, animated);
 }
-return NativeModules.PSPDFKitViewManager.setPageIndex(
-  pageIndex,
-  animated,
-  findNodeHandle(this._componentRef.current),
-);
+return NativeModules.PSPDFKitViewManager.setPageIndex(pageIndex, animated, findNodeHandle(this._componentRef.current));
 ```
 
 ---
@@ -258,18 +244,18 @@ return NativeModules.PSPDFKitViewManager.setPageIndex(
 
 ## Reference: Key files
 
-| Purpose                         | Location                                     |
-| ------------------------------- | -------------------------------------------- |
-| Architecture detection          | `src/ArchitectureDetector.ts`                |
-| App-level TurboModule spec      | `src/specs/NativeNutrientModule.ts`          |
+| Purpose                         | Location |
+|---------------------------------|----------|
+| Architecture detection          | `src/ArchitectureDetector.ts` |
+| App-level TurboModule spec      | `src/specs/NativeNutrientModule.ts` |
 | View TurboModule spec           | `src/specs/NativeNutrientViewTurboModule.ts` |
-| Fabric component spec           | `src/specs/NutrientViewNativeComponent.ts`   |
-| Public API (view + app methods) | `index.js`                                   |
-| Codegen config                  | `package.json` → `codegenConfig`             |
-| Legacy Android                  | `android/src/main/java/`                     |
-| New Arch Android                | `android/src/newarch/java/`                  |
-| Legacy iOS                      | `ios/` (e.g. ViewManagers, RCT\* modules)    |
-| New Arch iOS                    | `ios/Turbo/`, `ios/Fabric/`                  |
+| Fabric component spec           | `src/specs/NutrientViewNativeComponent.ts` |
+| Public API (view + app methods) | `index.js` |
+| Codegen config                  | `package.json` → `codegenConfig` |
+| Legacy Android                  | `android/src/main/java/` |
+| New Arch Android                | `android/src/newarch/java/` |
+| Legacy iOS                      | `ios/` (e.g. ViewManagers, RCT* modules) |
+| New Arch iOS                    | `ios/Turbo/`, `ios/Fabric/` |
 
 ---
 

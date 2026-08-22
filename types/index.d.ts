@@ -1264,10 +1264,22 @@ declare class NutrientView extends React.Component<Props, any, any> {
      */
     /**
      * @typedef DocumentViewportChangedPayload
+     * @property { 'documentViewportChanged' } event Name of the event.
      * @property { string } documentID Identifier of the document currently displayed.
      * @property { number } pageIndex The primary (most visible) page index for which ```visiblePdfRect``` is reported.
-     * @property { number } zoomScale Current zoom factor of the view.
-     * @property { Rect } visiblePdfRect Visible region of ```pageIndex```, expressed in PDF points.
+     * @property { number } zoomScale Current zoom factor of the view, relative to the zoom level at
+     * which the page fits the viewport, so it is ```1``` at the fitting zoom level. This is not the
+     * ratio between PDF points and screen points: use ```pdfToScreenScale``` for that.
+     * @property { number } pdfToScreenScale Screen points per PDF point on ```pageIndex``` at the
+     * current zoom level. Multiplying a distance in PDF points by this value gives the distance on screen.
+     * @property { Rect } visiblePdfRect Visible region of ```pageIndex```, expressed in PDF points and
+     * clipped to the page, so it is never larger than ```pageSize``` and never has a negative origin.
+     * Its origin is the PDF's bottom-left, so ```y``` is the distance from the bottom of the page. All
+     * zeros while the reported page is momentarily off screen, which can happen for a frame or two
+     * during a fling; the other fields stay valid.
+     * @property { object } pageSize Size of ```pageIndex```, in PDF points. Accounts for page rotation.
+     * @property { number } pageSize.width The width of the page.
+     * @property { number } pageSize.height The height of the page.
      * @property { Point } contentOffset Content offset of the scroll view, in screen points,
      * relative to ```pageIndex```'s top-left. Since ```pageIndex``` is whichever page is
      * currently anchored (closest to the center of the viewport), this jumps discontinuously
@@ -1459,6 +1471,10 @@ declare class NutrientView extends React.Component<Props, any, any> {
      */
     getViewportState: () => Promise<{
         /**
+         * Name of the event.
+         */
+        event: "documentViewportChanged";
+        /**
          * Identifier of the document currently displayed.
          */
         documentID: string;
@@ -1467,11 +1483,22 @@ declare class NutrientView extends React.Component<Props, any, any> {
          */
         pageIndex: number;
         /**
-         * Current zoom factor of the view.
+         * Current zoom factor of the view, relative to the zoom level at
+         * which the page fits the viewport, so it is ```1``` at the fitting zoom level. This is not the
+         * ratio between PDF points and screen points: use ```pdfToScreenScale``` for that.
          */
         zoomScale: number;
         /**
-         * Visible region of ```pageIndex```, expressed in PDF points.
+         * Screen points per PDF point on ```pageIndex``` at the
+         * current zoom level. Multiplying a distance in PDF points by this value gives the distance on screen.
+         */
+        pdfToScreenScale: number;
+        /**
+         * Visible region of ```pageIndex```, expressed in PDF points and
+         * clipped to the page, so it is never larger than ```pageSize``` and never has a negative origin.
+         * Its origin is the PDF's bottom-left, so ```y``` is the distance from the bottom of the page. All
+         * zeros while the reported page is momentarily off screen, which can happen for a frame or two
+         * during a fling; the other fields stay valid.
          */
         visiblePdfRect: {
             /**
@@ -1489,6 +1516,13 @@ declare class NutrientView extends React.Component<Props, any, any> {
             /**
              * The height of the rectangle.
              */
+            height: number;
+        };
+        /**
+         * Size of ```pageIndex```, in PDF points. Accounts for page rotation.
+         */
+        pageSize: {
+            width: number;
             height: number;
         };
         /**

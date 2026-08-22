@@ -1,19 +1,17 @@
-## 4.5.0 — 14 Aug 2026
-
-- Adds the `documentViewportChanged` NotificationCenter event, which reports the current viewport transformation state (zoom scale, visible PDF rect, content offset, and viewport size) so custom overlays can be positioned in sync with the rendered document. (J#HYB-1011)
+- Fixes the `DocumentViewportChangedPayload` type, which was missing the `event` property the payload has always carried at runtime, so subscribing to `documentViewportChanged` and holding the payload in typed state did not compile. (L#HYB-1035)
+- Adds a Custom Overlays example to the Catalog, which anchors React Native components to PDF coordinates across pages, places new ones from a tap through `convertPointToPage`, and reads the current page and zoom from `documentViewportChanged`. (L#HYB-1035)
+- Fixes the return value contract of `showSignaturePad` and `dismissSignaturePad` on Android so both architectures resolve a real boolean: `dismissSignaturePad` now reports whether a signature UI was actually dismissed instead of always resolving `true` on the New Architecture and `undefined` on the legacy architecture, and both methods are now typed as `Promise<boolean>`. (J#HYB-1043)
+- Fixes an issue where the element-level `readOnly` property of the `FormElement` objects returned by `getFormElements` was never populated on iOS and Android; it now reflects the form field's read-only state. (J#HYB-1042)
+- Adds the `documentViewportChanged` NotificationCenter event, which reports the current viewport transformation state (zoom scale, the visible PDF rect clipped to the page, content offset, and viewport size) so custom overlays can be positioned in sync with the rendered document. (J#HYB-1011)
 - Adds the `convertPointToScreen`, `convertPointToPage`, `convertRectToScreen`, `convertRectToPage`, and `getViewportState` methods on `NutrientView` for converting coordinates between PDF and screen space. (J#HYB-1011)
 - Adds the `NutrientOverlay` and `NutrientOverlayItem` components for rendering React Native components anchored to PDF coordinates, kept in sync with pan and zoom. (J#HYB-1013)
 - Adds multi-listener support to `NotificationCenter`: `subscribe` now returns a subscription handle whose `remove` method removes that listener only, multiple listeners can subscribe to the same event independently, and `unsubscribe` removes all listeners for the given event. (J#HYB-1014)
+- Adds `pdfToScreenScale` and `pageSize` to the `documentViewportChanged` payload and to `getViewportState`, so a point on the reported page can be converted to screen coordinates in JavaScript. `NutrientOverlay` items use them instead of one native coordinate conversion per item per event, which keeps them better aligned during a fast pan or pinch. (J#HYB-1032)
 - Adds the `setFormFieldReadOnly` method to `document.forms`, toggles the read-only state of an individual form field at runtime by its fully qualified name on iOS and Android.
 - Adds the `onShouldShowSignaturePad` callback and the `showSignaturePad` and `dismissSignaturePad` methods on `NutrientView`, allows intercepting or programmatically dismissing the signature UI for tapped signature form fields on iOS and Android.
 - Adds the `iOSNoteEditorDismissesOnSave` configuration option on iOS, which dismisses the comment editor automatically when a note's comment is saved. (J#HYB-1009)
-- Adds the `androidShowStylusButton` configuration option on Android, which shows or hides the stylus tool button in the annotation toolbar independently of `androidEnableStylusOnDetection`. (J#HYB-1023)
-- Updates for Nutrient iOS SDK 26.11.0.
-- Updates for Nutrient Android SDK 11.6.2.
-- Updates the Android integration to resolve Nutrient from Maven Central as `io.nutrient:nutrient-android-sdk`. The `https://my.nutrient.io/maven/` repository is no longer required for the SDK and can be removed from your `build.gradle`, unless you also use an add-on that isn't on Maven Central yet, such as OCR.
-- Fixes the return value contract of `showSignaturePad` and `dismissSignaturePad` on Android so both architectures resolve a real boolean: `dismissSignaturePad` now reports whether a signature UI was actually dismissed instead of always resolving `true` on the New Architecture and `undefined` on the legacy architecture, and both methods are now typed as `Promise<boolean>`. (J#HYB-1043)
-- Fixes an issue where the element-level `readOnly` property of the `FormElement` objects returned by `getFormElements` was never populated on iOS and Android; it now reflects the form field's read-only state. (J#HYB-1042)
 - Fixes memory leaks on Android where every document opened in a `NutrientView` stayed strongly referenced after the view was closed, causing the Java heap to grow with each document open until the app crashed with an `OutOfMemoryError`. (J#HYB-1015)
+- Adds the `androidShowStylusButton` configuration option on Android, which shows or hides the stylus tool button in the annotation toolbar independently of `androidEnableStylusOnDetection`. (J#HYB-1023)
 
 ## 4.4.0 — 03 Jul 2026
 

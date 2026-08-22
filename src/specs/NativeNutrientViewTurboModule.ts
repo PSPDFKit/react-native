@@ -51,7 +51,12 @@ export interface ViewportState {
   documentID: string;
   pageIndex: Double;
   zoomScale: Double;
+  pdfToScreenScale: Double;
   visiblePdfRect: Rect;
+  pageSize: {
+    width: Double;
+    height: Double;
+  };
   contentOffset: Point;
   viewportSize: {
     width: Double;

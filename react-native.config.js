@@ -4,10 +4,12 @@ module.exports = {
       platforms: {
         android: {
           libraryName: 'nutrient_sdk_react_native_codegen',
-          componentDescriptors: ['NutrientViewComponentDescriptor'],
+          componentDescriptors: [
+            'NutrientViewComponentDescriptor',
+          ],
           cmakeListsPath: 'src/main/jni/CMakeLists.txt',
         },
       },
     },
   },
-};
+}; 

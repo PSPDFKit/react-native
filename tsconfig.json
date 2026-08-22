@@ -4,15 +4,10 @@
     ],
     "compilerOptions": {
         "strict": true,
+        "jsx": "react",
         "rootDir": "src",
         "skipLibCheck": true,
         "outDir": "./lib",
-        "esModuleInterop": true,
-        // Sources under src/ include .tsx components (NutrientOverlay). This is a
-        // published library, so emit React.createElement calls rather than preserving
-        // JSX: lib/ ships to consumers and must not depend on their bundler being
-        // configured to transform JSX inside node_modules. (The Catalog uses
-        // "react-native" instead because it is an app, where Metro does that transform.)
-        "jsx": "react"
+        "esModuleInterop": true
     }
 }

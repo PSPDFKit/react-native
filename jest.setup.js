@@ -5,11 +5,12 @@ global.__DEV__ = true;
 const origError = console.error;
 console.error = (...args) => {
   const msg = args[0] || '';
-  if (
-    typeof msg === 'string' &&
-    (msg.includes('Warning:') || msg.includes('React does not recognize'))
-  ) {
+  if (typeof msg === 'string' && (
+    msg.includes('Warning:') ||
+    msg.includes('React does not recognize')
+  )) {
     return;
   }
   origError(...args);
 };
+

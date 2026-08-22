@@ -767,7 +767,7 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
 
                 // Check if it's a SignatureFormElement and get the overlapping annotation
                 val overlappingAnnotation = if (formElement is SignatureFormElement) {
-                    formElement.overlappingSignatures
+                    formElement.getOverlappingSignatures()
                 } else {
                     null
                 }
