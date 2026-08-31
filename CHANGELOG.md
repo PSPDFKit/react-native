@@ -1,3 +1,13 @@
+## 4.5.1 — 31 Aug 2026
+
+- Adds `pdfToScreenScale` and `pageSize` to the `documentViewportChanged` payload and `getViewportState`, for converting a PDF point to screen coordinates in JavaScript. (J#HYB-1032)
+- Adds a Custom Overlays example to the Catalog. (L#HYB-1035)
+- Updates for Nutrient Android SDK 11.6.4.
+- Fixes `NutrientOverlay` items not appearing until the first zoom or scroll, because neither platform reported the viewport when a document finished loading. (J#HYB-1011)
+- Fixes `NutrientOverlay` items staying blank after the view they track is remounted, such as a `key` change to swap documents. (J#HYB-1011)
+- Fixes the iOS `visiblePdfRect` not being clipped to the page, unlike Android. (J#HYB-1011)
+- Fixes the `DocumentViewportChangedPayload` type missing its `event` property. (L#HYB-1035)
+
 ## 4.5.0 — 14 Aug 2026
 
 - Adds the `documentViewportChanged` NotificationCenter event, which reports the current viewport transformation state (zoom scale, visible PDF rect, content offset, and viewport size) so custom overlays can be positioned in sync with the rendered document. (J#HYB-1011)

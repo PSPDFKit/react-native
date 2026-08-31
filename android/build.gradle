@@ -15,7 +15,7 @@
  *   Contains gradle configuration constants
  */
 ext {
-    NUTRIENT_VERSION = '11.6.2'
+    NUTRIENT_VERSION = '11.6.4'
 }
 
 buildscript {

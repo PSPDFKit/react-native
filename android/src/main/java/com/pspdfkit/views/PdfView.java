@@ -1566,8 +1566,11 @@ public class PdfView extends FrameLayout {
     private static final class ViewportData {
         int pageIndex;
         float zoomScale;
+        float pdfToScreenScale;
         final RectF visiblePdfRect = new RectF();
         final PointF contentOffset = new PointF();
+        float pageWidth;
+        float pageHeight;
         float viewportWidth;
         float viewportHeight;
         String documentID = "";
@@ -1575,7 +1578,8 @@ public class PdfView extends FrameLayout {
 
     /**
      * Computes the current viewport state from the given fragment. Must be called on the UI
-     * thread. Returns {@code null} if the primary page is not visible / laid out yet.
+     * thread. Returns {@code null} only when there is no page to report on at all; a page that is
+     * momentarily off screen still reports, with an empty visiblePdfRect.
      */
     @Nullable
     private ViewportData computeViewportData(@NonNull PdfFragment pdfFragment) {
@@ -1592,10 +1596,15 @@ public class PdfView extends FrameLayout {
             return null;
         }
 
-        // Visible PDF rect (already in PDF coordinates). Returns false when the page is not visible.
+        // Visible PDF rect (already in PDF coordinates). Returns false when the page is not
+        // visible, which happens for a frame or two during a fling while getPageIndex still
+        // names the departing page. Report an empty rect and carry on rather than dropping the
+        // update: the offset, the scale and the page size all still describe where the page sits,
+        // iOS behaves the same way, and the payload documents the all-zero rect as the signal.
         RectF visibleRect = new RectF();
-        if (!pdfFragment.getVisiblePdfRect(visibleRect, pageIndex)) {
-            return null;
+        boolean pageIsOnScreen = pdfFragment.getVisiblePdfRect(visibleRect, pageIndex);
+        if (!pageIsOnScreen) {
+            visibleRect.setEmpty();
         }
 
         float density = getResources().getDisplayMetrics().density;
@@ -1607,12 +1616,31 @@ public class PdfView extends FrameLayout {
         data.pageIndex = pageIndex;
         data.documentID = doc.getDocumentIdString();
         data.zoomScale = pdfFragment.getZoomScale(pageIndex);
-        // Normalize so serialization matches iOS (x = minX, y = minY).
-        data.visiblePdfRect.set(
+        // Page extent in PDF points. getPageSize accounts for page rotation, matching iOS's
+        // pageInfo.size, so on both platforms the page spans (0, 0) to this size in the PDF
+        // coordinate space the conversion methods work in.
+        Size pageSize = doc.getPageSize(pageIndex);
+        data.pageWidth = pageSize.width;
+        data.pageHeight = pageSize.height;
+
+        // Normalize so serialization matches iOS (x = minX, y = minY), and clip to the page.
+        // getVisiblePdfRect is already page-clipped, but its projection leaves a sub-point
+        // overshoot that grows with the page size (1.6 pt on a 2592 pt page), and the payload
+        // documents this rect as never reaching past the page. Intersected rather than clamped
+        // edge by edge: when the page is reduced to a sliver at the edge of the viewport the
+        // overshoot can carry the whole rect past the page, and independent clamps then invert
+        // it (left 595.8 against right 595.3) for a negative width.
+        RectF normalizedPdfRect = new RectF(
             Math.min(visibleRect.left, visibleRect.right),
             Math.min(visibleRect.top, visibleRect.bottom),
             Math.max(visibleRect.left, visibleRect.right),
             Math.max(visibleRect.top, visibleRect.bottom));
+        if (!data.visiblePdfRect.setIntersect(
+                normalizedPdfRect, new RectF(0f, 0f, pageSize.width, pageSize.height))) {
+            // Nothing of the page is left once the overshoot is taken off. Report an empty
+            // rect, as iOS does, rather than an inverted one.
+            data.visiblePdfRect.setEmpty();
+        }
 
         // Content offset: screen-space (dp) position of the page's visual top-left, negated.
         // (0, pageSize.height) is the PDF-native (bottom-left, y-up) top-left; toViewPoint's
@@ -1620,10 +1648,28 @@ public class PdfView extends FrameLayout {
         // in view (y-down) space that iOS's equivalent computes (RCTPSPDFKitView.m,
         // computeViewportPageView) via pageView's own plain UIKit bounds. Both platforms
         // compute the same quantity here.
-        Size pageSize = doc.getPageSize(pageIndex);
         PointF pageTopLeft = new PointF(0f, pageSize.height);
         pdfFragment.getViewProjection().toViewPoint(pageTopLeft, pageIndex); // -> view pixels
         data.contentOffset.set(-pageTopLeft.x / density, -pageTopLeft.y / density);
+
+        // Screen points (dp) per PDF point, probed through the same ViewProjection the
+        // convertPointToScreen family uses, so a position derived from this scale in JS agrees
+        // with those methods by construction rather than by assumption.
+        PointF pdfSpaceOrigin = new PointF(0f, 0f);
+        PointF pdfSpaceUnitX = new PointF(1f, 0f);
+        pdfFragment.getViewProjection().toViewPoint(pdfSpaceOrigin, pageIndex); // -> view pixels
+        pdfFragment.getViewProjection().toViewPoint(pdfSpaceUnitX, pageIndex); // -> view pixels
+        data.pdfToScreenScale = (float) Math.hypot(
+            pdfSpaceUnitX.x - pdfSpaceOrigin.x, pdfSpaceUnitX.y - pdfSpaceOrigin.y) / density;
+
+        // The projection is what every other spatial field here is built from, so a scale that is
+        // zero, negative or not a number means the fragment is not laid out yet and the rest of
+        // the payload describes nothing. Report no state rather than plausible-looking geometry:
+        // an off-screen page is a real state worth emitting, an unlaid-out one is not. Also keeps
+        // the payload's own contract, which tells consumers to derive positions from this scale.
+        if (!(data.pdfToScreenScale > 0f)) {
+            return null;
+        }
 
         data.viewportWidth = getWidth() / density;
         data.viewportHeight = getHeight() / density;
@@ -1636,6 +1682,7 @@ public class PdfView extends FrameLayout {
         json.put("documentID", data.documentID);
         json.put("pageIndex", data.pageIndex);
         json.put("zoomScale", data.zoomScale);
+        json.put("pdfToScreenScale", data.pdfToScreenScale);
 
         JSONObject rect = new JSONObject();
         rect.put("x", data.visiblePdfRect.left);
@@ -1643,6 +1690,11 @@ public class PdfView extends FrameLayout {
         rect.put("width", data.visiblePdfRect.width());
         rect.put("height", data.visiblePdfRect.height());
         json.put("visiblePdfRect", rect);
+
+        JSONObject pageSize = new JSONObject();
+        pageSize.put("width", data.pageWidth);
+        pageSize.put("height", data.pageHeight);
+        json.put("pageSize", pageSize);
 
         JSONObject offset = new JSONObject();
         offset.put("x", data.contentOffset.x);
@@ -1679,7 +1731,8 @@ public class PdfView extends FrameLayout {
             : getId();
         NutrientNotificationCenter.INSTANCE.documentViewportChanged(
             data.pageIndex, data.zoomScale, data.visiblePdfRect, data.contentOffset,
-            data.viewportWidth, data.viewportHeight, data.documentID, componentId);
+            data.viewportWidth, data.viewportHeight, data.pdfToScreenScale,
+            data.pageWidth, data.pageHeight, data.documentID, componentId);
     }
 
     /** Produces a viewport/coordinate JSONObject from an available PdfFragment. */

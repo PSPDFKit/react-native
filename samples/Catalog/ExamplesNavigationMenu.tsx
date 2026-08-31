@@ -160,6 +160,15 @@ export default [
     },
   },
   {
+    key: 'customOverlays',
+    name: 'Custom Overlays',
+    description:
+      'Render your own React Native components anchored to positions in the document, kept in sync with pan and zoom.',
+    action: (component: any) => {
+      component.props.navigation.push('CustomOverlays');
+    },
+  },
+  {
     key: 'item14',
     name: 'Custom Font Picker',
     description:

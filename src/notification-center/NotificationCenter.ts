@@ -353,17 +353,45 @@ const isNA: boolean = isNewArchitectureEnabled();
      */
     export type PdfRect = { x: number; y: number; width: number; height: number };
 
+    /**
+     * Size expressed in the document (PDF) coordinate space, in PDF points.
+     */
+    export type PdfSize = { width: number; height: number };
+
     export type DocumentViewportChangedPayload = {
       event: typeof DocumentEvent.VIEWPORT_CHANGED;
       /** Identifier of the document currently displayed. */
       documentID: string;
       /** The primary (most visible) page index for which `visiblePdfRect` is reported. */
       pageIndex: number;
-      /** Current zoom factor of the view. */
+      /**
+       * Current zoom factor of the view, relative to the zoom level at which the page fits
+       * the viewport. It is `1` at the fitting zoom level, so it is *not* the ratio between
+       * PDF points and screen points: use `pdfToScreenScale` for that.
+       */
       zoomScale: number;
-      /** Visible region of `pageIndex`, expressed in PDF points. */
+      /**
+       * Screen points per PDF point on `pageIndex`, at the current zoom level. Multiplying a
+       * distance in PDF points by this value gives the distance on screen.
+       */
+      pdfToScreenScale: number;
+      /**
+       * Visible region of `pageIndex`, expressed in PDF points and clipped to the page, so it
+       * is never larger than `pageSize` and never has a negative origin. Its origin is the
+       * PDF's bottom-left, so `y` is the distance from the bottom of the page. All zeros while
+       * the reported page is momentarily off screen, which can happen for a frame or two during
+       * a fling; the other fields stay valid.
+       */
       visiblePdfRect: PdfRect;
-      /** Content offset of the scroll view, in screen points. */
+      /** Size of `pageIndex`, in PDF points. Accounts for page rotation. */
+      pageSize: PdfSize;
+      /**
+       * Content offset of the scroll view, in screen points, relative to `pageIndex`'s
+       * top-left: a `y` of `40` means the page's top edge sits 40 points above the top of the
+       * viewport. Since `pageIndex` is whichever page is currently anchored, this jumps
+       * discontinuously when the anchor page changes, e.g. scrolling past a page boundary. It
+       * is not a document-absolute offset.
+       */
       contentOffset: { x: number; y: number };
       /** Size of the viewport, in screen points. */
       viewportSize: { width: number; height: number };

@@ -44,6 +44,17 @@
 @property (nonatomic, strong) NSMutableDictionary<NSString *, NSDictionary *> *pendingSignaturePresentationInfo;
 @property (nonatomic) BOOL isReplayingSignaturePad;
 @property (nonatomic, copy, nullable) NSString *lastTappedSignatureFieldName;
+/// Whether the one-time setup in documentDidFinishRendering: has already run for this view.
+@property (nonatomic) BOOL hasFinishedInitialRendering;
+/// The document whose load has already been reported, so that each document this view shows
+/// reports exactly once. Weak: this is only ever compared, never dereferenced after the fact, and
+/// it must not keep a replaced document alive. A replaced document going away only nils this out,
+/// which reads as "not the current one" and is the right answer. See reportDocumentLoadedIfNeeded.
+@property (nonatomic, weak, nullable) PSPDFDocument *lastReportedLoadedDocument;
+/// Whether any document load has been reported yet. Separate from lastReportedLoadedDocument
+/// because that one is weak, so it cannot tell a first load from a swap whose predecessor has
+/// already been deallocated. See reportDocumentLoadedIfNeeded.
+@property (nonatomic) BOOL hasReportedDocumentLoad;
 
 @end
 
@@ -71,8 +82,8 @@
 
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(spreadIndexDidChange:) name:PSPDFDocumentViewControllerSpreadIndexDidChangeNotification object:nil];
       
-    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(documentDidFinishRendering) name:PSPDFDocumentViewControllerDidConfigureSpreadViewNotification object:nil];
-      
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(documentDidFinishRendering:) name:PSPDFDocumentViewControllerDidConfigureSpreadViewNotification object:nil];
+
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(bookmarksDidChange:)
                                                  name:PSPDFBookmarksChangedNotification
@@ -871,17 +882,38 @@ static BOOL RCTPSPDFControllerIsSignatureUI(UIViewController *controller) {
 }
 
 /// Computes the spatial values shared by the viewport event and getViewportState.
-/// Returns NO (and leaves out-params untouched) when no page is currently visible.
+/// Returns NO (and leaves out-params untouched) when there is no page view to report on at all,
+/// or when it is not laid out yet. A page view that is momentarily off screen still reports, with
+/// an empty visiblePdfRect.
 - (BOOL)computeViewportPageView:(PSPDFPageView *_Nullable *_Nullable)outPageView
                  visiblePdfRect:(CGRect *_Nullable)outVisibleRect
-                  contentOffset:(CGPoint *_Nullable)outContentOffset {
+                  contentOffset:(CGPoint *_Nullable)outContentOffset
+               pdfToScreenScale:(CGFloat *_Nullable)outPdfToScreenScale
+                       pageSize:(CGSize *_Nullable)outPageSize {
     PSPDFPageView *pageView = [self primaryVisiblePageView];
-    if (pageView == nil) {
+    PSPDFPageInfo *pageInfo = pageView.pageInfo;
+    if (pageView == nil || pageInfo == nil) {
         return NO;
     }
+    // The page's extent in the coordinate space pdfCoordinateSpace works in: pageInfo.size
+    // already accounts for page rotation and the CropBox, so the page always spans (0, 0) to
+    // size there regardless of the raw PDF boxes.
+    CGSize pageSize = pageInfo.size;
     // Visible region of the page, in PDF points. pdfCoordinateSpace's origin is the PDF's
-    // bottom-left, per PSPDFPageView.h.
-    CGRect visiblePdfRect = [self convertRect:self.bounds toCoordinateSpace:pageView.pdfCoordinateSpace];
+    // bottom-left, per PSPDFPageView.h. The conversion is a plain affine map of the whole
+    // viewport, so on its own it can reach well past the page (negative origin, height larger
+    // than the page). Clip it to the page so the field means the visible region of this page,
+    // which is what it documents and what Android's page-clipped getVisiblePdfRect returns.
+    CGRect viewportInPdfSpace = [self convertRect:self.bounds toCoordinateSpace:pageView.pdfCoordinateSpace];
+    CGRect visiblePdfRect = CGRectIntersection(viewportInPdfSpace, CGRectMake(0.0, 0.0, pageSize.width, pageSize.height));
+    if (CGRectIsNull(visiblePdfRect) || CGRectIsEmpty(visiblePdfRect)) {
+        // None of the page is on screen, or the view has no size yet. CGRectIntersection hands
+        // back CGRectNull for a miss, whose origin is infinite, so normalize to zero. Everything
+        // else here still describes where the page sits, and primaryVisiblePageView can hold a
+        // page that has just left the screen for a frame or two during a fling, so dropping the
+        // whole event would stall the overlay exactly when it is moving fastest.
+        visiblePdfRect = CGRectZero;
+    }
     // Screen-space offset of the page's top-left relative to the viewport, in points.
     // Deliberately NOT pdfCoordinateSpace here: CGPointZero is pageView's own bounds origin
     // (plain UIKit, top-left, y-down — PSPDFPageView doesn't override view geometry), matching
@@ -889,9 +921,27 @@ static BOOL RCTPSPDFControllerIsSignatureUI(UIViewController *controller) {
     // through the page's y-flipping transform into the same top-left, y-down convention before
     // negating. Both platforms compute the same quantity here.
     CGPoint pageTopLeftInView = [pageView convertPoint:CGPointZero toView:self];
+    // Screen points per PDF point, probed through the same coordinate-space conversion the
+    // convertPointToScreen family uses, so a position derived from this scale in JS agrees with
+    // those methods by construction rather than by assumption.
+    CGPoint pdfSpaceOrigin = [self convertPoint:CGPointZero fromCoordinateSpace:pageView.pdfCoordinateSpace];
+    CGPoint pdfSpaceUnitX = [self convertPoint:CGPointMake(1.0, 0.0) fromCoordinateSpace:pageView.pdfCoordinateSpace];
+    CGFloat pdfToScreenScale = hypot(pdfSpaceUnitX.x - pdfSpaceOrigin.x, pdfSpaceUnitX.y - pdfSpaceOrigin.y);
+    // The conversion every other spatial field here is built from, so a scale that is zero,
+    // negative or not a number means the page view is not laid out yet and the rest of the
+    // payload describes nothing. Report no state rather than plausible-looking geometry: an
+    // off-screen page is a real state worth emitting, an unlaid-out one is not, and letting it
+    // through would resolve getViewportState truthily, stopping the overlay's retry loop while
+    // computeOverlayItemScreenPoint rejects the same scale and keeps every item on the slow
+    // path. Matches PdfView.computeViewportData on Android.
+    if (!(pdfToScreenScale > 0.0)) {
+        return NO;
+    }
     if (outPageView) { *outPageView = pageView; }
     if (outVisibleRect) { *outVisibleRect = visiblePdfRect; }
     if (outContentOffset) { *outContentOffset = CGPointMake(-pageTopLeftInView.x, -pageTopLeftInView.y); }
+    if (outPdfToScreenScale) { *outPdfToScreenScale = pdfToScreenScale; }
+    if (outPageSize) { *outPageSize = pageSize; }
     return YES;
 }
 
@@ -902,7 +952,13 @@ static BOOL RCTPSPDFControllerIsSignatureUI(UIViewController *controller) {
     PSPDFPageView *pageView = nil;
     CGRect visiblePdfRect = CGRectZero;
     CGPoint contentOffset = CGPointZero;
-    if (![self computeViewportPageView:&pageView visiblePdfRect:&visiblePdfRect contentOffset:&contentOffset]) {
+    CGFloat pdfToScreenScale = 1.0;
+    CGSize pageSize = CGSizeZero;
+    if (![self computeViewportPageView:&pageView
+                       visiblePdfRect:&visiblePdfRect
+                        contentOffset:&contentOffset
+                     pdfToScreenScale:&pdfToScreenScale
+                             pageSize:&pageSize]) {
         return;
     }
     NSString *documentID = self.pdfController.document.documentIdString ?: @"";
@@ -911,6 +967,8 @@ static BOOL RCTPSPDFControllerIsSignatureUI(UIViewController *controller) {
                                                             visiblePdfRect:visiblePdfRect
                                                              contentOffset:contentOffset
                                                               viewportSize:self.bounds.size
+                                                          pdfToScreenScale:pdfToScreenScale
+                                                                  pageSize:pageSize
                                                                 documentID:documentID
                                                                componentID:self.componentID];
 }
@@ -919,7 +977,13 @@ static BOOL RCTPSPDFControllerIsSignatureUI(UIViewController *controller) {
     PSPDFPageView *pageView = nil;
     CGRect visiblePdfRect = CGRectZero;
     CGPoint contentOffset = CGPointZero;
-    if (![self computeViewportPageView:&pageView visiblePdfRect:&visiblePdfRect contentOffset:&contentOffset]) {
+    CGFloat pdfToScreenScale = 1.0;
+    CGSize pageSize = CGSizeZero;
+    if (![self computeViewportPageView:&pageView
+                       visiblePdfRect:&visiblePdfRect
+                        contentOffset:&contentOffset
+                     pdfToScreenScale:&pdfToScreenScale
+                             pageSize:&pageSize]) {
         return nil;
     }
     NSString *documentID = self.pdfController.document.documentIdString ?: @"";
@@ -928,10 +992,12 @@ static BOOL RCTPSPDFControllerIsSignatureUI(UIViewController *controller) {
         @"documentID": documentID,
         @"pageIndex": @(pageView.pageIndex),
         @"zoomScale": @(self.currentZoomScale),
+        @"pdfToScreenScale": @(pdfToScreenScale),
         @"visiblePdfRect": @{ @"x": @(CGRectGetMinX(visiblePdfRect)),
                               @"y": @(CGRectGetMinY(visiblePdfRect)),
                               @"width": @(CGRectGetWidth(visiblePdfRect)),
                               @"height": @(CGRectGetHeight(visiblePdfRect)) },
+        @"pageSize": @{ @"width": @(pageSize.width), @"height": @(pageSize.height) },
         @"contentOffset": @{ @"x": @(contentOffset.x), @"y": @(contentOffset.y) },
         @"viewportSize": @{ @"width": @(CGRectGetWidth(self.bounds)),
                             @"height": @(CGRectGetHeight(self.bounds)) },
@@ -1129,13 +1195,63 @@ static BOOL RCTPSPDFControllerIsSignatureUI(UIViewController *controller) {
     
 }
 
-- (void)documentDidFinishRendering {
+/// Reports the current document as loaded, unless this view has reported it already.
+///
+/// The load path has four exits — the delegate and the onDocumentLoaded prop, plus the deferred
+/// version of each in processPendingCallbacks: — and each of them used to emit unguarded. That
+/// emits once per load today only because the two are mutually exclusive by architecture: the
+/// delegate is set from NutrientView.mm and the prop block only ever from the legacy view
+/// manager. Nothing states that anywhere, and a subscriber that sees the event twice reacts by
+/// dropping its viewport and re-pulling, which for NutrientOverlay means blanking every item in
+/// between. Guarding here makes once-per-document a property of this method rather than of the
+/// bridge's wiring.
+- (void)reportDocumentLoadedIfNeeded {
+    PSPDFDocument *document = _pdfController.document;
+    if (document == nil || document == self.lastReportedLoadedDocument) {
+        return;
+    }
+    BOOL isReplacement = self.hasReportedDocumentLoad;
+    self.lastReportedLoadedDocument = document;
+    self.hasReportedDocumentLoad = YES;
+    if (isReplacement) {
+        // A swapped-in document lays out at its own fit zoom, but didUpdateZoomScale:forSpreadAtIndex:
+        // is not called for that, so the cache would keep whatever the previous document was
+        // zoomed to. Positions stay right either way because they come from the live-probed
+        // pdfToScreenScale, but NutrientOverlay scales every item by this. Reset before
+        // reporting, since reporting is what sends JS back for a viewport state.
+        // Fit is the right value for the `document` prop, the only way in from React Native. A
+        // view state applying its own zoom before the load is reported would need the real one.
+        _currentZoomScale = 1.0;
+    }
+    [NutrientNotificationCenter.shared documentLoadedWithDocumentID:document.documentIdString componentID:self.componentID];
+}
+
+- (void)documentDidFinishRendering:(NSNotification *)notification {
+    // Posted for every spread view configured anywhere in the process, and this observer is no
+    // longer removed after the first one (see below), so without a filter a sibling view's
+    // rendering would run all of this against this view's document. PSPDFViewController's own
+    // didConfigureSpreadView: filters the same way.
+    if (notification.object != _pdfController.documentViewController) {
+        return;
+    }
+    // Re-asserted on every spread view because a document swap can bring a new
+    // documentViewController, and the viewport events are driven by its delegate callbacks.
+    // Assigning the same delegate again costs nothing.
     _pdfController.documentViewController.delegate = self;
-    // Remove observer after the initial notification
-    [NSNotificationCenter.defaultCenter removeObserver:self
-                                                  name:PSPDFDocumentViewControllerDidConfigureSpreadViewNotification
-                                                object:nil];
-    
+
+    // The observer used to be torn down here, after the first notification. It now stays for the
+    // lifetime of the view, because a document set later through the `document` prop has to
+    // report as loaded too, as it does on Android; otherwise nothing tracking document changes
+    // hears about a swap, and NutrientOverlay goes on placing items with the previous document's
+    // page size. Everything below this guard is initial-view setup and still runs exactly once,
+    // so the onDocumentLoaded and onReady prop callbacks keep their existing behaviour and only
+    // the NotificationCenter event repeats.
+    if (_hasFinishedInitialRendering) {
+        [self reportDocumentLoadedIfNeeded];
+        return;
+    }
+    _hasFinishedInitialRendering = YES;
+
     // For New Architecture (Fabric), check if event emitter is ready before calling delegate
     BOOL shouldCallDelegate = YES;
     if ([self.delegate respondsToSelector:@selector(isEventEmitterReady)]) {
@@ -1145,7 +1261,7 @@ static BOOL RCTPSPDFControllerIsSignatureUI(UIViewController *controller) {
     if ([self.delegate respondsToSelector:@selector(pspdfViewDidDocumentLoad:)]) {
         if (shouldCallDelegate) {
             [self.delegate pspdfViewDidDocumentLoad:self];
-            [NutrientNotificationCenter.shared documentLoadedWithDocumentID:_pdfController.document.documentIdString componentID:self.componentID];
+            [self reportDocumentLoadedIfNeeded];
         } else {
             [_sessionStorage addPendingCallback:CallbackTypeOnDocumentLoaded];
         }
@@ -1166,7 +1282,7 @@ static BOOL RCTPSPDFControllerIsSignatureUI(UIViewController *controller) {
         
         if (self.onDocumentLoaded) {
             self.onDocumentLoaded(@{});
-            [NutrientNotificationCenter.shared documentLoadedWithDocumentID:_pdfController.document.documentIdString componentID:self.componentID];
+            [self reportDocumentLoadedIfNeeded];
         }
     } else {
         [_sessionStorage addPendingCallback:CallbackTypeOnReady];
@@ -1403,11 +1519,11 @@ static BOOL RCTPSPDFControllerIsSignatureUI(UIViewController *controller) {
             case CallbackTypeOnDocumentLoaded:
                 if ([self.delegate respondsToSelector:@selector(pspdfViewDidDocumentLoad:)]) {
                     [self.delegate pspdfViewDidDocumentLoad:self];
-                    [NutrientNotificationCenter.shared documentLoadedWithDocumentID:_pdfController.document.documentIdString componentID:self.componentID];
+                    [self reportDocumentLoadedIfNeeded];
                 }
                 if (self.onDocumentLoaded) {
                     self.onDocumentLoaded(@{});
-                    [NutrientNotificationCenter.shared documentLoadedWithDocumentID:_pdfController.document.documentIdString componentID:self.componentID];
+                    [self reportDocumentLoadedIfNeeded];
                 }
                 break;
                 

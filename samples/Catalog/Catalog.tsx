@@ -15,6 +15,7 @@ import { Platform } from 'react-native';
 import { AnnotationPresetCustomization } from './examples/AnnotationPresetCustomization';
 import { AnnotationProcessing } from './examples/AnnotationProcessing';
 import { CustomFontPicker } from './examples/CustomFontPicker';
+import { CustomOverlays } from './examples/CustomOverlays';
 import { EventListeners } from './examples/EventListeners';
 import { GeneratePDF } from './examples/GeneratePDF';
 import GeneratePDFMenu from './examples/GeneratePDFMenu';
@@ -117,6 +118,7 @@ class Catalog extends React.Component {
           <Stack.Screen name="HiddenToolbar" component={HiddenToolbar} />
           <Stack.Screen name="ScrollOnEdgeTap" component={ScrollOnEdgeTap} />
           <Stack.Screen name="CustomFontPicker" component={CustomFontPicker} />
+          <Stack.Screen name="CustomOverlays" component={CustomOverlays} />
           <Stack.Screen name="GeneratePDFMenu" component={GeneratePDFMenu} />
           <Stack.Screen name="GeneratePDF" component={GeneratePDF} />
           <Stack.Screen

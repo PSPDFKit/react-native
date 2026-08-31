@@ -143,6 +143,9 @@ object NutrientNotificationCenter {
         contentOffset: PointF,
         viewportWidth: Float,
         viewportHeight: Float,
+        pdfToScreenScale: Float,
+        pageWidth: Float,
+        pageHeight: Float,
         documentID: String,
         componentID: Int
     ) {
@@ -150,6 +153,7 @@ object NutrientNotificationCenter {
         jsonData.putString("event", NotificationEvent.DOCUMENT_VIEWPORT_CHANGED.value)
         jsonData.putInt("pageIndex", pageIndex)
         jsonData.putDouble("zoomScale", zoomScale.toDouble())
+        jsonData.putDouble("pdfToScreenScale", pdfToScreenScale.toDouble())
 
         val visibleRectMap = Arguments.createMap()
         visibleRectMap.putDouble("x", visiblePdfRect.left.toDouble())
@@ -157,6 +161,11 @@ object NutrientNotificationCenter {
         visibleRectMap.putDouble("width", visiblePdfRect.width().toDouble())
         visibleRectMap.putDouble("height", visiblePdfRect.height().toDouble())
         jsonData.putMap("visiblePdfRect", visibleRectMap)
+
+        val pageSizeMap = Arguments.createMap()
+        pageSizeMap.putDouble("width", pageWidth.toDouble())
+        pageSizeMap.putDouble("height", pageHeight.toDouble())
+        jsonData.putMap("pageSize", pageSizeMap)
 
         val contentOffsetMap = Arguments.createMap()
         contentOffsetMap.putDouble("x", contentOffset.x.toDouble())
