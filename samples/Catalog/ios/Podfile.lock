@@ -8,7 +8,7 @@ PODS:
   - hermes-engine (0.14.1):
     - hermes-engine/Pre-built (= 0.14.1)
   - hermes-engine/Pre-built (0.14.1)
-  - Instant (26.11.0)
+  - Instant (26.12.0-dev)
   - nutrient-sdk-react-native (4.5.1):
     - boost
     - DoubleConversion
@@ -16,8 +16,8 @@ PODS:
     - fmt
     - glog
     - hermes-engine
-    - Instant (= 26.11.0)
-    - PSPDFKit (= 26.11.0)
+    - Instant
+    - PSPDFKit
     - RCT-Folly
     - RCT-Folly/Fabric
     - RCTRequired
@@ -39,9 +39,9 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - PSPDFKit (26.11.0):
-    - PSPDFKit/Core (= 26.11.0)
-  - PSPDFKit/Core (26.11.0)
+  - PSPDFKit (26.12.0-dev):
+    - PSPDFKit/Core (= 26.12.0-dev)
+  - PSPDFKit/Core (26.12.0-dev)
   - RCT-Folly (2024.11.18.00):
     - boost
     - DoubleConversion
@@ -2699,7 +2699,9 @@ DEPENDENCIES:
   - fmt (from `../node_modules/react-native/third-party-podspecs/fmt.podspec`)
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
   - hermes-engine (from `../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec`)
+  - Instant (from `https://my.nutrient.io/instant/nightly.podspec`)
   - "nutrient-sdk-react-native (from `../node_modules/@nutrient-sdk/react-native`)"
+  - PSPDFKit (from `https://my.nutrient.io/pspdfkit-ios/nightly.podspec`)
   - RCT-Folly (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCTDeprecation (from `../node_modules/react-native/ReactApple/Libraries/RCTFoundation/RCTDeprecation`)
   - RCTRequired (from `../node_modules/react-native/Libraries/Required`)
@@ -2780,8 +2782,6 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
-    - Instant
-    - PSPDFKit
     - SocketRocket
 
 EXTERNAL SOURCES:
@@ -2800,8 +2800,12 @@ EXTERNAL SOURCES:
   hermes-engine:
     :podspec: "../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec"
     :tag: hermes-v0.14.1
+  Instant:
+    :podspec: https://my.nutrient.io/instant/nightly.podspec
   nutrient-sdk-react-native:
     :path: "../node_modules/@nutrient-sdk/react-native"
+  PSPDFKit:
+    :podspec: https://my.nutrient.io/pspdfkit-ios/nightly.podspec
   RCT-Folly:
     :podspec: "../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec"
   RCTDeprecation:
@@ -2960,10 +2964,10 @@ SPEC CHECKSUMS:
   FBLazyVector: 7f47b3463fec4f3acdd9a7e24741908b9c5b493b
   fmt: 530618a01105dae0fa3a2f27c81ae11fa8f67eac
   glog: 5683914934d5b6e4240e497e0f4a3b42d1854183
-  hermes-engine: b2e13ce1c31781b8c813d1df83823d2af94c70ad
-  Instant: 5ffb798a318b7806c1afd1051d1436dd923612c6
-  nutrient-sdk-react-native: 0e76b17b136ed41ccbe50021d22845191c569156
-  PSPDFKit: 2bfec2c7a2b76de001295685e0e831ff4caac75e
+  hermes-engine: f689c4e26f136a84c3f0698ae3e298458d55e60a
+  Instant: ce339252c5194283a588da8b200a64b981c579d8
+  nutrient-sdk-react-native: d420d1dee57dfe21bb285f9bdc00cc52be06e441
+  PSPDFKit: e85d3ff8d780360143f1af7df549959c213a7ffc
   RCT-Folly: b29feb752b08042c62badaef7d453f3bb5e6ae23
   RCTDeprecation: 66da7829306a6741edb3f866687c13a4938ca5f4
   RCTRequired: c6853c7a563306968f833210c476741e09fc5f61
@@ -3041,6 +3045,6 @@ SPEC CHECKSUMS:
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   Yoga: 897e8c1fb1fd80c3c01231ed4ec8c1ffa652c29f
 
-PODFILE CHECKSUM: 15a803dd005df51c73e8bdc6743f55cca97a3bed
+PODFILE CHECKSUM: 81cd551781d960241ce56e2879ad0f44d1920dc2
 
 COCOAPODS: 1.15.2
