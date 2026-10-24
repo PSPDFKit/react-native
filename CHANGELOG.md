@@ -1,3 +1,9 @@
+- Ships R8 keep rules with the Android module for the turbo modules and Fabric view managers it creates by reflection, and the class names the Nutrient Android SDK uses to detect React Native. Release builds no longer depend on the Android SDK's own rules keeping everything under `com.pspdfkit` and `io.nutrient`. (L#AND-2184)
+- Logs a warning on iOS when `aiAssistantConfiguration` is missing `serverURL`, `jwt` or `sessionID`, or has a `serverURL` that isn't a valid URL. With Nutrient iOS SDK 27, AI Assistant then uses the on-device language model instead of a server. (L#HYB-1121)
+- Updates for Nutrient iOS SDK 27.1.0, which requires Xcode 27. Apps built with Xcode 27 must use the UIScene life cycle, or they fail to launch on iOS 27; the Catalog's `SceneDelegate.swift` shows how to start React Native from a scene. (L#HYB-1120)
+- Fixes an issue on Android where `selectAnnotations` ignored `showContextualMenu`, so the annotation contextual menu was not shown after a programmatic selection. (L#HYB-1118)
+- Updates the Catalog example to the UIScene life cycle, which apps built with Xcode 27 need to launch on iOS 27. (L#HYB-1119)
+
 ## 4.5.1 — 31 Aug 2026
 
 - Adds `pdfToScreenScale` and `pageSize` to the `documentViewportChanged` payload and `getViewportState`, for converting a PDF point to screen coordinates in JavaScript. (J#HYB-1032)

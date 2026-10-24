@@ -733,7 +733,10 @@ RCT_MULTI_ENUM_CONVERTER(PSPDFDocumentSharingPagesOptions,
   SET_PROPERTY(showThumbnailBar, thumbnailBarMode, PSPDFThumbnailBarMode)
     
   if (dictionary[@"aiAssistantConfiguration"]) {
-      [AIAConfig processAIAConfig:self aiaConfig:dictionary[@"aiAssistantConfiguration"]];
+      NSString *warning = [AIAConfig processAIAConfig:self aiaConfig:dictionary[@"aiAssistantConfiguration"]];
+      if (warning) {
+          RCTLogWarn(@"%@", warning);
+      }
   }
 }
 

@@ -42,10 +42,12 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 import java.util.EnumSet
+import java.util.WeakHashMap
 import androidx.core.graphics.toColorInt
 import java.lang.ref.WeakReference
 import com.pspdfkit.views.PdfView
 import com.pspdfkit.ui.PdfFragment
+import com.pspdfkit.ui.annotations.OnAnnotationSelectedListener
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -75,6 +77,8 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
 
     private val documents = ConcurrentHashMap<Int, DocumentData>()
     private val documentConfigurations = ConcurrentHashMap<Int, MutableMap<String, Any>>()
+    // Main thread only, at most one deferred popup toolbar request per fragment.
+    private val pendingPopupToolbarListeners = WeakHashMap<PdfFragment, OnAnnotationSelectedListener>()
 
     override fun getName(): String {
         return NAME
@@ -876,9 +880,11 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
                     .subscribe(
                         { pdfFragment ->
                             try {
+                                cancelPendingPopupToolbar(pdfFragment)
                                 pdfFragment.setSelectedAnnotations(annotationsToSelect)
-                                // Nutrient 11.3+: Annotation editing is handled by the annotation popup toolbar, which
-                                // is shown automatically for selected annotations when annotation editing is enabled.
+                                if (showContextualMenu) {
+                                    showPopupToolbarOnceSelected(pdfFragment, annotationsToSelect)
+                                }
                                 promise.resolve(true)
                             } catch (e: Exception) {
                                 promise.reject("selectAnnotations", e.message ?: "Failed to select annotations")
@@ -908,6 +914,7 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
             .subscribe(
                 { pdfFragment ->
                     try {
+                        cancelPendingPopupToolbar(pdfFragment)
                         pdfFragment.clearSelectedAnnotations()
                         promise.resolve(true)
                     } catch (e: Exception) {
@@ -918,6 +925,37 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
                     promise.reject("clearSelectedAnnotations", throwable.message ?: throwable.toString())
                 }
             )
+    }
+
+    // The popup toolbar only shows itself for a tap, and a selection on an unbound page lands later.
+    private fun showPopupToolbarOnceSelected(pdfFragment: PdfFragment, annotations: List<Annotation>) {
+        if (annotations.isEmpty()) return
+        if (pdfFragment.selectedAnnotations.containsAll(annotations)) {
+            pdfFragment.showAnnotationPopupToolbar()
+            return
+        }
+        // Waits for a selection that includes every requested annotation, until a newer request or a clear replaces it.
+        // Held weakly so the listener does not keep the map's fragment key alive.
+        val fragmentRef = WeakReference(pdfFragment)
+        val listener = object : OnAnnotationSelectedListener {
+            override fun onAnnotationSelectionFinished(selected: List<Annotation>, annotationsCreated: Boolean) {
+                val fragment = fragmentRef.get() ?: return
+                val isCurrent = pendingPopupToolbarListeners[fragment] === this
+                if (isCurrent && !selected.containsAll(annotations)) return
+                // A replaced listener removes itself here, since removal before the document view is ready is a no-op.
+                fragment.removeOnAnnotationSelectedListener(this)
+                if (isCurrent) {
+                    pendingPopupToolbarListeners.remove(fragment)
+                    fragment.showAnnotationPopupToolbar()
+                }
+            }
+        }
+        pendingPopupToolbarListeners[pdfFragment] = listener
+        pdfFragment.addOnAnnotationSelectedListener(listener)
+    }
+
+    private fun cancelPendingPopupToolbar(pdfFragment: PdfFragment) {
+        pendingPopupToolbarListeners.remove(pdfFragment)?.let(pdfFragment::removeOnAnnotationSelectedListener)
     }
 
     // Helper function to apply individual properties to annotations
