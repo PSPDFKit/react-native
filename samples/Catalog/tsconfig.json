@@ -6,8 +6,13 @@
     "isolatedModules": true,
     "jsx": "react-native",
     "lib": ["esnext"],
-    "types": ["react-native", "jest"],
-    "moduleResolution": "node",
+    "types": ["jest"],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    // React Native 0.87 made the Strict TypeScript API the default. @nutrient-sdk/react-native
+    // types `NativeModules.RNProcessor` by augmenting `NativeModulesStatic`, which only the
+    // legacy types have, so opt out until the module's typings move to the strict API.
+    "customConditions": ["react-native", "react-native-legacy-deep-imports"],
     "noEmit": true,
     "strict": true,
     "target": "esnext",

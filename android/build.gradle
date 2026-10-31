@@ -19,20 +19,11 @@ ext {
 }
 
 buildscript {
+    // Nutrient's metadata is compiled with Kotlin 2.4, so an integrator's Kotlin version has to
+    // be at least that. Anything older fails to read the SDK's .kotlin_module files.
     ext.kotlin_version = rootProject.ext.has('kotlinVersion') ? rootProject.ext.kotlinVersion :
             rootProject.ext.has('kotlin_version') ? rootProject.ext.kotlin_version :
-                    '1.9.24'
-
-    ext.getComposeVersion = { kotlin_version ->
-        switch (kotlin_version) {
-            case ~/2\..*/:
-                // For Kotlin 2.x+, compose compiler is handled by the plugin
-                return null
-            case '1.9.25': return '1.5.15'
-            case '1.9.24': return '1.5.14'
-            default: return '1.5.14'
-        }
-    }
+                    '2.4.10'
 
     repositories {
         mavenCentral()
@@ -43,20 +34,43 @@ buildscript {
     }
 
     dependencies {
-        classpath("com.android.tools.build:gradle:8.5.0")
+        // Only used when this module is built on its own: inside an app, the app's Android Gradle
+        // Plugin applies. React Native 0.86 and older can't run AGP 9, because their Gradle plugin
+        // uses AGP 8-only APIs; React Native 0.87 and later can.
+        classpath("com.android.tools.build:gradle:8.13.2")
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        // Add Compose compiler plugin for Kotlin 2.0+
-        if (kotlin_version.startsWith('2')) {
-            classpath "org.jetbrains.kotlin:compose-compiler-gradle-plugin:$kotlin_version"
-        }
+        classpath "org.jetbrains.kotlin:compose-compiler-gradle-plugin:$kotlin_version"
     }
 }
 
+def nutrientVersionAtLeast = { String version, List<Integer> minimum ->
+    def parts = version.tokenize('.-').take(3).collect { it.isInteger() ? it.toInteger() : 0 }
+    while (parts.size() < 3) parts << 0
+    for (int i = 0; i < 3; i++) {
+        if (parts[i] != minimum[i]) return parts[i] > minimum[i]
+    }
+    return true
+}
+def appAgpVersion = com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION
+
 apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
-// Add Compose compiler plugin for Kotlin 2.0+
-if (kotlin_version.startsWith('2')) {
-    apply plugin: 'org.jetbrains.kotlin.plugin.compose'
+// AGP 9 compiles Kotlin itself and refuses the kotlin-android plugin, unless the app opts out with
+// `android.builtInKotlin=false` (as the React Native 0.87+ templates do).
+if (!nutrientVersionAtLeast(appAgpVersion, [9, 0, 0]) || project.findProperty('android.builtInKotlin')?.toString() == 'false') {
+    apply plugin: 'kotlin-android'
+}
+apply plugin: 'org.jetbrains.kotlin.plugin.compose'
+
+// The app's own Android Gradle Plugin and Kotlin are the ones in use, not the versions above. With
+// anything older than Nutrient needs, the build fails on `compileSdkMinor` or on Kotlin metadata,
+// neither of which says to upgrade, so say it here.
+def appKotlinVersion = org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapperKt.getKotlinPluginVersion(project)
+if (!nutrientVersionAtLeast(appAgpVersion, [8, 13, 0]) || !nutrientVersionAtLeast(appKotlinVersion, [2, 4, 10])) {
+    throw new GradleException(
+            "@nutrient-sdk/react-native needs Android Gradle Plugin 8.13 or later and Kotlin 2.4.10 or later, " +
+                    "but this build uses Android Gradle Plugin $appAgpVersion and Kotlin $appKotlinVersion. " +
+                    "Raise them in your app's Gradle files; the @nutrient-sdk/react-native changelog lists every " +
+                    "toolchain version this release needs.")
 }
 
 def isNewArchitectureEnabled() {
@@ -71,15 +85,19 @@ if (isNewArchitectureEnabled()) {
     apply plugin: "com.facebook.react"
 }
 android {
-    compileSdkVersion 34
+    compileSdk 37
+    // API 37 ships as minor platform releases; Nutrient's AAR metadata requires android-37.1,
+    // so both the major and the minor version have to be set or the build fails in
+    // checkDebugAarMetadata before any source is compiled.
+    compileSdkMinor 1
 
     namespace "com.pspdfkit.react"
 
     defaultConfig {
         minSdkVersion 24
-        targetSdkVersion 34
         versionCode 1
         versionName "1.0"
+        consumerProguardFiles "consumer-rules.pro"
     }
 
     sourceSets {
@@ -88,6 +106,9 @@ android {
             // Conditionally include newarch sources only when New Architecture is enabled
             if (isNewArchitectureEnabled()) {
                 java.srcDirs += ["src/newarch/java"]
+                // AGP 9's built-in Kotlin only takes the .java files from java.srcDirs, so without
+                // this the Fabric view managers and events would silently be left out.
+                kotlin.srcDirs += ["src/newarch/java"]
             }
         }
     }
@@ -97,7 +118,7 @@ android {
         targetCompatibility JavaVersion.VERSION_17
     }
 
-    lintOptions {
+    lint {
         abortOnError false
     }
 
@@ -105,18 +126,12 @@ android {
         buildConfig true
         compose true
     }
+}
 
-    composeOptions {
-        def composeVersion = getComposeVersion(kotlin_version)
-        if (composeVersion != null) {
-            kotlinCompilerExtensionVersion composeVersion
-        }
-        // When using Kotlin 2.0+, the kotlinCompilerExtensionVersion is handled by the plugin
-    }
-
-    kotlin {
-        jvmToolchain(17)
-    }
+// Top level, not inside `android { }`: under AGP 9 the Kotlin toolchain is configured on the
+// Kotlin extension. Nesting it only ever worked because Groovy resolved it against the project.
+kotlin {
+    jvmToolchain(17)
 }
 
 // IMPORTANT: Do not force Compose runtime versions here.

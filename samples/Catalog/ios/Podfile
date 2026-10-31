@@ -6,6 +6,8 @@ require Pod::Executable.execute_command("node", ["-p", "require.resolve('react-n
 platform :ios, "17.0"
 prepare_react_native_project!
 ENV["RCT_NEW_ARCH_ENABLED"] = "1"
+# Xcode 27 rejects non-modular React headers in RN 0.84's prebuilt core framework.
+ENV["RCT_USE_PREBUILT_RNCORE"] = "0"
 
 linkage = ENV.fetch("USE_FRAMEWORKS", nil)
 unless linkage.nil?
@@ -28,8 +30,8 @@ target "Catalog" do
     app_path: "#{Pod::Config.instance.installation_root}/.."
   )
 
-  # PSPDFKit iOS SDK version specified by Nutrient React Native Plugin. Do not remove this line.
-  # Instant iOS SDK version specified by Nutrient React Native Plugin. Do not remove this line.
+  pod "PSPDFKit", podspec: "https://my.nutrient.io/pspdfkit-ios/nightly.podspec"
+  pod "Instant", podspec: "https://my.nutrient.io/instant/nightly.podspec"
 
   target "CatalogTests" do
     inherit! :complete

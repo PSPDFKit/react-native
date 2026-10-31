@@ -1,3 +1,12 @@
+- Fixes a crash on iOS with React Native 0.88 in debug builds, where every `NutrientView` and `NutrientInstantView` failed an assertion that component views set up their default props. (L#HYB-1092)
+- Supports apps on Android Gradle Plugin 9 with its built-in Kotlin enabled. The Android module no longer applies the `kotlin-android` plugin there, and compiles its New Architecture Kotlin sources, which AGP 9 otherwise left out so that every `NutrientView` failed with "Can't find ViewManager". The Catalog now uses React Native 0.88.0, Android Gradle Plugin 9.2.1 and Gradle 9.4.1. (L#HYB-1092)
+- Ships R8 keep rules with the Android module for the turbo modules and Fabric view managers it creates by reflection, and the class names the Nutrient Android SDK uses to detect React Native. Release builds no longer depend on the Android SDK's own rules keeping everything under `com.pspdfkit` and `io.nutrient`. (L#AND-2184)
+- Logs a warning on iOS when `aiAssistantConfiguration` is missing `serverURL`, `jwt` or `sessionID`, or has a `serverURL` that isn't a valid URL. With Nutrient iOS SDK 27, AI Assistant then uses the on-device language model instead of a server. (L#HYB-1121)
+- Updates for Nutrient iOS SDK 27.1.0, which requires Xcode 27. Apps built with Xcode 27 must use the UIScene life cycle, or they fail to launch on iOS 27; the Catalog's `SceneDelegate.swift` shows how to start React Native from a scene. (L#HYB-1120)
+- Updates the Android build toolchain to `compileSdk` 37.1, Android Gradle Plugin 8.13.2, Kotlin 2.4.10 and Gradle 9.3.0, which the current Nutrient Android SDK requires. Integrators have to raise their own Android Gradle Plugin to 8.13 or later, Gradle to 9.3 or later, Kotlin to 2.4.10 or later, and set both `compileSdk 37` and `compileSdkMinor 1` in the app module. With an older Android Gradle Plugin or Kotlin, the build now stops with a message naming the versions to raise them to. (J#HYB-1087)
+- Fixes an issue on Android where `selectAnnotations` ignored `showContextualMenu`, so the annotation contextual menu was not shown after a programmatic selection. (L#HYB-1118)
+- Updates the Catalog example to the UIScene life cycle, which apps built with Xcode 27 need to launch on iOS 27. (L#HYB-1119)
+
 ## 4.5.1 — 31 Aug 2026
 
 - Adds `pdfToScreenScale` and `pageSize` to the `documentViewportChanged` payload and `getViewportState`, for converting a PDF point to screen coordinates in JavaScript. (J#HYB-1032)

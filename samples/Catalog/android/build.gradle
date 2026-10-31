@@ -3,11 +3,15 @@
 buildscript {
     ext {
         minSdkVersion = 24
+        // Read by the other React Native modules. Only the app needs android-37.1 (see
+        // app/build.gradle). At 37, every module would compile against android-37.0, which
+        // AGP 8.13 installs on demand and then fails to find ("Failed to find target with hash
+        // string 'android-37'") until the next build, so fresh CI machines could never build.
         compileSdkVersion = 36
         targetSdkVersion = 36
 
         ndkVersion = "27.1.12297006"
-        kotlinVersion = "2.2.20"
+        kotlinVersion = "2.4.10"
     }
     repositories {
         google()
@@ -15,7 +19,10 @@ buildscript {
     }
     
     dependencies {
-        classpath("com.android.tools.build:gradle:8.7.0")
+        // Nutrient Android 12's Compose dependencies need AGP 9.1 or later. Stay on 9.2.x for now:
+        // the R8 in AGP 9.3.0-9.3.3 and 9.4.0-9.4.1 (b/558217403) breaks react-native-screens'
+        // native containers in minified release builds.
+        classpath("com.android.tools.build:gradle:9.2.1")
         classpath("com.facebook.react:react-native-gradle-plugin")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
 
