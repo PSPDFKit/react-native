@@ -688,6 +688,19 @@ export const ProgrammaticAnnotations = ({ navigation }: any) => {
                 }}>
                   <Text style={styles.button}>{'Get All Annotations'}</Text>
                 </TouchableOpacity>
+                <TouchableOpacity onPress={() => {
+                  // Select all the Ink annotations on page 0 and show the annotation contextual menu.
+                  const document = pdfRef.current?.getDocument();
+                  document?.getAnnotationsForPage(0, Annotation.Type.INK)
+                    .then( async (annotations: AnnotationType[]) => {
+                      await document.selectAnnotations(annotations, true);
+                    })
+                    .catch((error: any) => {
+                      Alert.alert('Nutrient', JSON.stringify(error));
+                    });
+                }}>
+                  <Text style={styles.button}>{'Select Ink With Menu'}</Text>
+                </TouchableOpacity>
               </View>
             </View>
           </View>

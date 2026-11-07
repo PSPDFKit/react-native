@@ -303,6 +303,7 @@ public class PSPDFKitPackage extends BaseReactPackage {
             viewManagers.add(fabricManager);
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | java.lang.reflect.InvocationTargetException | NoSuchMethodException e) {
             // Fabric ViewManager not available (Legacy Architecture)
+            logIfNewArchSourcesMissing(e);
         }
         try {
             Class<?> instantFabricManagerClass = Class.forName("io.nutrient.react.fabric.ReactInstantPdfViewManagerFabric");
@@ -310,9 +311,24 @@ public class PSPDFKitPackage extends BaseReactPackage {
             viewManagers.add(instantFabricManager);
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | java.lang.reflect.InvocationTargetException | NoSuchMethodException e) {
             // Instant Fabric ViewManager not available (Legacy Architecture)
+            logIfNewArchSourcesMissing(e);
         }
 
         return viewManagers;
+    }
+
+    /**
+     * The TurboModules (Java) and the Fabric view managers (Kotlin) are both New Architecture
+     * sources. If only the TurboModules made it into the build, the Kotlin ones were dropped by the
+     * build setup, and every NutrientView would fail with "Can't find ViewManager".
+     */
+    private static void logIfNewArchSourcesMissing(Exception e) {
+        try {
+            Class.forName("io.nutrient.react.turbo.NutrientTurboModule");
+        } catch (ClassNotFoundException legacyArchitecture) {
+            return;
+        }
+        android.util.Log.e("PSPDFKitPackage", "The New Architecture is enabled, but the Fabric view manager couldn't be created.", e);
     }
 
 }

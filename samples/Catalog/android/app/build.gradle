@@ -1,8 +1,6 @@
 apply plugin: "com.android.application"
 apply plugin: "com.facebook.react"
 
-import com.android.build.OutputFile
-
 /**
  * This is the configuration block to customize your React Native Android app.
  * By default you don't need to apply any configuration, just uncomment the lines you need.
@@ -99,7 +97,10 @@ android {
 
     ndkVersion rootProject.ext.ndkVersion
 
-    compileSdkVersion rootProject.ext.compileSdkVersion
+    // Nutrient's AAR metadata requires the android-37.1 platform, so the minor version has to be
+    // set as well, or the build fails in checkDebugAarMetadata.
+    compileSdk 37
+    compileSdkMinor 1
 
     namespace "com.pspdfkit.rn"
     defaultConfig {
@@ -127,27 +128,37 @@ android {
             // see https://reactnative.dev/docs/signed-apk-android.
             signingConfig signingConfigs.debug
             minifyEnabled enableProguardInReleaseBuilds
-            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-        }
-    }
-
-    // applicationVariants are e.g. debug, release
-    applicationVariants.all { variant ->
-        variant.outputs.each { output ->
-            // For each separate APK per architecture, set a unique version code as described here:
-            // https://developer.android.com/studio/build/configure-apk-splits.html
-            // Example: versionCode 1 will generate 1001 for armeabi-v7a, 1002 for x86, etc.
-            def versionCodes = ["armeabi-v7a": 1, "x86": 2, "arm64-v8a": 3, "x86_64": 4]
-            def abi = output.getFilter(OutputFile.ABI)
-            if (abi != null) {  // null for the universal-debug, universal-release variants
-                output.versionCodeOverride =
-                        defaultConfig.versionCode * 1000 + versionCodes.get(abi)
-            }
-
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
         }
     }
 
     sourceSets { main { assets.srcDirs = ['src/main/assets', '../../../PDFs'] } }
+}
+
+// For each separate APK per architecture, set a unique version code as described here:
+// https://developer.android.com/studio/build/configure-apk-splits.html
+// Example: versionCode 1 will generate 1001 for armeabi-v7a, 1002 for x86, etc.
+//
+// `applicationVariants` is deprecated in AGP 8 and removed in AGP 9, so this goes through
+// the `androidComponents` variant API instead.
+androidComponents {
+    // Read before the variant callbacks, which run after AGP has finalized the DSL.
+    def baseVersionCode = android.defaultConfig.versionCode
+    def versionCodes = ["armeabi-v7a": 1, "x86": 2, "arm64-v8a": 3, "x86_64": 4]
+    onVariants(selector().all()) { variant ->
+        variant.outputs.each { output ->
+            def abi = output.filters.find {
+                it.filterType == com.android.build.api.variant.FilterConfiguration.FilterType.ABI
+            }?.identifier
+            // null for the universal-debug / universal-release variants.
+            if (abi == null) return
+            def offset = versionCodes.get(abi)
+            if (offset == null) {
+                throw new GradleException("No version code offset is configured for the ABI '${abi}'.")
+            }
+            output.versionCode.set(baseVersionCode * 1000 + offset)
+        }
+    }
 }
 
 dependencies {
