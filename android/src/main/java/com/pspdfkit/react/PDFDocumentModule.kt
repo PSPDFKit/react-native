@@ -29,7 +29,6 @@ import com.pspdfkit.forms.SignatureFormElement
 import com.pspdfkit.forms.TextFormElement
 import com.pspdfkit.forms.SignatureFormConfiguration
 import com.pspdfkit.forms.TextFormConfiguration
-import com.pspdfkit.internal.jni.NativeFormFlags
 import android.graphics.RectF
 import com.pspdfkit.react.helper.AnnotationUtils
 import com.pspdfkit.react.helper.BookmarkUtils
@@ -37,15 +36,15 @@ import com.pspdfkit.react.helper.ConversionHelpers.getAnnotationTypes
 import com.pspdfkit.react.helper.DocumentJsonDataProvider
 import com.pspdfkit.react.helper.FormUtils
 import com.pspdfkit.react.helper.JsonUtilities
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.schedulers.Schedulers
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 import java.util.EnumSet
+import java.util.WeakHashMap
 import androidx.core.graphics.toColorInt
 import java.lang.ref.WeakReference
 import com.pspdfkit.views.PdfView
 import com.pspdfkit.ui.PdfFragment
+import com.pspdfkit.ui.annotations.OnAnnotationSelectedListener
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -75,6 +74,8 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
 
     private val documents = ConcurrentHashMap<Int, DocumentData>()
     private val documentConfigurations = ConcurrentHashMap<Int, MutableMap<String, Any>>()
+    // Main thread only, at most one deferred popup toolbar request per fragment.
+    private val pendingPopupToolbarListeners = WeakHashMap<PdfFragment, OnAnnotationSelectedListener>()
 
     override fun getName(): String {
         return NAME
@@ -108,13 +109,7 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
                     val docData = this@PDFDocumentModule.getDocument(reference)
                     val pdfView = docData?.pdfViewRef?.get()
                     if (pdfView != null) {
-                        pdfView.getPdfFragment()
-                            .take(1)
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(
-                                { pdfFragment -> pdfFragment.notifyAnnotationHasChanged(foundAnnotation!!) },
-                                { /* Ignore errors if fragment is not available */ }
-                            )
+                        pdfView.withPdfFragment { pdfFragment -> pdfFragment.notifyAnnotationHasChanged(foundAnnotation!!) }
                     }
                 }
                 promise.resolve(foundAnnotation != null)
@@ -283,6 +278,7 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
                 promise.resolve(true)
                 return
             }
+            promise.reject("save error", "Document is nil")
         } catch (e: Throwable) {
             promise.reject("save error", e)
         }
@@ -489,7 +485,7 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
                         promise.reject(RuntimeException(e))
                     }
                 }
-            }
+            } ?: promise.reject("applyInstantJSON error", "Document is nil")
         } catch (e: Throwable) {
             promise.reject("applyInstantJSON error", e)
         }
@@ -504,31 +500,27 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
                 }
 
                 val document = it
-                XfdfFormatter.parseXfdfAsync(document, ContentResolverDataProvider((Uri.parse(importPath))))
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                        { annotations ->
-                            scope.launch {
-                                try {
-                                    withContext(Dispatchers.Default) {
-                                        for (annotation in annotations) {
-                                            document.annotationProvider.addAnnotationToPage(annotation)
-                                        }
-                                    }
-                                    val result = JSONObject()
-                                    result.put("success", true)
-                                    val jsonMap = JsonUtilities.jsonObjectToMap(result)
-                                    val nativeMap = Arguments.makeNativeMap(jsonMap)
-                                    promise.resolve(nativeMap)
-                                } catch (e: Throwable) {
-                                    promise.reject("importXFDF error", e)
-                                }
+                scope.launch {
+                    try {
+                        // XfdfFormatter runs on the calling thread.
+                        val annotations = withContext(Dispatchers.IO) {
+                            XfdfFormatter.parseXfdfAsync(document, ContentResolverDataProvider((Uri.parse(importPath))))
+                        }
+                        withContext(Dispatchers.Default) {
+                            for (annotation in annotations) {
+                                document.annotationProvider.addAnnotationToPage(annotation)
                             }
-                        }, { e ->
-                            promise.reject("importXFDF error", e)
-                        })
-            }
+                        }
+                        val result = JSONObject()
+                        result.put("success", true)
+                        val jsonMap = JsonUtilities.jsonObjectToMap(result)
+                        val nativeMap = Arguments.makeNativeMap(jsonMap)
+                        promise.resolve(nativeMap)
+                    } catch (e: Throwable) {
+                        promise.reject("importXFDF error", e)
+                    }
+                }
+            } ?: promise.reject("importXFDF error", "Document is nil")
         } catch (e: Throwable) {
             promise.reject("importXFDF error", e)
         }
@@ -556,30 +548,21 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
                 }
                 var allFormFields: List<com.pspdfkit.forms.FormField> = emptyList()
                 if (Nutrient.getLicenseFeatures().contains(LicenseFeature.FORMS)) {
-                    allFormFields = document.formProvider.formFields
+                    allFormFields = document.formProvider.getFormFields()
                 }
-                XfdfFormatter.writeXfdfAsync(document, allAnnotations, allFormFields, outputStream)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                        {
-                            try {
-                                outputStream.close()
-                            } catch (_: Exception) { /* ignore */ }
-                            val result = JSONObject()
-                            result.put("success", true)
-                            result.put("filePath", filePath)
-                            val jsonMap = JsonUtilities.jsonObjectToMap(result)
-                            val nativeMap = Arguments.makeNativeMap(jsonMap)
-                            promise.resolve(nativeMap)
-                        },
-                        { e ->
-                            try {
-                                outputStream.close()
-                            } catch (_: Exception) { /* ignore */ }
-                            promise.reject("exportXFDF error", e)
-                        }
-                    )
+                // XfdfFormatter runs on the calling thread.
+                withContext(Dispatchers.IO) {
+                    XfdfFormatter.writeXfdfAsync(document, allAnnotations, allFormFields, outputStream)
+                }
+                try {
+                    outputStream.close()
+                } catch (_: Exception) { /* ignore */ }
+                val result = JSONObject()
+                result.put("success", true)
+                result.put("filePath", filePath)
+                val jsonMap = JsonUtilities.jsonObjectToMap(result)
+                val nativeMap = Arguments.makeNativeMap(jsonMap)
+                promise.resolve(nativeMap)
             } catch (e: Throwable) {
                 try {
                     outputStream.close()
@@ -590,38 +573,54 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
     }
 
     @ReactMethod fun getFormElements(reference: Int, promise: Promise) {
-        try {
-            this.getDocument(reference)?.document?.let {
-
-                val formElements = it.formProvider.formElements
-                val formElementsJSON = ArrayList<Map<String, Any>>()
-
-                for (formElement in formElements) {
-                    val elementJSON = FormUtils.formElementToJSON(formElement)
-                    formElementsJSON.add(elementJSON)
+        val document = this.getDocument(reference)?.document
+        if (document == null) {
+            promise.reject("getFormElements", "Document is nil")
+            return
+        }
+        scope.launch {
+            try {
+                val formElements = document.formProvider.getFormElements()
+                // Each element is read through many native getters; keep a large form off the main thread.
+                val formElementsJSON = withContext(Dispatchers.Default) {
+                    formElements.map { FormUtils.formElementToJSON(it) }
                 }
 
                 promise.resolve(Arguments.makeNativeArray(formElementsJSON))
+            } catch (e: Throwable) {
+                promise.reject("getFormElements", e)
             }
-        } catch (e: Throwable) {
-            promise.reject("getFormElements", e)
         }
     }
 
     @ReactMethod fun updateFormFieldValue(reference: Int, fullyQualifiedName: String, value: Dynamic, promise: Promise) {
-        try {
-            this.getDocument(reference)?.document?.let {
-
-                var formElement = it.formProvider.getFormFieldWithFullyQualifiedName(fullyQualifiedName)?.formElement
+        val document = this.getDocument(reference)?.document
+        if (document == null) {
+            promise.reject("updateFormFieldValue", "Document is nil")
+            return
+        }
+        // Read the value now: React Native may recycle the Dynamic once this method returns.
+        val valueType = value.type
+        val booleanValue = if (valueType == ReadableType.Boolean) value.asBoolean() else null
+        val stringValue = if (valueType == ReadableType.String) value.asString() else null
+        val indices: MutableList<Int>? = if (valueType == ReadableType.Array) {
+            value.asArray()?.toArrayList()
+                ?.filterIsInstance<Number>()
+                ?.map { it.toInt() }
+                ?.toMutableList()
+        } else null
+        scope.launch {
+            try {
+                var formElement = document.formProvider.getFormFieldWithFullyQualifiedName(fullyQualifiedName)?.formElement
                 if (formElement == null) {
-                    formElement = it.formProvider.getFormElementWithName(fullyQualifiedName)
+                    formElement = document.formProvider.getFormElementWithName(fullyQualifiedName)
                 }
                 var success = false
 
                 when (formElement) {
                     is EditableButtonFormElement -> {
-                        if (value.type == ReadableType.Boolean) {
-                            if (value.asBoolean()) {
+                        if (booleanValue != null) {
+                            if (booleanValue) {
                                 formElement.select()
                             } else {
                                 formElement.deselect()
@@ -630,25 +629,21 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
                         }
                     }
                     is ChoiceFormElement -> {
-                        if (value.type == ReadableType.Array) {
-                            val indices: MutableList<Int>? = value.asArray()?.toArrayList()
-                                ?.filterIsInstance<Number>()
-                                ?.map { it.toInt() }
-                                ?.toMutableList()
+                        if (valueType == ReadableType.Array) {
                             if (indices != null) {
                                 formElement.selectedIndexes = indices
                                 success = true
                             }
-                        } else if (value.type == ReadableType.String) {
+                        } else if (valueType == ReadableType.String) {
                             if (formElement is ComboBoxFormElement) {
-                                formElement.customText = value.asString()
+                                formElement.customText = stringValue
                                 success = true
                             }
                         }
                     }
                     is TextFormElement -> {
-                        if (value.type == ReadableType.String) {
-                            value.asString()?.let { it1 -> formElement.setText(it1) }
+                        if (valueType == ReadableType.String) {
+                            stringValue?.let { it1 -> formElement.setText(it1) }
                             success = true
                         }
                     }
@@ -659,38 +654,33 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
                 } else {
                     promise.reject("updateFormFieldValue", "Could not update form field value")
                 }
+            } catch (e: Throwable) {
+                promise.reject("updateFormFieldValue", e)
             }
-        } catch (e: Throwable) {
-            promise.reject("updateFormFieldValue", e)
         }
     }
 
     @ReactMethod fun setFormFieldReadOnly(reference: Int, fullyQualifiedName: String, readOnly: Boolean, promise: Promise) {
-        try {
-            this.getDocument(reference)?.document?.let { document ->
+        val document = this.getDocument(reference)?.document
+        if (document == null) {
+            promise.reject("setFormFieldReadOnly", "Document is nil")
+            return
+        }
+        scope.launch {
+            try {
                 val formField = document.formProvider.getFormFieldWithFullyQualifiedName(fullyQualifiedName)
                     ?: document.formProvider.getFormElementWithName(fullyQualifiedName)?.formField
 
                 if (formField == null) {
                     promise.reject("setFormFieldReadOnly", "Could not find form field")
-                    return
+                    return@launch
                 }
 
-                // Copy the flags before mutating: getFlags() returns the internally cached
-                // set, and setFlags() is a no-op when passed a set equal to the cached one.
-                val flags = EnumSet.copyOf(formField.internal.flags)
-                if (readOnly) {
-                    flags.add(NativeFormFlags.READONLY)
-                } else {
-                    flags.remove(NativeFormFlags.READONLY)
-                }
-                formField.internal.setFlags(flags)
+                formField.isReadOnly = readOnly
                 promise.resolve(true)
-            } ?: run {
-                promise.reject("setFormFieldReadOnly", "Document is nil")
+            } catch (e: Throwable) {
+                promise.reject("setFormFieldReadOnly", e)
             }
-        } catch (e: Throwable) {
-            promise.reject("setFormFieldReadOnly", e)
         }
     }
 
@@ -755,19 +745,24 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
     }
 
     @ReactMethod fun getOverlappingSignature(reference: Int, fullyQualifiedName: String, promise: Promise) {
-        try {
-            this.getDocument(reference)?.document?.let { document ->
+        val document = this.getDocument(reference)?.document
+        if (document == null) {
+            promise.reject("getOverlappingSignature", "Document is nil")
+            return
+        }
+        scope.launch {
+            try {
                 val formElement = document.formProvider.getFormFieldWithFullyQualifiedName(fullyQualifiedName)?.formElement
 
                 // Check if formElement was found
                 if (formElement == null) {
                     promise.reject("getOverlappingSignature", "Form element not found")
-                    return@let
+                    return@launch
                 }
 
                 // Check if it's a SignatureFormElement and get the overlapping annotation
                 val overlappingAnnotation = if (formElement is SignatureFormElement) {
-                    formElement.overlappingSignatures
+                    formElement.getOverlappingSignatures()
                 } else {
                     null
                 }
@@ -775,18 +770,16 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
                 // Check if overlapping annotation was found
                 if (overlappingAnnotation == null || overlappingAnnotation.size == 0) {
                     promise.reject("getOverlappingSignature", "No overlaps found")
-                    return@let
+                    return@launch
                 }
 
                 // Convert annotation to map using AnnotationUtils
                 val annotationMap = AnnotationUtils.processAnnotation(overlappingAnnotation.first())
                 val nativeMap = Arguments.makeNativeMap(annotationMap)
                 promise.resolve(nativeMap)
-            } ?: run {
-                promise.reject("getOverlappingSignature", "Document is nil")
+            } catch (e: Throwable) {
+                promise.reject("getOverlappingSignature", e)
             }
-        } catch (e: Throwable) {
-            promise.reject("getOverlappingSignature", e)
         }
     }
 
@@ -828,13 +821,7 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
                 val pdfView = docData?.pdfViewRef?.get()
                 if (pdfView != null) {
                     for (annotation in annotationsToUpdate) {
-                        pdfView.getPdfFragment()
-                            .take(1)
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(
-                                { pdfFragment -> pdfFragment.notifyAnnotationHasChanged(annotation) },
-                                { /* Ignore errors if fragment is not available */ }
-                            )
+                        pdfView.withPdfFragment { pdfFragment -> pdfFragment.notifyAnnotationHasChanged(annotation) }
                     }
                 }
                 promise.resolve(true)
@@ -869,25 +856,20 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
                     }
                     toSelect
                 }
-                pdfView.getPdfFragment()
-                    .take(1)
-                    .timeout(5, TimeUnit.SECONDS)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                        { pdfFragment ->
-                            try {
-                                pdfFragment.setSelectedAnnotations(annotationsToSelect)
-                                // Nutrient 11.3+: Annotation editing is handled by the annotation popup toolbar, which
-                                // is shown automatically for selected annotations when annotation editing is enabled.
-                                promise.resolve(true)
-                            } catch (e: Exception) {
-                                promise.reject("selectAnnotations", e.message ?: "Failed to select annotations")
-                            }
-                        },
-                        { throwable ->
-                            promise.reject("selectAnnotations", throwable.message ?: throwable.toString())
+                pdfView.withPdfFragment(TimeUnit.SECONDS.toMillis(5), { pdfFragment ->
+                    try {
+                        cancelPendingPopupToolbar(pdfFragment)
+                        pdfFragment.setSelectedAnnotations(annotationsToSelect)
+                        if (showContextualMenu) {
+                            showPopupToolbarOnceSelected(pdfFragment, annotationsToSelect)
                         }
-                    )
+                        promise.resolve(true)
+                    } catch (e: Exception) {
+                        promise.reject("selectAnnotations", e.message ?: "Failed to select annotations")
+                    }
+                }, {
+                    promise.reject("selectAnnotations", "The PDF view was closed or did not load within 5 seconds")
+                })
             } catch (e: Throwable) {
                 promise.reject("selectAnnotations", e.message ?: e.toString())
             }
@@ -901,23 +883,48 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
             promise.reject("clearSelectedAnnotations", "Document is nil")
             return
         }
-        pdfView.getPdfFragment()
-            .take(1)
-            .timeout(5, TimeUnit.SECONDS)
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                { pdfFragment ->
-                    try {
-                        pdfFragment.clearSelectedAnnotations()
-                        promise.resolve(true)
-                    } catch (e: Exception) {
-                        promise.reject("clearSelectedAnnotations", e.message ?: "Failed to clear selected annotations")
-                    }
-                },
-                { throwable ->
-                    promise.reject("clearSelectedAnnotations", throwable.message ?: throwable.toString())
+        pdfView.withPdfFragment(TimeUnit.SECONDS.toMillis(5), { pdfFragment ->
+            try {
+                cancelPendingPopupToolbar(pdfFragment)
+                pdfFragment.clearSelectedAnnotations()
+                promise.resolve(true)
+            } catch (e: Exception) {
+                promise.reject("clearSelectedAnnotations", e.message ?: "Failed to clear selected annotations")
+            }
+        }, {
+            promise.reject("clearSelectedAnnotations", "The PDF view was closed or did not load within 5 seconds")
+        })
+    }
+
+    // The popup toolbar only shows itself for a tap, and a selection on an unbound page lands later.
+    private fun showPopupToolbarOnceSelected(pdfFragment: PdfFragment, annotations: List<Annotation>) {
+        if (annotations.isEmpty()) return
+        if (pdfFragment.selectedAnnotations.containsAll(annotations)) {
+            pdfFragment.showAnnotationPopupToolbar()
+            return
+        }
+        // Waits for a selection that includes every requested annotation, until a newer request or a clear replaces it.
+        // Held weakly so the listener does not keep the map's fragment key alive.
+        val fragmentRef = WeakReference(pdfFragment)
+        val listener = object : OnAnnotationSelectedListener {
+            override fun onAnnotationSelectionFinished(selected: List<Annotation>, annotationsCreated: Boolean) {
+                val fragment = fragmentRef.get() ?: return
+                val isCurrent = pendingPopupToolbarListeners[fragment] === this
+                if (isCurrent && !selected.containsAll(annotations)) return
+                // A replaced listener removes itself here, since removal before the document view is ready is a no-op.
+                fragment.removeOnAnnotationSelectedListener(this)
+                if (isCurrent) {
+                    pendingPopupToolbarListeners.remove(fragment)
+                    fragment.showAnnotationPopupToolbar()
                 }
-            )
+            }
+        }
+        pendingPopupToolbarListeners[pdfFragment] = listener
+        pdfFragment.addOnAnnotationSelectedListener(listener)
+    }
+
+    private fun cancelPendingPopupToolbar(pdfFragment: PdfFragment) {
+        pendingPopupToolbarListeners.remove(pdfFragment)?.let(pdfFragment::removeOnAnnotationSelectedListener)
     }
 
     // Helper function to apply individual properties to annotations
@@ -1396,8 +1403,14 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
                 val signatureFormConfiguration = SignatureFormConfiguration.Builder(pageIndex, rectFSignatureFormConfiguration)
                     .build()
 
-                document.formProvider.addFormElementToPage(fullyQualifiedName, signatureFormConfiguration)
-                promise.resolve(true)
+                scope.launch {
+                    try {
+                        document.formProvider.addFormElementToPage(fullyQualifiedName, signatureFormConfiguration)
+                        promise.resolve(true)
+                    } catch (e: Throwable) {
+                        promise.reject("addElectronicSignatureFormField", e.message ?: "Failed to add signature field", e)
+                    }
+                }
             } ?: run {
                 promise.reject("addElectronicSignatureFormField", "Document is nil", null)
             }
@@ -1450,8 +1463,14 @@ class PDFDocumentModule(reactContext: ReactApplicationContext) : ReactContextBas
                 val textFormConfiguration = TextFormConfiguration.Builder(pageIndex, rectFFormConfiguration)
                     .build()
 
-                document.formProvider.addFormElementToPage(fullyQualifiedName, textFormConfiguration)
-                promise.resolve(true)
+                scope.launch {
+                    try {
+                        document.formProvider.addFormElementToPage(fullyQualifiedName, textFormConfiguration)
+                        promise.resolve(true)
+                    } catch (e: Throwable) {
+                        promise.reject("addTextFormField", e.message ?: "Failed to add text field", e)
+                    }
+                }
             } ?: run {
                 promise.reject("addTextFormField", "Document is nil", null)
             }

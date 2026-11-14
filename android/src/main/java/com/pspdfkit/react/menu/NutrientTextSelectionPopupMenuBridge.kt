@@ -1,9 +1,6 @@
 package com.pspdfkit.react.menu
 
 import android.content.Context
-import android.view.ViewGroup
-import android.widget.Button
-import androidx.appcompat.widget.TooltipCompat
 import com.facebook.react.bridge.ReadableArray
 import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.bridge.ReadableType
@@ -28,8 +25,6 @@ object NutrientTextSelectionPopupMenuBridge {
         val position: String,
         val customItemIds: Set<Int>,
         val customPopupItems: List<PopupToolbarMenuItem>,
-        /** Map menu item id → literal title to apply after popup [PopupToolbar.menuItems] is set. */
-        val literalTitlesByItemId: Map<Int, String>,
     )
 
     @JvmStatic
@@ -53,7 +48,6 @@ object NutrientTextSelectionPopupMenuBridge {
 
         val stockKeys = mutableListOf<String>()
         val customItems = mutableListOf<PopupToolbarMenuItem>()
-        val literalTitles = mutableMapOf<Int, String>()
         val customIds = mutableSetOf<Int>()
         val pkg = context.packageName
 
@@ -91,7 +85,6 @@ object NutrientTextSelectionPopupMenuBridge {
             position = position,
             customItemIds = customIds,
             customPopupItems = customItems,
-            literalTitlesByItemId = literalTitles,
         )
     }
 
@@ -148,7 +141,6 @@ object NutrientTextSelectionPopupMenuBridge {
             }
 
         toolbar.menuItems = merged
-        patchLiteralButtonTitles(toolbar, cfg.literalTitlesByItemId)
 
         toolbar.setOnPopupToolbarItemClickedListener(
             PopupToolbar.OnPopupToolbarItemClickedListener { item: PopupToolbarMenuItem ->
@@ -184,26 +176,6 @@ object NutrientTextSelectionPopupMenuBridge {
             "paste", "paste_annotation", "pasteAnnotation" ->
                 com.pspdfkit.R.id.pspdf__text_selection_toolbar_item_paste_annotation
             else -> null
-        }
-    }
-
-    @JvmStatic
-    internal fun patchLiteralButtonTitles(toolbar: PopupToolbar, literals: Map<Int, String>) {
-        if (literals.isEmpty()) return
-        try {
-            val field = PopupToolbar::class.java.getDeclaredField("popupToolbarView")
-            field.isAccessible = true
-            val popupToolbarView = field.get(toolbar) as? ViewGroup ?: return
-            for (i in 0 until popupToolbarView.childCount) {
-                val child = popupToolbarView.getChildAt(i)
-                if (child is Button) {
-                    val lit = literals[child.id] ?: continue
-                    child.text = lit
-                    child.contentDescription = lit
-                    TooltipCompat.setTooltipText(child, lit)
-                }
-            }
-        } catch (_: Exception) {
         }
     }
 

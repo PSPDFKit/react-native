@@ -25,15 +25,22 @@ class MenuItemListener: MenuItem.OnMenuItemClickListener {
         this.eventDispatcher = eventDispatcher
     }
 
-    override fun onMenuItemClick(menuItem: MenuItem): Boolean {
-        val resourceName: String? = context?.resources?.getResourceEntryName(menuItem.itemId)
-        if (resourceName != null) {
-            parent?.let {
-                val surfaceId = UIManagerHelper.getSurfaceId(it)
-                CustomToolbarButtonTappedEvent(surfaceId, it.id, resourceName)
-            }
-                ?.let { eventDispatcher!!.dispatchEvent(it) }
-        }
-        return false
+    override fun onMenuItemClick(menuItem: MenuItem): Boolean = dispatchItemTapped(menuItem.itemId)
+
+    /**
+     * Dispatches `customToolbarButtonTapped` for [itemId].
+     *
+     * Split out of [onMenuItemClick] because the Compose toolbars report taps by id rather than
+     * by `MenuItem`. Returns whether the tap was dispatched, which is what the toolbar item click
+     * listener has to report so unrecognized ids fall through to the SDK's own handling.
+     */
+    fun dispatchItemTapped(itemId: Int): Boolean {
+        val resourceName: String = runCatching { context?.resources?.getResourceEntryName(itemId) }
+            .getOrNull() ?: return false
+        val view = parent ?: return false
+        val dispatcher = eventDispatcher ?: return false
+        val surfaceId = UIManagerHelper.getSurfaceId(view)
+        dispatcher.dispatchEvent(CustomToolbarButtonTappedEvent(surfaceId, view.id, resourceName))
+        return true
     }
 }

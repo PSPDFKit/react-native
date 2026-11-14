@@ -13,7 +13,6 @@
 
 package com.pspdfkit.views;
 
-import android.annotation.SuppressLint;
 import android.graphics.PointF;
 import android.view.MotionEvent;
 
@@ -158,7 +157,6 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
 
     }
 
-    @SuppressLint("CheckResult")
     @Override
     public boolean onPageClick(@NonNull PdfDocument pdfDocument, int pageIndex, @Nullable MotionEvent motionEvent, @Nullable PointF pointF, @Nullable Annotation annotation) {
         String documentID = pdfDocument.getDocumentIdString();
@@ -244,12 +242,11 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
         return false;
     }
 
-    @SuppressLint("CheckResult")
     @Override
     public void onPageChanged(@NonNull PdfDocument pdfDocument, int pageIndex) {
         parent.updateState(pageIndex);
         if (NutrientNotificationCenter.INSTANCE.getIsNotificationCenterInUse()) {
-            parent.getPdfFragment().subscribe(pdfFragment -> {
+            parent.withPdfFragment(pdfFragment -> {
                 String documentID = pdfFragment.getDocument().getDocumentIdString();
                 int componentIdPg = parent.isFabricMode() ? (parent.getComponentReferenceId() != null ? parent.getComponentReferenceId() : parent.getId()) : parent.getId();
                 NutrientNotificationCenter.INSTANCE.documentPageChanged(pageIndex, documentID, componentIdPg);
@@ -295,11 +292,10 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
         return true; // Allow selection
     }
 
-    @SuppressLint("CheckResult")
     @Override
     public void onAnnotationSelected(@NonNull Annotation annotation, boolean annotationCreated) {
         if (NutrientNotificationCenter.INSTANCE.getIsNotificationCenterInUse()) {
-            parent.getPdfFragment().subscribe(pdfFragment -> {
+            parent.withPdfFragment(pdfFragment -> {
                 String documentID = pdfFragment.getDocument().getDocumentIdString();
                 int componentIdSel = parent.isFabricMode() ? (parent.getComponentReferenceId() != null ? parent.getComponentReferenceId() : parent.getId()) : parent.getId();
                 NutrientNotificationCenter.INSTANCE.didSelectAnnotations(annotation, documentID, componentIdSel);
@@ -307,11 +303,10 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
         }
     }
 
-    @SuppressLint("CheckResult")
     @Override
     public void onAnnotationCreated(@NonNull Annotation annotation) {
         if (NutrientNotificationCenter.INSTANCE.getIsNotificationCenterInUse()) {
-            parent.getPdfFragment().subscribe(pdfFragment -> {
+            parent.withPdfFragment(pdfFragment -> {
                 String documentID = pdfFragment.getDocument().getDocumentIdString();
                 int componentIdAdd = parent.isFabricMode() ? (parent.getComponentReferenceId() != null ? parent.getComponentReferenceId() : parent.getId()) : parent.getId();
                 NutrientNotificationCenter.INSTANCE.annotationsChanged("added", annotation, documentID, componentIdAdd);
@@ -324,11 +319,10 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
         }
     }
 
-    @SuppressLint("CheckResult")
     @Override
     public void onAnnotationUpdated(@NonNull Annotation annotation) {
         if (NutrientNotificationCenter.INSTANCE.getIsNotificationCenterInUse()) {
-            parent.getPdfFragment().subscribe(pdfFragment -> {
+            parent.withPdfFragment(pdfFragment -> {
                 String documentID = pdfFragment.getDocument().getDocumentIdString();
                 int componentIdChg = parent.isFabricMode() ? (parent.getComponentReferenceId() != null ? parent.getComponentReferenceId() : parent.getId()) : parent.getId();
                 NutrientNotificationCenter.INSTANCE.annotationsChanged("changed", annotation, documentID, componentIdChg);
@@ -341,11 +335,10 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
         }
     }
 
-    @SuppressLint("CheckResult")
     @Override
     public void onAnnotationRemoved(@NonNull Annotation annotation) {
         if (NutrientNotificationCenter.INSTANCE.getIsNotificationCenterInUse()) {
-            parent.getPdfFragment().subscribe(pdfFragment -> {
+            parent.withPdfFragment(pdfFragment -> {
                 String documentID = pdfFragment.getDocument().getDocumentIdString();
                 int componentIdRem = parent.isFabricMode() ? (parent.getComponentReferenceId() != null ? parent.getComponentReferenceId() : parent.getId()) : parent.getId();
                 NutrientNotificationCenter.INSTANCE.annotationsChanged("removed", annotation, documentID, componentIdRem);
@@ -363,11 +356,10 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
         // Not required.
     }
 
-    @SuppressLint("CheckResult")
     @Override
     public void onFormFieldUpdated(@NonNull FormField formField) {
         if (NutrientNotificationCenter.INSTANCE.getIsNotificationCenterInUse()) {
-            parent.getPdfFragment().subscribe(pdfFragment -> {
+            parent.withPdfFragment(pdfFragment -> {
                 String documentID = pdfFragment.getDocument().getDocumentIdString();
                 int componentIdForm = parent.isFabricMode() ? (parent.getComponentReferenceId() != null ? parent.getComponentReferenceId() : parent.getId()) : parent.getId();
                 NutrientNotificationCenter.INSTANCE.formFieldValuesUpdated(formField, documentID, componentIdForm);
@@ -388,11 +380,10 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
         // Not used.
     }
 
-    @SuppressLint("CheckResult")
     @Override
     public void onAnnotationDeselected(@NonNull Annotation annotation, boolean b) {
         if (NutrientNotificationCenter.INSTANCE.getIsNotificationCenterInUse()) {
-            parent.getPdfFragment().subscribe(pdfFragment -> {
+            parent.withPdfFragment(pdfFragment -> {
                 String documentID = pdfFragment.getDocument().getDocumentIdString();
                 int componentIdDesel = parent.isFabricMode() ? (parent.getComponentReferenceId() != null ? parent.getComponentReferenceId() : parent.getId()) : parent.getId();
                 NutrientNotificationCenter.INSTANCE.didDeselectAnnotations(annotation, documentID, componentIdDesel);
@@ -431,11 +422,10 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
         return true;
     }
 
-    @SuppressLint("CheckResult")
     @Override
     public void onFormElementSelected(@NonNull FormElement formElement) {
         if (NutrientNotificationCenter.INSTANCE.getIsNotificationCenterInUse()) {
-            parent.getPdfFragment().subscribe(pdfFragment -> {
+            parent.withPdfFragment(pdfFragment -> {
                 String documentID = pdfFragment.getDocument().getDocumentIdString();
                 int componentIdFormSel = parent.isFabricMode() ? (parent.getComponentReferenceId() != null ? parent.getComponentReferenceId() : parent.getId()) : parent.getId();
                 NutrientNotificationCenter.INSTANCE.didSelectFormField(formElement, documentID, componentIdFormSel);
@@ -443,11 +433,10 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
         }
     }
 
-    @SuppressLint("CheckResult")
     @Override
     public void onFormElementDeselected(@NonNull FormElement formElement, boolean b) {
         if (NutrientNotificationCenter.INSTANCE.getIsNotificationCenterInUse()) {
-            parent.getPdfFragment().subscribe(pdfFragment -> {
+            parent.withPdfFragment(pdfFragment -> {
                 String documentID = pdfFragment.getDocument().getDocumentIdString();
                 int componentIdFormDesel = parent.isFabricMode() ? (parent.getComponentReferenceId() != null ? parent.getComponentReferenceId() : parent.getId()) : parent.getId();
                 NutrientNotificationCenter.INSTANCE.didDeSelectFormField(formElement, documentID, componentIdFormDesel);
@@ -460,11 +449,10 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
         // Nothing to do here
     }
 
-    @SuppressLint("CheckResult")
     @Override
     public void onDocumentScrolled(int currX, int currY, int maxX, int maxY, int extendX, int extendY) {
         if (NutrientNotificationCenter.INSTANCE.getIsNotificationCenterInUse()) {
-            parent.getPdfFragment().subscribe(pdfFragment -> {
+            parent.withPdfFragment(pdfFragment -> {
                 String documentID = pdfFragment.getDocument().getDocumentIdString();
                 int componentIdScroll = parent.isFabricMode() ? (parent.getComponentReferenceId() != null ? parent.getComponentReferenceId() : parent.getId()) : parent.getId();
                 NutrientNotificationCenter.INSTANCE.documentScrolled(Map.of("currX", currX, "currY", currY, "maxX", maxX, "maxY", maxY, "extendX", extendX, "extendY", extendY), documentID, componentIdScroll);
@@ -473,11 +461,10 @@ class PdfViewDocumentListener implements DocumentListener, com.pspdfkit.ui.annot
         }
     }
 
-    @SuppressLint("CheckResult")
     @Override
     public void onBookmarksChanged(@NonNull List<Bookmark> list) {
         if (NutrientNotificationCenter.INSTANCE.getIsNotificationCenterInUse()) {
-            parent.getPdfFragment().subscribe(pdfFragment -> {
+            parent.withPdfFragment(pdfFragment -> {
                 String documentID = pdfFragment.getDocument().getDocumentIdString();
                 int componentIdBm = parent.isFabricMode() ? (parent.getComponentReferenceId() != null ? parent.getComponentReferenceId() : parent.getId()) : parent.getId();
                 NutrientNotificationCenter.INSTANCE.bookmarksChanged(list, documentID, componentIdBm);

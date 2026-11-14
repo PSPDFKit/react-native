@@ -26,8 +26,6 @@ object NutrientAnnotationPopupMenuBridge {
         val position: String,
         val customItemIds: Set<Int>,
         val customPopupItems: List<PopupToolbarMenuItem>,
-        /** Map menu item id → literal title to apply after popup [PopupToolbar.menuItems] is set. */
-        val literalTitlesByItemId: Map<Int, String>,
     )
 
     @JvmStatic
@@ -41,7 +39,6 @@ object NutrientAnnotationPopupMenuBridge {
 
         val stockKeys = mutableListOf<String>()
         val customItems = mutableListOf<PopupToolbarMenuItem>()
-        val literalTitles = mutableMapOf<Int, String>()
         val customIds = mutableSetOf<Int>()
         val pkg = context.packageName
 
@@ -79,7 +76,6 @@ object NutrientAnnotationPopupMenuBridge {
             position = position,
             customItemIds = customIds,
             customPopupItems = customItems,
-            literalTitlesByItemId = literalTitles,
         )
     }
 
@@ -127,7 +123,6 @@ object NutrientAnnotationPopupMenuBridge {
             }
 
         toolbar.menuItems = merged
-        NutrientTextSelectionPopupMenuBridge.patchLiteralButtonTitles(toolbar, cfg.literalTitlesByItemId)
 
         toolbar.setOnPopupToolbarItemClickedListener(
             PopupToolbar.OnPopupToolbarItemClickedListener { item: PopupToolbarMenuItem ->

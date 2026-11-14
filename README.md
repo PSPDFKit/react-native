@@ -48,6 +48,8 @@ Nutrient.setLicenseKey('YOUR_REACT_NATIVE_LICENSE_KEY_GOES_HERE');
 - The [latest stable version of Android Studio](https://developer.android.com/studio)
 - The [Android NDK](https://developer.android.com/studio/projects/install-ndk)
 - An [Android Virtual Device](https://developer.android.com/studio/run/managing-avds.html) or a hardware device
+- Android Gradle Plugin 8.13 or later, Gradle 9.3 or later, and Kotlin 2.4.10 or later
+- `compileSdk` 37 with `compileSdkMinor` 1 (the `android-37.1` platform), and `minSdk` 24
 
 ### Installation
 
@@ -55,7 +57,7 @@ To install the Nutrient React Native SDK, run `yarn add @nutrient-sdk/react-nati
 
 ### Expo config plugin (Android)
 
-When using Expo prebuild/dev client, add the package as a plugin so Android `AppTheme` is switched to a MaterialComponents-compatible theme:
+When using Expo prebuild/dev client, add the package as a plugin so Android `AppTheme` is switched to a MaterialComponents-compatible theme, and the generated Android project uses Kotlin 2.4.10 or later and compiles against android-37.1 or later:
 
 ```js
 // app.config.js
@@ -85,6 +87,8 @@ export default {
   },
 };
 ```
+
+If you also set `android.kotlinVersion` with `expo-build-properties`, list `@nutrient-sdk/react-native` before it in `plugins`, or set 2.4.10 or later there. Otherwise the version from `expo-build-properties` replaces the one this plugin sets.
 
 After updating app config, run `npx expo prebuild -p android` (or rebuild with EAS).
 
@@ -141,13 +145,39 @@ See our [Getting Started on React Native guide](https://www.nutrient.io/getting-
 
    > If you previously added `https://my.nutrient.io/maven/` for the Nutrient SDK, you can remove it. Keep it only if you also use an add-on that isn't on Maven Central yet, such as OCR (`io.nutrient:nutrient-ocr`).
 
+1. Raise the build toolchain in your project's `android/build.gradle`. Nutrient's Kotlin metadata is built with Kotlin 2.4, and `compileSdkMinor` needs Android Gradle Plugin 8.13 or later:
+
+   ```diff
+     buildscript {
+       ext {
+   -     kotlinVersion = "2.2.20"
+   +     kotlinVersion = "2.4.10"
+       }
+       dependencies {
+   -     classpath("com.android.tools.build:gradle:8.7.0")
+   +     classpath("com.android.tools.build:gradle:8.13.2")
+       }
+     }
+   ```
+
+   Then update the Gradle wrapper:
+
+   ```bash
+   ./gradlew wrapper --gradle-version 9.3.0
+   ```
+
+   > Do not move to Android Gradle Plugin 9 yet. AGP 9 requires Gradle 9.4.1 or later, and Gradle 9.4's embedded Kotlin 2.3 cannot compile React Native's own bundled `@react-native/gradle-plugin`, which is built with Kotlin 2.1. AGP 9 also removes the `org.jetbrains.kotlin.android` plugin that React Native community modules rely on.
+
 1. Open the app’s build.gradle file:
 
    ```diff
    ...
      android {
    -  compileSdkVersion rootProject.ext.compileSdkVersion
-   +  compileSdkVersion 36
+   +  compileSdk 37
+   +  // Nutrient's AAR metadata requires the android-37.1 platform, so the minor version
+   +  // has to be set as well.
+   +  compileSdkMinor 1
    ...
      defaultConfig {
        applicationId "com.nutrientdemo"
@@ -160,6 +190,8 @@ See our [Getting Started on React Native guide](https://www.nutrient.io/getting-
    }
    ...
    ```
+
+   > Set the compile SDK in the app module only, and leave `compileSdkVersion` in your project's `ext` block as it is. Other React Native modules read that value. At `37`, Android Gradle Plugin 8.13 installs the `android-37.0` platform during the build but then fails with `Failed to find target with hash string 'android-37'` until the next build, so builds on fresh CI machines fail.
 
 1. Open your project’s Podfile:
 

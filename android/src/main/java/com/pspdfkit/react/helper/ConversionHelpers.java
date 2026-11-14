@@ -18,7 +18,6 @@ import androidx.annotation.Nullable;
 import com.facebook.react.bridge.ReadableArray;
 import com.pspdfkit.annotations.AnnotationFlags;
 import com.pspdfkit.annotations.AnnotationType;
-import com.pspdfkit.ui.toolbar.ContextualToolbarMenuItem;
 import com.pspdfkit.ui.special_mode.controller.AnnotationTool;
 import com.pspdfkit.ui.special_mode.controller.AnnotationToolVariant;
 
@@ -232,17 +231,6 @@ public class ConversionHelpers {
         }
 
         return stringFlags;
-    }
-
-    public static ContextualToolbarMenuItem.Position getContextualToolbarMenuItemPosition(final String position) {
-        switch (position.toLowerCase()) {
-            case "start":
-                return ContextualToolbarMenuItem.Position.START;
-            case "end":
-                return ContextualToolbarMenuItem.Position.END;
-            default:
-                return ContextualToolbarMenuItem.Position.END;
-        }
     }
 
     public static AnnotationToolResult convertAnnotationTool(String tool) {

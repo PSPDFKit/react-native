@@ -168,17 +168,12 @@ public class ConfigurationAdapter {
         // Match the default PdfView configuration: disable immersive mode. Text selection uses the
         // SDK popup toolbar by default; React Native customizes it via OnPreparePopupToolbarListener
         // (see NutrientTextSelectionPopupMenuBridge). The legacy key androidUseTextSelectionToolbar
-        // is still honored for apps that explicitly force the contextual TextSelectionToolbar.
+        // is ignored: Nutrient Android removed the docked TextSelectionToolbar it switched to.
         this.configuration
             .contentEditingEnabled(false)
             .immersiveModeEnabled(false);
         if (hasConfiguration) {
             String key;
-
-            key = getKeyOrNull(configuration, "androidUseTextSelectionToolbar");
-            if (key != null && configuration.getBoolean(key)) {
-                this.configuration.textSelectionPopupToolbarEnabled(false);
-            }
 
             key = getKeyOrNull(configuration, PAGE_SCROLL_DIRECTION);
             if (key != null) {

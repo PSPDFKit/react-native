@@ -23,7 +23,7 @@ import com.pspdfkit.react.common.NutrientPropsToolbarHelper;
 import com.pspdfkit.react.common.NutrientPropsMeasurementConfigurationHelper;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReadableMap;
-import io.reactivex.rxjava3.functions.Consumer;
+import java.util.function.Consumer;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -171,9 +171,8 @@ public class NutrientViewTurboModule extends NativeNutrientViewTurboModuleSpec {
         }
 
         try {
-            view.dismissSignaturePad()
-                .subscribe(promise::resolve,
-                    throwable -> promise.reject(Errors.OPERATION_FAILED, throwable.getMessage()));
+            view.dismissSignaturePad(promise::resolve,
+                throwable -> promise.reject(Errors.OPERATION_FAILED, throwable.getMessage()));
         } catch (Exception e) {
             promise.reject(Errors.OPERATION_FAILED, e.getMessage());
         }

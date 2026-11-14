@@ -15,31 +15,27 @@ import ReactAppDependencyProvider
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
-    
+
+    static let tintColor = UIColor(red: 0.40, green: 0.35, blue: 0.29, alpha: 1.0)
+
+    // Set by `SceneDelegate`, which creates the window and starts React Native.
     var window: UIWindow?
     var reactNativeDelegate: ReactNativeDelegate?
     var reactNativeFactory: RCTReactNativeFactory?
-    
+
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        
+
         let delegate = ReactNativeDelegate()
         let factory = RCTReactNativeFactory(delegate: delegate)
         delegate.dependencyProvider = RCTAppDependencyProvider()
-        
+
         reactNativeDelegate = delegate
         reactNativeFactory = factory
-        
-        window = UIWindow(frame: UIScreen.main.bounds)
-        
+
         // Set up PSPDFKit-specific customizations
-        let tintColor = UIColor(red: 0.40, green: 0.35, blue: 0.29, alpha: 1.0)
-        window?.tintColor = tintColor
-        
-        UINavigationBar.appearance().tintColor = tintColor // Back button and bar button items
-        UINavigationBar.appearance().titleTextAttributes = [NSAttributedString.Key.foregroundColor: tintColor] // Title color
-        
-        factory.startReactNative(withModuleName: "Catalog", in: window, launchOptions: launchOptions)
-        
+        UINavigationBar.appearance().tintColor = AppDelegate.tintColor // Back button and bar button items
+        UINavigationBar.appearance().titleTextAttributes = [NSAttributedString.Key.foregroundColor: AppDelegate.tintColor] // Title color
+
         return true
     }
 }
