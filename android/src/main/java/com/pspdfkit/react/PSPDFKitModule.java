@@ -26,7 +26,6 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
@@ -57,9 +56,7 @@ import com.pspdfkit.react.helper.ConversionHelpers;
 import com.pspdfkit.react.helper.PSPDFKitUtils;
 import com.pspdfkit.ui.PdfActivity;
 import com.pspdfkit.ui.PdfFragment;
-import com.pspdfkit.ui.search.PdfSearchView;
-import com.pspdfkit.ui.search.PdfSearchViewInline;
-import com.pspdfkit.views.ReactMainToolbar;
+import com.pspdfkit.views.MainToolbarSupport;
 
 import java.io.File;
 import java.io.IOException;
@@ -252,20 +249,9 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
                 onPdfActivityOpenedTask = null;
             }
 
-            try {
-                ActionBar ab = pdfActivity.getSupportActionBar();
-                ab.setDisplayHomeAsUpEnabled(true);
-                ReactMainToolbar mainToolbar = pdfActivity.findViewById(R.id.pspdf__toolbar_main);
-                mainToolbar.setNavigationOnClickListener(v -> {
-                    pdfActivity.onBackPressed();
-                });
-                PdfSearchView searchView = pdfActivity.getPSPDFKitViews().getSearchView();
-                if (searchView instanceof PdfSearchViewInline searchViewInline) {
-                    searchViewInline.findViewById(com.pspdfkit.R.id.pspdf__search_btn_back).setVisibility(View.GONE);
-                }
-            } catch (Exception e) {
-                // Could not add back button to main toolbar
-            }
+            // Give the presented activity a back arrow that closes it.
+            MainToolbarSupport.setNavigationButtonShown(pdfActivity, true,
+                    () -> pdfActivity.getOnBackPressedDispatcher().onBackPressed());
 
             // We notify the called as soon as the document is loaded or loading failed.
             if (lastPresentPromise != null) {

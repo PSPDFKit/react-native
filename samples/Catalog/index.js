@@ -8,6 +8,8 @@ import { AppRegistry, LogBox } from 'react-native';
 
 LogBox.ignoreLogs([
   'InteractionManager has been deprecated and will be removed in a future release',
+  // Debug builds with a bundled JS file (as on CI) have no packager to reach.
+  'Packager status check returned unexpected result',
 ]);
 
 import { name as appName } from './app.json';

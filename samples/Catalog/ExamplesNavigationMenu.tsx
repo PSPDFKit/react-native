@@ -26,8 +26,9 @@ import {
   ImagePDFConfiguration,
   TemplatePDFConfiguration,
 } from '@nutrient-sdk/react-native';
+import type { Processor as ProcessorModule } from '@nutrient-sdk/react-native';
 
-const Processor = NativeModules.RNProcessor;
+const Processor: ProcessorModule = NativeModules.RNProcessor;
 
 export default [
   {

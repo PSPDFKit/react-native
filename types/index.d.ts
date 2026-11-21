@@ -19,20 +19,24 @@ export default NutrientView;
  */
 /**
  * Nutrient is a React Native {@link https://reactnative.dev/docs/native-modules-intro|Native Module} implementation used to call iOS and Android methods directly.
+ * Type the native module with this class, so that its methods are typed under React Native's Strict TypeScript API too.
  * @hideconstructor
  * @example
- * const Nutrient = NativeModules.Nutrient;
+ * import { NativeModules } from 'react-native';
+ * import type { Nutrient as NutrientModule } from '@nutrient-sdk/react-native';
+ *
+ * const Nutrient: NutrientModule = NativeModules.Nutrient;
  */
 export class Nutrient {
     /**
-     * Used to get the current version of the underlying Nutrient SDK.
+     * The version of the underlying Nutrient SDK: a method under the New Architecture, a string property under the old one.
      * @member versionString
      * @memberof Nutrient
-     * @type { string }
+     * @type { string | (() => string) }
      * @example
-     * const version = Nutrient.versionString
+     * const version = typeof Nutrient.versionString === 'function' ? Nutrient.versionString() : Nutrient.versionString;
      */
-    versionString: string;
+    versionString: string | (() => string);
     /**
      * Used to get the document properties of the specified document.
      * @method getDocumentProperties
@@ -272,9 +276,13 @@ export class Nutrient {
  */
 /**
  * Processor is a React Native {@link https://reactnative.dev/docs/native-modules-intro|Native Module} implementation used to call iOS and Android methods directly.
+ * Type the native module with this class, so that its methods are typed under React Native's Strict TypeScript API too.
  * @hideconstructor
  * @example
- * const Processor = NativeModules.RNProcessor;
+ * import { NativeModules } from 'react-native';
+ * import type { Processor as ProcessorModule } from '@nutrient-sdk/react-native';
+ *
+ * const Processor: ProcessorModule = NativeModules.RNProcessor;
  */
 export class Processor {
     /**
@@ -979,7 +987,7 @@ declare class NutrientView extends React.Component<Props, any, any> {
      */
     enterContentEditingMode: () => any;
     /**
-     * Exits the currently active mode, hiding all toolbars.
+     * Exits the currently active mode, hiding all toolbars, and deselects the selected annotations and form elements, which ends form editing.
      * @method exitCurrentlyActiveMode
      * @example
      * this.pdfRef.current.exitCurrentlyActiveMode();

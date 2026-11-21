@@ -32,10 +32,10 @@ import com.facebook.react.bridge.WritableMap;
 import com.pspdfkit.document.html.HtmlToPdfConverter;
 import com.pspdfkit.document.processor.NewPage;
 import com.pspdfkit.document.processor.PagePattern;
-import com.pspdfkit.document.processor.PdfProcessor;
 import com.pspdfkit.document.processor.PdfProcessorTask;
 import com.pspdfkit.react.helper.RNConfigurationHelper;
 import com.pspdfkit.react.helper.RNFileHelper;
+import com.pspdfkit.react.helper.SdkAsync;
 import com.pspdfkit.utils.Size;
 
 import java.io.File;
@@ -83,16 +83,12 @@ public class RNProcessor extends ReactContextBaseJavaModule {
 
             final PdfProcessorTask task = PdfProcessorTask.newPage(NewPage.patternPage(new Size((float) width, (float) height), PagePattern.BLANK).build());
 
-            PdfProcessor.processDocumentAsync(task, outputFile)
-                    .doFinally(() -> callback.resolve(result))
-                    .doOnError(callback::reject)
-                    .subscribe();
+            SdkAsync.processDocument(task, outputFile, resolveOnCompletion(callback, result));
         } catch (Exception e) {
             callback.reject(e);
         }
     }
 
-    @SuppressLint("CheckResult")
     @ReactMethod
     public void generatePDFFromHtmlString(@NonNull ReadableMap configuration, String htmlString, Promise callback) {
         try {
@@ -102,19 +98,16 @@ public class RNProcessor extends ReactContextBaseJavaModule {
             assert outputFile != null;
             result.putString("fileURL", outputFile.toURI().toString());
 
-            HtmlToPdfConverter.fromHTMLString(getReactApplicationContext(), htmlString, null)
-                    .title("Converted document")
-                    .convertToPdfAsync(outputFile)
-                    .doFinally(() -> callback.resolve(result))
-                    .doOnError((error) -> callback.reject(error))
-                    .subscribe();
+            HtmlToPdfConverter converter = HtmlToPdfConverter.fromHTMLString(getReactApplicationContext(), htmlString, null)
+                    .title("Converted document");
+            SdkAsync.convertToPdf(converter, outputFile, resolveOnCompletion(callback, result));
 
         } catch (Exception e) {
             callback.reject(e);
         }
     }
 
-    @SuppressLint({"CheckResult", "SetJavaScriptEnabled"})
+    @SuppressLint("SetJavaScriptEnabled")
     @ReactMethod
     public void generatePDFFromHtmlURL(@NonNull ReadableMap configuration, String originUri, Promise callback) {
         try {
@@ -140,14 +133,7 @@ public class RNProcessor extends ReactContextBaseJavaModule {
             boolean isJavascriptEnabled = !configuration.hasKey("enableJavascript") || configuration.getBoolean("enableJavaScript");
             converter.setJavaScriptEnabled(isJavascriptEnabled);
 
-            converter.convertToPdfAsync(outputFile)
-                    .doFinally(() -> callback.resolve(result))
-                    .doOnError((error) -> callback.reject(error))
-                    .subscribe(() -> {
-                        callback.resolve(result);
-                    }, throwable -> {
-                        callback.reject(throwable);
-                    });
+            SdkAsync.convertToPdf(converter, outputFile, resolveOnCompletion(callback, result));
 
         } catch (
                 Exception e) {
@@ -156,7 +142,6 @@ public class RNProcessor extends ReactContextBaseJavaModule {
 
     }
 
-    @SuppressLint("CheckResult")
     @ReactMethod
     public void generatePDFFromTemplate(@NonNull ReadableMap configuration, Promise callback) {
         try {
@@ -182,10 +167,7 @@ public class RNProcessor extends ReactContextBaseJavaModule {
                     configHelper.configuration = templates.getMap(i);
                     pdfProcessorTask.addNewPage(configHelper.parseConfiguration(), i);
                 }
-                PdfProcessor.processDocumentAsync(pdfProcessorTask, outputFile)
-                        .doFinally(() -> callback.resolve(result))
-                        .doOnError((error) -> callback.reject(error))
-                        .subscribe();
+                SdkAsync.processDocument(pdfProcessorTask, outputFile, resolveOnCompletion(callback, result));
                 return;
             }
 
@@ -223,10 +205,7 @@ public class RNProcessor extends ReactContextBaseJavaModule {
                 }
             }
 
-            PdfProcessor.processDocumentAsync(pdfProcessorTask, outputFile)
-                    .doOnError((error) -> callback.reject(error))
-                    .doFinally(() -> callback.resolve(result))
-                    .subscribe();
+            SdkAsync.processDocument(pdfProcessorTask, outputFile, resolveOnCompletion(callback, result));
 
         } catch (Exception e) {
             callback.reject(e);
@@ -263,13 +242,25 @@ public class RNProcessor extends ReactContextBaseJavaModule {
                 }
             }
 
-            PdfProcessor.processDocumentAsync(pdfProcessorTask, outputFile)
-                    .doOnError(callback::reject)
-                    .doFinally(() -> callback.resolve(result))
-                    .subscribe();
+            SdkAsync.processDocument(pdfProcessorTask, outputFile, resolveOnCompletion(callback, result));
 
         } catch (Exception e) {
             callback.reject(e);
         }
+    }
+
+    /** Resolves {@code callback} with {@code result} when the work completes, or rejects it with the failure. */
+    private static SdkAsync.Completion resolveOnCompletion(@NonNull Promise callback, @NonNull WritableMap result) {
+        return new SdkAsync.Completion() {
+            @Override
+            public void onComplete() {
+                callback.resolve(result);
+            }
+
+            @Override
+            public void onError(@NonNull Throwable error) {
+                callback.reject(error);
+            }
+        };
     }
 }

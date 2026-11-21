@@ -38,7 +38,7 @@
     "@types/react": ">=17.0.0",
     "prop-types": "^15.8.1",
     "react": ">=17.0.0",
-    "react-native": ">=0.66.0"
+    "react-native": ">=0.87.0"
   },
   "devDependencies": {
     "@babel/core": "^7.29.6",

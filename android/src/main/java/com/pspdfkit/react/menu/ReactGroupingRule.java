@@ -15,7 +15,6 @@ package com.pspdfkit.react.menu;
 
 import android.content.Context;
 import androidx.annotation.IdRes;
-import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
 import android.util.Log;
 
@@ -24,7 +23,6 @@ import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableType;
 import com.pspdfkit.R;
-import com.pspdfkit.ui.toolbar.ContextualToolbar;
 import com.pspdfkit.ui.toolbar.grouping.presets.MenuItem;
 import com.pspdfkit.ui.toolbar.grouping.presets.PresetMenuItemGroupingRule;
 
@@ -175,7 +173,7 @@ public class ReactGroupingRule extends PresetMenuItemGroupingRule {
 
     @NonNull
     @Override
-    public List<MenuItem> getGroupPreset(@IntRange(from = ContextualToolbar.MIN_TOOLBAR_CAPACITY) int capacity, int itemsCount) {
+    public List<MenuItem> getGroupPreset(int capacity, int itemsCount) {
         return items;
     }
 

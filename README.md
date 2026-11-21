@@ -37,6 +37,7 @@ Nutrient.setLicenseKey('YOUR_REACT_NATIVE_LICENSE_KEY_GOES_HERE');
 ### Requirements
 
 - A [development environment](https://reactnative.dev/docs/environment-setup) for running React Native projects using the React Native CLI. If you’re using Expo, [check out our blog post](https://www.nutrient.io/blog/how-to-use-pspdfkit-for-react-native-with-expo/) on the topic.
+- React Native 0.87 or later (Expo SDK 58 or later)
 
 #### iOS
 
@@ -48,6 +49,10 @@ Nutrient.setLicenseKey('YOUR_REACT_NATIVE_LICENSE_KEY_GOES_HERE');
 - The [latest stable version of Android Studio](https://developer.android.com/studio)
 - The [Android NDK](https://developer.android.com/studio/projects/install-ndk)
 - An [Android Virtual Device](https://developer.android.com/studio/run/managing-avds.html) or a hardware device
+- Android Gradle Plugin 9.1 or later and Kotlin 2.4.10 or later. React Native 0.87 and later already use Android Gradle Plugin 9.2.1 and Gradle 9.4.1.
+- `compileSdk` 37 with `compileSdkMinor` 1 (the `android-37.1` platform), and `minSdk` 24
+
+> If your app minifies release builds, avoid Android Gradle Plugin 9.3.0–9.3.3 and 9.4.0–9.4.1. Their R8 removes a null check in `react-native-screens` ([b/558217403](https://issuetracker.google.com/issues/558217403)), so the app crashes at launch. Stay on 9.2.1, or pin R8 9.4.29 or later.
 
 ### Installation
 
@@ -55,7 +60,7 @@ To install the Nutrient React Native SDK, run `yarn add @nutrient-sdk/react-nati
 
 ### Expo config plugin (Android)
 
-When using Expo prebuild/dev client, add the package as a plugin so Android `AppTheme` is switched to a MaterialComponents-compatible theme:
+When using Expo prebuild/dev client, add the package as a plugin so Android `AppTheme` is switched to a MaterialComponents-compatible theme, and the generated Android project uses Kotlin 2.4.10 or later and compiles against android-37.1 or later:
 
 ```js
 // app.config.js
@@ -85,6 +90,8 @@ export default {
   },
 };
 ```
+
+If you also set `android.kotlinVersion` with `expo-build-properties`, list `@nutrient-sdk/react-native` before it in `plugins`, or set 2.4.10 or later there. Otherwise the version from `expo-build-properties` replaces the one this plugin sets.
 
 After updating app config, run `npx expo prebuild -p android` (or rebuild with EAS).
 
@@ -141,25 +148,38 @@ See our [Getting Started on React Native guide](https://www.nutrient.io/getting-
 
    > If you previously added `https://my.nutrient.io/maven/` for the Nutrient SDK, you can remove it. Keep it only if you also use an add-on that isn't on Maven Central yet, such as OCR (`io.nutrient:nutrient-ocr`).
 
-1. Open the app’s build.gradle file:
+1. Raise Kotlin in your project's `android/build.gradle`. Nutrient's Kotlin metadata is built with Kotlin 2.4. The React Native template leaves the Kotlin Gradle plugin unversioned, so it has to be given the version as well:
+
+   ```diff
+     buildscript {
+       ext {
+   -     kotlinVersion = "2.2.0"
+   +     kotlinVersion = "2.4.10"
+       }
+       dependencies {
+         classpath("com.android.tools.build:gradle")
+         classpath("com.facebook.react:react-native-gradle-plugin")
+   -     classpath("org.jetbrains.kotlin:kotlin-gradle-plugin")
+   +     classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
+       }
+     }
+   ```
+
+   Keep the Android Gradle Plugin 9.2.1 and Gradle 9.4.1 that React Native 0.87 and later come with.
+
+1. Open the app’s build.gradle file and set the compile SDK's minor version:
 
    ```diff
    ...
      android {
-   -  compileSdkVersion rootProject.ext.compileSdkVersion
-   +  compileSdkVersion 36
-   ...
-     defaultConfig {
-       applicationId "com.nutrientdemo"
-   -     minSdkVersion rootProject.ext.minSdkVersion
-   +     minSdkVersion 24
-         targetSdkVersion rootProject.ext.targetSdkVersion
-         versionCode 1
-         versionName "1.0"
-     }
-   }
+       compileSdk rootProject.ext.compileSdkVersion
+   +   // Nutrient's AAR metadata requires the android-37.1 platform, so the minor version
+   +   // has to be set as well.
+   +   compileSdkMinor 1
    ...
    ```
+
+   > `compileSdkVersion` in your project's `ext` block is 37 in React Native 0.87 and later. If you lowered it, set `compileSdk 37` in the app module.
 
 1. Open your project’s Podfile:
 
@@ -236,9 +256,10 @@ See our [Getting Started on React Native guide](https://www.nutrient.io/getting-
    import React, { Component } from 'react';
    import { Platform } from 'react-native';
    import NutrientView from '@nutrient-sdk/react-native';
+   import type { Nutrient as NutrientModule } from '@nutrient-sdk/react-native';
    import { NativeModules } from 'react-native';
 
-   const Nutrient = NativeModules.Nutrient;
+   const Nutrient: NutrientModule = NativeModules.Nutrient;
    Nutrient.setLicenseKey(null);
 
    const DOCUMENT =
