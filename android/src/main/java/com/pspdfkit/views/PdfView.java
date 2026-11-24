@@ -68,9 +68,7 @@ import com.pspdfkit.configuration.sharing.ShareFeatures;
 
 import java.util.EnumSet;
 import com.pspdfkit.document.DocumentSource;
-import com.pspdfkit.document.ImageDocumentLoader;
 import com.pspdfkit.document.PdfDocument;
-import com.pspdfkit.document.PdfDocumentLoader;
 import com.pspdfkit.document.formatters.DocumentJsonFormatter;
 import com.pspdfkit.document.formatters.XfdfFormatter;
 import com.pspdfkit.document.providers.ContentResolverDataProvider;
@@ -79,10 +77,10 @@ import com.pspdfkit.exceptions.InvalidPasswordException;
 import com.pspdfkit.forms.ChoiceFormElement;
 import com.pspdfkit.forms.ComboBoxFormElement;
 import com.pspdfkit.forms.EditableButtonFormElement;
+import com.pspdfkit.forms.FormElement;
 import com.pspdfkit.forms.FormField;
 import com.pspdfkit.forms.SignatureFormElement;
 import com.pspdfkit.forms.TextFormElement;
-import com.pspdfkit.listeners.OnVisibilityChangedListener;
 import com.pspdfkit.listeners.SimpleDocumentListener;
 import com.pspdfkit.react.NutrientNotificationCenter;
 import com.pspdfkit.react.PDFDocumentModule;
@@ -107,6 +105,7 @@ import com.pspdfkit.react.helper.ConversionHelpers;
 import com.pspdfkit.react.helper.DocumentJsonDataProvider;
 import com.pspdfkit.react.helper.MeasurementsHelper;
 import com.pspdfkit.react.helper.RemoteDocumentDownloader;
+import com.pspdfkit.react.helper.SdkAsync;
 import com.pspdfkit.react.menu.NutrientAnnotationPopupMenuBridge;
 import com.pspdfkit.react.menu.NutrientPopupMenuBridge;
 import com.pspdfkit.react.menu.NutrientTextSelectionPopupMenuBridge;
@@ -124,8 +123,6 @@ import com.pspdfkit.ui.PdfUiFragment;
 import com.pspdfkit.ui.PdfUiFragmentBuilder;
 import com.pspdfkit.ui.fonts.Font;
 import com.pspdfkit.ui.fonts.FontManager;
-import com.pspdfkit.ui.search.PdfSearchView;
-import com.pspdfkit.ui.search.PdfSearchViewInline;
 import com.pspdfkit.ui.special_mode.controller.AnnotationTool;
 import com.pspdfkit.ui.toolbar.grouping.MenuItemGroupingRule;
 
@@ -138,7 +135,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
@@ -147,24 +143,13 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 
 
 import io.nutrient.data.models.AiAssistantConfiguration;
 import io.nutrient.data.models.DocumentIdentifiers;
 import io.nutrient.domain.ai.AiAssistant;
 import io.nutrient.domain.ai.AiAssistantKt;
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.core.Completable;
-import io.reactivex.rxjava3.core.Maybe;
-import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.core.ObservableSource;
-import io.reactivex.rxjava3.core.Single;
-import io.reactivex.rxjava3.disposables.CompositeDisposable;
-import io.reactivex.rxjava3.disposables.Disposable;
-import io.reactivex.rxjava3.functions.Consumer;
-import io.reactivex.rxjava3.functions.Function;
-import io.reactivex.rxjava3.schedulers.Schedulers;
-import io.reactivex.rxjava3.subjects.BehaviorSubject;
 import kotlin.Unit;
 import com.pspdfkit.react.SessionStorage;
 
@@ -215,7 +200,8 @@ public class PdfView extends FrameLayout {
     private EventDispatcher eventDispatcher;
     private String fragmentTag;
     private PdfActivityConfiguration configuration;
-    private Disposable documentOpeningDisposable;
+    @Nullable
+    private SdkAsync.Cancellable documentOpening;
     private PdfDocument document;
     private String documentPath;
     private String documentPassword;
@@ -232,17 +218,13 @@ public class PdfView extends FrameLayout {
     @Nullable
     private SimpleDocumentListener fragmentDocumentLoadedListener;
     private MenuItemListener menuItemListener;
-    private ToolbarMenuItemListener toolbarMenuItemListener;
-
-    @NonNull
-    private CompositeDisposable pendingFragmentActions = new CompositeDisposable();
 
     @Nullable
     private PdfUiFragment fragment;
 
-    /** We wrap the fragment in a list so we can have a state that encapsulates no element being set. */
+    /** Hands out the hosted fragment, now or once one is attached. */
     @NonNull
-    private final BehaviorSubject<List<PdfUiFragment>> pdfUiFragmentGetter = BehaviorSubject.createDefault(Collections.emptyList());
+    private final HostedFragment hostedFragment = new HostedFragment();
 
     /** An internal id we generate so we can track if fragments found belong to this specific PdfView instance. */
     private int internalId;
@@ -250,11 +232,11 @@ public class PdfView extends FrameLayout {
     /** Runnable to execute fragment transactions on the main thread */
     private Runnable fragmentTransactionRunnable;
 
-    /** We keep track if the navigation button should be shown so we can show it when the inline search view is closed. */
+    /**
+     * The {@code showNavigationButtonInToolbar} and {@code hideDefaultToolbar} props, kept so they
+     * can be applied to every fragment this view attaches.
+     */
     private boolean isNavigationButtonShown = false;
-    /** We keep track if the inline search view is shown since we don't want to add a second navigation button while it is shown. */
-    private boolean isSearchViewShown = false;
-
     private boolean isDefaultToolbarHidden = false;
 
     private boolean isStatusBarHidden = false;
@@ -262,9 +244,9 @@ public class PdfView extends FrameLayout {
     /** Indicates whether the image document annotations should be flattened only or flattened and embedded. */
     private String imageSaveMode = "flatten";
 
-    /** Disposable keeping track of our subscription to update the annotation configuration on each emitted PdfFragment. */
+    /** Keeps the annotation configuration applied to each PdfFragment the view hosts. */
     @Nullable
-    private Disposable updateAnnotationConfigurationDisposable;
+    private SdkAsync.Cancellable updateAnnotationConfigurationObserver;
 
     /** The currently configured array of available font names for free text annotations. */
     @Nullable
@@ -433,7 +415,6 @@ public class PdfView extends FrameLayout {
         pdfViewDocumentListener = new PdfViewDocumentListener(this,
             eventDispatcher, isFabricMode, delegate);
         menuItemListener = new MenuItemListener(this, eventDispatcher, getContext());
-        toolbarMenuItemListener = new ToolbarMenuItemListener(this, eventDispatcher, getContext(), isFabricMode, delegate);
     }
 
     /**
@@ -448,9 +429,6 @@ public class PdfView extends FrameLayout {
         }
         if (menuItemListener != null) {
             menuItemListener.setEventDispatcher(newDispatcher);
-        }
-        if (toolbarMenuItemListener != null) {
-            toolbarMenuItemListener.setEventDispatcher(newDispatcher);
         }
     }
     
@@ -492,12 +470,8 @@ public class PdfView extends FrameLayout {
     }
 
     public void setAllToolbarItems(final ArrayList stockToolbarItems, final ArrayList customToolbarItems) {
-        pendingFragmentActions.add(getCurrentPdfUiFragment()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(pdfUiFragment -> {
-                        ((ReactPdfUiFragment) pdfUiFragment).setCustomToolbarItems(stockToolbarItems, customToolbarItems, menuItemListener);
-                        pdfUiFragment.invalidateMenu();
-        }));
+        hostedFragment.withPdfUiFragment(pdfUiFragment ->
+                ((ReactPdfUiFragment) pdfUiFragment).setCustomToolbarItems(stockToolbarItems, customToolbarItems, menuItemListener));
     }
 
     public void setAnnotationConfiguration(final List<ReactAnnotationPresetConfiguration> annotationsConfigurations) {
@@ -542,8 +516,8 @@ public class PdfView extends FrameLayout {
                 documentPath = FILE_SCHEME + document;
             }
         }
-        if (documentOpeningDisposable != null) {
-            documentOpeningDisposable.dispose();
+        if (documentOpening != null) {
+            documentOpening.cancel();
         }
         this.documentPath = documentPath;
 
@@ -559,7 +533,7 @@ public class PdfView extends FrameLayout {
 
             RemoteDocumentDownloader downloader = new RemoteDocumentDownloader(documentPath, outputFilePath, overwriteExisting, getContext(), fragmentManager);
             downloader.startDownload((fileLocation, error) -> {
-                // The download is not tracked by documentOpeningDisposable, so a teardown while it
+                // The download is not tracked by documentOpening, so a teardown while it
                 // is in flight cannot cancel it. Bail out if the view was torn down meanwhile,
                 // otherwise this would start a new open and re-attach a fragment after teardown.
                 if (!isActive) {
@@ -573,10 +547,7 @@ public class PdfView extends FrameLayout {
                 }
 
                 if (fileLocation != null) {
-                    documentOpeningDisposable = PdfDocumentLoader.openDocumentAsync(getContext(), Uri.fromFile(fileLocation), documentPassword)
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(pdfDocument -> {
+                    documentOpening = SdkAsync.openPdfDocument(getContext(), Uri.fromFile(fileLocation), documentPassword, SdkAsync.callback(pdfDocument -> {
                                 if (!isActive) {
                                     return;
                                 }
@@ -599,16 +570,13 @@ public class PdfView extends FrameLayout {
                                     PdfView.this.document = null;
                                 }
                                 setupFragment(true);
-                            });
+                            }));
                 }
                 return Unit.INSTANCE;
             });
         } else {
             if (PSPDFKitUtils.isValidImage(documentPath)) {
-                documentOpeningDisposable = ImageDocumentLoader.openDocumentAsync(getContext(), new DocumentSource(Uri.parse(documentPath)))
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(imageDocument -> {
+                documentOpening = SdkAsync.openImageDocument(getContext(), new DocumentSource(Uri.parse(documentPath)), SdkAsync.callback(imageDocument -> {
                             if (!isActive) {
                                 return;
                             }
@@ -630,12 +598,9 @@ public class PdfView extends FrameLayout {
                                 }
                             }
                             setupFragment(false);
-                        });
+                        }));
             } else {
-                documentOpeningDisposable = PdfDocumentLoader.openDocumentAsync(getContext(), Uri.parse(documentPath), documentPassword)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(pdfDocument -> {
+                documentOpening = SdkAsync.openPdfDocument(getContext(), Uri.parse(documentPath), documentPassword, SdkAsync.callback(pdfDocument -> {
                             if (!isActive) {
                                 return;
                             }
@@ -658,17 +623,14 @@ public class PdfView extends FrameLayout {
                                 PdfView.this.document = null;
                             }
                             setupFragment(true);
-                        });
+                        }));
                 }
         }
     }
 
-    @SuppressLint("CheckResult")
     public void setPageIndex(int pageIndex) {
         this.pageIndex = pageIndex;
-        getCurrentPdfFragment()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(fragment -> {
+        hostedFragment.withPdfFragment(fragment -> {
                     if (fragment != null) {
                         try {
                             fragment.setPageIndex(pageIndex);
@@ -684,11 +646,9 @@ public class PdfView extends FrameLayout {
     }
 
     public void setUserInterfaceVisible(boolean visible) {
-        pendingFragmentActions.add(getCurrentPdfUiFragment()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(pdfUiFragment -> {
+        hostedFragment.withPdfUiFragment(pdfUiFragment -> {
                     pdfUiFragment.setUserInterfaceVisible(visible, true);
-                }));
+                });
     }
 
     public void setDisableDefaultActionForTappedAnnotations(boolean disableDefaultActionForTappedAnnotations) {
@@ -743,8 +703,8 @@ public class PdfView extends FrameLayout {
     }
 
     private void updateAnnotationConfiguration() {
-        if (updateAnnotationConfigurationDisposable != null) {
-            updateAnnotationConfigurationDisposable.dispose();
+        if (updateAnnotationConfigurationObserver != null) {
+            updateAnnotationConfigurationObserver.cancel();
         }
 
         // First we create the new FreeTextAnnotationConfiguration.
@@ -776,10 +736,7 @@ public class PdfView extends FrameLayout {
 
         final FreeTextAnnotationConfiguration configuration = builder.build();
         // We want to set this on the current PdfFragment and all future ones.
-        // We use the observable emitting PdfFragments for this purpose.
-        updateAnnotationConfigurationDisposable = getPdfFragment()
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(pdfFragment -> {
+        updateAnnotationConfigurationObserver = hostedFragment.observePdfFragments(pdfFragment -> {
                 if (pdfFragment.getView() != null) {
                     pdfFragment.getAnnotationConfiguration().put(
                             AnnotationTool.FREETEXT, configuration);
@@ -793,13 +750,8 @@ public class PdfView extends FrameLayout {
 
     public void setShowNavigationButtonInToolbar(final boolean showNavigationButtonInToolbar) {
         isNavigationButtonShown = showNavigationButtonInToolbar;
-        pendingFragmentActions.add(getCurrentPdfUiFragment()
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(pdfUiFragment -> {
-                if (!isSearchViewShown) {
-                    ((ReactPdfUiFragment) pdfUiFragment).setShowNavigationButtonInToolbar(showNavigationButtonInToolbar);
-                }
-            }));
+        hostedFragment.withPdfUiFragment(pdfUiFragment ->
+                ((ReactPdfUiFragment) pdfUiFragment).setShowNavigationButtonInToolbar(showNavigationButtonInToolbar));
     }
 
     public void setImageSaveMode(final String imageSaveMode) {
@@ -812,25 +764,14 @@ public class PdfView extends FrameLayout {
 
     public void setHideDefaultToolbar(boolean hideDefaultToolbar) {
         isDefaultToolbarHidden = hideDefaultToolbar;
-        pendingFragmentActions.add(getCurrentPdfUiFragment()
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(pdfUiFragment -> {
-                final View views = pdfUiFragment.getView();
-                if (views != null) {
-                    final ReactMainToolbar mainToolbar = views.findViewById(R.id.pspdf__toolbar_main);
-                    if (hideDefaultToolbar) {
-                        // If hiding the toolbar is requested we force the visibility to gone, this way it will never be shown.
-                        mainToolbar.setForcedVisibility(GONE);
-                    } else {
-                        // To reset we undo our forcing, and if the UI is supposed to be shown right
-                        // now we manually set the visibility to visible so it's immediately shown.
-                        mainToolbar.setForcedVisibility(null);
-                        if (pdfUiFragment.isUserInterfaceVisible()) {
-                            mainToolbar.setVisibility(VISIBLE);
-                        }
-                    }
+        hostedFragment.withPdfUiFragment(pdfUiFragment -> {
+                // The veto lives on the fragment's toolbar coordinator and needs no view, but the
+                // coordinator's ViewModel can't be reached once the fragment has been removed.
+                if (!pdfUiFragment.isAdded()) {
+                    return;
                 }
-            }));
+                MainToolbarSupport.setDefaultToolbarHidden(pdfUiFragment, hideDefaultToolbar);
+            });
     }
 
     private void setupFragment(boolean recreate) {
@@ -924,7 +865,7 @@ public class PdfView extends FrameLayout {
                 Log.w(TAG, "Failed to set AIA Configuration: " + e.getMessage());
             }
         }
-        pdfUiFragmentGetter.onNext(Collections.singletonList(pdfFragment));
+        hostedFragment.publish(pdfFragment);
     }
 
     private void prepareFragment(final PdfUiFragment pdfUiFragment, final boolean attachFragment) {
@@ -967,8 +908,7 @@ public class PdfView extends FrameLayout {
     }
 
     private void attachPdfFragmentListeners(final PdfUiFragment pdfUiFragment) {
-        pdfUiFragment.setOnContextualToolbarLifecycleListener(pdfViewModeController);
-        pdfUiFragment.setOnContextualToolbarMovementListener(pdfViewModeController);
+        pdfViewModeController.attachToFragment(pdfUiFragment);
         pdfUiFragment.getPSPDFKitViews().getFormEditingBarView().addOnFormEditingBarLifecycleListener(pdfViewModeController);
         ((ReactPdfUiFragment) pdfUiFragment).setReactPdfUiFragmentListener(new ReactPdfUiFragment.ReactPdfUiFragmentListener() {
             @Override
@@ -976,7 +916,7 @@ public class PdfView extends FrameLayout {
                 // If the configuration was changed from the UI a new fragment will be created, reattach our listeners.
                 prepareFragment(pdfUiFragment, false);
                 // Also notify other places that might want to reattach their listeners.
-                pdfUiFragmentGetter.onNext(Collections.singletonList(pdfUiFragment));
+                hostedFragment.publish(pdfUiFragment);
             }
 
             @Override
@@ -988,22 +928,11 @@ public class PdfView extends FrameLayout {
                 }
             }
         });
-
-        PdfSearchView searchView = pdfUiFragment.getPSPDFKitViews().getSearchView();
-        if (searchView instanceof PdfSearchViewInline) {
-            // The inline search view provides its own back button hide ours if it becomes visible.
-            searchView.addOnVisibilityChangedListener(new OnVisibilityChangedListener() {
-                @Override
-                public void onShow(@NonNull View view) {
-                    ((ReactPdfUiFragment) pdfUiFragment).setShowNavigationButtonInToolbar(false);
-                }
-
-                @Override
-                public void onHide(@NonNull View view) {
-                    ((ReactPdfUiFragment) pdfUiFragment).setShowNavigationButtonInToolbar(isNavigationButtonShown);
-                }
-            });
-        }
+        // The pending prop actions only reach the fragment that was current when the prop was set,
+        // and a new fragment (a document swap, for example) has a new toolbar coordinator, so apply
+        // both main toolbar props to every fragment that gets here.
+        ((ReactPdfUiFragment) pdfUiFragment).setShowNavigationButtonInToolbar(isNavigationButtonShown);
+        MainToolbarSupport.setDefaultToolbarHidden(pdfUiFragment, isDefaultToolbarHidden);
 
         // After attaching the PdfUiFragment we can access the PdfFragment.
         preparePdfFragment(pdfUiFragment.getPdfFragment());
@@ -1092,6 +1021,7 @@ public class PdfView extends FrameLayout {
             if (makeInactive) {
                 detachFragmentListeners(pdfUiFragment.getPdfFragment());
             }
+            pdfViewModeController.detachFromFragment();
             fragmentManager.beginTransaction()
                 .remove(pdfUiFragment)
                 .commitNowAllowingStateLoss();
@@ -1102,20 +1032,19 @@ public class PdfView extends FrameLayout {
             // Cancel any in-flight document open so its callback cannot repopulate the document
             // or re-attach a fragment after teardown. isActive gates the callbacks that disposal
             // cannot reach (e.g. a remote download still in flight).
-            if (documentOpeningDisposable != null) {
-                documentOpeningDisposable.dispose();
-                documentOpeningDisposable = null;
+            if (documentOpening != null) {
+                documentOpening.cancel();
+                documentOpening = null;
             }
             document = null;
             releaseDocumentReferences();
             // The attach runnable captures the PdfUiFragment; clearing it releases the fragment's
             // view hierarchy once the fragment is removed.
             fragmentTransactionRunnable = null;
-            pendingFragmentActions.dispose();
-            pendingFragmentActions = new CompositeDisposable();
+            hostedFragment.cancelPendingRequests();
         }
         fragment = null;
-        pdfUiFragmentGetter.onNext(Collections.emptyList());
+        hostedFragment.publish(null);
     }
 
     /**
@@ -1186,11 +1115,8 @@ public class PdfView extends FrameLayout {
         }
     }
 
-    @SuppressLint("CheckResult")
     void updateState() {
-        getCurrentPdfFragment()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(pdfFragment -> {
+        hostedFragment.withPdfFragment(pdfFragment -> {
                     try {
                         if (pdfFragment != null) {
                             updateState(pdfFragment.getPageIndex());
@@ -1204,11 +1130,8 @@ public class PdfView extends FrameLayout {
                 });
     }
 
-    @SuppressLint("CheckResult")
     void updateState(int pageIndex) {
-        getCurrentPdfFragment()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(pdfFragment -> {
+        hostedFragment.withPdfFragment(pdfFragment -> {
                     if (pdfFragment != null) {
                         if (pdfFragment.getDocument() != null) {
                             if (isFabricMode && delegate != null) {
@@ -1280,9 +1203,7 @@ public class PdfView extends FrameLayout {
             return true;
         }
 
-        getCurrentPdfFragment()
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(fragment -> {
+        hostedFragment.withPdfFragment(fragment -> {
                 ElectronicSignatureFragment.show(
                     fragment.getParentFragmentManager(),
                     new OnSignaturePickedListener() {
@@ -1298,8 +1219,6 @@ public class PdfView extends FrameLayout {
                     },
                     null,
                     fragment.getSignatureStorage());
-            }, throwable -> {
-                // Ignore errors; the fragment is not available.
             });
 
         return true;
@@ -1346,33 +1265,39 @@ public class PdfView extends FrameLayout {
      * Emits whether a signature UI was actually showing and got dismissed.
      */
     @SuppressWarnings("deprecation")
-    public Single<Boolean> dismissSignaturePad() {
+    public void dismissSignaturePad(@NonNull Consumer<Boolean> onResult, @NonNull Consumer<Throwable> onError) {
         // With no hosted fragment there is no signature UI that could be showing;
         // settle with false instead of waiting on a fragment that may never arrive.
-        final List<PdfUiFragment> pdfUiFragments = pdfUiFragmentGetter.getValue();
-        if (pdfUiFragments == null || pdfUiFragments.isEmpty() || pdfUiFragments.get(0).getPdfFragment() == null) {
-            return Single.just(false);
+        final PdfUiFragment pdfUiFragment = hostedFragment.getCurrent();
+        if (pdfUiFragment == null || pdfUiFragment.getPdfFragment() == null) {
+            onResult.accept(false);
+            return;
         }
-        return getCurrentPdfFragment()
-            .firstOrError()
-            .observeOn(AndroidSchedulers.mainThread())
-            .map(fragment -> {
+        // Settles with false too if the view is torn down before this runs.
+        hostedFragment.withPdfFragment(TimeUnit.SECONDS.toMillis(5), fragment -> {
+            final boolean wasShowing;
+            try {
                 FragmentManager fragmentManager = fragment.getParentFragmentManager();
                 // Detect by type rather than by fragment tag: this stays in sync with the
                 // dismiss() calls below by construction, and breaks at compile time instead
                 // of silently returning false if the SDK ever drops these classes.
-                boolean wasShowing = false;
+                boolean showing = false;
                 for (Fragment attachedFragment : fragmentManager.getFragments()) {
                     if (attachedFragment instanceof ElectronicSignatureFragment
                         || attachedFragment instanceof com.pspdfkit.ui.signatures.SignaturePickerFragment) {
-                        wasShowing = true;
+                        showing = true;
                         break;
                     }
                 }
                 ElectronicSignatureFragment.dismiss(fragmentManager);
                 com.pspdfkit.ui.signatures.SignaturePickerFragment.dismiss(fragmentManager);
-                return wasShowing;
-            });
+                wasShowing = showing;
+            } catch (Exception e) {
+                onError.accept(e);
+                return;
+            }
+            onResult.accept(wasShowing);
+        }, () -> onResult.accept(false));
     }
 
     /**
@@ -1393,9 +1318,7 @@ public class PdfView extends FrameLayout {
         }
 
         // Execute action on the current PdfFragment on the main thread.
-        getCurrentPdfFragment()
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(fragment -> {
+        hostedFragment.withPdfFragment(fragment -> {
                 try {
                     // Prevent re-entrancy into onShouldExecuteAction while we replay the action JS approved.
                     suppressShouldExecuteAction = true;
@@ -1406,64 +1329,40 @@ public class PdfView extends FrameLayout {
                 } finally {
                     suppressShouldExecuteAction = false;
                 }
-            }, throwable -> {
-                // Ignore errors for now; action was attempted.
             });
 
         return true;
     }
 
-    public Disposable enterAnnotationCreationMode(@Nullable final String annotationType, Runnable onComplete, Consumer<Throwable> onError) {
-        Disposable disposable;
+    public void enterAnnotationCreationMode(@Nullable final String annotationType, Runnable onComplete, Consumer<Throwable> onError) {
         if (annotationType == null) {
-            disposable = getCurrentPdfFragment()
-                    .observeOn(Schedulers.io())
-                    .subscribe(fragment -> {
-                        fragment.enterAnnotatingMode();
-                        if (onComplete != null) onComplete.run();
-                    }, onError);
+            runModeChange(PdfFragment::enterAnnotatingMode, onComplete, onError);
         } else {
             ConversionHelpers.AnnotationToolResult annotationTool = ConversionHelpers.convertAnnotationTool(annotationType);
             if (annotationTool.getAnnotationToolVariant() == null) {
-                disposable = getCurrentPdfFragment()
-                        .observeOn(Schedulers.io())
-                        .subscribe(fragment -> {
-                            fragment.enterAnnotatingMode(annotationTool.getAnnotationTool());
-                            if (onComplete != null) onComplete.run();
-                        }, onError);
+                runModeChange(fragment -> fragment.enterAnnotatingMode(annotationTool.getAnnotationTool()), onComplete, onError);
             } else {
-                disposable = getCurrentPdfFragment()
-                        .observeOn(Schedulers.io())
-                        .subscribe(fragment -> {
-                            fragment.enterAnnotatingMode(annotationTool.getAnnotationTool(), annotationTool.getAnnotationToolVariant());
-                            if (onComplete != null) onComplete.run();
-                        }, onError);
+                runModeChange(fragment -> fragment.enterAnnotatingMode(annotationTool.getAnnotationTool(), annotationTool.getAnnotationToolVariant()), onComplete, onError);
             }
         }
-        pendingFragmentActions.add(disposable);
-        return disposable;
     }
 
-    public Disposable exitCurrentlyActiveMode(Runnable onComplete, Consumer<Throwable> onError) {
-        Disposable disposable = getCurrentPdfFragment()
-                .observeOn(Schedulers.io())
-                .subscribe(fragment -> {
-                    fragment.exitCurrentlyActiveMode();
-                    if (onComplete != null) onComplete.run();
-                }, onError);
-        pendingFragmentActions.add(disposable);
-        return disposable;
+    public void exitCurrentlyActiveMode(Runnable onComplete, Consumer<Throwable> onError) {
+        runModeChange(PdfFragment::exitCurrentlyActiveMode, onComplete, onError);
     }
 
-    public Disposable enterContentEditingMode(Runnable onComplete, Consumer<Throwable> onError) {
-        Disposable disposable = getCurrentPdfFragment()
-                .observeOn(Schedulers.io())
-                .subscribe(fragment -> {
-                    fragment.enterContentEditingMode();
-                    if (onComplete != null) onComplete.run();
-                }, onError);
-        pendingFragmentActions.add(disposable);
-        return disposable;
+    public void enterContentEditingMode(Runnable onComplete, Consumer<Throwable> onError) {
+        runModeChange(PdfFragment::enterContentEditingMode, onComplete, onError);
+    }
+
+    /**
+     * Runs a mode change on the current PdfFragment off the main thread, where these have always
+     * run (entering content editing may save the document first), then reports the outcome on the
+     * main thread. Teardown drops a change that hasn't started, and the outcome of one that has,
+     * and reports to {@code onError} that the view was closed instead.
+     */
+    private void runModeChange(@NonNull Consumer<PdfFragment> change, @Nullable Runnable onComplete, @Nullable Consumer<Throwable> onError) {
+        hostedFragment.changeInBackground(change, onComplete, onError);
     }
 
     public boolean saveCurrentDocument() throws Exception {
@@ -1507,11 +1406,15 @@ public class PdfView extends FrameLayout {
         return false;
     }
 
-    public Disposable getFormFieldValue(final int requestId, @NonNull String formElementName) {
-        return document.getFormProvider().getFormElementWithNameAsync(formElementName)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(formElement -> {
+    public void getFormFieldValue(final int requestId, @NonNull String formElementName) {
+        SdkAsync.getFormElementWithName(document, formElementName, SdkAsync.callback(formElement -> {
+            try {
+                if (formElement == null) {
+                    JSONObject result = new JSONObject();
+                    result.put("error", "Failed to get the form field value.");
+                    dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, result));
+                    return;
+                }
                 JSONObject result = new JSONObject();
                 if (formElement instanceof TextFormElement) {
                     TextFormElement textFormElement = (TextFormElement) formElement;
@@ -1546,18 +1449,10 @@ public class PdfView extends FrameLayout {
                 } else {
                     dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, result));
                 }
-            },
-                throwable -> dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, throwable)),
-                () -> {
-                    try {
-                        JSONObject result = new JSONObject();
-                        result.put("error", "Failed to get the form field value.");
-                        dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, result));
-                    } catch (Exception e) {
-                        dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, e));
-                    }
-                });
-
+            } catch (Exception e) {
+                dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, e));
+            }
+        }, throwable -> dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, throwable))));
     }
 
     // region Viewport / coordinate conversion
@@ -1746,27 +1641,20 @@ public class PdfView extends FrameLayout {
      * with {@code null} if the fragment never becomes available (e.g. the view is destroyed
      * before it attaches) within the timeout.
      *
-     * The subscription is tracked so teardown cancels it: without that, a request made against
-     * one document could still be waiting when the view is torn down and resolve against a
-     * freshly attached document instead.
+     * Teardown settles a pending request with {@code null}: without that, a request made against
+     * one document could still be waiting when the view is torn down and resolve against a freshly
+     * attached document instead.
      */
     private void computeViewportResultAsync(@NonNull ViewportResultProducer producer, @NonNull Consumer<JSONObject> callback) {
-        Disposable disposable = getActivePdfFragment()
-            .timeout(5, TimeUnit.SECONDS, Maybe.empty())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                pdfFragment -> {
-                    JSONObject result;
-                    try {
-                        result = producer.produce(pdfFragment);
-                    } catch (Exception e) {
-                        result = null;
-                    }
-                    callback.accept(result);
-                },
-                throwable -> callback.accept(null),
-                () -> callback.accept(null));
-        pendingFragmentActions.add(disposable);
+        hostedFragment.withPdfFragment(TimeUnit.SECONDS.toMillis(5), pdfFragment -> {
+            JSONObject result;
+            try {
+                result = producer.produce(pdfFragment);
+            } catch (Exception e) {
+                result = null;
+            }
+            callback.accept(result);
+        }, () -> callback.accept(null));
     }
 
     /** One-shot pull of the current viewport state. */
@@ -1848,50 +1736,65 @@ public class PdfView extends FrameLayout {
 
     // endregion
 
-    public Maybe<Boolean> setFormFieldValue(@NonNull String formElementName, @NonNull final String value) {
-        return document.getFormProvider().getFormElementWithNameAsync(formElementName)
-            .map(formElement -> {
-                if (formElement instanceof TextFormElement) {
-                    TextFormElement textFormElement = (TextFormElement) formElement;
-                    textFormElement.setText(value);
-                    return true;
-                } else if (formElement instanceof EditableButtonFormElement) {
-                    EditableButtonFormElement editableButtonFormElement = (EditableButtonFormElement) formElement;
-                    if (value.equalsIgnoreCase("selected")) {
-                        editableButtonFormElement.select();
-                    } else if (value.equalsIgnoreCase("deselected")) {
-                        editableButtonFormElement.deselect();
+    /**
+     * Sets the value of the named form field. {@code onResult} receives whether the value was
+     * applied, and {@code false} if no form field has that name.
+     */
+    public void setFormFieldValue(@NonNull String formElementName, @NonNull final String value,
+                                  @NonNull Consumer<Boolean> onResult, @NonNull Consumer<Throwable> onError) {
+        SdkAsync.getFormElementWithName(document, formElementName, SdkAsync.callback(formElement -> {
+            final boolean applied;
+            try {
+                applied = formElement != null && applyFormFieldValue(formElement, value);
+            } catch (Exception e) {
+                onError.accept(e);
+                return;
+            }
+            onResult.accept(applied);
+        }, onError));
+    }
+
+    private static boolean applyFormFieldValue(@NonNull FormElement formElement, @NonNull String value) {
+        if (formElement instanceof TextFormElement) {
+            TextFormElement textFormElement = (TextFormElement) formElement;
+            textFormElement.setText(value);
+            return true;
+        } else if (formElement instanceof EditableButtonFormElement) {
+            EditableButtonFormElement editableButtonFormElement = (EditableButtonFormElement) formElement;
+            if (value.equalsIgnoreCase("selected")) {
+                editableButtonFormElement.select();
+            } else if (value.equalsIgnoreCase("deselected")) {
+                editableButtonFormElement.deselect();
+            }
+            return true;
+        } else if (formElement instanceof ChoiceFormElement) {
+            ChoiceFormElement choiceFormElement = (ChoiceFormElement) formElement;
+            try {
+                int selectedIndex = Integer.parseInt(value);
+                List<Integer> selectedIndices = new ArrayList<>();
+                selectedIndices.add(selectedIndex);
+                choiceFormElement.setSelectedIndexes(selectedIndices);
+                return true;
+            } catch (NumberFormatException e) {
+                try {
+                    // Maybe it's multiple indices.
+                    JSONArray indices = new JSONArray(value);
+                    List<Integer> selectedIndices = new ArrayList<>();
+                    for (int i = 0; i < indices.length(); i++) {
+                        selectedIndices.add(indices.getInt(i));
                     }
+                    choiceFormElement.setSelectedIndexes(selectedIndices);
                     return true;
-                } else if (formElement instanceof ChoiceFormElement) {
-                    ChoiceFormElement choiceFormElement = (ChoiceFormElement) formElement;
-                    try {
-                        int selectedIndex = Integer.parseInt(value);
-                        List<Integer> selectedIndices = new ArrayList<>();
-                        selectedIndices.add(selectedIndex);
-                        choiceFormElement.setSelectedIndexes(selectedIndices);
+                } catch (JSONException ex) {
+                    // This isn't an index maybe we can set a custom value on a combo box.
+                    if (formElement instanceof ComboBoxFormElement) {
+                        ((ComboBoxFormElement) formElement).setCustomText(value);
                         return true;
-                    } catch (NumberFormatException e) {
-                        try {
-                            // Maybe it's multiple indices.
-                            JSONArray indices = new JSONArray(value);
-                            List<Integer> selectedIndices = new ArrayList<>();
-                            for (int i = 0; i < indices.length(); i++) {
-                                selectedIndices.add(indices.getInt(i));
-                            }
-                            choiceFormElement.setSelectedIndexes(selectedIndices);
-                            return true;
-                        } catch (JSONException ex) {
-                            // This isn't an index maybe we can set a custom value on a combo box.
-                            if (formElement instanceof ComboBoxFormElement) {
-                                ((ComboBoxFormElement) formElement).setCustomText(value);
-                                return true;
-                            }
-                        }
                     }
                 }
-                return false;
-            });
+            }
+        }
+        return false;
     }
 
     public JSONObject convertConfiguration() {
@@ -1945,38 +1848,23 @@ public class PdfView extends FrameLayout {
         }
     }
 
-    /** Returns the {@link PdfFragment} hosted in the current {@link PdfUiFragment}. */
-    private Observable<PdfFragment> getCurrentPdfFragment() {
-        return getPdfFragment()
-            .take(1);
-    }
-
-    /** Returns the {@link PdfUiFragment}. */
-    private Observable<PdfUiFragment> getCurrentPdfUiFragment() {
-        return pdfUiFragmentGetter
-            .filter(pdfUiFragments -> !pdfUiFragments.isEmpty())
-            .map(pdfUiFragments -> pdfUiFragments.get(0))
-            .take(1);
+    /**
+     * Runs {@code action} on the main thread with the current {@link PdfFragment}, now or once one is
+     * attached. Don't keep the fragment: it can be replaced, for example when the user changes the
+     * view configuration.
+     */
+    @NonNull
+    public SdkAsync.Cancellable withPdfFragment(@NonNull Consumer<PdfFragment> action) {
+        return hostedFragment.withPdfFragment(action);
     }
 
     /**
-     * Returns the current fragment if it is set. You should not cache a reference to this as it might be replaced.
-     * If you want to register listeners on the {@link PdfFragment} you should observe the result of {@link #getPdfFragment()}
-     * and setup the listeners in there. This way if the fragment is replaced your listeners will be setup again.
+     * Like {@link #withPdfFragment(Consumer)}, but runs {@code onUnavailable} instead if no fragment
+     * is attached in time or the view is torn down first, so exactly one of the two always runs.
      */
-    public Maybe<PdfFragment> getActivePdfFragment() {
-        return getCurrentPdfFragment().firstElement();
-    }
-
-    /**
-     * This returns {@link PdfFragment} as they become available. If the user changes the view configuration or the fragment is replaced for other reasons a new {@link PdfFragment} is emitted.
-     */
-    public Observable<PdfFragment> getPdfFragment() {
-        return pdfUiFragmentGetter
-            .filter(pdfUiFragments -> !pdfUiFragments.isEmpty())
-            .map(pdfUiFragments -> pdfUiFragments.get(0))
-            .filter(pdfUiFragment -> pdfUiFragment.getPdfFragment() != null)
-            .map(PdfUiFragment::getPdfFragment);
+    @NonNull
+    public SdkAsync.Cancellable withPdfFragment(long timeoutMillis, @NonNull Consumer<PdfFragment> action, @NonNull Runnable onUnavailable) {
+        return hostedFragment.withPdfFragment(timeoutMillis, action, onUnavailable);
     }
 
     /** Returns the event registration map for the default events emitted by the {@link PdfView}. */
@@ -2043,6 +1931,7 @@ public class PdfView extends FrameLayout {
         } else {
             supportedToolbarPositionsList = null;
         }
+        pdfViewModeController.setSupportedToolbarPositions(supportedToolbarPositionsList);
     }
 
     /**

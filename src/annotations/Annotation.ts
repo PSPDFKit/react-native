@@ -75,7 +75,7 @@
  * @property { number } maximumAlpha
  * @property { number } minimumThickness
  * @property { number } maximumThickness
- * @property { boolean } customColorPickerEnabled
+ * @property { boolean } [customColorPickerEnabled] Deprecated, has no effect: Nutrient Android SDK 12 shows a single unified color picker, and iOS never read this option.
  * @property { boolean } previewEnabled
  * @property { boolean } zIndexEditingEnabled
  * @property { boolean } forceDefault
@@ -88,7 +88,7 @@
  * @memberof Annotation
  * @property { string } defaultColor
  * @property { string[] } availableColors
- * @property { boolean } customColorPickerEnabled
+ * @property { boolean } [customColorPickerEnabled] Deprecated, has no effect: Nutrient Android SDK 12 shows a single unified color picker, and iOS never read this option.
  * @property { number } defaultTextSize
  * @property { number } minimumTextSize
  * @property { number } maximumTextSize
@@ -113,7 +113,7 @@
  * @property { number } maximumAlpha
  * @property { number } minimumThickness
  * @property { number } maximumThickness
- * @property { boolean } customColorPickerEnabled
+ * @property { boolean } [customColorPickerEnabled] Deprecated, has no effect: Nutrient Android SDK 12 shows a single unified color picker, and iOS never read this option.
  * @property { boolean } previewEnabled
  * @property { Annotation.BorderStyle } defaultBorderStyle
  * @property { boolean } zIndexEditingEnabled
@@ -128,7 +128,7 @@
  * @property { string[] } availableColors
  * @property { string } defaultFillColor
  * @property { string[] } availableFillColors
- * @property { boolean } customColorPickerEnabled
+ * @property { boolean } [customColorPickerEnabled] Deprecated, has no effect: Nutrient Android SDK 12 shows a single unified color picker, and iOS never read this option.
  * @property { number } defaultThickness
  * @property { number } minimumThickness
  * @property { number } maximumThickness
@@ -152,7 +152,7 @@
  * @property { string[] } availableColors
  * @property { number } minimumAlpha
  * @property { number } maximumAlpha
- * @property { boolean } customColorPickerEnabled
+ * @property { boolean } [customColorPickerEnabled] Deprecated, has no effect: Nutrient Android SDK 12 shows a single unified color picker, and iOS never read this option.
  * @property { boolean } zIndexEditingEnabled
  * @property { boolean } forceDefaults Whether the configured default values should be enforced every time the view is displayed. When ```false``` (the default), the configured defaults are used only when no last-used value exists yet; afterwards the user's last-used annotation style values take precedence.
  * @property { string[] } supportedProperties
@@ -184,7 +184,7 @@
  * @memberof Annotation
  * @property { string } defaultColor
  * @property { string[] } availableColors
- * @property { boolean } customColorPickerEnabled
+ * @property { boolean } [customColorPickerEnabled] Deprecated, has no effect: Nutrient Android SDK 12 shows a single unified color picker, and iOS never read this option.
  * @property { string } defaultIconName
  * @property { string[] } availableIconNames
  * @property { boolean } zIndexEditingEnabled
@@ -207,7 +207,7 @@
  * @property { string } defaultFillColor
  * @property { string[] } availableColors
  * @property { string[] } availableFillColors
- * @property { boolean } customColorPickerEnabled
+ * @property { boolean } [customColorPickerEnabled] Deprecated, has no effect: Nutrient Android SDK 12 shows a single unified color picker, and iOS never read this option.
  * @property { boolean } previewEnabled
  * @property { boolean } zIndexEditingEnabled
  * @property { boolean } forceDefaults Whether the configured default values should be enforced every time the view is displayed. When ```false``` (the default), the configured defaults are used only when no last-used value exists yet; afterwards the user's last-used annotation style values take precedence.
@@ -236,7 +236,7 @@
  * @property { number } maximumAlpha
  * @property { number } minimumThickness
  * @property { number } maximumThickness
- * @property { boolean } customColorPickerEnabled
+ * @property { boolean } [customColorPickerEnabled] Deprecated, has no effect: Nutrient Android SDK 12 shows a single unified color picker, and iOS never read this option.
  * @property { boolean } previewEnabled
  * @property { boolean } zIndexEditingEnabled
  * @property { string[] } supportedProperties
@@ -257,7 +257,7 @@
  * @property { number } maximumAlpha
  * @property { number } minimumThickness
  * @property { number } maximumThickness
- * @property { boolean } customColorPickerEnabled
+ * @property { boolean } [customColorPickerEnabled] Deprecated, has no effect: Nutrient Android SDK 12 shows a single unified color picker, and iOS never read this option.
  * @property { boolean } previewEnabled
  * @property { boolean } zIndexEditingEnabled
  * @property { string[] } supportedProperties
@@ -278,7 +278,7 @@
  * @property { number } maximumAlpha
  * @property { number } minimumThickness
  * @property { number } maximumThickness
- * @property { boolean } customColorPickerEnabled
+ * @property { boolean } [customColorPickerEnabled] Deprecated, has no effect: Nutrient Android SDK 12 shows a single unified color picker, and iOS never read this option.
  * @property { boolean } previewEnabled
  * @property { boolean } zIndexEditingEnabled
  * @property { string[] } supportedProperties
@@ -395,6 +395,13 @@ export interface TextSelectionContextualMenuItem extends Omit<AnnotationContextu
   maximumAlpha?: number;
   minimumThickness?: number;
   maximumThickness?: number;
+  /**
+   * @deprecated Has no effect. Nutrient Android SDK 12 shows a single unified color picker, and iOS never read this option.
+   */
+  customColorPickerEnabled?: boolean;
+  /**
+   * @deprecated Misspelled and has no effect. Nutrient Android SDK 12 shows a single unified color picker, and iOS never read this option.
+   */
   costomColorPickerEnabled?: boolean;
   previewEnabled?: boolean;
   zIndexEditingEnabled?: boolean;
@@ -409,6 +416,9 @@ export interface TextSelectionContextualMenuItem extends Omit<AnnotationContextu
 export interface AnnotationPresetFreeText {
   defaultColor?: string;
   availableColors?: string[];
+  /**
+   * @deprecated Has no effect. Nutrient Android SDK 12 shows a single unified color picker, and iOS never read this option.
+   */
   customColorPickerEnabled?: boolean;
   defaultTextSize?: number;
   minimumTextSize?: number;
@@ -435,6 +445,9 @@ export interface AnnotationPresetShape {
   maximumAlpha?: number;
   minimumThickness?: number;
   maximumThickness?: number;
+  /**
+   * @deprecated Has no effect. Nutrient Android SDK 12 shows a single unified color picker, and iOS never read this option.
+   */
   customColorPickerEnabled?: boolean;
   previewEnabled?: boolean;
   defaultBorderStyle?: Annotation.BorderStyle;
@@ -451,6 +464,9 @@ export interface AnnotationPresetLine {
   availableColors?: string[];
   defaultFillColor?: string;
   availableFillColors?: string[];
+  /**
+   * @deprecated Has no effect. Nutrient Android SDK 12 shows a single unified color picker, and iOS never read this option.
+   */
   customColorPickerEnabled?: boolean;
   defaultThickness?: number;
   minimumThickness?: number;
@@ -479,6 +495,9 @@ export interface AnnotationPresetMarkup {
   availableColors?: string[];
   minimumAlpha?: number;
   maximumAlpha?: number;
+  /**
+   * @deprecated Has no effect. Nutrient Android SDK 12 shows a single unified color picker, and iOS never read this option.
+   */
   customColorPickerEnabled?: boolean;
   zIndexEditingEnabled?: boolean;
   forceDefaults?: boolean;
@@ -514,6 +533,9 @@ export interface AnnotationPresetStamp {
 export interface AnnotationPresetNote {
   defaultColor?: string;
   availableColors?: string[];
+  /**
+   * @deprecated Has no effect. Nutrient Android SDK 12 shows a single unified color picker, and iOS never read this option.
+   */
   customColorPickerEnabled?: boolean;
   defaultIconName?: string;
   availableIconNames?: string[];
@@ -539,6 +561,9 @@ export interface AnnotationPresetRedact {
   defaultFillColor?: string;
   availableColors?: string[];
   availableFillColors?: string[];
+  /**
+   * @deprecated Has no effect. Nutrient Android SDK 12 shows a single unified color picker, and iOS never read this option.
+   */
   customColorPickerEnabled?: boolean;
   previewEnabled?: boolean;
   zIndexEditingEnabled?: boolean;
@@ -570,6 +595,9 @@ export interface AnnotationPresetMeasurementArea {
   maximumAlpha?: number;
   minimumThickness?: number;
   maximumThickness?: number;
+  /**
+   * @deprecated Has no effect. Nutrient Android SDK 12 shows a single unified color picker, and iOS never read this option.
+   */
   customColorPickerEnabled?: boolean;
   previewEnabled?: boolean;
   zIndexEditingEnabled?: boolean;
@@ -595,6 +623,9 @@ export interface AnnotationPresetMeasurementPerimeter {
   maximumAlpha?: number;
   minimumThickness?: number;
   maximumThickness?: number;
+  /**
+   * @deprecated Has no effect. Nutrient Android SDK 12 shows a single unified color picker, and iOS never read this option.
+   */
   customColorPickerEnabled?: boolean;
   previewEnabled?: boolean;
   zIndexEditingEnabled?: boolean;
@@ -620,6 +651,9 @@ export interface AnnotationPresetMeasurementDistance {
   maximumAlpha?: number;
   minimumThickness?: number;
   maximumThickness?: number;
+  /**
+   * @deprecated Has no effect. Nutrient Android SDK 12 shows a single unified color picker, and iOS never read this option.
+   */
   customColorPickerEnabled?: boolean;
   previewEnabled?: boolean;
   zIndexEditingEnabled?: boolean;

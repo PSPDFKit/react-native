@@ -292,6 +292,38 @@ describe('PDFDocument JS helpers', () => {
       });
     });
   });
+
+  describe('updateAnnotations', () => {
+    const nativeUpdate = NativeModules.PDFDocumentManager.updateAnnotations as jest.Mock;
+
+    test.each([
+      ['a nested array', [[{ uuid: 'a', name: 'b', type: 'pspdfkit/ink' }]]],
+      ['elements without a uuid or name', [{ foo: 'bar' }]],
+    ])('rejects without calling native when given %s', async (_label, annotations) => {
+      const doc = new PDFDocument(1234);
+      await expect(doc.updateAnnotations(annotations)).rejects.toMatchObject({
+        code: 'updateAnnotations',
+        message: 'No annotations found to update',
+      });
+      expect(nativeUpdate).not.toHaveBeenCalled();
+    });
+
+    test('rejects instead of throwing when an element is null', async () => {
+      const doc = new PDFDocument(1234);
+      await expect(doc.updateAnnotations([null])).rejects.toThrow(TypeError);
+      expect(nativeUpdate).not.toHaveBeenCalled();
+    });
+
+    test('resolves without calling native when given an empty array', async () => {
+      const doc = new PDFDocument(1234);
+      await expect(doc.updateAnnotations([])).resolves.toBe(true);
+      expect(nativeUpdate).not.toHaveBeenCalled();
+    });
+
+    test('forwards annotations that carry an identifier to native', async () => {
+      const doc = new PDFDocument(1234);
+      await expect(doc.updateAnnotations([{ uuid: 'a', name: 'b' }, { foo: 'bar' }])).resolves.toBe(true);
+      expect(nativeUpdate).toHaveBeenCalledWith(expect.anything(), [{ uuid: 'a', name: 'b' }]);
+    });
+  });
 });
-
-

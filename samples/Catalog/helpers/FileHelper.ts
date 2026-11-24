@@ -1,7 +1,8 @@
 import { NativeModules, Platform } from 'react-native';
 import RNFS from 'react-native-fs';
+import type { Processor as ProcessorModule } from '@nutrient-sdk/react-native';
 
-const { RNProcessor: Processor } = NativeModules;
+const Processor: ProcessorModule = NativeModules.RNProcessor;
 
 const downloadFile = async (filePath: string) => {
   return await RNFS.moveFile(filePath, 'PDFs/').catch(err => {

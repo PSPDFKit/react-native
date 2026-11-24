@@ -335,18 +335,21 @@ import PSPDFKit
     
     @objc public func didSelectAnnotations(annotations: [Annotation], documentID: String, componentID: Int) {
         if (!isInUse) { return }
-        let isFormElement = annotations.contains(where: { $0 is FormElement })
+        // A selection can mix form elements and other annotations, each form element gets its own event.
+        let formElements = annotations.compactMap { $0 as? FormElement }
+        let otherAnnotations = annotations.filter { !($0 is FormElement) }
         
-        if (isFormElement) {
-            if let annotationJSON = try? RCTConvert.instantJSON(from: annotations[0] as? FormElement) {
+        for formElement in formElements {
+            if let annotationJSON = try? RCTConvert.instantJSON(from: formElement) {
                 let jsonData = ["event" : NotificationEvent.formFieldSelected.rawValue, "formField" : annotationJSON, "documentID" : documentID] as [String : Any]
                 let payload = createEventPayload(jsonData: jsonData, componentID: componentID)
                 routeEvent(.formFieldSelected, payload: payload)
             } else {
                 // Could not decode annotation data
             }
-        } else {
-            if let annotationJSON = try? RCTConvert.instantJSON(from: annotations) {
+        }
+        if !otherAnnotations.isEmpty {
+            if let annotationJSON = try? RCTConvert.instantJSON(from: otherAnnotations) {
                 let jsonData = ["event" : NotificationEvent.annotationsSelected.rawValue, "annotations" : annotationJSON, "documentID" : documentID] as [String : Any]
                 let payload = createEventPayload(jsonData: jsonData, componentID: componentID)
                 routeEvent(.annotationsSelected, payload: payload)
@@ -358,18 +361,21 @@ import PSPDFKit
     
     @objc public func didDeselectAnnotations(annotations: [Annotation], documentID: String, componentID: Int) {
         if (!isInUse) { return }
-        let isFormElement = annotations.contains(where: { $0 is FormElement })
+        // A selection can mix form elements and other annotations, each form element gets its own event.
+        let formElements = annotations.compactMap { $0 as? FormElement }
+        let otherAnnotations = annotations.filter { !($0 is FormElement) }
         
-        if (isFormElement) {
-            if let annotationJSON = try? RCTConvert.instantJSON(from: annotations[0] as? FormElement) {
+        for formElement in formElements {
+            if let annotationJSON = try? RCTConvert.instantJSON(from: formElement) {
                 let jsonData = ["event" : NotificationEvent.formFieldDeselected.rawValue, "formField" : annotationJSON, "documentID" : documentID] as [String : Any]
                 let payload = createEventPayload(jsonData: jsonData, componentID: componentID)
                 routeEvent(.formFieldDeselected, payload: payload)
             } else {
                 // Could not decode annotation data
             }
-        } else {
-            if let annotationJSON = try? RCTConvert.instantJSON(from: annotations) {
+        }
+        if !otherAnnotations.isEmpty {
+            if let annotationJSON = try? RCTConvert.instantJSON(from: otherAnnotations) {
                 let jsonData = ["event" : NotificationEvent.annotationsDeselected.rawValue, "annotations" : annotationJSON, "documentID" : documentID] as [String : Any]
                 let payload = createEventPayload(jsonData: jsonData, componentID: componentID)
                 routeEvent(.annotationsDeselected, payload: payload)

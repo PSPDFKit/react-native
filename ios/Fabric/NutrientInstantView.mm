@@ -60,6 +60,9 @@ using namespace facebook::react;
 
 - (instancetype)initWithFrame:(CGRect)frame {
   if (self = [super initWithFrame:frame]) {
+    // React Native 0.88 asserts that every component view sets up its default props.
+    static const auto defaultProps = std::make_shared<const NutrientInstantViewProps>();
+    _props = defaultProps;
     _pageIndex = 0;
     _view = [[RCTInstantPSPDFKitView alloc] initWithFrame:frame];
     _view.delegate = self;

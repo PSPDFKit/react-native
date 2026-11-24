@@ -17,7 +17,7 @@ import { extractFromAssetsIfMissing } from '../helpers/FileSystemHelpers';
 // Long enough for the remaining taps to land, the signature UI to finish
 // presenting, and a UI test to assert that it is visible, before the armed
 // dismissal fires.
-const ARM_DISMISS_DELAY_MS = 6000;
+const ARM_DISMISS_DELAY_MS = 15000;
 
 export const SignaturePadControl = ({ navigation }: any) => {
   const pdfRef = useRef<NutrientView | null>(null);

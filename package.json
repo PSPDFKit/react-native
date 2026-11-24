@@ -1,6 +1,6 @@
 {
   "name": "@nutrient-sdk/react-native",
-  "version": "4.5.1",
+  "version": "4.6.0",
   "description": "Nutrient React Native SDK",
   "keywords": [
     "react native",
@@ -38,7 +38,7 @@
     "@types/react": ">=17.0.0",
     "prop-types": "^15.8.1",
     "react": ">=17.0.0",
-    "react-native": ">=0.66.0"
+    "react-native": ">=0.87.0"
   },
   "devDependencies": {
     "@babel/core": "^7.29.6",
@@ -58,6 +58,8 @@
     "jsdoc": "^4.0.5",
     "prettier": "^2.8.8",
     "prop-types": "^15.8.1",
+    "react": "19.3.0",
+    "react-native": "0.88.0",
     "typescript": "^5.1.3"
   },
   "engines": {

@@ -13,6 +13,7 @@ module.exports = {
     PDFDocumentManager: {
       getPageCount: jest.fn().mockResolvedValue(10),
       getDocumentId: jest.fn().mockResolvedValue('doc-id'),
+      updateAnnotations: jest.fn().mockResolvedValue(true),
     },
     PSPDFKitViewManager: {},
     Nutrient: {

@@ -202,10 +202,31 @@
 }
 
 - (BOOL)exitCurrentlyActiveMode {
+  // Deselecting ends form editing like the form Done button, closing the keyboard and the date or choice popover.
+  for (PSPDFPageView *pageView in self.pdfController.visiblePageViews) {
+    NSArray<PSPDFAnnotation *> *deselected = pageView.selectedAnnotations;
+    // Skipping pages with nothing selected keeps their text selection, which clearing would discard.
+    if (deselected.count == 0) {
+      continue;
+    }
+    pageView.selectedAnnotations = @[];
+    // The setter does not call the delegate, so report the deselection to JS as Android does.
+    // Form elements go separately, the notification center reads the first one as a form field.
+    NSPredicate *isFormElement = [NSPredicate predicateWithBlock:^BOOL(id annotation, NSDictionary *bindings) {
+      return [annotation isKindOfClass:PSPDFFormElement.class];
+    }];
+    NSArray<PSPDFAnnotation *> *formElements = [deselected filteredArrayUsingPredicate:isFormElement];
+    NSArray<PSPDFAnnotation *> *otherAnnotations = [deselected filteredArrayUsingPredicate:[NSCompoundPredicate notPredicateWithSubpredicate:isFormElement]];
+    for (NSArray<PSPDFAnnotation *> *group in @[formElements, otherAnnotations]) {
+      if (group.count > 0) {
+        [self pdfViewController:self.pdfController didDeselectAnnotations:group onPageView:pageView];
+      }
+    }
+  }
   if ([self.pdfController.annotationToolbarController isToolbarVisible]) {
     return [self.pdfController.annotationToolbarController hideToolbarAnimated:YES completion:NULL];
   }
-  return true;
+  return YES;
 }
 
 - (void)enterContentEditingMode {

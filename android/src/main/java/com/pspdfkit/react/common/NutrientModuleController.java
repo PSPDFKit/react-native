@@ -13,7 +13,6 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
@@ -32,7 +31,6 @@ import com.pspdfkit.document.PdfDocument;
 import com.pspdfkit.document.PdfDocumentLoader;
 import com.pspdfkit.document.image.CameraImagePickerFragment;
 import com.pspdfkit.document.image.GalleryImagePickerFragment;
-import com.pspdfkit.document.processor.PdfProcessor;
 import com.pspdfkit.document.processor.PdfProcessorTask;
 import com.pspdfkit.exceptions.InvalidNutrientLicenseException;
 import com.pspdfkit.exceptions.InvalidPasswordException;
@@ -44,11 +42,10 @@ import com.pspdfkit.react.R;
 import com.pspdfkit.react.helper.ConversionHelpers;
 import com.pspdfkit.react.ConfigurationAdapter;
 import com.pspdfkit.react.helper.PSPDFKitUtils;
+import com.pspdfkit.react.helper.SdkAsync;
 import com.pspdfkit.ui.PdfActivity;
 import com.pspdfkit.ui.PdfFragment;
-import com.pspdfkit.ui.search.PdfSearchView;
-import com.pspdfkit.ui.search.PdfSearchViewInline;
-import com.pspdfkit.views.ReactMainToolbar;
+import com.pspdfkit.views.MainToolbarSupport;
 
 import java.io.File;
 import java.io.IOException;
@@ -266,21 +263,34 @@ public class NutrientModuleController implements Application.ActivityLifecycleCa
                                    @Nullable final String password,
                                    @NonNull final Promise promise) {
         String documentPath = Uri.parse(sourceDocumentPath).getScheme() == null ? FILE_SCHEME + sourceDocumentPath : sourceDocumentPath;
-        if (password != null) {
-            PdfDocumentLoader.openDocumentAsync(reactContext, Uri.parse(documentPath), password)
-                    .flatMapCompletable(document -> {
-                        PdfProcessorTask task = setupProcessAnnotations(document, processingMode, annotationTypes);
-                        return PdfProcessor.processDocumentAsync(task, new File(targetDocumentPath)).ignoreElements();
-                    })
-                    .subscribe(() -> promise.resolve(Boolean.TRUE), promise::reject);
-        } else {
-            PdfDocumentLoader.openDocumentAsync(reactContext, Uri.parse(documentPath))
-                    .flatMapCompletable(document -> {
-                        PdfProcessorTask task = setupProcessAnnotations(document, processingMode, annotationTypes);
-                        return PdfProcessor.processDocumentAsync(task, new File(targetDocumentPath)).ignoreElements();
-                    })
-                    .subscribe(() -> promise.resolve(Boolean.TRUE), promise::reject);
-        }
+        SdkAsync.openPdfDocument(reactContext, Uri.parse(documentPath), password, new SdkAsync.Callback<PdfDocument>() {
+            @Override
+            public void onSuccess(@NonNull PdfDocument document) {
+                final PdfProcessorTask task;
+                try {
+                    task = setupProcessAnnotations(document, processingMode, annotationTypes);
+                } catch (Exception e) {
+                    promise.reject(e);
+                    return;
+                }
+                SdkAsync.processDocument(task, new File(targetDocumentPath), new SdkAsync.Completion() {
+                    @Override
+                    public void onComplete() {
+                        promise.resolve(Boolean.TRUE);
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable error) {
+                        promise.reject(error);
+                    }
+                });
+            }
+
+            @Override
+            public void onError(@NonNull Throwable error) {
+                promise.reject(error);
+            }
+        });
     }
 
     private PdfProcessorTask setupProcessAnnotations(@NonNull final PdfDocument document,
@@ -324,20 +334,9 @@ public class NutrientModuleController implements Application.ActivityLifecycleCa
                 onPdfActivityOpenedTask.run();
                 onPdfActivityOpenedTask = null;
             }
-            try {
-                ActionBar ab = pdfActivity.getSupportActionBar();
-                if (ab != null) ab.setDisplayHomeAsUpEnabled(true);
-                ReactMainToolbar mainToolbar = pdfActivity.findViewById(R.id.pspdf__toolbar_main);
-                if (mainToolbar != null) {
-                    mainToolbar.setNavigationOnClickListener(v -> pdfActivity.onBackPressed());
-                }
-                PdfSearchView searchView = pdfActivity.getPSPDFKitViews().getSearchView();
-                if (searchView instanceof PdfSearchViewInline searchViewInline) {
-                    View back = searchViewInline.findViewById(com.pspdfkit.R.id.pspdf__search_btn_back);
-                    if (back != null) back.setVisibility(View.GONE);
-                }
-            } catch (Exception ignored) { }
-
+            // Give the presented activity a back arrow that closes it.
+            MainToolbarSupport.setNavigationButtonShown(pdfActivity, true,
+                    () -> pdfActivity.getOnBackPressedDispatcher().onBackPressed());
             if (lastPresentPromise != null) {
                 pdfActivity.getPdfFragment().addDocumentListener(new SimpleDocumentListener() {
                     @Override

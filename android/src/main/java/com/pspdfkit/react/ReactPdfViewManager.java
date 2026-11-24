@@ -47,16 +47,12 @@ import com.pspdfkit.views.PdfView;
 import com.pspdfkit.configuration.activity.PdfActivityConfiguration;
 import org.json.JSONObject;
 
+import java.util.function.Consumer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import javax.annotation.Nullable;
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.disposables.CompositeDisposable;
-import io.reactivex.rxjava3.disposables.Disposable;
-import io.reactivex.rxjava3.functions.Consumer;
-import io.reactivex.rxjava3.schedulers.Schedulers;
 
 /**
  * Exposes {@link PdfView} to react-native.
@@ -87,7 +83,6 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
     public static final int COMMAND_SHOW_SIGNATURE_PAD = 22;
     public static final int COMMAND_DISMISS_SIGNATURE_PAD = 23;
 
-    private final CompositeDisposable annotationDisposables = new CompositeDisposable();
 
     private ReactApplicationContext reactApplicationContext;
 
@@ -362,24 +357,16 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
             case COMMAND_GET_FORM_FIELD_VALUE:
                 if (args != null && args.size() == 2) {
                     final int requestId = args.getInt(0);
-                    annotationDisposables.add(root.getFormFieldValue(requestId, args.getString(1)));
+                    root.getFormFieldValue(requestId, args.getString(1));
                 }
                 break;
             case COMMAND_SET_FORM_FIELD_VALUE:
                 if (args != null && args.size() == 3) {
                     final int requestId = args.getInt(0);
-                    Disposable annotationDisposable = root.setFormFieldValue(args.getString(1), args.getString(2))
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(fieldSet ->  {
-                            root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, fieldSet));
-                        }, throwable -> {
-                            root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, throwable));
-                        },() -> {
-                            // Called when no form field was found.
-                            root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, false));
-                        });
-                    annotationDisposables.add(annotationDisposable);
+                    // Reports false when no form field has that name.
+                    root.setFormFieldValue(args.getString(1), args.getString(2),
+                        fieldSet -> root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, fieldSet)),
+                        throwable -> root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, throwable)));
                 }
                 break;
             case COMMAND_REMOVE_FRAGMENT:
@@ -511,7 +498,7 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
             case COMMAND_DISMISS_SIGNATURE_PAD:
                 if (args != null && args.size() >= 1) {
                     final int requestId = args.getInt(0);
-                    root.dismissSignaturePad().subscribe(
+                    root.dismissSignaturePad(
                         didDismiss -> root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, (boolean) didDismiss)),
                         throwable -> root.getEventDispatcher().dispatchEvent(new PdfViewDataReturnedEvent(root.getId(), requestId, throwable)));
                 }

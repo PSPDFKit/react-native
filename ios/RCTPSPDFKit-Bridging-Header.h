@@ -7,8 +7,8 @@
 //  This notice may not be removed from this file.
 //
 
-#import "RCTBridgeModule.h"
-#import "RCTEventEmitter.h"
+#import <React/RCTBridgeModule.h>
+#import <React/RCTEventEmitter.h>
 
 // Helper to pass ObjC exceptions nicely to Swift / RN
 NS_INLINE NSException * _Nullable ExecuteWithObjCExceptionHandling(void(NS_NOESCAPE^_Nonnull tryBlock)(void)) {

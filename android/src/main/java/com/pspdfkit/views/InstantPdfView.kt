@@ -261,8 +261,7 @@ class InstantPdfView @JvmOverloads constructor(
                     fragment = newFragment
                     registerFragmentListeners(newFragment)
 
-                    // Apply forced toolbar visibility after the fragment view is attached.
-                    newFragment.view?.post { applyHideDefaultToolbar() } ?: applyHideDefaultToolbar()
+                    applyHideDefaultToolbar()
 
                     toolbarJSONString?.let { applyToolbarCustomization(it) }
                     showNavigationButtonInToolbar?.let { newFragment.setShowNavigationButtonInToolbar(it) }
@@ -444,14 +443,11 @@ class InstantPdfView @JvmOverloads constructor(
     }
 
     private fun applyHideDefaultToolbar() {
-        val toolbarView = fragment?.view?.findViewById<View>(R.id.pspdf__toolbar_main) ?: return
-        if (toolbarView is ReactMainToolbar) {
-            // Mirror PdfView.java: forcedVisibility overrides future updates.
-            toolbarView.setForcedVisibility(if (hideDefaultToolbar) View.GONE else null)
-            toolbarView.visibility = if (hideDefaultToolbar) View.GONE else View.VISIBLE
-        } else {
-            toolbarView.visibility = if (hideDefaultToolbar) View.GONE else View.VISIBLE
-        }
+        val uiFragment = fragment ?: return
+        // The veto lives on the fragment's toolbar coordinator and needs no view, but the
+        // coordinator's ViewModel can't be reached once the fragment has been removed.
+        if (!uiFragment.isAdded) return
+        MainToolbarSupport.setDefaultToolbarHidden(uiFragment, hideDefaultToolbar)
     }
 
     private fun applyToolbarCustomization(toolbarJSONString: String) {
@@ -492,7 +488,5 @@ class InstantPdfView @JvmOverloads constructor(
             customToolbarItems,
             menuListener
         )
-
-        fragmentOrNull.invalidateMenu()
     }
 }

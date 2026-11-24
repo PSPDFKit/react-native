@@ -51,6 +51,12 @@ const val MAX_ALPHA = "maximumAlpha"
 const val MIN_ALPHA = "minimumAlpha"
 const val MAX_THICKNESS = "maximumThickness"
 const val MIN_THICKNESS = "minimumThickness"
+/**
+ * Accepted and ignored, so existing configurations keep loading. Nutrient Android unified the two
+ * annotation-inspector color pickers into a single Compose picker and removed
+ * `setCustomColorPickerEnabled`, so there is no second picker to switch to. The JavaScript option is
+ * deprecated (https://linear.app/nutrient/issue/HYB-1089).
+ */
 const val CUSTOM_COLOR_PICKER_ENABLED = "customColorPickerEnabled"
 const val Z_INDEX_EDITING_ENABLED = "zIndexEditingEnabled"
 const val AGGREGATION_STRATEGY = "aggregationStrategy"
@@ -357,9 +363,7 @@ class AnnotationConfigurationAdaptor {
                     MIN_ALPHA -> builder.setMinAlpha(configuration.getDouble(key).toFloat())
                     MAX_THICKNESS -> builder.setMaxThickness(configuration.getDouble(key).toFloat())
                     MIN_THICKNESS -> builder.setMinThickness(configuration.getDouble(key).toFloat())
-                    CUSTOM_COLOR_PICKER_ENABLED -> builder.setCustomColorPickerEnabled(
-                        configuration.getBoolean(key)
-                    )
+                    CUSTOM_COLOR_PICKER_ENABLED -> {}
 
                     PREVIEW_ENABLED -> builder.setPreviewEnabled(configuration.getBoolean(key))
                     Z_INDEX_EDITING_ENABLED -> builder.setZIndexEditingEnabled(
@@ -411,9 +415,7 @@ class AnnotationConfigurationAdaptor {
                     MIN_ALPHA -> builder.setMinAlpha(configuration.getDouble(key).toFloat())
                     MAX_THICKNESS -> builder.setMaxThickness(configuration.getDouble(key).toFloat())
                     MIN_THICKNESS -> builder.setMinThickness(configuration.getDouble(key).toFloat())
-                    CUSTOM_COLOR_PICKER_ENABLED -> builder.setCustomColorPickerEnabled(
-                        configuration.getBoolean(key)
-                    )
+                    CUSTOM_COLOR_PICKER_ENABLED -> {}
 
                     PREVIEW_ENABLED -> builder.setPreviewEnabled(configuration.getBoolean(key))
                     Z_INDEX_EDITING_ENABLED -> builder.setZIndexEditingEnabled(
@@ -481,9 +483,7 @@ class AnnotationConfigurationAdaptor {
                     MIN_ALPHA -> builder.setMinAlpha(configuration.getDouble(key).toFloat())
                     MAX_THICKNESS -> builder.setMaxThickness(configuration.getDouble(key).toFloat())
                     MIN_THICKNESS -> builder.setMinThickness(configuration.getDouble(key).toFloat())
-                    CUSTOM_COLOR_PICKER_ENABLED -> builder.setCustomColorPickerEnabled(
-                        configuration.getBoolean(key)
-                    )
+                    CUSTOM_COLOR_PICKER_ENABLED -> {}
 
                     PREVIEW_ENABLED -> builder.setPreviewEnabled(configuration.getBoolean(key))
                     Z_INDEX_EDITING_ENABLED -> builder.setZIndexEditingEnabled(
@@ -572,11 +572,7 @@ class AnnotationConfigurationAdaptor {
                     MIN_ALPHA -> builder.setMinAlpha(configuration.getDouble(key).toFloat())
                     MAX_THICKNESS -> builder.setMaxThickness(configuration.getDouble(key).toFloat())
                     MIN_THICKNESS -> builder.setMinThickness(configuration.getDouble(key).toFloat())
-                    CUSTOM_COLOR_PICKER_ENABLED -> builder.setCustomColorPickerEnabled(
-                        configuration.getBoolean(
-                            key
-                        )
-                    )
+                    CUSTOM_COLOR_PICKER_ENABLED -> {}
 
                     Z_INDEX_EDITING_ENABLED -> builder.setZIndexEditingEnabled(
                         configuration.getBoolean(
@@ -633,11 +629,7 @@ class AnnotationConfigurationAdaptor {
 
                     MAX_ALPHA -> builder.setMaxAlpha(configuration.getDouble(key).toFloat())
                     MIN_ALPHA -> builder.setMinAlpha(configuration.getDouble(key).toFloat())
-                    CUSTOM_COLOR_PICKER_ENABLED -> builder.setCustomColorPickerEnabled(
-                        configuration.getBoolean(
-                            key
-                        )
-                    )
+                    CUSTOM_COLOR_PICKER_ENABLED -> {}
 
                     Z_INDEX_EDITING_ENABLED -> builder.setZIndexEditingEnabled(
                         configuration.getBoolean(
@@ -843,11 +835,7 @@ class AnnotationConfigurationAdaptor {
                         )
                     }
 
-                    CUSTOM_COLOR_PICKER_ENABLED -> builder.setCustomColorPickerEnabled(
-                        configuration.getBoolean(
-                            key
-                        )
-                    )
+                    CUSTOM_COLOR_PICKER_ENABLED -> {}
 
                     PREVIEW_ENABLED -> builder.setPreviewEnabled(configuration.getBoolean(key))
                     Z_INDEX_EDITING_ENABLED -> builder.setZIndexEditingEnabled(
@@ -892,11 +880,7 @@ class AnnotationConfigurationAdaptor {
                         builder.setAvailableColors(extractColors(colors.toArrayList().map { it as String }))
                     }
 
-                    CUSTOM_COLOR_PICKER_ENABLED -> builder.setCustomColorPickerEnabled(
-                        configuration.getBoolean(
-                            key
-                        )
-                    )
+                    CUSTOM_COLOR_PICKER_ENABLED -> {}
 
                     DEFAULT_ICON_NAME -> configuration.getString(
                         key
@@ -955,11 +939,7 @@ class AnnotationConfigurationAdaptor {
                         builder.setAvailableFillColors(extractColors(fillColors.toArrayList().map { it as String }))
                     }
 
-                    CUSTOM_COLOR_PICKER_ENABLED -> builder.setCustomColorPickerEnabled(
-                        configuration.getBoolean(
-                            key
-                        )
-                    )
+                    CUSTOM_COLOR_PICKER_ENABLED -> {}
 
                     DEFAULT_THICKNESS -> builder.setDefaultThickness(
                         configuration.getDouble(key).toFloat()
@@ -1054,11 +1034,7 @@ class AnnotationConfigurationAdaptor {
                         builder.setAvailableColors(extractColors(colors.toArrayList().map { it as String }))
                     }
 
-                    CUSTOM_COLOR_PICKER_ENABLED -> builder.setCustomColorPickerEnabled(
-                        configuration.getBoolean(
-                            key
-                        )
-                    )
+                    CUSTOM_COLOR_PICKER_ENABLED -> {}
 
                     DEFAULT_TEXT_SIZE -> builder.setDefaultTextSize(
                         configuration.getDouble(key).toFloat()
@@ -1151,11 +1127,7 @@ class AnnotationConfigurationAdaptor {
                     MIN_ALPHA -> builder.setMinAlpha(configuration.getDouble(key).toFloat())
                     MAX_THICKNESS -> builder.setMaxThickness(configuration.getDouble(key).toFloat())
                     MIN_THICKNESS -> builder.setMinThickness(configuration.getDouble(key).toFloat())
-                    CUSTOM_COLOR_PICKER_ENABLED -> builder.setCustomColorPickerEnabled(
-                        configuration.getBoolean(
-                            key
-                        )
-                    )
+                    CUSTOM_COLOR_PICKER_ENABLED -> {}
 
                     PREVIEW_ENABLED -> builder.setPreviewEnabled(configuration.getBoolean(key))
                     Z_INDEX_EDITING_ENABLED -> builder.setZIndexEditingEnabled(

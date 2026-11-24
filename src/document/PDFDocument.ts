@@ -72,7 +72,7 @@ export class PDFDocument {
       if (isNewArchitectureEnabled()) {
         return this.pdfViewRef;
       }
-      return findNodeHandle(this.pdfViewRef);
+      return findNodeHandle(this.pdfViewRef) ?? null;
     }
 
    /**
@@ -649,9 +649,13 @@ export class PDFDocument {
     * annotations[0].color = '#FF0000';
     * annotations[0].opacity = 0.5;
     * const result = await this.pdfRef.current?.getDocument().updateAnnotations(annotations);
-    * @returns { Promise<boolean> } A promise containing the result of the operation. An exception will be thrown if an error occurred.
+    * @returns { Promise<boolean> } A promise containing the result of the operation. It rejects if an error occurred, including when annotations are passed but none can be matched by ```uuid``` or ```name``` to an annotation in the document.
     */
-    updateAnnotations(annotations: Array<any> | Array<AnnotationType>): Promise<boolean> {
+    async updateAnnotations(annotations: Array<any> | Array<AnnotationType>): Promise<boolean> {
+      if (annotations.length === 0) {
+        return true; // Nothing to update
+      }
+
       // Extract only changed properties from each annotation
       const updatePayload = annotations.map((annotation: any) => {
         // Check if annotation has change tracking
@@ -680,7 +684,8 @@ export class PDFDocument {
       });
       
       if (updatePayload.length === 0) {
-        return Promise.resolve(true); // No changes to apply
+        // Same error the native modules reject with when nothing matches
+        throw Object.assign(new Error('No annotations found to update'), { code: 'updateAnnotations' });
       }
       
       return NativeModules.PDFDocumentManager.updateAnnotations(this.getRef(), updatePayload);
@@ -817,7 +822,9 @@ export class PDFDocument {
             if (nodeHandle == null) {
                 return Promise.reject(new Error('PDF view reference is not available'));
             }
-            const viewManagerConfig = UIManager.getViewManagerConfig('RCTPSPDFKitView');
+            // The Strict TypeScript API types the config as `Object`, the legacy types as `any`.
+            const viewManagerConfig = UIManager.getViewManagerConfig('RCTPSPDFKitView') as
+                { Commands?: { setPageIndex?: number } } | null | undefined;
             const command = viewManagerConfig?.Commands?.setPageIndex;
             if (command == null) {
                 return Promise.reject(new Error('setPageIndex command is not available'));

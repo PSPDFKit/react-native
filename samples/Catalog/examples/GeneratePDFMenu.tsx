@@ -2,15 +2,13 @@ import React, { useMemo } from 'react';
 import {
   FlatList,
   Image,
-  NativeModules,
   Text,
   TouchableHighlight,
   View,
 } from 'react-native';
 
 import { pspdfkitColor } from '../configuration/Constants';
-
-const Nutrient = NativeModules.Nutrient;
+import { Nutrient } from '../helpers/Nutrient';
 import { generatePDFMenu } from '../ExamplesNavigationMenu';
 import styles from '../styles/styles';
 

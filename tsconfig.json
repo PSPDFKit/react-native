@@ -8,6 +8,13 @@
         "skipLibCheck": true,
         "outDir": "./lib",
         "esModuleInterop": true,
+        // React Native 0.87+ publishes its types only through package.json `exports`,
+        // which the default (node10) resolution ignores. node16 reads `exports` and, as
+        // this package has no "type": "module", still emits CommonJS for consumers.
+        // The target stays the old default (ES5) so `lib/` doesn't change with it.
+        "module": "node16",
+        "moduleResolution": "node16",
+        "target": "es5",
         // Sources under src/ include .tsx components (NutrientOverlay). This is a
         // published library, so emit React.createElement calls rather than preserving
         // JSX: lib/ ships to consumers and must not depend on their bundler being
