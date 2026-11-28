@@ -660,9 +660,9 @@
     "@babel/helper-plugin-utils" "^7.27.1"
 
 "@babel/runtime@^7.25.0", "@babel/runtime@^7.29.6":
-  version "7.29.13"
-  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.29.13.tgz#6b33e456181ff15b5585d932f3aebfc0669b32dd"
-  integrity sha512-v+oN26xP4YIlQsbQ/CbTH1WG5m/l/DjKKZNy/Kp3f/AFvbgt7Em/D0FeMM3O2hX0YzeN2M16W8lOpyhIkfCBcQ==
+  version "7.29.14"
+  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.29.14.tgz#9ad0cc2addbbc8c46adaec9e90b21bb76d42b483"
+  integrity sha512-Y5tqevQaUAZhhj82BpYMNC1ssvLQTVAfwKdm8iy8qwmhvC2/CpcAu8OC+QEtjM7pMk7knx83u1Qj8gzkicyelw==
 
 "@babel/template@^7.25.0", "@babel/template@^7.28.6", "@babel/template@^7.29.7":
   version "7.29.7"
@@ -1475,9 +1475,9 @@
     "@sinonjs/commons" "^3.0.1"
 
 "@tsconfig/react-native@^3.0.0":
-  version "3.0.9"
-  resolved "https://registry.npmjs.org/@tsconfig/react-native/-/react-native-3.0.9.tgz"
-  integrity sha512-+PuvMuxb0OTHo/o04vEQI7LfUoiPH33pePvAH+qxf5ZPsRAVwtespj7LqysOTAYcsmRvjLPjik7V8pIcm84dEQ==
+  version "3.0.10"
+  resolved "https://registry.yarnpkg.com/@tsconfig/react-native/-/react-native-3.0.10.tgz#67f901e6890ef7ceb014b196c63f86596174dbf7"
+  integrity sha512-7vJ+Ow3L4s1GJJyX58fsBbGp+9yXeYVifUQqWDhCjaoO260zToHZK2YYGi62phYxnGUAuuLL5kxBpP8JUmD2Jg==
 
 "@tybys/wasm-util@^0.10.3":
   version "0.10.4"

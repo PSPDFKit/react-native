@@ -399,6 +399,10 @@ const isNA: boolean = isNewArchitectureEnabled();
 
     export type DocumentTappedPayload = {
       event: typeof DocumentEvent.TAPPED;
+      /**
+       * Tap location on `pageIndex`, in a platform-specific space. Android: PDF points,
+       * origin top-left. iOS: page view points, origin top-left.
+       */
       point: { x: number; y: number };
       pageIndex: number;
       documentID: string;
